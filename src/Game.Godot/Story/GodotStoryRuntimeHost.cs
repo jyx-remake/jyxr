@@ -212,6 +212,13 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost
 		return ValueTask.CompletedTask;
 	}
 
+	[StoryCommand("gamefin")]
+	private ValueTask ExecuteGameFinAsync()
+	{
+		UIRoot.Instance.ShowGameFinScreen();
+		return ValueTask.CompletedTask;
+	}
+
 	private static bool ParseToastSuppressed(string mode)
 	{
 		return mode.Trim() switch

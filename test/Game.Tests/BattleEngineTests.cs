@@ -1221,7 +1221,7 @@ public sealed class BattleEngineTests
                     BattleDamageContextField.TargetDefence,
                     ModifierOp.PostAdd,
                     0d,
-                    ValuePerUnitLevel: 10d),
+                    DeltaPerUnitLevel: 10d),
             ],
         };
 
