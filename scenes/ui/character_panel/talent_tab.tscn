@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://bcmomxyksiwp8"]
+
+[ext_resource type="Script" uid="uid://b8fpvahwvuuiv" path="res://src/Game.Godot/UI/Character/CharacterTalentTab.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/talent_box.tscn" id="2_talent_box"]
+
+[node name="TalentTab" type="Control" unique_id=368852546]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+TalentBoxScene = ExtResource("2_talent_box")
+
+[node name="PointLabel" type="Label" parent="." unique_id=1859793427]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = -20.0
+offset_right = 428.0
+offset_bottom = 51.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 60
+text = "武学常识 0/50"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1826043446]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 45.0
+offset_right = 1161.0
+offset_bottom = 495.0
+
+[node name="TalentContainer" type="VBoxContainer" parent="ScrollContainer" unique_id=105579076]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0

@@ -1,0 +1,123 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Skills/SkillBox.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="2_tooltip"]
+[ext_resource type="Texture2D" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_avatar"]
+[ext_resource type="Texture2D" path="res://assets/art/misc/btn-cross.png" id="4_check"]
+[ext_resource type="Texture2D" path="res://assets/art/misc/touxiangbiankuang.png" id="5_badge"]
+
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="LabelSettings" id="2"]
+font_size = 30
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="3"]
+font_size = 50
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="SkillBox" type="Control"]
+custom_minimum_size = Vector2(210, 210)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 210.0
+offset_bottom = 210.0
+script = ExtResource("1_script")
+TooltipScene = ExtResource("2_tooltip")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 34.0
+offset_right = 174.0
+offset_bottom = 173.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("1")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Avatar" type="TextureRect" parent="Panel/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("3_avatar")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="NameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 26.0
+offset_top = 135.0
+offset_right = 184.0
+offset_bottom = 210.0
+text = "降龙十八掌"
+label_settings = SubResource("2")
+horizontal_alignment = 1
+vertical_alignment = 2
+autowrap_mode = 3
+
+[node name="FormNameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 2.0
+offset_top = 166.0
+offset_right = 208.0
+offset_bottom = 208.0
+text = "亢龙有悔"
+label_settings = SubResource("2")
+horizontal_alignment = 1
+vertical_alignment = 2
+autowrap_mode = 3
+
+[node name="LevelLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 140.0
+offset_top = -8.0
+offset_right = 190.0
+offset_bottom = 52.0
+text = "20"
+label_settings = SubResource("3")
+horizontal_alignment = 1
+
+[node name="ActiveButton" type="TextureButton" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -1.0
+offset_top = -3.0
+offset_right = 79.0
+offset_bottom = 79.0
+mouse_filter = 0
+ignore_texture_size = true
+stretch_mode = 5
+texture_normal = ExtResource("5_badge")
+
+[node name="CheckMark" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 13.0
+offset_right = 78.0
+offset_bottom = 78.0
+mouse_filter = 2
+texture = ExtResource("4_check")
+expand_mode = 1
+stretch_mode = 5

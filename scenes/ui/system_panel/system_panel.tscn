@@ -1,0 +1,490 @@
+[gd_scene format=3 uid="uid://sdtyoj35nitl"]
+
+[ext_resource type="Script" uid="uid://dfeiaxmn5awtk" path="res://src/Game.Godot/UI/System/SystemPanel.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://5n52fg3sl8bk" path="res://assets/art/battle_bg/zhulin.jpg" id="2_background"]
+[ext_resource type="Texture2D" uid="uid://b1n3vntrjjyry" path="res://assets/art/ui/icon_main_menu.svg" id="3_quit_icon"]
+[ext_resource type="Texture2D" uid="uid://bbc8vj3vn1kxx" path="res://assets/art/ui/icon_load.svg" id="4_load_icon"]
+[ext_resource type="Texture2D" uid="uid://yw4d3sy6ibqr" path="res://assets/art/ui/icon_save.svg" id="5_save_icon"]
+[ext_resource type="Texture2D" uid="uid://bk4oxdt3ugto2" path="res://assets/art/ui/icon_delete.svg" id="6_delete_icon"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_transparent_normal"]
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_transparent_pressed"]
+bg_color = Color(0, 0, 0, 0.08)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_transparent_hover"]
+bg_color = Color(1, 1, 1, 0.04)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_quit"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.99, 0.95, 0.84)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.48, 0.24, 0.13, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0.28, 0.14, 0.08, 0.38)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_load"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.99, 0.95, 0.84)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.77, 0.52, 0.11, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0.44, 0.29, 0.07, 0.36)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_save"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.99, 0.95, 0.84)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.12, 0.47, 0.68, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0.05, 0.24, 0.38, 0.34)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_delete"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.99, 0.95, 0.84)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.68, 0.17, 0.14, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0.39, 0.09, 0.08, 0.34)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[node name="SystemPanel" type="Control" unique_id=1875352258]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1093288141]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=1532776401]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.18)
+
+[node name="BackButton" type="Button" parent="." unique_id=1680764813]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 90)
+layout_mode = 0
+offset_left = 1537.0
+offset_top = 114.0
+offset_right = 1817.0
+offset_bottom = 204.0
+text = "返回游戏"
+
+[node name="SettingsVBox" type="VBoxContainer" parent="." unique_id=1628029161]
+layout_mode = 0
+offset_left = 78.0
+offset_top = 489.0
+offset_right = 768.0
+offset_bottom = 1009.0
+size_flags_vertical = 3
+theme_override_constants/separation = 26
+
+[node name="ShowBattleHpCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=241839893]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+text = "战斗血条显示"
+
+[node name="AutoSaveCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=1547401015]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+button_pressed = true
+text = "自动存档"
+
+[node name="AutoBattleCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=1797562101]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+text = "自动战斗"
+
+[node name="MusicCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=485689480]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+button_pressed = true
+text = "音乐"
+
+[node name="SfxCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=2144269868]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+button_pressed = true
+text = "音效"
+
+[node name="SettingsSpacer" type="Control" parent="SettingsVBox" unique_id=86344426]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ConsoleVBox" type="VBoxContainer" parent="." unique_id=1398615551]
+layout_mode = 0
+offset_left = 78.0
+offset_top = 45.0
+offset_right = 1419.0
+offset_bottom = 307.0
+theme_override_constants/separation = 18
+
+[node name="ConsoleTitle" type="Label" parent="ConsoleVBox" unique_id=1313749824]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "命令行"
+
+[node name="InputRow" type="HBoxContainer" parent="ConsoleVBox" unique_id=1760579999]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ConsoleInput" type="LineEdit" parent="ConsoleVBox/InputRow" unique_id=1705413527]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "输入指令..."
+
+[node name="ExecuteButton" type="Button" parent="ConsoleVBox/InputRow" unique_id=681298942]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 84)
+layout_mode = 2
+text = "执行"
+
+[node name="ConsoleOutput" type="RichTextLabel" parent="ConsoleVBox" unique_id=1236216528]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 86)
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="ActionRow" type="Control" parent="." unique_id=1158134751]
+anchors_preset = 0
+offset_left = 922.0
+offset_top = 646.0
+offset_right = 1813.0
+offset_bottom = 1016.0
+
+[node name="QuitButton" type="Button" parent="ActionRow" unique_id=858266893]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 255)
+layout_mode = 0
+offset_left = 15.0
+offset_top = 53.0
+offset_right = 215.0
+offset_bottom = 308.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_transparent_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_transparent_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_transparent_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_transparent_hover")
+
+[node name="QuitLayout" type="MarginContainer" parent="ActionRow/QuitButton" unique_id=237040938]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="QuitVBox" type="VBoxContainer" parent="ActionRow/QuitButton/QuitLayout" unique_id=523837735]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="QuitCard" type="PanelContainer" parent="ActionRow/QuitButton/QuitLayout/QuitVBox" unique_id=1913598830]
+custom_minimum_size = Vector2(170, 140)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_action_quit")
+
+[node name="QuitIconMargin" type="MarginContainer" parent="ActionRow/QuitButton/QuitLayout/QuitVBox/QuitCard" unique_id=1423972117]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="QuitIcon" type="TextureRect" parent="ActionRow/QuitButton/QuitLayout/QuitVBox/QuitCard/QuitIconMargin" unique_id=563417098]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_quit_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QuitLabel" type="Label" parent="ActionRow/QuitButton/QuitLayout/QuitVBox" unique_id=1461312086]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.09, 0.07, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.95, 0.88, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 44
+text = "退出游戏"
+horizontal_alignment = 1
+
+[node name="LoadButton" type="Button" parent="ActionRow" unique_id=871097712]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 255)
+layout_mode = 0
+offset_left = 235.0
+offset_top = 53.0
+offset_right = 435.0
+offset_bottom = 308.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_transparent_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_transparent_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_transparent_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_transparent_hover")
+
+[node name="LoadLayout" type="MarginContainer" parent="ActionRow/LoadButton" unique_id=1896376769]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="LoadVBox" type="VBoxContainer" parent="ActionRow/LoadButton/LoadLayout" unique_id=2096411061]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="LoadCard" type="PanelContainer" parent="ActionRow/LoadButton/LoadLayout/LoadVBox" unique_id=1033242118]
+custom_minimum_size = Vector2(170, 140)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_action_load")
+
+[node name="LoadIconMargin" type="MarginContainer" parent="ActionRow/LoadButton/LoadLayout/LoadVBox/LoadCard" unique_id=1128810166]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="LoadIcon" type="TextureRect" parent="ActionRow/LoadButton/LoadLayout/LoadVBox/LoadCard/LoadIconMargin" unique_id=486916272]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_load_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LoadLabel" type="Label" parent="ActionRow/LoadButton/LoadLayout/LoadVBox" unique_id=1905543615]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.09, 0.07, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.95, 0.88, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 44
+text = "读档"
+horizontal_alignment = 1
+
+[node name="SaveButton" type="Button" parent="ActionRow" unique_id=298006004]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 255)
+layout_mode = 0
+offset_left = 455.0
+offset_top = 53.0
+offset_right = 655.0
+offset_bottom = 308.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_transparent_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_transparent_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_transparent_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_transparent_hover")
+
+[node name="SaveLayout" type="MarginContainer" parent="ActionRow/SaveButton" unique_id=1931887834]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="SaveVBox" type="VBoxContainer" parent="ActionRow/SaveButton/SaveLayout" unique_id=882930059]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="SaveCard" type="PanelContainer" parent="ActionRow/SaveButton/SaveLayout/SaveVBox" unique_id=1653543648]
+custom_minimum_size = Vector2(170, 140)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_action_save")
+
+[node name="SaveIconMargin" type="MarginContainer" parent="ActionRow/SaveButton/SaveLayout/SaveVBox/SaveCard" unique_id=1606717553]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SaveIcon" type="TextureRect" parent="ActionRow/SaveButton/SaveLayout/SaveVBox/SaveCard/SaveIconMargin" unique_id=1802449772]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("5_save_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SaveLabel" type="Label" parent="ActionRow/SaveButton/SaveLayout/SaveVBox" unique_id=107280820]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.09, 0.07, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.95, 0.88, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 44
+text = "存档"
+horizontal_alignment = 1
+
+[node name="DeleteSaveButton" type="Button" parent="ActionRow" unique_id=208159084]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 255)
+layout_mode = 0
+offset_left = 675.0
+offset_top = 53.0
+offset_right = 875.0
+offset_bottom = 308.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_transparent_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_transparent_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_transparent_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_transparent_hover")
+
+[node name="DeleteLayout" type="MarginContainer" parent="ActionRow/DeleteSaveButton" unique_id=1478004255]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="DeleteVBox" type="VBoxContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout" unique_id=701538260]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DeleteCard" type="PanelContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox" unique_id=1058307990]
+custom_minimum_size = Vector2(170, 140)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_action_delete")
+
+[node name="DeleteIconMargin" type="MarginContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox/DeleteCard" unique_id=598491738]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="DeleteIcon" type="TextureRect" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox/DeleteCard/DeleteIconMargin" unique_id=955616295]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_delete_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DeleteLabel" type="Label" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox" unique_id=588494603]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.09, 0.07, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.95, 0.88, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 44
+text = "删档"
+horizontal_alignment = 1

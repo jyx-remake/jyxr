@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://klid4fbotbmo"]
+
+[ext_resource type="Script" uid="uid://c0w3sxw2gkhan" path="res://src/Game.Godot/UI/Shop/ShopItemBox.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b173d0wt20k3t" path="res://assets/art/misc/biankuang.png" id="2_frame"]
+[ext_resource type="Texture2D" uid="uid://hhslflvjkysr" path="res://assets/art/misc/dise.png" id="3_mask"]
+[ext_resource type="Texture2D" uid="uid://c6tnvcjup3en1" path="res://assets/art/item/baoguo.png" id="4_placeholder"]
+[ext_resource type="LabelSettings" uid="uid://bq4vwt6mmhytg" path="res://assets/theme/item_name.tres" id="5_label"]
+[ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/inventory_item_tooltip.tscn" id="6_tooltip"]
+
+[sub_resource type="StyleBoxFlat" id="1_price_bg"]
+bg_color = Color(0, 0, 0, 0.52)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="ShopItemBox" type="TextureButton" unique_id=1569050527]
+custom_minimum_size = Vector2(180, 218)
+offset_right = 180.0
+offset_bottom = 218.0
+ignore_texture_size = true
+stretch_mode = 4
+script = ExtResource("1_script")
+TooltipScene = ExtResource("6_tooltip")
+
+[node name="Frame" type="TextureRect" parent="." unique_id=812930353]
+layout_mode = 0
+offset_right = 180.0
+offset_bottom = 180.0
+mouse_filter = 2
+texture = ExtResource("2_frame")
+expand_mode = 1
+
+[node name="Mask" type="TextureRect" parent="." unique_id=1474884932]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 150.0
+offset_bottom = 150.0
+mouse_filter = 2
+texture = ExtResource("3_mask")
+expand_mode = 1
+
+[node name="Avatar" type="TextureRect" parent="." unique_id=1664133321]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 24.0
+offset_right = 153.0
+offset_bottom = 155.0
+mouse_filter = 2
+texture = ExtResource("4_placeholder")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="NameLabel" type="Label" parent="." unique_id=1461701637]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -31.0
+offset_top = 131.0
+offset_right = 209.0
+offset_bottom = 189.0
+text = "物品"
+label_settings = ExtResource("5_label")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+justification_flags = 161
+
+[node name="PricePanel" type="Panel" parent="." unique_id=1092569358]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 180.0
+offset_right = 174.0
+offset_bottom = 216.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("1_price_bg")
+
+[node name="PriceLabel" type="Label" parent="PricePanel" unique_id=374273410]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.32, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 25
+text = "银两 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LimitLabel" type="Label" parent="." unique_id=1904779906]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 104.0
+offset_top = 8.0
+offset_right = 176.0
+offset_bottom = 40.0
+theme_override_colors/font_color = Color(0.9843137, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 25
+horizontal_alignment = 2

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://d1qdddofh12io"]
+
+[ext_resource type="Script" uid="uid://duemfd5pub805" path="res://src/Game.Godot/UI/Battle/BattleBoardView.cs" id="1_board_view"]
+[ext_resource type="PackedScene" uid="uid://yd52w6eba8oa" path="res://scenes/ui/battle/battle_unit_view.tscn" id="2_unit_view"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_skill_view.tscn" id="3_skill_view"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_float_text.tscn" id="4_float_text"]
+
+[node name="BattleBoardView" type="Control" unique_id=885128343]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_board_view")
+BattleUnitViewScene = ExtResource("2_unit_view")
+BattleSkillViewScene = ExtResource("3_skill_view")
+BattleFloatTextScene = ExtResource("4_float_text")
+
+[node name="CombatantLayer" type="Node2D" parent="." unique_id=1494257021]
+unique_name_in_owner = true
+z_index = 10
+y_sort_enabled = true
+
+[node name="EffectLayer" type="Node2D" parent="." unique_id=1436925693]
+unique_name_in_owner = true
+z_index = 20
+y_sort_enabled = true

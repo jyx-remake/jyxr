@@ -1,0 +1,150 @@
+[gd_scene format=3 uid="uid://b2mjgxqlxtul1"]
+
+[ext_resource type="Script" uid="uid://bwmdjjw6hl1ew" path="res://src/Game.Godot/UI/Party/PartyCharacterBox.cs" id="1_npk1i"]
+[ext_resource type="Texture2D" uid="uid://b173d0wt20k3t" path="res://assets/art/misc/biankuang.png" id="2_frame"]
+[ext_resource type="Texture2D" uid="uid://hhslflvjkysr" path="res://assets/art/misc/dise.png" id="3_mask"]
+[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="4_avatar"]
+[ext_resource type="LabelSettings" uid="uid://m7pdfcciwdqj" path="res://assets/theme/label_team_object.tres" id="5_label"]
+[ext_resource type="Texture2D" uid="uid://ciw3akdmn0c3n" path="res://assets/art/ui/ying.png" id="6_male"]
+[ext_resource type="Texture2D" uid="uid://dh7d5aiq7fgql" path="res://assets/art/ui/hudie.png" id="7_female"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[node name="PartyCharacterBox" type="Button" unique_id=1085331682]
+custom_minimum_size = Vector2(280, 280)
+offset_right = 280.0
+offset_bottom = 280.0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+flat = true
+script = ExtResource("1_npk1i")
+
+[node name="Content" type="Control" parent="." unique_id=1065774651]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Frame" type="TextureRect" parent="Content" unique_id=183630472]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 3.0
+offset_right = 286.0
+offset_bottom = 283.0
+texture = ExtResource("2_frame")
+expand_mode = 1
+
+[node name="Mask" type="TextureRect" parent="Content" unique_id=187769451]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 47.0
+offset_right = 236.0
+offset_bottom = 235.0
+scale = Vector2(1.02, 1.02)
+mouse_filter = 2
+texture = ExtResource("3_mask")
+expand_mode = 1
+
+[node name="Avatar" type="TextureRect" parent="Content" unique_id=450953964]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 38.0
+offset_top = 29.0
+offset_right = 251.0
+offset_bottom = 242.0
+mouse_filter = 2
+texture = ExtResource("4_avatar")
+expand_mode = 1
+
+[node name="NameLabel" type="Label" parent="Content" unique_id=705201754]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 208.0
+offset_top = 59.0
+offset_right = 261.0
+offset_bottom = 273.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 20
+theme_override_font_sizes/font_size = 45
+text = "小虾米"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+justification_flags = 161
+
+[node name="Stats" type="VBoxContainer" parent="Content" unique_id=1485521689]
+layout_mode = 0
+offset_top = 4.0
+offset_right = 113.0
+offset_bottom = 112.0
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="LevelLabel" type="Label" parent="Content/Stats" unique_id=1831536436]
+unique_name_in_owner = true
+layout_mode = 2
+text = "等级:30"
+label_settings = ExtResource("5_label")
+
+[node name="AttackLabel" type="Label" parent="Content/Stats" unique_id=1804223596]
+unique_name_in_owner = true
+layout_mode = 2
+text = "攻:500"
+label_settings = ExtResource("5_label")
+
+[node name="DefenceLabel" type="Label" parent="Content/Stats" unique_id=1783053157]
+unique_name_in_owner = true
+layout_mode = 2
+text = "防:1000"
+label_settings = ExtResource("5_label")
+
+[node name="MaleLogo" type="TextureRect" parent="Content" unique_id=280261015]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 203.0
+offset_top = 4.0
+offset_right = 299.0
+offset_bottom = 100.0
+mouse_filter = 2
+texture = ExtResource("6_male")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FemaleLogo" type="TextureRect" parent="Content" unique_id=1417750693]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 203.0
+offset_top = 4.0
+offset_right = 299.0
+offset_bottom = 100.0
+mouse_filter = 2
+texture = ExtResource("7_female")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LockLabel" type="Label" parent="Content" unique_id=1579312415]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 12.0
+offset_top = 240.0
+offset_right = 124.0
+offset_bottom = 269.0
+theme_override_colors/font_color = Color(1, 0.92549, 0.647059, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 18
+text = "主角锁定"
+
+[node name="DragHighlight" type="ColorRect" parent="Content" unique_id=1991012401]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_right = 280.0
+offset_bottom = 280.0
+mouse_filter = 2
+color = Color(1, 0.9137255, 0.35686275, 0.18039216)

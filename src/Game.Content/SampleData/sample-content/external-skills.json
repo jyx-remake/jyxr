@@ -1,0 +1,163 @@
+[
+  {
+    "id": "basic_attack",
+    "name": "Basic Attack",
+    "description": "",
+    "icon": "",
+    "type": "quanzhang",
+    "isHarmony": false,
+    "affinity": 0,
+    "hard": 1,
+    "cooldown": 0,
+    "cost": {
+      "mp": 0,
+      "rage": 0
+    },
+    "powerBase": 0,
+    "powerStep": 0,
+    "audio": "",
+    "animation": "",
+    "buffs": [],
+    "levelOverrides": [],
+    "formSkills": [],
+    "affixes": []
+  },
+  {
+    "id": "staff_bolt",
+    "name": "Staff Bolt",
+    "description": "",
+    "icon": "",
+    "type": "qimen",
+    "isHarmony": false,
+    "affinity": 0,
+    "hard": 1,
+    "cooldown": 0,
+    "cost": {
+      "mp": 0,
+      "rage": 0
+    },
+    "powerBase": 0,
+    "powerStep": 0,
+    "audio": "",
+    "animation": "",
+    "buffs": [],
+    "levelOverrides": [],
+    "formSkills": [],
+    "affixes": []
+  },
+  {
+    "id": "fireball",
+    "name": "Fireball",
+    "description": "",
+    "icon": "",
+    "type": "qimen",
+    "isHarmony": false,
+    "affinity": 0,
+    "hard": 1,
+    "cooldown": 2,
+    "cost": {
+      "mp": 10,
+      "rage": 0
+    },
+    "powerBase": 0,
+    "powerStep": 0,
+    "audio": "",
+    "animation": "",
+    "buffs": [],
+    "levelOverrides": [],
+    "formSkills": [],
+    "affixes": []
+  },
+  {
+    "id": "guard_shout",
+    "name": "Guard Shout",
+    "description": "",
+    "icon": "",
+    "type": "quanzhang",
+    "isHarmony": false,
+    "affinity": 0,
+    "hard": 1,
+    "cooldown": 1,
+    "cost": {
+      "mp": 0,
+      "rage": 20
+    },
+    "powerBase": 0,
+    "powerStep": 0,
+    "audio": "",
+    "animation": "",
+    "buffs": [],
+    "levelOverrides": [],
+    "formSkills": [],
+    "affixes": []
+  },
+  {
+    "id": "minor_heal",
+    "name": "Minor Heal",
+    "description": "",
+    "icon": "",
+    "type": "qimen",
+    "isHarmony": false,
+    "affinity": 0,
+    "hard": 1,
+    "cooldown": 1,
+    "cost": {
+      "mp": 8,
+      "rage": 0
+    },
+    "powerBase": 0,
+    "powerStep": 0,
+    "audio": "",
+    "animation": "",
+    "buffs": [],
+    "levelOverrides": [],
+    "formSkills": [],
+    "affixes": []
+  },
+  {
+    "id": "smite",
+    "name": "Smite",
+    "description": "",
+    "icon": "",
+    "type": "qimen",
+    "isHarmony": false,
+    "affinity": 0,
+    "hard": 1,
+    "cooldown": 0,
+    "cost": {
+      "mp": 4,
+      "rage": 0
+    },
+    "powerBase": 0,
+    "powerStep": 0,
+    "audio": "",
+    "animation": "",
+    "buffs": [],
+    "levelOverrides": [],
+    "formSkills": [],
+    "affixes": []
+  },
+  {
+    "id": "rending_blow",
+    "name": "Rending Blow",
+    "description": "",
+    "icon": "",
+    "type": "daofa",
+    "isHarmony": false,
+    "affinity": 0,
+    "hard": 1,
+    "cooldown": 1,
+    "cost": {
+      "mp": 0,
+      "rage": 15
+    },
+    "powerBase": 0,
+    "powerStep": 0,
+    "audio": "",
+    "animation": "",
+    "buffs": [],
+    "levelOverrides": [],
+    "formSkills": [],
+    "affixes": []
+  }
+]

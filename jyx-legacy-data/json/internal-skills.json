@@ -1,0 +1,3611 @@
+[
+  {
+    "id": "基本内功",
+    "name": "基本内功",
+    "description": "天下内功的根基",
+    "icon": "icon_neigong_001",
+    "hard": 1.0,
+    "yin": 25,
+    "yang": 25,
+    "attackScale": 0.15,
+    "criticalScale": 0.15,
+    "defenceScale": 0.15,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 8
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "bili",
+          "value": {
+            "op": "add",
+            "delta": 8
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "shenfa",
+          "value": {
+            "op": "add",
+            "delta": 8
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "wuxing",
+          "value": {
+            "op": "add",
+            "delta": 8
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "dingli",
+          "value": {
+            "op": "add",
+            "delta": 8
+          }
+        },
+        "minimumLevel": 17
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "fuyuan",
+          "value": {
+            "op": "add",
+            "delta": 8
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "血刀心法",
+    "name": "血刀心法",
+    "description": "血刀门的入门心法，只重攻不重防",
+    "icon": "icon_neigong_002",
+    "hard": 2.0,
+    "yin": 50,
+    "yang": 50,
+    "attackScale": 0.5,
+    "criticalScale": 0.0,
+    "defenceScale": 0.0,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "血刀大法",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "血刀大法",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "血海魔功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "全真心法",
+    "name": "全真心法",
+    "description": "全真派的内功心法",
+    "icon": "icon_neigong_003",
+    "hard": 2.0,
+    "yin": 40,
+    "yang": 40,
+    "attackScale": 0.3,
+    "criticalScale": 0.2,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "先天功",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "九阴神功",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "accuracy",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 20
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_mult",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "天山心法",
+    "name": "天山心法",
+    "description": "灵鹫宫的内功心法，据说藏着很大秘密",
+    "icon": "icon_neigong_004",
+    "hard": 2.0,
+    "yin": 45,
+    "yang": 45,
+    "attackScale": 0.3,
+    "criticalScale": 0.2,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "北冥神功",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "八荒六合唯我独尊功",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "逍遥绝学.生死符",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "逍遥绝学.生死符",
+          "value": {
+            "op": "add",
+            "delta": 0.06
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "八荒六合唯我独尊功",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "武当心法",
+    "name": "武当心法",
+    "description": "武当派的内功心法",
+    "icon": "icon_neigong_005",
+    "hard": 2.0,
+    "yin": 40,
+    "yang": 40,
+    "attackScale": 0.2,
+    "criticalScale": 0.2,
+    "defenceScale": 0.4,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "太极神功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "纯阳无极功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "青城内功",
+    "name": "青城内功",
+    "description": "青城内功青山重重",
+    "icon": "icon_neigong_006",
+    "hard": 2.0,
+    "yin": 40,
+    "yang": 40,
+    "attackScale": 0.2,
+    "criticalScale": 0.4,
+    "defenceScale": 0.4,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "青城剑法",
+          "value": {
+            "op": "add",
+            "delta": 0.5
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "摧心掌",
+          "value": {
+            "op": "add",
+            "delta": 0.5
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "青城剑法",
+          "value": {
+            "op": "add",
+            "delta": 0.7
+          }
+        },
+        "minimumLevel": 20
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "摧心掌",
+          "value": {
+            "op": "add",
+            "delta": 0.7
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "星宿心法",
+    "name": "星宿心法",
+    "description": "星宿派的入门内功",
+    "icon": "icon_neigong_006",
+    "hard": 2.0,
+    "yin": 50,
+    "yang": -10,
+    "attackScale": 0.2,
+    "criticalScale": 0.4,
+    "defenceScale": 0.4,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "抽髓掌",
+          "value": {
+            "op": "add",
+            "delta": 0.5
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "三阴蜈蚣爪",
+          "value": {
+            "op": "add",
+            "delta": 0.5
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "抽髓掌",
+          "value": {
+            "op": "add",
+            "delta": 0.7
+          }
+        },
+        "minimumLevel": 20
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "三阴蜈蚣爪",
+          "value": {
+            "op": "add",
+            "delta": 0.7
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "石梁心法",
+    "name": "石梁心法",
+    "description": "石梁派心法",
+    "icon": "icon_neigong_007",
+    "hard": 2.0,
+    "yin": 40,
+    "yang": 40,
+    "attackScale": 0.5,
+    "criticalScale": 0.3,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "少林心法",
+    "name": "少林心法",
+    "description": "少林派早课",
+    "icon": "icon_neigong_008",
+    "hard": 2.0,
+    "yin": -30,
+    "yang": 60,
+    "attackScale": 0.3,
+    "criticalScale": 0.0,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "少林九阳功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "九阳神功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "易筋经",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "段氏心法",
+    "name": "段氏心法",
+    "description": "大理段氏的内功心法",
+    "icon": "icon_neigong_009",
+    "hard": 3.0,
+    "yin": 0,
+    "yang": 50,
+    "attackScale": 0.3,
+    "criticalScale": 0.2,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "奋战"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "一阳指",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "六脉神剑",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "大理世家"
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "紫霞神功",
+    "name": "紫霞神功",
+    "description": "华山派心法",
+    "icon": "icon_neigong_010",
+    "hard": 3.0,
+    "yin": 0,
+    "yang": 50,
+    "attackScale": 0.3,
+    "criticalScale": 0.2,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "奋战"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "华山一剑",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "华山一剑",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 20
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "化功大法",
+    "name": "化功大法",
+    "description": "星宿老仙丁春秋为武林所不齿的内功绝技",
+    "icon": "icon_neigong_011",
+    "hard": 4.0,
+    "yin": 50,
+    "yang": 0,
+    "attackScale": 0.2,
+    "criticalScale": 0.2,
+    "defenceScale": 0.2,
+    "formSkills": [
+      {
+        "id": "化功大法.腐尸毒",
+        "name": "化功大法.腐尸毒",
+        "description": "用自身带毒的内力散去敌方内功",
+        "cooldown": 4,
+        "cost": {
+          "rage": 2
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 1,
+          "impactType": "fan",
+          "impactSize": 3
+        },
+        "powerExtra": 4.0,
+        "animation": "ball_purple",
+        "audio": "音效.暗器2",
+        "unlockLevel": 5,
+        "buffs": [
+          {
+            "id": "中毒",
+            "level": 4,
+            "duration": 2,
+            "chance": 100
+          },
+          {
+            "id": "内伤",
+            "level": 10,
+            "duration": 2,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "毒系精通"
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 15
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "抽髓掌",
+          "value": {
+            "op": "add",
+            "delta": 0.3
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "三阴蜈蚣爪",
+          "value": {
+            "op": "add",
+            "delta": 0.3
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "化功大法"
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "天山剑法决",
+    "name": "天山剑法决",
+    "description": "天山大侠配合天山剑法所打造的独家内功",
+    "icon": "icon_neigong_012",
+    "hard": 4.0,
+    "yin": 45,
+    "yang": 45,
+    "attackScale": 0.3,
+    "criticalScale": 0.2,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "天山剑法",
+          "value": {
+            "op": "add",
+            "delta": 0.8
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "shenfa",
+          "value": {
+            "op": "add",
+            "delta": 15
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "dingli",
+          "value": {
+            "op": "add",
+            "delta": 20
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "少林九阳功",
+    "name": "少林九阳功",
+    "description": "九阳神功在少林的分枝",
+    "icon": "icon_neigong_013",
+    "hard": 5.0,
+    "yin": -30,
+    "yang": 50,
+    "attackScale": 0.4,
+    "criticalScale": 0.0,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "拳掌封印"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "九阳神功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "易筋经",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "武当九阳功",
+    "name": "武当九阳功",
+    "description": "九阳神功在武当派的分枝",
+    "icon": "icon_neigong_014",
+    "hard": 5.0,
+    "yin": 45,
+    "yang": 45,
+    "attackScale": 0.4,
+    "criticalScale": 0.0,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "剑封印"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "九阳神功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "纯阳无极功",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "峨眉九阳功",
+    "name": "峨眉九阳功",
+    "description": "九阳神功在峨眉的分枝",
+    "icon": "icon_neigong_015",
+    "hard": 5.0,
+    "yin": -5,
+    "yang": 50,
+    "attackScale": 0.4,
+    "criticalScale": 0.25,
+    "defenceScale": 0.3,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "刀封印"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "九阳神功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.08
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "玉女心经",
+    "name": "玉女心经",
+    "description": "古墓派高级内功",
+    "icon": "icon_neigong_016",
+    "hard": 6.0,
+    "yin": 50,
+    "yang": 30,
+    "attackScale": 0.3,
+    "criticalScale": 0.2,
+    "defenceScale": 0.2,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "清心"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 11
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "清心"
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "玉女素心剑",
+          "value": {
+            "op": "add",
+            "delta": 0.2
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "罗汉伏魔功",
+    "name": "罗汉伏魔功",
+    "description": "集佛家内功之大成，深奥精微",
+    "icon": "icon_neigong_017",
+    "hard": 6.0,
+    "yin": 0,
+    "yang": 60,
+    "attackScale": 0.2,
+    "criticalScale": 0.1,
+    "defenceScale": 1.0,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "真气护体"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "怒不可遏"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "太玄神功",
+          "value": {
+            "op": "add",
+            "delta": 0.06
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 20
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "太玄神功奥义式",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "太玄神功奥义式",
+          "value": {
+            "op": "add",
+            "delta": 0.04
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "太玄神功",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "蛤蟆功",
+    "name": "蛤蟆功",
+    "description": "西毒欧阳锋的独创内功，“呱呱”",
+    "icon": "icon_neigong_018",
+    "hard": 6.0,
+    "yin": 70,
+    "yang": 0,
+    "attackScale": 0.65,
+    "criticalScale": 0.3,
+    "defenceScale": 0.4,
+    "formSkills": [
+      {
+        "id": "蛤蟆功.癞蛤蟆蹬地",
+        "name": "蛤蟆功.癞蛤蟆蹬地",
+        "description": "趴在地上，呱呱",
+        "cooldown": 3,
+        "cost": {
+          "rage": 2
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 1,
+          "impactType": "fan",
+          "impactSize": 3
+        },
+        "powerExtra": 1.0,
+        "animation": "longjuanfeng2",
+        "audio": "音效.蛤蟆叫",
+        "unlockLevel": 5,
+        "buffs": [
+          {
+            "id": "内伤",
+            "level": 5,
+            "duration": 3,
+            "chance": 100
+          },
+          {
+            "id": "中毒",
+            "level": 5,
+            "duration": 5,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "灵蛇拳",
+          "value": {
+            "op": "add",
+            "delta": 0.8
+          }
+        },
+        "minimumLevel": 18
+      }
+    ]
+  },
+  {
+    "id": "小无相功",
+    "name": "小无相功",
+    "description": "无相，即没脸，不要脸的功夫……",
+    "icon": "icon_neigong_019",
+    "hard": 6.0,
+    "yin": 55,
+    "yang": 55,
+    "attackScale": 0.6,
+    "criticalScale": 0.4,
+    "defenceScale": 0.6,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "斗魂"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "fuyuan",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "fuyuan",
+          "value": {
+            "op": "add",
+            "delta": 10
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "龙象般若功",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "太极神功",
+    "name": "太极神功",
+    "description": "张三丰所悟的太极心法",
+    "icon": "icon_neigong_020",
+    "hard": 7.0,
+    "yin": 60,
+    "yang": 60,
+    "attackScale": 0.4,
+    "criticalScale": 0.3,
+    "defenceScale": 0.4,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "太极高手"
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "太极拳",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "太极剑",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "纯阳无极功",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "北冥神功",
+    "name": "北冥神功",
+    "description": "逍遥派心法宝典，能够吸取内力",
+    "icon": "icon_neigong_021",
+    "hard": 7.0,
+    "yin": 40,
+    "yang": 40,
+    "attackScale": 0.35,
+    "criticalScale": 0.15,
+    "defenceScale": 0.4,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "北冥神功"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "鲲跃北溟"
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "控鹤功",
+    "name": "控鹤功",
+    "description": "谢烟客的心法",
+    "icon": "icon_neigong_022",
+    "hard": 7.0,
+    "yin": 70,
+    "yang": 40,
+    "attackScale": 0.85,
+    "criticalScale": 0.6,
+    "defenceScale": 0.4,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_mult",
+          "value": {
+            "op": "add",
+            "delta": 0.2
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "无妄神功",
+    "name": "无妄神功",
+    "description": "依“无妄”卦象所创内功，讲求“天雷无妄，无妄而得，必有所失，必有所得”",
+    "icon": "icon_neigong_023",
+    "hard": 7.0,
+    "yin": 60,
+    "yang": 60,
+    "attackScale": 0.6,
+    "criticalScale": 0.3,
+    "defenceScale": 0.6,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "破甲"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "真气护体"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "金钟罩"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.25
+          }
+        },
+        "minimumLevel": 15
+      }
+    ]
+  },
+  {
+    "id": "太玄神功",
+    "name": "太玄神功",
+    "description": "侠客岛石壁上记载的神奇无上内功",
+    "icon": "icon_neigong_024",
+    "hard": 7.0,
+    "yin": 80,
+    "yang": 80,
+    "attackScale": 0.7,
+    "criticalScale": 0.1,
+    "defenceScale": 0.65,
+    "formSkills": [
+      {
+        "id": "太玄神功.太玄真气",
+        "name": "太玄神功.太玄真气",
+        "description": "侠客岛石壁上记载的神奇无上内功",
+        "cooldown": 3,
+        "cost": {
+          "rage": 3
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 4,
+          "impactType": "square",
+          "impactSize": 4
+        },
+        "powerExtra": 4.0,
+        "animation": "fo",
+        "audio": "音效.内功攻击1",
+        "unlockLevel": 5,
+        "buffs": [
+          {
+            "id": "重伤",
+            "level": 3,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "真气护体"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "百穴归一"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "attack",
+          "value": {
+            "op": "add",
+            "delta": 100
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_chance",
+          "value": {
+            "op": "add",
+            "delta": 0.2
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "吴钩霜雪"
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "血海魔功",
+    "name": "血海魔功",
+    "description": "血刀门神秘的邪恶内功",
+    "icon": "icon_neigong_025",
+    "hard": 7.0,
+    "yin": 90,
+    "yang": 90,
+    "attackScale": 1.0,
+    "criticalScale": 0.2,
+    "defenceScale": 0.0,
+    "formSkills": [
+      {
+        "id": "血海魔功.血魔刀",
+        "name": "血海魔功.血魔刀",
+        "description": "血刀门神秘的邪恶内功",
+        "cooldown": 2,
+        "cost": {
+          "rage": 2
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 2,
+          "impactType": "plus",
+          "impactSize": 3
+        },
+        "powerExtra": 4.0,
+        "animation": "anranxiaohunzhang",
+        "audio": "音效.内功攻击1",
+        "unlockLevel": 5,
+        "buffs": [
+          {
+            "id": "内伤",
+            "level": 3,
+            "duration": 3,
+            "chance": 100
+          },
+          {
+            "id": "魔神降临",
+            "level": 2,
+            "duration": 2,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "血海魔功"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "血刀大法",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "lifesteal",
+          "value": {
+            "op": "add",
+            "delta": 0.25
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "血刀大法",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "血刀大法奥义.血海无边",
+          "value": {
+            "op": "add",
+            "delta": 0.37
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "血刀大法奥义.血海无边",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_mult",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 19
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "魔神降临"
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "混元功",
+    "name": "混元功",
+    "description": "华山派由内而外的内功，需配合混元掌使用。",
+    "icon": "icon_neigong_026",
+    "hard": 7.0,
+    "yin": 40,
+    "yang": 40,
+    "attackScale": 0.5,
+    "criticalScale": 0.1,
+    "defenceScale": 0.5,
+    "formSkills": [
+      {
+        "id": "混元功.混元一气",
+        "name": "混元功.混元一气",
+        "description": "混元一气,浑身坚逾精钢",
+        "cooldown": 3,
+        "cost": {
+          "rage": 4
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 3,
+          "impactType": "square",
+          "impactSize": 4
+        },
+        "powerExtra": 2.5,
+        "animation": "huozhu_hong",
+        "audio": "音效.内功攻击2",
+        "unlockLevel": 10,
+        "buffs": [
+          {
+            "id": "内伤",
+            "level": 8,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "拳掌封印"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "混元掌",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "混元掌",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "混元掌",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "混元掌奥义.劈石破玉拳",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "混元掌奥义.劈石破玉拳",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "混元掌奥义.劈石破玉拳",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "寒冰真气",
+    "name": "寒冰真气",
+    "description": "嵩山派掌门左冷禅的独门内功",
+    "icon": "icon_neigong_027",
+    "hard": 7.0,
+    "yin": 70,
+    "yang": -70,
+    "attackScale": 0.5,
+    "criticalScale": 0.1,
+    "defenceScale": 0.5,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "拳掌封印"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "寒冰真气"
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "寒冰真气",
+          "value": {
+            "op": "add",
+            "delta": 0.4
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "日月心经",
+    "name": "日月心经",
+    "description": "日月神教代代相传的心法",
+    "icon": "icon_neigong_028",
+    "hard": 7.0,
+    "yin": 70,
+    "yang": 70,
+    "attackScale": 0.6,
+    "criticalScale": 0.3,
+    "defenceScale": 0.6,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "拳掌封印"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 15
+      }
+    ]
+  },
+  {
+    "id": "八荒六合唯我独尊功",
+    "name": "八荒六合唯我独尊功",
+    "description": "易经归藏，天地至理，八荒六合，唯我独尊",
+    "icon": "icon_neigong_029",
+    "hard": 8.0,
+    "yin": 75,
+    "yang": 75,
+    "attackScale": 0.8,
+    "criticalScale": 0.3,
+    "defenceScale": 0.6,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "不老长春"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "金钟罩"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "grant_model",
+          "modelId": "guoxiang",
+          "priority": 0,
+          "description": "化身为天山童姥"
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "天山折梅手",
+          "value": {
+            "op": "add",
+            "delta": 0.25
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "灵鹫宫绝学.天地唯我独尊",
+          "value": {
+            "op": "add",
+            "delta": 0.25
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "灵鹫宫绝学.天地唯我独尊",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "灵鹫宫绝学.天地唯我独尊",
+          "value": {
+            "op": "add",
+            "delta": 0.25
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "灵鹫宫绝学.天地唯我独尊",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "神照功",
+    "name": "神照功",
+    "description": "有神罩着，当然牛逼了",
+    "icon": "icon_neigong_030",
+    "hard": 8.0,
+    "yin": 70,
+    "yang": 70,
+    "attackScale": 0.7,
+    "criticalScale": 0.25,
+    "defenceScale": 0.75,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "无尽斗志"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "连城剑法",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "我就是神"
+        },
+        "minimumLevel": 18,
+        "requiresEquippedInternalSkill": true
+      }
+    ]
+  },
+  {
+    "id": "先天功",
+    "name": "先天功",
+    "description": "先天真气，生生不息",
+    "icon": "icon_neigong_031",
+    "hard": 8.0,
+    "yin": 70,
+    "yang": 70,
+    "attackScale": 0.7,
+    "criticalScale": 0.25,
+    "defenceScale": 0.5,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "真气护体"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 14
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "全真绝学.三花聚顶",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "全真绝学.三花聚顶",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "全真绝学.三花聚顶.炼神返虚",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "全真绝学.三花聚顶.炼神返虚",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "九阴神功",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "纯阳无极功",
+    "name": "纯阳无极功",
+    "description": "武当派张三丰所创至高心法，必须处男才能使哦~",
+    "icon": "icon_neigong_032",
+    "hard": 9.0,
+    "yin": -50,
+    "yang": 100,
+    "attackScale": 0.65,
+    "criticalScale": 0.2,
+    "defenceScale": 0.7,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "诸般封印"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "真气护体"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "太极拳",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "太极剑",
+          "value": {
+            "op": "add",
+            "delta": 0.12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "武当绝学.太极拳奥义",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "武当绝学.太极拳奥义",
+          "value": {
+            "op": "add",
+            "delta": 0.06
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "武当绝学.太极剑奥义",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "武当绝学.太极剑奥义",
+          "value": {
+            "op": "add",
+            "delta": 0.06
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "龙象般若功",
+    "name": "龙象般若功",
+    "description": "雪山密宗的盖世奇功",
+    "icon": "icon_neigong_033",
+    "hard": 9.0,
+    "yin": 80,
+    "yang": 80,
+    "attackScale": 0.65,
+    "criticalScale": 0.35,
+    "defenceScale": 0.8,
+    "formSkills": [
+      {
+        "id": "龙象般若功.龙象秘境",
+        "name": "龙象般若功.龙象秘境",
+        "description": "雪山密宗的盖世奇功",
+        "cooldown": 2,
+        "cost": {
+          "rage": 2
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 2,
+          "impactType": "plus",
+          "impactSize": 2
+        },
+        "powerExtra": 1.0,
+        "animation": "anranxiaohunzhang",
+        "audio": "音效.内功攻击3",
+        "unlockLevel": 5,
+        "buffs": [
+          {
+            "id": "内伤",
+            "level": 3,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      },
+      {
+        "id": "龙象般若功.庄严宝相",
+        "name": "龙象般若功.庄严宝相",
+        "description": "雪山密宗的盖世奇功",
+        "cooldown": 4,
+        "cost": {
+          "rage": 4
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 4,
+          "impactType": "square",
+          "impactSize": 3
+        },
+        "powerExtra": 3.0,
+        "animation": "longjuanfeng2",
+        "audio": "音效.内功攻击1",
+        "unlockLevel": 10,
+        "buffs": [
+          {
+            "id": "定身",
+            "level": 4,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "斗魂"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "defence",
+          "value": {
+            "op": "add",
+            "delta": 0
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_crit_chance",
+          "value": {
+            "op": "add",
+            "delta": 1
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 18
+      }
+    ]
+  },
+  {
+    "id": "铁血大旗功",
+    "name": "铁血大旗功",
+    "description": "铁剑门绝传内功,大成后周身运转无碍,有夺天之造化",
+    "icon": "icon_neigong_034",
+    "hard": 9.0,
+    "yin": 80,
+    "yang": 80,
+    "attackScale": 0.8,
+    "criticalScale": 0.1,
+    "defenceScale": 0.7,
+    "formSkills": [
+      {
+        "id": "铁血大旗功.铁血",
+        "name": "铁血大旗功.铁血",
+        "description": "铁血",
+        "cooldown": 4,
+        "cost": {
+          "rage": 2
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 3,
+          "impactType": "plus",
+          "impactSize": 4
+        },
+        "powerExtra": 1.0,
+        "animation": "fo",
+        "audio": "音效.内功攻击1",
+        "unlockLevel": 10,
+        "buffs": [
+          {
+            "id": "防御强化",
+            "level": 2,
+            "duration": 2,
+            "chance": 100
+          },
+          {
+            "id": "攻击强化",
+            "level": 2,
+            "duration": 2,
+            "chance": 100
+          }
+        ]
+      },
+      {
+        "id": "铁血大旗功.大旗",
+        "name": "铁血大旗功.大旗",
+        "description": "铁血大旗功精髓所在,大旗所指,所向披靡",
+        "cooldown": 6,
+        "cost": {
+          "rage": 4
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 4,
+          "impactType": "square",
+          "impactSize": 4
+        },
+        "powerExtra": 1.5,
+        "animation": "huozhu_jin",
+        "audio": "音效.内功攻击3",
+        "unlockLevel": 10,
+        "buffs": [
+          {
+            "id": "神速攻击",
+            "level": 7,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "攀云乘龙"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "shenfa",
+          "value": {
+            "op": "add",
+            "delta": 15
+          }
+        },
+        "minimumLevel": 13
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "铁剑门绝学.银河落九天",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "legend_skill_chance_modifier",
+          "skillId": "铁剑门绝学.银河落九天",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "神行百变"
+        },
+        "minimumLevel": 17,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "铁剑掌门"
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "易筋经",
+    "name": "易筋经",
+    "description": "少林至高无上的内功宝典",
+    "icon": "icon_neigong_035",
+    "hard": 10.0,
+    "yin": 90,
+    "yang": 90,
+    "attackScale": 0.7,
+    "criticalScale": 0.2,
+    "defenceScale": 0.8,
+    "formSkills": [
+      {
+        "id": "易筋经.易筋神功",
+        "name": "易筋经.易筋神功",
+        "description": "易筋经中记载的绝世武艺",
+        "cooldown": 6,
+        "cost": {
+          "rage": 2
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 4,
+          "impactType": "square",
+          "impactSize": 3
+        },
+        "powerExtra": 1.0,
+        "animation": "huozhu_hong",
+        "audio": "音效.内功攻击1",
+        "unlockLevel": 5,
+        "buffs": [
+          {
+            "id": "内伤",
+            "level": 3,
+            "duration": 3,
+            "chance": 100
+          },
+          {
+            "id": "防御强化",
+            "level": 10,
+            "duration": 1,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "普照"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "清心"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "defence",
+          "value": {
+            "op": "add",
+            "delta": 40
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_crit_chance",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.2
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.2
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "九阴神功",
+    "name": "九阴神功",
+    "description": "至高无上的内功心法",
+    "icon": "icon_neigong_036",
+    "hard": 10.0,
+    "yin": 100,
+    "yang": 40,
+    "attackScale": 0.9,
+    "criticalScale": 0.5,
+    "defenceScale": 0.45,
+    "formSkills": [
+      {
+        "id": "九阴神功.九阴神爪",
+        "name": "九阴神功.九阴神爪",
+        "description": "这绝不是九阴白骨爪",
+        "cooldown": 6,
+        "cost": {
+          "rage": 2
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 3,
+          "impactType": "single",
+          "impactSize": 1
+        },
+        "powerExtra": 3.0,
+        "animation": "zhua",
+        "audio": "音效.破空钝器",
+        "unlockLevel": 5,
+        "buffs": [
+          {
+            "id": "缓速",
+            "level": 3,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      },
+      {
+        "id": "九阴神功.九阴极意",
+        "name": "九阴神功.九阴极意",
+        "description": "九阴真经中所领悟出来的天下武学总纲",
+        "cooldown": 6,
+        "cost": {
+          "rage": 6
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 3,
+          "impactType": "square",
+          "impactSize": 3
+        },
+        "powerExtra": 5.0,
+        "animation": "guanghuan_blue2",
+        "audio": "音效.吸取内力",
+        "unlockLevel": 10,
+        "buffs": [
+          {
+            "id": "致盲",
+            "level": 3,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "破甲"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "attack",
+          "value": {
+            "op": "add",
+            "delta": 40
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_chance",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "attack",
+          "value": {
+            "op": "add",
+            "delta": 40
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_chance",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "怒不可遏"
+        },
+        "minimumLevel": 20,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_mult",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "逆运九阴神功",
+    "name": "逆运九阴神功",
+    "description": "走火入魔的九阴神功",
+    "icon": "icon_neigong_037",
+    "hard": 10.0,
+    "yin": 100,
+    "yang": 0,
+    "attackScale": 1.0,
+    "criticalScale": 1.0,
+    "defenceScale": 0.0,
+    "formSkills": [
+      {
+        "id": "逆运九阴神功.九阴狂啸",
+        "name": "逆运九阴神功.九阴狂啸",
+        "description": "威力无匹的逆天神技",
+        "cooldown": 6,
+        "cost": {
+          "rage": 3
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 4,
+          "impactType": "square",
+          "impactSize": 4
+        },
+        "powerExtra": 12.0,
+        "animation": "guanghuan_blue2",
+        "audio": "音效.吸取内力",
+        "unlockLevel": 10,
+        "buffs": [
+          {
+            "id": "致盲",
+            "level": 3,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "破甲"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "attack",
+          "value": {
+            "op": "add",
+            "delta": 40
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_chance",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "attack",
+          "value": {
+            "op": "add",
+            "delta": 40
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "crit_chance",
+          "value": {
+            "op": "add",
+            "delta": 0.05
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "我是疯子"
+        },
+        "minimumLevel": 20,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "九阳神功",
+    "name": "九阳神功",
+    "description": "至高无上的内功心法",
+    "icon": "icon_neigong_038",
+    "hard": 10.0,
+    "yin": 40,
+    "yang": 100,
+    "attackScale": 0.6,
+    "criticalScale": 0.3,
+    "defenceScale": 0.9,
+    "formSkills": [
+      {
+        "id": "九阳神功.乾卦九阳",
+        "name": "九阳神功.乾卦九阳",
+        "description": "九阳神功绝招",
+        "cooldown": 4,
+        "cost": {
+          "rage": 4
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 3,
+          "impactType": "square",
+          "impactSize": 4
+        },
+        "powerExtra": 1.0,
+        "animation": "jiuyangshengong",
+        "audio": "音效.内功攻击4",
+        "unlockLevel": 10,
+        "buffs": [
+          {
+            "id": "防御强化",
+            "level": 15,
+            "duration": 2,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "金钟罩"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "defence",
+          "value": {
+            "op": "add",
+            "delta": 15
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_crit_chance",
+          "value": {
+            "op": "add",
+            "delta": 0.15
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "anti_debuff",
+          "value": {
+            "op": "add",
+            "delta": 0.1
+          }
+        },
+        "minimumLevel": 16
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "至刚至阳"
+        },
+        "minimumLevel": 20,
+        "requiresEquippedInternalSkill": true
+      }
+    ]
+  },
+  {
+    "id": "葵花宝典",
+    "name": "葵花宝典",
+    "description": "欲练神功，必先自宫",
+    "icon": "icon_neigong_039",
+    "hard": 10.0,
+    "yin": 100,
+    "yang": -100,
+    "attackScale": 1.0,
+    "criticalScale": 0.4,
+    "defenceScale": 0.6,
+    "formSkills": [
+      {
+        "id": "葵花宝典.绣花针",
+        "name": "葵花宝典.绣花针",
+        "description": "阴毒之极，迅速之极",
+        "cooldown": 0,
+        "cost": {
+          "rage": 1
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 6,
+          "impactType": "single",
+          "impactSize": 1
+        },
+        "powerExtra": 0.0,
+        "animation": "anqi",
+        "audio": "音效.暗器2",
+        "unlockLevel": 9,
+        "buffs": [
+          {
+            "id": "致盲",
+            "level": 2,
+            "duration": 5,
+            "chance": 100
+          }
+        ]
+      },
+      {
+        "id": "葵花宝典.真辟邪剑法",
+        "name": "葵花宝典.真辟邪剑法",
+        "description": "阴毒之极，迅速之极，辟邪剑法奥义式",
+        "cooldown": 5,
+        "cost": {
+          "rage": 4
+        },
+        "targeting": {
+          "castType": null,
+          "castSize": 0,
+          "impactType": "plus",
+          "impactSize": 5
+        },
+        "powerExtra": 2.0,
+        "animation": "longjuanfeng_green",
+        "audio": "音效.利器6",
+        "unlockLevel": 10,
+        "buffs": [
+          {
+            "id": "致盲",
+            "level": 5,
+            "duration": 5,
+            "chance": 100
+          },
+          {
+            "id": "轻身",
+            "level": 2,
+            "duration": 3,
+            "chance": 100
+          }
+        ]
+      }
+    ],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "自我主义"
+        },
+        "minimumLevel": 1,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "斗魂"
+        },
+        "minimumLevel": 5,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "飘然"
+        },
+        "minimumLevel": 8,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 12
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "辟邪剑法",
+          "value": {
+            "op": "add",
+            "delta": 0.06
+          }
+        },
+        "minimumLevel": 12
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "辟邪剑法",
+          "value": {
+            "op": "add",
+            "delta": 0.06
+          }
+        },
+        "minimumLevel": 15
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "辟邪剑法",
+          "value": {
+            "op": "add",
+            "delta": 0.06
+          }
+        },
+        "minimumLevel": 18
+      },
+      {
+        "effect": {
+          "type": "grant_model",
+          "modelId": "dongfang",
+          "priority": 0,
+          "description": "化身为东方不败"
+        },
+        "minimumLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "黑炎心法",
+    "name": "黑炎心法",
+    "description": "神秘的黑暗武学",
+    "icon": "icon_neigong_040",
+    "hard": 12.0,
+    "yin": 100,
+    "yang": 100,
+    "attackScale": 1.0,
+    "criticalScale": 1.0,
+    "defenceScale": 1.0,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "grant_talent",
+          "talentId": "魔神降临"
+        },
+        "minimumLevel": 10,
+        "requiresEquippedInternalSkill": true
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "gengu",
+          "value": {
+            "op": "add",
+            "delta": 5
+          }
+        },
+        "minimumLevel": 10
+      }
+    ]
+  },
+  {
+    "id": "墨阴神功",
+    "name": "墨阴神功",
+    "description": "传自战国墨家的古老心法，适宜女性使用",
+    "icon": "icon_neigong_041",
+    "hard": 14.0,
+    "yin": 130,
+    "yang": 100,
+    "attackScale": 1.0,
+    "criticalScale": 1.0,
+    "defenceScale": 1.0,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "dingli",
+          "value": {
+            "op": "add",
+            "delta": 20
+          }
+        },
+        "minimumLevel": 5
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "墨阳神功",
+          "value": {
+            "op": "add",
+            "delta": 0.4
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.2
+          }
+        },
+        "minimumLevel": 12
+      }
+    ]
+  },
+  {
+    "id": "墨阳神功",
+    "name": "墨阳神功",
+    "description": "传自战国墨家的古老心法，适宜男性使用",
+    "icon": "icon_neigong_042",
+    "hard": 14.0,
+    "yin": 100,
+    "yang": 130,
+    "attackScale": 1.0,
+    "criticalScale": 1.0,
+    "defenceScale": 1.0,
+    "formSkills": [],
+    "affixes": [
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "fuyuan",
+          "value": {
+            "op": "add",
+            "delta": 20
+          }
+        },
+        "minimumLevel": 5
+      },
+      {
+        "effect": {
+          "type": "skill_bonus_modifier",
+          "skillId": "墨阴神功",
+          "value": {
+            "op": "add",
+            "delta": 0.4
+          }
+        },
+        "minimumLevel": 10
+      },
+      {
+        "effect": {
+          "type": "stat_modifier",
+          "stat": "speed",
+          "value": {
+            "op": "add",
+            "delta": 0.2
+          }
+        },
+        "minimumLevel": 12
+      }
+    ]
+  }
+]

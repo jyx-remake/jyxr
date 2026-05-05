@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://b1hd7sr7biah0"]
+
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="1_5er46"]
+
+[node name="JyButton" type="TextureButton" unique_id=1774622667]
+offset_right = 100.0
+offset_bottom = 100.0
+ignore_texture_size = true
+stretch_mode = 4
+script = ExtResource("1_5er46")

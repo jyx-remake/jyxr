@@ -1,0 +1,88 @@
+[gd_scene format=3 uid="uid://b4kveik4eci2d"]
+
+[ext_resource type="Texture2D" uid="uid://jsmmfitkrv5x" path="res://assets/art/misc/dikuang2.png" id="1_nu0yr"]
+[ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="2_lapn3"]
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="3_ephwk"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/ConfirmDialog.cs" id="4_confirm_dialog"]
+
+[node name="ConfirmDialog" type="Control" unique_id=1873262433]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("4_confirm_dialog")
+
+[node name="Background" type="TextureRect" parent="." unique_id=265742394]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -515.0
+offset_top = -284.0
+offset_right = 515.0
+offset_bottom = 284.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_nu0yr")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ConfirmButton" type="TextureButton" parent="." unique_id=1517638290]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 536.0
+offset_top = 628.0
+offset_right = 900.0
+offset_bottom = 722.0
+texture_normal = ExtResource("2_lapn3")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_ephwk")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ConfirmButton" unique_id=1942565471]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 18.0
+offset_right = 238.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 50
+text = "确认"
+
+[node name="CancelButton" type="TextureButton" parent="." unique_id=867066366]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1000.0
+offset_top = 628.0
+offset_right = 1364.0
+offset_bottom = 722.0
+texture_normal = ExtResource("2_lapn3")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_ephwk")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="CancelButton" unique_id=852268700]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 18.0
+offset_right = 238.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 50
+text = "取消"
+
+[node name="ContentLabel" type="RichTextLabel" parent="." unique_id=854334387]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 559.0
+offset_top = 319.0
+offset_right = 1348.0
+offset_bottom = 609.0
+horizontal_alignment = 1
+vertical_alignment = 1

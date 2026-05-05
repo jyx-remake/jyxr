@@ -1,0 +1,17 @@
+[
+  {
+    "id": "sample_map",
+    "name": "Sample Map",
+    "locations": [
+      {
+        "id": "sample_location",
+        "name": "Camp Entrance",
+        "position": {
+          "x": 1,
+          "y": 2
+        },
+        "events": []
+      }
+    ]
+  }
+]

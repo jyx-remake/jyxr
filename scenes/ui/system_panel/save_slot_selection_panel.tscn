@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://brltgo8b2opqk"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" uid="uid://b5rjwcm2fqdl6" path="res://src/Game.Godot/UI/System/SaveSlotSelectionPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://dtr5c0pjawo7x" path="res://scenes/ui/system_panel/save_slot_card.tscn" id="3_card"]
+
+[node name="SaveSlotSelectionPanel" unique_id=1893980029 instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+
+[node name="TitleLabel" type="Label" parent="." index="3" unique_id=1729731194]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 250.0
+offset_top = 133.0
+offset_right = 884.0
+offset_bottom = 203.0
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.94, 0.86, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 54
+text = "选择存档位置"
+
+[node name="SubtitleLabel" type="Label" parent="." index="4" unique_id=1253383595]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 251.0
+offset_top = 209.0
+offset_right = 1073.0
+offset_bottom = 253.0
+theme_override_colors/font_color = Color(0.32, 0.22, 0.14, 1)
+theme_override_font_sizes/font_size = 26
+text = "选择一个槽位写入当前进度。"
+
+[node name="SlotsGrid" type="GridContainer" parent="." index="5" unique_id=645477168]
+layout_mode = 0
+offset_left = 250.0
+offset_top = 246.0
+offset_right = 1675.0
+offset_bottom = 869.0
+theme_override_constants/h_separation = 28
+theme_override_constants/v_separation = 28
+columns = 2
+
+[node name="SlotCard1" parent="SlotsGrid" index="0" unique_id=191581327 instance=ExtResource("3_card")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SlotCard2" parent="SlotsGrid" index="1" unique_id=445674418 instance=ExtResource("3_card")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SlotCard3" parent="SlotsGrid" index="2" unique_id=1725427486 instance=ExtResource("3_card")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SlotCard4" parent="SlotsGrid" index="3" unique_id=403031374 instance=ExtResource("3_card")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SkipConfirmationCheckBox" type="CheckBox" parent="." index="6" unique_id=1033205733]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 0
+offset_left = 248.0
+offset_top = 856.0
+offset_right = 438.0
+offset_bottom = 934.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "删除、覆盖存档无需确认"

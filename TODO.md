@@ -1,0 +1,26 @@
+# TODO
+
+- 重新审视 `CharacterDefinition` 中初始技能/装备的表达方式：继续使用纯 `SkillIds` / `EquipmentIds`，还是引入定义侧条目对象来承载默认等级、开关、锻造等初始配置。
+- 技能等级上限目前统一使用 `SkillInstance.DefaultMaxLevel = 20`。legacy `maxlevel` 剧情命令当前只做技能存在性校验并发 toast，不写入技能实例；后续如要支持动态突破上限，需要重新建模“技能精通/上限提升”的持久化归属。
+- 内容加载目前只是“DTO 校验 + 按顺序构建 runtime definitions”，还不是真正的二阶段加载。后续如需支持定义间循环依赖，应改成“先注册 runtime definition 空壳，再统一 resolve 引用”的两阶段装配流程。
+- 当前 affix 引用解析集中在 `JsonContentLoader.ResolveAffixes(...)`，而不是各 definition 自己的 `Resolve(...)` 方法。后续如继续扩展 affix 来源，应把 affix 引用解析入口收敛成更明确的专门服务或 definition 统一协议，避免新增来源时漏掉 `GrantTalentAffix` 等需要 resolve 的条目。
+- `IContentRepository` 在真实游戏中是否需要全局可访问，后续需要结合地图、事件、宿主装配再判断。
+- 当前 `Party` 是全局队伍，无队伍 id/name；如果后续支持多队伍/多编队，需要重新建模队伍集合、队伍标识与存档结构。
+- 统一空值校验策略：内部代码以 C# nullable reference types 为主，边界层（宿主入口、内容加载入口、外部输入入口）保留显式运行时校验，避免在内部领域代码中堆积大量 `ArgumentNullException.ThrowIfNull`。
+- 世界/地图层待建模对象：`MapDefinition`、`MapState`、`MapNode`/`MapCell`、`MapRegion`，用于承载非战斗地图、区域信息、可通行性、场景切换锚点等。
+- 地图交互对象待建模：`InteractableDefinition`、`InteractableState`、`MapObjectDefinition`、`MapObjectState`，用于承载宝箱、门、机关、调查点、采集点、触发器等。
+- 事件/剧本系统待建模：`StoryEventDefinition`、`StoryConditionDefinition`、`StoryActionDefinition`、`StoryFlagSet`，用于承载剧情触发条件、状态位、分支与执行动作。
+- 演出系统待建模：`CutsceneDefinition`、`CutsceneStepDefinition`、`DialogueDefinition`、`DialogueLineDefinition`、`SpeakerDefinition`，用于承载对话、镜头、角色入场退场、立绘/动画/音效触发。
+- 地图会话层待建模：`MapSession` 或 `WorldSession`，用于承载当前地图、当前交互状态、场景内事件进度，并与 `GameSession` / 战斗入口衔接。
+- 当前“进入地图后的自动触发事件”消费编排暂放在 `MapScreen`。后续应上移到 `World` 或专门的宿主 flow coordinator，保持 `MapService` 只负责返回结果、`MapScreen` 只负责展示和点击交互，避免 Godot screen 承担场景流转编排职责。
+- 战斗外触发入口待建模：`InteractionCommand`、`StoryCommand`、`MapTransitionCommand`，用于统一地图交互、剧情推进、场景切换等外部输入。
+- 地图与战斗的衔接对象待建模：`BattleEncounterDefinition`、`EncounterTriggerDefinition`、`BattleResultProjection`，用于表达地图遭遇战入口、触发条件，以及战斗结果如何回写世界状态。
+- 剧情对白/选项中的 `$MALE$` / `$FEMALE$` 当前先在 `Game.Application` 做临时文本插值，只覆盖主角名与女主名，不属于正式统一变量系统。后续应与剧情变量读取/写入模型统一设计，避免模板文本占位与表达式变量长期分裂。
+- 商店系统后续待建模：商品刷新、回购、动态库存、商店关闭回调、剧情锁定商品、元宝商品展示分组，以及旧 `contentId == "元宝"` / `*残章` 兼容条目的清理策略。
+- 物品使用后续待建模：普通消耗品、功能道具、剧情物品、战斗内使用上下文、目标选择规则与效果执行器。目前只接入装备、武学书、绝技书、天赋书和基础强化道具。
+- 装备选择 UI 当前直接复用背包物品格与 tooltip，后续如装备比较、替换确认、套装/词条高亮变复杂，应抽专门 presenter，而不是把规则继续堆在 Godot 控件脚本里。
+- 战场系统后续按 `docs/battlefield-system-design.md` 重建，不保留旧 `BattleEngine` / `CombatantState` / battle hook 运行实现的兼容层。
+- Attachment 系统后续按 `docs/attachment-design.md` 重建；当前旧 `IAttachmentSourceDefinition` / `ModifierDefinition` / `AttachmentResolver` 实现已删除，不保留兼容层。
+- 持久化层后续可能要补：`MapStateRecord`、`InteractableRecord`、`StoryFlagRecord`，用于把地图交互进度、机关状态、剧情标记纳入存档。
+- 当前诊断日志抽象暂放在 `Game.Application`，后续如补齐 `Infrastructure` / `Hosting` 层，应迁移 `IDiagnosticLogger` 及相关实现的抽象边界，避免应用层长期承载宿主/基础设施能力接口。
+- 当前 DTO 与 runtime definition 存在较多重复字段。后续应收缩 DTO 噪音：优先只保留确有 raw/runtime 差异的类型，并考虑把 DTO 模型进一步内聚到 loader 内部，避免扩散成整层平行定义。

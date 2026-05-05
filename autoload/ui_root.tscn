@@ -1,0 +1,126 @@
+[gd_scene format=3 uid="uid://qq8i1hc2ns12"]
+
+[ext_resource type="Script" uid="uid://b26rtcod4xv7t" path="res://src/Game.Godot/UI/UIRoot.cs" id="1_ui_root"]
+[ext_resource type="PackedScene" uid="uid://jon61teprdc7" path="res://scenes/ui/party_panel/party_panel.tscn" id="2_party_panel"]
+[ext_resource type="PackedScene" uid="uid://c7xwca038g3px" path="res://scenes/ui/character_panel/character_panel.tscn" id="3_i0hgf"]
+[ext_resource type="PackedScene" uid="uid://beqsxw0hmqwm" path="res://scenes/ui/story/story_dialogue_panel.tscn" id="4_story_dialogue"]
+[ext_resource type="PackedScene" path="res://scenes/ui/story/story_choice_panel.tscn" id="5_story_choice"]
+[ext_resource type="PackedScene" uid="uid://bnk146v0yfw02" path="res://scenes/ui/hud/hud.tscn" id="6_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/journal/journal_panel.tscn" id="7_journal"]
+[ext_resource type="PackedScene" uid="uid://bdvws2ugdkk6a" path="res://scenes/ui/hero_panel/hero_panel.tscn" id="8_hero_panel"]
+[ext_resource type="PackedScene" uid="uid://sdtyoj35nitl" path="res://scenes/ui/system_panel/system_panel.tscn" id="9_system_panel"]
+[ext_resource type="Script" uid="uid://d0fqg0iuf06b" path="res://src/Game.Godot/UI/ToastPanel.cs" id="9_toast_panel"]
+[ext_resource type="Texture2D" uid="uid://dh8ti123spcg0" path="res://assets/art/ui/toast.png" id="10_1766m"]
+[ext_resource type="PackedScene" uid="uid://cxqxd285b6u0o" path="res://scenes/ui/hint/hint_box.tscn" id="10_hint_box"]
+[ext_resource type="PackedScene" uid="uid://brltgo8b2opqk" path="res://scenes/ui/system_panel/save_slot_selection_panel.tscn" id="10_save_slots"]
+[ext_resource type="PackedScene" uid="uid://b4kveik4eci2d" path="res://scenes/ui/base/confirm_dialog.tscn" id="11_confirm_dialog"]
+[ext_resource type="PackedScene" uid="uid://bs35w4y4foane" path="res://scenes/ui/inventory_panel/inventory_panel.tscn" id="12_inventory_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/shop_panel/shop_panel.tscn" id="13_shop_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/chest_panel/chest_panel.tscn" id="13_chest_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/select_sect/select_sect_screen.tscn" id="14_select_sect"]
+[ext_resource type="PackedScene" path="res://scenes/ui/start_question/input_name_panel.tscn" id="15_input_name"]
+[ext_resource type="PackedScene" path="res://scenes/ui/start_question/select_head_panel.tscn" id="16_select_head"]
+[ext_resource type="PackedScene" path="res://scenes/ui/start_question/roll_stats_panel.tscn" id="17_roll_stats"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gameover/gameover_screen.tscn" id="18_gameover"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/combatant_select_panel.tscn" id="19_combatant_select"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_screen.tscn" id="20_battle_screen"]
+
+[node name="UIRoot" type="Control" unique_id=684934628]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_ui_root")
+PartyPanelScene = ExtResource("2_party_panel")
+CharacterPanelScene = ExtResource("3_i0hgf")
+InventoryPanelScene = ExtResource("12_inventory_panel")
+GameLogPanelScene = ExtResource("7_journal")
+HeroPanelScene = ExtResource("8_hero_panel")
+SystemPanelScene = ExtResource("9_system_panel")
+SaveSlotSelectionPanelScene = ExtResource("10_save_slots")
+ShopPanelScene = ExtResource("13_shop_panel")
+ChestPanelScene = ExtResource("13_chest_panel")
+CombatantSelectPanelScene = ExtResource("19_combatant_select")
+BattleScreenScene = ExtResource("20_battle_screen")
+SelectSectScreenScene = ExtResource("14_select_sect")
+InputNamePanelScene = ExtResource("15_input_name")
+SelectHeadPanelScene = ExtResource("16_select_head")
+RollStatsPanelScene = ExtResource("17_roll_stats")
+GameOverScreenScene = ExtResource("18_gameover")
+
+[node name="HudLayer" type="CanvasLayer" parent="." unique_id=1159616672]
+unique_name_in_owner = true
+layer = 10
+
+[node name="Hud" parent="HudLayer" unique_id=978258501 instance=ExtResource("6_hud")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="PanelLayer" type="CanvasLayer" parent="." unique_id=261397122]
+unique_name_in_owner = true
+layer = 20
+
+[node name="ModalLayer" type="CanvasLayer" parent="." unique_id=697258805]
+unique_name_in_owner = true
+layer = 30
+
+[node name="StoryDialoguePanel" parent="ModalLayer" unique_id=2120644622 instance=ExtResource("4_story_dialogue")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="StoryChoicePanel" parent="ModalLayer" unique_id=353291670 instance=ExtResource("5_story_choice")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="HintBox" parent="ModalLayer" unique_id=463491151 instance=ExtResource("10_hint_box")]
+layout_mode = 1
+
+[node name="ConfirmDialog" parent="ModalLayer" unique_id=1760846137 instance=ExtResource("11_confirm_dialog")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="OverlayLayer" type="CanvasLayer" parent="." unique_id=1997746900]
+unique_name_in_owner = true
+layer = 40
+
+[node name="ToastPanel" type="Control" parent="OverlayLayer" unique_id=318086013]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(360, 44)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("9_toast_panel")
+
+[node name="TextureRect" type="TextureRect" parent="OverlayLayer/ToastPanel" unique_id=1470423910]
+layout_mode = 0
+offset_left = 649.0
+offset_top = 14.0
+offset_right = 1374.0
+offset_bottom = 224.0
+texture = ExtResource("10_1766m")
+stretch_mode = 5
+
+[node name="MessageLabel" type="Label" parent="OverlayLayer/ToastPanel" unique_id=1346246878]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(324, 24)
+layout_mode = 0
+offset_left = 675.0
+offset_top = 59.0
+offset_right = 1312.0
+offset_bottom = 177.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 40
+text = "获得称号【草头百姓】"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

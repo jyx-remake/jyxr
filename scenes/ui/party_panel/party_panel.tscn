@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://jon61teprdc7"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="2_base"]
+[ext_resource type="Script" uid="uid://c81noqnx8x52p" path="res://src/Game.Godot/UI/Party/PartyPanel.cs" id="2_dov0m"]
+[ext_resource type="PackedScene" uid="uid://b2mjgxqlxtul1" path="res://scenes/ui/party_panel/party_character_box.tscn" id="3_box"]
+
+[node name="PartyPanel" unique_id=410951020 instance=ExtResource("2_base")]
+script = ExtResource("2_dov0m")
+PartyCharacterBoxScene = ExtResource("3_box")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." index="3" unique_id=1113950281]
+layout_mode = 1
+offset_left = 192.0
+offset_top = 144.0
+offset_right = 1677.0
+offset_bottom = 885.0
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer" index="0" unique_id=199504820]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 5
+
+[node name="PartyCharacterBox" parent="ScrollContainer/GridContainer" index="0" unique_id=527980720 instance=ExtResource("3_box")]
+layout_mode = 2
+
+[node name="HintLabel" type="Label" parent="." index="4" unique_id=823510971]
+layout_mode = 0
+offset_left = 442.0
+offset_top = 998.0
+offset_right = 1414.0
+offset_bottom = 1046.0
+theme_override_colors/font_color = Color(0.929412, 0.878431, 0.698039, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 40
+text = "拖拽队友卡片可调整顺序，主角固定在队伍首位。"
+
+[node name="EmptyLabel" type="Label" parent="." index="5" unique_id=1930187884]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 250.0
+offset_top = 166.0
+offset_right = 1200.0
+offset_bottom = 226.0
+theme_override_font_sizes/font_size = 26
+text = "当前没有队伍成员。"
+
+[connection signal="pressed" from="CloseButton" to="." method="_on_close_button_pressed"]

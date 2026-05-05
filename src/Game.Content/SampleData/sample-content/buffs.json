@@ -1,0 +1,29 @@
+[
+  {
+    "id": "guarded",
+    "name": "Guarded",
+    "isDebuff": false,
+    "defaultDuration": 2,
+    "canStack": false,
+    "maxStacks": 1,
+    "affixes": [
+      {
+        "type": "stat_modifier",
+        "stat": "gengu",
+        "value": {
+          "op": "add",
+          "delta": 5
+        }
+      }
+    ]
+  },
+  {
+    "id": "burning",
+    "name": "Burning",
+    "isDebuff": true,
+    "defaultDuration": 2,
+    "canStack": true,
+    "maxStacks": 3,
+    "affixes": []
+  }
+]

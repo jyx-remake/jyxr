@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://beqsxw0hmqwm"]
+
+[ext_resource type="Script" uid="uid://ccv8pp0tiortu" path="res://src/Game.Godot/UI/Story/StoryDialoguePanel.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d4ck8mcd45xfr" path="res://assets/art/misc/dialogue_frame.png" id="2_frame"]
+[ext_resource type="PackedScene" uid="uid://cveba3f8kxvxc" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="3_avatar"]
+
+[node name="StoryDialoguePanel" type="Control" unique_id=415902696]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="ShadowPanel" type="Panel" parent="." unique_id=504217441]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 347.6103
+offset_top = 647.3161
+offset_right = 1567.6104
+offset_bottom = 985.3161
+scale = Vector2(1.1825043, 1.1825043)
+
+[node name="Frame" type="TextureRect" parent="." unique_id=687102799]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 372.0
+offset_right = 4576.0
+offset_bottom = 1992.0
+scale = Vector2(0.4138765, 0.4138765)
+mouse_filter = 2
+texture = ExtResource("2_frame")
+
+[node name="AvatarBox" parent="." unique_id=55954989 instance=ExtResource("3_avatar")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 250.0
+offset_top = 845.00006
+offset_right = 250.0
+offset_bottom = 845.00006
+scale = Vector2(0.53212696, 0.53212696)
+
+[node name="SpeakerLabel" type="Label" parent="." unique_id=1569061937]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 556.0
+offset_top = 677.0
+offset_right = 742.0
+offset_bottom = 758.0
+scale = Vector2(1.1825043, 1.1825043)
+theme_override_font_sizes/font_size = 60
+text = "说话人"
+
+[node name="ContentLabel" type="RichTextLabel" parent="." unique_id=1748108074]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 559.0
+offset_top = 777.0
+offset_right = 1541.6603
+offset_bottom = 971.50244
+scale = Vector2(1.1825043, 1.1825043)
+mouse_filter = 0
+scroll_active = true
+bbcode_enabled = true
+text = "对话内容"
+
+[node name="SkipButton" type="Button" parent="." unique_id=54483169]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1383.0
+offset_top = 564.0
+offset_right = 1547.9043
+offset_bottom = 621.50507
+scale = Vector2(1.1825043, 1.1825043)
+text = "跳过"

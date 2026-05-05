@@ -1,0 +1,333 @@
+[gd_scene format=3 uid="uid://yd52w6eba8oa"]
+
+[ext_resource type="Script" uid="uid://bhwyiutc87gtc" path="res://src/Game.Godot/UI/Battle/BattleUnitView.cs" id="1_script"]
+[ext_resource type="AnimationLibrary" uid="uid://bbw02vxa8nxa6" path="res://assets/animation/combatant/zyjk.tres" id="3_p1k0d"]
+[ext_resource type="Texture2D" path="res://assets/art/atlas_texture/zyjk/zyjk-stand001.tres" id="4_0y46n"]
+[ext_resource type="Texture2D" uid="uid://cs45878e3n7p6" path="res://assets/art/ui/battle/yinyingxiao.png" id="4_shadow"]
+[ext_resource type="Texture2D" uid="uid://ctf1yvtn7ngc1" path="res://assets/art/ui/battle/arrow.png" id="5_arrow"]
+[ext_resource type="Texture2D" uid="uid://b3pmv2oib5y05" path="res://assets/art/ui/battle/battle_duihuakuang.png" id="6_speech_bg"]
+
+[sub_resource type="LabelSettings" id="1_name_label"]
+font_size = 20
+font_color = Color(1, 1, 0, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="6_speech_label"]
+font_size = 14
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="2_bar_background"]
+bg_color = Color(0.08, 0.08, 0.08, 0.92)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="3_hp_fill"]
+bg_color = Color(0.78, 0.18, 0.18, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="4_mp_fill"]
+bg_color = Color(0.2, 0.48, 0.9, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="5_gauge_fill"]
+bg_color = Color(0.9484504, 0.9484504, 0.9484504, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_attack"]
+animation = &"attack"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hit"]
+animation = &"hit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_idle"]
+animation = &"idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_move"]
+animation = &"move"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_hit_idle"]
+priority = 2
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_start_idle"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_idle_move"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_move_idle"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_idle_attack"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_attack_idle"]
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_idle_hit"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_hit_end"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_combatant"]
+states/End/position = Vector2(498.0251, 250.76385)
+states/Start/position = Vector2(200, 140)
+states/attack/node = SubResource("AnimationNodeAnimation_attack")
+states/attack/position = Vector2(342.24945, 40.285717)
+states/hit/node = SubResource("AnimationNodeAnimation_hit")
+states/hit/position = Vector2(342.21796, 251.41609)
+states/idle/node = SubResource("AnimationNodeAnimation_idle")
+states/idle/position = Vector2(340.57144, 138.5381)
+states/move/node = SubResource("AnimationNodeAnimation_move")
+states/move/position = Vector2(499.11536, 139.29646)
+transitions = ["hit", "idle", SubResource("AnimationNodeStateMachineTransition_hit_idle"), "Start", "idle", SubResource("AnimationNodeStateMachineTransition_start_idle"), "idle", "move", SubResource("AnimationNodeStateMachineTransition_idle_move"), "move", "idle", SubResource("AnimationNodeStateMachineTransition_move_idle"), "idle", "attack", SubResource("AnimationNodeStateMachineTransition_idle_attack"), "attack", "idle", SubResource("AnimationNodeStateMachineTransition_attack_idle"), "idle", "hit", SubResource("AnimationNodeStateMachineTransition_idle_hit"), "hit", "End", SubResource("AnimationNodeStateMachineTransition_hit_end")]
+graph_offset = Vector2(-14.4697895, 0)
+
+[sub_resource type="Animation" id="Animation_active_arrow"]
+resource_name = "default"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ActiveArrow:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -250), Vector2(0, -230)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_active_arrow"]
+_data = {
+&"default": SubResource("Animation_active_arrow")
+}
+
+[node name="BattleUnitView" type="Node2D" unique_id=602343214]
+script = ExtResource("1_script")
+
+[node name="TooltipHitArea" type="Control" parent="." unique_id=1419564428]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = -64.0
+offset_top = -84.0
+offset_right = 62.0
+offset_bottom = 54.0
+mouse_filter = 1
+
+[node name="Shadow" type="Sprite2D" parent="." unique_id=1492195440]
+z_index = -1
+scale = Vector2(0.35, 0.35)
+texture = ExtResource("4_shadow")
+
+[node name="Overlay" type="Control" parent="." unique_id=1644808179]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -61.0
+offset_top = -218.0
+offset_right = 62.0
+offset_bottom = 55.0
+mouse_filter = 2
+
+[node name="RagePips" type="VBoxContainer" parent="Overlay" unique_id=2091548818]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 7)
+layout_mode = 0
+offset_left = 112.0
+offset_top = 59.0
+offset_right = 126.0
+offset_bottom = 116.0
+mouse_filter = 2
+theme_override_constants/separation = 3
+alignment = 1
+
+[node name="RagePip1" type="ColorRect" parent="Overlay/RagePips" unique_id=1690474666]
+custom_minimum_size = Vector2(14, 7)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 0.78, 0.1, 1)
+
+[node name="RagePip2" type="ColorRect" parent="Overlay/RagePips" unique_id=196606346]
+custom_minimum_size = Vector2(14, 7)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 0.78, 0.1, 1)
+
+[node name="RagePip3" type="ColorRect" parent="Overlay/RagePips" unique_id=401994513]
+custom_minimum_size = Vector2(14, 7)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 0.78, 0.1, 1)
+
+[node name="RagePip4" type="ColorRect" parent="Overlay/RagePips" unique_id=622948889]
+custom_minimum_size = Vector2(14, 7)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 0.78, 0.1, 1)
+
+[node name="RagePip5" type="ColorRect" parent="Overlay/RagePips" unique_id=1907298392]
+custom_minimum_size = Vector2(14, 7)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 0.78, 0.1, 1)
+
+[node name="RagePip6" type="ColorRect" parent="Overlay/RagePips" unique_id=1464764533]
+custom_minimum_size = Vector2(14, 7)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 0.78, 0.1, 1)
+
+[node name="NameLabel" type="Label" parent="Overlay" unique_id=1407938241]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 12.0
+offset_right = 120.0
+offset_bottom = 36.0
+text = "侠客"
+label_settings = SubResource("1_name_label")
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="BuffListLabel" type="RichTextLabel" parent="Overlay" unique_id=1802403301]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -105.0
+offset_top = 52.0
+offset_right = 17.0
+offset_bottom = 215.0
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "[color=yellow]圣战[/color]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 2
+
+[node name="SpeechBubble" type="Control" parent="Overlay" unique_id=1427702365]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 0
+offset_left = 122.7
+offset_top = 24.2
+offset_right = 300.7
+offset_bottom = 95.2
+mouse_filter = 2
+
+[node name="SpeechBackground" type="TextureRect" parent="Overlay/SpeechBubble" unique_id=1718432688]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_speech_bg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SpeechHead" type="TextureRect" parent="Overlay/SpeechBubble" unique_id=1067522290]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 9.0
+offset_top = 11.8
+offset_right = 49.0
+offset_bottom = 51.8
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SpeechLabel" type="Label" parent="Overlay/SpeechBubble" unique_id=253416080]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 60.0
+offset_top = 11.8
+offset_right = 176.8
+offset_bottom = 51.8
+label_settings = SubResource("6_speech_label")
+autowrap_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Overlay" unique_id=792659433]
+layout_mode = 0
+offset_top = 233.0
+offset_right = 120.0
+offset_bottom = 285.0
+theme_override_constants/separation = 3
+
+[node name="HpBar" type="ProgressBar" parent="Overlay/VBoxContainer" unique_id=158685384]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("2_bar_background")
+theme_override_styles/fill = SubResource("3_hp_fill")
+value = 100.0
+show_percentage = false
+
+[node name="MpBar" type="ProgressBar" parent="Overlay/VBoxContainer" unique_id=1196569573]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("2_bar_background")
+theme_override_styles/fill = SubResource("4_mp_fill")
+value = 100.0
+show_percentage = false
+
+[node name="GaugeBar" type="ProgressBar" parent="Overlay/VBoxContainer" unique_id=1332561080]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("2_bar_background")
+theme_override_styles/fill = SubResource("5_gauge_fill")
+show_percentage = false
+
+[node name="AnimationSlot" type="Node2D" parent="." unique_id=1248584231]
+texture_filter = 1
+scale = Vector2(1.5, 1.5)
+
+[node name="Sprite" type="Sprite2D" parent="AnimationSlot" unique_id=2115115971]
+unique_name_in_owner = true
+texture = ExtResource("4_0y46n")
+centered = false
+offset = Vector2(-28.952295, -115.97324)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="AnimationSlot" unique_id=74145691]
+unique_name_in_owner = true
+libraries/ = ExtResource("3_p1k0d")
+
+[node name="AnimationTree" type="AnimationTree" parent="AnimationSlot" unique_id=1521530840]
+unique_name_in_owner = true
+root_node = NodePath("%AnimationTree/..")
+tree_root = SubResource("AnimationNodeStateMachine_combatant")
+advance_expression_base_node = NodePath("..")
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="ActiveArrow" type="Sprite2D" parent="." unique_id=1930771862]
+unique_name_in_owner = true
+visible = false
+z_index = 2
+position = Vector2(0, -170)
+scale = Vector2(0.07, 0.07)
+texture = ExtResource("5_arrow")
+
+[node name="ArrowAnimationPlayer" type="AnimationPlayer" parent="." unique_id=999257958]
+libraries/ = SubResource("AnimationLibrary_active_arrow")
+autoplay = &"default"

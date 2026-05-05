@@ -1,0 +1,25 @@
+[
+  {
+    "id": "battle_focus",
+    "name": "Battle Focus",
+    "point": 0,
+    "description": "",
+    "affixes": [
+      {
+        "type": "stat_modifier",
+        "stat": "bili",
+        "value": {
+          "op": "add",
+          "delta": 5
+        }
+      }
+    ]
+  },
+  {
+    "id": "bloodlust",
+    "name": "Bloodlust",
+    "point": 0,
+    "description": "",
+    "affixes": []
+  }
+]

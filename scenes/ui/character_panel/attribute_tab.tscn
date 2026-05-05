@@ -1,0 +1,434 @@
+[gd_scene format=3 uid="uid://cnvfko4652fdb"]
+
+[ext_resource type="Script" uid="uid://dv5101dqh0tk2" path="res://src/Game.Godot/UI/Character/CharacterAttributeTab.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://w3p5tddepxul" path="res://assets/art/ui/character_stat/shuxingbiaoqian.png" id="2_top_frame"]
+[ext_resource type="Texture2D" uid="uid://bev5ptosmdsee" path="res://assets/art/ui/character_stat/jiahao.png" id="3_add"]
+[ext_resource type="Texture2D" uid="uid://broc3ykivhb6d" path="res://assets/art/ui/character_stat/iconquanzhang.png" id="4_quanzhang"]
+[ext_resource type="Texture2D" uid="uid://ucxhityfcr5k" path="res://assets/art/ui/character_stat/iconjianfa.png" id="5_jianfa"]
+[ext_resource type="Texture2D" uid="uid://dcdftdynmhiyq" path="res://assets/art/ui/character_stat/icondaofa.png" id="6_daofa"]
+[ext_resource type="Texture2D" uid="uid://og4o54kuyhm2" path="res://assets/art/ui/character_stat/iconqimen.png" id="7_qimen"]
+[ext_resource type="Texture2D" uid="uid://dhvod7rox8r0m" path="res://assets/art/ui/character_stat/iconbili.png" id="8_bili"]
+[ext_resource type="Texture2D" uid="uid://dcr8uc8ve854a" path="res://assets/art/ui/character_stat/iconshenfa.png" id="9_shenfa"]
+[ext_resource type="Texture2D" uid="uid://bpq0eglpucoxa" path="res://assets/art/ui/character_stat/iconwuxing.png" id="10_wuxing"]
+[ext_resource type="Texture2D" uid="uid://dtajimg1dmful" path="res://assets/art/ui/character_stat/iconfuyuan.png" id="11_fuyuan"]
+[ext_resource type="Texture2D" uid="uid://d2hjb1d5p507" path="res://assets/art/ui/character_stat/icongengu.png" id="12_gengu"]
+[ext_resource type="Texture2D" uid="uid://4ydgqmrijbv" path="res://assets/art/ui/character_stat/icondingli.png" id="13_dingli"]
+[ext_resource type="LabelSettings" uid="uid://c5allkd7v57v7" path="res://assets/theme/label_character_attr_.tres" id="14_label_settings"]
+[ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="15_button"]
+[ext_resource type="Texture2D" uid="uid://io7wtm55j24j" path="res://assets/art/ui/character_stat/shuxingfenpei.png" id="16_qq1ga"]
+[ext_resource type="Texture2D" uid="uid://rp0frp5p0jig" path="res://assets/art/misc/cross.png" id="17_tjgo3"]
+
+[node name="AttributeTab" type="Control" unique_id=478578747]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="TopFrame" type="TextureRect" parent="." unique_id=775189672]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 24.0
+offset_right = 1086.0
+offset_bottom = 84.0
+texture = ExtResource("2_top_frame")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="AddPointButton" parent="." unique_id=641480103 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1126.0
+offset_top = 6.0
+offset_right = 1190.0
+offset_bottom = 70.0
+texture_normal = ExtResource("3_add")
+
+[node name="PointLabel" type="Label" parent="AddPointButton" unique_id=793962033]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -126.0
+offset_top = -26.5
+offset_right = -33.0
+offset_bottom = 26.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0"
+label_settings = ExtResource("14_label_settings")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Columns" type="HBoxContainer" parent="." unique_id=1352966059]
+layout_mode = 0
+offset_left = 42.0
+offset_top = 116.0
+offset_right = 1070.0
+offset_bottom = 480.0
+theme_override_constants/separation = 72
+
+[node name="Column1" type="HBoxContainer" parent="Columns" unique_id=1357001928]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icons" type="VBoxContainer" parent="Columns/Column1" unique_id=2018199271]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QuanzhangIcon" type="TextureRect" parent="Columns/Column1/Icons" unique_id=1605119586]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("4_quanzhang")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="JianfaIcon" type="TextureRect" parent="Columns/Column1/Icons" unique_id=1734627]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("5_jianfa")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DaofaIcon" type="TextureRect" parent="Columns/Column1/Icons" unique_id=1154965034]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("6_daofa")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="QimenIcon" type="TextureRect" parent="Columns/Column1/Icons" unique_id=1441337279]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("7_qimen")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Names" type="VBoxContainer" parent="Columns/Column1" unique_id=2016289642]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QuanzhangName" type="Label" parent="Columns/Column1/Names" unique_id=577581375]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "拳掌"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="JianfaName" type="Label" parent="Columns/Column1/Names" unique_id=1493094875]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "剑法"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="DaofaName" type="Label" parent="Columns/Column1/Names" unique_id=1006121572]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "刀法"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="QimenName" type="Label" parent="Columns/Column1/Names" unique_id=115186261]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "奇门"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="Values" type="VBoxContainer" parent="Columns/Column1" unique_id=390428417]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QuanzhangLabel" type="Label" parent="Columns/Column1/Values" unique_id=68762523]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="JianfaLabel" type="Label" parent="Columns/Column1/Values" unique_id=377183406]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="DaofaLabel" type="Label" parent="Columns/Column1/Values" unique_id=698881966]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="QimenLabel" type="Label" parent="Columns/Column1/Values" unique_id=702911616]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="Column2" type="HBoxContainer" parent="Columns" unique_id=1702531807]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icons" type="VBoxContainer" parent="Columns/Column2" unique_id=2036347529]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BiliIcon" type="TextureRect" parent="Columns/Column2/Icons" unique_id=1112595837]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("8_bili")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ShenfaIcon" type="TextureRect" parent="Columns/Column2/Icons" unique_id=1918844732]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("9_shenfa")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WuxingIcon" type="TextureRect" parent="Columns/Column2/Icons" unique_id=1619995497]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("10_wuxing")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Names" type="VBoxContainer" parent="Columns/Column2" unique_id=1806681221]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BiliName" type="Label" parent="Columns/Column2/Names" unique_id=1723382824]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "臂力"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="ShenfaName" type="Label" parent="Columns/Column2/Names" unique_id=1675911497]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "身法"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="WuxingName" type="Label" parent="Columns/Column2/Names" unique_id=1942595407]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "悟性"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="Values" type="VBoxContainer" parent="Columns/Column2" unique_id=1688556484]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BiliLabel" type="Label" parent="Columns/Column2/Values" unique_id=1987173335]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="ShenfaLabel" type="Label" parent="Columns/Column2/Values" unique_id=1421813712]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="WuxingLabel" type="Label" parent="Columns/Column2/Values" unique_id=631566080]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="Column3" type="HBoxContainer" parent="Columns" unique_id=2000552467]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icons" type="VBoxContainer" parent="Columns/Column3" unique_id=100986728]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FuyuanIcon" type="TextureRect" parent="Columns/Column3/Icons" unique_id=1499246673]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("11_fuyuan")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GenguIcon" type="TextureRect" parent="Columns/Column3/Icons" unique_id=1872686129]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("12_gengu")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DingliIcon" type="TextureRect" parent="Columns/Column3/Icons" unique_id=1099025888]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+texture = ExtResource("13_dingli")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Names" type="VBoxContainer" parent="Columns/Column3" unique_id=933879654]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FuyuanName" type="Label" parent="Columns/Column3/Names" unique_id=1825407249]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "福缘"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="GenguName" type="Label" parent="Columns/Column3/Names" unique_id=10847508]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "根骨"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="DingliName" type="Label" parent="Columns/Column3/Names" unique_id=190463212]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "定力"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="Values" type="VBoxContainer" parent="Columns/Column3" unique_id=323841367]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FuyuanLabel" type="Label" parent="Columns/Column3/Values" unique_id=905330995]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="GenguLabel" type="Label" parent="Columns/Column3/Values" unique_id=1159327397]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="DingliLabel" type="Label" parent="Columns/Column3/Values" unique_id=1787822230]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "0(+0)"
+label_settings = ExtResource("14_label_settings")
+vertical_alignment = 1
+
+[node name="AssignStatWidget" type="Control" parent="." unique_id=161896769]
+visible = false
+anchors_preset = 0
+offset_left = 3.0
+offset_top = 365.0
+offset_right = 1160.0
+offset_bottom = 669.0
+
+[node name="Shuxingfenpei" type="TextureRect" parent="AssignStatWidget" unique_id=693891733]
+layout_mode = 0
+offset_left = 17.0
+offset_right = 1102.0
+offset_bottom = 237.0
+texture = ExtResource("16_qq1ga")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="AssignStatWidget" unique_id=824560544]
+layout_mode = 1
+offset_left = 68.0
+offset_top = 54.0
+offset_right = 1047.0
+offset_bottom = 214.0
+
+[node name="AddBiliButton" parent="AssignStatWidget/HBoxContainer" unique_id=1774622667 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+texture_normal = ExtResource("8_bili")
+
+[node name="AddShenfaButton" parent="AssignStatWidget/HBoxContainer" unique_id=1008068573 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+texture_normal = ExtResource("9_shenfa")
+
+[node name="AddWuxingButton" parent="AssignStatWidget/HBoxContainer" unique_id=1266303661 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+texture_normal = ExtResource("10_wuxing")
+
+[node name="AddFuyuanButton" parent="AssignStatWidget/HBoxContainer" unique_id=325414288 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+texture_normal = ExtResource("11_fuyuan")
+
+[node name="AddGenguButton" parent="AssignStatWidget/HBoxContainer" unique_id=1383911500 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+texture_normal = ExtResource("12_gengu")
+
+[node name="AddDingliButton" parent="AssignStatWidget/HBoxContainer" unique_id=170449178 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+texture_normal = ExtResource("13_dingli")
+
+[node name="CloseButton" parent="AssignStatWidget" unique_id=332136538 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1004.0
+offset_top = -11.0
+offset_right = 1117.0
+offset_bottom = 95.0
+texture_normal = ExtResource("17_tjgo3")
+PressOffset = null
+PressColor = null

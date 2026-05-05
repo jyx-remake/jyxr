@@ -1,0 +1,51 @@
+<root>
+<task name="购买物品" description="前往洛阳的商店购买五颗小还丹" next="">
+	<location name="洛阳"/>
+	<location name="商店"/>
+	<finish>
+		<condition type="should_finish" value="original_新手引导.买药继续"/>
+	</finish>
+	<result ret="0" type="story" value="original_新手引导.买到药了"/>
+</task>
+<task name="购买药品完成" description="购买药品后，回到南贤居，和南贤对话">
+	<location name="南贤居"/>
+	<location name="南贤"/>
+	<finish>
+		<condition type="should_finish" value="original_新手引导.买药完成"/>
+	</finish>
+	<result ret="0" type="story" value="original_新手引导.任务打人"/>
+</task>
+<task name="教训小孩" description="前往洛阳，教训街上不听话的小孩">
+	<location name="洛阳"/>
+	<location name="小孩"/>
+	<finish>
+		<condition type="should_finish" value="original_新手引导.教训小孩成功"/>
+	</finish>
+	<result ret="0" type="story" value="original_新手引导.教训小孩复命"/>
+</task>
+<task name="教训小孩完成" description="教训完了小孩，回去找南贤吧">
+	<location name="南贤居"/>
+	<location name="南贤"/>
+	<finish>
+		<condition type="should_finish" value="original_新手引导.教训小孩完成"/>
+	</finish>
+    <result ret="0" type="story" value="original_新手引导结束"/>
+</task>
+
+<task name="教训黑老大" description="前往衡阳，教训衡阳城里的黑老大">
+	<location name="衡阳"/>
+	<location name="黑老大"/>
+	<finish>
+		<condition type="should_finish" value="original_新手引导.教训黑老大负"/>
+	</finish>
+	<result ret="0" type="story" value="original_新手引导.教训黑老大复命"/>
+</task>
+<task name="教训黑老大完成" description="衡阳黑老大的事情告一段落了，回去找南贤吧">
+	<location name="南贤居"/>
+	<location name="南贤"/>
+	<finish>
+		<condition type="should_finish" value="original_新手引导.教训黑老大完成"/>
+	</finish>
+    <result ret="0" type="story" value="original_新手引导结束"/>
+</task>
+</root>

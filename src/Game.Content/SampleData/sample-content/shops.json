@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sample_shop",
+    "name": "Sample Shop",
+    "products": [
+      {
+        "contentId": "healing_potion",
+        "price": 25
+      }
+    ]
+  }
+]

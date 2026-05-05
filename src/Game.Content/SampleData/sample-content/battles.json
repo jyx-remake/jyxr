@@ -1,0 +1,9 @@
+[
+  {
+    "id": "sample_battle",
+    "name": "Sample Battle",
+    "mapId": "sample_map",
+    "participants": [],
+    "randomParticipants": []
+  }
+]

@@ -1,0 +1,301 @@
+[gd_scene format=3 uid="uid://c7xwca038g3px"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" uid="uid://bgpdvgmngujai" path="res://src/Game.Godot/UI/Character/CharacterPanel.cs" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://cilt411j4qp5o" path="res://assets/art/ui/character_panel/renwuzhuangtai_dise.png" id="3_background"]
+[ext_resource type="Texture2D" uid="uid://cnpmuiricosrf" path="res://assets/art/ui/guoxiang.png" id="4_avatar"]
+[ext_resource type="Texture2D" uid="uid://cegwblxnksegl" path="res://assets/art/ui/character_panel/renwuzhuangtai_touxiangdise.png" id="5_avatar_background"]
+[ext_resource type="Texture2D" uid="uid://bdmh4kt0xk26e" path="res://assets/art/ui/character_panel/touxiangbiankuang.png" id="6_avatar_frame"]
+[ext_resource type="Texture2D" uid="uid://43wukauo8e1n" path="res://assets/art/ui/character_panel/renwuzhuangtai_shuxing.png" id="7_attr_button"]
+[ext_resource type="Texture2D" uid="uid://h6a75nag5ti7" path="res://assets/art/ui/character_panel/renwuzhuangtai_zhuangbei.png" id="8_equip_button"]
+[ext_resource type="Texture2D" uid="uid://ceqf5ghnswo2h" path="res://assets/art/ui/character_panel/renwuzhuangtai_jineng.png" id="9_skill_button"]
+[ext_resource type="Texture2D" uid="uid://burcoa7lhsxxo" path="res://assets/art/ui/character_panel/renwuzhuangtai_tianfu.png" id="10_talent_button"]
+[ext_resource type="Texture2D" uid="uid://du67x404pgcg3" path="res://assets/art/ui/character_panel/renwuzhuangtai_liezhuang.png" id="11_biography_button"]
+[ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="12_button"]
+[ext_resource type="Texture2D" uid="uid://bme7m3xaidyeo" path="res://assets/art/ui/character_panel/nav_prev.svg" id="13_prev_nav"]
+[ext_resource type="Texture2D" uid="uid://fehul5q0per7" path="res://assets/art/ui/character_panel/nav_next.svg" id="14_next_nav"]
+[ext_resource type="PackedScene" uid="uid://cnvfko4652fdb" path="res://scenes/ui/character_panel/attribute_tab.tscn" id="15_attribute_tab"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/talent_tab.tscn" id="16_talent_tab"]
+[ext_resource type="PackedScene" path="res://scenes/ui/skill_tab/skill_tab.tscn" id="17_skill_tab"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/biography_tab.tscn" id="18_biography_tab"]
+[ext_resource type="LabelSettings" uid="uid://bny34iuy5pp6r" path="res://assets/theme/label_character_under_avatar.tres" id="19_under_avatar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/equipment_tab.tscn" id="20_equipment_tab"]
+
+[sub_resource type="StyleBoxEmpty" id="1_empty"]
+
+[node name="CharacterPanel" unique_id=104948523 instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+
+[node name="BackGround" parent="." index="1" unique_id=2084013287]
+texture = ExtResource("3_background")
+
+[node name="AvatarBox" type="Control" parent="." index="3" unique_id=1151911410]
+anchors_preset = 0
+
+[node name="ClipBackground" type="TextureRect" parent="AvatarBox" index="0" unique_id=219727967]
+clip_children = 2
+layout_mode = 0
+offset_left = 106.0
+offset_top = 34.0
+offset_right = 619.48517
+offset_bottom = 545.796
+texture = ExtResource("5_avatar_background")
+expand_mode = 1
+
+[node name="Avatar" type="TextureRect" parent="AvatarBox/ClipBackground" index="0" unique_id=924422102]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 65.0
+offset_top = 64.0
+offset_right = 611.67084
+offset_bottom = 610.67084
+scale = Vector2(0.6914581, 0.70631546)
+texture = ExtResource("4_avatar")
+expand_mode = 1
+
+[node name="AvatarFrame" type="TextureRect" parent="AvatarBox" index="1" unique_id=2050947383]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 10.0
+offset_right = 588.5491
+offset_bottom = 513.7993
+scale = Vector2(1.0947978, 1.0947978)
+texture = ExtResource("6_avatar_frame")
+expand_mode = 1
+
+[node name="PrevCharacterButton" parent="AvatarBox" index="2" unique_id=1378105116 instance=ExtResource("12_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 206.0
+offset_right = 124.0
+offset_bottom = 306.0
+texture_normal = ExtResource("13_prev_nav")
+stretch_mode = 0
+
+[node name="NextCharacterButton" parent="AvatarBox" index="3" unique_id=1062137731 instance=ExtResource("12_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 596.0
+offset_top = 206.0
+offset_right = 696.0
+offset_bottom = 306.0
+texture_normal = ExtResource("14_next_nav")
+stretch_mode = 0
+
+[node name="Labels" type="Control" parent="." index="4" unique_id=686035826]
+anchors_preset = 0
+offset_left = 224.0
+offset_top = 520.0
+offset_right = 520.0
+offset_bottom = 860.0
+
+[node name="NameLabel" type="Label" parent="Labels" index="0" unique_id=998987688]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -38.0
+offset_top = -88.0
+offset_right = 192.0
+offset_bottom = -12.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 52
+text = "角色"
+horizontal_alignment = 1
+
+[node name="Stats" type="HBoxContainer" parent="Labels" index="1" unique_id=1878933587]
+layout_mode = 0
+offset_left = -30.0
+offset_top = -2.0
+offset_right = 160.0
+offset_bottom = 308.0
+theme_override_constants/separation = 20
+
+[node name="StatNames" type="VBoxContainer" parent="Labels/Stats" index="0" unique_id=740608427]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LevelText" type="Label" parent="Labels/Stats/StatNames" index="0" unique_id=1470090216]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "等级"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="HpText" type="Label" parent="Labels/Stats/StatNames" index="1" unique_id=1448672079]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "生命"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="MpText" type="Label" parent="Labels/Stats/StatNames" index="2" unique_id=1239007595]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "内力"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="XpText" type="Label" parent="Labels/Stats/StatNames" index="3" unique_id=2140751199]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "经验"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="AttackText" type="Label" parent="Labels/Stats/StatNames" index="4" unique_id=1738089070]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "攻击"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="DefenceText" type="Label" parent="Labels/Stats/StatNames" index="5" unique_id=1011866529]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "防御"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="StatValues" type="VBoxContainer" parent="Labels/Stats" index="1" unique_id=206840489]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LevelValueLabel" type="Label" parent="Labels/Stats/StatValues" index="0" unique_id=682341729]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "1"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="HpValueLabel" type="Label" parent="Labels/Stats/StatValues" index="1" unique_id=1583742916]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "0"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="MpValueLabel" type="Label" parent="Labels/Stats/StatValues" index="2" unique_id=23051696]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "0"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="XpValueLabel" type="Label" parent="Labels/Stats/StatValues" index="3" unique_id=289827804]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "0"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="AttackValueLabel" type="Label" parent="Labels/Stats/StatValues" index="4" unique_id=149084320]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "0"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="DefenceValueLabel" type="Label" parent="Labels/Stats/StatValues" index="5" unique_id=1589588472]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "0"
+label_settings = ExtResource("19_under_avatar")
+
+[node name="Buttons" type="Control" parent="." index="5" unique_id=1248383560]
+anchors_preset = 0
+
+[node name="AttrButton" parent="Buttons" index="0" unique_id=286457594 instance=ExtResource("12_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 675.0
+offset_top = 106.0
+offset_right = 885.0
+offset_bottom = 316.0
+texture_normal = ExtResource("7_attr_button")
+stretch_mode = 0
+
+[node name="EquipButton" parent="Buttons" index="1" unique_id=1180885541 instance=ExtResource("12_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 874.0
+offset_top = 176.0
+offset_right = 1084.0
+offset_bottom = 386.0
+texture_normal = ExtResource("8_equip_button")
+stretch_mode = 0
+
+[node name="SkillButton" parent="Buttons" index="2" unique_id=1557070536 instance=ExtResource("12_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1267.0
+offset_top = 175.0
+offset_right = 1477.0
+offset_bottom = 385.0
+texture_normal = ExtResource("9_skill_button")
+stretch_mode = 0
+
+[node name="TalentButton" parent="Buttons" index="3" unique_id=2089298929 instance=ExtResource("12_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1075.0
+offset_top = 104.0
+offset_right = 1285.0
+offset_bottom = 314.0
+texture_normal = ExtResource("10_talent_button")
+stretch_mode = 0
+
+[node name="BiographyButton" parent="Buttons" index="4" unique_id=1727327431 instance=ExtResource("12_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1453.0
+offset_top = 106.0
+offset_right = 1663.0
+offset_bottom = 316.0
+texture_normal = ExtResource("11_biography_button")
+stretch_mode = 0
+
+[node name="TabContainer" type="TabContainer" parent="." index="6" unique_id=1891201305]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 536.0
+offset_top = 380.0
+offset_right = 1708.0
+offset_bottom = 900.0
+theme_override_styles/panel = SubResource("1_empty")
+current_tab = 0
+tabs_visible = false
+
+[node name="AttributeTab" parent="TabContainer" index="1" unique_id=1934449746 instance=ExtResource("15_attribute_tab")]
+unique_name_in_owner = true
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="EquipmentTab" parent="TabContainer" index="2" unique_id=1055523497 instance=ExtResource("20_equipment_tab")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="SkillTab" parent="TabContainer" index="3" unique_id=980935855 instance=ExtResource("17_skill_tab")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="TalentTab" parent="TabContainer" index="4" unique_id=80760765 instance=ExtResource("16_talent_tab")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="BiographyTab" parent="TabContainer" index="5" unique_id=2143392001 instance=ExtResource("18_biography_tab")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." index="7" unique_id=1343441799]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 920.0
+offset_right = 1773.0
+offset_bottom = 1067.0
+
+[node name="QuickPartyContainer" type="HBoxContainer" parent="ScrollContainer" index="0" unique_id=1744764174]
+unique_name_in_owner = true
+layout_mode = 2

@@ -1,0 +1,19 @@
+<root>
+  <grow_template shenfa="1" hp="120" qimen="1" name="default" mp="80" bili="1" dingli="1" daofa="1" quanzhang="1" gengu="1" wuxue="8" fuyuan="1" wuxing="0" jianfa="1" />
+  <grow_template shenfa="2" hp="120" qimen="2" name="主角" mp="80" bili="2" dingli="2" daofa="2" quanzhang="2" gengu="2" wuxue="11" fuyuan="2" wuxing="0" jianfa="2" />
+  <grow_template shenfa="3" hp="120" qimen="2" name="无门派主角" mp="80" bili="3" dingli="3" daofa="2" quanzhang="2" gengu="3" wuxue="15" fuyuan="3" wuxing="2" jianfa="2" />
+  <grow_template shenfa="1" hp="200" qimen="0" name="肉盾" mp="40" bili="2" dingli="3" daofa="0" quanzhang="2" gengu="2" wuxue="8" fuyuan="0" wuxing="0" jianfa="0" />
+  <grow_template shenfa="2" hp="120" qimen="0" name="剑侠" mp="60" bili="1" dingli="3" daofa="0" quanzhang="0" gengu="1" wuxue="8" fuyuan="1" wuxing="0" jianfa="4" />
+  <grow_template shenfa="3" hp="120" qimen="0" name="刀客" mp="60" bili="2" dingli="1" daofa="4" quanzhang="0" gengu="1" wuxue="8" fuyuan="1" wuxing="0" jianfa="0" />
+  <grow_template shenfa="2" hp="120" qimen="2" name="宗师" mp="80" bili="2" dingli="3" daofa="2" quanzhang="2" gengu="3" wuxue="11" fuyuan="3" wuxing="0" jianfa="2" />
+  <grow_template shenfa="2" hp="200" qimen="0" name="大侠" mp="50" bili="2" dingli="2" daofa="0" quanzhang="3" gengu="3" wuxue="9" fuyuan="1" wuxing="0" jianfa="0" />
+  <grow_template shenfa="1" hp="150" qimen="0" name="剑掌双修" mp="80" bili="2" dingli="2" daofa="0" quanzhang="3" gengu="2" wuxue="8" fuyuan="1" wuxing="0" jianfa="3" />
+  <grow_template shenfa="4" hp="120" qimen="3" name="小龙女" mp="80" bili="2" dingli="2" daofa="0" quanzhang="2" gengu="2" wuxue="10" fuyuan="2" wuxing="5" jianfa="3" />
+  <grow_template shenfa="3" hp="120" qimen="0" name="段誉" mp="120" bili="2" dingli="1" daofa="0" quanzhang="3" gengu="3" wuxue="10" fuyuan="5" wuxing="0" jianfa="0" />
+  <grow_template shenfa="2" hp="100" qimen="1" name="女子" mp="80" bili="1" dingli="1" daofa="1" quanzhang="1" gengu="1" wuxue="8" fuyuan="2" wuxing="0" jianfa="1" />
+  <grow_template shenfa="3" hp="120" qimen="4" name="奇门" mp="80" bili="1" dingli="1" daofa="0" quanzhang="0" gengu="1" wuxue="8" fuyuan="1" wuxing="0" jianfa="0" />
+  <grow_template shenfa="1" hp="80" qimen="1" name="韦小宝" mp="50" bili="0" dingli="1" daofa="1" quanzhang="1" gengu="1" wuxue="4" fuyuan="5" wuxing="0" jianfa="1" />
+  <grow_template shenfa="1" hp="140" qimen="1" name="内家" mp="100" bili="1" dingli="1" daofa="1" quanzhang="1" gengu="2" wuxue="8" fuyuan="1" wuxing="0" jianfa="1" />
+  <grow_template shenfa="1" hp="180" qimen="1" name="内功大师" mp="150" bili="1" dingli="3" daofa="1" quanzhang="1" gengu="4" wuxue="8" fuyuan="2" wuxing="0" jianfa="1" />
+  <grow_template shenfa="1" hp="120" qimen="0" name="医生" mp="80" bili="1" dingli="2" daofa="0" quanzhang="0" gengu="4" wuxue="5" fuyuan="4" wuxing="0" jianfa="0" />
+</root>

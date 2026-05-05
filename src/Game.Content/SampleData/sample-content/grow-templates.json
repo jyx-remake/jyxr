@@ -1,0 +1,10 @@
+[
+  {
+    "id": "sample_growth",
+    "name": "Sample Growth",
+    "statGrowth": {
+      "max_hp": 2,
+      "max_mp": 1
+    }
+  }
+]

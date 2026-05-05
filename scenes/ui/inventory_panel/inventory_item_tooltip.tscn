@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Inventory/InventoryItemTooltip.cs" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0, 0, 0, 0.39215687)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="LabelSettings" id="2"]
+font_size = 34
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="InventoryItemTooltip" type="PanelContainer"]
+custom_minimum_size = Vector2(560, 0)
+theme_override_styles/panel = SubResource("1")
+script = ExtResource("1_script")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="NameLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "物品名"
+label_settings = SubResource("2")
+
+[node name="ContentLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 0)
+layout_mode = 2
+theme_override_constants/line_separation = 2
+theme_override_constants/paragraph_separation = 0
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+fit_content = true
+scroll_active = false

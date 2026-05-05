@@ -1,0 +1,23 @@
+<root>
+  <touch key="测试" pic="touch.test">
+    <zone y1="338" y2="-89" x1="-8" x2="131" />
+    <zone y1="-26" y2="-83" x1="-247" x2="203" />
+    <zone y1="150" y2="6" x1="-49" x2="186" />
+  </touch>
+  <touch key="田青文" pic="touch.tianqingwen">
+    <zone y1="184" y2="-16" x1="-145" x2="75" />
+    <zone y1="-74" y2="-293" x1="-28" x2="165" />
+  </touch>
+  <touch key="王语嫣" pic="touch.wangyuyan">
+    <zone y1="224" y2="-274" x1="-116" x2="72" />
+    <zone y1="-72" y2="-267" x1="-158" x2="218" />
+  </touch>
+  <touch key="木婉清" pic="touch.muwanqing">
+    <zone y1="304" y2="-236" x1="23" x2="114" />
+    <zone y1="147" y2="-97" x1="-29" x2="187" />
+  </touch>
+  <touch key="李青萝" pic="touch.liqingluo">
+    <zone y1="255" y2="-274" x1="-60" x2="104" />
+    <zone y1="-75" y2="-277" x1="-140" x2="180" />
+  </touch>
+</root>

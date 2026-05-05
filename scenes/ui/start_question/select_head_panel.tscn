@@ -1,0 +1,69 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/StartQuestion/SelectHeadPanel.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://jsmmfitkrv5x" path="res://assets/art/misc/dikuang2.png" id="2_dikuang"]
+[ext_resource type="PackedScene" path="res://scenes/ui/start_question/select_head_slot.tscn" id="2_slot"]
+[ext_resource type="Texture2D" uid="uid://db82ulbrpujgy" path="res://assets/art/misc/btn-cross.png" id="3_ack"]
+[ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="4_jy_button"]
+[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="5_head"]
+
+[node name="SelectHeadPanel" type="Control" unique_id=971016697]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+SelectHeadSlotScene = ExtResource("2_slot")
+
+[node name="Dikuang2" type="TextureRect" parent="." unique_id=550941196]
+layout_mode = 0
+offset_left = 166.0
+offset_top = 33.0
+offset_right = 1782.0
+offset_bottom = 1000.0
+texture = ExtResource("2_dikuang")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HintLabel" type="Label" parent="Dikuang2" unique_id=166081965]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 590.0
+offset_top = 88.0
+offset_right = 940.0
+offset_bottom = 148.0
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "请选择人物头像"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Dikuang2" unique_id=218737271]
+layout_mode = 0
+offset_left = 184.0
+offset_top = 136.0
+offset_right = 1422.0
+offset_bottom = 780.0
+
+[node name="HeadContainer" type="GridContainer" parent="Dikuang2/ScrollContainer" unique_id=409473605]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 5
+
+[node name="TextureRect" type="TextureRect" parent="Dikuang2/ScrollContainer/HeadContainer" unique_id=571213946]
+custom_minimum_size = Vector2(220, 220)
+layout_mode = 2
+texture = ExtResource("5_head")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AckButton" parent="." unique_id=1526949031 instance=ExtResource("4_jy_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1612.0
+offset_top = 742.0
+offset_right = 1871.0
+offset_bottom = 1022.0
+texture_normal = ExtResource("3_ack")
+ignore_texture_size = true
+stretch_mode = 5

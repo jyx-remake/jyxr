@@ -1,0 +1,62 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/StartQuestion/RollStatsPanel.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://c7xwca038g3px" path="res://scenes/ui/character_panel/character_panel.tscn" id="2_character_panel"]
+[ext_resource type="Texture2D" uid="uid://b4ri2c48e87g7" path="res://assets/art/misc/touzi.png" id="3_roll"]
+[ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="4_jy_button"]
+[ext_resource type="Texture2D" uid="uid://db82ulbrpujgy" path="res://assets/art/misc/btn-cross.png" id="5_ack"]
+
+[node name="RollStatsPanel" type="Control" unique_id=759897927]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="CharacterPanel" parent="." unique_id=1831736585 instance=ExtResource("2_character_panel")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="RollButton" parent="." unique_id=847721665 instance=ExtResource("4_jy_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 63.0
+offset_top = 851.0
+offset_right = 243.0
+offset_bottom = 1031.0
+texture_normal = ExtResource("3_roll")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="RollButton" unique_id=1740807050]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 81.0
+offset_right = 165.0
+offset_bottom = 176.0
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_font_sizes/font_size = 80
+text = "重置"
+
+[node name="AckButton" parent="." unique_id=2099066780 instance=ExtResource("4_jy_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1694.0
+offset_top = 862.0
+offset_right = 1874.0
+offset_bottom = 1042.0
+texture_normal = ExtResource("5_ack")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="AckButton" unique_id=747906373]
+layout_mode = 0
+offset_left = -1.0
+offset_top = 71.0
+offset_right = 159.0
+offset_bottom = 166.0
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_font_sizes/font_size = 80
+text = "确定"

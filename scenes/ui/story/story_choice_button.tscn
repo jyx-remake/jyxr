@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Story/StoryChoiceButton.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/misc/moji2.png" id="2_texture"]
+
+[node name="StoryChoiceButton" type="TextureButton"]
+custom_minimum_size = Vector2(1200, 130)
+offset_right = 1200.0
+offset_bottom = 130.0
+texture_normal = ExtResource("2_texture")
+ignore_texture_size = true
+stretch_mode = 0
+focus_mode = 2
+script = ExtResource("1_script")
+
+[node name="ChoiceLabel" type="RichTextLabel" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 164.0
+offset_top = 23.0
+offset_right = 989.0
+offset_bottom = 95.0
+mouse_filter = 2
+bbcode_enabled = true
+fit_content = false
+scroll_active = false
+theme_override_font_sizes/normal_font_size = 50
+text = "选项"
+horizontal_alignment = 1

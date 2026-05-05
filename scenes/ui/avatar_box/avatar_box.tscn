@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://cveba3f8kxvxc"]
+
+[ext_resource type="Script" uid="uid://dgpa2bknacgnk" path="res://src/Game.Godot/UI/AvatarBox.cs" id="1_anahy"]
+[ext_resource type="Texture2D" uid="uid://bno8qbr5uudas" path="res://assets/art/misc/avatar_bg.png" id="1_j1r3i"]
+[ext_resource type="Shader" uid="uid://byh2mxf018i6u" path="res://scenes/ui/avatar_box/avatar_box.gdshader" id="3_vguyd"]
+[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="4_i7gls"]
+[ext_resource type="Texture2D" uid="uid://c8wx1redpc4qx" path="res://assets/art/misc/avatar_frame.png" id="4_rmodk"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_d7dln"]
+shader = ExtResource("3_vguyd")
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/radius = 0.5
+
+[node name="AvatarBox" type="Control" unique_id=904865663]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_anahy")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1199421531]
+layout_mode = 0
+offset_left = -365.0
+offset_top = -365.0
+offset_right = 365.0
+offset_bottom = 365.0
+texture = ExtResource("1_j1r3i")
+
+[node name="Avatar" type="TextureRect" parent="." unique_id=854740600]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_d7dln")
+layout_mode = 0
+offset_left = -358.0
+offset_top = -358.0
+offset_right = 154.0
+offset_bottom = 154.0
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("4_i7gls")
+
+[node name="Frame" type="TextureRect" parent="." unique_id=1041321992]
+layout_mode = 0
+offset_left = -420.0
+offset_top = -420.0
+offset_right = 400.0
+offset_bottom = 404.0
+texture = ExtResource("4_rmodk")

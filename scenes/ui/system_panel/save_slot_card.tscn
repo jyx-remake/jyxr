@@ -1,0 +1,206 @@
+[gd_scene format=3 uid="uid://dtr5c0pjawo7x"]
+
+[ext_resource type="Script" uid="uid://m2jcypjverpf" path="res://src/Game.Godot/UI/System/SaveSlotCard.cs" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_normal"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.2, 0.15, 0.09, 0.78)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.69, 0.58, 0.36, 0.82)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 10
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_pressed"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.17, 0.12, 0.08, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.79, 0.64, 0.33, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_hover"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.25, 0.18, 0.1, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.93, 0.8, 0.44, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_disabled"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.14, 0.11, 0.08, 0.55)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.39, 0.35, 0.29, 0.65)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_portrait"]
+bg_color = Color(0.09, 0.07, 0.05, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.56, 0.44, 0.26, 0.86)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="SaveSlotCard" type="Button" unique_id=1168732317]
+custom_minimum_size = Vector2(650, 295)
+offset_right = 650.0
+offset_bottom = 295.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_card_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_card_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_card_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_card_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_card_hover")
+alignment = 0
+script = ExtResource("1_script")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=828750394]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1138809716]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="Margin/VBox" unique_id=78954124]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.27, 0.91, 0.93, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.04, 0.8)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 42
+text = "存档1"
+
+[node name="ContentRow" type="HBoxContainer" parent="Margin/VBox" unique_id=970388627]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="PortraitPanel" type="PanelContainer" parent="Margin/VBox/ContentRow" unique_id=15342250]
+custom_minimum_size = Vector2(118, 156)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_portrait")
+
+[node name="Portrait" type="TextureRect" parent="Margin/VBox/ContentRow/PortraitPanel" unique_id=457092067]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(118, 156)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="Margin/VBox/ContentRow" unique_id=517824296]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=395789326]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.98, 0.91, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.04, 0.03, 0.82)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 36
+text = "空档"
+
+[node name="PartyCountLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=1410164908]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.91, 0.8, 1)
+theme_override_font_sizes/font_size = 26
+
+[node name="GameTimeLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=1735996101]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.91, 0.8, 1)
+theme_override_font_sizes/font_size = 26
+
+[node name="RunInfoRow" type="HBoxContainer" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=1940620639]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 26
+
+[node name="DifficultyLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=2015163800]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.15, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0.18, 0.03, 0.02, 0.9)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 26
+text = "难度：简单"
+
+[node name="RoundLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=694259001]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.91, 0.8, 1)
+theme_override_font_sizes/font_size = 26
+text = "周目：1"
+
+[node name="LocationLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=335058721]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.91, 0.8, 1)
+theme_override_font_sizes/font_size = 26
+
+[node name="SavedAtLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=1985571942]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.76, 0.63, 1)
+theme_override_font_sizes/font_size = 22
+
+[node name="HintLabel" type="Label" parent="Margin/VBox" unique_id=1537577179]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.82, 0.42, 1)
+theme_override_font_sizes/font_size = 24
+text = "点击写入当前进度"

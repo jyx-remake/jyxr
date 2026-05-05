@@ -1,0 +1,96 @@
+<root>
+  <trigger story="mainStory_黑暗的阴影">
+    <condition value="主角#10" type="level_greater_than" />
+    <condition value="4" type="friendCount" />
+  </trigger>
+  <trigger story="mainStory_神秘剑客">
+    <condition value="主角#15" type="level_greater_than" />
+    <condition value="8" type="friendCount" />
+    <condition value="mainStory_黑暗的阴影1" type="should_finish" />
+  </trigger>
+  <trigger story="mainStory_组织1">
+    <condition value="主角#22" type="level_greater_than" />
+    <condition value="8" type="friendCount" />
+    <condition value="mainStory_神秘剑客1" type="should_finish" />
+  </trigger>
+  <trigger story="mainStory_紧急">
+    <condition value="主角#25" type="level_greater_than" />
+    <condition value="8" type="friendCount" />
+    <condition value="mainStory_组织1" type="should_finish" />
+  </trigger>
+  <trigger story="血刀门_出师">
+    <condition value="40" type="exceed_day" />
+    <condition value="血刀门" type="in_menpai" />
+  </trigger>
+  <trigger story="血刀门_门内比武">
+    <condition value="85" type="exceed_day" />
+    <condition value="血刀门" type="in_menpai" />
+  </trigger>
+  <trigger story="门派灵鹫宫_出师">
+    <condition value="50" type="exceed_day" />
+    <condition value="灵鹫宫" type="in_menpai" />
+  </trigger>
+  <trigger story="灵鹫宫_攻打">
+    <condition value="240" type="exceed_day" />
+    <condition value="灵鹫宫" type="in_menpai" />
+    <condition value="灵鹫宫_委屈求全" type="should_not_finish" />
+  </trigger>
+  <trigger story="灵鹫宫_攻打_完成珍珑棋局">
+    <condition value="360" type="exceed_day" />
+    <condition value="灵鹫宫" type="in_menpai" />
+    <condition value="灵鹫宫_委屈求全" type="should_finish" />
+  </trigger>
+  <trigger story="少林寺_福建南少林">
+    <condition value="40" type="exceed_day" />
+    <condition value="少林寺" type="in_menpai" />
+  </trigger>
+  <trigger story="少林派_南少林出师">
+    <condition value="75" type="exceed_day" />
+    <condition value="少林寺" type="in_menpai" />
+    <condition value="少林寺_福建南少林破败" type="should_finish" />
+  </trigger>
+  <trigger story="南少林_如来神掌">
+    <condition value="390" type="exceed_day" />
+    <condition value="少林寺" type="in_menpai" />
+    <condition value="少林派_南少林出师" type="should_finish" />
+  </trigger>
+  <trigger story="少林派_少林出师">
+    <condition value="75" type="exceed_day" />
+    <condition value="少林寺" type="in_menpai" />
+    <condition value="少林寺_福建南少林破败" type="should_not_finish" />
+  </trigger>
+  <trigger story="少林派_门派大比">
+    <condition value="150" type="exceed_day" />
+    <condition value="少林寺" type="in_menpai" />
+    <condition value="少林寺_福建南少林破败" type="should_not_finish" />
+  </trigger>
+  <trigger story="少林_金刚门">
+    <condition value="400" type="exceed_day" />
+    <condition value="少林寺" type="in_menpai" />
+    <condition value="少林寺_南北之争" type="should_not_finish" />
+  </trigger>
+  <trigger story="全真教_门派大比">
+    <condition value="50" type="exceed_day" />
+    <condition value="全真教" type="in_menpai" />
+  </trigger>
+  <trigger story="全真教_大校">
+    <condition value="90" type="exceed_day" />
+    <condition value="全真教" type="in_menpai" />
+  </trigger>
+  <trigger story="武当派_出师">
+    <condition value="65" type="exceed_day" />
+    <condition value="武当派" type="in_menpai" />
+  </trigger>
+  <trigger story="星宿派_出师">
+    <condition value="40" type="exceed_day" />
+    <condition value="星宿派" type="in_menpai" />
+  </trigger>
+  <trigger story="星宿派_星宿老仙考校">
+    <condition value="90" type="exceed_day" />
+    <condition value="星宿派" type="in_menpai" />
+  </trigger>
+  <trigger story="星宿派_召回擂鼓山">
+    <condition value="150" type="exceed_day" />
+    <condition value="星宿派" type="in_menpai" />
+  </trigger>
+</root>

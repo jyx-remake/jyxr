@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Character/CharacterEquipmentSelectionPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/inventory_item_box.tscn" id="3_item_box"]
+
+[node name="CharacterEquipmentSelectionPanel" instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+InventoryItemBoxScene = ExtResource("3_item_box")
+
+[node name="TitleLabel" type="Label" parent="." index="3"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 760.0
+offset_top = 82.0
+offset_right = 1160.0
+offset_bottom = 160.0
+theme_override_colors/font_color = Color(1, 0.96, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 58
+text = "选择装备"
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="." index="4"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 360.0
+offset_top = 168.0
+offset_right = 1570.0
+offset_bottom = 216.0
+theme_override_colors/font_color = Color(0.93, 0.88, 0.7, 1)
+theme_override_font_sizes/font_size = 30
+text = "选择可装备的物品。"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." index="5"]
+layout_mode = 0
+offset_left = 310.0
+offset_top = 238.0
+offset_right = 1660.0
+offset_bottom = 884.0
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 40
+columns = 6
+
+[node name="EmptyLabel" type="Label" parent="." index="6"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 430.0
+offset_top = 318.0
+offset_right = 1510.0
+offset_bottom = 376.0
+theme_override_colors/font_color = Color(0.78, 0.7, 0.53, 1)
+theme_override_font_sizes/font_size = 32
+text = "背包中没有可装备的物品。"
+horizontal_alignment = 1

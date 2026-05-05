@@ -1,0 +1,2629 @@
+<root>
+  <story name="original_女主长安">
+    <result value="original_女主长安接任务" type="story" ret="0" />
+    <result value="original_女主长安加入队伍判断" type="story" ret="1" />
+    <action value="主角#啊，是$FEMALE$..." type="DIALOG" />
+    <action value="主角#说些什么好呢？#最近还好吗？#要不要和我一起闯江湖？" type="SELECT" />
+  </story>
+  <story name="original_女主长安接任务">
+    <result value="original_长安深夜怪事.开篇" type="story" ret="0">
+      <condition value="original_长安深夜怪事.开篇" type="should_not_finish" />
+    </result>
+    <result value="original_山庄风云.开篇" type="story" ret="0">
+      <condition value="original_山庄风云.出发" type="should_not_finish" />
+    </result>
+    <result value="original_女主.一切太平" type="story" ret="0" />
+  </story>
+  <story name="original_女主长安加入队伍判断">
+    <result value="original_女主长安加入队伍" type="story" ret="0">
+      <condition value="60" type="haogan_more_than" />
+    </result>
+    <result value="original_女主长安不加入" type="story" ret="0">
+      <condition value="60" type="haogan_less_than" />
+    </result>
+  </story>
+  <story name="original_女主长安加入队伍">
+    <action value="女主#好啊！我们走吧！" type="DIALOG" />
+    <action value="女主" type="JOIN" />
+  </story>
+  <story name="original_女主长安不加入">
+    <action value="女主#我...好像不太舒服，还是下次再跟你跑吧。" type="DIALOG" />
+    <action value="主角#好吧..." type="DIALOG" />
+  </story>
+  <story name="original_女主.一切太平">
+    <action value="主角#$FEMALE$，好久不见，最近还好吗？" type="DIALOG" />
+    <action value="女主#$MALE$，嘻嘻，谢谢你关心，最近一切太平。" type="DIALOG" />
+  </story>
+  <story name="original_长安深夜怪事.开篇">
+    <action value="主角#$FEMALE$，好久不见，最近还好吗？" type="DIALOG" />
+    <action value="女主#$MALE$，嘻嘻，谢谢你关心，最近挺好的。就是最近长安城里出了一件怪事，我特别好奇。" type="DIALOG" />
+    <action value="主角#哦？" type="DIALOG" />
+    <action value="女主#最近听说菜市口附近，一到半夜就会发出凄厉的鬼叫，打更的人去查看，又找不到声音到底在哪里发出来的。" type="DIALOG" />
+    <action value="主角#这官府没去管吗？" type="DIALOG" />
+    <action value="女主#长安的王公贵族才不会去砍犯人脑袋的菜市口呢，他们不在乎的地方，官府当然也不会在乎啦。" type="DIALOG" />
+    <action value="主角#恩...要不，我去看看到底什么情况吧！" type="DIALOG" />
+    <action value="女主#（两眼放光）好呀好呀，要不我跟你一起去？" type="DIALOG" />
+    <action value="主角#...别。" type="DIALOG" />
+    <action value="女主#...为虾米" type="DIALOG" />
+    <action value="主角#要是有危险怎么办。" type="DIALOG" />
+    <action value="女主#你会保护我嘛。" type="DIALOG" />
+    <action value="主角#......还是我先去看看什么情况吧，要是情况太危险，我一个人还有办法脱险，带上你就不好说了。" type="DIALOG" />
+    <action value="女主#咕呜..." type="DIALOG" />
+    <action value="主角#好了，就这么说定了。我去看看到底什么情况吧。" type="DIALOG" />
+  </story>
+  <story name="original_长安深夜怪事">
+    <action value="地图.城市" type="BACKGROUND" />
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="主角#夜半时分...菜市口这种专砍人头的地方，呆久了确实感觉毛毛的。" type="DIALOG" />
+    <action value="主角#咦？似乎那边真的有怪叫？" type="DIALOG" />
+    <action value="主角#（偷偷摸摸到街角...）是一个女子的哭声..." type="DIALOG" />
+    <action value="主角#要过去看看吗？#过去看看#有点不安的感觉，还是回去吧。" type="SELECT" />
+    <result value="original_长安深夜怪事.初遇夜间人" type="story" ret="0" />
+    <result value="original_长安深夜怪事.回复任务失败" type="story" ret="1" />
+  </story>
+  <story name="original_长安深夜怪事.初遇夜间人">
+    <action value="主角#没什么好怕的，这世上哪有什么鬼魂。" type="DIALOG" />
+    <action value="主角#！！有埋伏！！" type="DIALOG" />
+    <action value="original_长安深夜怪事.初遇夜间人" type="BATTLE" />
+    <result value="original_长安深夜怪事.初遇夜间人2" type="story" ret="win" />
+  </story>
+  <story name="original_长安深夜怪事.初遇夜间人2">
+    <result value="original_长安深夜怪事.回复任务成功" type="story" ret="0" />
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="主角#你是什么人！为何要偷袭我？！" type="DIALOG" />
+    <action value="长安深夜神秘女子#......（一下子不见了踪影）" type="DIALOG" />
+    <action value="主角#站住！！...这人武功怪异，轻功高明，我还是先回去跟$FEMALE$说一下情况吧。" type="DIALOG" />
+  </story>
+  <story name="original_长安深夜怪事.回复任务成功">
+    <action value="地图.府门前" type="BACKGROUND" />
+    <action value="音乐.琵琶语" type="MUSIC" />
+    <action value="女主#怎么样，见到鬼了吗？" type="DIALOG" />
+    <action value="主角#根本不是什么鬼，倒像是个神秘的武林高手！（将情景描述一番）" type="DIALOG" />
+    <action value="女主#哇！好期待！她的爪法真的那么犀利吗？" type="DIALOG" />
+    <action value="主角#...此人武功极其诡异，爪法中透出一股阴气，但是我又感觉到她所用的武功其实源自玄门正宗...真是怪哉怪哉。" type="DIALOG" />
+    <action value="女主#要不，下次你也带我再去会会她吧？" type="DIALOG" />
+    <action value="主角#不可不可，此事不妥。" type="DIALOG" />
+    <action value="女主#啊...（失望）" type="DIALOG" />
+    <action value="主角#此人武功虽然不及我，但是我隐隐感觉到她的招式之中还有更大的后手，带上你，我怕她忽施奇手，我是救不及的。" type="DIALOG" />
+    <action value="女主#哦..." type="DIALOG" />
+    <action value="主角#而且经过今夜一战，她可能早已逃遁，不再出现在菜市口了。" type="DIALOG" />
+    <action value="女主#好吧...真没劲。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="女主#3" type="HAOGAN" />
+  </story>
+  <story name="original_长安深夜怪事.回复任务失败">
+    <action value="地图.府门前" type="BACKGROUND" />
+    <action value="音乐.琵琶语" type="MUSIC" />
+    <action value="女主#怎么样，见到鬼了吗？" type="DIALOG" />
+    <action value="主角#(...想办法糊弄过去吧）没见到，可能是时候不对吧，我下次再去看看。" type="DIALOG" />
+    <action value="女主#哦..." type="DIALOG" />
+    <action value="女主#-1" type="HAOGAN" />
+  </story>
+  <story name="original_长安深夜怪事.再遇夜间人">
+    <result value="original_长安深夜怪事.再遇夜间人2" type="story" ret="win" />
+    <action value="地图.树林" type="BACKGROUND" />
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="长安菜农#女侠饶命，女侠饶命啊！" type="DIALOG" />
+    <action value="长安深夜神秘女子#......" type="DIALOG" />
+    <action value="长安菜农#女侠，我上有八十老母，下有三岁小儿，一家老小都靠着我啊，女侠饶命啊女侠。" type="DIALOG" />
+    <action value="长安深夜神秘女子#（作势正要杀人）" type="DIALOG" />
+    <action value="主角#住手！" type="DIALOG" />
+    <action value="original_长安深夜怪事.再遇夜间人" type="BATTLE" />
+  </story>
+  <story name="original_长安深夜怪事.再遇夜间人2">
+    <action value="主角#你到底是什么人！居然半夜伏击无辜的菜农，真是枉费了你一身上乘武学！" type="DIALOG" />
+    <action value="长安深夜神秘女子#上乘武学？你说我练的是上乘武学？哈哈哈哈，哈哈哈哈！" type="DIALOG" />
+    <action value="主角#（此人笑声好尖利，真令人毛骨悚然）你武功本源自上乘玄门正宗，为何却变得如此阴毒寒邪？" type="DIALOG" />
+    <action value="长安深夜神秘女子#世人皆笑我疯癫，世人皆道我入魔。你也不过如此罢了，哈哈哈哈，哈哈哈哈！（身形只一晃就失去了影踪)" type="DIALOG" />
+    <action value="主角#老伯，你没事吧？" type="DIALOG" />
+    <action value="长安菜农#谢谢大侠救命之恩，谢谢大侠救命之恩啊！这个贱...婊子，吓得我脚都软了。" type="DIALOG" />
+    <action value="主角#老伯别怕，有我在她不敢再怎么样了。老伯可认识刚才的女子？" type="DIALOG" />
+    <action value="长安菜农#不认识！不认识！我要是认识这么恐怖的婊子，恐怕三十条命都早没了。" type="DIALOG" />
+    <action value="主角#(...既然不认识，她何苦为难素不相识、又不会武功的百姓？难道，她是杀人魔？)" type="DIALOG" />
+    <action value="3" type="DAODE" />
+  </story>
+  <story name="original_长安深夜怪事.再遇夜间人.回复任务">
+    <action value="女主#？你最近气色好像不太好？" type="DIALOG" />
+    <action value="主角#没事，有些心事罢了。" type="DIALOG" />
+    <action value="女主#怎么了？" type="DIALOG" />
+    <action value="主角#（把长安城外遇见菜农和神秘女子的事情一五一十地说出）" type="DIALOG" />
+    <action value="女主#杀人魔？" type="DIALOG" />
+    <action value="主角#我有这个担心...你最近小心一点，尤其是夜间外出！" type="DIALOG" />
+    <action value="女主#呵呵，谢谢你关心我。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="女主#3" type="HAOGAN" />
+  </story>
+  <story name="original_长安深夜怪事.三遇夜间人">
+    <action value="地图.华山山洞" type="BACKGROUND" />
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="主角#奇怪，洞中为何有一股腐臭味？" type="DIALOG" />
+    <action value="主角#等等？！这些都是人的尸体？" type="DIALOG" />
+    <action value="主角#被撕碎成了一块块肉片...好狠毒的手法！" type="DIALOG" />
+    <action value="长安深夜神秘女子#我和阁下到底有什么仇怨，居然又在此遇见。" type="DIALOG" />
+    <action value="主角#又是你！" type="DIALOG" />
+    <action value="长安深夜神秘女子#今日你自投罗网，正好试一试我新近领悟的摧魂鬼手，哈哈哈哈！" type="DIALOG" />
+    <action value="主角#我问你，这些人跟你何怨何仇，你竟要将他们杀害到撕成碎片？" type="DIALOG" />
+    <action value="长安深夜神秘女子#我和他们无怨也无仇，怪只怪他们运气不好要遇见我了。少侠，这个答案，你满意么？" type="DIALOG" />
+    <action value="主角#简直莫名其妙！那天在长安城郊遇见的菜农，也是和你无冤无仇？" type="DIALOG" />
+    <action value="长安深夜神秘女子#不错，这些个人啊，为了贪那么点蝇头小利，要冒险走夜路，你说叫我遇上了，那有什么办法呢？哈哈哈哈！" type="DIALOG" />
+    <action value="主角#简直丧心病狂，你这武林败类，看我今日替民除害！" type="DIALOG" />
+    <action value="长安深夜神秘女子#今时不同往日，我的催魂手已经大成，少侠你可要当心哦。" type="DIALOG" />
+    <action value="original_长安深夜怪事.三遇夜间人" type="BATTLE" />
+    <result value="original_长安深夜怪事.三遇夜间人2" type="story" ret="win" />
+  </story>
+  <story name="original_长安深夜怪事.三遇夜间人2">
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="长安深夜神秘女子#可恶！为什么我都已经将七伤摧魂手修到了顶级，却还是赢不了这个人！" type="DIALOG" />
+    <action value="主角#因为我是主角啊，你认命吧。" type="DIALOG" />
+    <action value="长安深夜神秘女子#连这个毛头小子都赢不了！夫君啊！儿子啊！我如何替你们报仇雪恨啊！！" type="DIALOG" />
+    <action value="主角#?" type="DIALOG" />
+    <action value="长安深夜神秘女子#不，不可能，不可能！（强行催动真气，脸色显得越发乌黑）" type="DIALOG" />
+    <action value="长安深夜神秘女子#不可能！（嘴角忽然渗出一丝鲜血，整个人剧烈地抽动起来）" type="DIALOG" />
+    <action value="主角#看她的样子，似乎是受了这门邪门的武功反噬，怎么办？" type="DIALOG" />
+    <action value="主角#该怎么办？#趁她病，要她命啊！#再观察一下" type="SELECT" />
+    <result value="original_长安深夜怪事.三遇夜间人.杀" type="story" ret="0" />
+    <result value="original_长安深夜怪事.三遇夜间人.不杀" type="story" ret="1" />
+  </story>
+  <story name="original_长安深夜怪事.三遇夜间人.杀">
+    <action value="主角#你这恶婆娘，作恶多端，杀人无数，今日我替被你杀死的无辜百姓伸张正义！（手起刀落）" type="DIALOG" />
+    <action value="-3" type="DAODE" />
+    <action value="主角#...虽然乘人之危有违侠义道，但是这下子再也不会有人晚上被害了，长安终于可以恢复平安了。" type="DIALOG" />
+    <action value="主角#咦？这是？" type="DIALOG" />
+    <action value="七伤摧魂针法" type="ITEM" />
+    <action value="主角#......此手法果然极为凶险残暴，如果没有玄门正宗内功相佐，很容易走入邪途，甚至迷乱心性。" type="DIALOG" />
+    <action value="主角#此人想必也是练了此武功后，才心性大变，滥杀无辜。唉，何苦。" type="DIALOG" />
+  </story>
+  <story name="original_长安深夜怪事.三遇夜间人.不杀">
+    <action value="主角#此人虽然作恶多端，死有余辜。但我辈中人决不乘人之危，痛下杀手。且看她到底会如何下去吧。" type="DIALOG" />
+    <action value="3" type="DAODE" />
+    <action value="赵志诚#在这里！找到妖女了！" type="DIALOG" />
+    <action value="主角#？是全真教的人？" type="DIALOG" />
+    <action value="长安深夜神秘女子#咳咳...好...来得好..." type="DIALOG" />
+    <action value="赵志诚#大家伙儿快把这妖女围住！别让她跑了!" type="DIALOG" />
+    <action value="主角#这几位，可是全真教的道长？" type="DIALOG" />
+    <action value="赵志诚#不错，小兄弟捉拿妖女有功，辛苦了。烦请一让，待我等铲除妖孽。" type="DIALOG" />
+    <action value="主角#道长，此人确实罪大恶极，该交由全真教处置。不过念在她还有伤在身，我辈中人决不乘人之危，还请道长暂且饶她一命。" type="DIALOG" />
+    <action value="赵志诚#少罗嗦，快让开！" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="长安深夜神秘女子#哈哈哈哈，赵志诚，你害死我丈夫还嫌不够，如今还要来斩草除根，你好狠！" type="DIALOG" />
+    <action value="赵志诚#我呸！邪魔外道，人人得而诛之，受死！" type="DIALOG" />
+    <action value="长安深夜神秘女子#就凭你？还不够！（忽然单掌击出，趁着赵志诚格挡之际，整个人就势窜出，转眼不见踪影）" type="DIALOG" />
+    <action value="赵志诚#...小子，都怪你！让这妖女给跑了！" type="DIALOG" />
+    <action value="主角#我..." type="DIALOG" />
+    <action value="赵志诚#这妖女不知道从哪里学来这阴毒武功，杀了不知道多少百姓，你居然还替她出头，我呸。" type="DIALOG" />
+    <action value="主角#道长，这女子丈夫真是道长所害？" type="DIALOG" />
+    <action value="赵志诚#此女名为霓裳，原本是长安西市的婊子。他丈夫赌鬼一个，死不足惜。但干我个屁事？" type="DIALOG" />
+    <action value="主角#......（此事看来还有隐情，去和$FEMALE$商量一下吧。)" type="DIALOG" />
+  </story>
+  <story name="original_长安深夜怪事.女主的提议">
+    <action value="主角#$FEMALE$，关于你原来说的菜市口半夜鬼叫的事情，现在又有了新进展。（把华山上的情形仔细说了一遍）" type="DIALOG" />
+    <action value="女主#看来，这也是个可怜的女人。" type="DIALOG" />
+    <action value="主角#何来的可怜一说？" type="DIALOG" />
+    <action value="女主#多半是这姓赵的道士对她多加迫害，才逼成了这个疯样子。" type="DIALOG" />
+    <action value="主角#可是她杀人无数，这也是真的。" type="DIALOG" />
+    <action value="女主#恩...事到如今，难道就没有能救她的办法了？" type="DIALOG" />
+    <action value="主角#救她？（这我可从没想过...）" type="DIALOG" />
+    <action value="女主#这背后的故事，我们都还没有弄明白呢。要不你带我去一趟重阳宫，问问姓赵的道士如何？" type="DIALOG" />
+    <action value="主角#(重阳宫高手众多，她想必不会遇到什么危险...）好，我也很好奇到底是怎么回事。我们就去一趟重阳宫吧。" type="DIALOG" />
+    <action value="女主#嘻嘻，太好了。$MALE$又带我出去玩喽。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="女主" type="FOLLOW" />
+  </story>
+  <story name="original_长安深夜怪事.重阳宫">
+    <action value="地图.全真教" type="BACKGROUND" />
+    <action value="音乐.刀间鼓" type="MUSIC" />
+    <action value="女主#哇！这就是天下玄门祖庭重阳宫啊！真的是神仙风骨，好一番气派！" type="DIALOG" />
+    <action value="主角#赵道长！" type="DIALOG" />
+    <action value="赵志诚#...你是...那天在华山上的小子？" type="DIALOG" />
+    <action value="女主#道长你好，那日$MALE$和你匆匆别过，还有很多话没有来得及问道长。" type="DIALOG" />
+    <action value="赵志诚#你又是谁？" type="DIALOG" />
+    <action value="女主#我是...我是他的朋友。" type="DIALOG" />
+    <action value="赵志诚#朋友？嘿嘿，专门陪着这小子来问霓裳的事情？小子你女人缘也挺不错的。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="女主#(脸红)..." type="DIALOG" />
+    <action value="女主#道长，你就别取笑我们了。那位霓裳，到底是怎么回事？" type="DIALOG" />
+    <action value="赵志诚#霓裳，哼，这个女人。她自己是个婊子不说，她那死去的老公也是个赌棍，欠了老子一屁股债没还，后来哪天自己就自杀了。" type="DIALOG" />
+    <action value="女主#......" type="DIALOG" />
+    <action value="赵志诚#自从那之后霓裳这号人就从长安城里消失了，这没几年工夫，忽然又杀了回来。以前她一个妓女会什么武功，现在居然不知道从哪里学来那么邪门的一套功夫。" type="DIALOG" />
+    <action value="女主#道长和霓裳交过手？" type="DIALOG" />
+    <action value="赵志诚#交过手，这婊子居然胆敢跑到重阳宫来行刺我。还好众师兄弟将她赶了走。" type="DIALOG" />
+    <action value="赵志诚#这婊子几年时间武功大进，肯定不寻常。我左思右想，觉得放任她在外头，迟早要回来跟老子作对。不如自己找上门去杀了她，这才有了华山上遇见这小子的事情。" type="DIALOG" />
+    <action value="霓裳#一片胡言乱语！" type="DIALOG" />
+    <action value="赵志诚#！！妖女，胆敢擅闯重阳宫！来人哪！" type="DIALOG" />
+    <action value="霓裳#先要你命！" type="DIALOG" />
+    <action value="主角#且慢！" type="DIALOG" />
+    <action value="original_长安深夜怪事.重阳宫霓裳" type="BATTLE" />
+    <result value="original_长安深夜怪事.重阳宫2" type="story" ret="win" />
+  </story>
+  <story name="original_长安深夜怪事.重阳宫2">
+    <action value="音乐.刀间鼓" type="MUSIC" />
+    <action value="霓裳#（冷笑）哼，你武功高强，我打不过你。可是姓赵的，你别以为躲得了一时，躲得过一世。" type="DIALOG" />
+    <action value="赵志诚#妖女！今日你居然自投罗网，休想离开重阳宫。我赵志诚绝不会让你再出去为非作歹！" type="DIALOG" />
+    <action value="霓裳#（凄然）哈哈哈哈，哈哈哈哈。这世界是怎么了，像你这样道貌岸然的家伙一个个狼心狗肺，天不为我撑腰，我只能选择成魔！" type="DIALOG" />
+    <action value="女主#霓裳姑娘！这其中莫非还有隐情？" type="DIALOG" />
+    <action value="霓裳#（斜眼看了眼$FEMALE$)，小姑娘，此人害我家破人亡。我这一身摧魂鬼手的功夫，都是为了杀了他！" type="DIALOG" />
+    <action value="霓裳#昔日，我丈夫曾向他借了三百纹银经商，不料生意失败后，此人翻脸不认人，将我丈夫掳走拷打致死，又将我卖入青楼..." type="DIALOG" />
+    <action value="女主#啊..." type="DIALOG" />
+    <action value="霓裳#最可怜的是我那尚在肚中的孩儿，经此一劫，竟然化为了一滩血水（泪水流淌）。赵志诚，你这个人面兽心的道士！我今日化为厉鬼，只为向你索命！" type="DIALOG" />
+    <action value="赵志诚#妖，妖女！一派胡言！小鬼，别听她胡言乱语，此人在长安一带残害了无数无辜百姓，这是板上钉钉的事实！" type="DIALOG" />
+    <action value="霓裳#（凄然）我身陷青楼，又无功夫在身，更无权贵撑腰，如果不是机缘巧合得到高人传我这摧魂鬼手，哪年哪月才杀得了这禽兽。" type="DIALOG" />
+    <action value="霓裳#只是这武功虽厉害，却需要极其高强的内功相衬。我没有那个时间去学，所以每到夜间阴气旺盛之时，就只能吸食人血补充阳气...赵志诚，今日杀死你后，我必自刎以谢罪！" type="DIALOG" />
+    <action value="霓裳#但是你...非死不可！（忽然飞出银针数枚！)" type="DIALOG" />
+    <action value="主角#糟糕！" type="DIALOG" />
+    <action value="赵志诚#啊！！（一声惨叫）妖女，你这妖女，看我杀了你！" type="DIALOG" />
+    <action value="霓裳#（冷笑）哼哼，你倒是动手啊？七伤腐骨钉毒性极其霸道，七日之内必定皮肉片片凋落，化为一滩血水！哈哈哈哈，哈哈哈哈！" type="DIALOG" />
+    <action value="赵志诚#啊啊啊啊！好疼啊，好疼啊！！师父救我，师父救我！" type="DIALOG" />
+    <action value="主角#$FEMALE$，眼前这情况？" type="DIALOG" />
+    <action value="女主#看这位霓裳姑娘所说，应该不假。这赵志诚老是叫我们一口一个小鬼，一口一个小子，我一点也不喜欢他，就这样吧。" type="DIALOG" />
+    <action value="赵志诚#啊啊啊啊！！好疼，好疼！！大侠！！女侠！！求你们大慈大悲救我啊！！" type="DIALOG" />
+    <action value="女主#刚刚还是小鬼啊、小子啊的，这下有求于人就成了女侠、大侠了，这人变得真快...我最讨厌这种男人了。" type="DIALOG" />
+    <action value="主角#我也是..." type="DIALOG" />
+    <action value="赵志诚#(眼中凶光一闪，忽然闪到$FEMALE$身边，一口剑架在$FEMALE$脖颈上）" type="DIALOG" />
+    <action value="主角#$FEMALE$！！" type="DIALOG" />
+    <action value="女主#$MALE$！" type="DIALOG" />
+    <action value="主角#喂，牛鼻子！这是你们之间的恩怨，快放了$FEMALE$！" type="DIALOG" />
+    <action value="赵志诚#（扭曲着嘴唇）要我放人也可以！那边的婊子，快把解药交出来！" type="DIALOG" />
+    <action value="霓裳#无耻！" type="DIALOG" />
+    <action value="赵志诚#哈哈哈哈，哈哈哈哈！跟杀人不眨眼的婊子讲什么道德！" type="DIALOG" />
+    <action value="主角#（望着旁边）啊！道长，快来看你徒弟！" type="DIALOG" />
+    <action value="赵志诚#（本能地往旁边望）" type="DIALOG" />
+    <action value="主角#就是现在！" type="DIALOG" />
+    <action value="original_长安深夜怪事.重阳宫赵志诚" type="BATTLE" />
+    <result value="original_长安深夜怪事.重阳宫3" type="story" ret="win" />
+  </story>
+  <story name="original_长安深夜怪事.重阳宫3">
+    <action value="音乐.全真教" type="MUSIC" />
+    <action value="霓裳#趁现在！（一把要救回$FEMALE$）" type="DIALOG" />
+    <action value="赵志诚#别想得逞！！（垂死中一剑向$FEMALE$刺去）" type="DIALOG" />
+    <action value="主角#$FEMALE$！！" type="DIALOG" />
+    <action value="霓裳#（电光火石之间，再次施展鬼魅般的身法横在赵志诚和$FEMALE$之间，一爪抓穿赵志诚的胸膛！)" type="DIALOG" />
+    <action value="女主#（惊慌未定）谢...谢谢。" type="DIALOG" />
+    <action value="霓裳#...不用谢，我是个有罪之人。我杀了这么多人，今天大仇得报，夫君，我这就来陪你。（又一掌向自己天灵拍去）" type="DIALOG" />
+    <action value="女主#不！！霓裳姑娘！！（眼泪盈眶）" type="DIALOG" />
+    <action value="霓裳#夫...君...(死去）" type="DIALOG" />
+    <action value="女主#为什么！这是为什么！" type="DIALOG" />
+    <action value="主角#$FEMALE$...（不知为何心很疼，好想一把把她抱紧...）" type="DIALOG" />
+    <action value="主角#咦，地上掉落了什么东西？" type="DIALOG" />
+    <action value="七伤摧魂针法#1" type="ITEM" />
+    <action value="主角#...此武功虽然邪门霸道，但是亦可以成为小女子伸张正义的武器...所以天下的武功，又哪有好坏之分呢..." type="DIALOG" />
+    <action value="女主#我再也不想停留在这里了，我们去把霓裳姑娘安葬了吧。" type="DIALOG" />
+    <action value="主角#好..." type="DIALOG" />
+    <action value="1" type="COST_DAY" />
+    <action value="主角#这次让你遇到危险了，对不起..." type="DIALOG" />
+    <action value="女主#嘻嘻，没事，多亏你聪明机智，才让我脱离了危险。" type="DIALOG" />
+    <action value="女主#7" type="HAOGAN" />
+    <action value="主角#...总之还是护送你回家吧，外面真是太危险了。" type="DIALOG" />
+    <action value="女主#哦...我自己回去了，下次再来玩吧。" type="DIALOG" />
+    <action value="主角#恩。" type="DIALOG" />
+    <action value="女主" type="LEAVE_FOLLOW" />
+  </story>
+  <story name="original_山庄风云.开篇">
+    <action value="主角#$FEMALE$，你好.." type="DIALOG" />
+    <action value="女主#啊，$MALE$，你来的正好。" type="DIALOG" />
+    <action value="主角#？" type="DIALOG" />
+    <action value="女主#昨天我们家收到了一封请帖，你看。" type="DIALOG" />
+    <action value="主角#“鸣凤山庄庄主贾武，恭迎各位贵人及武林同道参加金盆洗手大礼...”" type="DIALOG" />
+    <action value="主角#这鸣凤山庄没听说过啊，很有名吗？" type="DIALOG" />
+    <action value="女主#啧啧，真是土包子一个，鸣凤山庄在长安可是大大有名。贾庄主在江湖上交友广泛，据说其祖上来自西域，一套天山剑法高深莫测，武林之中人人佩服呢。" type="DIALOG" />
+    <action value="主角#哦...看来是我孤陋寡闻了，既不知道鸣凤山庄，更不知道啥天山剑法。" type="DIALOG" />
+    <action value="女主#嘻嘻，这样吧，要不要我带你去见识一下？" type="DIALOG" />
+    <action value="主角#要去鸣凤山庄喝酒吗？#去吧。#不去，没兴趣。" type="SELECT" />
+    <result value="original_山庄风云.出发" type="story" ret="0" />
+    <result value="original_山庄风云.开篇不去" type="story" ret="1" />
+  </story>
+  <story name="original_山庄风云.开篇不去">
+    <action value="女主#...不去算了，我随便找个长安城里的官家俊小伙儿陪我去，气死你。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="女主#-1" type="HAOGAN" />
+  </story>
+  <story name="original_山庄风云.出发">
+    <action value="女主#嘻嘻，太好了，我们走吧！鸣凤山庄就在长安近郊，很好找的。" type="DIALOG" />
+    <action value="女主" type="FOLLOW" />
+  </story>
+  <story name="original_山庄风云.金盆洗手大会">
+    <result value="original_山庄风云.金盆洗手大会.突变" type="story" ret="0" />
+    <action value="地图.酒楼" type="BACKGROUND" />
+    <action value="音乐.室内_世俗" type="MUSIC" />
+    <action value="女主#今天人挺多的...来了这么多江湖豪杰，真是大场面啊！" type="DIALOG" />
+    <action value="山庄风云江湖豪客1#哈哈哈哈！来！喝酒！" type="DIALOG" />
+    <action value="山庄风云江湖豪客2#要感谢贾老爷子请我们喝酒啊，来！干了！哈哈哈哈！" type="DIALOG" />
+    <action value="山庄风云江湖豪客1#痛快啊，痛快！" type="DIALOG" />
+    <action value="山庄风云长安官员1#贾老爷子行走江湖数十年，威震四方，我们长安人也跟着有光彩啊！" type="DIALOG" />
+    <action value="山庄风云长安官员2#是啊是啊，一直听闻贾老爷子武功盖世，今日有缘得见，真是有幸，哈哈。" type="DIALOG" />
+    <action value="主角#(皱眉）那边的是太行山的矮脚虎，左首里侧的还有山西一对鬼，那边还有黄河怪鱼，尽是些武林中不入流的鸡狗之辈..." type="DIALOG" />
+    <action value="女主#(白眼）人家都是鸡狗啊，猫虾的，就你是龙凤行了吧？" type="DIALOG" />
+    <action value="主角#...我是要提醒你小心一点。" type="DIALOG" />
+    <action value="女主#哦..." type="DIALOG" />
+    <action value="贾飞#两位好，是来喝父亲金盆洗手的喜酒的吧？来，这边请坐。来人！上酒！" type="DIALOG" />
+    <action value="女主#想必你就是贾老爷子的公子贾飞了？" type="DIALOG" />
+    <action value="贾飞#不才正是贾飞，敢问姑娘芳名？" type="DIALOG" />
+    <action value="女主#嘻嘻，我叫$FEMALE$，幸会。" type="DIALOG" />
+    <action value="贾飞#啊，原来是司马大人千金！小姐今日光临，真是蓬荜生辉。请稍做休息，大典一会儿开始。我还需要在门口迎宾，失陪了。" type="DIALOG" />
+    <action value="女主#举止投足间自信满满，风度翩翩，不愧是名门子弟。" type="DIALOG" />
+    <action value="主角#我怎么就是想不起来江湖中有这么一号人呢..." type="DIALOG" />
+    <action value="山庄风云江湖豪客1#小兄弟啊，你真是孤陋寡闻啊，连大名鼎鼎的贾家天山剑法也没听说过？" type="DIALOG" />
+    <action value="主角#恕我孤陋寡闻..." type="DIALOG" />
+    <action value="山庄风云江湖豪客1#你太小了！老一辈的传说都不知道吧！昔日天山飞鹰贾大侠的天山剑法，在中原武林可是人尽皆知！" type="DIALOG" />
+    <action value="山庄风云江湖豪客2#是啊是啊，贾大侠昔日行侠仗义，泽披苍生，今日聚在这里的，多半都是旧日祖上曾蒙贾大侠恩泽的人。" type="DIALOG" />
+    <action value="主角#这位贾大侠能让如此多绿林中人将恩泽辈辈相传，令人动容。只可惜没有能够生在那个时代，一睹大侠风采。" type="DIALOG" />
+    <action value="山庄风云江湖豪客1#哈哈哈，那也不打紧，一会儿金盆洗手礼上。贾老爷子定要施展一下天山剑法，让我们开开眼哪！" type="DIALOG" />
+    <action value="山庄风云江湖豪客2#是啊是啊，我也好期待一睹天山剑法真容啊！来，喝酒喝酒。" type="DIALOG" />
+    <action value="主角#大家伙儿都还没见识过天山剑法？" type="DIALOG" />
+    <action value="山庄风云江湖豪客1#贾老爷子为人谦和，江湖中从不树敌。大家想见也一直没机会呀。今日贾老爷子可定要让我们开开眼了。哈哈哈哈，来喝酒了，喝酒！" type="DIALOG" />
+    <action value="主角#我对这天山剑法，也是越来越好奇了..." type="DIALOG" />
+    <action value="贾飞#各位，各位！父亲的金盆洗手大典马上就要开始！" type="DIALOG" />
+    <action value="贾武#各位来自长安的贵宾，各位武林中的朋友，感谢大家远道而来，贾某薄酒一杯，向大家致谢！" type="DIALOG" />
+    <action value="贾武#贾某蒙先祖恩泽，经营凤鸣山庄数十年，得以终老，退隐江湖。小儿贾飞年纪尚幼，经验尚浅，以后还请各位江湖同道多多担待！" type="DIALOG" />
+    <action value="山庄风云江湖豪客1#贾老爷子！我们担待没关系啊！贾老爷子要退隐了，能不能让我们一睹天山剑法的风采啊！" type="DIALOG" />
+    <action value="山庄风云江湖豪客2#是啊！请贾老爷子让我们开开眼啊！" type="DIALOG" />
+    <action value="贾武#好！那贾某就却之不恭了。（衣襟飘飞，剑光点点，一时间满堂都是剑影）" type="DIALOG" />
+    <action value="山庄风云江湖豪客1#好，好，好！" type="DIALOG" />
+    <action value="山庄风云江湖豪客2#果然好剑法，果然好剑法！" type="DIALOG" />
+    <action value="主角#（剑法是好剑法，不过若说一流，我看也未必...是我武功太浅，看不明白么...）" type="DIALOG" />
+  </story>
+  <story name="original_山庄风云.金盆洗手大会.突变">
+    <result value="original_山庄风云bonus1" type="story" ret="win" />
+    <result value="original_山庄风云.金盆洗手大会.群豪" type="story" ret="lose" />
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="山庄风云神秘人#哈哈哈哈！原来天山剑法不过如此，我还当是什么宝贝，哼。" type="DIALOG" />
+    <action value="贾武#什么人！" type="DIALOG" />
+    <action value="山庄风云神秘人#老子生平最喜欢搜集天下奇门武学，天山剑法百年前威名很盛，今日一见剑法传人...我呸。什么狗屎功夫。" type="DIALOG" />
+    <action value="贾武#阁下不要欺人太甚！" type="DIALOG" />
+    <action value="original_山庄风云贾武" type="BATTLE" />
+  </story>
+  <story name="original_山庄风云bonus1">
+    <action value="音乐.中原树林" type="MUSIC" />
+    <result value="original_山庄风云.金盆洗手大会.群豪" type="story" ret="0" />
+  </story>
+  <story name="original_山庄风云.金盆洗手大会.群豪">
+    <result value="original_山庄风云.金盆洗手大会.恶战" type="story" ret="0" />
+    <result value="original_山庄风云.金盆洗手大会.撤退" type="story" ret="1" />
+    <action value="音乐.中原树林" type="MUSIC" />
+    <action value="山庄风云神秘人#撤剑！（一股内力涌出，贾武长剑脱手，面色惨白）沽名钓誉之辈，还有点自尊的话，自裁吧。" type="DIALOG" />
+    <action value="主角#（这贾武果然只是武功平平，并非我眼力不好。）" type="DIALOG" />
+    <action value="贾武#（面色惨白）今日贾某人在天下英豪面前出丑，祖上蒙羞...还有何颜面立于江湖之上...(自行震碎心脉而亡）" type="DIALOG" />
+    <action value="山庄风云神秘人#...此人武功虽弱，倒是条汉子。" type="DIALOG" />
+    <action value="贾飞#父亲！大家伙儿若还念记我贾家旧日的情谊，请替父亲报仇！" type="DIALOG" />
+    <action value="山庄风云江湖豪客1#这...贾老爷子待我等不薄，不过贾老爷子都打不过，我等再上一百个也是枉然啊。" type="DIALOG" />
+    <action value="山庄风云江湖豪客2#是啊是啊，天山剑法威力无双，尚且...呃...不是对手，我等上去只是送死啊！" type="DIALOG" />
+    <action value="贾飞#（愤慨）世情冷暖，不过如是。罢了，就算死，我今日也跟你拼了！" type="DIALOG" />
+    <action value="山庄风云神秘人#.......你这小子倒还有几分气概。你们这些软蛋，都给我滚吧。老子今天心情好，不愿意大开杀戒。" type="DIALOG" />
+    <action value="山庄风云江湖豪客1#快走，快走..." type="DIALOG" />
+    <action value="山庄风云江湖豪客2#是是是，好汉不吃眼前亏...贾老爷子他日我们定为你讨回公道！快走吧，快走吧。" type="DIALOG" />
+    <action value="山庄风云长安官员1#江湖中的事情，不要卷入得好，走了走了。" type="DIALOG" />
+    <action value="山庄风云长安官员2#太危险了，快走，快走..." type="DIALOG" />
+    <action value="女主#这些人啊，一个个把贾老爷子喊得亲热，真有事了都溜走了。咱们怎么办？" type="DIALOG" />
+    <action value="主角#怎么办呢？#留下来。#先撤退，再缓图之。" type="SELECT" />
+  </story>
+  <story name="original_山庄风云.金盆洗手大会.恶战">
+    <action value="音乐.中原树林" type="MUSIC" />
+    <action value="女主#嘻嘻，可以留下来喽。" type="DIALOG" />
+    <action value="女主#3" type="HAOGAN" />
+    <action value="3" type="DAODE" />
+    <action value="山庄风云神秘人#那边两位，老子还有话问这个小子。你们没事就快滚吧。" type="DIALOG" />
+    <action value="主角#前辈武功了得，晚辈甚为佩服。但以强凛弱，绝非我道中人之举。前辈，得饶人处且饶人，今日贾老爷子已死，还请前辈收手吧。" type="DIALOG" />
+    <action value="山庄风云神秘人#老子今日为一探天山剑法的奥妙而来，谁知这姓贾的性格如此刚烈，居然真的自裁了。大的死了，这天山剑法的秘密，当然是要问这小的了。" type="DIALOG" />
+    <action value="主角#前辈，武林之中最忌深挖别门别派武学，需知前辈武功虽高，江湖群豪起而攻之，前辈未必能胜过。" type="DIALOG" />
+    <action value="山庄风云神秘人#（勃然大怒）老子要你多嘴！" type="DIALOG" />
+    <action value="original_山庄风云神秘人" type="BATTLE" />
+    <result value="original_山庄风云.金盆洗手.悲戚" type="story" ret="win" />
+  </story>
+  <story name="original_山庄风云.金盆洗手.悲戚">
+    <action value="音乐.中原树林" type="MUSIC" />
+    <action value="山庄风云神秘人#...好功夫，长江后浪推前浪，原来今日座下有如此人才。我眼拙了，告辞。" type="DIALOG" />
+    <action value="主角#...贾兄弟，请节哀，我们就此别过。" type="DIALOG" />
+    <action value="贾飞#大侠！大侠请留步啊！" type="DIALOG" />
+    <action value="主角#？" type="DIALOG" />
+    <action value="贾飞#大侠，请教我武功，替父亲报仇！我给你磕头了！！" type="DIALOG" />
+    <action value="主角#...我教你武功，别人只以为我是贪图你家天山剑法，此事不可。$FEMALE$，我们走吧。" type="DIALOG" />
+    <action value="贾飞#大侠！...大侠!" type="DIALOG" />
+    <action value="女主#贾公子今日遭此大变，也挺可怜的，你就教他一点吧。" type="DIALOG" />
+    <action value="主角#(摇头）他先把天山剑法练到他父亲的程度，再教也不迟。" type="DIALOG" />
+    <action value="女主#哦..." type="DIALOG" />
+    <result value="original_山庄风云.金盆洗手.回家" type="story" ret="0" />
+  </story>
+  <story name="original_山庄风云.金盆洗手.回家">
+    <result value="长安城中心" type="map" ret="0" />
+    <action value="地图.府门前" type="BACKGROUND" />
+    <action value="女主#今天辛苦了。" type="DIALOG" />
+    <action value="主角#好，你也好好休息。" type="DIALOG" />
+    <action value="女主#恩。" type="DIALOG" />
+    <action value="女主" type="LEAVE_FOLLOW" />
+  </story>
+  <story name="original_山庄风云.金盆洗手大会.撤退">
+    <result value="original_山庄风云.金盆洗手.回家" type="story" ret="0" />
+    <action value="音乐.中原树林" type="MUSIC" />
+    <action value="主角#此处不宜久留，我们先走吧。" type="DIALOG" />
+    <action value="女主#看这位贾公子一人显然不是那人对手，难道要见死不救？" type="DIALOG" />
+    <action value="主角#江湖仇杀，天天上演。江湖有江湖的规矩，我们和凤鸣山庄不熟，外人不宜涉足太深。" type="DIALOG" />
+    <action value="女主#哦..." type="DIALOG" />
+    <action value="女主#-2" type="HAOGAN" />
+    <action value="-2" type="DAODE" />
+  </story>
+  <story name="original_山庄风云.再见贾飞">
+    <action value="主角#这不是贾飞吗？他怎么会在这里？贾飞！" type="DIALOG" />
+    <action value="贾飞#啊，恩公，原来是你。" type="DIALOG" />
+    <action value="主角#你怎么会在这里？" type="DIALOG" />
+    <action value="贾飞#说来话长...那天家父死在那神秘人手上..." type="DIALOG" />
+    <action value="主角#他不是死在那人手上，他是自己气不过自杀了。" type="DIALOG" />
+    <action value="贾飞#（愤而拍桌）有什么分别？不是遭到那人羞辱，家父如何会选择轻生？！" type="DIALOG" />
+    <action value="主角#你别激动，继续说。" type="DIALOG" />
+    <action value="贾飞#...我不是那人对手，家传的天山剑法我左练右练，总是不得其法！我决定去天山一趟，一探剑法的奥妙。" type="DIALOG" />
+    <action value="主角#恩...那天我见到贾老爷子施展天山剑法，只觉得稀疏平常。可能是我见识短，但实在是看不到其中到底能有怎样的奥妙。" type="DIALOG" />
+    <action value="贾飞#我不相信！先祖的传说摆在那里，这剑法里一定有奇妙的因缘。" type="DIALOG" />
+    <action value="主角#那你准备怎么去做？" type="DIALOG" />
+    <action value="贾飞#我...我不知道。恩公，我求你指点我！" type="DIALOG" />
+    <action value="主角#我也没有办法啊。" type="DIALOG" />
+    <action value="贾飞#恩公，剑法里一定有奥妙！" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="original_山庄风云.再见贾飞2">
+    <action value="贾飞#恩公，剑法里一定有奥妙！" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="original_山庄风云.贾飞发疯">
+    <action value="地图.酒楼" type="BACKGROUND" />
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="酒楼老板#救命啊，救命啊！" type="DIALOG" />
+    <action value="主角#？那边有事发生。" type="DIALOG" />
+    <action value="酒楼老板#大侠饶命，大侠饶命啊！" type="DIALOG" />
+    <action value="疯狂贾飞#......" type="DIALOG" />
+    <action value="主角#这不是鸣凤山庄的贾飞吗？怎么会在这里出现？" type="DIALOG" />
+    <action value="主角#贾公子？" type="DIALOG" />
+    <action value="疯狂贾飞#！！你也是那日见死不救的人！" type="DIALOG" />
+    <action value="主角#江湖恩怨，我等外人本不该深入。再说那日那人其实并没有杀死你父亲之心，是他自己气不过自杀了..." type="DIALOG" />
+    <action value="疯狂贾飞#住口！！我杀死你们这些狼心狗肺的杂种！" type="DIALOG" />
+    <action value="original_山庄风云疯狂贾飞" type="BATTLE" />
+    <result value="original_山庄风云.贾飞发疯2" type="story" ret="win" />
+  </story>
+  <story name="original_山庄风云.贾飞发疯2">
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="主角#他的武功变得真厉害，这就是天山剑法的真实威力吗？到底他身上发生了什么？" type="DIALOG" />
+    <action value="疯狂贾飞#你武功这么好，为什么那天不救爹爹，为什么！" type="DIALOG" />
+    <action value="主角#江湖上的纷争，太正常不过。那日我要保护朋友，有什么出手的必要？" type="DIALOG" />
+    <action value="疯狂贾飞#朋友？啊对！嘿嘿嘿嘿...（一闪消失了踪迹）" type="DIALOG" />
+    <action value="主角#糟了！他怕是要对$FEMALE$不利！快追！" type="DIALOG" />
+  </story>
+  <story name="original_山庄风云.贾飞女主">
+    <result value="original_山庄风云.贾飞女主2" type="story" ret="win" />
+    <action value="地图.府门前" type="BACKGROUND" />
+    <action value="音乐.刀间鼓" type="MUSIC" />
+    <action value="女主#救命啊，呜呜呜，呜呜呜，不要啊，不要~" type="DIALOG" />
+    <action value="疯狂贾飞#嘿嘿嘿嘿..." type="DIALOG" />
+    <action value="主角#$FEMALE$！畜生，你干了些什么！" type="DIALOG" />
+    <action value="疯狂贾飞#正要品尝美味，就有搅局的苍蝇出现了。看我先拍死苍蝇，再来料理司马大人的千金小姐，哇哈哈哈！" type="DIALOG" />
+    <action value="original_山庄风云疯狂贾飞女主" type="BATTLE" />
+  </story>
+  <story name="original_山庄风云.贾飞女主2">
+    <action value="音乐.中原树林" type="MUSIC" />
+    <action value="疯狂贾飞#怎么..可能....我明明已经..." type="DIALOG" />
+    <action value="疯狂贾飞#爹...孩儿...不能替你...报仇了...（咽气）" type="DIALOG" />
+    <action value="主角#报仇你也找错对象了吧，真是疯了。$FEMALE$，你没事吧！那个畜生对你怎么了？！" type="DIALOG" />
+    <action value="女主#（眼泪夺眶而出）呜呜呜...呜呜呜..." type="DIALOG" />
+    <action value="主角#$FEMALE$！到底怎么了！" type="DIALOG" />
+    <action value="女主#呜呜呜....呜呜呜..." type="DIALOG" />
+    <action value="主角#这个畜生！！看我撕碎他！" type="DIALOG" />
+    <action value="女主#呜呜呜...没事，他还没来得及对我怎么样...只可惜衣裳被他撕破了..." type="DIALOG" />
+    <action value="主角#哦...虚惊一场。只是衣裳撕破了那还好..." type="DIALOG" />
+    <action value="女主#...一点也不好。这个人怎么了？怎么变得这么丧心病狂？" type="DIALOG" />
+    <action value="主角#我不知道，他父亲死了后，他和那个神秘人之间发生了什么，他又是怎么学会这天山剑法的，一切都已经成为谜了。" type="DIALOG" />
+    <action value="女主#恩..." type="DIALOG" />
+    <action value="主角#他这把佩剑不错，我就收下了。" type="DIALog" />
+    <action value="鸣凤剑" type="ITEM" />
+    <action value="女主#10" type="HAOGAN" />
+  </story>
+  <story name="original_长安一梦.宝藏的秘密1">
+    <result value="original_长安一梦.宝藏的秘密2" type="story" ret="0">
+      <condition value="陈达海" type="key_in_team" />
+    </result>
+    <action value="长安一梦部落众1#$MALE$，你好，谢谢你帮我们夺回这片草原。" type="DIALOG" />
+    <action value="主角#不客气，只是他们为什么要霸占这里呢？他们又不放牧..." type="DIALOG" />
+    <action value="长安一梦部落众1#这我就不知道了..." type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.宝藏的秘密2">
+    <action value="陈达海#哈哈，我知道，我知道！" type="DIALOG" />
+    <action value="主角#哦？" type="DIALOG" />
+    <action value="陈达海#这种把蛮夷赶跑，然后去找宝藏的事，我陈达海可没少干！" type="DIALOG" />
+    <action value="主角#你这是想当然吧..." type="DIALOG" />
+    <action value="长安一梦部落众1#诶哟，你这倒是提醒了我，我们这里还真有一个宝藏的传说。" type="DIALOG" />
+    <action value="主角#啊？不会吧？这也可以？" type="DIALOG" />
+    <action value="陈达海#都跟你说了，一般就是这么回事。你们的是个什么宝贝啊？" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="长安一梦部落众1#具体是什么我也说不上来，不过听说是一件很厉害的东西！" type="DIALOG" />
+    <action value="陈达海#哦，塞外是个部落基本都吹自己有个很厉害的宝贝。" type="DIALOG" />
+    <action value="主角#......就没有其他线索了？" type="DIALOG" />
+    <action value="长安一梦部落众1#传说太久远了，只说这里有件宝器什么的，具体我也不知道了。" type="DIALOG" />
+    <action value="主角#哦......" type="DIALOG" />
+    <action value="1" type="COST_DAY" />
+  </story>
+  <story name="original_长安一梦.宝藏日常">
+    <action value="主角#想起宝藏的事情来了么？" type="DIALOG" />
+    <action value="长安一梦部落众1#嗯...好像有点印象！哎呀，但是我今天要去放羊，一边放羊一边想就困难了..." type="DIALOG" />
+    <action value="主角#...我帮你放羊！你专心想！" type="DIALOG" />
+    <action value="长安一梦部落众1#好啊，谢谢！" type="DIALOG" />
+    <action value="1" type="COST_DAY" />
+    <result value="original_长安一梦.宝藏想起" type="story" ret="0">
+      <condition value="20" type="probability" />
+    </result>
+    <result value="original_长安一梦.宝藏日常2" type="story" ret="0" />
+  </story>
+  <story name="original_长安一梦.宝藏日常2">
+    <action value="主角#想起来了？" type="DIALOG" />
+    <action value="长安一梦部落众1#唔，没有。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.宝藏想起">
+    <result value="original_长安一梦.宝藏想起2" type="story" ret="0">
+      <condition value="河岳英灵集" type="have_item" />
+    </result>
+    <result value="original_长安一梦.宝藏没想起" type="story" ret="0" />
+    <action value="主角#想起来了？" type="DIALOG" />
+    <action value="长安一梦部落众1#啊！我想起来了！是什么什么英灵集！" type="DIALOG" />
+    <action value="主角#英灵集？" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.宝藏没想起">
+    <action value="主角#...还是不知道在说什么…唉，算了。" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.宝藏想起2">
+    <action value="主角#啊！你说的，是不是这本河岳英灵集？" type="DIALOG" />
+    <action value="长安一梦部落众1#哎哟我的妈呀，你居然身怀宝物啊！" type="DIALOG" />
+    <action value="主角#你弄错了，这其实只是一本普通的诗集，不是什么..." type="DIALOG" />
+    <action value="长安一梦部落众1#不是不是！先祖说了，英灵集是宝物！我们部落曾经也有一本，如今不见了。" type="DIALOG" />
+    <action value="主角#（原来宝物只是这本高昌迷宫的诗集...瓦尔拉齐说了，这不是什么宝物...好失望）" type="DIALOG" />
+    <result value="original_长安一梦.宝藏想起3" type="story" ret="0" />
+  </story>
+  <story name="original_长安一梦.宝藏想起3">
+    <action value="地图.塞外" type="BACKGROUND" />
+    <action value="主角#唉，原来宝物也只是河岳英灵集这种书籍，真是无趣。" type="DIALOG" />
+    <action value="主角#！！什么人？！" type="DIALOG" />
+    <action value="original_长安一梦.宝藏争夺" type="BATTLE" />
+    <result value="original_长安一梦.宝藏想起4" type="story" ret="win" />
+  </story>
+  <story name="original_长安一梦.宝藏想起4">
+    <action value="长安一梦陌生男子#可恶..." type="DIALOG" />
+    <action value="主角#兄弟，不用这样吧，就一本书而已，抢什么抢。" type="DIALOG" />
+    <action value="长安一梦陌生男子#求求你，把圣物给我吧！" type="DIALOG" />
+    <action value="主角#莫名其妙，我为什么要给你啊？" type="DIALOG" />
+    <action value="长安一梦陌生男子#......（离开）" type="DIALOG" />
+    <action value="主角#喂！偷袭我的帐还没算呢！...算了，看这人神经兮兮的。" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.阿玉">
+    <action value="长安一梦阿玉#大哥哥，你好。" type="DIALOG" />
+    <action value="主角#咦？小妹妹你是汉人？" type="DIALOG" />
+    <action value="长安一梦阿玉#是呀，大哥哥，我叫阿玉。我没有爹娘，是他们收留了我。仙丽雅姐姐去长安找救兵也是我出的主意呢。" type="DIALOG" />
+    <action value="主角#阿玉，真是个好名字。" type="DIALOG" />
+    <action value="长安一梦阿玉#嘻嘻。" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.阿玉的镯子">
+    <action value="长安一梦阿玉#奇怪，为什么怎么也找不到了..." type="DIALOG" />
+    <action value="主角#怎么了，阿玉？" type="DIALOG" />
+    <action value="长安一梦阿玉#大哥哥，你有没有看到我得银手镯子？" type="DIALOG" />
+    <action value="主角#手镯子不见了？" type="DIALOG" />
+    <action value="长安一梦阿玉#是啊，急死我了，呜呜呜呜。" type="DIALOG" />
+    <result value="original_长安一梦.阿玉的镯子没有" type="story" ret="0">
+      <condition value="银手镯" type="not_have_item" />
+    </result>
+    <result value="original_长安一梦.阿玉的镯子有" type="story" ret="0">
+      <condition value="银手镯" type="have_item" />
+    </result>
+  </story>
+  <story name="original_长安一梦.阿玉的镯子没有">
+    <action value="主角#一时间也爱莫能助，看能不能找到银手镯给阿玉吧。" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.阿玉的镯子有">
+    <action value="主角#别急，别急，阿玉的银镯子我虽然没有...但是我这里有一个银镯子，送给你吧！" type="DIALOG" />
+    <action value="长安一梦阿玉#哈哈，谢谢大哥哥，大哥哥最好了！" type="DIALOG" />
+    <action value="银手镯#-1" type="ITEM" />
+    <action value="长安一梦阿玉#5" type="HAOGAN" />
+    <action value="1" type="COST_DAY" />
+  </story>
+  <story name="original_长安一梦.草场仙丽雅阿玉">
+    <action value="主角#啊，仙丽雅，阿玉，你们好。" type="DIALOG" />
+    <action value="仙丽雅#嘻嘻，$MALE$，你好。今天你是来看我还是来看阿玉的呀？" type="DIALOG" />
+    <action value="长安一梦阿玉#仙丽雅，大哥哥当然是来看你的喽。" type="DIALOG" />
+    <action value="仙丽雅#那可不一定，阿玉现在越生越漂亮了！" type="DIALOG" />
+    <action value="长安一梦阿玉#阿玉哪里比得上仙丽雅你啊，对吧，大哥哥？" type="DIALOG" />
+    <action value="主角#呃...（这种要选择哪个比较漂亮的对话实在是太坑爹了！！）" type="DIALOG" />
+    <action value="仙丽雅#$MALE$，你说我和阿玉你更喜欢哪个？嗯？" type="DIALOG" />
+    <action value="主角#呃...（喂！！果然要开始问我坑爹问题了，怎么办，怎么办？）" type="DIALOG" />
+    <action value="长安一梦阿玉#（脸红）仙丽雅！你们真是太坏了，不跟你们玩了。（一溜烟地逃跑了）" type="DIALOG" />
+    <action value="主角#（抚额...)" type="DIALOG" />
+    <action value="仙丽雅#嘻嘻，今天真是愉快。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.溪边阿玉">
+    <action value="主角#啊，是阿玉。阿玉！" type="DIALOG" />
+    <action value="长安一梦阿玉#啊！！救命啊！！" type="DIALOG" />
+    <action value="主角#阿玉，别跑了啊！（施展轻功追上阿玉）你躲什么躲啊？小心跑迷路了。" type="DIALOG" />
+    <action value="长安一梦阿玉#（拍拍胸膛）我是大草原的孩子！不会迷路的！" type="DIALOG" />
+    <action value="主角#哦...那你怎么看了我就逃跑啊？" type="DIALOG" />
+    <action value="长安一梦阿玉#都，都是仙丽雅不好，刚刚在草场讲什么男啊女的，喜欢啊不喜欢啊的..." type="DIALOG" />
+    <action value="主角#呃...（这孩子还把仙丽雅的玩笑给当真了...)" type="DIALOG" />
+    <action value="主角#对阿玉说什么好呢？#别听仙丽雅胡说八道。#阿玉，大哥哥挺喜欢你的。" type="SELECT" />
+    <result value="original_长安一梦.溪边阿玉胡说八道" type="story" ret="0" />
+    <result value="original_长安一梦.溪边阿玉调戏" type="story" ret="1" />
+  </story>
+  <story name="original_长安一梦.溪边阿玉胡说八道">
+    <action value="主角#仙丽雅胡说八道你也当真，真是可爱的孩子。" type="DIALOG" />
+    <action value="长安一梦阿玉#啊？" type="DIALOG" />
+    <action value="主角#仙丽雅跟你说着玩呢，看你这么容易被欺负，她就欺负你一下喽。" type="DIALOG" />
+    <action value="长安一梦阿玉#（脸红）啊！！！这个仙丽雅！！看我去找她算账！（又一溜烟跑了）" type="DIALOG" />
+    <action value="主角#（抚额）......" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.溪边阿玉调戏">
+    <action value="主角#（一脸严肃）阿玉，你听大哥哥说。" type="DIALOG" />
+    <action value="长安一梦阿玉#咦？" type="DIALOG" />
+    <action value="主角#大哥哥是认真的。" type="DIALOG" />
+    <action value="长安一梦阿玉#诶？（紧张）" type="DIALOG" />
+    <action value="主角#阿玉，大哥哥真的很喜欢你。" type="DIALOG" />
+    <action value="长安一梦阿玉#啊？（霎时脸红了）啊？？" type="DIALOG" />
+    <action value="主角#（实在忍不住开始笑起来）大哥哥，真的...噗嗤...很喜欢...哈哈哈哈哈哈！！" type="DIALOG" />
+    <action value="长安一梦阿玉#啊！！你逗我玩的！！你这个坏蛋！！你和仙丽雅是一伙的！！！" type="DIALOG" />
+    <action value="主角#哈哈哈哈，太好玩了，哈哈哈哈哈哈哈哈。" type="DIALOG" />
+    <action value="长安一梦阿玉#站住！你这个坏蛋！！站住！！" type="DIALOG" />
+    <action value="主角#哈哈哈哈哈哈哈哈。" type="DIALOG" />
+    <action value="长安一梦阿玉#5" type="HAOGAN" />
+    <action value="1" type="COST_DAY" />
+  </story>
+  <story name="original_长安一梦.半夜鬼叫">
+    <action value="长安一梦部落众1#最近好像老是听到山洞那边传来奇怪的声音。是不是闹鬼啊？" type="DIALOG" />
+    <action value="长安一梦长老#闹鬼？没那么可怕吧..." type="DIALOG" />
+    <action value="主角#确实，最近半夜有奇怪的声音...有点在意，要去看看吗？" type="DIALOG" />
+    <action value="主角#要去看看吗？#去看看吧。#算了。" type="SELECT" />
+    <result value="original_长安一梦.半夜鬼叫去" type="story" ret="0" />
+    <result value="original_长安一梦.半夜鬼叫不去" type="story" ret="1" />
+  </story>
+  <story name="original_长安一梦.半夜鬼叫去">
+    <result value="长安一梦山洞" type="map" ret="0" />
+    <action value="主角#有点在意到底是怎么回事，去山洞看看吧。" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.山洞退缩">
+    <action value="主角#要离开山洞不再管半夜鬼叫的事情了吗？" type="DIALOG" />
+    <action value="主角#要走吗？#走吧，不管了#不走，查个究竟！" type="SELECT" />
+    <result value="original_长安一梦.半夜鬼叫不去" type="story" ret="0" />
+  </story>
+  <story name="original_长安一梦.半夜鬼叫不去">
+    <result value="original_长安一梦.阿玉失踪" type="story" ret="0" />
+    <action value="主角#...算了，不管这档子事。" type="DIALOG" />
+    <action value="1" type="COST_DAY" />
+    <action value="长安一梦" type="SET_MAP" />
+  </story>
+  <story name="original_长安一梦.汉家松鼠">
+    <action value="主角#咦？你是？" type="DIALOG" />
+    <action value="汉家松鼠#不错！我就是这个世界的创造者，汉家松鼠！" type="DIALOG" />
+    <action value="主角#哇啊啊，怎么会在这里出现..." type="DIALOG" />
+    <action value="汉家松鼠#咳咳，快叫一声松鼠大大，本鼠就告诉你..." type="DIALOG" />
+    <action value="主角#...不叫。" type="DIALOG" />
+    <action value="汉家松鼠#......" type="DIALOG" />
+    <action value="汉家松鼠#咳咳...真是太不乖了。好吧，既然你发现我了，就给你点小奖励。" type="DIALOG" />
+    <action value="主角#哇！有奖励？" type="DIALOG" />
+    <action value="汉家松鼠#你自己选吧，是要春天的花，夏天的瓜，秋天的月亮，还是冬天的太阳..." type="DIALOG" />
+    <action value="主角#这都是啥和啥..." type="DIALOG" />
+    <action value="汉家松鼠#快选！只有一次机会！" type="DIALOG" />
+    <action value="主角#呃..." type="DIALOG" />
+    <action value="主角#选什么好呢？#春天的花#夏天的瓜#秋天的月亮#冬天的太阳" type="SELECT" />
+    <result value="original_长安一梦.春花" type="story" ret="0" />
+    <result value="original_长安一梦.夏瓜" type="story" ret="1" />
+    <result value="original_长安一梦.秋月" type="story" ret="2" />
+    <result value="original_长安一梦.冬日" type="story" ret="3" />
+  </story>
+  <story name="original_长安一梦.春花">
+    <action value="独孤九剑#1" type="MAXLEVEL" />
+    <result value="original_长安一梦.松鼠告别" type="story" ret="0" />
+  </story>
+  <story name="original_长安一梦.夏瓜">
+    <result value="original_长安一梦.松鼠告别" type="story" ret="0" />
+    <action value="胡家刀法#1" type="MAXLEVEL" />
+  </story>
+  <story name="original_长安一梦.秋月">
+    <action value="斗转星移#1" type="MAXLEVEL" />
+    <result value="original_长安一梦.松鼠告别" type="story" ret="0" />
+  </story>
+  <story name="original_长安一梦.冬日">
+    <action value="野球拳#1" type="MAXLEVEL" />
+    <result value="original_长安一梦.松鼠告别" type="story" ret="0" />
+  </story>
+  <story name="original_长安一梦.松鼠告别">
+    <action value="汉家松鼠#礼物已经送到，少年我们就此别过了。" type="DIALOG" />
+    <action value="主角#喂喂喂，这到底算啥啊..." type="DIALOG" />
+    <action value="汉家松鼠#长安洞中，如幻如梦，少年有缘再见吧~（消失了）" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.山洞阿玉">
+    <result value="original_长安一梦.山洞阿玉2" type="story" ret="win" />
+    <action value="长安一梦阿玉#......" type="DIALOG" />
+    <action value="主角#是阿玉..?怎么阿玉会在这里？" type="DIALOG" />
+    <action value="长安一梦阿玉#爹...娘...我好想你们..." type="DIALOG" />
+    <action value="主角#原来她是想念父母，怕被人知道，一个人偷偷来这里哭.." type="DIALOG" />
+    <action value="马贼王#奶奶的，我说最近怎么老睡不好，半夜鬼叫，原来是你这个丫头在这里扰老子清静！" type="DIALOG" />
+    <action value="主角#糟了！阿玉，大哥哥来了！" type="DIALOG" />
+    <action value="马贼王#妈呀，还有只男鬼，兄弟们上啊！" type="DIALOG" />
+    <action value="original_长安一梦.山洞阿玉" type="BATTLE" />
+  </story>
+  <story name="original_长安一梦.山洞阿玉2">
+    <result value="长安一梦" type="map" ret="0" />
+    <action value="音乐.天外村" type="MUSIC" />
+    <action value="长安一梦阿玉#大..哥哥？我不是在做梦吧？" type="DIALOG" />
+    <action value="主角#怎么会是做梦，你大哥哥差点就被这帮马贼给宰了，累死我了，哼哧。" type="DIALOG" />
+    <action value="长安一梦阿玉#我..对不起..." type="DIALOG" />
+    <action value="主角#下次一个人半夜偷偷躲起来哭声音也调小点，吵着了部落的人就算了，连马贼都吵来了，这该多大音量啊。" type="DIALOG" />
+    <action value="长安一梦阿玉#（脸红）对不起..." type="DIALOG" />
+    <action value="主角#好了，平安就好。跟大哥哥回去吧。别太难过了，这里有大哥哥，还有仙丽雅，还有大家伙保护你，你爹娘知道了肯定也会很开心的。" type="DIALOG" />
+    <action value="长安一梦阿玉#...恩！" type="DIALOG" />
+    <action value="长安一梦阿玉#5" type="HAOGAN" />
+    <action value="1" type="COST_DAY" />
+  </story>
+  <story name="original_长安一梦.阿玉失踪">
+    <action value="地图.塞外" type="BACKGROUND" />
+    <action value="音乐.刀间鼓" type="MUSIC" />
+    <action value="仙丽雅#$MALE$!$MALE$!出事了，出大事了！" type="DIALOG" />
+    <action value="主角#怎么了？" type="DIALOG" />
+    <action value="仙丽雅#阿玉不见了！" type="DIALOG" />
+    <action value="主角#什么！！" type="DIALOG" />
+    <action value="主角#那快去找啊！" type="DIALOG" />
+    <action value="仙丽雅#似乎有一批人昨天经过了这里！顺着马蹄印去追可能还来得及！" type="DIALOG" />
+    <action value="主角#那我们赶紧走吧！" type="DIALOG" />
+    <result value="original_长安一梦.阿玉失踪2" type="story" ret="0" />
+  </story>
+  <story name="original_长安一梦.阿玉失踪2">
+    <action value="地图.沙漠" type="BACKGROUND" />
+    <action value="仙丽雅#阿玉！阿玉！你在哪里？阿玉！" type="DIALOG" />
+    <action value="主角#阿玉！阿玉！" type="DIALOG" />
+    <action value="仙丽雅#糟糕，前方出现了两道马蹄印，该走哪边好呢？" type="DIALOG" />
+    <action value="主角#这..." type="DIALOG" />
+    <result value="original_长安一梦.阿玉失踪选择" type="story" ret="0">
+      <condition value="original_长安一梦.阿玉的镯子没有" type="should_finish" />
+    </result>
+    <result value="original_长安一梦.阿玉失踪追击" type="story" ret="0">
+      <condition value="original_长安一梦.阿玉的镯子有" type="should_finish" />
+    </result>
+  </story>
+  <story name="original_长安一梦.阿玉失踪选择">
+    <action value="地图.沙漠" type="BACKGROUND" />
+    <action value="主角#往哪边追？#左边#右边" type="SELECT" />
+    <result value="original_长安一梦.阿玉失踪结束" type="story" ret="0" />
+    <result value="original_长安一梦.阿玉失踪结束" type="story" ret="1" />
+  </story>
+  <story name="original_长安一梦.阿玉失踪追击">
+    <result value="original_长安一梦.阿玉追踪沙漠" type="story" ret="0" />
+    <action value="地图.沙漠" type="BACKGROUND" />
+    <action value="仙丽雅#等等，地上好像有什么在发光？" type="DIALOG" />
+    <action value="主角#啊！记得有一次阿玉的手镯不见了，这是我送给她的银手镯！" type="DIALOG" />
+    <action value="仙丽雅#阿玉真是聪明！她一定是趁强盗不注意，把镯子丢下来给我们指路！" type="DIALOG" />
+    <action value="主角#我们追！" type="DIALOG" />
+    <action value="仙丽雅#嗯！" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.阿玉追踪沙漠">
+    <result value="original_长安一梦.阿玉追踪沙漠2" type="story" ret="win" />
+    <action value="地图.沙漠" type="BACKGROUND" />
+    <action value="主角#马蹄印到这里就消失了..." type="DIALOG" />
+    <action value="仙丽雅#看！那边！" type="DIALOG" />
+    <action value="主角#是阿玉！阿玉！" type="DIALOG" />
+    <action value="马贼王#奶奶的，居然还有人来救这个小鬼。兄弟们，上！" type="DIALOG" />
+    <action value="主角#哈哈，乖乖受死吧！" type="DIALOG" />
+    <action value="original_长安一梦.沙漠马贼王" type="BATTLE" />
+  </story>
+  <story name="original_长安一梦.阿玉追踪沙漠2">
+    <action value="音乐.宿命" type="MUSIC" />
+    <action value="地图.沙漠" type="BACKGROUND" />
+    <action value="主角#阿玉，你没事吧？" type="DIALOG" />
+    <action value="长安一梦阿玉#呜呜呜，大哥哥...我就知道你一定会来救我的.." type="DIALOG" />
+    <action value="仙丽雅#还有我也来救你呢。" type="DIALOG" />
+    <action value="长安一梦阿玉#仙丽雅又不会武功，累赘一个。" type="DIALOG" />
+    <action value="仙丽雅#......" type="DIALOG" />
+    <action value="仙丽雅#刚得救了就会拌嘴了，到底是怎么回事，你怎么会被他们抓走？" type="DIALOG" />
+    <action value="长安一梦阿玉#我，我...晚上一个人想爹娘了，在部落外头就被他们抓到了..." type="DIALOG" />
+    <action value="主角#......可怜的阿玉，以后不要到处乱跑了，晚上很危险的，有什么事和大哥哥说好不好？" type="DIALOG" />
+    <action value="长安一梦阿玉#恩..我再也不到处乱跑了..." type="DIALOG" />
+    <action value="主角#回去吧，好好休息下。" type="DIALOG" />
+    <action value="长安一梦阿玉#恩..." type="DIALOG" />
+    <action value="长安一梦阿玉#5" type="HAOGAN" />
+  </story>
+  <story name="original_长安一梦.阿玉失踪结束">
+    <result value="original_长安一梦.阿玉失踪结束2" type="story" ret="0" />
+    <action value="主角#好，那就走这边吧！" type="DIALOG" />
+    <action value="仙丽雅#恩，我们追！" type="DIALOG" />
+    <action value="主角#阿玉！阿玉！" type="DIALOG" />
+    <action value="仙丽雅#阿玉！" type="DIALOG" />
+    <action value="主角#阿玉！你在哪里？！" type="DIALOG" />
+    <action value="仙丽雅#阿玉！！阿玉！！！" type="DIALOG" />
+    <action value="主角#可恶！可能不是这条路！我们快回那条路上去，说不定还来得及！！" type="DIALOG" />
+    <action value="仙丽雅#好！" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.阿玉失踪结束2">
+    <action value="音乐.宿命" type="MUSIC" />
+    <action value="主角#阿玉！！阿玉！！" type="DIALOG" />
+    <action value="仙丽雅#（忍不住流下泪来）阿玉！！阿玉！！你到底在哪里？！" type="DIALOG" />
+    <action value="主角#天色渐渐暗下来，沙漠的远方什么都没有，什么...都没有..." type="DIALOG" />
+    <action value="仙丽雅#不！这不是真的...呜呜呜...阿玉...阿玉我再也不欺负你了...阿玉你快回来啊...阿玉..." type="DIALOG" />
+    <action value="主角#仙丽雅..." type="DIALOG" />
+    <action value="仙丽雅#她不会就这么不见的，不会的，不会的...呜呜呜...呜呜呜..." type="DIALOG" />
+    <action value="主角#...我们继续找！" type="DIALOG" />
+    <action value="仙丽雅#...嗯..." type="DIALOG" />
+    <action value="主角#（一把抱住仙丽雅）别怕。" type="DIALOG" />
+    <action value="仙丽雅#（颤抖）恩。" type="DIALOG" />
+    <action value="主角#来，上马。" type="DIALOG" />
+    <action value="仙丽雅#嗯。" type="DIALOG" />
+    <action value="3" type="COST_DAY" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="仙丽雅#（早已经泣不成声）" type="DIALOG" />
+    <action value="主角#都是我不好，没有能保护好阿玉..." type="DIALOG" />
+    <action value="仙丽雅#（只是一个人静静地哭着）" type="DIALOG" />
+    <action value="主角#（轻轻搂过仙丽雅的肩头）仙丽雅..." type="DIALOG" />
+    <action value="仙丽雅#（啜泣）" type="DIALOG" />
+    <action value="主角#那一天，大漠黄沙，长河落日，我搂着静静啜泣的仙丽雅，再也不知道该说什么好。那之后，我再也没有见到阿玉..." type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.部落长老">
+    <result value="original_长安一梦.部落长老聊天" type="story" ret="0" />
+    <result value="original_长安一梦.部落长老放牧" type="story" ret="1" />
+    <result value="original_长安一梦.部落长老打水" type="story" ret="2" />
+    <result value="original_长安一梦.部落长老砍柴" type="story" ret="3" />
+    <result value="original_长安一梦.部落长老没事" type="story" ret="4" />
+    <action value="主角#长老您好。" type="DIALOG" />
+    <action value="长安一梦长老#$MALE$，你好。" type="DIALOG" />
+    <action value="长安一梦长老#有什么事情找我呢？" type="DIALOG" />
+    <action value="主角#我是想...#找您聊天#去草场放牧#去河边打水#去砍柴#没事" type="SELECT" />
+  </story>
+  <story name="original_长安一梦.部落长老聊天">
+    <action value="长安一梦长老#今天有点累了，改天再聊吧。" type="DIALOG" />
+    <action value="主角#好吧。" type="DIALOG" />
+  </story>
+  <story name="original_长安一梦.部落长老放牧">
+    <action value="地图.草场" type="BACKGROUND" />
+    <action value="主角#看着羊儿满山坡跑，不如试试多久能把它们都赶到一堆里去。" type="DIALOG" />
+    <action value="主角#呼呼，累死了。" type="DIALOG" />
+    <action value="主角#2" type="UPGRADE.身法" />
+    <action value="1" type="COST_DAY" />
+  </story>
+  <story name="original_长安一梦.部落长老打水">
+    <action value="地图.郊野" type="BACKGROUND" />
+    <action value="主角#一个部落这么多人，要打水也是很辛苦的事情呢。" type="DIALOG" />
+    <action value="主角#哼哧！好重！好像回到了天天练基本功的生活一样。" type="DIALOG" />
+    <action value="主角#2" type="UPGRADE.臂力" />
+    <action value="1" type="COST_DAY" />
+  </story>
+  <story name="original_长安一梦.部落长老砍柴">
+    <action value="地图.树林" type="BACKGROUND" />
+    <action value="主角#这附近有片林子可以砍柴，不用烧粪便真是好啊。" type="DIALOG" />
+    <action value="主角#2" type="UPGRADE.根骨" />
+    <action value="1" type="COST_DAY" />
+  </story>
+  <story name="original_长安一梦.部落长老没事" />
+  <story name="original_新手引导.开始">
+    <result value="original_新手引导.任务买药" type="story" ret="0" />
+    <result value="original_门派选择" type="story" ret="1" />
+    <action value="南贤#等一下，我想起一个事。" type="DIALOG" />
+    <action value="主角#？" type="DIALOG" />
+    <action value="南贤#我得来点新手任务。" type="DIALOG" />
+    <action value="主角#不会吧，又是新手任务..." type="DIALOG" />
+    <action value="南贤#放心吧，一定有好礼物的哦？做不做啊？" type="DIALOG" />
+    <action value="主角#要不要做新手任务？#还是做一做吧。#做啥新手任务，我要闯江湖！" type="SELECT" />
+  </story>
+  <story name="original_新手引导.任务买药">
+    <action value="主角#...好吧，你赢了。" type="DIALOG" />
+    <action value="南贤#那给你第一个任务吧，这里有300银两。" type="DIALOG" />
+    <action value="300" type="GET_MONEY" />
+    <action value="主角#哇！真是慷慨！" type="DIALOG" />
+    <action value="南贤#你先别开心太早！这钱给你是教你怎么买药的。" type="DIALOG" />
+    <action value="主角#呃...买药？" type="DIALOG" />
+    <action value="南贤#人在江湖飘，哪能不挨刀。你现在武功都被封印了，战斗中被虐了就吃点药..." type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+    <action value="南贤#卖药的地方在洛阳，你先在大地图中找到[[red:洛阳]]，然后点进去以后再找到[[red:商店]]。在商店买[[yellow:5]]颗[[yellow:小还丹]]回来。" type="DIALOG" />
+    <action value="主角#哦..." type="DIALOG" />
+    <action value="购买物品" type="NEWBIE" />
+    <action value="南贤#你可以点击右边的[[red:日志]]按钮查看当前游戏进度和任务目标。" type="DIALOG" />
+    <action value="主角#好，我买药去了。" type="DIALOG" />
+    <result value="大地图" type="map" ret="0" />
+  </story>
+  <story name="original_新手引导.买药">
+    <action value="商人#哎呀，小兄弟来买药的？欢迎光临！看你是新手，我送你一本武功秘籍！你要什么类型的？" type="DIALOG" />
+    <action value="主角#要什么类型的秘籍呢？#拳掌#剑法#刀法#奇门" type="SELECT" />
+    <result value="original_新手引导.买药拳" type="story" ret="0" />
+    <result value="original_新手引导.买药剑" type="story" ret="1" />
+    <result value="original_新手引导.买药刀" type="story" ret="2" />
+    <result value="original_新手引导.买药奇门" type="story" ret="3" />
+  </story>
+  <story name="original_新手引导.买药拳">
+    <result value="original_新手引导.买药继续" type="story" ret="0" />
+    <action value="罗汉拳谱#1" type="ITEM" />
+  </story>
+  <story name="original_新手引导.买药剑">
+    <action value="青蟒剑法秘籍#1" type="ITEM" />
+    <result value="original_新手引导.买药继续" type="story" ret="0" />
+  </story>
+  <story name="original_新手引导.买药刀">
+    <result value="original_新手引导.买药继续" type="story" ret="0" />
+    <action value="万劫刀法谱#1" type="ITEM" />
+  </story>
+  <story name="original_新手引导.买药奇门">
+    <action value="疯魔杖法秘诀#1" type="ITEM" />
+    <result value="original_新手引导.买药继续" type="story" ret="0" />
+  </story>
+  <story name="original_新手引导.买药继续">
+    <action value="主角#谢谢掌柜！" type="DIALOG" />
+    <action value="商人#哈哈，太客气了。你可是要成为一代大侠的人物，我得讨好你这个大主顾..." type="DIALOG" />
+    <action value="商人#我再送你五颗小还丹！你不用花钱买了！" type="DIALOG" />
+    <action value="主角#哇！慷慨啊！" type="DIALOG" />
+    <action value="小还丹#5" type="ITEM" />
+    <action value="商人#嘿嘿，小意思。小兄弟可要成为一代大侠哦，这个游戏很好玩的哦。" type="DIALOG" />
+    <action value="主角#一定一定！" type="DIALOG" />
+  </story>
+  <story name="original_新手引导.买到药了">
+    <action value="主角#呼呼，[[yellow:任务完成了]]，回去[[red:南贤居]]复命吧。" type="DIALOG" />
+    <action value="购买药品完成" type="NEWBIE" />
+  </story>
+  <story name="original_新手引导.买药完成">
+    <action value="南贤#恩，干得不错！" type="DIALOG" />
+    <action value="主角#100" type="UPGRADE.MAXHP" />
+    <action value="主角#100" type="UPGRADE.MAXMP" />
+    <action value="南贤#吃药很重要的！打不过的敌人记得多吃药！" type="DIALOG" />
+    <action value="主角#......哦。" type="DIALOG" />
+  </story>
+  <story name="original_新手引导.任务打人">
+    <result value="original_新手引导.任务打人小孩" type="story" ret="0" />
+    <result value="original_新手引导.任务打人黑帮" type="story" ret="1" />
+    <action value="南贤#[[red:新的任务]]来了！这样吧，你去帮我把[[red:洛阳]]城里那个不听话的[[yellow:小孩]]教训一下！" type="DIALOG" />
+    <action value="主角#...欺负小孩，太没品了。" type="DIALOG" />
+    <action value="南贤#...你牛逼，你是大英雄，要不你去帮我教训一下[[red:衡阳]]城里的[[yellow:黑老大]]？" type="DIALOG" />
+    <action value="主角#该如何选择？#还是去欺负小孩吧。#我要教训黑老大！" type="SELECT" />
+  </story>
+  <story name="original_新手引导.任务打人小孩">
+    <action value="主角#...我还是去教训小孩吧。" type="DIALOG" />
+    <action value="南贤#真乖，新手任务嘛，挑个好欺负的混过去就好了。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="教训小孩" type="NEWBIE" />
+    <action value="南贤#还愣着干什么，快去[[red:洛阳]]，把街上那个[[yellow:小孩]]给我教训一顿！" type="DIALOG" />
+  </story>
+  <story name="original_新手引导.教训小孩开始">
+    <result value="original_新手引导.教训小孩成功" type="story" ret="win" />
+    <result value="original_教训小孩负" type="story" ret="lose" />
+    <action value="小孩#叔叔，陪我玩玩嘛！" type="DIALOG" />
+    <action value="主角#叫哥哥就陪你玩。" type="DIALOG" />
+    <action value="小孩#......怪叔叔，陪我玩玩嘛！" type="DIALOG" />
+    <action value="主角#...真是不乖，小心叔叔扁你哦！" type="DIALOG" />
+    <action value="小孩#哈哈，怪叔叔你打不过我~" type="DIALOG" />
+    <action value="主角#狂妄的小鬼，看我吃了你~" type="DIALOG" />
+    <action value="新手任务小孩" type="BATTLE" />
+  </story>
+  <story name="original_教训小孩负">
+    <result value="original_新手引导.教训小孩成功" type="story" ret="0" />
+    <action value="音乐.城市3" type="MUSIC" />
+    <action value="主角#呃，我居然输给了这个小鬼？？" type="DIALOG" />
+    <action value="小孩#嘻嘻，说了你很菜的。" type="DIALOG" />
+    <action value="主角#！！小鬼，你妈来了！看那边！" type="DIALOG" />
+    <action value="小孩#咦？（反过头去）" type="DIALOG" />
+    <action value="主角#（趁现在！一拳把小鬼揍倒。）" type="DIALOG" />
+  </story>
+  <story name="original_新手引导.教训小孩成功">
+    <action value="音乐.城市3" type="MUSIC" />
+    <action value="主角#（抹抹汗）呼，终于教训了这个小鬼一顿..." type="DIALOG" />
+    <action value="小孩#...坏叔叔" type="DIALOG" />
+  </story>
+  <story name="original_新手引导.教训小孩复命">
+    <action value="主角#[[yellow:任务完成了]]，这下子可以回去[[red:南贤居]]复命了..." type="DIALOG" />
+    <action value="教训小孩完成" type="NEWBIE" />
+  </story>
+  <story name="original_新手引导.教训小孩完成">
+    <action value="南贤#干得不错！在江湖上，就靠拳头说话了！" type="DIALOG" />
+    <action value="主角#唔，欺负小孩也是江湖了？" type="DIALOG" />
+    <action value="南贤#那当然，有人的地方就是江湖！" type="DIALOG" />
+    <action value="主角#...哦。" type="DIALOG" />
+    <action value="基本内功#1" type="MAXLEVEL" />
+  </story>
+  <story name="original_新手引导.任务打人黑帮">
+    <action value="主角#当哥真的武功全失啊？我要去教训黑老大！" type="DIALOG" />
+    <action value="南贤#...好吧，good luck..." type="DIALOG" />
+    <action value="教训黑老大" type="NEWBIE" />
+    <action value="南贤#你去南面的[[red:衡阳]]，然后挑战了街上的[[yellow:黑老大]]再回来吧。" type="DIALOG" />
+  </story>
+  <story name="original_新手引导.教训黑老大开始">
+    <result value="original_新手引导.教训黑老大胜" type="story" ret="win" />
+    <result value="original_新手引导.教训黑老大负" type="story" ret="lose" />
+    <action value="黑老大#什么样的节奏呀，最呀最摇摆~" type="DIALOG" />
+    <action value="黑老大#什么样的茅屋最耐大风拆~" type="DIALOG" />
+    <action value="主角#黑老大，今日受死吧！" type="DIALOG" />
+    <action value="黑老大#（怒）什么人，敢打扰老子修炼轻功！" type="DIALOG" />
+    <action value="新手任务黑老大" type="BATTLE" />
+  </story>
+  <story name="original_新手引导.教训黑老大胜">
+    <action value="音乐.武侠流水" type="MUSIC" />
+    <action value="黑老大#小子有些道行，再吃我这一招~" type="DIALOG" />
+    <action value="主角#啊~（被一刀撂倒）" type="DIALOG" />
+    <result value="original_新手引导.教训黑老大负" type="story" ret="0" />
+  </story>
+  <story name="original_新手引导.教训黑老大负">
+    <action value="音乐.武侠流水" type="MUSIC" />
+    <action value="主角#大哥，你好猛啊~大哥饶命啊，大哥饶命啊~" type="DIALOG" />
+    <action value="黑老大#看老子一刀砍死你！敢挡着老子练轻功！" type="DIALOG" />
+    <action value="主角#大哥我错了，大哥我上有老，下有小，大哥我也是出来混口饭吃的啊~" type="DIALOG" />
+    <action value="黑老大#这次就放过你，下次再来惹事看我不劈死你。" type="DIALOG" />
+    <action value="主角#是是是，大哥海涵，大哥海涵..." type="DIALOG" />
+  </story>
+  <story name="original_新手引导.教训黑老大复命">
+    <action value="主角#居然很羞辱地被黑老大欺负了，回[[red:南贤居]]报告一下情况吧..." type="DIALOG" />
+    <action value="教训黑老大完成" type="NEWBIE" />
+  </story>
+  <story name="original_新手引导.教训黑老大完成">
+    <action value="南贤#怎么样？叫你逞英雄，打不过吧？" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="南贤#你要记住，这个江湖是一个[[red:开放世界]]。遇到打不过的对手，是很正常的。" type="DIALOG" />
+    <action value="主角#那打不过怎么办？" type="DIALOG" />
+    <action value="南贤#[[red:读档]]，躲着走啊！" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="南贤#总之，等自己实力更强了，再去挑战之前无法战胜的对手吧。" type="DIALOG" />
+    <action value="主角#哦..." type="DIALOG" />
+    <action value="基本内功#1" type="MAXLEVEL" />
+  </story>
+  <story name="original_新手引导.买药去啊">
+    <action value="南贤#还愣着干啥？快去买药啊。" type="DIALOG" />
+    <action value="南贤#到[[red:洛阳]]，找到[[red:商店]]，买[[yellow:5]]颗[[yellow:小还丹]]回来。" type="DIALOG" />
+  </story>
+  <story name="original_新手引导.教训小孩去啊">
+    <action value="南贤#还愣着干啥？快去教训小孩啊。" type="DIALOG" />
+    <action value="南贤#到[[red:洛阳]]，找到[[red:小孩]]，扁他一顿。" type="DIALOG" />
+  </story>
+  <story name="original_新手引导.教训黑老大去啊">
+    <action value="南贤#还愣着干啥？快去教训黑老大啊，大英雄。" type="DIALOG" />
+    <action value="南贤#到[[red:衡阳]]，找到[[red:黑老大]]，扁他一顿。" type="DIALOG" />
+    <action value="南贤#当然啦，我估计被打得满地找牙的是你，嘿嘿。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="original_新手引导结束">
+    <result value="original_门派选择" type="story" ret="0" />
+    <action value="南贤#好了，打人、嗑药、探索，江湖无非如此，我的[[yellow:新手教学]]到这里就[[yellow:结束]]了。" type="DIALOG" />
+    <action value="南贤#接下来，就看你自己大展身手了!" type="DIALOG" />
+    <action value="主角#没问题！" type="DIALOG" />
+  </story>
+  <story name="original_新手地图.送镖">
+    <action value="地图.府门前" type="BACKGROUND" />
+    <action value="音乐.倚天.醉拳" type="MUSIC" />
+    <result value="original_新手地图.送镖不进入" type="story" ret="0">
+      <condition value="主角#10" type="level_greater_than" />
+    </result>
+    <result value="original_新手地图.送镖进入" type="story" ret="0" />
+  </story>
+  <story name="original_新手地图.送镖不进入">
+    <action value="镖局老大#小兄弟武功高超，老夫这厢有礼了。" type="DIALOG" />
+  </story>
+  <story name="original_新手地图.送镖进入">
+    <result value="original_新手地图.接镖完成" type="story" ret="0" />
+    <result value="original_新手地图.接镖劫匪1" type="story" ret="0">
+      <condition value="50" type="probability" />
+    </result>
+    <result value="original_新手地图.接镖劫匪2" type="story" ret="0">
+      <condition value="50" type="probability" />
+    </result>
+    <result value="original_新手地图.接镖完成" type="story" ret="0" />
+    <action value="镖局老大#小兄弟看起来武功不错，要不要帮我送个镖，赚点银子？" type="DIALOG" />
+    <action value="主角#要不要接镖？#接镖！#不接" type="SELECT" />
+  </story>
+  <story name="original_新手地图.接镖劫匪1">
+    <result value="original_新手地图.接镖完成" type="story" ret="win" />
+    <result value="original_新手地图.接镖失败" type="story" ret="lose" />
+    <action value="地图.沙漠" type="BACKGROUND" />
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="主角#这个镖还挺远的..." type="DIALOG" />
+    <action value="马贼#打劫啦！打劫啦！" type="DIALOG" />
+    <action value="主角#...老套，来吧！" type="DIALOG" />
+    <action value="original_新手地图.接镖劫匪1" type="BATTLE" />
+  </story>
+  <story name="original_新手地图.接镖劫匪2">
+    <result value="original_新手地图.接镖完成" type="story" ret="win" />
+    <result value="original_新手地图.接镖失败" type="story" ret="lose" />
+    <action value="地图.树林" type="BACKGROUND" />
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="主角#这个镖还挺远的..." type="DIALOG" />
+    <action value="山贼#打劫啦！打劫啦！" type="DIALOG" />
+    <action value="主角#...老套，来吧！" type="DIALOG" />
+    <action value="original_新手地图.接镖劫匪2" type="BATTLE" />
+  </story>
+  <story name="original_新手地图.接镖完成">
+    <result value="龙门镖局" type="map" ret="0" />
+    <action value="10" type="COST_DAY" />
+    <action value="地图.府门前" type="BACKGROUND" />
+    <action value="音乐.倚天.醉拳" type="MUSIC" />
+    <action value="主角#总算把镖送到回来了。" type="DIALOG" />
+    <action value="镖局老大#不错！打赏！" type="DIALOG" />
+    <action value="50" type="GET_MONEY" />
+    <action value="主角#唉，真少。" type="DIALOG" />
+    <action value="镖局老大#......" type="DIALOG" />
+  </story>
+  <story name="original_新手地图.接镖失败">
+    <action value="10" type="COST_DAY" />
+    <action value="地图.府门前" type="BACKGROUND" />
+    <action value="音乐.倚天.醉拳" type="MUSIC" />
+    <action value="主角#镖丢了.." type="DIALOG" />
+    <action value="镖局老大#饭桶一个，滚！" type="DIALOG" />
+  </story>
+  <story name="original_非古墓">
+    <result value="original_拜会古墓" type="story" ret="0" />
+    <result value="original_灭门古墓" type="story" ret="1" />
+    <action value="主角#要怎么做？#拜会古墓派#[[red:灭门古墓！]]" type="SELECT" />
+  </story>
+  <story name="original_拜会古墓">
+    <action value="主角#久闻古墓派有一黄衫女子，武功奇高，清丽脱俗。今日有幸得见，果然名不虚传。" type="DIALOG" />
+    <action value="黄衫女子#公子客气。古墓乃是清幽之地，无事请回吧。" type="DIALOG" />
+  </story>
+  <story name="original_灭门古墓">
+    <action value="主角#哈哈哈哈，今天我来领教古墓派的高招！" type="DIALOG" />
+    <action value="黄衫女子#请进招吧。" type="DIALOG" />
+    <action value="灭门古墓黄衫女子1" type="BATTLE" />
+    <result value="original_灭门古墓2" type="story" ret="win" />
+  </story>
+  <story name="original_灭门古墓2">
+    <action value="主角#趁你受伤，痛下杀手！" type="DIALOG" />
+    <action value="黄衫女子#休要小看我古墓派！" type="DIALOG" />
+    <action value="灭门古墓黄衫女子2" type="BATTLE" />
+    <result value="original_灭门古墓离开判断" type="story" ret="win" />
+  </story>
+  <story name="original_灭门古墓离开判断">
+    <result value="original_灭门古墓杨过离开" type="story" ret="0">
+      <condition value="杨过" type="in_team" />
+    </result>
+    <result value="original_灭门古墓小龙女离开" type="story" ret="0">
+      <condition value="小龙女" type="in_team" />
+    </result>
+    <result value="original_灭门古墓郭襄离开" type="story" ret="0">
+      <condition value="郭襄" type="in_team" />
+    </result>
+    <result value="original_灭门古墓超级战" type="story" ret="0" />
+  </story>
+  <story name="original_灭门古墓杨过离开">
+    <result value="original_灭门古墓离开判断" type="story" ret="0" />
+    <action value="杨过#你居然真的对我古墓派痛下杀手，好，我杨过看错你了。" type="DIALOG" />
+    <action value="杨过" type="LEAVE" />
+  </story>
+  <story name="original_灭门古墓小龙女离开">
+    <result value="original_灭门古墓离开判断" type="story" ret="0" />
+    <action value="小龙女#我绝不会让古墓派亡在你手上，誓死我都要和你斗争到底！" type="DIALOG" />
+    <action value="小龙女" type="LEAVE" />
+  </story>
+  <story name="original_灭门古墓郭襄离开">
+    <result value="original_灭门古墓离开判断" type="story" ret="0" />
+    <action value="郭襄#古墓是大哥哥和龙姐姐的心血，我绝不允许你破坏它！" type="DIALOG" />
+    <action value="郭襄" type="LEAVE" />
+  </story>
+  <story name="original_灭门古墓超级战">
+    <result value="original_灭门古墓成功" type="story" ret="win" />
+    <action value="主角#哼，还有什么招数都使出来吧！今天古墓就要从江湖中除名！" type="DIALOG" />
+    <action value="灭门古墓超级战" type="BATTLE" />
+  </story>
+  <story name="original_灭门古墓成功">
+    <action value="主角#哈哈，从此天下再没有古墓派！" type="DIALOG" />
+    <action value="灭门古墓派。" type="LOG" />
+    <action value="玉女素心剑#2" type="MAXLEVEL" />
+    <action value="玄铁剑法#2" type="MAXLEVEL" />
+    <action value="黯然销魂掌#2" type="MAXLEVEL" />
+    <result value="大地图" type="map" ret="0" />
+  </story>
+  <story name="original_非大轮">
+    <action value="地图.大轮寺正殿" type="BACKGROUND" />
+    <action value="音乐.天龙八部.佛音4" type="MUSIC" />
+    <action value="主角#要怎么做？#拜会大轮寺#[[red:灭门大轮寺！]]" type="SELECT" />
+    <result value="original_拜会大轮" type="story" ret="0" />
+    <result value="original_灭门大轮" type="story" ret="1" />
+  </story>
+  <story name="original_拜会大轮">
+    <action value="主角#金轮法王武功高强，大轮寺人才济济，佩服，佩服。" type="DIALOG" />
+    <action value="金轮法王#没事跑来拍马屁干什么？出去出去。" type="DIALOG" />
+  </story>
+  <story name="original_灭门大轮">
+    <result value="original_灭门大轮2" type="story" ret="win" />
+    <action value="主角#大轮寺，哼哼！今日就要把尔等从江湖中除名" type="DIALOG" />
+    <action value="金轮法王#好狂妄的小子！来吧！" type="DIALOG" />
+    <action value="灭门大轮1" type="BATTLE" />
+  </story>
+  <story name="original_灭门大轮2">
+    <result value="original_灭门大轮成功" type="story" ret="win" />
+    <action value="金轮法王#可恶！老子跟你们拼了！！" type="DIALOG" />
+    <action value="灭门大轮2" type="BATTLE" />
+  </story>
+  <story name="original_灭门大轮成功">
+    <result value="大地图" type="map" ret="0" />
+    <action value="主角#我，$MALE$，在此宣布，从此江湖之中，再没有大轮寺这个名号！哈哈哈哈！！" type="DIALOG" />
+    <action value="灭门大轮寺。" type="LOG" />
+    <action value="3" type="DAODE" />
+    <action value="龙象般若功#2" type="MAXLEVEL" />
+    <action value="打狗棒#1" type="ITEM" />
+  </story>
+  <story name="original_非血刀">
+    <result value="original_拜会血刀" type="story" ret="0" />
+    <result value="original_灭门血刀血刀老祖离开" type="story" ret="1">
+      <condition value="血刀老祖" type="in_team" />
+    </result>
+    <result value="original_灭门血刀开始" type="story" ret="1" />
+    <action value="地图.血刀门" type="BACKGROUND" />
+    <action value="音乐.血刀门" type="MUSIC" />
+    <action value="主角#要怎么做？#拜会血刀门#[[red:灭门血刀！]]" type="SELECT" />
+  </story>
+  <story name="original_拜会血刀">
+    <action value="主角#听说血刀门有一门神功名叫血刀大法，简直就是个BUG啊。" type="DIALOG" />
+    <action value="血刀老祖#嘿嘿，知道就好。你不是我血刀门的，来这里干什么，小心血刀大法伺候哦。快出去出去。" type="DIALOG" />
+  </story>
+  <story name="original_灭门血刀血刀老祖离开">
+    <action value="血刀老祖" type="LEAVE" />
+    <result value="original_灭门血刀开始" type="story" ret="0" />
+  </story>
+  <story name="original_灭门血刀开始">
+    <action value="主角#哼哼，血刀门，今日将你们从江湖中除名。" type="DIALOG" />
+    <action value="血刀老祖#小子找死！" type="DIALOG" />
+    <action value="灭门血刀1" type="BATTLE" />
+    <result value="original_灭门血刀2" type="story" ret="win" />
+  </story>
+  <story name="original_灭门血刀2">
+    <result value="original_灭门血刀成功" type="story" ret="win" />
+    <action value="血刀老祖#今天看来求饶也没用了！老子跟你拼了！！" type="DIALOG" />
+    <action value="灭门血刀2" type="BATTLE" />
+  </story>
+  <story name="original_灭门血刀成功">
+    <result value="大地图" type="map" ret="0" />
+    <action value="主角#$MALE$在此宣布，血刀大法从此绝迹江湖！哈哈哈哈！！" type="DIALOG" />
+    <action value="灭门血刀。" type="LOG" />
+    <action value="5" type="DAODE" />
+    <action value="血刀大法#2" type="MAXLEVEL" />
+    <action value="血海魔功#2" type="MAXLEVEL" />
+  </story>
+  <story name="original_非全真">
+    <result value="original_拜会全真" type="story" ret="0" />
+    <result value="original_灭门全真" type="story" ret="1" />
+    <action value="地图.全真教" type="BACKGROUND" />
+    <action value="音乐.全真教" type="MUSIC" />
+    <action value="主角#要怎么做？#拜会全真教#[[red:灭门全真！]]" type="SELECT" />
+  </story>
+  <story name="original_拜会全真">
+    <action value="主角#全真教乃道家大派，数百年来英才济济，不愧是天下名门正派。" type="DIALOG" />
+    <action value="赵志敬#知道就好，既然不是我派弟子，速速离去吧。" type="DIALOG" />
+  </story>
+  <story name="original_灭门全真">
+    <action value="主角#嘿嘿，全真教，我倒要看看你们有几斤几两！" type="DIALOG" />
+    <action value="赵志敬#师父！不妙啊！有敌人啊！！" type="DIALOG" />
+    <action value="灭门全真1" type="BATTLE" />
+    <result value="original_灭门全真2" type="story" ret="win" />
+  </story>
+  <story name="original_灭门全真2">
+    <result value="original_灭门全真离开判断" type="story" ret="win" />
+    <action value="主角#哈哈哈哈，全真七子，不过尔尔！" type="DIALOG" />
+    <action value="周伯通#大家别慌，我来助阵！" type="DIALOG" />
+    <action value="灭门全真2" type="BATTLE" />
+  </story>
+  <story name="original_灭门全真离开判断">
+    <result value="original_灭门全真郭靖离开" type="story" ret="0">
+      <condition value="郭靖" type="in_team" />
+    </result>
+    <result value="original_灭门古墓黄蓉离开" type="story" ret="0">
+      <condition value="黄蓉" type="in_team" />
+    </result>
+    <result value="original_灭门全真超级战" type="story" ret="0" />
+  </story>
+  <story name="original_灭门全真郭靖离开">
+    <result value="original_灭门全真离开判断" type="story" ret="0" />
+    <action value="郭靖#全真教上下对我有大恩，我不能眼睁睁看你灭门。" type="DIALOG" />
+    <action value="郭靖" type="LEAVE" />
+  </story>
+  <story name="original_灭门古墓黄蓉离开">
+    <result value="original_灭门全真离开判断" type="story" ret="0" />
+    <action value="黄蓉#决不允许你灭全真教！你这是与天下正义之士为敌！" type="DIALOG" />
+    <action value="黄蓉" type="LEAVE" />
+  </story>
+  <story name="original_灭门全真超级战">
+    <result value="original_灭门全真成功" type="story" ret="win" />
+    <action value="主角#哼，可惜王重阳死得早，不然连他一起灭了，你们来吧。" type="DIALOG" />
+    <action value="周伯通#小子，不要太嚣张！" type="DIALOG" />
+    <action value="灭门全真超级战" type="BATTLE" />
+  </story>
+  <story name="original_灭门全真成功">
+    <result value="大地图" type="map" ret="0" />
+    <action value="主角#哈哈，全真教亡了，九阴真经在我手上了！" type="DIALOG" />
+    <action value="灭门全真教。" type="LOG" />
+    <action value="九阴神功#1" type="MAXLEVEL" />
+    <action value="先天功#2" type="MAXLEVEL" />
+    <action value="七星七绝剑#2" type="MAXLEVEL" />
+    <action value="九阴真经" type="ITEM" />
+    <action value="-5" type="DAODE" />
+  </story>
+  <story name="original_周伯通全真教灭门">
+    <action value="周伯通#你把师哥的全真教都灭了，我跟你这种人没什么好说的。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="original_非灵鹫">
+    <result value="original_拜会灵鹫" type="story" ret="0" />
+    <result value="original_灭门灵鹫" type="story" ret="1" />
+    <action value="地图.灵鹫宫" type="BACKGROUND" />
+    <action value="音乐.天外村" type="MUSIC" />
+    <action value="主角#要怎么做？#拜会灵鹫宫#[[red:灭门灵鹫宫！]]" type="SELECT" />
+  </story>
+  <story name="original_拜会灵鹫">
+    <action value="主角#灵鹫是一个武林传说，什么返老还童啊，什么生死符啊，太牛逼了。" type="DIALOG" />
+    <action value="秦婆婆#既然不是灵鹫门人，快走吧。" type="DIALOG" />
+  </story>
+  <story name="original_灭门灵鹫">
+    <result value="original_灭门灵鹫2" type="story" ret="win" />
+    <action value="主角#灵鹫宫？哼哼，把你们的宝贝都给我交出来！" type="DIALOG" />
+    <action value="秦婆婆#誓死保卫灵鹫宫！" type="DIALOG" />
+    <action value="灭门灵鹫1" type="BATTLE" />
+  </story>
+  <story name="original_灭门灵鹫2">
+    <result value="original_灭门灵鹫成功" type="story" ret="win" />
+    <action value="天山童姥#好厉害！师妹，你忍心看着师兄的基业毁于一旦？！" type="DIALOG" />
+    <action value="李秋水#...今日帮你一次。" type="DIALOG" />
+    <action value="灭门灵鹫2" type="BATTLE" />
+  </story>
+  <story name="original_灭门灵鹫成功">
+    <action value="李秋水#不顶用的废物！罢了，灵鹫宫气数已尽，我犯不着陪着一起死。" type="DIALOG" />
+    <action value="主角#哈哈哈哈！天山童姥，不过尔尔。" type="DIALOG" />
+    <action value="灭门灵鹫宫。" type="LOG" />
+    <action value="八荒六合唯我独尊功#2" type="MAXLEVEL" />
+    <action value="天山折梅手#2" type="MAXLEVEL" />
+    <action value="北冥神功精义#1" type="ITEM" />
+    <result value="大地图" type="map" ret="0" />
+  </story>
+  <story name="original_东海剑池">
+    <action value="地图.剑魔荒冢" type="BACKGROUND" />
+    <action value="音乐.开场" type="MUSIC" />
+    <action value="主角#此处剑气纵横，仿佛可以感受到前辈高人的气息…" type="DIALOG" />
+    <action value="主角#来到剑池做什么？#静修#洗练装备#离开" type="SELECT" />
+    <result value="original_东海剑池开始" type="story" ret="0">
+      <condition value="original_东海剑池开始" type="should_not_finish" />
+    </result>
+    <result value="original_东海剑池开始2" type="story" ret="0">
+      <condition value="original_东海剑池开始2" type="should_not_finish" />
+    </result>
+    <result value="original_东海剑池开始3" type="story" ret="0">
+      <condition value="original_东海剑池开始3" type="should_not_finish" />
+    </result>
+    <result value="original_东海剑池开始4" type="story" ret="0">
+      <condition value="original_东海剑池开始4" type="should_not_finish" />
+    </result>
+    <result value="original_东海剑池开始5" type="story" ret="0">
+      <condition value="original_东海剑池开始5" type="should_not_finish" />
+    </result>
+    <result value="original_东海剑池开始6" type="story" ret="0" />
+    <result value="洗练装备介绍" type="story" ret="1">
+      <condition value="洗练装备介绍" type="should_not_finish" />
+    </result>
+    <result value="洗练选择" type="story" ret="1" />
+  </story>
+  <story name="original_东海剑池开始">
+    <result value="original_东海剑池倚天屠龙笔法" type="story" ret="0">
+      <condition value="9" type="probability" />
+    </result>
+    <result value="original_东海剑池斗转星移" type="story" ret="0">
+      <condition value="10" type="probability" />
+    </result>
+    <result value="original_东海剑池打狗棒法" type="story" ret="0">
+      <condition value="11" type="probability" />
+    </result>
+    <result value="original_东海剑池夫妻刀法" type="story" ret="0">
+      <condition value="13" type="probability" />
+    </result>
+    <result value="original_东海剑池胡家刀法" type="story" ret="0">
+      <condition value="14" type="probability" />
+    </result>
+    <result value="original_东海剑池鸳鸯刀法" type="story" ret="0">
+      <condition value="16" type="probability" />
+    </result>
+    <result value="original_东海剑池七伤拳" type="story" ret="0">
+      <condition value="20" type="probability" />
+    </result>
+    <result value="original_东海剑池降龙十八掌" type="story" ret="0">
+      <condition value="25" type="probability" />
+    </result>
+    <result value="original_东海剑池太极剑法" type="story" ret="0">
+      <condition value="33" type="probability" />
+    </result>
+    <result value="original_东海剑池狂风快剑" type="story" ret="0">
+      <condition value="50" type="probability" />
+    </result>
+    <result value="original_东海剑池独孤九剑" type="story" ret="0" />
+    <action value="主角#冥冥之中，仿佛无数内劲碰撞交融。到底是何处而来的侠客的思念，居然在这里凝结…" type="DIALOG" />
+    <action value="主角#似乎有一些过往的战斗可以在这里回顾..." type="DIALOG" />
+  </story>
+  <story name="original_东海剑池开始2">
+    <action value="主角#冥冥之中，仿佛无数内劲碰撞交融。到底是何处而来的侠客的思念，居然在这里凝结..." type="DIALOG" />
+    <action value="主角#似乎有一些过往的战斗可以在这里回顾..." type="DIALOG" />
+    <result value="original_东海剑池倚天屠龙笔法" type="story" ret="0">
+      <condition value="9" type="probability" />
+    </result>
+    <result value="original_东海剑池斗转星移" type="story" ret="0">
+      <condition value="10" type="probability" />
+    </result>
+    <result value="original_东海剑池打狗棒法" type="story" ret="0">
+      <condition value="11" type="probability" />
+    </result>
+    <result value="original_东海剑池夫妻刀法" type="story" ret="0">
+      <condition value="13" type="probability" />
+    </result>
+    <result value="original_东海剑池胡家刀法" type="story" ret="0">
+      <condition value="14" type="probability" />
+    </result>
+    <result value="original_东海剑池鸳鸯刀法" type="story" ret="0">
+      <condition value="16" type="probability" />
+    </result>
+    <result value="original_东海剑池七伤拳" type="story" ret="0">
+      <condition value="20" type="probability" />
+    </result>
+    <result value="original_东海剑池降龙十八掌" type="story" ret="0">
+      <condition value="25" type="probability" />
+    </result>
+    <result value="original_东海剑池太极剑法" type="story" ret="0">
+      <condition value="33" type="probability" />
+    </result>
+    <result value="original_东海剑池狂风快剑" type="story" ret="0">
+      <condition value="50" type="probability" />
+    </result>
+    <result value="original_东海剑池独孤九剑" type="story" ret="0" />
+  </story>
+  <story name="original_东海剑池开始3">
+    <action value="主角#冥冥之中，仿佛无数内劲碰撞交融。到底是何处而来的侠客的思念，居然在这里凝结..." type="DIALOG" />
+    <action value="主角#似乎有一些过往的战斗可以在这里回顾..." type="DIALOG" />
+    <result value="original_东海剑池倚天屠龙笔法" type="story" ret="0">
+      <condition value="9" type="probability" />
+    </result>
+    <result value="original_东海剑池斗转星移" type="story" ret="0">
+      <condition value="10" type="probability" />
+    </result>
+    <result value="original_东海剑池打狗棒法" type="story" ret="0">
+      <condition value="11" type="probability" />
+    </result>
+    <result value="original_东海剑池夫妻刀法" type="story" ret="0">
+      <condition value="13" type="probability" />
+    </result>
+    <result value="original_东海剑池胡家刀法" type="story" ret="0">
+      <condition value="14" type="probability" />
+    </result>
+    <result value="original_东海剑池鸳鸯刀法" type="story" ret="0">
+      <condition value="16" type="probability" />
+    </result>
+    <result value="original_东海剑池七伤拳" type="story" ret="0">
+      <condition value="20" type="probability" />
+    </result>
+    <result value="original_东海剑池降龙十八掌" type="story" ret="0">
+      <condition value="25" type="probability" />
+    </result>
+    <result value="original_东海剑池太极剑法" type="story" ret="0">
+      <condition value="33" type="probability" />
+    </result>
+    <result value="original_东海剑池狂风快剑" type="story" ret="0">
+      <condition value="50" type="probability" />
+    </result>
+    <result value="original_东海剑池独孤九剑" type="story" ret="0" />
+  </story>
+  <story name="original_东海剑池开始4">
+    <result value="original_东海剑池倚天屠龙笔法" type="story" ret="0">
+      <condition value="9" type="probability" />
+    </result>
+    <result value="original_东海剑池斗转星移" type="story" ret="0">
+      <condition value="10" type="probability" />
+    </result>
+    <result value="original_东海剑池打狗棒法" type="story" ret="0">
+      <condition value="11" type="probability" />
+    </result>
+    <result value="original_东海剑池夫妻刀法" type="story" ret="0">
+      <condition value="13" type="probability" />
+    </result>
+    <result value="original_东海剑池胡家刀法" type="story" ret="0">
+      <condition value="14" type="probability" />
+    </result>
+    <result value="original_东海剑池鸳鸯刀法" type="story" ret="0">
+      <condition value="16" type="probability" />
+    </result>
+    <result value="original_东海剑池七伤拳" type="story" ret="0">
+      <condition value="20" type="probability" />
+    </result>
+    <result value="original_东海剑池降龙十八掌" type="story" ret="0">
+      <condition value="25" type="probability" />
+    </result>
+    <result value="original_东海剑池太极剑法" type="story" ret="0">
+      <condition value="33" type="probability" />
+    </result>
+    <result value="original_东海剑池狂风快剑" type="story" ret="0">
+      <condition value="50" type="probability" />
+    </result>
+    <result value="original_东海剑池独孤九剑" type="story" ret="0" />
+    <action value="主角#冥冥之中，仿佛无数内劲碰撞交融。到底是何处而来的侠客的思念，居然在这里凝结..." type="DIALOG" />
+    <action value="主角#似乎有一些过往的战斗可以在这里回顾..." type="DIALOG" />
+  </story>
+  <story name="original_东海剑池开始5">
+    <action value="主角#冥冥之中，仿佛无数内劲碰撞交融。到底是何处而来的侠客的思念，居然在这里凝结..." type="DIALOG" />
+    <action value="主角#似乎有一些过往的战斗可以在这里回顾..." type="DIALOG" />
+    <result value="original_东海剑池倚天屠龙笔法" type="story" ret="0">
+      <condition value="9" type="probability" />
+    </result>
+    <result value="original_东海剑池斗转星移" type="story" ret="0">
+      <condition value="10" type="probability" />
+    </result>
+    <result value="original_东海剑池打狗棒法" type="story" ret="0">
+      <condition value="11" type="probability" />
+    </result>
+    <result value="original_东海剑池夫妻刀法" type="story" ret="0">
+      <condition value="13" type="probability" />
+    </result>
+    <result value="original_东海剑池胡家刀法" type="story" ret="0">
+      <condition value="14" type="probability" />
+    </result>
+    <result value="original_东海剑池鸳鸯刀法" type="story" ret="0">
+      <condition value="16" type="probability" />
+    </result>
+    <result value="original_东海剑池七伤拳" type="story" ret="0">
+      <condition value="20" type="probability" />
+    </result>
+    <result value="original_东海剑池降龙十八掌" type="story" ret="0">
+      <condition value="25" type="probability" />
+    </result>
+    <result value="original_东海剑池太极剑法" type="story" ret="0">
+      <condition value="33" type="probability" />
+    </result>
+    <result value="original_东海剑池狂风快剑" type="story" ret="0">
+      <condition value="50" type="probability" />
+    </result>
+    <result value="original_东海剑池独孤九剑" type="story" ret="0" />
+  </story>
+  <story name="original_东海剑池开始6">
+    <action value="主角#冥冥之中，仿佛无数内劲碰撞交融。到底是何处而来的侠客的思念，居然在这里凝结..." type="DIALOG" />
+    <action value="主角#似乎有一些过往的战斗可以在这里回顾..." type="DIALOG" />
+    <result value="original_东海剑池倚天屠龙笔法" type="story" ret="0">
+      <condition value="9" type="probability" />
+    </result>
+    <result value="original_东海剑池斗转星移" type="story" ret="0">
+      <condition value="10" type="probability" />
+    </result>
+    <result value="original_东海剑池打狗棒法" type="story" ret="0">
+      <condition value="11" type="probability" />
+    </result>
+    <result value="original_东海剑池夫妻刀法" type="story" ret="0">
+      <condition value="13" type="probability" />
+    </result>
+    <result value="original_东海剑池胡家刀法" type="story" ret="0">
+      <condition value="14" type="probability" />
+    </result>
+    <result value="original_东海剑池鸳鸯刀法" type="story" ret="0">
+      <condition value="16" type="probability" />
+    </result>
+    <result value="original_东海剑池七伤拳" type="story" ret="0">
+      <condition value="20" type="probability" />
+    </result>
+    <result value="original_东海剑池降龙十八掌" type="story" ret="0">
+      <condition value="25" type="probability" />
+    </result>
+    <result value="original_东海剑池太极剑法" type="story" ret="0">
+      <condition value="33" type="probability" />
+    </result>
+    <result value="original_东海剑池狂风快剑" type="story" ret="0">
+      <condition value="50" type="probability" />
+    </result>
+    <result value="original_东海剑池独孤九剑" type="story" ret="0" />
+  </story>
+  <story name="original_东海剑池七伤拳">
+    <result value="original_东海剑池升级拳" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#内劲变幻不定，仿佛有七种不同劲道...崆峒派的七伤拳法。" type="DIALOG" />
+    <action value="主角#对面的敌手也...很强...啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池七伤拳" type="BATTLE" />
+  </story>
+  <story name="original_东海剑池降龙十八掌">
+    <result value="original_东海剑池升级拳" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#此拳法刚烈勇猛，一往无前，仿佛千军万马亦不惧！见龙在田，飞龙在天...这是丐帮的降龙十八掌！" type="DIALOG" />
+    <action value="主角#降龙十八掌，威力无匹，可是对面的人影似乎依然是游刃有余！这一场比试，好精彩！" type="DIALOG" />
+    <action value="东海剑池降龙十八掌" type="BATTLE" />
+  </story>
+  <story name="original_东海剑池太极剑法">
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#此剑法极其柔和，与天下武功招式、原理皆不相同，只可能是武当派的太极剑法。" type="DIALOG" />
+    <action value="主角#啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池太极剑法" type="BATTLE" />
+    <result value="original_东海剑池升级剑" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+  </story>
+  <story name="original_东海剑池狂风快剑">
+    <result value="original_东海剑池升级剑" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#此剑法极其迅速，如怒海狂涛一般涌来，不依靠内功修为，单凭剑法本身居然能达到这样的境界！这只能是华山剑宗的狂风快剑了。" type="DIALOG" />
+    <action value="主角#一剑快过一剑，如疾风迅雷一般...啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池狂风快剑" type="BATTLE" />
+  </story>
+  <story name="original_东海剑池独孤九剑">
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#此剑法完全无章法可循，但是每一招都克敌制胜，仿佛无论怎样的招式都可以拆解。这样恐怖的剑法，一定是传说中的独孤九剑了！" type="DIALOG" />
+    <action value="主角#独孤九剑，败尽天下高手。可是对面的人影居然丝毫不落下风！这一场比试，好精彩！" type="DIALOG" />
+    <action value="东海剑池独孤九剑" type="BATTLE" />
+    <result value="original_东海剑池升级剑" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+  </story>
+  <story name="original_东海剑池夫妻刀法">
+    <result value="original_东海剑池升级刀" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#此套刀法两人合使则威力巨大，仿佛心有灵犀，不点即通！这是传说中的夫妻刀法吧？" type="DIALOG" />
+    <action value="主角#对面的武功也很是高深...啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池夫妻刀法" type="BATTLE" />
+  </story>
+  <story name="original_东海剑池胡家刀法">
+    <result value="original_东海剑池升级刀" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#此套刀法刀影笼罩四面八方，虎虎生威，这样威力巨大的刀法，只可能是关东大侠胡一刀的胡家刀法了！" type="DIALOG" />
+    <action value="主角#对面的武功也很是高深...啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池胡家刀法" type="BATTLE" />
+  </story>
+  <story name="original_东海剑池鸳鸯刀法">
+    <result value="original_东海剑池升级刀" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#此套刀法变化繁复，如同天上星彩一般绚丽美丽。这..我猜想是传说中仁者无敌的鸳鸯刀法！" type="DIALOG" />
+    <action value="主角#对面的武功也很是高深...啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池鸳鸯刀法" type="BATTLE" />
+  </story>
+  <story name="original_东海剑池倚天屠龙笔法">
+    <result value="original_东海剑池升级奇门" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#此套武功居然源自书法！铁划银钩，纵横捭阖，这是武当派张翠山大侠的倚天屠龙笔法！" type="DIALOG" />
+    <action value="主角#对面的武功也很了得...啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池倚天屠龙笔法" type="BATTLE" />
+  </story>
+  <story name="original_东海剑池斗转星移">
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#以彼之道，还施彼身！武林中最可怕的传说，姑苏慕容的斗转星移！" type="DIALOG" />
+    <action value="主角#对面的武功虽然高明，在斗转星移之下还能支撑多久...啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池斗转星移" type="BATTLE" />
+    <result value="original_东海剑池升级奇门" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+  </story>
+  <story name="original_东海剑池打狗棒法">
+    <result value="original_东海剑池升级奇门" type="story" ret="win" />
+    <result value="original_东海剑池白打" type="story" ret="lose" />
+    <action value="主角#眼前忽然影像迷蒙，仿佛剑池中有人在打斗。" type="DIALOG" />
+    <action value="主角#哈哈！这套武功仿佛教训街头恶狗一般，轻灵飘逸，处处透着狡黠的鬼点子。这是丐帮打狗棒法！" type="DIALOG" />
+    <action value="主角#对面的武功也很了得...啊，剑池中的人影居然真的打起来了！" type="DIALOG" />
+    <action value="东海剑池打狗棒法" type="BATTLE" />
+  </story>
+  <story name="original_东海剑池升级剑">
+    <result value="original_东海剑池无效" type="story" ret="0">
+      <condition value="original_东海剑池开始" type="should_finish" />
+      <condition value="original_东海剑池开始2" type="should_finish" />
+      <condition value="original_东海剑池开始3" type="should_finish" />
+      <condition value="original_东海剑池开始4" type="should_finish" />
+      <condition value="original_东海剑池开始5" type="should_finish" />
+    </result>
+    <result value="original_东海剑池升级剑结束" type="story" ret="0">
+      <condition value="主角#80" type="jianfa_less_than" />
+    </result>
+    <result value="original_东海剑池升级剑无效" type="story" ret="0" />
+    <action value="地图.剑魔荒冢" type="BACKGROUND" />
+    <action value="音乐.开场" type="MUSIC" />
+    <action value="主角#刚刚我仿佛灵魂出窍一般，居然可以和池中人影合二为一，击退强敌？" type="DIALOG" />
+    <action value="主角#真是一次神奇的体验..." type="DIALOG" />
+  </story>
+  <story name="original_东海剑池升级剑结束">
+    <action value="主角#从刚才的对决中，我也明白了一些用剑的道理。" type="DIALOG" />
+    <action value="主角#5" type="UPGRADE.剑法" />
+  </story>
+  <story name="original_东海剑池升级剑无效">
+    <action value="主角#这些用剑的道理我都已经烂熟于胸，似乎学不到什么了。" type="DIALOG" />
+  </story>
+  <story name="original_东海剑池升级拳">
+    <result value="original_东海剑池无效" type="story" ret="0">
+      <condition value="original_东海剑池开始" type="should_finish" />
+      <condition value="original_东海剑池开始2" type="should_finish" />
+      <condition value="original_东海剑池开始3" type="should_finish" />
+      <condition value="original_东海剑池开始4" type="should_finish" />
+      <condition value="original_东海剑池开始5" type="should_finish" />
+    </result>
+    <result value="original_东海剑池升级拳结束" type="story" ret="0">
+      <condition value="主角#80" type="quanzhang_less_than" />
+    </result>
+    <result value="original_东海剑池升级拳无效" type="story" ret="0" />
+    <action value="地图.剑魔荒冢" type="BACKGROUND" />
+    <action value="音乐.开场" type="MUSIC" />
+    <action value="主角#刚刚我仿佛灵魂出窍一般，居然可以和池中人影合二为一，击退强敌？" type="DIALOG" />
+    <action value="主角#真是一次神奇的体验..." type="DIALOG" />
+  </story>
+  <story name="original_东海剑池升级拳结束">
+    <action value="主角#从刚才的对决中，我也明白了一些拳掌功夫的道理。" type="DIALOG" />
+    <action value="主角#5" type="UPGRADE.拳掌" />
+  </story>
+  <story name="original_东海剑池升级拳无效">
+    <action value="主角#这些拳掌的道理我都已经烂熟于胸，似乎学不到什么了。" type="DIALOG" />
+  </story>
+  <story name="original_东海剑池升级刀">
+    <result value="original_东海剑池无效" type="story" ret="0">
+      <condition value="original_东海剑池开始" type="should_finish" />
+      <condition value="original_东海剑池开始2" type="should_finish" />
+      <condition value="original_东海剑池开始3" type="should_finish" />
+      <condition value="original_东海剑池开始4" type="should_finish" />
+      <condition value="original_东海剑池开始5" type="should_finish" />
+    </result>
+    <result value="original_东海剑池升级刀结束" type="story" ret="0">
+      <condition value="主角#80" type="daofa_less_than" />
+    </result>
+    <result value="original_东海剑池升级刀无效" type="story" ret="0" />
+    <action value="地图.剑魔荒冢" type="BACKGROUND" />
+    <action value="音乐.开场" type="MUSIC" />
+    <action value="主角#刚刚我仿佛灵魂出窍一般，居然可以和池中人影合二为一，击退强敌？" type="DIALOG" />
+    <action value="主角#真是一次神奇的体验..." type="DIALOG" />
+  </story>
+  <story name="original_东海剑池升级刀结束">
+    <action value="主角#从刚才的对决中，我也明白了一些刀法的道理。" type="DIALOG" />
+    <action value="主角#5" type="UPGRADE.刀法" />
+  </story>
+  <story name="original_东海剑池升级刀无效">
+    <action value="主角#这些刀法的道理我都已经烂熟于胸，似乎学不到什么了。" type="DIALOG" />
+  </story>
+  <story name="original_东海剑池升级奇门">
+    <action value="地图.剑魔荒冢" type="BACKGROUND" />
+    <action value="音乐.开场" type="MUSIC" />
+    <action value="主角#刚刚我仿佛灵魂出窍一般，居然可以和池中人影合二为一，击退强敌？" type="DIALOG" />
+    <action value="主角#真是一次神奇的体验..." type="DIALOG" />
+    <result value="original_东海剑池无效" type="story" ret="0">
+      <condition value="original_东海剑池开始" type="should_finish" />
+      <condition value="original_东海剑池开始2" type="should_finish" />
+      <condition value="original_东海剑池开始3" type="should_finish" />
+      <condition value="original_东海剑池开始4" type="should_finish" />
+      <condition value="original_东海剑池开始5" type="should_finish" />
+    </result>
+    <result value="original_东海剑池升级奇门结束" type="story" ret="0">
+      <condition value="主角#80" type="qimen_less_than" />
+    </result>
+    <result value="original_东海剑池升级奇门无效" type="story" ret="0" />
+  </story>
+  <story name="original_东海剑池升级奇门结束">
+    <action value="主角#从刚才的对决中，我也明白了一些奇门绝学的道理。" type="DIALOG" />
+    <action value="主角#5" type="UPGRADE.奇门" />
+  </story>
+  <story name="original_东海剑池升级奇门无效">
+    <action value="主角#这些奇门绝学的道理我都已经烂熟于胸，似乎学不到什么了。" type="DIALOG" />
+  </story>
+  <story name="original_东海剑池白打">
+    <action value="地图.剑魔荒冢" type="BACKGROUND" />
+    <action value="音乐.开场" type="MUSIC" />
+    <action value="主角#刚刚我仿佛灵魂出窍一般，居然可以和池中人影合二为一，抗击强敌？" type="DIALOG" />
+    <action value="主角#真是一次神奇的体验...可惜我没能打败对手，下次再试试吧。" type="DIALOG" />
+  </story>
+  <story name="original_东海剑池无效">
+    <action value="地图.剑魔荒冢" type="BACKGROUND" />
+    <action value="音乐.开场" type="MUSIC" />
+    <action value="主角#东海剑池的灵气好像减弱了，我虽然击败了对手，却似乎没有能学到什么东西了。" type="DIALOG" />
+  </story>
+  <story name="白马啸西风_初次见面">
+    <result value="白马啸西风_郭靖" type="story" ret="0">
+      <condition value="郭靖" type="key_in_team" />
+    </result>
+    <result value="白马啸西风_韦小宝" type="story" ret="0">
+      <condition value="韦小宝" type="key_in_team" />
+    </result>
+    <result value="白马啸西风_初次见面2" type="story" ret="0">
+      <condition value="韦小宝" type="key_not_in_team" />
+      <condition value="郭靖" type="key_not_in_team" />
+    </result>
+    <action value="主角#咦，想不到草海荒漠之中，还有这么漂亮的汉人妹子。" type="DIALOG" />
+    <action value="李文秀#..." type="DIALOG" />
+  </story>
+  <story name="白马啸西风_郭靖">
+    <result value="白马啸西风_初次见面2" type="story" ret="0" />
+    <action value="郭靖#啊，你也是在塞外的汉人吗？你好你好，呵呵（傻笑）。" type="DIALOG" />
+    <action value="李文秀#你是...？" type="DIALOG" />
+    <action value="郭靖#我是草海那边蒙古部落长大的，我叫郭靖。" type="DIALOG" />
+    <action value="李文秀#嘻嘻，我是在这边的哈萨克部落长大的。计爷爷待我很好的。" type="DIALOG" />
+    <action value="李文秀#5" type="HAOGAN" />
+  </story>
+  <story name="白马啸西风_韦小宝">
+    <action value="韦小宝#哇！真是极品美女啊！这脸，这身材！简直就是天仙下凡，我小宝哥的盘中肉啊！" type="DIALOG" />
+    <action value="李文秀#你是...？" type="DIALOG" />
+    <action value="韦小宝#hi，美女，跟你认识一下。小宝哥可是见多识广，要不要听哥哥给你讲讲中原的花花草草啊？" type="DIALOG" />
+    <action value="李文秀#我不喜欢你说话的样子，计爷爷说不要和陌生人说话。" type="DIALOG" />
+    <action value="李文秀#-5" type="HAOGAN" />
+    <result value="白马啸西风_初次见面2" type="story" ret="0" />
+  </story>
+  <story name="白马啸西风_初次见面2">
+    <action value="主角#能再为我们介绍一下这里的情况吗？" type="DIALOG" />
+    <action value="李文秀#这里是哈萨克部落，我是这里长大的李文秀。但是哈萨克人不喜欢汉人，你们还是快走吧。" type="DIALOG" />
+  </story>
+  <story name="白马啸西风_李文秀出走">
+    <action value="主角#李姑娘，这么晚了你这是要去哪里？" type="DIALOG" />
+    <action value="李文秀#呜呜呜呜..." type="DIALOG" />
+    <action value="主角#姑娘，怎么这就哭了，有话好好说嘛！" type="DIALOG" />
+    <action value="李文秀#呜呜呜呜...我是个汉人，苏普他是不会喜欢我的...阿曼对他好，他对阿曼也好...这本是极好的事情...可是为什么我要这么难过..." type="DIALOG" />
+    <action value="主角#原来是感情上的事情...那你有什么打算？" type="DIALOG" />
+    <action value="李文秀#我不知道，你不要管我了，呜呜呜呜...（走出部落）" type="DIALOG" />
+    <action value="主角#李姑娘！怎么办？" type="DIALOG" />
+    <action value="主角#该怎么办？#跟出去看看。#别管闲事了。" type="SELECT" />
+    <result value="白马啸西风_沙漠恶战" type="story" ret="0" />
+    <result value="哈萨克部落" type="map" ret="1" />
+  </story>
+  <story name="白马啸西风_沙漠恶战">
+    <result value="白马啸西风_沙漠恶战2" type="story" ret="win" />
+    <action value="地图.沙漠2" type="BACKGROUND" />
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="主角#李姑娘！（糟了，她似乎被中原来的武林人士盯上了）" type="DIALOG" />
+    <action value="李文秀#公子小心！这些人来者不善！" type="DIALOG" />
+    <action value="白马啸西风.沙漠_战斗" type="BATTLE" />
+  </story>
+  <story name="白马啸西风_沙漠恶战2">
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="主角#李姑娘，原来你功夫这么好的。这么俊的一手流星锤的功夫，是家传的武功吗？" type="DIALOG" />
+    <action value="李文秀#......" type="DIALOG" />
+    <action value="华辉#哼，小子，你动的什么歪主意？这流星锤的功夫是我教她的。" type="DIALOG" />
+    <action value="李文秀#啊！师父？！您怎么也来了？" type="DIALOG" />
+    <action value="华辉#我听到这边有打斗声，所以来看看情况。阿秀，这些人为什么要为难你？" type="DIALOG" />
+    <action value="李文秀#师父，他们都是坏人！他们想抓我问沙漠的宝藏！" type="DIALOG" />
+    <action value="华辉#哼！中原人，都是一个德行。和之前来打探你下落的是同一批人吧。" type="DIALOG" />
+    <action value="主角#（这姑娘看来还不是第一次被武林中人围攻，她到底知道什么样的秘密呢？）" type="DIALOG" />
+    <action value="华辉#小子，你也是中原人吧？刚才是你出手帮了阿秀？" type="DIALOG" />
+    <action value="主角#前辈你好，我只是路过而已。早知道李姑娘武功超卓，我也不用班门弄斧了。" type="DIALOG" />
+    <action value="华辉#哼，中原人就喜欢摆弄文字，什么超卓，什么弄斧。小子，敢不敢和我比试比试，看你够不够格救我徒弟？" type="DIALOG" />
+    <action value="主角#（这人好无理！我帮了他徒弟不感谢我，反而要为难我！）" type="DIALOG" />
+    <action value="主角#我该怎么办？#太狂妄了吧前辈，扁你哦！#赔笑" type="SELECT" />
+    <result value="白马啸西风_沙漠战华辉" type="story" ret="0" />
+    <result value="白马啸西风_沙漠赔笑" type="story" ret="1" />
+  </story>
+  <story name="白马啸西风_沙漠战华辉">
+    <result value="白马啸西风_沙漠战华辉2" type="story" ret="win" />
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="主角#(是可忍孰不可忍！）前辈，得罪了！" type="DIALOG" />
+    <action value="李文秀#喂，你们怎么又打起来了！" type="DIALOG" />
+    <action value="李文秀#-5" type="HAOGAN" />
+    <action value="白马啸西风.沙漠战华辉_战斗" type="BATTLE" />
+  </story>
+  <story name="白马啸西风_沙漠战华辉2">
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="华辉#...我打不过你，你杀了我吧！" type="DIALOG" />
+    <action value="主角#莫名其妙，我只是出手帮了你徒弟，干嘛要杀你。" type="DIALOG" />
+    <action value="华辉#..." type="DIALOG" />
+    <action value="李文秀#...公子你走吧，我师父脾气古怪，我谢过你的救命之恩了。" type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+  </story>
+  <story name="白马啸西风_沙漠赔笑">
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="主角#（赔笑）前辈，您大人有大量，我不知道令徒武功高强。还强出头想当英雄，多有得罪了，得罪了。" type="DIALOG" />
+    <action value="华辉#..." type="DIALOG" />
+    <action value="李文秀#..." type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+    <action value="华辉#咳咳...算了，不跟你计较。阿秀，我们走，今天师父再教你两招。" type="DIALOG" />
+    <action value="李文秀#好的，师父。嘻嘻，你真有趣，师父从来见到陌生人都是打啊杀的，你是第一个没跟他起冲突的。" type="DIALOG" />
+    <action value="李文秀#后会有期。" type="DIALOG" />
+    <action value="李文秀#5" type="HAOGAN" />
+  </story>
+  <story name="白马啸西风_初见陈达海">
+    <result value="白马啸西风_陈达海战斗" type="story" ret="0" />
+    <result value="白马啸西风_陈达海和事佬" type="story" ret="1" />
+    <action value="地图.塞外" type="BACKGROUND" />
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="陈达海#哈哈，一帮蛮子，还想跟我斗。" type="DIALOG" />
+    <action value="李文秀#你为什么要伤害他们！他们跟你无冤无仇！" type="DIALOG" />
+    <action value="陈达海#嘿嘿，没教养的野蛮人，都杀了也不痛不痒啊。" type="DIALOG" />
+    <action value="主角#李姑娘，怎么了？" type="DIALOG" />
+    <action value="李文秀#啊，是你...这个汉人，带着一帮恶徒冲到我们部落里，还打伤了苏普！" type="DIALOG" />
+    <action value="主角#我该怎么办？#李姑娘，我帮你教训这些恶人！#李姑娘，这里头是不是有误会..." type="SELECT" />
+  </story>
+  <story name="白马啸西风_陈达海战斗">
+    <action value="主角#李姑娘，我帮你教训恶人！" type="DIALOG" />
+    <action value="李文秀#5" type="HAOGAN" />
+    <action value="哈萨克部落_战斗" type="BATTLE" />
+    <result value="白马啸西风_再见李文秀" type="story" ret="win" />
+  </story>
+  <story name="白马啸西风_陈达海和事佬">
+    <action value="主角#李姑娘，这里头是不是有误会..." type="DIALOG" />
+    <action value="李文秀#你！好，我错看了你！" type="DIALOG" />
+    <action value="李文秀#-5" type="HAOGAN" />
+    <action value="-3" type="DAODE" />
+    <action value="哈萨克部落李文秀_战斗" type="BATTLE" />
+    <result value="白马啸西风_再见李文秀" type="story" ret="win" />
+  </story>
+  <story name="白马啸西风_再见李文秀">
+    <action value="地图.塞外" type="BACKGROUND" />
+    <action value="音乐.太行八径" type="MUSIC" />
+    <action value="主角#啊，那个姓陈的跑了。" type="DIALOG" />
+    <action value="李文秀#..." type="DIALOG" />
+    <action value="主角#李姑娘，到底是怎么回事？" type="DIALOG" />
+    <action value="李文秀#...他们多半是杀害我父母的仇人！" type="DIALOG" />
+    <action value="主角#啊？" type="DIALOG" />
+    <action value="李文秀#十几年前，中原一帮武林人士得知我父母有高昌藏宝图的事情，一路追杀他们到西域。" type="DIALOG" />
+    <action value="李文秀#后来，父母被他们杀死了，但是藏宝图却没有找到。所以他们一直没有死心，一直在试图找到我，逼我说出宝藏的事情！" type="DIALOG" />
+    <result value="白马啸西风_李文秀加入" type="story" ret="0">
+      <condition value="李文秀#60" type="haogan_more_than" />
+    </result>
+    <result value="白马啸西风_前往高昌" type="story" ret="0">
+      <condition value="李文秀#60" type="haogan_less_than" />
+    </result>
+  </story>
+  <story name="白马啸西风_李文秀加入">
+    <action value="主角#李姑娘，我和你一起去惩罚那些恶人！我想他们还没有走远。" type="DIALOG" />
+    <action value="李文秀#好。" type="DIALOG" />
+    <action value="李文秀" type="JOIN" />
+  </story>
+  <story name="白马啸西风_前往高昌">
+    <action value="主角#那后来藏宝图呢？" type="DIALOG" />
+    <action value="李文秀#我不知道。" type="DIALOG" />
+    <action value="主角#啊？" type="DIALOG" />
+    <action value="李文秀#他们说的高昌秘宝，父母从来没有告诉过我。" type="DIALOG" />
+    <action value="主角#这..." type="DIALOG" />
+    <action value="李文秀#但是这些恶人都不信，现在我武功已成，我要去为爹娘报仇雪恨！" type="DIALOG" />
+    <action value="主角#（这里头有点奇怪，有必要去找找高昌秘宝）" type="DIALOG" />
+  </story>
+  <story name="白马啸西风_进入高昌迷宫">
+    <action value="地图.沙漠3" type="BACKGROUND" />
+    <action value="音乐.宿命" type="MUSIC" />
+    <action value="李文秀#我们循着那帮恶人的足迹走来，却没想到这沙漠深处，真的还有古老的迷宫..." type="DIALOG" />
+    <action value="主角#咦？前面有打斗的声音！" type="DIALOG" />
+    <action value="瓦耳拉齐#哈哈，苏鲁克，还有你的小崽子，都不是我的对手！" type="DIALOG" />
+    <action value="李文秀#苏普！" type="DIALOG" />
+    <action value="瓦耳拉齐#找死！（毒针向李文秀飞来）" type="DIALOG" />
+    <action value="计老人#阿秀！（忽然冲出来，挡下毒针，身体慢慢地软了下去）" type="DIALOG" />
+    <action value="李文秀#不！！计爷爷！！！" type="DIALOG" />
+    <action value="高昌迷宫_战斗" type="BATTLE" />
+    <result value="白马啸西风_完结1" type="story" ret="win" />
+  </story>
+  <story name="白马啸西风_完结1">
+    <result value="白马啸西风_完结2" type="story" ret="0" />
+    <action value="地图.沙漠3" type="BACKGROUND" />
+    <action value="音乐.宿命" type="MUSIC" />
+    <action value="李文秀#等等，这功夫，这手法...你是师父？！" type="DIALOG" />
+    <action value="瓦耳拉齐#呵呵...阿秀，你的眼睛很尖。" type="DIALOG" />
+    <action value="李文秀#师父！他们说迷宫里的是阿萨克人，可是你..." type="DIALOG" />
+    <action value="瓦耳拉齐#嘿嘿，不错，你只知道我是华辉，可我也是瓦耳拉齐。" type="DIALOG" />
+    <action value="瓦耳拉齐#我被族人赶走，学了汉人的功夫，嘿嘿。" type="DIALOG" />
+    <action value="李文秀#师父！你不要死，我只有你和计爷爷才是真的对我好。" type="DIALOG" />
+    <action value="瓦耳拉齐#乖...你的计爷爷，也是我的徒弟，他为了救你而死。很好，很好..." type="DIALOG" />
+    <action value="李文秀#师父！" type="DIALOG" />
+    <action value="瓦耳拉齐#汉人中也有好人，哈萨克人里也有我这样的...坏蛋..." type="DIALOG" />
+    <action value="李文秀#师父！" type="DIALOG" />
+    <action value="瓦耳拉齐#雅丽仙...（瓦耳拉齐再也没有了生息）" type="DIALOG" />
+  </story>
+  <story name="白马啸西风_完结2">
+    <result value="original_女主.白马啸西风" type="story" ret="0">
+      <condition value="original_长安.家中" type="should_finish" />
+      <condition value="女主" type="key_in_team" />
+    </result>
+    <result value="大地图" type="map" ret="0">
+      <condition value="女主" type="key_not_in_team" />
+    </result>
+    <action value="地图.沙漠3" type="BACKGROUND" />
+    <action value="音乐.宿命" type="MUSIC" />
+    <action value="主角#阿秀姑娘，节哀..." type="DIALOG" />
+    <action value="李文秀#...师父死了，计爷爷也死了。苏普心里也没有我...我不知道我还能去哪里。" type="DIALOG" />
+    <action value="主角#不如和我一起回中原吧，江南有杨柳、桃花，有燕子、金鱼……汉人中，有的是英俊勇武的少年，倜傥潇洒的少年……" type="DIALOG" />
+    <action value="李文秀#那都是很好很好的，可是我偏不喜欢。" type="DIALOG" />
+    <action value="李文秀#（骑着年老的白马渐渐远去...）" type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+    <action value="主角#人不能活在回忆里！" type="DIALOG" />
+    <action value="李文秀#（转头）？" type="DIALOG" />
+    <action value="主角#如果你活得不开心，计爷爷保护你又是为了什么呢？" type="DIALOG" />
+    <action value="李文秀#（心头一震）" type="DIALOG" />
+    <action value="主角#如果因为你爱的人爱上了别人就一个人躲起来，不过是自残罢了。悲剧是很吸引人，可是..." type="DIALOG" />
+    <action value="李文秀#可是？" type="DIALOG" />
+    <action value="主角#可是我们还活着的人，应该追求的是未来耀眼的幸福。" type="DIALOG" />
+    <action value="李文秀#（忽然呆住了，许久噗嗤一笑）" type="DIALOG" />
+    <action value="主角#笑什么啊？" type="DIALOG" />
+    <action value="李文秀#忽然觉得从你这种人嘴里说出这么严肃的话，很有喜感。" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="李文秀#虽然你是很丑，但是你的话很受用。" type="DIALOG" />
+    <action value="主角#不要说我丑......" type="DIALOG" />
+    <action value="李文秀#好了，为了报答你这一番教诲，我和你去中原看看吧。" type="DIALOG" />
+    <action value="主角#哈哈，那我们走吧！" type="DIALOG" />
+    <action value="李文秀#30" type="GET_POINT" />
+    <action value="李文秀#40" type="UPGRADE.奇门" />
+    <action value="李文秀#500" type="UPGRADE.MAXHP" />
+    <action value="李文秀#500" type="UPGRADE.MAXMP" />
+    <action value="黑血神针秘籍#1" type="ITEM" />
+    <action value="白马西风" type="NICK" />
+  </story>
+  <story name="白马啸西风_高昌秘宝">
+    <action value="地图.沙漠3" type="BACKGROUND" />
+    <action value="音乐.宿命" type="MUSIC" />
+    <action value="主角#这...循着陈达海那帮人的足迹走来，这茫茫沙海之中，居然真的有一座高昌古城。" type="DIALOG" />
+    <action value="瓦耳拉齐#你和那些汉人果然是一伙的！你果然也是觊觎高昌的宝藏而来！" type="DIALOG" />
+    <action value="主角#糟了！是埋伏！" type="DIALOG" />
+    <action value="高昌迷宫_战斗" type="BATTLE" />
+    <result value="白马啸西风_高昌秘宝2" type="story" ret="win" />
+  </story>
+  <story name="白马啸西风_高昌秘宝2">
+    <action value="地图.沙漠3" type="BACKGROUND" />
+    <action value="音乐.宿命" type="MUSIC" />
+    <action value="主角#这瓦耳拉齐还真是厉害...为什么他的武功招式和李文秀那么相像？" type="DIALOG" />
+    <action value="李文秀#师父！我来迟了！" type="DIALOG" />
+    <action value="瓦耳拉齐#...阿秀" type="DIALOG" />
+    <action value="主角#什么？你师父不是那个叫华辉的人吗？" type="DIALOG" />
+    <action value="李文秀#师父！我知道是您...我听声音就能听出来..." type="DIALOG" />
+    <action value="瓦耳拉齐#...阿秀，对不起，师父一直瞒着你。师父不是汉人，华辉是师父曾经的名字。师父叫做瓦耳拉齐，是哈萨克的汉子..." type="DIALOG" />
+    <action value="李文秀#师父...为什么您不回部落和其他人一起生活？" type="DIALOG" />
+    <action value="瓦耳拉齐#...师父被同族放逐，不能回去...师父被那小贼伤得很重...你...（瓦耳拉齐昏了过去）" type="DIALOG" />
+    <action value="李文秀#师父！！你这恶贼，我跟你拼了！" type="DIALOG" />
+    <action value="高昌迷宫李文秀_战斗" type="BATTLE" />
+    <result value="白马啸西风_高昌秘宝3" type="story" ret="win" />
+  </story>
+  <story name="白马啸西风_高昌秘宝3">
+    <action value="地图.沙漠3" type="BACKGROUND" />
+    <action value="音乐.宿命" type="MUSIC" />
+    <action value="李文秀#...我打不过你，要杀要剐随你便。" type="DIALOG" />
+    <action value="主角#李姑娘，我们误会太深了。我只是误打误撞来到这里，想一探高昌迷宫的秘密而已。" type="DIALOG" />
+    <action value="瓦耳拉齐#...这里没有什么秘密，我在这里住了十年，什么宝藏都没有。" type="DIALOG" />
+    <action value="李文秀#...什么？那我爹娘的藏宝图？" type="DIALOG" />
+    <action value="瓦耳拉齐#阿秀，这里曾经是有过宝藏的。当时高昌古国十分强盛，国王把全国的珍宝都藏在这个迷宫里，不让外人发现。" type="DIALOG" />
+    <action value="瓦耳拉齐#可是后来，中原人把高昌国征服了，也把这里的宝藏掳掠一空。他们担心西域人不服教化，所以送来很多琴棋书画、四书五经，让我们的祖辈诵读。" type="DIALOG" />
+    <action value="瓦耳拉齐#如今的高昌迷宫里，藏着的只是从那久远的时代遗留下来的一些琴棋书画，都是中原随处可见的器物罢了。" type="DIALOG" />
+    <action value="李文秀#这..." type="DIALOG" />
+    <action value="瓦耳拉齐#你爹娘也好，这么多中原武林人士也罢，都只是在追逐这些破烂货罢了！真是天大的讽刺啊！哈哈哈哈！" type="DIALOG" />
+    <action value="主角#...原来真相只是如此的简单。" type="DIALOG" />
+    <action value="李文秀#...师父，这里再无好留恋的。你和我一起回部落去，好吗？" type="DIALOG" />
+    <action value="瓦耳拉齐#...我还有未尽的恩怨，我不能回去。再见了，阿秀。" type="DIALOG" />
+    <action value="李文秀#师父！...师父走了，我也要回部落去了。你多保重吧。" type="DIALOG" />
+    <action value="主角#...都走了，我就不信这里什么都没有留下。" type="DIALOG" />
+    <action value="主角#...这是...一本很独特的诗集。先收着吧。" type="DIALOG" />
+    <action value="河岳英灵集" type="ITEM" />
+  </story>
+  <story name="白马啸西风_陈达海加入">
+    <action value="主角#哟，这不是陈达海嘛！你还在找高昌迷宫？" type="DIALOG" />
+    <action value="陈达海#...小子，不要你管。" type="DIALOG" />
+    <action value="主角#唉，别找了，那里什么也没有。（把高昌的事情复述了一遍）" type="DIALOG" />
+    <action value="陈达海#...（瘫坐在沙漠上）完了，都完了..." type="DIALOG" />
+    <action value="主角#也真是怪可怜的，一辈子都在找一个虚无缥缈的秘密，唉。" type="DIALOG" />
+    <action value="主角#要带上陈达海一起吗？#看他可怜，带上吧。#不理他" type="SELECT" />
+    <result value="白马啸西风_陈达海加入2" type="story" ret="0" />
+    <result value="白马啸西风_陈达海加入3" type="story" ret="1" />
+  </story>
+  <story name="白马啸西风_陈达海加入2">
+    <action value="陈达海" type="JOIN" />
+    <action value="-2" type="DAODE" />
+  </story>
+  <story name="白马啸西风_陈达海加入3">
+    <action value="主角#算了，他也算是完了。不理他了，走吧。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_描述.木婉清.蒙面">
+    <action value="主角#一位蒙着黑纱的女子，一双美目顾盼流连。女子身着黑色劲装，身形有几分清瘦。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_描述.木婉清.不蒙面">
+    <action value="主角#一位清秀绝美的女子，她的眼神里仿佛有流波在闪动，神情里带着一股野性，几分哀愁。诗经有云，有美一人，婉而清扬。木婉清这个名字，实在是再美不过了。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_描述.钟灵">
+    <action value="主角#看上去尚有几分未脱离稚气的样子，粉粉的小脸煞是可爱。虽然年纪不大，但已经是标致的美人胚子，天真纯朴的山庄小姐的模样。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_描述.王语嫣">
+    <action value="主角#初一看仿佛是凭虚御风、凌波而立的仙子，带着不胜娇羞的神情，令人如痴如醉。冰雕玉琢、素手纤纤，此美只应天上有。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_描述.阿朱">
+    <action value="主角#温婉如玉的江南女子，仔细一看又仿佛有些调皮的神情。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_描述.阿碧">
+    <action value="主角#吴侬软语，声声入梦，容貌已经是标致的了，说话的声音更是让人直发酥。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_描述.再见木婉清.2">
+    <action value="主角#眼前是一位清秀绝美的女子，她的眼神里仿佛有流波在闪动，神情里带着一股野性，几分哀愁。" type="DIALOG" />
+    <action value="主角#...啊，对了，是那时候那个蒙面的姑娘！" type="DIALOG" />
+    <result value="tlbb.dy_对话.再见木婉清2" type="story" ret="0" />
+  </story>
+  <story name="tlbb.dy_对话.再见木婉清2">
+    <action value="主角#你是那时候在树林里的那个姑娘，对吧？" type="DIALOG" />
+    <action value="木婉清#......是又怎么样，不是又怎么样？" type="DIALOG" />
+    <action value="主角#你不要这么倔嘛，我是真的好心好意要帮助你诶。后来你去哪里了？" type="DIALOG" />
+    <action value="木婉清#后来...那后来就...呜呜呜呜...（哭了起来）" type="DIALOG" />
+    <action value="主角#喂喂喂！你不要哭啊！好好说嘛，不要哭...（她哭起来如同梨花带雨，真是美极了..）" type="DIALOG" />
+    <action value="木婉清#后来，我跟着段誉去救钟灵，又遇上了南海鳄神。我在段誉面前揭开了面纱，他已经是我的夫君了。可是他却，可是他却...不见了...呜呜呜呜。" type="DIALOG" />
+    <action value="主角#（喂！这剧情发展太快了吧！）难道你们已经在小黑屋里...那个过了...？" type="DIALOG" />
+    <action value="木婉清#我不明白你在说什么。" type="DIALOG" />
+    <action value="主角#哦...虚惊。那你怎么就认他做夫君了啊？" type="DIALOG" />
+    <action value="木婉清#你上回不就猜中了吗？我在师父面前发过誓，第一个看到我面容的男子，就要娶我为妻。" type="DIALOG" />
+    <action value="主角#我还以为你是说着玩的..." type="DIALOG" />
+    <action value="木婉清#......如今段郎不知道去哪里了，呜呜呜呜。（又哭了起来）" type="DIALOG" />
+    <action value="主角#（世界上怎么会有如此清丽绝美的人，她的野性和直率或许是她自己都没有意识到的独特魅力...）" type="DIALOG" />
+    <action value="主角#段誉啊段誉，凌波微步你抢走了也就算了，妹子你也要抢...为啥我就啥都没有呢？" type="DIALOG" />
+    <action value="木婉清#我现在该怎么办...呜呜呜呜。" type="DIALOG" />
+    <action value="主角#说什么好呢？#算了，忘了段誉吧，跟我走！#你不要怕，我想一定可以找到段誉的。" type="SELECT" />
+    <result value="tlbb.dy_再见木婉清.仇恨" type="story" ret="0" />
+    <result value="tlbb.dy_再见木婉清.好感" type="story" ret="1" />
+  </story>
+  <story name="tlbb.dy_木婉清.touch.前奏">
+    <result value="tlbb.dy_木婉清.touch.成功" type="story" ret="win" />
+    <result value="tlbb.dy_木婉清.touch.不成功" type="story" ret="lose" />
+    <action value="木婉清#段郎！段郎！！（泪流满面）" type="DIALOG" />
+    <action value="木婉清#你不要走！不要走！！为什么！！为什么在这个时候要离开我！！" type="DIALOG" />
+    <action value="木婉清#为什么兄妹就不可以！为什么要离我而去！！" type="DIALOG" />
+    <action value="木婉清#我把什么都愿意给你，为什么你却不接受我！我不管那些人怎么讲，我好喜欢你！" type="DIALOG" />
+    <action value="主角#木姑娘！你还好吧！！" type="DIALOG" />
+    <action value="木婉清#我好喜欢你啊，段郎！我为了你什么都可以做啊！你不要走，不要走！（哽咽）" type="DIALOG" />
+    <action value="木婉清#你为什么要这么抛弃我，你抛弃我，你抛弃我..." type="DIALOG" />
+    <action value="木婉清#我好恨你啊！你为什么要走！你就不怕我死给你看！我好恨你，我恨你！！" type="DIALOG" />
+    <action value="主角#木姑娘！你冷静点！（她的情绪波动太大了，必须让她冷静下来！）" type="DIALOG" />
+    <action value="木婉清#（脸色涨得通红）我好热，好热。好难受，好难受..." type="DIALOG" />
+    <action value="木婉清#（眼中春色流波，美艳不可方物）" type="DIALOG" />
+    <action value="主角#木姑娘！（糟了，必须想办法替她解毒才可以！）" type="DIALOG" />
+    <action value="木婉清#我...段誉...（昏了过去）" type="DIALOG" />
+    <action value="主角#形势紧急......木姑娘，得罪了！" type="DIALOG" />
+    <action value="主角#（必须立刻替木姑娘[[yellow:封住周身大穴]]才可以！木姑娘，得罪了！）" type="DIALOG" />
+    <action value="木婉清" type="TOUCH" />
+  </story>
+  <story name="tlbb.dy_木婉清.touch.成功">
+    <action value="地图.地牢" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="木婉清#（从半昏半醒之间渐渐回过神来）...我是在？" type="DIALOG" />
+    <action value="主角#（尴尬）...木姑娘，你醒过来了。你的毒解得差不多了吧？" type="DIALOG" />
+    <action value="木婉清#...毒？啊！段郎...我...你都知道了？" type="DIALOG" />
+    <action value="主角#木姑娘，刚才我也是形势所迫，才出手帮你解毒。如有冒犯，还请姑娘海涵。" type="DIALOG" />
+    <action value="木婉清#你替我解毒，我很感激你..." type="DIALOG" />
+    <action value="主角#木姑娘...？" type="DIALOG" />
+    <action value="木婉清#段郎他走了...刚才多亏了你才得救...我...谢谢你。" type="DIALOG" />
+    <action value="主角#只要你不怪我冒犯了就好.." type="DIALOG" />
+    <action value="木婉清#..." type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+    <action value="木婉清#我该走了，公子，谢谢你。我们有缘再见。" type="DIALOG" />
+    <action value="主角#啊！木姑娘...我...（她真是太美了，到哪里才可以再见到她？）" type="DIALOG" />
+    <result value="大地图" type="map" ret="0" />
+  </story>
+  <story name="tlbb.dy_木婉清.touch.不成功">
+    <action value="地图.地牢" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="木婉清#（从半昏半醒之间渐渐回过神来）...我是在？" type="DIALOG" />
+    <action value="主角#（尴尬）...木姑娘，你醒过来了。你的毒解得差不多了吧？" type="DIALOG" />
+    <action value="木婉清#...毒？啊！段郎...我...你都知道了？" type="DIALOG" />
+    <action value="主角#木姑娘，刚才我也是形势所迫，才出手帮你解毒。如有冒犯，还请姑娘海涵。" type="DIALOG" />
+    <action value="木婉清#你！！不要以为段郎不在，你就可以肆意妄为！你刚才到底做了什么？！" type="DIALOG" />
+    <action value="主角#木姑娘...我..." type="DIALOG" />
+    <action value="段延庆#谁在屋里？！" type="DIALOG" />
+    <action value="主角#糟了！惊动了外面的四大恶人！" type="DIALOG" />
+    <action value="主角#木姑娘，我们快走！" type="DIALOG" />
+    <action value="段延庆#休想！！" type="DIALOG" />
+    <action value="touch木婉清失败_战斗" type="BATTLE" />
+    <result value="tlbb.dy_木婉清.touch.不成功2" type="story" ret="win" />
+  </story>
+  <story name="tlbb.dy_木婉清.touch.不成功2">
+    <result value="大地图" type="map" ret="0" />
+    <action value="地图.地牢" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="主角#...好一场恶战...咦？木姑娘人已经不见了。" type="DIALOG" />
+    <action value="主角#她...我...她一定是记恨我了，唉。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_木婉清.攻略成功">
+    <action value="地图.琴舍" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="主角#...木姑娘，是你..." type="DIALOG" />
+    <action value="木婉清#你...（说着居然留下泪来）" type="DIALOG" />
+    <action value="秦红棉#乖女儿，怎么了？！他是不是欺负你！" type="DIALOG" />
+    <action value="主角#前辈，我..." type="DIALOG" />
+    <action value="秦红棉#我打死你这个小畜生！" type="DIALOG" />
+    <action value="木婉清#师父！...娘！你等等。" type="DIALOG" />
+    <action value="主角#木姑娘..." type="DIALOG" />
+    <action value="木婉清#我问你，那天在钟灵家的石室里..." type="DIALOG" />
+    <action value="主角#（心里咯噔一下）" type="DIALOG" />
+    <action value="木婉清#为什么，你要救我？" type="DIALOG" />
+    <action value="主角#我..." type="DIALOG" />
+    <action value="木婉清#可怜我？可怜我被姓段的甩在一边？" type="DIALOG" />
+    <action value="木婉清#还是可怜我中了...毒，生不如死？" type="DIALOG" />
+    <action value="主角#不是的！" type="DIALOG" />
+    <action value="主角#这些日子我一直睡不好，总是想着你，你的身影在空气中摇曳，我忘不了你。" type="DIALOG" />
+    <action value="木婉清#！！你..." type="DIALOG" />
+    <action value="主角#后来我忽然明白了，也许从很早的时候开始，我就是被你深深吸引住了。" type="DIALOG" />
+    <action value="木婉清#..." type="DIALOG" />
+    <action value="主角#木姑娘，我喜欢你，我现在才明白，我爱你！爱得发狂了！" type="DIALOG" />
+    <action value="木婉清#...（不做声，眼泪簌簌流淌）" type="DIALOG" />
+    <action value="主角#我知道第一个看到你容貌的不是我，但是我不知道是不是还能再给我一次机会？" type="DIALOG" />
+    <action value="木婉清#...（还是不做声，眼泪簌簌流淌）" type="DIALOG" />
+    <action value="秦红棉#唉...情债，情孽...年轻人，你拿什么去给我的女儿？" type="DIALOG" />
+    <action value="主角#我！" type="DIALOG" />
+    <action value="秦红棉#一入江湖岁月催...女儿大了，人也老了...可是我希望她有个好归宿。" type="DIALOG" />
+    <action value="主角#前辈！我不知道我能给到什么，可是我是认真的！" type="DIALOG" />
+    <action value="秦红棉#段王爷当年又何尝不是认真的呢？" type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+    <action value="秦红棉#你走吧。" type="DIALOG" />
+    <action value="主角#...我不能走，前辈。" type="DIALOG" />
+    <action value="秦红棉#哦？" type="DIALOG" />
+    <action value="主角#...我如果在这里走了，一辈子都会后悔的。" type="DIALOG" />
+    <action value="秦红棉#你！" type="DIALOG" />
+    <action value="主角#请求前辈成全！" type="DIALOG" />
+    <action value="秦红棉#你！不要逼我动手！" type="DIALOG" />
+    <action value="木婉清#娘！" type="DIALOG" />
+    <action value="秦红棉#婉儿，你不要插嘴。" type="DIALOG" />
+    <action value="木婉清#娘！你不要赶他走！" type="DIALOG" />
+    <action value="秦红棉#（一怔）你？" type="DIALOG" />
+    <action value="木婉清#我...这些天，我也一直在想段郎和你...我...我不知道自己到底是怎样的心情。" type="DIALOG" />
+    <action value="木婉清#可是娘！我很想弄清楚，自己到底是如何想的！" type="DIALOG" />
+    <action value="木婉清#就在刚才，我觉得我似乎明白了。" type="DIALOG" />
+    <action value="木婉清#女人有一个爱自己的男人，真是一件再幸福不过的事情了。" type="DIALOG" />
+    <action value="秦红棉#婉儿..." type="DIALOG" />
+    <action value="木婉清#我懂了，我们一起走吧。娘，我还想和他一起闯荡江湖！" type="DIALOG" />
+    <action value="秦红棉#婉儿...唉，我真是老了。你们走吧..." type="DIALOG" />
+    <action value="主角#谢谢前辈成全！木姑娘！" type="DIALOG" />
+    <action value="木婉清#你还叫我木姑娘..." type="DIALOG" />
+    <action value="主角#婉妹..." type="DIALOG" />
+    <action value="木婉清#...（莞尔一笑）走吧。" type="DIALOG" />
+    <action value="木婉清" type="JOIN" />
+    <action value="木婉清#夫妻同心" type="LEARN.TALENT" />
+    <action value="主角#夫妻同心" type="LEARN.TALENT" />
+  </story>
+  <story name="tlbb.dy_再见木婉清.仇恨">
+    <result value="tlbb.dy_再见木婉清.仇恨2" type="story" ret="win" />
+    <action value="主角#算了，忘了段誉吧，跟我走！我会照顾你的！" type="DIALOG" />
+    <action value="木婉清#（愣住）" type="DIALOG" />
+    <action value="主角#？没听清楚？" type="DIALOG" />
+    <action value="木婉清#（咬牙切齿）你这个轻薄子，你侮辱我！" type="DIALOG" />
+    <action value="木婉清#-5" type="HAOGAN" />
+    <action value="再见木婉清_战斗" type="BATTLE" />
+  </story>
+  <story name="tlbb.dy_再见木婉清.仇恨2">
+    <action value="地图.树林" type="BACKGROUND" />
+    <action value="音乐.天龙八部10" type="MUSIC" />
+    <action value="木婉清#（闭上眼睛）...我打不过你，你想怎样，悉听尊便！" type="DIALOG" />
+    <action value="主角#我..." type="DIALOG" />
+    <action value="木婉清#...好，还算你有良心。你我就此别过！（身影消失在密林深处）" type="DIALOG" />
+    <action value="主角#...刚刚那个悉听尊便到底是什么意思？？" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_再见木婉清.好感">
+    <action value="主角#木姑娘，你冷静下来，我相信一定可以找到段誉的。我们在附近好好打听一下！" type="DIALOG" />
+    <action value="木婉清#谢谢你..." type="DIALOG" />
+    <action value="主角#木姑娘，你我不妨同行..." type="DIALOG" />
+    <action value="木婉清#不用了，我是段郎的妻子，和你同行多有不便。我们分头打探消息，后会有期！" type="DIALOG" />
+    <action value="主角#好吧，后会有期..." type="DIALOG" />
+    <action value="木婉清#5" type="HAOGAN" />
+  </story>
+  <story name="tlbb.dy_木婉清江南段誉">
+    <action value="段誉#啊！婉妹。" type="DIALOG" />
+    <action value="木婉清#......" type="DIALOG" />
+    <action value="段誉#原来..你们在一起了。" type="DIALOG" />
+    <action value="木婉清#是。" type="DIALOG" />
+    <action value="段誉#...也罢，也罢。" type="DIALOG" />
+    <action value="木婉清#你如今要泡曼陀山庄的王姑娘，我想也是也罢了。" type="DIALOG" />
+    <action value="段誉#...你还是我的亲妹妹，我还是会疼你照顾你的。" type="DIALOG" />
+    <action value="木婉清#谢谢哥哥关心，我不需要你照顾，我有他照顾就可以了。" type="DIALOG" />
+    <action value="段誉#..." type="DIALOG" />
+    <action value="主角#（尴尬）段誉我们走吧。" type="DIALOG" />
+    <action value="段誉#哦..." type="DIALOG" />
+    <action value="主角#（既要收段誉，又要收妹子，真是艰苦的人生啊...）" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_曼陀山庄初见王语嫣">
+    <result value="tlbb.dy_曼陀山庄初见王语嫣2" type="story" ret="0" />
+    <result value="tlbb.dy_曼陀山庄初见王语嫣3" type="story" ret="1" />
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.燕子坞" type="MUSIC" />
+    <action value="王语嫣#..." type="DIALOG" />
+    <action value="主角#眼前的女子初一看仿佛是凭虚御风、凌波而立的仙子，带着不胜娇羞的神情，令人如痴如醉。冰雕玉琢、素手纤纤，此美只应天上有。" type="DIALOG" />
+    <action value="主角#说些什么呢？#姑娘，你真美。#敢问姑娘芳名？" type="SELECT" />
+  </story>
+  <story name="tlbb.dy_曼陀山庄初见王语嫣2">
+    <action value="主角#姑娘，你真美。" type="DIALOG" />
+    <action value="王语嫣#嘻嘻，谢谢你夸奖。" type="DIALOG" />
+    <action value="主角#姑娘，在下并非玩笑。姑娘之貌，天下少有。冰雕玉琢，素手纤纤，仿佛天上的仙子下凡一般。" type="DIALOG" />
+    <action value="王语嫣#你这人啊，我们素未平生，就对我这样大吹马屁，看来不是什么好人。" type="DIALOG" />
+    <action value="主角#呃，姑娘莫怪我。姑娘生得太漂亮了，我一般是很少这样的。" type="DIALOG" />
+    <action value="王语嫣#嘻嘻，那倒是要怪我长太美了？（掩齿而笑）" type="DIALOG" />
+    <action value="主角#（不知道该怎么答好了，尴尬）" type="DIALOG" />
+    <action value="王语嫣#你这人，还真是挺有意思的。" type="DIALOG" />
+    <action value="主角#让姑娘见笑了..." type="DIALOG" />
+    <action value="王语嫣#3" type="HAOGAN" />
+  </story>
+  <story name="tlbb.dy_曼陀山庄初见王语嫣3">
+    <action value="主角#敢问姑娘芳名？" type="DIALOG" />
+    <action value="王语嫣#你是谁？" type="DIALOG" />
+    <action value="主角#姑娘，在下..." type="DIALOG" />
+    <action value="王语嫣#你为什么要问我名字？" type="DIALOG" />
+    <action value="主角#姑娘，我..." type="DIALOG" />
+    <action value="王语嫣#你是怎么跑到我们家来的？" type="DIALOG" />
+    <action value="主角#我..." type="DIALOG" />
+    <action value="王语嫣#来人啊！有贼啊！" type="DIALOG" />
+    <action value="主角#糟了！！" type="DIALOG" />
+    <action value="王语嫣#-3" type="HAOGAN" />
+    <action value="初见王语嫣_战斗" type="BATTLE" />
+    <result value="tlbb.dy_曼陀山庄初见王语嫣4" type="story" ret="win" />
+  </story>
+  <story name="tlbb.dy_曼陀山庄初见王语嫣4">
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.燕子坞" type="MUSIC" />
+    <action value="主角#此时解释不清楚，还是先走人吧。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_曼陀山庄阿朱王语嫣">
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.燕子坞" type="MUSIC" />
+    <action value="阿朱#小姐，你好。" type="DIALOG" />
+    <action value="王语嫣#啊，是阿朱来了呀。有没有什么表哥的消息呢？" type="DIALOG" />
+    <action value="阿朱#恩...暂时还没有。" type="DIALOG" />
+    <action value="王语嫣#哦...咦？这位我们好像在哪里见过？" type="DIALOG" />
+    <action value="主角#姑娘你好.." type="DIALOG" />
+    <action value="阿朱#啊，原来你们见过啊。我还想给你们介绍一下呢。" type="DIALOG" />
+    <action value="主角#见过是见过了，但是还是不知道这位姑娘芳名。" type="DIALOG" />
+    <action value="阿朱#嘻嘻，想着搭讪呢？" type="DIALOG" />
+    <action value="王语嫣#...上次都搭过了。" type="DIALOG" />
+    <action value="阿朱#......" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="阿朱#咳咳，公子，这位小姐姓王，名语嫣，是曼陀山庄的小主人。" type="DIALOG" />
+    <action value="阿朱#小姐，这位公子替燕子坞击退了强敌，是慕容公子和我们燕子坞的恩人。" type="DIALOG" />
+    <action value="王语嫣#啊，原来你帮了表哥，谢谢你。" type="DIALOG" />
+    <action value="阿朱#小姐，今天夫人不在家吧？" type="DIALOG" />
+    <action value="王语嫣#不在啊。要不你这鬼精灵的，哪里敢跑进来，还不怕被做成花肥。嘻嘻。" type="DIALOG" />
+    <action value="阿朱#嘻嘻，那我们去玩吧。" type="DIALOG" />
+    <action value="王语嫣#好呀。" type="DIALOG" />
+    <action value="主角#（于是阿朱和王姑娘去花园深处愉快地玩耍了，只留下我一只在这里发傻。)" type="DIALOG" />
+    <action value="阿朱#嘻嘻，今天玩得好开心。小姐，我们下次再一起玩。" type="DIALOG" />
+    <action value="王语嫣#好啊，嘻嘻。公子下次也要再一起过来呀。" type="DIALOG" />
+    <action value="主角#(这只是客套话吧...）恩，好的。王姑娘再见。" type="DIALOG" />
+    <action value="王语嫣#+5" type="HAOGAN" />
+  </story>
+  <story name="tlbb.dy_听香水榭阿碧王语嫣" />
+  <story name="tlbb.dy_阿碧线王语嫣touch">
+    <result value="tlbb.dy_阿碧线王语嫣touch2" type="story" ret="0" />
+    <action value="阿碧#公子，此处事情已了，我们走吧。" type="DIALOG" />
+    <action value="主角#等等，你看那边的求救信号！曼陀山庄里，好像有些变故。" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_阿碧线王语嫣touch2">
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.紧张感" type="MUSIC" />
+    <action value="曼陀山庄神秘人#不老长春的秘密到底在哪里，给我说！" type="DIALOG" />
+    <action value="李青萝#我..不知...道..." type="DIALOG" />
+    <action value="王语嫣#母亲！" type="DIALOG" />
+    <action value="李青萝#这是...什..么毒，为..什么我..身..上一点..力..气..都没有了..." type="DIALOG" />
+    <action value="曼陀山庄神秘人#哈哈哈哈！本来你们母女二人武功粗浅，用不着这悲酥清风。不过嘛，为了让兄弟们还能有点乐子，嘿嘿..." type="DIALOG" />
+    <action value="李青萝#你们...敢..." type="DIALOG" />
+    <action value="曼陀山庄神秘人#有什么不敢？哈哈哈哈！看你们吐不吐出不老长春的秘密！" type="DIALOG" />
+    <action value="王语嫣#啊啊！救命啊！" type="DIALOG" />
+    <action value="主角#王姑娘！" type="DIALOG" />
+    <action value="touch王语嫣_战斗" type="BATTLE" />
+    <result value="tlbb.dy_阿碧线王语嫣touch3" type="story" ret="win" />
+  </story>
+  <story name="tlbb.dy_阿碧线王语嫣touch3">
+    <result value="tlbb.dy_阿碧线王语嫣.touch.成功" type="story" ret="win" />
+    <result value="tlbb.dy_阿碧线王语嫣.touch.不成功" type="story" ret="lose" />
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="阿碧#公子，敌人虽然击退了。但是小姐和夫人中的毒怎么办？" type="DIALOG" />
+    <action value="主角#这悲酥清风毒性极强，若不及时解毒只怕要伤及五脏六腑！我来试试吧。" type="DIALOG" />
+    <action value="李青萝#小贼！我..不要..不要..你解毒！我不相信任何男人！！" type="DIALOG" />
+    <action value="主角#...看来只能先替王姑娘解毒了。" type="DIALOG" />
+    <action value="王语嫣#...公...公子，语嫣..都…拜托...了…" type="DIALOG" />
+    <action value="主角#（必须封住王姑娘[[yellow:周身大穴]]，阻止[[yellow:毒气流转]]！）" type="DIALOG" />
+    <action value="王语嫣" type="TOUCH" />
+  </story>
+  <story name="tlbb.dy_阿碧线王语嫣.touch.成功">
+    <result value="tlbb.dy_阿碧线李青萝.touch.成功" type="story" ret="win" />
+    <result value="tlbb.dy_阿碧线李青萝.touch.不成功" type="story" ret="lose" />
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="主角#好了，毒终于解了..王姑娘，得罪了..." type="DIALOG" />
+    <action value="王语嫣#...没有...语嫣很感激...公子..." type="DIALOG" />
+    <action value="李青萝#啊...好难受...毒好像..扩散...了" type="DIALOG" />
+    <action value="王语嫣#母亲！公子，求你救救母亲吧！！语嫣给你做牛做马了！！" type="DIALOG" />
+    <action value="主角#（必须按照刚才救治王姑娘的方法，封住王夫人的[[yellow:周身大穴]]，阻止[[yellow:毒气流转]]，救人水火之中，不能犹豫！）" type="DIALOG" />
+    <action value="李青萝" type="TOUCH" />
+  </story>
+  <story name="tlbb.dy_阿碧线李青萝.touch.成功">
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="主角#好了，毒终于解了..应该已经没事了.." type="DIALOG" />
+    <action value="李青萝#我..你...我...谢谢。" type="DIALOG" />
+    <action value="主角#夫人，情势紧急，得罪了，请见谅。" type="DIALOG" />
+    <action value="王语嫣#公子，谢谢你救了我们母女俩。语嫣给你磕头了。" type="DIALOG" />
+    <action value="主角#王姑娘万万不可！（立马开始磕头）" type="DIALOG" />
+    <action value="王语嫣#你为何反而要向我磕头？" type="DIALOG" />
+    <action value="主角#王姑娘美若天仙，从看到你的第一眼开始，在下就深深为之着迷了。" type="DIALOG" />
+    <action value="王语嫣#啊。" type="DIALOG" />
+    <action value="主角#就此告辞..." type="DIALOG" />
+    <action value="王语嫣#公子且慢！" type="DIALOG" />
+    <action value="主角#王姑娘？" type="DIALOG" />
+    <action value="王语嫣#公子...语嫣...今日公子相救，语嫣也是很感激，很...很高兴的..." type="DIALOG" />
+    <action value="主角#？!" type="DIALOG" />
+    <action value="王语嫣#公子...语嫣多次承蒙公子告知表哥的事情...也一直有些事很想跟他说个清楚，问个清楚...语嫣可以和你一起去吗？" type="DIALOG" />
+    <action value="李青萝#乖女儿，你要和他一起走？" type="DIALOG" />
+    <action value="王语嫣#母亲，你觉得公子不能保护我？" type="DIALOG" />
+    <action value="李青萝#不是..我...罢了，唉，罢了。女儿大了。今日强敌来犯，我也保护不了你了。这位公子...也...不是坏人。" type="DIALOG" />
+    <action value="王语嫣#嗯...公子，我们走吧。去找表哥！" type="DIALOG" />
+    <action value="主角#嗯。" type="DIALOG" />
+    <action value="王语嫣" type="JOIN" />
+    <action value="王语嫣#夫妻同心" type="LEARN.TALENT" />
+    <action value="主角#夫妻同心" type="LEARN.TALENT" />
+  </story>
+  <story name="tlbb.dy_阿碧线李青萝.touch.不成功">
+    <result value="tlbb.dy_阿碧线李青萝.touch.不成功2" type="story" ret="0" />
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="李青萝#住手！住手！我好难过，好难过！" type="DIALOG" />
+    <action value="主角#糟了！毒气还没有除尽，她此时强运真气，恐怕有性命之忧！" type="DIALOG" />
+    <action value="王语嫣#母亲！你就听这位公子的吧！求你了，母亲！" type="DIALOG" />
+    <action value="李青萝#我...我…啊！！！好难过啊！！" type="DIALOG" />
+    <action value="主角#喂！你冷静！" type="DIALOG" />
+    <action value="李青萝#我...段郎...（口角流出一丝鲜血，已经没有了声息)" type="DIALOG" />
+    <action value="王语嫣#母亲！母亲！呜呜呜..." type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="tlbb.dy_阿碧线李青萝.touch.不成功2">
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="10" type="COST_DAY" />
+    <action value="王语嫣#母亲...呜呜呜...母亲..." type="DIALOG" />
+    <action value="主角#王姑娘，请节哀..." type="DIALOG" />
+    <action value="阿碧#......" type="DIALOG" />
+    <action value="主角#王姑娘，接下来你有什么打算呢？" type="DIALOG" />
+    <action value="王语嫣#我...我也不知道..." type="DIALOG" />
+    <action value="阿碧#小姐，此处不再安全，那些人随时可能再回来。不如和我们一起去找慕容公子，你看如何？" type="DIALOG" />
+    <action value="王语嫣#表哥他...杀心太重...沉迷在复国的念头里，不可自拔。" type="DIALOG" />
+    <action value="主角#不如我们一起去找慕容公子说个清楚，说不定事情还有转机？" type="DIALOG" />
+    <action value="王语嫣#也罢...我就随你们一起去吧...娘...女儿会回来看你的。" type="DIALOG" />
+    <action value="王语嫣" type="JOIN" />
+  </story>
+  <story name="tlbb.dy_阿碧线王语嫣.touch.不成功">
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="王语嫣#啊..啊...好难受，好难受..." type="DIALOG" />
+    <action value="主角#糟了，王姑娘在反抗我，她的真气开始紊乱了！" type="DIALOG" />
+    <action value="王语嫣#好难受...难受...别过来，别过来！！" type="DIALOG" />
+    <action value="主角#糟了，情况要失控了！" type="DIALOG" />
+    <action value="李青萝#女...女儿！！啊...啊...我这是...怎么...了...（真气紊乱）" type="DIALOG" />
+    <action value="主角#这！！他们母女二人都很危险！" type="DIALOG" />
+    <action value="主角#王姑娘，让我再来帮你解毒一次！" type="DIALOG" />
+    <action value="王语嫣#不！！不要过来！！不要！！啊！！！！（目光可怖，嘴角渗出鲜血）" type="DIALOG" />
+    <action value="主角#王姑娘！！" type="DIALOG" />
+    <action value="王语嫣#（已经停止了呼吸）" type="DIALOG" />
+    <action value="李青萝#女...女儿！！啊!!!!（惨状与王语嫣无异）" type="DIALOG" />
+    <action value="主角#王夫人！！" type="DIALOG" />
+    <action value="李青萝#（停止了呼吸）" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <result value="tlbb.dy_阿碧线王语嫣.touch.不成功2" type="story" ret="0" />
+  </story>
+  <story name="tlbb.dy_阿碧线王语嫣.touch.不成功2">
+    <action value="地图.院内" type="BACKGROUND" />
+    <action value="音乐.天龙八部.逍遥派抒情版" type="MUSIC" />
+    <action value="10" type="COST_DAY" />
+    <action value="主角#埋葬了王姑娘和王夫人，阿碧，我们走吧..." type="DIALOG" />
+    <action value="阿碧#......嗯" type="DIALOG" />
+    <action value="主角#唉...都怪我...都怪我..." type="DIALOG" />
+  </story>
+  <story name="一键变态">
+    <action value="主角#我要变身了！！" type="DIALOG" />
+    <action value="主角#7000" type="UPGRADE.MAXHP" />
+    <action value="主角#7000" type="UPGRADE.MAXMP" />
+    <action value="主角#乾坤大挪移" type="LEARN.TALENT" />
+    <action value="主角#清心" type="LEARN.TALENT" />
+    <action value="主角#破甲" type="LEARN.TALENT" />
+    <action value="主角#铁拳无双" type="LEARN.TALENT" />
+    <action value="主角#素心神剑" type="LEARN.TALENT" />
+    <action value="主角#斗转星移" type="LEARN.TALENT" />
+    <action value="主角#不老长春" type="LEARN.TALENT" />
+    <action value="主角#博览群书" type="LEARN.TALENT" />
+    <action value="主角#碎裂的怒吼" type="LEARN.TALENT" />
+    <action value="主角#沾衣十八跌" type="LEARN.TALENT" />
+    <action value="主角#妙手仁心" type="LEARN.TALENT" />
+    <action value="主角#150" type="GET_POINT" />
+    <action value="主角#野球拳#12" type="LEARN.SKILL" />
+    <action value="主角#天山折梅手#12" type="LEARN.SKILL" />
+    <action value="主角#降龙十八掌#12" type="LEARN.SKILL" />
+    <action value="主角#庖丁解牛#12" type="LEARN.SKILL" />
+    <action value="主角#六脉神剑#12" type="LEARN.SKILL" />
+    <action value="主角#黯然销魂掌#12" type="LEARN.SKILL" />
+    <action value="主角#一阳指#12" type="LEARN.SKILL" />
+    <action value="主角#越女剑法#12" type="LEARN.SKILL" />
+    <action value="主角#凌波微步" type="LEARN.SPECIALSKILL" />
+    <action value="主角#九阴神功#12" type="LEARN.INTERNALSKILL" />
+    <action value="主角#九阳神功#12" type="LEARN.INTERNALSKILL" />
+    <action value="主角#易筋经#12" type="LEARN.INTERNALSKILL" />
+    <action value="主角#100" type="UPGRADE.拳掌" />
+    <action value="主角#100" type="UPGRADE.剑法" />
+    <action value="主角#100" type="UPGRADE.刀法" />
+    <action value="主角#100" type="UPGRADE.奇门" />
+    <action value="续命八丸#10" type="ITEM" />
+    <action value="生生造化丹#30" type="ITEM" />
+    <action value="灭仙爪#1" type="ITEM" />
+    <action value="主角#200" type="UPGRADE.定力" />
+    <action value="主角#200" type="UPGRADE.根骨" />
+    <action value="主角#200" type="UPGRADE.臂力" />
+  </story>
+  <story name="original_新手任务无法进入">
+    <action value="主角#还是先跟着[[red:地图提示]]，完成新手任务吧。如果忘了任务是什么，点击右下的[[yellow:日志]]按钮可以查看。" type="DIALOG" />
+  </story>
+  <story name="洗练装备介绍">
+    <result value="洗练选择" type="story" ret="0" />
+    <action value="主角#这里有无数剑气，我能感受到前辈高人的武学精髓，似乎可以被兵刃所吸收，何不试一试？" type="DIALOG" />
+    <action value="在东海剑池可以支付元宝，将装备的一项属性重置，从而强化你的装备。" type="SUGGEST" />
+  </story>
+  <story name="洗练选择">
+    <result value="0" type="xilian" ret="0">
+      <condition value="1" type="have_yuanbao" />
+    </result>
+    <result value="洗练元宝不够" type="story" ret="0" />
+    <action value="主角#要开始洗练装备吗？（消耗一个元宝）#是#否" type="SELECT" />
+  </story>
+  <story name="洗练元宝不够">
+    <action value="主角#身上的元宝数不够了。。" type="DIALOG" />
+    <result value="大地图" type="map" ret="0" />
+  </story>
+  <story name="洗练_没有装备">
+    <action value="主角#貌似没有能够洗练的装备。（物品栏中需要有一个以上的带有附加属性的非白色装备）" type="DIALOG" />
+    <result value="大地图" type="map" ret="0" />
+  </story>
+  <story name="洗练_洗练成功">
+    <result value="洗练选择" type="story" ret="0" />
+    <action value="主角#洗练成功！" type="DIALOG" />
+  </story>
+  <story name="工作室入口">
+    <action value="主角#等等，为什么这里会…有一个鼠洞？！" type="DIALOG" />
+  </story>
+  <story name="工作室.子尹">
+    <action value="子尹#zZ" type="DIALOG" />
+    <action value="主角#喂！快起来干活啦！" type="DIALOG" />
+    <action value="子尹#啥？干活？" type="DIALOG" />
+    <action value="子尹#哦…zZ…zZ" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="子尹#那么想…被虐么…zZ…zZ" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="工作室.CG">
+    <action value="cg#我靠，这里又有一个BUG！" type="DIALOG" />
+    <action value="主角#...加油，赶紧改，小弟我已经被您的BUG虐傻了。" type="DIALOG" />
+    <action value="cg#我靠，你怎么会在这里出现？有BUG？！" type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+    <action value="cg#一个人写代码太无聊了！让我开个YY直播先…" type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+    <action value="cg#啊啊啊，好变态的代码，这XXX谁改了我的代码？！" type="DIALOG" />
+    <action value="主角#..." type="DIALOG" />
+    <action value="cg#不行，用了过猛了，我得去打把LOL压压惊…" type="DIALOG" />
+    <action value="主角#这……" type="DIALOG" />
+  </story>
+  <story name="工作室.文艺吕布">
+    <action value="文艺吕布#（两眼放绿光）我画，我再画！" type="DIALOG" />
+    <action value="主角#...大哥您要不要这么拼…" type="DIALOG" />
+    <action value="文艺吕布#（两眼放绿光），我画，我再画！" type="DIALOG" />
+    <action value="主角#这位大哥…" type="DIALOG" />
+    <action value="文艺吕布#（两眼放绿光）我画！我再画！" type="DIALOG" />
+    <action value="主角#...看来没法交流了…" type="DIALOG" />
+  </story>
+  <story name="工作室.home">
+    <action value="home#coding…" type="DIALOG" />
+    <action value="主角#又是一只程序猿？" type="DIALOG" />
+    <action value="home#coding…" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+    <action value="home#coding…" type="DIALOG" />
+    <action value="主角#除了coding你还会点别的么？" type="DIALOG" />
+    <action value="home#......" type="DIALOG" />
+    <action value="home#debugging…" type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="工作室.素心">
+    <action value="主角#咦？居然有可爱的妹子？！这不科学啊！" type="DIALOG" />
+    <action value="素心#...有虾米不科学…" type="DIALOG" />
+    <action value="主角#这不是一个散发着浓郁宅男气息的工作室么？！" type="DIALOG" />
+    <action value="素心#我是来给我们家子尹送饭，顺便出来打个酱油的…" type="DIALOG" />
+    <action value="主角#哦…" type="DIALOG" />
+    <action value="子尹#迷迷糊糊…" type="DIALOG" />
+    <action value="素心#别睡了，快起来干活了！" type="DIALOG" />
+    <action value="子尹#迷迷糊糊…" type="DIALOG" />
+    <action value="素心#...吃饭啦！" type="DIALOG" />
+    <action value="子尹#迷迷糊糊…" type="DIALOG" />
+    <action value="素心#再不起来，就不理你了！" type="DIALOG" />
+    <action value="子尹#！！别咯，理我咯~~" type="DIALOG" />
+    <action value="素心#吃饭！吃完了乖乖码代码！" type="DIALOG" />
+    <action value="子尹#哦...好困..." type="DIALOG" />
+    <action value="主角#......" type="DIALOG" />
+  </story>
+  <story name="告示牌内容">
+    <action value="主角#咦，这里有一张告示牌？" type="DIALOG" />
+    <action value="cg#来[[red:汉家松鼠贴吧]]、[[red:新浪微博]]、[[red:游侠网专版]]和我们多交流吧~" type="DIALOG" />
+    <action value="子尹#不知道地址么？请百度“汉家松鼠”进贴吧、微博就好啦！" type="DIALOG" />
+    <action value="素心#还可以访问我们的网站，www.jy-x.com，和我们多多交流吧^" type="DIALOG" />
+    <action value="cg#最后！想支持我们就请给我们捐款吧！扫这个码用支付宝就ok了！" type="DIALOG" />
+    <action value="支付宝二维码#请大家捐款支持！谢谢啦~" type="DIALOG" />
+  </story>
+  <story name="捐款">
+    <action value="支付宝二维码#走过路过，不要错过~" type="DIALOG" />
+    <action value="主角#咦，松鼠一只？" type="DIALOG" />
+    <action value="汉家松鼠#玩了这么久，开心吧？" type="DIALOG" />
+    <action value="主角#还不错…" type="DIALOG" />
+    <action value="汉家松鼠#那要不，给我捐点款？" type="DIALOG" />
+    <action value="主角#不捐…" type="DIALOG" />
+    <action value="汉家松鼠#...为啥啊？" type="DIALOG" />
+    <action value="主角#捐不捐都照样玩，捐款干啥啊…" type="DIALOG" />
+    <action value="汉家松鼠#呜呜呜，就是因为都照你这么想，我都要饿傻了，呜呜呜呜呜…" type="DIALOG" />
+    <action value="主角#...有这么惨？总有土豪捐的嘛！" type="DIALOG" />
+    <action value="支付宝二维码#群众的力量才最伟大…每个人都捐几块钱，松鼠就发财啦~哇哈哈哈~" type="DIALOG" />
+    <action value="主角#...不捐" type="DIALOG" />
+    <action value="汉家松鼠#呜呜呜...别说发财了，真的要饿死了..." type="DIALOG" />
+    <action value="主角#有这么可怜么？" type="DIALOG" />
+    <action value="汉家松鼠#绝对有..." type="DIALOG" />
+    <action value="主角#那要不给你捐点吧..." type="DIALOG" />
+    <action value="汉家松鼠#（两眼放光）好啊好哈，$MALE$你真是好人啊！！" type="DIALOG" />
+    <action value="主角#怎么捐啊？" type="DIALOG" />
+    <action value="支付宝二维码#打开支付宝扫这个二维码就可以了！" type="DIALOG" />
+    <action value="主角#...我在游戏里怎么进支付宝。" type="DIALOG" />
+    <action value="支付宝二维码#手机截图然后进支付宝扫照片就可以了嘛..." type="DIALOG" />
+    <action value="主角#...不会弄怎么办" type="DIALOG" />
+    <action value="支付宝二维码#直接支付宝付款到hanjiasongshu@163.com也是可以的！" type="DIALOG" />
+    <action value="主角#哦..." type="DIALOG" />
+    <action value="支付宝二维码#一定要捐哦！真的要饿死了...饿死了看谁给你们做游戏玩，哼哼..." type="DIALOG" />
+  </story>
+</root>

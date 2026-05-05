@@ -1,0 +1,335 @@
+[gd_scene format=3 uid="uid://bhe7ohx87bpf8"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" uid="uid://ecqwf6cyhgrm" path="res://src/Game.Godot/UI/Shop/ShopPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://klid4fbotbmo" path="res://scenes/ui/shop_panel/shop_item_box.tscn" id="3_item_box"]
+[ext_resource type="Texture2D" uid="uid://cguhj5812a2hr" path="res://assets/art/map/shop.jpg" id="4_shop_bg"]
+[ext_resource type="Texture2D" uid="uid://csplcrelb0rev" path="res://assets/art/ui/shopkeeper.png" id="5_keeper"]
+[ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="6_filter_button"]
+
+[sub_resource type="StyleBoxTexture" id="1_button_normal"]
+texture = ExtResource("6_filter_button")
+
+[node name="ShopPanel" unique_id=1022265152 instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+ShopItemBoxScene = ExtResource("3_item_box")
+
+[node name="CloseButton" parent="." index="2" unique_id=962603895]
+visible = false
+PressOffset = Vector2(2, 2)
+PressColor = Color(0.8, 0.8, 0.8, 1)
+
+[node name="BackgroundTexture" type="TextureRect" parent="." index="3" unique_id=100000001]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_shop_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BackgroundDim" type="ColorRect" parent="." index="4" unique_id=100000002]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.32)
+
+[node name="Shopkeeper" type="TextureRect" parent="." index="5" unique_id=100000003]
+layout_mode = 0
+offset_left = 66.0
+offset_top = 180.0
+offset_right = 445.0
+offset_bottom = 880.0
+mouse_filter = 2
+texture = ExtResource("5_keeper")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="." index="6" unique_id=100000004]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 480.0
+offset_top = 54.0
+offset_right = 1120.0
+offset_bottom = 124.0
+theme_override_colors/font_color = Color(0.93, 0.88, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 48
+text = "商店"
+
+[node name="QuickBuyCheckBox" type="CheckBox" parent="." index="7" unique_id=100000005]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 104.0
+offset_top = 126.0
+offset_right = 386.0
+offset_bottom = 188.0
+theme_override_colors/font_color = Color(0.82, 0.95, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 30
+text = "快速买入"
+
+[node name="ModeButtons" type="HBoxContainer" parent="." index="8" unique_id=100000006]
+layout_mode = 0
+offset_left = 834.0
+offset_top = 60.0
+offset_right = 1606.0
+offset_bottom = 128.0
+theme_override_constants/separation = 36
+
+[node name="BuyModeButton" type="Button" parent="ModeButtons" index="0" unique_id=100000007]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 66)
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "买入"
+
+[node name="SellModeButton" type="Button" parent="ModeButtons" index="1" unique_id=100000008]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 66)
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "卖出"
+
+[node name="LeaveButton" type="Button" parent="ModeButtons" index="2" unique_id=100000009]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 66)
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "离开"
+
+[node name="CategoryButtons" type="VBoxContainer" parent="." index="9" unique_id=100000010]
+layout_mode = 0
+offset_left = 384.0
+offset_top = 204.0
+offset_right = 584.0
+offset_bottom = 932.0
+theme_override_constants/separation = 8
+
+[node name="AllButton" type="Button" parent="CategoryButtons" index="0" unique_id=100000011]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "全部"
+
+[node name="EquipmentButton" type="Button" parent="CategoryButtons" index="1" unique_id=100000012]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "装备"
+
+[node name="ConsumableButton" type="Button" parent="CategoryButtons" index="2" unique_id=100000013]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "消耗品"
+
+[node name="SkillBookButton" type="Button" parent="CategoryButtons" index="3" unique_id=100000014]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "武学书"
+
+[node name="SpecialSkillBookButton" type="Button" parent="CategoryButtons" index="4" unique_id=100000015]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "特技书"
+
+[node name="TalentBookButton" type="Button" parent="CategoryButtons" index="5" unique_id=100000016]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "天赋书"
+
+[node name="QuestItemButton" type="Button" parent="CategoryButtons" index="6" unique_id=100000017]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "剧情物品"
+
+[node name="BoosterButton" type="Button" parent="CategoryButtons" index="7" unique_id=100000018]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "强化道具"
+
+[node name="UtilityButton" type="Button" parent="CategoryButtons" index="8" unique_id=100000019]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "功能道具"
+
+[node name="GoodsPanel" type="Panel" parent="." index="10" unique_id=100000020]
+layout_mode = 0
+offset_left = 610.0
+offset_top = 174.0
+offset_right = 1742.0
+offset_bottom = 900.0
+mouse_filter = 2
+
+[node name="Header" type="HBoxContainer" parent="GoodsPanel" index="0" unique_id=100000021]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 6.0
+offset_right = 1089.0
+offset_bottom = 52.0
+theme_override_constants/separation = 20
+
+[node name="CategoryLabel" type="Label" parent="GoodsPanel/Header" index="0" unique_id=100000022]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92941177, 0.8784314, 0.7019608, 1)
+theme_override_font_sizes/font_size = 32
+text = "全部"
+
+[node name="CountLabel" type="Label" parent="GoodsPanel/Header" index="1" unique_id=100000023]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92941177, 0.8784314, 0.7019608, 1)
+theme_override_font_sizes/font_size = 26
+text = "0 项"
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="GoodsPanel" index="1" unique_id=100000024]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 69.0
+offset_right = 1100.0
+offset_bottom = 685.0
+
+[node name="GridContainer" type="GridContainer" parent="GoodsPanel/ScrollContainer" index="0" unique_id=100000025]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 30
+columns = 5
+
+[node name="EmptyLabel" type="Label" parent="GoodsPanel" index="2" unique_id=100000026]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 160.0
+offset_top = 278.0
+offset_right = 960.0
+offset_bottom = 338.0
+theme_override_colors/font_color = Color(0.34, 0.23, 0.12, 1)
+theme_override_font_sizes/font_size = 32
+text = "当前分类下没有物品。"
+horizontal_alignment = 1
+
+[node name="PromptLabel" type="Label" parent="." index="11" unique_id=100000027]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 462.0
+offset_top = 932.0
+offset_right = 1244.0
+offset_bottom = 1004.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 46
+text = "客官需要买点什么？"
+
+[node name="CurrencyBar" type="HBoxContainer" parent="." index="12" unique_id=100000028]
+layout_mode = 0
+offset_left = 1320.0
+offset_top = 940.0
+offset_right = 1774.0
+offset_bottom = 1002.0
+theme_override_constants/separation = 34
+
+[node name="SilverTitle" type="Label" parent="CurrencyBar" index="0" unique_id=100000029]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.86, 0.82, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 34
+text = "银两"
+
+[node name="SilverLabel" type="Label" parent="CurrencyBar" index="1" unique_id=100000030]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 38
+text = "0"
+vertical_alignment = 1
+
+[node name="GoldTitle" type="Label" parent="CurrencyBar" index="2" unique_id=100000031]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.18, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 34
+text = "元宝"
+
+[node name="GoldLabel" type="Label" parent="CurrencyBar" index="3" unique_id=100000032]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 38
+text = "0"
+vertical_alignment = 1

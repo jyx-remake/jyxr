@@ -1,0 +1,418 @@
+[gd_scene format=3 uid="uid://di28xqh0osmwk"]
+
+[ext_resource type="Script" uid="uid://cp5451k3twt6r" path="res://src/Game.Godot/UI/Battle/BattleScreen.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://5n52fg3sl8bk" path="res://assets/art/battle_bg/zhulin.jpg" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://beuwbdagaqxxq" path="res://assets/art/ui/battle/battle_actionBarBg.png" id="3_action_bg"]
+[ext_resource type="Texture2D" uid="uid://cx575i6rso56w" path="res://assets/art/ui/battle/battle_shuimodi.png" id="4_bottom_strip"]
+[ext_resource type="Texture2D" uid="uid://dy2gt4wfmhyr" path="res://assets/art/ui/battle/battle_touxiangkuang.png" id="5_avatar_frame"]
+[ext_resource type="Texture2D" uid="uid://cvcu58vmb6qvl" path="res://assets/art/ui/battle/battle_shijianxianzhi.png" id="6_clock"]
+[ext_resource type="Texture2D" uid="uid://bb5ik3dmfcc6l" path="res://assets/art/ui/battle/battle_zhandoujilubiaoqian.png" id="7_log_tag"]
+[ext_resource type="Texture2D" uid="uid://cwew33n5mbgj3" path="res://assets/art/ui/battle/xuandingjineng-dise.png" id="8_selected_skill"]
+[ext_resource type="Texture2D" uid="uid://dhyu83ur01mx" path="res://assets/art/ui/battle/battle_yidong-tubiao.png" id="9_move_btn"]
+[ext_resource type="Texture2D" uid="uid://cx2jrb06xy61h" path="res://assets/art/ui/battle/battle_yidong.png" id="10_move_word"]
+[ext_resource type="Texture2D" uid="uid://bjm0ql2rhmq6q" path="res://assets/art/ui/battle/battle_wupin-tubiao.png" id="11_item_btn"]
+[ext_resource type="Texture2D" uid="uid://bdw6xourk6852" path="res://assets/art/ui/battle/battle_wupin.png" id="12_item_word"]
+[ext_resource type="Texture2D" uid="uid://c4ngqcvo4kjm7" path="res://assets/art/ui/battle/battle_xiuxi-tubiao.png" id="13_rest_btn"]
+[ext_resource type="Texture2D" uid="uid://b3h356h4xfurf" path="res://assets/art/ui/battle/battle_xiuxi.png" id="14_rest_word"]
+[ext_resource type="Texture2D" uid="uid://u5msb8uqcflv" path="res://assets/art/ui/battle/battle_zhuangtai-tubiao.png" id="15_skill_btn"]
+[ext_resource type="Texture2D" uid="uid://dm6cedvudfbhe" path="res://assets/art/ui/battle/battle_zhuangtai.png" id="16_skill_word"]
+[ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="17_font"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_skill_box.tscn" id="18_skill_box"]
+[ext_resource type="PackedScene" uid="uid://d1qdddofh12io" path="res://scenes/ui/battle/battle_board_view.tscn" id="19_board_view"]
+[ext_resource type="PackedScene" uid="uid://oei4u3648ovq" path="res://scenes/ui/battle/battle_item_panel.tscn" id="20_item_panel"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
+bg_color = Color(0.18, 0.14, 0.1, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.8, 0.55, 0.45)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
+bg_color = Color(0, 0, 0, 0.72)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skill_icon"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_legacy_skill"]
+line_spacing = -18.0
+font = ExtResource("17_font")
+font_size = 40
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="BattleScreen" type="Control" unique_id=96008142]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+BattleSkillBoxScene = ExtResource("18_skill_box")
+BattleItemPanelScene = ExtResource("20_item_panel")
+
+[node name="Background" type="TextureRect" parent="." unique_id=372176778]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BackgroundDim" type="ColorRect" parent="." unique_id=198460847]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.2)
+
+[node name="TopClock" type="TextureRect" parent="." unique_id=1545890483]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 16.0
+offset_right = 836.0
+offset_bottom = 199.0
+mouse_filter = 2
+texture = ExtResource("6_clock")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="TopClock" unique_id=1760768761]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 178.0
+offset_top = 26.0
+offset_right = 560.0
+offset_bottom = 82.0
+theme_override_colors/font_color = Color(0.98, 0.94, 0.74, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 38
+text = "战场"
+
+[node name="SubtitleLabel" type="Label" parent="TopClock" unique_id=731501548]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 180.0
+offset_top = 88.0
+offset_right = 776.0
+offset_bottom = 148.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+
+[node name="FinishButton" type="Button" parent="." unique_id=507302681]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 1628.0
+offset_top = 34.0
+offset_right = 1860.0
+offset_bottom = 106.0
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
+disabled = true
+text = "返回"
+
+[node name="BattleLogTag" type="TextureRect" parent="." unique_id=1046574722]
+layout_mode = 0
+offset_left = -44.0
+offset_top = 200.0
+offset_right = 122.0
+offset_bottom = 659.0
+mouse_filter = 2
+texture = ExtResource("7_log_tag")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LogPanel" type="PanelContainer" parent="." unique_id=1677156711]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 244.0
+offset_right = 268.0
+offset_bottom = 748.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_overlay")
+
+[node name="LogPadding" type="MarginContainer" parent="LogPanel" unique_id=1810979141]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="LogLabel" type="RichTextLabel" parent="LogPanel/LogPadding" unique_id=1613561611]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 470)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.94, 0.93, 0.88, 1)
+theme_override_font_sizes/normal_font_size = 20
+
+[node name="BoardGrid" parent="." unique_id=843775524 instance=ExtResource("19_board_view")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 237.0
+offset_top = 242.0
+offset_right = 237.0
+offset_bottom = 242.0
+
+[node name="BottomHud" type="Control" parent="." unique_id=414540527]
+anchors_preset = 0
+
+[node name="BottomStrip" type="TextureRect" parent="BottomHud" unique_id=1312754331]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 901.0
+offset_right = 1387.0
+offset_bottom = 1064.0
+mouse_filter = 2
+texture = ExtResource("4_bottom_strip")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ActionBarBg" type="TextureRect" parent="BottomHud" unique_id=1125755907]
+layout_mode = 0
+offset_left = 650.0
+offset_top = 533.0
+offset_right = 1908.0865
+offset_bottom = 1072.0
+mouse_filter = 2
+texture = ExtResource("3_action_bg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SelectedSkillBg" type="TextureRect" parent="BottomHud" unique_id=103111520]
+layout_mode = 0
+offset_left = 55.0
+offset_top = 767.0
+offset_right = 312.0
+offset_bottom = 1049.0
+mouse_filter = 2
+texture = ExtResource("8_selected_skill")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SelectedSkillIconPanel" type="Panel" parent="BottomHud/SelectedSkillBg" unique_id=1569974441]
+layout_mode = 0
+offset_left = 39.0
+offset_top = 66.0
+offset_right = 179.0
+offset_bottom = 205.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_skill_icon")
+
+[node name="SelectedSkillIconMargin" type="MarginContainer" parent="BottomHud/SelectedSkillBg/SelectedSkillIconPanel" unique_id=1240268755]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="SelectedSkillIcon" type="TextureRect" parent="BottomHud/SelectedSkillBg/SelectedSkillIconPanel/SelectedSkillIconMargin" unique_id=1889567405]
+unique_name_in_owner = true
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 4
+
+[node name="SelectedSkillNameLabel" type="Label" parent="BottomHud/SelectedSkillBg" unique_id=48809877]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -3.0
+offset_top = -1.0
+offset_right = 36.0
+offset_bottom = 268.0
+text = "未选中技能"
+label_settings = SubResource("LabelSettings_legacy_skill")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="SelectedSkillFormNameLabel" type="Label" parent="BottomHud/SelectedSkillBg" unique_id=978270284]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 40.0
+offset_top = 14.0
+offset_right = 79.0
+offset_bottom = 283.0
+label_settings = SubResource("LabelSettings_legacy_skill")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="ListScroll" type="ScrollContainer" parent="BottomHud" unique_id=60321938]
+layout_mode = 0
+offset_left = 267.0
+offset_top = 855.0
+offset_right = 1425.0
+offset_bottom = 1074.0
+vertical_scroll_mode = 0
+
+[node name="ListContainer" type="HBoxContainer" parent="BottomHud/ListScroll" unique_id=2070798312]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Avatar" type="TextureRect" parent="BottomHud" unique_id=912225212]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1598.0
+offset_top = 827.0
+offset_right = 1755.0
+offset_bottom = 993.9545
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AvatarFrame" type="TextureRect" parent="BottomHud" unique_id=55353986]
+layout_mode = 0
+offset_left = 1583.0
+offset_top = 839.0
+offset_right = 1781.2417
+offset_bottom = 1003.0
+mouse_filter = 2
+texture = ExtResource("5_avatar_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EndButton" type="Button" parent="BottomHud" unique_id=890715130]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(132, 56)
+layout_mode = 0
+offset_left = 1707.0
+offset_top = 519.0
+offset_right = 1909.0
+offset_bottom = 581.0
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
+text = "结束"
+
+[node name="SkillButton" type="TextureButton" parent="BottomHud" unique_id=250363507]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1595.0
+offset_top = 685.0
+offset_right = 1772.0
+offset_bottom = 845.0
+texture_normal = ExtResource("15_skill_btn")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="SkillWord" type="TextureRect" parent="BottomHud/SkillButton" unique_id=1217349101]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 11.0
+offset_right = 133.0
+offset_bottom = 81.0
+mouse_filter = 2
+texture = ExtResource("16_skill_word")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemButton" type="TextureButton" parent="BottomHud" unique_id=984075596]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1724.0
+offset_top = 763.0
+offset_right = 1901.0
+offset_bottom = 923.0
+texture_normal = ExtResource("11_item_btn")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ItemWord" type="TextureRect" parent="BottomHud/ItemButton" unique_id=1820730931]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 14.0
+offset_right = 137.0
+offset_bottom = 84.0
+mouse_filter = 2
+texture = ExtResource("12_item_word")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RestButton" type="TextureButton" parent="BottomHud" unique_id=861883801]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1729.0
+offset_top = 918.0
+offset_right = 1906.0
+offset_bottom = 1078.0
+texture_normal = ExtResource("13_rest_btn")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="RestWord" type="TextureRect" parent="BottomHud/RestButton" unique_id=1311330508]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 22.0
+offset_right = 144.0
+offset_bottom = 92.0
+mouse_filter = 2
+texture = ExtResource("14_rest_word")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MoveButton" type="TextureButton" parent="BottomHud" unique_id=1408921671]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1462.0
+offset_top = 919.0
+offset_right = 1639.0
+offset_bottom = 1079.0
+texture_normal = ExtResource("9_move_btn")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MoveWord" type="TextureRect" parent="BottomHud/MoveButton" unique_id=336048975]
+layout_mode = 0
+offset_left = 35.0
+offset_top = 16.0
+offset_right = 135.0
+offset_bottom = 86.0
+mouse_filter = 2
+texture = ExtResource("10_move_word")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="OverlayRoot" type="Control" parent="." unique_id=2009935606]
+unique_name_in_owner = true
+z_index = 100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

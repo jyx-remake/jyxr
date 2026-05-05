@@ -1,0 +1,224 @@
+[gd_scene format=3 uid="uid://bdvws2ugdkk6a"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="2_button_texture"]
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="3_button_script"]
+[ext_resource type="Script" uid="uid://gajb5sg2ub38" path="res://src/Game.Godot/UI/Hero/HeroPanel.cs" id="4_script"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_tab_title"]
+font_size = 60
+
+[sub_resource type="Theme" id="Theme_dr12l"]
+Label/constants/line_spacing = 10
+Label/font_sizes/font_size = 40
+RichTextLabel/constants/line_separation = 10
+RichTextLabel/font_sizes/mono_font_size = 40
+RichTextLabel/font_sizes/normal_font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_page_title"]
+font_size = 48
+
+[sub_resource type="LabelSettings" id="LabelSettings_page_subtitle"]
+font_size = 40
+
+[node name="HeroPanel" unique_id=1789677815 instance=ExtResource("1_panel")]
+script = ExtResource("4_script")
+
+[node name="CloseButton" parent="." index="2" unique_id=962603895]
+PressOffset = Vector2(2, 2)
+PressColor = Color(0.8, 0.8, 0.8, 1)
+
+[node name="TabButtonRow" type="HBoxContainer" parent="." index="3" unique_id=1213870777]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 134.0
+offset_right = 1684.0
+offset_bottom = 246.0
+theme_override_constants/separation = 80
+alignment = 1
+
+[node name="AdventureTabButton" type="TextureButton" parent="TabButtonRow" index="0" unique_id=880954121]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(342, 112)
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("2_button_texture")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="TabButtonRow/AdventureTabButton" index="0" unique_id=1588260131]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "江湖历练"
+label_settings = SubResource("LabelSettings_tab_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AchievementTabButton" type="TextureButton" parent="TabButtonRow" index="1" unique_id=2026592363]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(342, 112)
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("2_button_texture")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="TabButtonRow/AchievementTabButton" index="0" unique_id=386301227]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "我的成就"
+label_settings = SubResource("LabelSettings_tab_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MasteryTabButton" type="TextureButton" parent="TabButtonRow" index="2" unique_id=1633701570]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(342, 112)
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("2_button_texture")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="TabButtonRow/MasteryTabButton" index="0" unique_id=888277509]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "武学精通"
+label_settings = SubResource("LabelSettings_tab_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeroTabContainer" type="TabContainer" parent="." index="4" unique_id=1703835921]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 217.0
+offset_top = 264.0
+offset_right = 1691.0
+offset_bottom = 924.0
+theme = SubResource("Theme_dr12l")
+current_tab = 1
+tabs_visible = false
+
+[node name="AdventureTab" type="Control" parent="HeroTabContainer" index="1" unique_id=1308277667]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="AdventurePageSubtitle" type="RichTextLabel" parent="HeroTabContainer/AdventureTab" index="0" unique_id=58969025]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -686.0
+offset_top = -276.0
+offset_right = -246.0
+offset_bottom = -160.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+text = "道德：[color=red]0[/color]
+女主角好感：[color=red]0[/color]"
+fit_content = true
+
+[node name="AchievementTab" type="Control" parent="HeroTabContainer" index="2" unique_id=728918971]
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="CompletionLabel" type="Label" parent="HeroTabContainer/AchievementTab" index="0" unique_id=1048106557]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 33.0
+offset_top = 84.0
+offset_right = 341.0
+offset_bottom = 144.0
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 50
+text = "完成度：0%"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="HeroTabContainer/AchievementTab" index="1" unique_id=1970319434]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 214.0
+offset_right = 369.0
+offset_bottom = 494.0
+text = "成就代表你在金X世界中探索剧情程度。完成不同的分支剧情可能会解锁不同的成就噢！"
+autowrap_mode = 3
+
+[node name="AchievementLabel" type="RichTextLabel" parent="HeroTabContainer/AchievementTab" index="2" unique_id=1009544496]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 401.0
+offset_top = 19.0
+offset_right = 1450.0
+offset_bottom = 646.0
+bbcode_enabled = true
+
+[node name="PreviewCheckBox" type="CheckBox" parent="HeroTabContainer/AchievementTab" index="3" unique_id=1439308183]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 0
+offset_left = 74.0
+offset_top = 539.0
+offset_right = 264.0
+offset_bottom = 617.0
+text = "预览"
+
+[node name="MasteryTab" type="Control" parent="HeroTabContainer" index="3" unique_id=627145902]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="MasteryPageTitle" type="Label" parent="HeroTabContainer/MasteryTab" index="0" unique_id=450542089]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -60.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "武学精通"
+label_settings = SubResource("LabelSettings_page_title")
+horizontal_alignment = 1
+
+[node name="MasteryPageSubtitle" type="Label" parent="HeroTabContainer/MasteryTab" index="1" unique_id=776178644]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 12.0
+offset_right = 220.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "这里放武学精通与养成数据。"
+label_settings = SubResource("LabelSettings_page_subtitle")
+horizontal_alignment = 1

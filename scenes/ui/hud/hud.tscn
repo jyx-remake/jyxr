@@ -1,0 +1,191 @@
+[gd_scene format=3 uid="uid://bnk146v0yfw02"]
+
+[ext_resource type="Script" uid="uid://y7omqi147a7k" path="res://src/Game.Godot/UI/Hud/HudPanel.cs" id="1_hud_script"]
+[ext_resource type="Texture2D" uid="uid://3oqhk4cx0io6" path="res://assets/art/misc/story/dingbu.png" id="2_top_frame"]
+[ext_resource type="Texture2D" uid="uid://dskv8y611d62s" path="res://assets/art/misc/story/gold_ingot.png" id="3_gold"]
+[ext_resource type="Texture2D" uid="uid://c3blrbqi0vr2j" path="res://assets/art/misc/story/silver_ingot.png" id="4_silver"]
+[ext_resource type="PackedScene" uid="uid://cveba3f8kxvxc" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="5_avatar_box"]
+[ext_resource type="Texture2D" uid="uid://bdjuv8dnauuna" path="res://assets/art/misc/story/nandu.png" id="6_difficulty"]
+[ext_resource type="Texture2D" uid="uid://87tpd68w0d1v" path="res://assets/art/misc/story/anniukuang.png" id="7_menu_frame"]
+[ext_resource type="Texture2D" uid="uid://dgwbyq7dicqt4" path="res://assets/art/misc/story/chilun.png" id="8_system"]
+[ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="9_button"]
+[ext_resource type="Texture2D" uid="uid://co16la5kihi6o" path="res://assets/art/misc/story/daoju.png" id="10_backpack"]
+[ext_resource type="Texture2D" uid="uid://bpbr4s8fsji6r" path="res://assets/art/misc/story/rizhi.png" id="11_log"]
+[ext_resource type="Texture2D" uid="uid://cc7yi6jgcfwde" path="res://assets/art/misc/story/zhuangtai.png" id="12_team"]
+
+[node name="Hud" type="Control" unique_id=1846363281]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud_script")
+
+[node name="TopBox" type="Control" parent="." unique_id=1135363019]
+anchors_preset = 0
+
+[node name="ShadowPanel" type="Panel" parent="TopBox" unique_id=35497544]
+layout_mode = 0
+offset_left = 19.0
+offset_right = 1895.0
+offset_bottom = 69.0
+
+[node name="Frame" type="TextureRect" parent="TopBox" unique_id=1230438179]
+layout_mode = 0
+offset_left = 9.000061
+offset_right = 4569.0
+offset_bottom = 212.0
+scale = Vector2(0.41627344, 0.41627347)
+texture = ExtResource("2_top_frame")
+
+[node name="GoldIngot" type="TextureRect" parent="TopBox" unique_id=1207954560]
+layout_mode = 0
+offset_left = 1605.0
+offset_top = 24.0
+offset_right = 1685.0
+offset_bottom = 72.0
+texture = ExtResource("3_gold")
+expand_mode = 1
+
+[node name="SilverIngot" type="TextureRect" parent="TopBox" unique_id=69149685]
+layout_mode = 0
+offset_left = 1275.0
+offset_top = 24.0
+offset_right = 1360.1852
+offset_bottom = 70.0
+texture = ExtResource("4_silver")
+expand_mode = 1
+
+[node name="MapLabel" type="Label" parent="TopBox" unique_id=1162998076]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 365.0
+offset_top = 29.0
+offset_right = 616.0
+offset_bottom = 60.0
+text = "桃花岛"
+horizontal_alignment = 1
+
+[node name="DataTimeLabel" type="Label" parent="TopBox" unique_id=190790743]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 733.0
+offset_top = 29.0
+offset_right = 1207.0
+offset_bottom = 60.0
+text = "1年1月1日 子时"
+horizontal_alignment = 1
+
+[node name="SilverIngotLabel" type="Label" parent="TopBox" unique_id=194327460]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1383.0
+offset_top = 29.0
+offset_right = 1511.0
+offset_bottom = 60.0
+text = "0"
+horizontal_alignment = 1
+
+[node name="GlodIngotLabel" type="Label" parent="TopBox" unique_id=822597299]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1701.0
+offset_top = 29.0
+offset_right = 1856.0
+offset_bottom = 60.0
+text = "0"
+horizontal_alignment = 1
+
+[node name="HeroButton" parent="." unique_id=75376425 instance=ExtResource("9_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 27.0
+offset_top = 17.0
+offset_right = 328.0
+offset_bottom = 314.0
+tooltip_text = "玩家数据"
+
+[node name="HeroBox" parent="HeroButton" unique_id=1235880245 instance=ExtResource("5_avatar_box")]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 155.0
+offset_top = 151.0
+offset_right = 155.0
+offset_bottom = 151.0
+scale = Vector2(0.36274618, 0.36274618)
+mouse_filter = 2
+
+[node name="RunInfo" type="TextureRect" parent="." unique_id=1712729508]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 239.0
+offset_top = 224.0
+offset_right = 531.0
+offset_bottom = 512.0
+scale = Vector2(0.3784722, 0.3784722)
+texture = ExtResource("6_difficulty")
+
+[node name="MenueButtonGroup" type="Control" parent="." unique_id=737845938]
+anchors_preset = 0
+offset_left = 1730.0001
+offset_top = 885.0
+offset_right = 1730.0001
+offset_bottom = 885.0
+scale = Vector2(0.3684396, 0.36843964)
+
+[node name="Frame" type="TextureRect" parent="MenueButtonGroup" unique_id=1224916071]
+layout_mode = 0
+offset_left = -455.97705
+offset_top = -464.1194
+offset_right = 456.02295
+offset_bottom = 467.8806
+texture = ExtResource("7_menu_frame")
+
+[node name="SystemButton" parent="MenueButtonGroup" unique_id=2079598957 instance=ExtResource("9_button")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -214.41748
+offset_top = -187.27637
+offset_right = 477.58252
+offset_bottom = 496.72363
+grow_horizontal = 0
+grow_vertical = 0
+tooltip_text = "系统"
+texture_normal = ExtResource("8_system")
+
+[node name="BackpackButton" parent="MenueButtonGroup" unique_id=708079883 instance=ExtResource("9_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -428.83554
+offset_top = 100.4235
+offset_right = -92.83554
+offset_bottom = 436.4235
+tooltip_text = "物品"
+texture_normal = ExtResource("10_backpack")
+
+[node name="LogButton" parent="MenueButtonGroup" unique_id=822725145 instance=ExtResource("9_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -317.55542
+offset_top = -320.26956
+offset_right = 18.44458
+offset_bottom = 15.730438
+tooltip_text = "江湖日志"
+texture_normal = ExtResource("11_log")
+
+[node name="TeamButton" parent="MenueButtonGroup" unique_id=713409378 instance=ExtResource("9_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 86.85277
+offset_top = -436.97794
+offset_right = 422.85278
+offset_bottom = -100.977936
+tooltip_text = "队伍"
+texture_normal = ExtResource("12_team")

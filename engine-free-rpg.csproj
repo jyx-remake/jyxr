@@ -1,0 +1,31 @@
+<Project Sdk="Godot.NET.Sdk/4.6.2">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>engine-free-rpg</AssemblyName>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>enginefreerpg</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src\Game.Godot\**\*.cs" Exclude="src\Game.Godot\**\obj\**\*.cs;src\Game.Godot\**\bin\**\*.cs;src\Game.Godot\**\.godot\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src\Game.Content\Game.Content.csproj" />
+    <ProjectReference Include="src\Game.Application\Game.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\Game.Godot\Map\" />
+    <Folder Include="src\Game.Godot\UI\Character\" />
+    <Folder Include="src\Game.Godot\UI\GameConfig\" />
+    <Folder Include="src\Game.Godot\UI\GameLog\" />
+    <Folder Include="src\Game.Godot\UI\HeroInfo\" />
+    <Folder Include="src\Game.Godot\UI\Inventory\" />
+  </ItemGroup>
+</Project>

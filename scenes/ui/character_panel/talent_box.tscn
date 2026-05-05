@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Character/CharacterTalentBox.cs" id="1_script"]
+
+[node name="TalentBox" type="VBoxContainer"]
+custom_minimum_size = Vector2(0, 74)
+theme_override_constants/separation = 0
+script = ExtResource("1_script")
+
+[node name="NameLabel" type="RichTextLabel" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 30
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="DescriptionLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+autowrap_mode = 3
+text = "天赋描述"

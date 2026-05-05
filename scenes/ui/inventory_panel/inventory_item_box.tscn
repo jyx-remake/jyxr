@@ -1,0 +1,88 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Inventory/InventoryItemBox.cs" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/inventory_item_tooltip.tscn" id="2_tooltip"]
+[ext_resource type="Texture2D" path="res://assets/art/misc/biankuang.png" id="3_frame"]
+[ext_resource type="Texture2D" path="res://assets/art/misc/dise.png" id="4_mask"]
+[ext_resource type="Texture2D" path="res://assets/art/item/baoguo.png" id="5_placeholder"]
+[ext_resource type="LabelSettings" path="res://assets/theme/item_name.tres" id="6_label"]
+
+[node name="InventoryItemBox" type="TextureButton"]
+custom_minimum_size = Vector2(180, 180)
+offset_right = 180.0
+offset_bottom = 180.0
+ignore_texture_size = true
+stretch_mode = 4
+script = ExtResource("1_script")
+TooltipScene = ExtResource("2_tooltip")
+
+[node name="Frame" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_frame")
+expand_mode = 1
+
+[node name="Mask" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -60.0
+offset_right = 60.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.02, 1.02)
+mouse_filter = 2
+texture = ExtResource("4_mask")
+expand_mode = 1
+
+[node name="Avatar" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 24.0
+offset_right = 153.0
+offset_bottom = 155.0
+mouse_filter = 2
+texture = ExtResource("5_placeholder")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="NameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -31.0
+offset_top = 131.0
+offset_right = 209.0
+offset_bottom = 189.0
+mouse_filter = 2
+text = "物品"
+label_settings = ExtResource("6_label")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+justification_flags = 161
+
+[node name="StackLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 116.0
+offset_top = 7.0
+offset_right = 170.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9843137, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 34
+text = "99"
+horizontal_alignment = 2

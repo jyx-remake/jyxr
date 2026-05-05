@@ -1,0 +1,16 @@
+[
+  {
+    "id": "sample_tower",
+    "name": "Sample Tower",
+    "stages": [
+      {
+        "id": "sample_stage",
+        "name": "sample_stage",
+        "battleId": "sample_battle",
+        "index": 1,
+        "rewards": []
+      }
+    ],
+    "unlockConditions": []
+  }
+]

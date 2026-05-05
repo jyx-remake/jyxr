@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/base/jy_panel.tscn" id="1_base"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Journal/JournalPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/journal/journal_entry.tscn" id="3_entry"]
+
+[node name="JournalPanel" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+JournalEntryScene = ExtResource("3_entry")
+
+[node name="TitleLabel" type="Label" parent="." index="3"]
+layout_mode = 0
+offset_left = 790.0
+offset_top = 109.0
+offset_right = 1190.0
+offset_bottom = 227.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 100
+text = "江湖日志"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." index="4"]
+layout_mode = 0
+offset_left = 263.0
+offset_top = 224.0
+offset_right = 1660.0
+offset_bottom = 905.0
+
+[node name="EntryContainer" type="VBoxContainer" parent="ScrollContainer" index="0"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="EmptyLabel" type="Label" parent="." index="5"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 320.0
+offset_top = 280.0
+offset_right = 1580.0
+offset_bottom = 360.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+text = "当前还没有江湖日志。"
+horizontal_alignment = 1

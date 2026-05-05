@@ -1,0 +1,96 @@
+[
+  {
+    "category": "normal",
+    "id": "healing_potion",
+    "name": "Healing Potion",
+    "type": "consumable",
+    "level": 1,
+    "price": 25,
+    "cooldown": 0,
+    "canDrop": true,
+    "description": "A basic healing potion.",
+    "picture": "",
+    "requirements": [],
+    "useEffects": [
+      {
+        "type": "add_hp",
+        "value": 12
+      }
+    ]
+  },
+  {
+    "category": "equipment",
+    "id": "iron_blade",
+    "name": "Iron Blade",
+    "type": "equipment",
+    "slotType": "weapon",
+    "level": 1,
+    "price": 0,
+    "cooldown": 0,
+    "canDrop": true,
+    "description": "",
+    "picture": "",
+    "requirements": [],
+    "useEffects": [],
+    "affixes": [
+      {
+        "type": "stat_modifier",
+        "stat": "bili",
+        "value": {
+          "op": "add",
+          "delta": 2
+        }
+      }
+    ]
+  },
+  {
+    "category": "equipment",
+    "id": "oak_staff",
+    "name": "Oak Staff",
+    "type": "equipment",
+    "slotType": "weapon",
+    "level": 1,
+    "price": 0,
+    "cooldown": 0,
+    "canDrop": true,
+    "description": "",
+    "picture": "",
+    "requirements": [],
+    "useEffects": [],
+    "affixes": [
+      {
+        "type": "stat_modifier",
+        "stat": "qimen",
+        "value": {
+          "op": "add",
+          "delta": 2
+        }
+      }
+    ]
+  },
+  {
+    "category": "equipment",
+    "id": "ward_charm",
+    "name": "Ward Charm",
+    "type": "equipment",
+    "slotType": "accessory",
+    "level": 1,
+    "price": 0,
+    "cooldown": 0,
+    "canDrop": true,
+    "description": "",
+    "picture": "",
+    "requirements": [],
+    "useEffects": [],
+    "affixes": [
+      {
+        "type": "stat_modifier",
+        "stat": "gengu",
+        "value": {
+          "op": "add",
+          "delta": 2
+        }
+      }
+    ]
+  }
+]

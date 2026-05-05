@@ -1,0 +1,216 @@
+<root>
+  <tower desc="与江湖上各种奇人异士一争高下。" key="江湖异人">
+    <map key="天关.江湖异人.渔樵耕读" index="0">
+      <item probability="1.0" number="-1" key="大还丹" />
+      <item probability="1.0" number="-1" key="特制鸡腿" />
+      <item probability="1.0" number="1" key="罗汉拳谱" />
+      <item probability="1.0" number="1" key="飘雪穿云掌法" />
+      <item probability="1.0" number="1" key="松风剑法秘籍" />
+      <item probability="1.0" number="1" key="华山剑法秘籍" />
+      <item probability="1.0" number="1" key="三分剑术" />
+      <item probability="1.0" number="1" key="南山刀法谱" />
+      <item probability="1.0" number="1" key="万劫刀法谱" />
+      <item probability="1.0" number="1" key="蛇鹤八打" />
+      <item probability="1.0" number="1" key="拂尘秘诀" />
+      <item probability="1.0" number="1" key="疯魔杖法秘诀" />
+      <item probability="1.0" number="-1" key="将军头盔" />
+      <item probability="1.0" number="-1" key="粗布披风" />
+    </map>
+    <map key="天关.江湖异人.高手来了！" index="1">
+      <item probability="1.0" number="-1" key="黑玉断续膏" />
+      <item probability="1.0" number="-1" key="九花玉露丸" />
+      <item probability="1.0" number="1" key="四象掌掌谱" />
+      <item probability="1.0" number="1" key="寒冰绵掌谱" />
+      <item probability="1.0" number="1" key="百花错拳谱" />
+      <item probability="1.0" number="1" key="八卦游身掌法" />
+      <item probability="1.0" number="1" key="五毒神掌掌谱" />
+      <item probability="1.0" number="1" key="无量剑法秘籍" />
+      <item probability="1.0" number="1" key="绕指柔剑剑谱" />
+      <item probability="1.0" number="1" key="峨眉剑法秘籍" />
+      <item probability="1.0" number="1" key="嵩山剑法秘籍" />
+      <item probability="1.0" number="1" key="全真剑法秘籍" />
+      <item probability="1.0" number="1" key="铁剑剑法秘籍" />
+      <item probability="1.0" number="1" key="草原刀法" />
+      <item probability="1.0" number="1" key="玄虚刀法" />
+      <item probability="1.0" number="1" key="玉蜂针" />
+      <item probability="1.0" number="1" key="流星锤法" />
+      <item probability="1.0" number="-1" key="精制匕首" />
+      <item probability="1.0" number="-1" key="铲刀" />
+      <item probability="1.0" number="-1" key="飞轮" />
+      <item probability="1.0" number="-1" key="拳击手套" />
+      <item probability="1.0" number="-1" key="檀香佛珠" />
+      <item probability="1.0" number="-1" key="金丝护腕" />
+    </map>
+    <map key="天关.江湖异人.四个和尚" index="2">
+      <item probability="1.0" number="-1" key="黑玉断续膏" />
+      <item probability="1.0" number="-1" key="生生造化丹" />
+      <item probability="1.0" number="1" key="佛光普照" />
+      <item probability="1.0" number="1" key="铁掌掌谱" />
+      <item probability="1.0" number="1" key="幻阴指指法精要" />
+      <item probability="1.0" number="1" key="百变千幻云雾十三式秘籍" />
+      <item probability="1.0" number="1" key="达摩剑法" />
+      <item probability="1.0" number="1" key="两仪剑法" />
+      <item probability="1.0" number="1" key="反两仪刀法" />
+      <item probability="1.0" number="1" key="燃木刀法" />
+      <item probability="1.0" number="1" key="黑血神针秘籍" />
+      <item probability="1.0" number="1" key="伏魔杖法" />
+      <item probability="1.0" number="1" key="海叟钓法" />
+      <item probability="1.0" number="-1" key="橙色灯戒" />
+      <item probability="1.0" number="-1" key="华裳" />
+      <item probability="1.0" number="-1" key="月梦爪" />
+      <item probability="1.0" number="-1" key="戒刀" />
+      <item probability="1.0" number="-1" key="古铜匕首" />
+    </map>
+    <map key="天关.江湖异人.雁门关的雪？血？" index="3">
+      <item probability="0.2" number="3" key="灭仙爪" />
+      <item probability="0.2" number="3" key="倚天剑" />
+      <item probability="0.2" number="3" key="屠龙刀" />
+      <item probability="0.2" number="3" key="打狗棒" />
+      <item probability="1.0" number="-1" key="天王保命丹" />
+      <item probability="1.0" number="-1" key="续命八丸" />
+      <item probability="1.0" number="-1" key="松果" />
+      <item probability="1.0" number="-1" key="锯齿刀" />
+      <item probability="1.0" number="-1" key="龙泉剑" />
+      <item probability="1.0" number="-1" key="忍者服" />
+      <item probability="0.15" number="1" key="天关.决战光明顶之证" />
+      <item probability="0.15" number="1" key="天关.林平之的复仇" />
+      <item probability="0.15" number="1" key="天关.血战少室山" />
+    </map>
+    <map key="天关.江湖异人.终章" index="4">
+      <item probability="1" number="1" key="天关.炼狱之证" />
+      <item probability="0.5" number="1" key="降龙十八掌谱" />
+      <item probability="0.5" number="1" key="独孤九剑剑谱" />
+      <item probability="0.5" number="1" key="一阳指书" />
+      <item probability="0.5" number="1" key="鸳鸯刀" />
+      <item probability="0.3" number="3" key="笑傲江湖曲" />
+      <item probability="0.2" number="3" key="天下轻功总决" />
+      <item probability="0.3" number="3" key="青莲诗集" />
+      <item probability="0.3" number="3" key="天地同寿" />
+      <item probability="0.3" number="1" key="隔空取物" />
+      <item probability="0.3" number="1" key="妙手仁心" />
+      <item probability="0.3" number="1" key="灵心慧质" />
+      <item probability="0.5" number="3" key="王母蟠桃" />
+      <item probability="0.5" number="3" key="道家仙丹" />
+      <item probability="1.0" number="-1" key="霓裳羽衣" />
+      <item probability="1.0" number="-1" key="幽梦衣" />
+      <item probability="1.0" number="-1" key="蓝宝戒指" />
+      <item probability="1.0" number="-1" key="水晶护符" />
+      <item probability="1.0" number="-1" key="流星锤" />
+      <item probability="1.0" number="-1" key="搏击爪套" />
+    </map>
+  </tower>
+  <tower desc="你将扮演六大派高手，围剿明教光明顶。" key="决战光明顶">
+    <map key="天关.决战光明顶" index="0">
+      <item probability="0.4" number="1" key="乾坤大挪移心法" />
+      <item probability="1.0" number="2" key="洗练书" />
+      <item probability="1.0" number="-1" key="生生造化丹" />
+    </map>
+    <condition value="天关.决战光明顶之证" type="have_item" />
+  </tower>
+  <tower desc="你将扮演林平之，完成对木高峰、余沧海的复仇。" key="林平之的复仇">
+    <map key="天关.林平之的复仇" index="0">
+      <item probability="1.0" number="1" key="渡元禅师的木鱼" />
+      <item probability="1.0" number="-1" key="生生造化丹" />
+    </map>
+    <condition value="天关.林平之的复仇" type="have_item" />
+  </tower>
+  <tower desc="你将扮演庄聚贤，慕容复，丁春秋对战天龙三兄弟" key="血战少室山">
+    <map key="天关.血战少室山" index="0">
+      <item probability="1.0" number="1" key="罗汉伏魔功秘本" />
+      <item probability="1.0" number="-1" key="生生造化丹" />
+    </map>
+    <condition value="天关.血战少室山" type="have_item" />
+  </tower>
+  <tower desc="挑战《越女剑》顶级BOSS 阿青" key="越女剑">
+    <condition value="天关.越女剑" type="have_item" />
+    <map key="天关.越女剑" index="0">
+      <item probability="1.0" number="1" key="越女剑法秘籍" />
+      <item probability="0.05" number="1" key="越女神剑" />
+      <item probability="0.1" number="1" key="小人物的逆袭" />
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+    </map>
+  </tower>
+  <tower desc="炼狱级天关，挑战各个绝顶高手，获取丰厚的奖励。" key="炼狱">
+    <map key="天关.炼狱.作为炼狱，一开始就应该很难" index="0">
+      <item probability="0.2" number="3" key="灭仙爪" />
+      <item probability="0.2" number="3" key="倚天剑" />
+      <item probability="0.2" number="3" key="屠龙刀" />
+      <item probability="0.2" number="3" key="打狗棒" />
+      <item probability="1.0" number="-1" key="天王保命丹" />
+      <item probability="1.0" number="-1" key="续命八丸" />
+      <item probability="1.0" number="-1" key="松果" />
+      <item probability="1.0" number="-1" key="霓裳羽衣" />
+      <item probability="1.0" number="-1" key="幽梦衣" />
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+    </map>
+    <map key="天关.炼狱.来吧，小规模的华山论剑" index="1">
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+      <item probability="0.5" number="1" key="降龙十八掌谱" />
+      <item probability="0.5" number="1" key="独孤九剑剑谱" />
+      <item probability="0.5" number="1" key="鸳鸯刀" />
+      <item probability="0.3" number="2" key="笑傲江湖曲" />
+      <item probability="0.2" number="3" key="天下轻功总决" />
+      <item probability="0.3" number="3" key="青莲诗集" />
+      <item probability="0.3" number="3" key="天地同寿" />
+      <item probability="0.5" number="3" key="王母蟠桃" />
+      <item probability="0.5" number="3" key="道家仙丹" />
+      <item probability="1.0" number="-1" key="蓝宝戒指" />
+      <item probability="1.0" number="-1" key="水晶护符" />
+      <item probability="1.0" number="-1" key="龙泉剑" />
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+    </map>
+    <map key="天关.炼狱.谁才是高手高手高高手" index="2">
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+      <item probability="1.0" number="-1" key="圣战之药" />
+      <item probability="0.3" number="1" key="黑暗遗篇之黑天死炎" />
+      <item probability="0.3" number="2" key="乾坤大挪移心法" />
+      <item probability="0.3" number="3" key="素心神剑心得" />
+      <item probability="0.3" number="3" key="太极心得手抄本" />
+      <item probability="0.3" number="1" key="华佗遗篇" />
+      <item probability="0.3" number="3" key="凌波微步图谱" />
+      <item probability="0.3" number="3" key="无尽斗志" />
+      <item probability="0.3" number="3" key="神行百变秘籍" />
+      <item probability="0.3" number="3" key="厚黑学" />
+      <item probability="0.3" number="1" key="碎裂的怒吼" />
+      <item probability="0.3" number="1" key="沾衣十八跌" />
+      <item probability="0.3" number="1" key="万年长春" />
+    </map>
+    <map key="天关.炼狱.又见血战重阳宫！" index="3">
+      <item probability="0.3" number="3" key="独孤求败的草帽" />
+      <item probability="0.3" number="3" key="达摩祖师的木鱼" />
+      <item probability="0.3" number="3" key="孙悟空的紧箍咒" />
+      <item probability="0.3" number="3" key="蚩尤的护甲" />
+      <item probability="0.3" number="3" key="姜子牙的道袍" />
+      <item probability="0.3" number="3" key="岳飞的重铠" />
+      <item probability="0.3" number="3" key="被诅咒的木刀" />
+      <item probability="0.3" number="3" key="真.倚天剑" />
+      <item probability="0.3" number="3" key="真.屠龙刀" />
+      <item probability="0.3" number="3" key="真.打狗棒" />
+      <item probability="0.3" number="3" key="真.灭仙爪" />
+      <item probability="0.3" number="1" key="魔神信物" />
+      <item probability="0.3" number="1" key="千变魔女的披风" />
+      <item probability="1.0" number="-1" key="圣战之药" />
+    </map>
+    <condition value="天关.炼狱之证" type="have_item" />
+    <condition value="crazy" type="game_mode" />
+  </tower>
+  <tower desc="最终华山论剑" key="华山论剑">
+    <condition value="天关.华山论剑之证" type="have_item" />
+    <map key="华山论剑.不服输的高手们" index="0">
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+    </map>
+    <map key="华山论剑.来吧，把你们统统打倒" index="1">
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+    </map>
+    <map key="华山论剑.不怕死的就上吧" index="2">
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+    </map>
+    <map key="华山论剑.天下第一战" index="3">
+      <item probability="1.0" number="-1" key="仙灵琼露" />
+    </map>
+  </tower>
+  <tower desc=" " key="江湖生死战">
+    <condition value="天关.不可能之证" type="have_item" />
+    <map key="江湖生死战.之一" index="0" />
+  </tower>
+</root>

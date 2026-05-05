@@ -1,0 +1,149 @@
+using System.Globalization;
+using Game.Core.Abstractions;
+using Game.Core.Affix;
+using Game.Core.Definitions.Skills;
+using Game.Core.Model;
+
+namespace Game.Application.Formatters;
+
+public static class AffixFormatter
+{
+    private enum ValueDisplayKind
+    {
+        Plain,
+        Percentage
+    }
+
+    private readonly record struct ValueDisplaySpec(ValueDisplayKind Kind, double AdditiveScale = 1d);
+
+    public static string FormatCn(AffixDefinition affix, IContentRepository contentRepository)
+    {
+        ArgumentNullException.ThrowIfNull(affix);
+        ArgumentNullException.ThrowIfNull(contentRepository);
+
+        return affix switch
+        {
+            StatModifierAffix statModifier => $"{FormatterTextCn.GetStatNameCn(statModifier.Stat)}{FormatStatModifierValueCn(statModifier.Stat, statModifier.Value)}",
+            GrantTalentAffix grantTalent => $"天赋「{FormatterTextCn.ResolveTalentName(grantTalent.TalentId, contentRepository)}」",
+            GrantModelAffix grantModel => $"时装「{GetModelDisplayText(grantModel)}」",
+            SkillBonusModifierAffix skillBonus => $"技能「{FormatterTextCn.ResolveSkillName(skillBonus.SkillId, contentRepository)}」威力{FormatModifierValueCn(skillBonus.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
+            WeaponBonusModifierAffix weaponBonus => $"{FormatterTextCn.GetWeaponTypeNameCn(weaponBonus.WeaponType)}类武功威力{FormatModifierValueCn(weaponBonus.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
+            LegendSkillChanceModifierAffix legendChance => $"绝技「{FormatterTextCn.ResolveSkillName(legendChance.SkillId, contentRepository)}」触发率{FormatModifierValueCn(legendChance.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
+            _ => throw new NotSupportedException($"Unsupported affix type '{affix.GetType().Name}'.")
+        };
+    }
+
+    public static string FormatCn(SkillAffixDefinition affix, IContentRepository contentRepository)
+    {
+        ArgumentNullException.ThrowIfNull(contentRepository);
+
+        var effectText = FormatCn(affix.Effect, contentRepository);
+        var parts = new List<string>(2);
+
+        if (affix.MinimumLevel > 1)
+        {
+            parts.Add($"{affix.MinimumLevel}级解锁");
+        }
+
+        if (affix.RequiresEquippedInternalSkill)
+        {
+            parts.Add("装备生效");
+        }
+
+        return parts.Count == 0
+            ? effectText
+            : $"{string.Join('，', parts)}：{effectText}";
+    }
+
+    public static IReadOnlyList<string> FormatLinesCn(
+        IEnumerable<AffixDefinition> affixes,
+        IContentRepository contentRepository)
+    {
+        ArgumentNullException.ThrowIfNull(affixes);
+        ArgumentNullException.ThrowIfNull(contentRepository);
+
+        return affixes.Select(affix => FormatCn(affix, contentRepository)).ToList();
+    }
+
+    public static IReadOnlyList<string> FormatLinesCn(
+        IEnumerable<SkillAffixDefinition> affixes,
+        IContentRepository contentRepository)
+    {
+        ArgumentNullException.ThrowIfNull(affixes);
+        ArgumentNullException.ThrowIfNull(contentRepository);
+
+        return affixes.Select(affix => FormatCn(affix, contentRepository)).ToList();
+    }
+
+    private static string GetModelDisplayText(GrantModelAffix affix) =>
+        string.IsNullOrWhiteSpace(affix.Description) ? affix.ModelId : affix.Description;
+
+    private static string FormatStatModifierValueCn(StatType statType, ModifierValue value) =>
+        FormatModifierValueCn(value, GetStatValueDisplaySpec(statType));
+
+    private static string FormatModifierValueCn(ModifierValue value, ValueDisplaySpec displaySpec) =>
+        value.Op switch
+        {
+            ModifierOp.Add => FormatAdditiveValueCn(value.Delta, displaySpec),
+            ModifierOp.Increase => FormatMultiplierValueCn(value.Delta),
+            ModifierOp.More => FormatMoreValueCn(value.Delta),
+            ModifierOp.PostAdd => FormatAdditiveValueCn(value.Delta, displaySpec),
+            _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
+        };
+
+    private static string FormatAdditiveValueCn(double value, ValueDisplaySpec displaySpec)
+    {
+        var scaledValue = Math.Round(
+            value * displaySpec.AdditiveScale,
+            6,
+            MidpointRounding.AwayFromZero);
+        return displaySpec.Kind switch
+        {
+            ValueDisplayKind.Plain => $" {FormatSignedNumber(scaledValue)}",
+            ValueDisplayKind.Percentage => $" {FormatSignedNumber(scaledValue)}%",
+            _ => throw new ArgumentOutOfRangeException(nameof(displaySpec), displaySpec, null)
+        };
+    }
+
+    private static string FormatMultiplierValueCn(double value)
+    {
+        var percentText = FormatUnsignedNumber(Math.Round(Math.Abs(value) * 100d, 6, MidpointRounding.AwayFromZero));
+        return value >= 0
+            ? $"提高{percentText}%"
+            : $"降低{percentText}%";
+    }
+
+    private static string FormatMoreValueCn(double value)
+    {
+        var percentText = FormatUnsignedNumber(Math.Round(Math.Abs(value - 1d) * 100d, 6, MidpointRounding.AwayFromZero));
+        return value >= 1d
+            ? $"提高{percentText}%"
+            : $"降低{percentText}%";
+    }
+
+    private static string FormatSignedNumber(double value)
+    {
+        var rounded = Math.Round(value, 6, MidpointRounding.AwayFromZero);
+        var numberText = rounded.ToString("0.######", CultureInfo.InvariantCulture);
+        return rounded >= 0 ? $"+{numberText}" : numberText;
+    }
+
+    private static string FormatUnsignedNumber(double value)
+    {
+        var rounded = Math.Round(value, 6, MidpointRounding.AwayFromZero);
+        return rounded.ToString("0.######", CultureInfo.InvariantCulture);
+    }
+
+    private static ValueDisplaySpec GetStatValueDisplaySpec(StatType statType) =>
+        statType switch
+        {
+            StatType.Accuracy => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
+            StatType.CritChance => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
+            StatType.CritMult => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
+            StatType.AntiCritChance => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
+            StatType.Lifesteal => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
+            StatType.AntiDebuff => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
+            _ => new ValueDisplaySpec(ValueDisplayKind.Plain)
+        };
+
+}

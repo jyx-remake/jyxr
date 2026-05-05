@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://clogl7v6nv5x0"]
+
+[ext_resource type="Script" uid="uid://byh01asg0e7rr" path="res://src/Game.Godot/World.cs" id="1_world"]
+[ext_resource type="PackedScene" uid="uid://cx0h6a41fqirj" path="res://scenes/map/map_screen.tscn" id="2_map_screen"]
+[ext_resource type="Script" uid="uid://b4kwdhhutdr0x" path="res://src/Game.Godot/Story/TimedStoryCoordinator.cs" id="3_timed_story"]
+
+[node name="World" type="Control" unique_id=724556095]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_world")
+MapScreenScene = ExtResource("2_map_screen")
+
+[node name="Background" type="TextureRect" parent="." unique_id=147190001]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TimedStoryCoordinator" type="Node" parent="." unique_id=1606403680]
+unique_name_in_owner = true
+script = ExtResource("3_timed_story")

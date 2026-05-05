@@ -1,0 +1,156 @@
+[
+  {
+    "id": "ally_warrior",
+    "name": "Ally Warrior",
+    "stats": {
+      "max_hp": 44,
+      "speed": 35,
+      "movement": 3,
+      "max_mp": 10
+    },
+    "externalSkills": [
+      {
+        "level": 1,
+        "id": "basic_attack"
+      },
+      {
+        "level": 1,
+        "id": "guard_shout"
+      }
+    ],
+    "internalSkills": [],
+    "talentIds": [],
+    "equipmentIds": [
+      "iron_blade"
+    ],
+    "specialSkillIds": []
+  },
+  {
+    "id": "ally_mage",
+    "name": "Ally Mage",
+    "stats": {
+      "max_hp": 30,
+      "speed": 42,
+      "movement": 3,
+      "max_mp": 28
+    },
+    "externalSkills": [
+      {
+        "level": 1,
+        "id": "staff_bolt"
+      },
+      {
+        "level": 1,
+        "id": "fireball"
+      }
+    ],
+    "internalSkills": [],
+    "talentIds": [
+      "battle_focus"
+    ],
+    "equipmentIds": [
+      "oak_staff"
+    ],
+    "specialSkillIds": []
+  },
+  {
+    "id": "ally_cleric",
+    "name": "Ally Cleric",
+    "stats": {
+      "max_hp": 34,
+      "speed": 36,
+      "movement": 3,
+      "max_mp": 24
+    },
+    "externalSkills": [
+      {
+        "level": 1,
+        "id": "smite"
+      },
+      {
+        "level": 1,
+        "id": "minor_heal"
+      }
+    ],
+    "internalSkills": [],
+    "talentIds": [],
+    "equipmentIds": [
+      "ward_charm"
+    ],
+    "specialSkillIds": []
+  },
+  {
+    "id": "enemy_brute",
+    "name": "Enemy Brute",
+    "stats": {
+      "max_hp": 48,
+      "speed": 33,
+      "movement": 3,
+      "max_mp": 0
+    },
+    "externalSkills": [
+      {
+        "level": 1,
+        "id": "basic_attack"
+      },
+      {
+        "level": 1,
+        "id": "rending_blow"
+      }
+    ],
+    "internalSkills": [],
+    "talentIds": [],
+    "equipmentIds": [
+      "iron_blade"
+    ],
+    "specialSkillIds": []
+  },
+  {
+    "id": "enemy_acolyte",
+    "name": "Enemy Acolyte",
+    "stats": {
+      "max_hp": 28,
+      "speed": 39,
+      "movement": 3,
+      "max_mp": 24
+    },
+    "externalSkills": [
+      {
+        "level": 1,
+        "id": "staff_bolt"
+      },
+      {
+        "level": 1,
+        "id": "fireball"
+      }
+    ],
+    "internalSkills": [],
+    "talentIds": [],
+    "equipmentIds": [
+      "oak_staff"
+    ],
+    "specialSkillIds": []
+  },
+  {
+    "id": "enemy_scout",
+    "name": "Enemy Scout",
+    "stats": {
+      "max_hp": 26,
+      "speed": 46,
+      "movement": 4,
+      "max_mp": 8
+    },
+    "externalSkills": [
+      {
+        "level": 1,
+        "id": "basic_attack"
+      }
+    ],
+    "internalSkills": [],
+    "talentIds": [
+      "battle_focus"
+    ],
+    "equipmentIds": [],
+    "specialSkillIds": []
+  }
+]

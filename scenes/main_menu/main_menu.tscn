@@ -1,0 +1,135 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/MainMenu/MainMenu.cs" id="1_main_menu"]
+[ext_resource type="Texture2D" path="res://assets/art/map/taohuadao.jpg" id="2_background"]
+[ext_resource type="Texture2D" path="res://assets/art/misc/cross.png" id="3_cross"]
+[ext_resource type="Texture2D" path="res://assets/art/misc/title.png" id="4_title"]
+[ext_resource type="Texture2D" path="res://assets/art/misc/moji2.png" id="5_button"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="6_jy_button"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main_menu")
+
+[node name="Bg" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Cross" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1324.0
+offset_top = 133.0
+offset_right = -348.0
+offset_bottom = -699.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_cross")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="TextureRect" parent="."]
+layout_mode = 1
+offset_left = 318.0
+offset_top = 108.0
+offset_right = 1345.0
+offset_bottom = 395.0
+mouse_filter = 2
+texture = ExtResource("4_title")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 612.0
+offset_top = 401.0
+offset_right = 1312.0
+offset_bottom = 891.0
+
+[node name="StartButton" type="TextureButton" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(700, 150)
+layout_mode = 2
+texture_normal = ExtResource("5_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("6_jy_button")
+
+[node name="Label" type="Label" parent="VBoxContainer/StartButton"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.88400006
+offset_right = 1.0
+offset_bottom = 0.051986694
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 60
+text = "启程"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LoadButton" type="TextureButton" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(700, 150)
+layout_mode = 2
+texture_normal = ExtResource("5_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("6_jy_button")
+
+[node name="Label" type="Label" parent="VBoxContainer/LoadButton"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.88400006
+offset_right = 1.0
+offset_bottom = 0.051986694
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 60
+text = "追忆"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MusicButton" type="TextureButton" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(700, 150)
+layout_mode = 2
+texture_normal = ExtResource("5_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("6_jy_button")
+
+[node name="Label" type="Label" parent="VBoxContainer/MusicButton"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.88400006
+offset_right = 1.0
+offset_bottom = 0.051986694
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 60
+text = "抚琴"
+horizontal_alignment = 1
+vertical_alignment = 1

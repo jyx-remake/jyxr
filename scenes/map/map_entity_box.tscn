@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://ddj5n2c43qsj6"]
+
+[ext_resource type="Script" uid="uid://c13ybqkrsoqmm" path="res://src/Game.Godot/Map/MapEntityButton.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b173d0wt20k3t" path="res://assets/art/misc/biankuang.png" id="2_frame"]
+[ext_resource type="Texture2D" uid="uid://hhslflvjkysr" path="res://assets/art/misc/dise.png" id="3_mask"]
+[ext_resource type="Shader" uid="uid://da6twnar51dns" path="res://assets/shader/mask.gdshader" id="4_shader"]
+[ext_resource type="Texture2D" uid="uid://cs1psp77hdbsp" path="res://assets/art/ui/town/noevent.png" id="5_default"]
+[ext_resource type="LabelSettings" uid="uid://dujr1paoinppd" path="res://assets/theme/label_map_object.tres" id="6_label"]
+[ext_resource type="Texture2D" uid="uid://bdpoct3im0wgd" path="res://assets/art/misc/tanhao.png" id="7_notice"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_avatar"]
+shader = ExtResource("4_shader")
+shader_parameter/mask_tex = ExtResource("3_mask")
+shader_parameter/mask_use_red_channel = false
+
+[sub_resource type="Animation" id="Animation_notice_reset"]
+length = 0.001
+
+[sub_resource type="Animation" id="Animation_notice_bounce"]
+resource_name = "default"
+length = 2.0
+loop_mode = 1
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Notice:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(186, -23), Vector2(174, 16)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_notice"]
+_data = {
+&"RESET": SubResource("Animation_notice_reset"),
+&"default": SubResource("Animation_notice_bounce")
+}
+
+[node name="MapEntityBox" type="Button" unique_id=1579733610]
+custom_minimum_size = Vector2(256, 256)
+offset_right = 256.0
+offset_bottom = 256.0
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+flat = true
+script = ExtResource("1_script")
+DefaultTexture = ExtResource("5_default")
+
+[node name="Frame" type="TextureRect" parent="." unique_id=1430924282]
+layout_mode = 0
+offset_right = 256.0
+offset_bottom = 256.0
+texture = ExtResource("2_frame")
+expand_mode = 1
+
+[node name="Mask" type="TextureRect" parent="." unique_id=1340125122]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 40.0
+offset_right = 210.0
+offset_bottom = 212.0
+scale = Vector2(1.02, 1.02)
+texture = ExtResource("3_mask")
+expand_mode = 1
+
+[node name="Avatar" type="TextureRect" parent="." unique_id=245001264]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_avatar")
+layout_mode = 0
+offset_left = 39.0
+offset_top = 42.0
+offset_right = 211.0
+offset_bottom = 214.0
+texture = ExtResource("5_default")
+expand_mode = 1
+
+[node name="NameLabel" type="Label" parent="." unique_id=864106716]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -37.0
+offset_top = 215.0
+offset_right = 288.0
+offset_bottom = 292.0
+text = "长安城中心"
+label_settings = ExtResource("6_label")
+horizontal_alignment = 1
+justification_flags = 161
+
+[node name="Notice" type="TextureRect" parent="." unique_id=376641715]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 186.0
+offset_top = -23.0
+offset_right = 350.0
+offset_bottom = 233.0
+scale = Vector2(0.401498, 0.401498)
+texture = ExtResource("7_notice")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1770998024]
+libraries/ = SubResource("AnimationLibrary_notice")
+autoplay = &"default"
+speed_scale = 2.0

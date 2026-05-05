@@ -1,0 +1,137 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Character/CharacterEquipmentTab.cs" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/zbk_wuqi.png" id="2_weapon_slot"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/zbk_fangju.png" id="3_armor_slot"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/zbk_shipin.png" id="4_accessory_slot"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/equipment_box.tscn" id="5_box"]
+[ext_resource type="PackedScene" path="res://scenes/ui/base/jy_button.tscn" id="6_slot_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/equipment_selection_panel.tscn" id="7_selection_panel"]
+
+[node name="CharacterEquipmentTab" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_script")
+EquipmentSelectionPanelScene = ExtResource("7_selection_panel")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 236.0
+offset_top = 120.0
+offset_right = 936.0
+offset_bottom = 320.0
+theme_override_constants/separation = 50
+
+[node name="WeaponSlot" parent="HBoxContainer" instance=ExtResource("6_slot_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture_normal = ExtResource("2_weapon_slot")
+
+[node name="WeaponEmptyLabel" type="Label" parent="HBoxContainer/WeaponSlot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -16.0
+offset_right = 50.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_font_sizes/font_size = 22
+text = "未装备"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WeaponBox" parent="HBoxContainer/WeaponSlot" instance=ExtResource("5_box")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 9.0
+offset_top = 6.0
+offset_right = 189.0
+offset_bottom = 186.0
+scale = Vector2(1.4048016, 1.4048016)
+pivot_offset = Vector2(90, 90)
+
+[node name="ArmorSlot" parent="HBoxContainer" instance=ExtResource("6_slot_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture_normal = ExtResource("3_armor_slot")
+
+[node name="ArmorEmptyLabel" type="Label" parent="HBoxContainer/ArmorSlot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -16.0
+offset_right = 50.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_font_sizes/font_size = 22
+text = "未装备"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ArmorBox" parent="HBoxContainer/ArmorSlot" instance=ExtResource("5_box")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 9.0
+offset_top = 6.0
+offset_right = 189.0
+offset_bottom = 186.0
+scale = Vector2(1.4048016, 1.4048016)
+pivot_offset = Vector2(90, 90)
+
+[node name="AccessorySlot" parent="HBoxContainer" instance=ExtResource("6_slot_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture_normal = ExtResource("4_accessory_slot")
+
+[node name="AccessoryEmptyLabel" type="Label" parent="HBoxContainer/AccessorySlot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -16.0
+offset_right = 50.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_font_sizes/font_size = 22
+text = "未装备"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AccessoryBox" parent="HBoxContainer/AccessorySlot" instance=ExtResource("5_box")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 9.0
+offset_top = 6.0
+offset_right = 189.0
+offset_bottom = 186.0
+scale = Vector2(1.4048016, 1.4048016)
+pivot_offset = Vector2(90, 90)

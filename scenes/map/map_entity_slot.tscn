@@ -1,0 +1,107 @@
+[gd_scene format=3 uid="uid://jl0mhh433a7u"]
+
+[ext_resource type="Script" uid="uid://c13ybqkrsoqmm" path="res://src/Game.Godot/Map/MapEntityButton.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cs1psp77hdbsp" path="res://assets/art/ui/town/noevent.png" id="2_noevent"]
+[ext_resource type="Texture2D" uid="uid://bdpoct3im0wgd" path="res://assets/art/misc/tanhao.png" id="3_notice"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_normal"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pressed"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hover"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_name"]
+font_size = 25
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Animation" id="Animation_notice_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Notice:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(59, -11)]
+}
+
+[sub_resource type="Animation" id="Animation_notice_bounce"]
+resource_name = "default"
+length = 2.0
+loop_mode = 1
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Notice:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.11),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(59, -11), Vector2(56, 5)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_notice"]
+_data = {
+&"RESET": SubResource("Animation_notice_reset"),
+&"default": SubResource("Animation_notice_bounce")
+}
+
+[node name="MapEntitySlot" type="Button" unique_id=1781355164]
+custom_minimum_size = Vector2(80, 80)
+offset_right = 80.0
+offset_bottom = 80.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_normal")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_pressed")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_hover")
+flat = true
+script = ExtResource("1_script")
+DefaultTexture = ExtResource("2_noevent")
+
+[node name="Avatar" type="TextureRect" parent="." unique_id=1516912145]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_noevent")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="." unique_id=184962917]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -35.0
+offset_top = 70.0
+offset_right = 115.0
+offset_bottom = 106.0
+text = "南贤居"
+label_settings = SubResource("LabelSettings_name")
+horizontal_alignment = 1
+
+[node name="Notice" type="TextureRect" parent="." unique_id=402496180]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 59.0
+offset_top = -11.0
+offset_right = 114.0
+offset_bottom = 75.0
+scale = Vector2(0.401498, 0.401498)
+texture = ExtResource("3_notice")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1288017062]
+libraries/ = SubResource("AnimationLibrary_notice")
+autoplay = &"default"
+speed_scale = 2.0

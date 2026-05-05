@@ -1,0 +1,4551 @@
+<root>
+  <battle key="测试战斗" music="" mapkey="city" must="">
+    <roles>
+      <role key="王重阳" face="1" team="1" x="2" index="" y="2" />
+      <role key="松鼠郭靖" face="1" team="1" x="2" index="" y="0" />
+      <role key="乔峰" face="1" team="1" x="2" index="" y="1" />
+      <role key="林朝英" face="1" team="1" x="1" index="" y="2" />
+      <role key="松鼠令狐冲" face="1" team="1" x="2" index="" y="3" />
+      <role key="欧阳锋" face="0" team="2" x="8" y="1" />
+      <role key="黄药师" face="0" team="2" x="8" y="2" />
+      <role key="洪七公" face="0" team="2" x="9" y="2" />
+      <role key="一灯大师" face="0" team="2" x="9" y="0" />
+      <role key="鸠摩智" face="0" team="2" x="7" y="0" />
+      <role key="金轮法王" face="0" team="2" x="7" y="1" />
+      <role key="东方不败" face="0" team="2" x="7" y="2" />
+      <role key="石破天" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="南贤居_木头人_战斗" music="" mapkey="city2" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="2" index="0" y="2" />
+      <role key="木头人" face="1" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="南贤居_经验木头人_战斗" music="" mapkey="city2" must="">
+    <roles>
+      <role key="" face="0" team="1" x="2" index="0" y="1" />
+      <role key="" face="0" team="1" x="2" index="1" y="2" />
+      <role key="" face="0" team="1" x="2" index="2" y="3" />
+      <role key="经验木头人" face="1" team="2" x="7" y="2" />
+      <role key="经验木头人" face="1" team="2" x="8" y="1" />
+      <role key="经验木头人" face="1" team="2" x="8" y="2" />
+      <role key="经验木头人" face="1" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="南贤居_练功木头人_战斗" music="" mapkey="city2" must="">
+    <roles>
+      <role key="" face="0" team="1" x="2" index="0" y="2" />
+      <role key="练功木头人" face="1" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="破庙战田青文" music="" mapkey="shinei" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="2" index="0" y="2" />
+      <role key="田青文" face="1" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="新手任务小孩" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="小孩" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="新手任务黑老大" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="黑老大" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_新手地图.接镖劫匪1" music="" mapkey="shamo" must="">
+    <roles>
+      <role key="" face="0" team="1" x="2" index="0" y="2" />
+      <role key="" face="0" team="1" x="2" index="1" y="3" />
+      <role key="马贼" face="0" team="2" x="8" y="3" />
+      <role key="马贼" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_新手地图.接镖劫匪2" music="" mapkey="zhulin" must="">
+    <roles>
+      <role key="" face="0" team="1" x="2" index="0" y="2" />
+      <role key="" face="0" team="1" x="2" index="1" y="3" />
+      <role key="" face="0" team="1" x="3" index="2" y="2" />
+      <role key="山贼" face="0" team="2" x="8" y="3" />
+      <role key="山贼" face="0" team="2" x="8" y="2" />
+      <role key="山贼" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="商家堡.商宝震练功" music="" mapkey="shinei2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="商宝震" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="商家堡.商家堡风波1" music="" mapkey="wanshang" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="2" />
+      <role key="" face="1" team="1" x="1" index="3" y="3" />
+      <role key="商宝震" face="0" team="2" x="9" y="2" />
+      <role key="商老太" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random>
+      <role name="商家堡众" level="0" face="0" x="6" y="0" />
+      <role name="商家堡众" level="0" face="0" x="6" y="1" />
+      <role name="商家堡众" level="0" face="0" x="6" y="3" />
+      <role name="商家堡众" level="0" face="0" x="7" y="1" />
+      <role name="商家堡众" level="0" face="0" x="7" y="2" />
+      <role name="商家堡众" level="0" face="0" x="8" y="1" />
+      <role name="商家堡众" level="0" face="0" x="10" y="3" />
+      <role name="商家堡众" level="0" face="0" x="10" y="0" />
+    </random>
+  </battle>
+  <battle key="商家堡.商家堡风波2" music="" mapkey="wanshang" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="2" />
+      <role key="" face="1" team="1" x="1" index="3" y="3" />
+      <role key="" face="1" team="1" x="0" index="4" y="2" />
+      <role key="商宝震" face="0" team="2" x="9" y="2" />
+      <role key="商老太" face="0" team="2" x="9" y="3" />
+      <role key="商剑鸣" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random>
+      <role name="商家堡众" level="0" face="0" x="6" y="0" />
+      <role name="商家堡众" level="0" face="0" x="6" y="1" />
+      <role name="商家堡众" level="0" face="0" x="6" y="3" />
+      <role name="商家堡众" level="0" face="0" x="7" y="1" />
+      <role name="商家堡众" level="0" face="0" x="7" y="2" />
+      <role name="商家堡众" level="0" face="0" x="8" y="1" />
+      <role name="商家堡众" level="0" face="0" x="10" y="3" />
+      <role name="商家堡众" level="0" face="0" x="10" y="0" />
+    </random>
+  </battle>
+  <battle key="商家堡.商家堡风波3" music="" mapkey="wanshang" must="主角#胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="2" />
+      <role key="" face="1" team="1" x="1" index="3" y="3" />
+      <role key="" face="1" team="1" x="0" index="4" y="2" />
+      <role key="商剑鸣" face="0" team="2" x="7" y="2" />
+      <role key="商剑鸣" face="0" team="2" x="7" y="3" />
+      <role key="商剑鸣" face="0" team="2" x="6" y="2" />
+      <role key="商剑鸣" face="0" team="2" x="6" y="3" />
+      <role key="商剑鸣" face="0" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="胡斐居.战斗" music="" mapkey="yewai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="胡斐" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="阎基居.战斗" music="" mapkey="city2" must="主角#胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="3" index="1" y="1" />
+      <role key="" face="1" team="1" x="3" index="0" y="3" />
+      <role key="阎基" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="阎基居.战斗.七星海棠" music="" mapkey="city2" must="主角#胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="3" index="1" y="1" />
+      <role key="" face="1" team="1" x="3" index="0" y="3" />
+      <role key="阎基" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random>
+      <role name="江湖流氓" level="1" face="0" x="5" y="0" />
+      <role name="江湖流氓" level="1" face="1" x="0" y="0" />
+      <role name="江湖流氓" level="1" face="1" x="0" y="1" />
+      <role name="江湖流氓" level="1" face="0" x="5" y="1" />
+      <role name="江湖流氓" level="1" face="1" x="1" y="1" />
+      <role name="江湖流氓" level="1" face="1" x="1" y="3" />
+    </random>
+  </battle>
+  <battle key="佛山镇.凤天南作恶.战斗" music="" mapkey="city" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="凤天南" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random>
+      <role name="五虎派弟子" level="0" face="0" x="8" y="0" />
+      <role name="五虎派弟子" level="0" face="0" x="7" y="2" />
+      <role name="五虎派弟子" level="0" face="0" x="7" y="3" />
+      <role name="五虎派弟子" level="0" face="0" x="6" y="1" />
+      <role name="五虎派弟子" level="0" face="0" x="5" y="3" />
+      <role name="五虎派弟子" level="0" face="0" x="5" y="0" />
+    </random>
+  </battle>
+  <battle key="湘妃庙.凤天南作恶.战斗" music="" mapkey="shinei" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="1" />
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="凤天南" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random>
+      <role name="五虎派保镖" level="1" face="0" x="8" y="0" />
+      <role name="五虎派保镖" level="1" face="0" x="7" y="2" />
+      <role name="五虎派保镖" level="1" face="0" x="7" y="3" />
+      <role name="五虎派保镖" level="1" face="0" x="6" y="1" />
+      <role name="五虎派保镖" level="1" face="0" x="5" y="3" />
+      <role name="五虎派保镖" level="1" face="0" x="5" y="0" />
+    </random>
+  </battle>
+  <battle key="苗人凤居.苗人凤被毒.战斗" music="" mapkey="yewai3" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="0" y="3" />
+      <role key="" face="1" team="1" x="4" index="1" y="2" />
+    </roles>
+    <random>
+      <role name="天龙门弟子" level="1" face="1" x="2" y="3" />
+      <role name="天龙门弟子" level="1" face="0" x="8" y="2" />
+      <role name="天龙门弟子" level="1" face="0" x="8" y="1" />
+    </random>
+  </battle>
+  <battle key="苗人凤居.田归农来战.战斗" music="" mapkey="yewai3" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="1" y="2" />
+      <role key="" face="1" team="1" x="5" index="0" y="3" />
+      <role key="田归农" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random>
+      <role name="天龙门弟子" level="2" face="0" x="7" y="2" />
+      <role name="天龙门弟子" level="2" face="1" x="8" y="3" />
+      <role name="天龙门弟子" level="2" face="1" x="8" y="1" />
+      <role name="天龙门弟子" level="2" face="1" x="6" y="0" />
+      <role name="天龙门弟子" level="2" face="1" x="5" y="0" />
+      <role name="天龙门弟子" level="2" face="1" x="6" y="1" />
+      <role name="天龙门弟子" level="2" face="1" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="苗人凤居.阎基对峙.杀苗人凤.战斗" music="" mapkey="yewai3" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="1" y="3" />
+      <role key="" face="1" team="1" x="5" index="0" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="3" />
+      <role key="苗人凤" face="0" team="2" x="4" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="苗人凤居.田归农胡斐.杀苗人凤.战斗" music="" mapkey="yewai3" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="1" y="3" />
+      <role key="" face="1" team="1" x="5" index="0" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="3" />
+      <role key="苗人凤" face="0" team="2" x="4" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="湘妃庙.田归农.阎基.战斗" music="" mapkey="wanshang" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="0" />
+      <role key="" face="1" team="1" x="3" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="田归农" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random>
+      <role name="天龙门弟子" level="1" face="0" x="8" y="0" />
+      <role name="天龙门弟子" level="1" face="0" x="7" y="0" />
+      <role name="天龙门弟子" level="1" face="0" x="8" y="3" />
+      <role name="天龙门弟子" level="1" face="0" x="5" y="2" />
+      <role name="天龙门弟子" level="1" face="0" x="5" y="1" />
+      <role name="天龙门弟子" level="1" face="0" x="5" y="3" />
+    </random>
+  </battle>
+  <battle key="湘妃庙.胡斐单挑田归农阎基.战斗" music="" mapkey="wanshang" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="变态田归农" face="0" team="2" x="8" y="2" />
+      <role key="阎基" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="湘妃庙.胡斐单挑田归农.战斗" music="" mapkey="wanshang" must="胡斐">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="变态田归农" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="苗人凤居.回忆战.战斗" music="音乐.刀间鼓" mapkey="yewai3" must="胡斐">
+    <roles>
+      <role key="" face="0" team="1" x="4" index="1" y="2" />
+      <role key="" face="1" team="1" x="5" index="0" y="3" />
+      <role key="胡一刀" face="1" team="2" x="3" y="3" />
+      <role key="苗人凤" face="0" team="2" x="7" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="药王庄.毒手药王.战斗" music="" mapkey="shanding" must="程灵素#主角">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="1" y="1" />
+      <role key="" face="1" team="1" x="5" index="0" y="3" />
+      <role key="毒手药王" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="药王庄.毒手药王.单挑战.战斗" music="" mapkey="shanding" must="程灵素">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="毒手药王" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="古墓内_战斗1" music="" mapkey="mojiao" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="李莫愁" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="绝情谷大厅_战斗1" music="" mapkey="shinei2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="1" />
+      <role key="" face="1" team="1" x="1" index="4" y="3" />
+      <role key="" face="1" team="1" x="1" index="5" y="0" />
+      <role key="公孙谷主" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random>
+      <role name="绝情谷众" level="1" face="0" x="6" y="0" />
+      <role name="绝情谷众" level="1" face="0" x="8" y="1" />
+      <role name="绝情谷众" level="1" face="0" x="9" y="3" />
+      <role name="绝情谷众" level="1" face="0" x="9" y="1" />
+      <role name="绝情谷众" level="1" face="0" x="9" y="2" />
+      <role name="绝情谷众" level="1" face="0" x="7" y="0" />
+      <role name="绝情谷众" level="1" face="0" x="7" y="3" />
+      <role name="绝情谷众" level="1" face="0" x="7" y="1" />
+      <role name="绝情谷众" level="1" face="0" x="5" y="1" />
+      <role name="绝情谷众" level="1" face="0" x="5" y="2" />
+    </random>
+  </battle>
+  <battle key="风陵渡口.郭襄_战斗1" music="" mapkey="yewai2" must="主角#田伯光">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="郭芙" face="0" team="2" x="8" y="3" />
+      <role key="郭襄" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random>
+      <role name="郭家随从" level="0" face="0" x="4" y="1" />
+      <role name="郭家随从" level="0" face="0" x="3" y="3" />
+      <role name="郭家随从" level="0" face="0" x="7" y="1" />
+      <role name="郭家随从" level="0" face="0" x="7" y="3" />
+      <role name="郭家随从" level="0" face="0" x="9" y="1" />
+      <role name="郭家随从" level="0" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="鹿鼎记_神龙岛" music="" mapkey="zhulin" must="主角#韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="洪教主" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random>
+      <role name="神龙教教众" level="2" face="0" x="3" y="1" />
+      <role name="神龙教教众" level="2" face="0" x="3" y="3" />
+      <role name="神龙教教众" level="2" face="0" x="7" y="1" />
+      <role name="神龙教教众" level="2" face="0" x="7" y="3" />
+      <role name="神龙教教众" level="2" face="0" x="9" y="1" />
+      <role name="神龙教教众" level="2" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="剑魔荒冢_战斗.杨过" music="" mapkey="jianchi" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="杨过" face="0" team="2" x="8" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="剑魔荒冢_战斗.神雕" music="" mapkey="jianchi" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="0" y="2" />
+      <role key="" face="1" team="1" x="4" index="1" y="3" />
+      <role key="神雕" face="1" team="2" x="0" y="0" />
+      <role key="神雕" face="0" team="2" x="8" y="3" />
+      <role key="神雕" face="0" team="2" x="9" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="剑魔荒冢_战斗.杀死杨过" music="" mapkey="jianchi" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="神雕" face="0" team="2" x="9" y="0" />
+      <role key="杨过" face="0" team="2" x="8" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="绝情谷底_战斗1" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="2" />
+      <role key="杨过" face="1" team="2" x="0" y="2" />
+      <role key="小龙女" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="刀白凤树林_战斗1" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="1" />
+      <role key="刀白凤" face="1" team="1" x="5" index="" y="3" />
+      <role key="云中鹤" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random>
+      <role name="恶人" level="0" face="1" x="2" y="2" />
+      <role name="恶人" level="0" face="1" x="2" y="3" />
+      <role name="恶人" level="0" face="0" x="7" y="3" />
+      <role name="恶人" level="0" face="0" x="7" y="1" />
+    </random>
+  </battle>
+  <battle key="岳老三树林_战斗1" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="1" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="岳老三" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random>
+      <role name="恶人" level="0" face="0" x="6" y="2" />
+      <role name="恶人" level="0" face="0" x="6" y="1" />
+      <role name="恶人" level="0" face="0" x="5" y="1" />
+      <role name="恶人" level="0" face="0" x="5" y="3" />
+      <role name="恶人" level="0" face="0" x="7" y="0" />
+      <role name="恶人" level="0" face="0" x="7" y="2" />
+      <role name="恶人" level="0" face="0" x="7" y="3" />
+    </random>
+  </battle>
+  <battle key="木婉清树林_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="木婉清(蒙面)" face="1" team="1" x="3" index="" y="0" />
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="0" />
+      <role key="童姥使者" face="0" team="2" x="6" y="3" />
+      <role key="童姥使者" face="0" team="2" x="6" y="2" />
+      <role key="童姥使者" face="0" team="2" x="5" y="2" />
+      <role key="童姥使者" face="0" team="2" x="5" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="木婉清树林杀死_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="木婉清(蒙面)" face="1" team="2" x="0" y="2" />
+      <role key="童姥使者" face="0" team="2" x="6" y="3" />
+      <role key="童姥使者" face="0" team="2" x="6" y="2" />
+      <role key="童姥使者" face="0" team="2" x="5" y="2" />
+      <role key="童姥使者" face="0" team="2" x="5" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="再见木婉清_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="木婉清" face="1" team="2" x="0" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="touch木婉清失败_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="段延庆" face="0" team="2" x="7" y="1" />
+      <role key="叶二娘" face="0" team="2" x="7" y="3" />
+      <role key="岳老三" face="0" team="2" x="6" y="2" />
+      <role key="云中鹤" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="镇南王府.身世_战斗" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="0" />
+      <role key="" face="1" team="1" x="1" index="2" y="0" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="" face="1" team="1" x="0" index="4" y="1" />
+      <role key="段正淳" face="0" team="2" x="5" y="3" />
+      <role key="褚万里" face="0" team="2" x="6" y="1" />
+      <role key="古笃诚" face="0" team="2" x="6" y="0" />
+      <role key="傅思归" face="0" team="2" x="6" y="2" />
+      <role key="朱丹臣" face="0" team="2" x="5" y="0" />
+    </roles>
+    <random>
+      <role name="王府随从" level="0" face="0" x="4" y="0" />
+      <role name="王府随从" level="0" face="0" x="4" y="2" />
+      <role name="王府随从" level="0" face="0" x="7" y="0" />
+      <role name="王府随从" level="0" face="0" x="7" y="2" />
+      <role name="王府随从" level="0" face="0" x="8" y="3" />
+      <role name="王府随从" level="0" face="0" x="8" y="1" />
+      <role name="王府随从" level="0" face="0" x="9" y="0" />
+      <role name="王府随从" level="0" face="0" x="10" y="3" />
+    </random>
+  </battle>
+  <battle key="镇南王府.救木婉清_战斗" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="0" />
+      <role key="" face="1" team="1" x="1" index="2" y="0" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="褚万里" face="0" team="2" x="6" y="1" />
+      <role key="古笃诚" face="0" team="2" x="6" y="0" />
+      <role key="傅思归" face="0" team="2" x="6" y="2" />
+      <role key="朱丹臣" face="0" team="2" x="5" y="0" />
+    </roles>
+    <random>
+      <role name="大理高手" level="1" face="0" x="4" y="0" />
+      <role name="大理高手" level="1" face="0" x="4" y="2" />
+      <role name="大理高手" level="1" face="0" x="7" y="0" />
+      <role name="大理高手" level="1" face="0" x="7" y="2" />
+      <role name="大理高手" level="1" face="0" x="8" y="3" />
+      <role name="大理高手" level="1" face="0" x="8" y="1" />
+      <role name="大理高手" level="1" face="0" x="9" y="0" />
+      <role name="大理高手" level="1" face="0" x="10" y="3" />
+    </random>
+  </battle>
+  <battle key="田伯光居_战斗1" music="" mapkey="city3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="田伯光" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="血刀门_宝象雪遁步行" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="宝象" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="血刀门_胜谛抢民女" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="2" />
+    </roles>
+    <random>
+      <role name="见义勇为之士" level="1" face="1" x="2" y="2" />
+      <role name="见义勇为之士" level="1" face="0" x="8" y="2" />
+    </random>
+  </battle>
+  <battle key="血刀门_门内比武1" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="血刀弟子" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="血刀门_门内比武2" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="宝象" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="血刀门_门内比武3" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="胜谛" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="血刀门_门内比武4" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="善勇" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="血刀门_血刀老祖的试炼1" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="血刀老祖" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="血刀门_血刀老祖的试炼2" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="血刀老祖2" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="血刀门_血刀老祖的试炼3" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="血刀老祖3" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门血刀1" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="血刀老祖2" face="0" team="2" x="9" y="2" />
+      <role key="宝象" face="0" team="2" x="9" y="3" />
+      <role key="善勇" face="0" team="2" x="8" y="2" />
+      <role key="胜谛" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门血刀2" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="血刀老祖3" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="赵志敬_战斗" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="赵志敬" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="门派大比1_谭守诚" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="谭守诚" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="门派大比2_李志常" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="李志常" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="门派大比3_苗守一" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="苗守一" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教大校_战斗1" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="谭守诚" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教大校_战斗2" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="李志常" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教大校_战斗3" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="尹志平" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教大校_战斗4" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="孙不二" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教_马钰" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="7" index="0" y="2" />
+      <role key="马钰" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教_真九阴" music="音乐.神雕.主题" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="1" y="2" />
+      <role key="王重阳" face="0" team="2" x="5" y="0" />
+      <role key="林朝英" face="0" team="2" x="5" y="3" />
+      <role key="丘处机" face="1" team="2" x="2" y="2" />
+      <role key="黄裳" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门全真1" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="1" />
+      <role key="丘处机" face="0" team="2" x="7" y="1" />
+      <role key="孙不二" face="0" team="2" x="7" y="2" />
+      <role key="马钰" face="0" team="2" x="7" y="3" />
+      <role key="李志常" face="0" team="2" x="7" y="0" />
+      <role key="谭守诚" face="0" team="2" x="8" y="1" />
+      <role key="苗守一" face="0" team="2" x="8" y="2" />
+      <role key="赵志敬" face="0" team="2" x="8" y="3" />
+      <role key="尹志平" face="0" team="2" x="8" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门全真2" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="0" />
+      <role key="丘处机" face="0" team="2" x="7" y="2" />
+      <role key="孙不二" face="0" team="2" x="7" y="3" />
+      <role key="马钰" face="0" team="2" x="8" y="3" />
+      <role key="炼狱周伯通" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门全真超级战" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="0" />
+      <role key="松鼠郭靖" face="0" team="2" x="7" y="2" />
+      <role key="松鼠黄蓉" face="0" team="2" x="7" y="3" />
+      <role key="丘处机" face="0" team="2" x="8" y="2" />
+      <role key="炼狱周伯通" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="arena_单挑战" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="0" team="1" x="6" index="0" y="2" />
+      <role key="木头人" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="arena_沙漠4v4" music="" mapkey="shamo" must="">
+    <roles>
+      <role key="" face="0" team="1" x="8" index="0" y="2" />
+      <role key="" face="0" team="1" x="9" index="1" y="3" />
+      <role key="" face="0" team="1" x="9" index="2" y="0" />
+      <role key="" face="0" team="1" x="8" index="3" y="0" />
+      <role key="灭绝师太" face="1" team="2" x="4" y="0" />
+      <role key="周芷若" face="1" team="2" x="3" y="2" />
+      <role key="峨眉弟子" face="1" team="2" x="3" y="0" />
+      <role key="峨眉弟子" face="1" team="2" x="3" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="arena_血战重阳宫" music="" mapkey="menpai3" must="">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="2" />
+      <role key="黄药师" face="1" team="2" x="0" y="0" />
+      <role key="欧阳锋" face="0" team="2" x="10" y="0" />
+      <role key="一灯大师" face="1" team="2" x="10" y="3" />
+      <role key="洪七公" face="0" team="2" x="0" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="arena_三吃一" music="" mapkey="haibian" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="2" />
+      <role key="" face="0" team="1" x="10" index="1" y="0" />
+      <role key="" face="0" team="1" x="10" index="2" y="3" />
+      <role key="狄云" face="1" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="张无忌_战斗" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="张无忌" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="汝阳王府_战斗" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="" face="0" team="1" x="4" index="1" y="2" />
+      <role key="鹤笔翁" face="1" team="2" x="0" y="2" />
+      <role key="鹿杖客" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random>
+      <role name="精兵铁卫" level="1" face="0" x="7" y="1" />
+      <role name="精兵铁卫" level="1" face="0" x="7" y="3" />
+      <role name="精兵铁卫" level="1" face="1" x="1" y="3" />
+    </random>
+  </battle>
+  <battle key="武当山_战斗" music="" mapkey="shanding" must="张无忌#主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="0" />
+      <role key="" face="1" team="1" x="1" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="宋远桥" face="0" team="2" x="8" y="0" />
+      <role key="俞莲舟" face="0" team="2" x="8" y="1" />
+      <role key="俞岱岩" face="0" team="2" x="8" y="2" />
+      <role key="张松溪" face="0" team="2" x="8" y="3" />
+      <role key="张翠山" face="0" team="2" x="9" y="0" />
+      <role key="殷梨亭" face="0" team="2" x="9" y="3" />
+      <role key="莫声谷" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="金刚伏魔圈" music="" mapkey="yewai3" must="张无忌#主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="2" />
+      <role key="" face="1" team="1" x="5" index="1" y="1" />
+      <role key="" face="0" team="1" x="5" index="2" y="3" />
+      <role key="渡劫" face="1" team="2" x="0" y="0" />
+      <role key="渡难" face="1" team="2" x="0" y="3" />
+      <role key="渡厄" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="金刚伏魔圈邪线" music="" mapkey="yewai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="2" />
+      <role key="" face="1" team="1" x="5" index="1" y="1" />
+      <role key="" face="0" team="1" x="5" index="2" y="3" />
+      <role key="渡劫" face="1" team="2" x="0" y="0" />
+      <role key="渡难" face="1" team="2" x="0" y="3" />
+      <role key="渡厄" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山坐忘峰_战斗" music="" mapkey="shanding" must="张无忌#主角">
+    <roles>
+      <role key="" face="0" team="1" x="8" index="0" y="2" />
+      <role key="" face="0" team="1" x="8" index="1" y="3" />
+      <role key="岳肃" face="1" team="2" x="2" y="3" />
+      <role key="蔡子峰" face="1" team="2" x="2" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="青城派_战斗" music="" mapkey="zhulin" must="张无忌">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="长青子" face="0" team="2" x="6" y="2" />
+      <role key="青城精英弟子" face="0" team="2" x="5" y="0" />
+      <role key="青城精英弟子" face="0" team="2" x="5" y="2" />
+      <role key="青城精英弟子" face="0" team="2" x="7" y="0" />
+      <role key="青城精英弟子" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="劝说青城张无忌_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="变身张无忌" face="0" team="2" x="9" y="2" />
+      <role key="周芷若" face="0" team="2" x="9" y="1" />
+      <role key="赵敏" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关战斗_鄱阳湖对陈友谅" music="" mapkey="shuizhan" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="" face="0" team="1" x="5" index="1" y="2" />
+      <role key="" face="0" team="1" x="5" index="2" y="3" />
+      <role key="" face="1" team="1" x="6" index="3" y="0" />
+      <role key="" face="1" team="1" x="6" index="4" y="3" />
+      <role key="火枪兵" face="1" team="2" x="0" y="0" />
+      <role key="火枪兵" face="1" team="2" x="0" y="2" />
+      <role key="火枪兵" face="1" team="2" x="0" y="3" />
+      <role key="火枪兵" face="0" team="2" x="10" y="0" />
+      <role key="火枪兵" face="0" team="2" x="10" y="3" />
+      <role key="精兵铁卫" face="1" team="2" x="2" y="0" />
+      <role key="精兵铁卫" face="1" team="2" x="2" y="1" />
+      <role key="精兵铁卫" face="1" team="2" x="2" y="2" />
+      <role key="精兵铁卫" face="0" team="2" x="9" y="0" />
+      <role key="精兵铁卫" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="光明圣火阵_战斗" music="" mapkey="heiyijiao" must="主角#张无忌">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="" face="0" team="1" x="5" index="2" y="3" />
+      <role key="紫衫龙王" face="1" team="2" x="0" y="3" />
+      <role key="殷天正" face="1" team="2" x="1" y="3" />
+      <role key="谢逊" face="1" team="2" x="2" y="2" />
+      <role key="韦一笑" face="0" team="2" x="9" y="0" />
+      <role key="杨逍" face="0" team="2" x="8" y="2" />
+      <role key="范遥" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="鄱阳湖张无忌_战斗" music="" mapkey="shuizhan" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="2" />
+      <role key="变身张无忌" face="0" team="2" x="10" y="2" />
+      <role key="彭和尚" face="0" team="2" x="8" y="1" />
+      <role key="火枪兵" face="0" team="2" x="6" y="0" />
+      <role key="火枪兵" face="0" team="2" x="6" y="3" />
+      <role key="精兵铁卫" face="0" team="2" x="5" y="0" />
+      <role key="精兵铁卫" face="0" team="2" x="5" y="1" />
+      <role key="精兵铁卫" face="0" team="2" x="5" y="2" />
+      <role key="精兵铁卫" face="0" team="2" x="5" y="3" />
+      <role key="精兵铁卫" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关战斗_邪线鄱阳湖" music="" mapkey="shuizhan" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="2" />
+      <role key="火枪兵" face="0" team="2" x="6" y="0" />
+      <role key="火枪兵" face="0" team="2" x="6" y="1" />
+      <role key="火枪兵" face="0" team="2" x="6" y="3" />
+      <role key="火枪兵" face="0" team="2" x="6" y="2" />
+      <role key="火枪兵" face="0" team="2" x="7" y="3" />
+      <role key="火枪兵" face="0" team="2" x="7" y="1" />
+      <role key="精兵铁卫" face="0" team="2" x="5" y="1" />
+      <role key="精兵铁卫" face="0" team="2" x="5" y="3" />
+      <role key="常遇春" face="0" team="2" x="9" y="1" />
+      <role key="徐达" face="0" team="2" x="9" y="3" />
+      <role key="变身张无忌" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="杀康茂才_战斗" music="" mapkey="shuizhan" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="2" />
+      <role key="火枪兵" face="0" team="2" x="6" y="0" />
+      <role key="火枪兵" face="0" team="2" x="6" y="1" />
+      <role key="火枪兵" face="0" team="2" x="6" y="3" />
+      <role key="火枪兵" face="0" team="2" x="6" y="2" />
+      <role key="火枪兵" face="0" team="2" x="7" y="3" />
+      <role key="火枪兵" face="0" team="2" x="7" y="1" />
+      <role key="精兵铁卫" face="0" team="2" x="5" y="1" />
+      <role key="精兵铁卫" face="0" team="2" x="5" y="3" />
+      <role key="康茂才" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="大理夺阵_战斗" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="大理内家高手" face="0" team="2" x="5" y="0" />
+      <role key="大理内家高手" face="0" team="2" x="5" y="1" />
+      <role key="大理内家高手" face="0" team="2" x="6" y="1" />
+      <role key="大理内家高手" face="0" team="2" x="6" y="3" />
+      <role key="大理内家高手" face="0" team="2" x="7" y="0" />
+      <role key="大理内家高手" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灵鹫宫_阿猫阿狗之战" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="童姥使者" face="1" team="2" x="0" y="3" />
+      <role key="童姥使者" face="1" team="2" x="0" y="1" />
+      <role key="童姥使者" face="0" team="2" x="8" y="1" />
+      <role key="童姥使者" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灵鹫宫_李秋水之战" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="李秋水" face="1" team="2" x="0" y="3" />
+      <role key="李秋水" face="1" team="2" x="0" y="1" />
+      <role key="李秋水" face="0" team="2" x="8" y="1" />
+      <role key="李秋水" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门灵鹫1" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="秦婆婆" face="0" team="2" x="7" y="3" />
+      <role key="虚竹" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门灵鹫2" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="0" />
+      <role key="天山童姥" face="0" team="2" x="8" y="2" />
+      <role key="虚竹" face="0" team="2" x="8" y="3" />
+      <role key="李秋水" face="0" team="2" x="8" y="0" />
+      <role key="李秋水" face="0" team="2" x="5" y="2" />
+      <role key="李秋水" face="0" team="2" x="5" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灵鹫宫_童姥之死" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="虚竹" face="1" team="1" x="3" index="" y="0" />
+      <role key="" face="1" team="1" x="2" index="0" y="0" />
+      <role key="李秋水" face="0" team="2" x="6" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灵鹫宫_慕容复" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="0" />
+      <role key="虚竹" face="1" team="1" x="3" index="" y="2" />
+      <role key="慕容复" face="0" team="2" x="8" y="2" />
+      <role key="包不同" face="0" team="2" x="6" y="0" />
+      <role key="风波恶" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天山_对战虚竹天山童姥" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="0" />
+      <role key="" face="1" team="1" x="3" index="1" y="2" />
+      <role key="李秋水" face="1" team="1" x="0" index="" y="2" />
+      <role key="天山童姥" face="0" team="2" x="8" y="3" />
+      <role key="虚竹" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖东方_战斗" music="" mapkey="mojiao" must="令狐冲#主角#任盈盈">
+    <roles>
+      <role key="" face="0" team="1" x="10" index="0" y="2" />
+      <role key="" face="1" team="1" x="0" index="1" y="0" />
+      <role key="" face="1" team="1" x="0" index="2" y="1" />
+      <role key="受重伤的东方不败" face="0" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="琴居东方_战斗" music="" mapkey="menpai" must="令狐冲#主角#任盈盈">
+    <roles>
+      <role key="" face="0" team="1" x="10" index="0" y="2" />
+      <role key="" face="1" team="1" x="0" index="1" y="0" />
+      <role key="" face="1" team="1" x="0" index="2" y="1" />
+      <role key="东方不败" face="1" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="风陵渡黑衣人_战斗" music="" mapkey="yewai2" must="令狐冲#主角#任盈盈">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="2" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="1" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="0" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关战斗_围攻黑木崖" music="" mapkey="mojiao" must="令狐冲#主角#任盈盈">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="2" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="1" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="0" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="2" />
+      <role key="蒙面黑衣人" face="0" team="2" x="7" y="2" />
+      <role key="蒙面黑衣人" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="战东方不败_战斗" music="" mapkey="mojiao" must="令狐冲#主角#任盈盈">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="2" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="1" />
+      <role key="蒙面黑衣人" face="0" team="2" x="4" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="0" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="3" />
+      <role key="蒙面黑衣人" face="0" team="2" x="6" y="2" />
+      <role key="蒙面黑衣人" face="0" team="2" x="7" y="2" />
+      <role key="蒙面黑衣人" face="0" team="2" x="7" y="3" />
+      <role key="东方不败" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="令狐挑东方_战斗" music="" mapkey="mojiao" must="令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="东方不败" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="鸳鸯刀_太岳四侠战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="2" />
+      <role key="烟霞神龙" face="0" team="2" x="6" y="0" />
+      <role key="双手开碑" face="0" team="2" x="6" y="1" />
+      <role key="流星赶月" face="0" team="2" x="6" y="2" />
+      <role key="盖七省" face="0" team="2" x="6" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="鸳鸯刀风陵渡1_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="2" />
+      <role key="烟霞神龙" face="0" team="2" x="6" y="0" />
+      <role key="双手开碑" face="0" team="2" x="6" y="1" />
+      <role key="流星赶月" face="0" team="2" x="6" y="2" />
+      <role key="盖七省" face="0" team="2" x="6" y="3" />
+      <role key="萧中慧" face="0" team="2" x="8" y="3" />
+      <role key="袁冠南" face="0" team="2" x="8" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="鸳鸯刀正风陵渡_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="卓天雄" face="0" team="2" x="7" y="2" />
+      <role key="精兵铁卫" face="0" team="2" x="4" y="2" />
+      <role key="精兵铁卫" face="0" team="2" x="4" y="3" />
+      <role key="精兵铁卫" face="0" team="2" x="4" y="0" />
+      <role key="精兵铁卫" face="0" team="2" x="6" y="0" />
+      <role key="精兵铁卫" face="0" team="2" x="6" y="3" />
+      <role key="精兵铁卫" face="0" team="2" x="6" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="笑傲邪华山_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="梁发" face="0" team="2" x="10" y="2" />
+      <role key="华山高手" face="0" team="2" x="7" y="0" />
+      <role key="华山高手" face="0" team="2" x="7" y="2" />
+      <role key="华山高手" face="0" team="2" x="7" y="3" />
+      <role key="华山高手" face="0" team="2" x="7" y="1" />
+      <role key="华山高手" face="0" team="2" x="8" y="0" />
+      <role key="华山高手" face="0" team="2" x="8" y="2" />
+      <role key="华山弟子" face="0" team="2" x="6" y="1" />
+      <role key="华山弟子" face="0" team="2" x="6" y="3" />
+      <role key="华山弟子" face="0" team="2" x="5" y="1" />
+      <role key="华山弟子" face="0" team="2" x="5" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="收服恒山_战斗" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="松鼠令狐冲" face="0" team="2" x="8" y="2" />
+      <role key="向问天" face="0" team="2" x="7" y="0" />
+      <role key="神级任盈盈" face="0" team="2" x="7" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="笑傲邪_并派战斗" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="左冷禅" face="1" team="1" x="2" index="" y="2" />
+      <role key="鲁连荣" face="0" team="2" x="8" y="2" />
+      <role key="天乙真人" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="笑傲邪_围攻黑木崖战斗2" music="" mapkey="shanding" must="主角#神林平之">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="0" />
+      <role key="" face="1" team="1" x="1" index="1" y="1" />
+      <role key="东方不败" face="1" team="1" x="0" index="" y="2" />
+      <role key="左冷禅" face="1" team="1" x="1" index="" y="3" />
+      <role key="天乙真人" face="1" team="1" x="2" index="" y="0" />
+      <role key="鲁连荣" face="1" team="1" x="2" index="" y="1" />
+      <role key="仪清" face="1" team="1" x="2" index="" y="3" />
+      <role key="任我行" face="0" team="2" x="10" y="2" />
+      <role key="向问天" face="0" team="2" x="8" y="0" />
+      <role key="上官云" face="0" team="2" x="8" y="1" />
+      <role key="神级任盈盈" face="0" team="2" x="9" y="1" />
+      <role key="松鼠令狐冲" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="笑傲邪_围攻黑木崖战斗3" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="8" index="0" y="2" />
+      <role key="不败令狐冲" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="笑傲江湖_杀死令狐冲" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="8" index="0" y="2" />
+      <role key="松鼠令狐冲" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林寺_火头僧之战" music="" mapkey="yewai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="少林伙夫" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林寺_南少林之战" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="本真和尚" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林寺_大比1" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="少林伙夫" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林寺_大比2" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="罗汉堂首座" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林寺_大比3" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="戒律院首座" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林寺_洗髓经" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="玄生" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林寺_火工头陀之战" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="火工头陀" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_宋青书之战" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="宋青书" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_黑风寨之战" music="" mapkey="yewai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="1" y="2" />
+    </roles>
+    <random>
+      <role name="小混混" level="0" face="1" x="2" y="3" />
+      <role name="小混混" level="0" face="1" x="2" y="1" />
+      <role name="小混混" level="0" face="0" x="6" y="1" />
+      <role name="小混混" level="0" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="武当派_黑白双煞之战" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="黑煞" face="0" team="2" x="9" y="1" />
+      <role key="白煞" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_玄冥二老之战" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="鹤笔翁" face="0" team="2" x="7" y="1" />
+      <role key="鹿杖客" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_余沧海之战" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="余沧海" face="0" team="2" x="7" y="1" />
+      <role key="木高峰" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_殷梨亭考校" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="殷梨亭" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_山顶悟道之战" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="3" index="0" y="2" />
+      <role key="张三丰" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_蛇形刁手之战" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="2" />
+      <role key="太极主角" face="0" team="2" x="10" y="0" />
+      <role key="太极主角" face="0" team="2" x="10" y="3" />
+      <role key="太极主角" face="1" team="2" x="0" y="0" />
+      <role key="太极主角" face="1" team="2" x="0" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_火手判官之战" music="" mapkey="city3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="张召重" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_玉罗刹之战" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="3" index="0" y="2" />
+      <role key="宋远桥" face="1" team="1" x="2" index="" y="1" />
+      <role key="莫声谷" face="1" team="1" x="2" index="" y="3" />
+      <role key="卓一航" face="0" team="2" x="9" y="1" />
+      <role key="练霓裳" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_玉罗刹之战2" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="9" index="0" y="1" />
+      <role key="宋远桥" face="1" team="1" x="2" index="" y="1" />
+      <role key="莫声谷" face="1" team="1" x="2" index="" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武道大会_比武" music="音乐.仙剑奇缘" mapkey="simiao" must="">
+    <roles>
+      <role key="" face="0" team="1" x="0" index="0" y="1" />
+      <role key="" face="0" team="1" x="1" index="1" y="2" />
+      <role key="" face="0" team="1" x="0" index="2" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_天柱峰之战" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="卓一航" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当派_天柱峰之战1" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="忘情卓一航" face="0 " team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑暗的阴影_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="0" team="1" x="9" index="2" y="1" />
+      <role key="" face="0" team="1" x="9" index="3" y="3" />
+      <role key="神秘刺客" face="1" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="神秘剑客_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="0" />
+      <role key="" face="1" team="1" x="0" index="1" y="1" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="" face="1" team="1" x="1" index="4" y="3" />
+      <role key="神秘剑客" face="0" team="2" x="8" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="襄阳_战斗" music="" mapkey="zhanchang" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="0" />
+      <role key="" face="1" team="1" x="0" index="1" y="1" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="" face="1" team="1" x="1" index="4" y="3" />
+      <role key="神秘剑客" face="0" team="2" x="8" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="9" y="0" />
+      <role key="神秘剑客" face="0" team="2" x="9" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="9" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教_襄阳邪教人物" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="神秘剑客" face="0" team="2" x="6" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="襄阳_战斗2" music="" mapkey="zhanchang" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="0" />
+      <role key="" face="1" team="1" x="0" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="" face="1" team="1" x="1" index="4" y="3" />
+      <role key="神秘剑客" face="0" team="2" x="5" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="1" />
+      <role key="神秘伍长" face="0" team="2" x="6" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="3" />
+      <role key="神秘剑客" face="0" team="2" x="7" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="2" />
+      <role key="神秘伍长" face="0" team="2" x="7" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="襄阳_战斗3" music="" mapkey="zhanchang" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="0" />
+      <role key="" face="1" team="1" x="0" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="" face="1" team="1" x="1" index="4" y="3" />
+      <role key="神秘剑客" face="0" team="2" x="5" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="1" />
+      <role key="神秘伍长" face="0" team="2" x="6" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="3" />
+      <role key="神秘剑客" face="0" team="2" x="7" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="2" />
+      <role key="神秘伍长" face="0" team="2" x="7" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="襄阳_战斗4" music="" mapkey="zhanchang" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="0" />
+      <role key="" face="1" team="1" x="0" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="" face="1" team="1" x="1" index="4" y="3" />
+      <role key="神秘剑客" face="0" team="2" x="5" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="5" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="1" />
+      <role key="神秘伍长" face="0" team="2" x="6" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="6" y="3" />
+      <role key="神秘剑客" face="0" team="2" x="7" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="7" y="2" />
+      <role key="神秘伍长" face="0" team="2" x="7" y="3" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="0" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="1" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="2" />
+      <role key="神秘刺客" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="最终战场_战斗" music="" mapkey="heiyijiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="0" />
+      <role key="" face="1" team="1" x="0" index="1" y="1" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="" face="1" team="1" x="1" index="4" y="3" />
+      <role key="神秘使者" face="0" team="2" x="10" y="2" />
+      <role key="神秘刺史" face="0" team="2" x="6" y="1" />
+      <role key="神秘刺史" face="0" team="2" x="6" y="0" />
+      <role key="神秘刺史" face="0" team="2" x="8" y="1" />
+      <role key="神秘刺史" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山论剑群殴战" music="音乐.华山论剑" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="0" y="0" />
+      <role key="" face="1" team="1" x="4" index="1" y="1" />
+      <role key="" face="1" team="1" x="4" index="2" y="3" />
+      <role key="" face="1" team="1" x="4" index="3" y="2" />
+      <role key="" face="1" team="1" x="5" index="4" y="1" />
+      <role key="" face="1" team="1" x="5" index="5" y="2" />
+      <role key="" face="1" team="1" x="5" index="6" y="3" />
+      <role key="东方不败" face="1" team="2" x="1" y="1" />
+      <role key="丁春秋" face="1" team="2" x="1" y="2" />
+      <role key="成昆" face="1" team="2" x="1" y="3" />
+      <role key="公孙谷主" face="1" team="2" x="1" y="0" />
+      <role key="张召重" face="1" team="2" x="2" y="0" />
+      <role key="左冷禅" face="1" team="2" x="2" y="1" />
+      <role key="血刀老祖" face="1" team="2" x="2" y="3" />
+      <role key="超级疯狂封不平" face="1" team="2" x="2" y="2" />
+      <role key="鸠摩智" face="1" team="2" x="0" y="0" />
+      <role key="裘千仞" face="1" team="2" x="0" y="3" />
+      <role key="欧阳锋" face="1" team="2" x="0" y="2" />
+      <role key="张三丰" face="0" team="2" x="7" y="1" />
+      <role key="苗人凤" face="0" team="2" x="7" y="2" />
+      <role key="独孤求败" face="0" team="2" x="7" y="3" />
+      <role key="风清扬" face="0" team="2" x="6" y="0" />
+      <role key="王重阳" face="0" team="2" x="7" y="0" />
+      <role key="林朝英" face="0" team="2" x="8" y="1" />
+      <role key="周伯通" face="0" team="2" x="8" y="3" />
+      <role key="黄药师" face="0" team="2" x="8" y="0" />
+      <role key="一灯大师" face="0" team="2" x="8" y="2" />
+      <role key="洪七公" face="0" team="2" x="9" y="2" />
+      <role key="穆人清" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山论剑群殴战炼狱" music="音乐.华山论剑" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="0" y="0" />
+      <role key="" face="1" team="1" x="4" index="1" y="1" />
+      <role key="" face="1" team="1" x="4" index="2" y="3" />
+      <role key="" face="1" team="1" x="4" index="3" y="2" />
+      <role key="" face="1" team="1" x="5" index="4" y="1" />
+      <role key="" face="1" team="1" x="5" index="5" y="2" />
+      <role key="" face="1" team="1" x="5" index="6" y="3" />
+      <role key="炼狱东方不败" face="1" team="2" x="0" y="0" />
+      <role key="炼狱丁春秋" face="1" team="2" x="0" y="1" />
+      <role key="炼狱成昆" face="1" team="2" x="0" y="2" />
+      <role key="炼狱公孙谷主" face="1" team="2" x="0" y="3" />
+      <role key="炼狱张召重" face="1" team="2" x="2" y="1" />
+      <role key="炼狱左冷禅" face="1" team="2" x="1" y="0" />
+      <role key="炼狱血刀老祖" face="1" team="2" x="1" y="1" />
+      <role key="炼狱鸠摩智" face="1" team="2" x="1" y="3" />
+      <role key="炼狱裘千仞" face="1" team="2" x="1" y="2" />
+      <role key="炼狱欧阳锋" face="0" team="2" x="8" y="0" />
+      <role key="炼狱张三丰" face="0" team="2" x="8" y="1" />
+      <role key="炼狱苗人凤" face="0" team="2" x="8" y="2" />
+      <role key="炼狱独孤求败" face="0" team="2" x="8" y="3" />
+      <role key="炼狱风清扬" face="0" team="2" x="9" y="0" />
+      <role key="炼狱王重阳" face="0" team="2" x="9" y="1" />
+      <role key="炼狱林朝英" face="0" team="2" x="9" y="2" />
+      <role key="炼狱周伯通" face="0" team="2" x="9" y="3" />
+      <role key="炼狱黄药师" face="0" team="2" x="10" y="0" />
+      <role key="炼狱一灯大师" face="0" team="2" x="10" y="1" />
+      <role key="炼狱洪七公" face="0" team="2" x="10" y="3" />
+      <role key="炼狱穆人清" face="0" team="2" x="10" y="2" />
+      <role key="炼狱超级疯狂封不平" face="1" team="2" x="2" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="真华山论剑" music="音乐.华山论剑" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="1" />
+      <role key="" face="1" team="1" x="3" index="3" y="2" />
+      <role key="" face="1" team="1" x="3" index="4" y="3" />
+      <role key="松鼠无名老僧" face="0" team="2" x="10" y="0" />
+      <role key="松鼠无敌小虾米" face="0" team="2" x="10" y="1" />
+      <role key="松鼠王重阳" face="0" team="2" x="10" y="2" />
+      <role key="松鼠独孤求败" face="0" team="2" x="10" y="3" />
+      <role key="松鼠黄裳" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山论剑.不服输的高手们" music="音乐.华山论剑" mapkey="shanding2" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="1" />
+      <role key="" face="1" team="1" x="3" index="3" y="2" />
+      <role key="" face="1" team="1" x="3" index="4" y="3" />
+      <role key="左冷禅" face="0" team="2" x="10" y="0" />
+      <role key="丁春秋" face="0" team="2" x="10" y="1" />
+      <role key="成昆" face="0" team="2" x="10" y="2" />
+      <role key="公孙谷主" face="0" team="2" x="10" y="3" />
+      <role key="张召重" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山论剑.来吧，把你们统统打倒" music="音乐.华山论剑" mapkey="shanding2" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="1" />
+      <role key="" face="1" team="1" x="3" index="3" y="2" />
+      <role key="" face="1" team="1" x="3" index="4" y="3" />
+      <role key="封不平" face="0" team="2" x="10" y="0" />
+      <role key="鸠摩智" face="0" team="2" x="10" y="1" />
+      <role key="裘千仞" face="0" team="2" x="10" y="2" />
+      <role key="欧阳锋" face="0" team="2" x="10" y="3" />
+      <role key="金轮法王" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山论剑.不怕死的就上吧" music="音乐.华山论剑" mapkey="shanding2" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="1" />
+      <role key="" face="1" team="1" x="3" index="3" y="2" />
+      <role key="" face="1" team="1" x="3" index="4" y="3" />
+      <role key="黄药师" face="0" team="2" x="10" y="0" />
+      <role key="周伯通" face="0" team="2" x="10" y="1" />
+      <role key="洪七公" face="0" team="2" x="10" y="2" />
+      <role key="一灯大师" face="0" team="2" x="10" y="3" />
+      <role key="风清扬" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山论剑.天下第一战" music="音乐.华山论剑" mapkey="shanding2" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="1" />
+      <role key="" face="1" team="1" x="3" index="3" y="2" />
+      <role key="" face="1" team="1" x="3" index="4" y="3" />
+      <role key="东方不败" face="0" team="2" x="10" y="0" />
+      <role key="独孤求败" face="0" team="2" x="10" y="1" />
+      <role key="王重阳" face="0" team="2" x="10" y="2" />
+      <role key="张三丰" face="0" team="2" x="10" y="3" />
+      <role key="无崖子" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="白驼山欧阳克_战斗" music="" mapkey="xueshan" must="">
+    <roles>
+      <role key="" face="0" team="1" x="0" index="0" y="1" />
+      <role key="" face="0" team="1" x="0" index="1" y="3" />
+      <role key="" face="0" team="1" x="1" index="2" y="2" />
+      <role key="" face="0" team="1" x="1" index="3" y="3" />
+      <role key="欧阳克" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random>
+      <role name="白驼山庄丁" level="0" face="0" x="8" y="0" />
+      <role name="白驼山庄丁" level="0" face="0" x="8" y="1" />
+      <role name="白驼山庄丁" level="0" face="0" x="8" y="3" />
+      <role name="白驼山庄丁" level="0" face="0" x="8" y="2" />
+      <role name="白驼山庄丁" level="0" face="0" x="7" y="0" />
+      <role name="白驼山庄丁" level="0" face="0" x="7" y="1" />
+      <role name="白驼山庄丁" level="0" face="0" x="7" y="3" />
+      <role name="白驼山庄丁" level="0" face="0" x="7" y="2" />
+    </random>
+  </battle>
+  <battle key="岳王墓_战斗" music="" mapkey="wanshang" must="">
+    <roles>
+      <role key="" face="0" team="1" x="8" index="0" y="0" />
+      <role key="" face="0" team="1" x="8" index="1" y="1" />
+      <role key="" face="0" team="1" x="9" index="2" y="1" />
+      <role key="" face="0" team="1" x="9" index="3" y="3" />
+      <role key="顶尖杀手" face="1" team="2" x="1" y="0" />
+      <role key="顶尖杀手" face="1" team="2" x="1" y="1" />
+      <role key="顶尖杀手" face="1" team="2" x="1" y="3" />
+      <role key="顶尖杀手" face="1" team="2" x="1" y="2" />
+      <role key="顶尖杀手" face="1" team="2" x="0" y="0" />
+      <role key="顶尖杀手" face="1" team="2" x="0" y="1" />
+      <role key="顶尖杀手" face="1" team="2" x="0" y="2" />
+      <role key="顶尖杀手" face="1" team="2" x="0" y="3" />
+      <role key="顶尖杀手" face="1" team="2" x="2" y="0" />
+      <role key="顶尖杀手" face="1" team="2" x="2" y="1" />
+      <role key="顶尖杀手" face="1" team="2" x="2" y="2" />
+      <role key="顶尖杀手" face="1" team="2" x="2" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="梅超风_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="3" index="0" y="2" />
+      <role key="梅超风" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="新手村梅超风_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="3" index="0" y="2" />
+      <role key="新手村梅超风" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="渔樵耕读_战斗" music="" mapkey="yewai3" must="主角#郭靖">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="渔" face="0" team="2" x="6" y="0" />
+      <role key="樵" face="0" team="2" x="6" y="1" />
+      <role key="耕" face="0" team="2" x="7" y="1" />
+      <role key="读" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="白驼山欧阳锋_战斗" music="" mapkey="shinei2" must="主角#郭靖">
+    <roles>
+      <role key="" face="0" team="1" x="8" index="0" y="1" />
+      <role key="" face="0" team="1" x="8" index="1" y="3" />
+      <role key="欧阳锋" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="桃花岛黄药师_战斗" music="" mapkey="zhulin" must="主角#郭靖">
+    <roles>
+      <role key="" face="0" team="1" x="9" index="0" y="2" />
+      <role key="" face="0" team="1" x="10" index="0" y="3" />
+      <role key="黄药师" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="一灯居一灯大师_战斗" music="" mapkey="city2" must="主角#郭靖">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="一灯大师" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="长江岸边洪七公_战斗" music="" mapkey="yewai2" must="主角#郭靖">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="洪七公" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="桃花岛招亲_战斗" music="" mapkey="zhulin" must="主角#郭靖">
+    <roles>
+      <role key="" face="0" team="1" x="6" index="0" y="2" />
+      <role key="" face="0" team="1" x="6" index="1" y="3" />
+      <role key="" face="1" team="1" x="7" index="2" y="2" />
+      <role key="" face="1" team="1" x="7" index="3" y="3" />
+      <role key="黄药师" face="1" team="2" x="0" y="1" />
+      <role key="欧阳锋" face="1" team="2" x="0" y="2" />
+      <role key="一灯大师" face="0" team="2" x="9" y="1" />
+      <role key="洪七公" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教欧阳锋_战斗" music="" mapkey="menpai3" must="郭靖#黄蓉">
+    <roles>
+      <role key="" face="0" team="1" x="6" index="0" y="2" />
+      <role key="" face="0" team="1" x="6" index="1" y="3" />
+      <role key="欧阳锋" face="1" team="2" x="1" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教王重阳1_战斗" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="6" index="0" y="2" />
+      <role key="王重阳" face="1" team="2" x="1" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="全真教王重阳2_战斗" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="2" />
+      <role key="王重阳" face="1" team="2" x="0" y="2" />
+      <role key="黄药师" face="1" team="2" x="0" y="0" />
+      <role key="欧阳锋" face="1" team="2" x="0" y="1" />
+      <role key="一灯大师" face="0" team="2" x="10" y="0" />
+      <role key="洪七公" face="0" team="2" x="10" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="襄阳城南_战斗" music="" mapkey="zhanchang" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+    </roles>
+    <random>
+      <role name="蒙古杀手" level="1" face="0" x="8" y="1" />
+      <role name="蒙古杀手" level="1" face="0" x="8" y="2" />
+      <role name="蒙古杀手" level="1" face="0" x="8" y="3" />
+      <role name="蒙古杀手" level="1" face="0" x="8" y="0" />
+      <role name="蒙古杀手" level="1" face="0" x="9" y="1" />
+      <role name="蒙古杀手" level="1" face="0" x="9" y="2" />
+      <role name="蒙古杀手" level="1" face="0" x="9" y="3" />
+      <role name="蒙古杀手" level="1" face="0" x="9" y="0" />
+      <role name="蒙古杀手" level="1" face="0" x="10" y="1" />
+      <role name="蒙古杀手" level="1" face="0" x="10" y="2" />
+      <role name="蒙古杀手" level="1" face="0" x="10" y="3" />
+      <role name="蒙古杀手" level="1" face="0" x="10" y="0" />
+    </random>
+  </battle>
+  <battle key="风陵渡口金针_战斗" music="" mapkey="haibian" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="6" index="0" y="2" />
+      <role key="" face="0" team="1" x="6" index="1" y="3" />
+      <role key="" face="1" team="1" x="7" index="2" y="2" />
+      <role key="" face="1" team="1" x="7" index="3" y="3" />
+      <role key="顶尖杀手" face="1" team="2" x="0" y="1" />
+      <role key="顶尖杀手" face="1" team="2" x="0" y="2" />
+      <role key="顶尖杀手" face="0" team="2" x="9" y="1" />
+      <role key="顶尖杀手" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天龙寺.战鸠摩智_战斗" music="" mapkey="shinei" must="主角#段誉">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="0" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="0" team="1" x="10" index="2" y="0" />
+      <role key="" face="0" team="1" x="10" index="3" y="3" />
+      <role key="鸠摩智" face="1" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天龙寺.六脉神剑_战斗" music="" mapkey="shinei" must="段誉#木婉清">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="鸠摩智" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天龙寺.六脉神剑_战斗2" music="" mapkey="shinei" must="主角#段誉#木婉清">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="1" index="2" y="2" />
+      <role key="枯荣大师" face="1" team="1" x="3" index="" y="2" />
+      <role key="段正明" face="1" team="1" x="3" index="" y="0" />
+      <role key="鸠摩智" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="曼陀山庄_战斗" music="" mapkey="shanding2" must="主角#段誉">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="包不同" face="0" team="2" x="8" y="1" />
+      <role key="风波恶" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="初见王语嫣_战斗" music="" mapkey="menpai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+    </roles>
+    <random>
+      <role name="山庄保镖" level="0" face="0" x="7" y="1" />
+      <role name="山庄保镖" level="0" face="0" x="7" y="2" />
+      <role name="山庄保镖" level="0" face="0" x="7" y="3" />
+      <role name="山庄保镖" level="0" face="0" x="8" y="1" />
+      <role name="山庄保镖" level="0" face="0" x="8" y="2" />
+      <role name="山庄保镖" level="0" face="0" x="8" y="3" />
+      <role name="山庄保镖" level="0" face="0" x="9" y="0" />
+      <role name="山庄保镖" level="0" face="0" x="9" y="1" />
+      <role name="山庄保镖" level="0" face="0" x="9" y="2" />
+      <role name="山庄保镖" level="0" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="touch王语嫣_战斗" music="" mapkey="menpai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="0" />
+      <role key="曼陀山庄神秘人" face="0" team="2" x="7" y="1" />
+    </roles>
+    <random>
+      <role name="江湖大盗" level="2" face="0" x="7" y="2" />
+      <role name="江湖大盗" level="2" face="0" x="7" y="3" />
+      <role name="江湖大盗" level="2" face="0" x="8" y="1" />
+      <role name="江湖大盗" level="2" face="0" x="8" y="2" />
+      <role name="江湖大盗" level="2" face="0" x="8" y="3" />
+      <role name="江湖高手" level="3" face="0" x="9" y="0" />
+      <role name="江湖高手" level="3" face="0" x="9" y="1" />
+    </random>
+  </battle>
+  <battle key="江南郊野_战斗" music="" mapkey="shanding" must="主角#段誉">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="乔峰" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="丐帮弟子_战斗" music="" mapkey="feixu" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="丐帮弟子" face="0" team="2" x="5" y="0" />
+      <role key="丐帮弟子" face="0" team="2" x="5" y="1" />
+      <role key="丐帮弟子" face="0" team="2" x="5" y="2" />
+      <role key="丐帮弟子" face="0" team="2" x="5" y="3" />
+      <role key="丐帮弟子" face="0" team="2" x="6" y="0" />
+      <role key="丐帮弟子" face="0" team="2" x="6" y="2" />
+      <role key="丐帮弟子" face="0" team="2" x="6" y="3" />
+      <role key="丐帮弟子" face="0" team="2" x="7" y="1" />
+      <role key="丐帮弟子" face="0" team="2" x="7" y="2" />
+      <role key="丐帮弟子" face="0" team="2" x="7" y="3" />
+      <role key="丐帮弟子" face="0" team="2" x="8" y="0" />
+      <role key="丐帮弟子" face="0" team="2" x="8" y="1" />
+      <role key="丐帮弟子" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="丐帮大变1_战斗" music="" mapkey="feixu" must="主角#段誉">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="传功长老" face="0" team="2" x="10" y="3" />
+      <role key="执法长老" face="0" team="2" x="10" y="1" />
+      <role key="全冠清" face="0" team="2" x="9" y="2" />
+      <role key="丐帮弟子" face="0" team="2" x="5" y="0" />
+      <role key="丐帮弟子" face="0" team="2" x="5" y="1" />
+      <role key="丐帮弟子" face="0" team="2" x="5" y="2" />
+      <role key="丐帮弟子" face="0" team="2" x="5" y="3" />
+      <role key="丐帮弟子" face="0" team="2" x="6" y="0" />
+      <role key="丐帮弟子" face="0" team="2" x="6" y="2" />
+      <role key="丐帮弟子" face="0" team="2" x="6" y="3" />
+      <role key="丐帮弟子" face="0" team="2" x="7" y="1" />
+      <role key="丐帮弟子" face="0" team="2" x="7" y="2" />
+      <role key="丐帮弟子" face="0" team="2" x="7" y="3" />
+      <role key="丐帮弟子" face="0" team="2" x="8" y="0" />
+      <role key="丐帮弟子" face="0" team="2" x="8" y="1" />
+      <role key="丐帮弟子" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="丐帮大变2_战斗" music="" mapkey="zhulin" must="主角#段誉">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="段延庆" face="0" team="2" x="7" y="1" />
+      <role key="叶二娘" face="0" team="2" x="7" y="3" />
+      <role key="岳老三" face="0" team="2" x="6" y="2" />
+      <role key="云中鹤" face="0" team="2" x="6" y="0" />
+      <role key="李延宗" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random>
+      <role face="0" x="5" y="0" />
+      <role face="0" x="5" y="1" />
+      <role face="0" x="5" y="2" />
+      <role face="0" x="5" y="3" />
+      <role face="0" x="4" y="0" />
+      <role face="0" x="4" y="1" />
+      <role face="0" x="4" y="2" />
+      <role face="0" x="4" y="3" />
+    </random>
+  </battle>
+  <battle key="丐帮屋内_战斗" music="" mapkey="feixu" must="段誉">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="李延宗" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林寺乔峰_战斗" music="" mapkey="simiao" must="主角#段誉">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="玄慈方丈" face="0" team="2" x="6" y="2" />
+      <role key="玄难" face="0" team="2" x="7" y="1" />
+      <role key="玄寂" face="0" team="2" x="7" y="3" />
+      <role key="少林禅师" face="0" team="2" x="8" y="1" />
+      <role key="少林禅师" face="0" team="2" x="8" y="2" />
+      <role key="少林禅师" face="0" team="2" x="8" y="3" />
+      <role key="少林禅师" face="0" team="2" x="9" y="2" />
+      <role key="少林禅师" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="聚贤庄_战斗" music="" mapkey="city3" must="主角#段誉">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="乔峰" face="1" team="1" x="3" index="" y="2" />
+      <role key="游驹" face="0" team="2" x="6" y="1" />
+      <role key="游骥" face="0" team="2" x="6" y="3" />
+      <role key="玄难" face="0" team="2" x="7" y="0" />
+      <role key="谭婆" face="0" team="2" x="7" y="2" />
+      <role key="传功长老" face="0" team="2" x="7" y="1" />
+      <role key="执法长老" face="0" team="2" x="7" y="3" />
+      <role key="玄寂" face="0" team="2" x="8" y="1" />
+      <role key="赵钱孙" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random>
+      <role name="武林群豪" level="3" face="0" x="9" y="0" />
+      <role name="武林群豪" level="3" face="0" x="9" y="1" />
+      <role name="武林群豪" level="3" face="0" x="9" y="2" />
+      <role name="武林群豪" level="3" face="0" x="9" y="3" />
+      <role name="武林群豪" level="3" face="0" x="10" y="1" />
+      <role name="武林群豪" level="3" face="0" x="10" y="3" />
+    </random>
+  </battle>
+  <battle key="雁门关_战斗" music="" mapkey="heiyijiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="0" team="1" x="8" index="1" y="2" />
+      <role key="超级乔峰" face="1" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="小镜湖阿朱王语嫣_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="超级乔峰" face="2" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="枯井底_战斗" music="" mapkey="dongxue" must="段誉">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="发狂鸠摩智" face="1" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林萧远山1_战斗" music="" mapkey="simiao" must="主角#段誉">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="鸠摩智" face="0" team="2" x="8" y="2" />
+      <role key="庄聚贤" face="0" team="2" x="9" y="1" />
+      <role key="慕容复" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林萧远山2_战斗" music="" mapkey="simiao" must="段誉">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="慕容复" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林萧远山帮萧峰_战斗" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="慕容复" face="0" team="2" x="10" y="1" />
+      <role key="慕容博" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林萧远山帮慕容复_战斗" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="萧峰" face="0" team="2" x="10" y="1" />
+      <role key="萧远山" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="无量山洞斗转星移_战斗" music="" mapkey="shanding" must="段誉#慕容复">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="无名老僧" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="真曼陀山庄_战斗" music="" mapkey="zhulin" must="主角#段誉#木婉清">
+    <roles>
+      <role key="" face="0" team="1" x="8" index="0" y="0" />
+      <role key="" face="0" team="1" x="8" index="1" y="1" />
+      <role key="" face="0" team="1" x="9" index="2" y="2" />
+      <role key="李青萝" face="1" team="2" x="0" y="2" />
+    </roles>
+    <random>
+      <role name="庄客" level="1" face="1" x="1" y="1" />
+      <role name="庄客" level="1" face="1" x="1" y="2" />
+      <role name="庄客" level="1" face="1" x="1" y="3" />
+      <role name="庄客" level="1" face="1" x="3" y="0" />
+      <role name="庄客" level="1" face="1" x="3" y="2" />
+      <role name="庄客" level="1" face="1" x="3" y="3" />
+      <role name="庄客" level="1" face="1" x="4" y="0" />
+      <role name="庄客" level="1" face="1" x="4" y="3" />
+    </random>
+  </battle>
+  <battle key="马夫人_战斗" music="" mapkey="city3" must="主角#段誉#木婉清#段正淳">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="传功长老" face="0" team="2" x="5" y="1" />
+      <role key="执法长老" face="0" team="2" x="5" y="3" />
+    </roles>
+    <random>
+      <role name="江湖豪杰" level="2" face="1" x="6" y="0" />
+      <role name="江湖豪杰" level="2" face="1" x="6" y="1" />
+      <role name="江湖豪杰" level="2" face="1" x="6" y="3" />
+      <role name="江湖豪杰" level="2" face="1" x="6" y="2" />
+      <role name="江湖豪杰" level="2" face="0" x="7" y="0" />
+      <role name="江湖豪杰" level="2" face="0" x="7" y="1" />
+      <role name="江湖豪杰" level="2" face="0" x="7" y="3" />
+      <role name="江湖豪杰" level="2" face="0" x="7" y="2" />
+      <role name="江湖豪杰" level="2" face="0" x="8" y="0" />
+      <role name="江湖豪杰" level="2" face="0" x="8" y="2" />
+    </random>
+  </battle>
+  <battle key="小镜湖阮星竹段延庆_战斗" music="" mapkey="menpai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="" face="0" team="1" x="5" index="1" y="3" />
+      <role key="段延庆" face="0" team="2" x="9" y="2" />
+      <role key="叶二娘" face="0" team="2" x="9" y="3" />
+      <role key="岳老三" face="1" team="2" x="2" y="2" />
+      <role key="云中鹤" face="1" team="2" x="2" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="小镜湖阮星竹慕容复_战斗" music="" mapkey="menpai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="松鼠慕容复" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="阿朱阿碧_战斗" music="" mapkey="menpai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="0" />
+      <role key="" face="1" team="1" x="3" index="3" y="1" />
+    </roles>
+    <random>
+      <role name="江湖流氓" level="0" face="0" x="7" y="1" />
+      <role name="江湖流氓" level="0" face="0" x="7" y="2" />
+      <role name="江湖流氓" level="0" face="0" x="7" y="3" />
+      <role name="江湖流氓" level="0" face="0" x="8" y="1" />
+      <role name="江湖流氓" level="0" face="0" x="8" y="2" />
+      <role name="江湖流氓" level="0" face="0" x="8" y="3" />
+      <role name="江湖流氓" level="0" face="0" x="9" y="0" />
+      <role name="江湖流氓" level="0" face="0" x="9" y="1" />
+      <role name="江湖流氓" level="0" face="0" x="9" y="2" />
+      <role name="江湖流氓" level="0" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="阿朱阿碧屠杀_战斗" music="" mapkey="menpai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="0" y="3" />
+      <role key="阿朱" face="1" team="2" x="1" y="0" />
+      <role key="阿碧" face="1" team="2" x="1" y="2" />
+    </roles>
+    <random>
+      <role name="江湖流氓" level="0" face="0" x="7" y="1" />
+      <role name="江湖流氓" level="0" face="0" x="7" y="2" />
+      <role name="江湖流氓" level="0" face="0" x="7" y="3" />
+      <role name="江湖流氓" level="0" face="0" x="8" y="1" />
+      <role name="江湖流氓" level="0" face="0" x="8" y="2" />
+      <role name="江湖流氓" level="0" face="0" x="8" y="3" />
+      <role name="江湖流氓" level="0" face="0" x="9" y="0" />
+      <role name="江湖流氓" level="0" face="0" x="9" y="1" />
+      <role name="江湖流氓" level="0" face="0" x="9" y="2" />
+      <role name="江湖流氓" level="0" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="无量秘洞无崖子_战斗" music="" mapkey="shanding" must="主角#段誉#木婉清">
+    <roles>
+      <role key="" face="0" team="1" x="10" index="0" y="0" />
+      <role key="" face="0" team="1" x="10" index="1" y="3" />
+      <role key="" face="1" team="1" x="0" index="2" y="2" />
+      <role key="无崖子" face="1" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="曼陀山庄逍遥子_战斗" music="" mapkey="shanding" must="主角#段誉#木婉清#阿碧">
+    <roles>
+      <role key="" face="0" team="1" x="10" index="0" y="0" />
+      <role key="" face="0" team="1" x="10" index="1" y="3" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="0" index="2" y="0" />
+      <role key="逍遥子" face="1" team="2" x="5" y="2" />
+      <role key="无崖子" face="1" team="2" x="5" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="闪电貂_战斗" music="" mapkey="zhulin" must="主角#钟灵">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="" face="1" team="1" x="5" index="1" y="3" />
+      <role key="" face="1" team="1" x="5" index="2" y="0" />
+      <role key="段延庆" face="0" team="2" x="6" y="2" />
+      <role key="叶二娘" face="0" team="2" x="6" y="3" />
+      <role key="岳老三" face="1" team="2" x="1" y="2" />
+      <role key="云中鹤" face="1" team="2" x="1" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="擂鼓山神秘人_战斗" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="2" />
+      <role key="无敌小虾米" face="0" team="2" x="8" y="2" />
+      <role key="无敌小虾米" face="1" team="2" x="2" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="擂鼓山_战斗" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="1" />
+      <role key="" face="0" team="1" x="5" index="1" y="3" />
+      <role key="段延庆" face="0" team="2" x="10" y="0" />
+      <role key="鸠摩智" face="0" team="2" x="10" y="3" />
+      <role key="丁春秋" face="1" team="2" x="0" y="0" />
+      <role key="慕容复" face="1" team="2" x="0" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="何红药_战斗" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="何红药" face="0" team="2" x="4" y="2" />
+    </roles>
+    <random>
+      <role name="何红药帮手" level="1" face="0" x="6" y="1" />
+      <role name="何红药帮手" level="1" face="0" x="6" y="3" />
+      <role name="何红药帮手" level="1" face="0" x="7" y="1" />
+      <role name="何红药帮手" level="1" face="0" x="7" y="3" />
+      <role name="何红药帮手" level="1" face="0" x="3" y="1" />
+      <role name="何红药帮手" level="1" face="0" x="3" y="3" />
+    </random>
+  </battle>
+  <battle key="夏雪宜_战斗" music="" mapkey="dongxue" must="袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="金蛇郎君" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="穆人清_战斗" music="" mapkey="dongxue" must="袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="穆人清" face="0" team="2" x="8" y="1" />
+      <role key="木桑道长" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="金蛇窟_战斗" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="五毒教圣使" face="1" team="2" x="0" y="0" />
+      <role key="五毒教圣使" face="1" team="2" x="0" y="1" />
+      <role key="五毒教圣使" face="1" team="2" x="0" y="3" />
+      <role key="五毒教圣使" face="1" team="2" x="0" y="2" />
+      <role key="五毒教圣使" face="0" team="2" x="10" y="0" />
+      <role key="五毒教圣使" face="0" team="2" x="10" y="1" />
+      <role key="五毒教圣使" face="0" team="2" x="10" y="3" />
+      <role key="五毒教圣使" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="平一指_战斗" music="" mapkey="yewai3" must="主角#令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="费彬" face="0" team="2" x="8" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="曲非烟_战斗" music="" mapkey="shanding2" must="主角#令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="曲非烟" face="1" team="1" x="2" index="" y="3" />
+      <role key="费彬" face="0" team="2" x="8" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="岳灵珊_战斗" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="岳灵珊" face="0" team="2" x="8" y="2" />
+      <role key="华山弟子" face="0" team="2" x="5" y="0" />
+      <role key="华山弟子" face="0" team="2" x="5" y="1" />
+      <role key="华山弟子" face="0" team="2" x="5" y="3" />
+      <role key="华山弟子" face="0" team="2" x="5" y="2" />
+      <role key="华山弟子" face="0" team="2" x="6" y="0" />
+      <role key="华山弟子" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="岳不群_战斗" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="岳灵珊" face="0" team="2" x="8" y="2" />
+      <role key="岳不群" face="1" team="2" x="8" y="3" />
+      <role key="华山弟子" face="0" team="2" x="5" y="0" />
+      <role key="华山弟子" face="0" team="2" x="5" y="1" />
+      <role key="华山弟子" face="0" team="2" x="5" y="3" />
+      <role key="华山弟子" face="0" team="2" x="5" y="2" />
+      <role key="华山弟子" face="0" team="2" x="6" y="0" />
+      <role key="华山弟子" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="西湖底_战斗林平之" music="" mapkey="mishi" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="林平之" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="西湖底_战斗封不平" music="" mapkey="mishi" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="封不平" face="0" team="2" x="8" y="2" />
+      <role key="剑宗弟子" face="1" team="2" x="8" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="1" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="2" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山山洞_战斗辟邪剑谱" music="" mapkey="dongxue" must="主角#令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="封不平" face="0" team="2" x="8" y="2" />
+      <role key="剑宗弟子" face="1" team="2" x="8" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="1" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="2" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖_战斗封不平1" music="" mapkey="shanding" must="令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="阉割封不平" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖_战斗封不平2" music="" mapkey="shanding" must="令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="疯狂封不平" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖_战斗封不平3" music="" mapkey="shanding" must="主角#令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="超级疯狂封不平" face="0" team="2" x="8" y="2" />
+      <role key="剑宗弟子" face="1" team="2" x="8" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="1" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="2" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖_辟邪剑谱" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="黑木崖超级令狐冲" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖_战斗封不平林平之1" music="" mapkey="shanding" must="令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="阉割封不平" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖_战斗封不平林平之2" music="" mapkey="shanding" must="主角#令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="阉割封不平" face="0" team="2" x="8" y="1" />
+      <role key="林平之" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖_战斗封不平林平之3" music="" mapkey="shanding" must="主角#令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="疯狂封不平" face="0" team="2" x="8" y="2" />
+      <role key="林平之" face="1" team="2" x="8" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="1" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="2" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑木崖下_战斗" music="" mapkey="shanding" must="主角#令狐冲#曲非烟">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="费彬" face="0" team="2" x="8" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="嵩山派1_战斗" music="" mapkey="menpai" must="主角#令狐冲#曲非烟">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="费彬" face="0" team="2" x="8" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="嵩山派2_战斗" music="" mapkey="menpai" must="主角#令狐冲#曲非烟">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="费彬" face="0" team="2" x="8" y="2" />
+      <role key="左冷禅" face="0" team="2" x="10" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="5" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="9" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="嵩山派3_战斗" music="" mapkey="menpai" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="疯狂曲非烟" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山后山剑宗1_战斗" music="" mapkey="dongxue" must="主角#令狐冲#曲非烟">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="封不平" face="0" team="2" x="8" y="2" />
+      <role key="剑宗弟子" face="1" team="2" x="8" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="1" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="3" />
+      <role key="剑宗弟子" face="0" team="2" x="5" y="2" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="0" />
+      <role key="剑宗弟子" face="0" team="2" x="6" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山后山剑宗2_战斗" music="" mapkey="dongxue" must="令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="封不平" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="昆仑仙境_战斗" music="" mapkey="zhulin" must="主角#张无忌">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="成昆" face="0" team="2" x="7" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="昆仑山血刀老祖_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="血刀老祖" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="唐诗山洞狄云_战斗" music="" mapkey="dongxue" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="狄云" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="连城诀_唐诗山洞.直接杀死狄云" music="" mapkey="dongxue" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="狄云" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random>
+      <role name="正义伙伴" level="2" face="0" x="5" y="1" />
+      <role name="正义伙伴" level="2" face="0" x="5" y="2" />
+      <role name="正义伙伴" level="2" face="0" x="5" y="3" />
+      <role name="正义伙伴" level="2" face="0" x="6" y="1" />
+      <role name="正义伙伴" level="2" face="0" x="6" y="2" />
+      <role name="正义伙伴" level="2" face="0" x="6" y="3" />
+      <role name="正义伙伴" level="2" face="0" x="7" y="1" />
+      <role name="正义伙伴" level="2" face="0" x="7" y="2" />
+      <role name="正义伙伴" level="2" face="0" x="7" y="3" />
+    </random>
+  </battle>
+  <battle key="唐诗山洞狄云等人_战斗" music="" mapkey="dongxue" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="狄云" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random>
+      <role name="正义伙伴" level="2" face="0" x="5" y="1" />
+      <role name="正义伙伴" level="2" face="0" x="5" y="2" />
+      <role name="正义伙伴" level="2" face="0" x="5" y="3" />
+      <role name="正义伙伴" level="2" face="0" x="6" y="1" />
+      <role name="正义伙伴" level="2" face="0" x="6" y="2" />
+      <role name="正义伙伴" level="2" face="0" x="6" y="3" />
+      <role name="正义伙伴" level="2" face="0" x="7" y="1" />
+      <role name="正义伙伴" level="2" face="0" x="7" y="2" />
+      <role name="正义伙伴" level="2" face="0" x="7" y="3" />
+    </random>
+  </battle>
+  <battle key="天宁寺_战斗_梅念笙" music="" mapkey="shinei" must="狄云#水笙">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="1" y="1" />
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="梅念笙" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="白马啸西风.沙漠_战斗" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="李文秀" face="1" team="1" x="2" index="" y="3" />
+    </roles>
+    <random>
+      <role name="武林败类" level="0" face="0" x="8" y="1" />
+      <role name="武林败类" level="0" face="0" x="8" y="2" />
+      <role name="武林败类" level="0" face="0" x="8" y="3" />
+      <role name="武林败类" level="0" face="0" x="7" y="1" />
+      <role name="武林败类" level="0" face="0" x="7" y="2" />
+      <role name="武林败类" level="0" face="0" x="7" y="3" />
+    </random>
+  </battle>
+  <battle key="白马啸西风.沙漠战华辉_战斗" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="华辉" face="0" team="2" x="8" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="哈萨克部落_战斗" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="李文秀" face="1" team="1" x="2" index="" y="3" />
+      <role key="陈达海" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random>
+      <role name="武林败类" level="0" face="0" x="8" y="1" />
+      <role name="武林败类" level="0" face="0" x="8" y="3" />
+      <role name="武林败类" level="0" face="0" x="7" y="1" />
+      <role name="武林败类" level="0" face="0" x="7" y="2" />
+      <role name="武林败类" level="0" face="0" x="7" y="3" />
+    </random>
+  </battle>
+  <battle key="哈萨克部落李文秀_战斗" music="" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="李文秀" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="高昌迷宫_战斗" music="" mapkey="shamo" must="主角#李文秀">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="" face="1" team="1" x="3" index="2" y="1" />
+      <role key="" face="1" team="1" x="3" index="3" y="3" />
+      <role key="瓦耳拉齐" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random>
+      <role name="恶徒" level="1" face="0" x="6" y="3" />
+      <role name="恶徒" level="1" face="0" x="6" y="2" />
+      <role name="恶徒" level="1" face="0" x="6" y="1" />
+      <role name="恶徒" level="1" face="0" x="7" y="3" />
+      <role name="恶徒" level="1" face="0" x="5" y="3" />
+      <role name="恶徒" level="1" face="0" x="7" y="2" />
+    </random>
+  </battle>
+  <battle key="高昌迷宫李文秀_战斗" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="李文秀" face="0" team="2" x="9" y="2" />
+      <role key="计老人" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random>
+      <role name="哈萨克勇士" level="1" face="0" x="6" y="3" />
+      <role name="哈萨克勇士" level="1" face="0" x="6" y="2" />
+      <role name="哈萨克勇士" level="1" face="0" x="6" y="1" />
+    </random>
+  </battle>
+  <battle key="回族部落_战斗" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="3" />
+      <role key="霍青桐" face="1" team="1" x="2" index="" y="1" />
+    </roles>
+    <random>
+      <role name="朝廷走狗" level="1" face="0" x="8" y="3" animation="shibing" />
+      <role name="朝廷走狗" level="1" face="0" x="8" y="1" animation="shibing" />
+      <role name="朝廷走狗" level="1" face="0" x="7" y="3" animation="shibing" />
+      <role name="朝廷走狗" level="1" face="0" x="7" y="1" animation="shibing" />
+      <role name="朝廷走狗" level="1" face="0" x="7" y="0" animation="shibing" />
+    </random>
+  </battle>
+  <battle key="六和塔_战斗" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="张召重" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random>
+      <role name="朝廷鹰犬" level="1" face="0" x="5" y="1" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="5" y="2" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="5" y="3" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="5" y="0" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="6" y="0" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="6" y="1" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="6" y="3" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="6" y="2" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="7" y="0" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="7" y="1" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="10" y="2" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="9" y="3" animation="shibing" />
+    </random>
+  </battle>
+  <battle key="庖丁解牛_战斗" music="" mapkey="shamo" must="主角#陈家洛#霍青桐">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="张召重" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random>
+      <role name="朝廷鹰犬" level="1" face="0" x="5" y="1" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="5" y="2" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="5" y="3" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="5" y="0" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="6" y="0" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="6" y="1" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="6" y="3" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="6" y="2" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="7" y="0" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="7" y="1" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="10" y="2" animation="shibing" />
+      <role name="朝廷鹰犬" level="1" face="0" x="9" y="3" animation="shibing" />
+    </random>
+  </battle>
+  <battle key="御书房_战斗" music="" mapkey="simiao" must="主角#韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="鳌拜" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random>
+      <role name="鳌拜爪牙" level="1" face="0" x="5" y="1" />
+      <role name="鳌拜爪牙" level="1" face="0" x="5" y="2" />
+      <role name="鳌拜爪牙" level="1" face="0" x="5" y="3" />
+      <role name="鳌拜爪牙" level="1" face="0" x="5" y="0" />
+    </random>
+  </battle>
+  <battle key="慈宁宫1_战斗" music="" mapkey="simiao" must="主角#韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="太后" face="0" team="2" x="8" y="2" />
+      <role key="柳燕" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random>
+      <role name="太后爪牙" level="1" face="0" x="5" y="1" />
+      <role name="太后爪牙" level="1" face="0" x="5" y="2" />
+      <role name="太后爪牙" level="1" face="0" x="5" y="3" />
+      <role name="太后爪牙" level="1" face="0" x="5" y="0" />
+    </random>
+  </battle>
+  <battle key="慈宁宫2_战斗" music="" mapkey="simiao" must="主角#韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="毛东珠" face="0" team="2" x="8" y="2" />
+      <role key="柳燕" face="0" team="2" x="8" y="3" />
+      <role key="胖头陀" face="0" team="2" x="7" y="1" />
+      <role key="瘦头陀" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random>
+      <role name="太后爪牙" level="1" face="0" x="5" y="1" />
+      <role name="太后爪牙" level="1" face="0" x="5" y="2" />
+      <role name="太后爪牙" level="1" face="0" x="5" y="3" />
+      <role name="太后爪牙" level="1" face="0" x="5" y="0" />
+    </random>
+  </battle>
+  <battle key="大理_战斗" music="" mapkey="shanding2" must="主角#韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="九难" face="0" team="2" x="7" y="2" />
+      <role key="阿珂" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="鹿鼎记_吴三桂" music="" mapkey="shanding2" must="主角#韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="吴三桂" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random>
+      <role name="吴府打手" level="2" face="0" x="5" y="1" />
+      <role name="吴府打手" level="2" face="0" x="5" y="2" />
+      <role name="吴府打手" level="2" face="0" x="5" y="3" />
+      <role name="吴府打手" level="2" face="0" x="5" y="0" />
+      <role name="吴府打手" level="2" face="0" x="6" y="1" />
+      <role name="吴府打手" level="2" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="洞中等级0_战斗" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="1" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+    </roles>
+    <random>
+      <role name="马贼" level="0" face="0" x="5" y="1" />
+      <role name="马贼" level="0" face="0" x="5" y="2" />
+      <role name="马贼" level="0" face="0" x="5" y="3" />
+      <role name="马贼" level="0" face="0" x="5" y="0" />
+      <role name="马贼" level="0" face="0" x="6" y="1" />
+      <role name="马贼" level="0" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="洞中等级1_战斗" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+    </roles>
+    <random>
+      <role name="马贼" level="1" face="0" x="5" y="1" />
+      <role name="马贼" level="1" face="0" x="5" y="2" />
+      <role name="马贼" level="1" face="0" x="5" y="3" />
+      <role name="马贼" level="1" face="0" x="5" y="0" />
+      <role name="马贼" level="1" face="0" x="6" y="1" />
+      <role name="马贼" level="1" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="洞中等级2_战斗" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+    </roles>
+    <random>
+      <role name="马贼" level="2" face="0" x="5" y="1" />
+      <role name="马贼" level="2" face="0" x="5" y="2" />
+      <role name="马贼" level="2" face="0" x="5" y="3" />
+      <role name="马贼" level="2" face="0" x="5" y="0" />
+      <role name="马贼" level="2" face="0" x="6" y="1" />
+      <role name="马贼" level="2" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="洞中等级3_战斗" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+    </roles>
+    <random>
+      <role name="马贼" level="3" face="0" x="5" y="1" />
+      <role name="马贼" level="3" face="0" x="5" y="2" />
+      <role name="马贼" level="3" face="0" x="5" y="3" />
+      <role name="马贼" level="3" face="0" x="5" y="0" />
+      <role name="马贼" level="3" face="0" x="6" y="1" />
+      <role name="马贼" level="3" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="山中等级0_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="1" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+    </roles>
+    <random>
+      <role name="剪径强盗" level="0" face="0" x="5" y="1" />
+      <role name="剪径强盗" level="0" face="0" x="5" y="2" />
+      <role name="剪径强盗" level="0" face="0" x="5" y="3" />
+      <role name="剪径强盗" level="0" face="0" x="5" y="0" />
+      <role name="剪径强盗" level="0" face="0" x="6" y="1" />
+      <role name="剪径强盗" level="0" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="山中等级1_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+    </roles>
+    <random>
+      <role name="剪径强盗" level="1" face="0" x="5" y="1" />
+      <role name="剪径强盗" level="1" face="0" x="5" y="2" />
+      <role name="剪径强盗" level="1" face="0" x="5" y="3" />
+      <role name="剪径强盗" level="1" face="0" x="5" y="0" />
+      <role name="剪径强盗" level="1" face="0" x="6" y="1" />
+      <role name="剪径强盗" level="1" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="山中等级2_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+    </roles>
+    <random>
+      <role name="剪径强盗" level="2" face="0" x="5" y="1" />
+      <role name="剪径强盗" level="2" face="0" x="5" y="2" />
+      <role name="剪径强盗" level="2" face="0" x="5" y="3" />
+      <role name="剪径强盗" level="2" face="0" x="5" y="0" />
+      <role name="剪径强盗" level="2" face="0" x="6" y="1" />
+      <role name="剪径强盗" level="2" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="山中等级3_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+    </roles>
+    <random>
+      <role name="剪径强盗" level="3" face="0" x="5" y="1" />
+      <role name="剪径强盗" level="3" face="0" x="5" y="2" />
+      <role name="剪径强盗" level="3" face="0" x="5" y="3" />
+      <role name="剪径强盗" level="3" face="0" x="5" y="0" />
+      <role name="剪径强盗" level="3" face="0" x="6" y="1" />
+      <role name="剪径强盗" level="3" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="雪山中等级0_战斗" music="" mapkey="xueshan" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="1" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+    </roles>
+    <random>
+      <role name="土匪" level="0" face="0" x="5" y="1" />
+      <role name="土匪" level="0" face="0" x="5" y="2" />
+      <role name="土匪" level="0" face="0" x="5" y="3" />
+      <role name="土匪" level="0" face="0" x="5" y="0" />
+      <role name="土匪" level="0" face="0" x="6" y="1" />
+      <role name="土匪" level="0" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="雪山中等级1_战斗" music="" mapkey="xueshan" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="1" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+    </roles>
+    <random>
+      <role name="土匪" level="1" face="0" x="5" y="1" />
+      <role name="土匪" level="1" face="0" x="5" y="2" />
+      <role name="土匪" level="1" face="0" x="5" y="3" />
+      <role name="土匪" level="1" face="0" x="5" y="0" />
+      <role name="土匪" level="1" face="0" x="6" y="1" />
+      <role name="土匪" level="1" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="雪山中等级2_战斗" music="" mapkey="xueshan" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="1" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+    </roles>
+    <random>
+      <role name="土匪" level="2" face="0" x="5" y="1" />
+      <role name="土匪" level="2" face="0" x="5" y="2" />
+      <role name="土匪" level="2" face="0" x="5" y="3" />
+      <role name="土匪" level="2" face="0" x="5" y="0" />
+      <role name="土匪" level="2" face="0" x="6" y="1" />
+      <role name="土匪" level="2" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="雪山中等级3_战斗" music="" mapkey="xueshan" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="1" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+    </roles>
+    <random>
+      <role name="土匪" level="3" face="0" x="5" y="1" />
+      <role name="土匪" level="3" face="0" x="5" y="2" />
+      <role name="土匪" level="3" face="0" x="5" y="3" />
+      <role name="土匪" level="3" face="0" x="5" y="0" />
+      <role name="土匪" level="3" face="0" x="6" y="1" />
+      <role name="土匪" level="3" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="华山弟子_战斗" music="" mapkey="menpai3" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="0" />
+      <role key="华山弟子" face="0" team="2" x="6" y="1" />
+      <role key="华山弟子" face="0" team="2" x="6" y="3" />
+      <role key="华山弟子" face="0" team="2" x="7" y="2" />
+      <role key="华山弟子" face="0" team="2" x="7" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山高手_战斗" music="" mapkey="menpai3" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="0" />
+      <role key="华山高手" face="0" team="2" x="6" y="1" />
+      <role key="华山高手" face="0" team="2" x="6" y="3" />
+      <role key="华山高手" face="0" team="2" x="7" y="2" />
+      <role key="华山高手" face="0" team="2" x="7" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="嵩山弟子_战斗" music="" mapkey="menpai" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="1" />
+      <role key="嵩山弟子" face="0" team="2" x="6" y="3" />
+      <role key="嵩山弟子" face="0" team="2" x="7" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="7" y="0" />
+      <role key="嵩山弟子" face="0" team="2" x="8" y="2" />
+      <role key="嵩山弟子" face="0" team="2" x="8" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="嵩山高手_战斗" music="" mapkey="menpai" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="0" />
+      <role key="嵩山高手" face="0" team="2" x="6" y="1" />
+      <role key="嵩山高手" face="0" team="2" x="6" y="3" />
+      <role key="嵩山高手" face="0" team="2" x="7" y="2" />
+      <role key="嵩山高手" face="0" team="2" x="7" y="0" />
+      <role key="嵩山高手" face="0" team="2" x="8" y="2" />
+      <role key="嵩山高手" face="0" team="2" x="8" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="莫大_战斗" music="" mapkey="menpai3" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="3" index="2" y="3" />
+      <role key="莫大" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="周伯通_战斗" music="" mapkey="zhulin" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="3" index="2" y="3" />
+      <role key="周伯通" face="0" team="2" x="8" y="2" />
+      <role key="瑛姑" face="0" team="2" x="8" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="长安一梦_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+    </roles>
+    <random>
+      <role name="恶棍" level="1" face="0" x="8" y="1" />
+      <role name="恶棍" level="1" face="0" x="8" y="3" />
+      <role name="恶棍" level="1" face="1" x="3" y="1" />
+      <role name="恶棍" level="1" face="1" x="3" y="3" />
+      <role name="恶棍" level="1" face="1" x="1" y="2" />
+    </random>
+  </battle>
+  <battle key="少林木人巷" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="少林小和尚" face="0" team="2" x="3" y="2" />
+      <role key="少林小和尚" face="0" team="2" x="3" y="3" />
+      <role key="少林小和尚" face="0" team="2" x="5" y="1" />
+      <role key="少林小和尚" face="0" team="2" x="5" y="3" />
+      <role key="少林小和尚" face="0" team="2" x="5" y="0" />
+      <role key="少林小和尚" face="0" team="2" x="6" y="0" />
+      <role key="少林小和尚" face="0" team="2" x="6" y="2" />
+      <role key="少林小和尚" face="0" team="2" x="6" y="3" />
+      <role key="少林小和尚" face="0" team="2" x="7" y="0" />
+      <role key="少林小和尚" face="0" team="2" x="7" y="3" />
+      <role key="少林小和尚" face="0" team="2" x="9" y="1" />
+      <role key="少林小和尚" face="0" team="2" x="9" y="3" />
+      <role key="少林小和尚" face="0" team="2" x="10" y="1" />
+      <role key="少林小和尚" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林铜人巷" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="少林禅师" face="0" team="2" x="3" y="2" />
+      <role key="少林禅师" face="0" team="2" x="3" y="3" />
+      <role key="少林禅师" face="0" team="2" x="5" y="1" />
+      <role key="少林禅师" face="0" team="2" x="5" y="3" />
+      <role key="少林禅师" face="0" team="2" x="5" y="0" />
+      <role key="少林禅师" face="0" team="2" x="6" y="0" />
+      <role key="少林禅师" face="0" team="2" x="6" y="2" />
+      <role key="少林禅师" face="0" team="2" x="6" y="3" />
+      <role key="少林禅师" face="0" team="2" x="7" y="0" />
+      <role key="少林禅师" face="0" team="2" x="7" y="3" />
+      <role key="少林禅师" face="0" team="2" x="9" y="1" />
+      <role key="少林禅师" face="0" team="2" x="9" y="3" />
+      <role key="少林禅师" face="0" team="2" x="10" y="1" />
+      <role key="少林禅师" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="少林无名老僧" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="无名老僧" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当七截阵" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="武当高手" face="0" team="2" x="9" y="0" />
+      <role key="武当高手" face="0" team="2" x="9" y="1" />
+      <role key="武当高手" face="0" team="2" x="9" y="3" />
+      <role key="武当高手" face="0" team="2" x="9" y="2" />
+      <role key="武当高手" face="0" team="2" x="10" y="1" />
+      <role key="武当高手" face="0" team="2" x="10" y="2" />
+      <role key="武当高手" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="张三丰_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="0" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="0" team="1" x="10" index="2" y="0" />
+      <role key="" face="0" team="1" x="10" index="3" y="3" />
+      <role key="张三丰" face="1" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="真武七截阵_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="0" />
+      <role key="" face="1" team="1" x="1" index="4" y="2" />
+      <role key="" face="1" team="1" x="1" index="5" y="3" />
+      <role key="宋远桥" face="0" team="2" x="8" y="0" />
+      <role key="俞莲舟" face="0" team="2" x="8" y="2" />
+      <role key="俞岱岩" face="0" team="2" x="8" y="3" />
+      <role key="张松溪" face="0" team="2" x="9" y="1" />
+      <role key="张翠山" face="0" team="2" x="9" y="2" />
+      <role key="殷梨亭" face="0" team="2" x="9" y="3" />
+      <role key="莫声谷" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当_真武七截阵_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="宋远桥" face="0" team="2" x="8" y="0" />
+      <role key="俞莲舟" face="0" team="2" x="8" y="2" />
+      <role key="俞岱岩" face="0" team="2" x="8" y="3" />
+      <role key="张松溪" face="0" team="2" x="9" y="1" />
+      <role key="张翠山" face="0" team="2" x="9" y="2" />
+      <role key="殷梨亭" face="0" team="2" x="9" y="3" />
+      <role key="莫声谷" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="武当究极战_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="0" />
+      <role key="" face="1" team="1" x="1" index="4" y="2" />
+      <role key="" face="1" team="1" x="1" index="5" y="3" />
+      <role key="张召重" face="0" team="2" x="7" y="0" />
+      <role key="冲虚道长" face="0" team="2" x="7" y="3" />
+      <role key="张三丰" face="0" team="2" x="7" y="2" />
+      <role key="宋远桥" face="0" team="2" x="8" y="0" />
+      <role key="俞莲舟" face="0" team="2" x="8" y="2" />
+      <role key="俞岱岩" face="0" team="2" x="8" y="3" />
+      <role key="张松溪" face="0" team="2" x="9" y="1" />
+      <role key="张翠山" face="0" team="2" x="9" y="2" />
+      <role key="殷梨亭" face="0" team="2" x="9" y="3" />
+      <role key="莫声谷" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="无量山洞庄子_战斗" music="" mapkey="shanding" must="段誉#陈家洛">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="" face="1" team="1" x="5" index="1" y="3" />
+      <role key="道家高手" face="0" team="2" x="10" y="1" />
+      <role key="道家高手" face="0" team="2" x="10" y="2" />
+      <role key="道家高手" face="0" team="2" x="10" y="3" />
+      <role key="道家高手" face="0" team="2" x="10" y="0" />
+      <role key="道家高手" face="1" team="2" x="1" y="0" />
+      <role key="道家高手" face="1" team="2" x="1" y="1" />
+      <role key="道家高手" face="1" team="2" x="3" y="2" />
+      <role key="道家高手" face="1" team="2" x="3" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="剑魔荒冢独孤求败_战斗" music="" mapkey="jianchi" must="杨过#令狐冲">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="独孤求败" face="0" team="2" x="10" y="2" />
+      <role key="神雕" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="光明顶_战斗" music="" mapkey="shanding2" must="主角#张无忌">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="空性大师" face="0" team="2" x="5" y="1" />
+      <role key="华山长老" face="0" team="2" x="6" y="0" />
+      <role key="华山长老" face="0" team="2" x="6" y="1" />
+      <role key="何太冲" face="0" team="2" x="7" y="3" />
+      <role key="班淑娴" face="0" team="2" x="7" y="1" />
+      <role key="灭绝师太" face="0" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="古墓王重阳_战斗" music="" mapkey="mojiao" must="杨过#小龙女">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="王重阳" face="0" team="2" x="8" y="1" />
+      <role key="林朝英" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠降龙十八掌_战斗" music="" mapkey="heiyijiao" must="">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="" face="0" team="1" x="5" index="1" y="2" />
+      <role key="" face="1" team="1" x="5" index="2" y="3" />
+      <role key="" face="1" team="1" x="5" index="3" y="0" />
+      <role key="松鼠洪七公" face="1" team="2" x="2" y="1" />
+      <role key="松鼠郭靖" face="1" team="2" x="2" y="3" />
+      <role key="松鼠乔峰" face="0" team="2" x="10" y="1" />
+      <role key="松鼠黄裳" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠独孤九剑_战斗" music="" mapkey="yewai2" must="">
+    <roles>
+      <role key="" face="0" team="1" x="4" index="0" y="1" />
+      <role key="" face="0" team="1" x="4" index="1" y="3" />
+      <role key="" face="1" team="1" x="6" index="2" y="1" />
+      <role key="" face="1" team="1" x="6" index="3" y="3" />
+      <role key="" face="0" team="1" x="5" index="4" y="2" />
+      <role key="松鼠独孤求败" face="1" team="2" x="0" y="0" />
+      <role key="松鼠风清扬" face="1" team="2" x="0" y="3" />
+      <role key="松鼠杨过" face="0" team="2" x="10" y="0" />
+      <role key="松鼠令狐冲" face="0" team="2" x="10" y="3" />
+      <role key="松鼠神雕" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠九阴真经_战斗" music="" mapkey="dongxue" must="">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="" face="0" team="1" x="5" index="1" y="2" />
+      <role key="" face="1" team="1" x="5" index="2" y="3" />
+      <role key="" face="1" team="1" x="5" index="3" y="0" />
+      <role key="松鼠杨过" face="1" team="2" x="2" y="1" />
+      <role key="松鼠小龙女" face="1" team="2" x="2" y="3" />
+      <role key="松鼠王重阳" face="0" team="2" x="10" y="1" />
+      <role key="松鼠林朝英" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠斗转星移_战斗" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="" face="0" team="1" x="5" index="1" y="2" />
+      <role key="" face="1" team="1" x="5" index="2" y="3" />
+      <role key="" face="1" team="1" x="5" index="3" y="0" />
+      <role key="松鼠无敌小虾米" face="1" team="2" x="2" y="1" />
+      <role key="松鼠慕容复" face="1" team="2" x="2" y="3" />
+      <role key="松鼠无名老僧" face="0" team="2" x="10" y="1" />
+      <role key="松鼠慕容博" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆公孙谷主" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="公孙谷主" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆木桑道长" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="木桑道长" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆岳不群" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="岳不群" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆庄聚贤" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="庄聚贤" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆胡一刀" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="胡一刀" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆毒手药王" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="毒手药王" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆周伯通" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="周伯通" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆一灯大师" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="一灯大师" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆东方不败" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="东方不败" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆风清扬" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="风清扬" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆慕容博" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="慕容博" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="松鼠旅馆无崖子" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="无崖子" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="古墓叛徒_战斗" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="古墓叛徒" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="古墓世仇_战斗" music="" mapkey="city3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="全真高手" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="古墓故友_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="桃花高手" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="杨冰儿_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="杨冰儿" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="古墓左右互搏_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="左右互搏小虾米" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="玄铁剑1_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="黄衫女子" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="玄铁剑2_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="黄衫女子强化" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="玄铁剑3_战斗" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="黄衫女子再强化" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门古墓黄衫女子1" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="黄衫女子强化" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门古墓黄衫女子2" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="黄衫女子再强化" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门古墓超级战" music="" mapkey="mojiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="" face="1" team="1" x="1" index="0" y="3" />
+      <role key="黄衫女子再强化" face="0" team="2" x="8" y="2" />
+      <role key="松鼠杨过" face="0" team="2" x="9" y="2" />
+      <role key="松鼠小龙女" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="桑结_战斗" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="桑结" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="达尔巴_战斗" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="达尔巴" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灵智上人_战斗" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="灵智上人" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="大轮寺大理高手_战斗" music="" mapkey="shinei2" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="大理高手" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门大轮1" music="" mapkey="shinei2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="金轮法王" face="0" team="2" x="8" y="2" />
+      <role key="霍都" face="0" team="2" x="8" y="3" />
+      <role key="达尔巴" face="0" team="2" x="8" y="1" />
+      <role key="灵智上人" face="0" team="2" x="9" y="3" />
+      <role key="桑结" face="0" team="2" x="9" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="灭门大轮2" music="" mapkey="shinei2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="金轮法王强化" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="霍都_战斗" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="霍都" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="鹿鼎记_台湾郑克爽1" music="" mapkey="shanding" must="主角#韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="郑克爽" face="0" team="2" x="6" y="1" />
+      <role key="冯锡范" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random>
+      <role name="郑王府打手" level="2" face="0" x="8" y="0" />
+      <role name="郑王府打手" level="2" face="0" x="8" y="2" />
+      <role name="郑王府打手" level="2" face="0" x="9" y="0" />
+      <role name="郑王府打手" level="2" face="0" x="7" y="2" />
+      <role name="郑王府打手" level="2" face="0" x="6" y="0" />
+      <role name="郑王府打手" level="2" face="0" x="6" y="2" />
+    </random>
+  </battle>
+  <battle key="鹿鼎记_台湾郑克爽2" music="" mapkey="shanding" must="韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="郑克爽" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="鹿鼎记_鹿鼎山之战" music="" mapkey="city" must="主角#韦小宝">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+    </roles>
+    <random>
+      <role name="大内绝顶高手" level="3" face="1" x="6" y="0" animation="guanyuan2" />
+      <role name="大内绝顶高手" level="3" face="1" x="6" y="1" animation="guanyuan2" />
+      <role name="大内绝顶高手" level="3" face="0" x="6" y="3" animation="guanyuan2" />
+      <role name="大内绝顶高手" level="3" face="0" x="6" y="2" animation="guanyuan2" />
+      <role name="大内绝顶高手" level="3" face="0" x="7" y="1" animation="guanyuan2" />
+      <role name="大内绝顶高手" level="3" face="0" x="7" y="3" animation="guanyuan2" />
+      <role name="大内绝顶高手" level="3" face="0" x="8" y="0" animation="guanyuan2" />
+      <role name="大内绝顶高手" level="3" face="0" x="8" y="2" animation="guanyuan2" />
+    </random>
+  </battle>
+  <battle key="马贼王_战斗" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="马贼王" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random>
+      <role name="马贼" level="1" face="0" x="6" y="1" />
+      <role name="马贼" level="1" face="0" x="6" y="2" />
+      <role name="马贼" level="1" face="0" x="6" y="3" />
+    </random>
+  </battle>
+  <battle key="original_长安深夜怪事.初遇夜间人" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="长安深夜神秘女子" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_长安深夜怪事.再遇夜间人" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="长安深夜神秘女子2" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_长安深夜怪事.三遇夜间人" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="长安深夜神秘女子3" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_长安深夜怪事.重阳宫霓裳" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="霓裳" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_长安深夜怪事.重阳宫赵志诚" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="赵志诚" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_山庄风云贾武" music="" mapkey="menpai2" must="">
+    <roles>
+      <role key="贾武" face="1" team="1" x="2" index="" y="2" />
+      <role key="山庄风云神秘人" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_山庄风云神秘人" music="" mapkey="menpai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="山庄风云神秘人" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_山庄风云疯狂贾飞" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="疯狂贾飞" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_山庄风云疯狂贾飞女主" music="" mapkey="menpai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="疯狂贾飞" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random>
+      <role name="武林败类" level="2" face="0" x="8" y="2" />
+      <role name="武林败类" level="2" face="0" x="8" y="3" />
+      <role name="武林败类" level="2" face="0" x="9" y="2" />
+      <role name="武林败类" level="2" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="original_回纥男子.长安花市刺客" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="回纥男子刺客" face="0" team="2" x="7" y="2" />
+      <role key="回纥男子刺客" face="0" team="2" x="7" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_回纥男子.沙漠月夜乌护干" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="乌护干" face="0" team="2" x="7" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_回纥男子.唐军营救人" music="" mapkey="zhanchang" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+    </roles>
+    <random>
+      <role name="中原义士" level="2" face="0" x="8" y="2" />
+      <role name="中原义士" level="2" face="0" x="8" y="3" />
+      <role name="中原义士" level="2" face="0" x="9" y="2" />
+      <role name="中原义士" level="2" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="original_回纥男子.长安乌护干" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="" face="1" team="1" x="6" index="1" y="2" />
+      <role key="" face="1" team="1" x="5" index="2" y="1" />
+      <role key="乌护干" face="0" team="2" x="8" y="2" />
+      <role key="回纥男子刺客" face="0" team="2" x="1" y="3" />
+      <role key="回纥男子刺客" face="0" team="2" x="1" y="2" />
+      <role key="回纥男子刺客" face="0" team="2" x="1" y="1" />
+      <role key="回纥男子刺客" face="0" team="2" x="7" y="3" />
+      <role key="回纥男子刺客" face="0" team="2" x="7" y="2" />
+      <role key="回纥男子刺客" face="0" team="2" x="7" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="original_长安一梦.山洞阿玉" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="马贼王" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random>
+      <role name="马贼" level="1" face="0" x="8" y="2" />
+      <role name="马贼" level="1" face="0" x="8" y="3" />
+      <role name="马贼" level="1" face="0" x="9" y="2" />
+      <role name="马贼" level="1" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="original_长安一梦.沙漠马贼王" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="马贼王" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random>
+      <role name="马贼" level="1" face="0" x="8" y="2" />
+      <role name="马贼" level="1" face="0" x="8" y="3" />
+      <role name="马贼" level="1" face="0" x="9" y="2" />
+      <role name="马贼" level="1" face="0" x="9" y="3" />
+    </random>
+  </battle>
+  <battle key="original_长安一梦.宝藏争夺" music="" mapkey="shamo" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="长安一梦陌生男子" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="试炼之地_战斗" music="音乐.刀间鼓" mapkey="mishi" must="">
+    <roles>
+      <role key="" face="0" team="1" x="0" index="0" y="2" />
+    </roles>
+    <random>
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="0" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="2" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="3" animation="" />
+    </random>
+  </battle>
+  <battle key="珍珑棋局_战斗" music="音乐.天龙八部.逍遥派" mapkey="zhulin" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="0" />
+      <role key="" face="1" team="1" x="1" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+    </roles>
+    <random>
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="0" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="2" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="3" animation="" />
+    </random>
+  </battle>
+  <battle key="序章_战斗十大善人" music="" mapkey="mishi" must="主角">
+    <roles>
+      <role key="神级主角" face="0" team="1" x="5" index="" y="2" />
+      <role key="苗人凤" face="1" team="2" x="0" y="0" />
+      <role key="张三丰" face="1" team="2" x="0" y="1" />
+      <role key="黄药师" face="1" team="2" x="0" y="2" />
+      <role key="丘处机" face="1" team="2" x="0" y="3" />
+      <role key="一灯大师" face="1" team="2" x="1" y="2" />
+      <role key="松鼠乔峰" face="0" team="2" x="10" y="0" />
+      <role key="松鼠郭靖" face="0" team="2" x="10" y="1" />
+      <role key="洪七公" face="0" team="2" x="10" y="2" />
+      <role key="黄蓉" face="0" team="2" x="10" y="3" />
+      <role key="周伯通" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="侠客行_石张家口" music="" mapkey="yewai2" must="主角#石破天">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="" face="1" team="1" x="5" index="1" y="3" />
+      <role key="白自在" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random>
+      <role name="雪山派门徒" level="2" face="1" x="0" y="0" />
+      <role name="雪山派门徒" level="2" face="1" x="0" y="3" />
+      <role name="雪山派门徒" level="2" face="1" x="1" y="1" />
+      <role name="雪山派门徒" level="2" face="1" x="1" y="3" />
+      <role name="雪山派门徒" level="2" face="0" x="7" y="0" />
+      <role name="雪山派门徒" level="2" face="0" x="7" y="3" />
+      <role name="雪山派门徒" level="2" face="0" x="8" y="1" />
+      <role name="雪山派门徒" level="2" face="0" x="8" y="3" />
+    </random>
+  </battle>
+  <battle key="侠客行_破天太玄经" music="" mapkey="dongxue" must="主角#石破天">
+    <roles>
+      <role key="" face="0" team="1" x="10" index="0" y="0" />
+      <role key="" face="0" team="1" x="10" index="1" y="3" />
+      <role key="" face="1" team="1" x="0" index="2" y="0" />
+      <role key="" face="0" team="1" x="0" index="3" y="3" />
+      <role key="疯狂石破天" face="1" team="2" x="5" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="侠客行_主角大雪山" music="" mapkey="city" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="白自在" face="0" team="2" x="8" y="1" />
+      <role key="谢烟客" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="侠客行_主角太玄经" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="5" index="0" y="2" />
+      <role key="龙岛主" face="1" team="2" x="0" y="0" />
+      <role key="木岛主" face="1" team="2" x="0" y="3" />
+      <role key="白自在" face="0" team="2" x="10" y="0" />
+      <role key="石破天" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="广州.战斗" music="" mapkey="city3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="儿时袁承志" face="1" team="1" x="3" index="" y="3" />
+      <role key="崔秋山" face="1" team="1" x="2" index="" y="3" />
+      <role key="东厂杀手" face="0" team="2" x="6" y="0" />
+      <role key="东厂杀手" face="0" team="2" x="6" y="3" />
+      <role key="东厂杀手" face="0" team="2" x="7" y="2" />
+      <role key="东厂杀手" face="0" team="2" x="7" y="3" />
+      <role key="东厂杀手" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山仙境.战斗" music="" mapkey="shanding" must="儿时袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="穆人清" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山仙境.战斗2" music="" mapkey="shanding" must="袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="炼狱穆人清" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山仙境.战斗3" music="" mapkey="shanding" must="袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="金蛇郎君" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山仙境.战斗4" music="" mapkey="shanding" must="袁承志#温青青">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="炼狱金蛇郎君" face="0" team="2" x="8" y="1" />
+      <role key="炼狱金蛇郎君" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="风陵渡口.袁承志" music="" mapkey="yewai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="袁承志" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="风陵渡口.龙游帮1" music="" mapkey="yewai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="船老大" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random>
+      <role name="江湖流氓" level="1" face="0" x="4" y="3" />
+      <role name="江湖流氓" level="1" face="0" x="5" y="2" />
+      <role name="江湖流氓" level="1" face="0" x="4" y="2" />
+      <role name="江湖流氓" level="1" face="0" x="5" y="3" />
+    </random>
+  </battle>
+  <battle key="风陵渡口.龙游帮2" music="" mapkey="yewai2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="船老大" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random>
+      <role name="江湖流氓" level="1" face="0" x="4" y="3" />
+      <role name="江湖流氓" level="1" face="0" x="5" y="2" />
+      <role name="江湖流氓" level="1" face="0" x="4" y="2" />
+      <role name="江湖流氓" level="1" face="0" x="5" y="3" />
+      <role name="江湖流氓" level="1" face="0" x="6" y="0" />
+      <role name="江湖流氓" level="1" face="0" x="6" y="1" />
+      <role name="江湖流氓" level="1" face="0" x="6" y="3" />
+      <role name="江湖流氓" level="1" face="0" x="6" y="2" />
+    </random>
+  </battle>
+  <battle key="石梁派_战斗1" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="2" />
+      <role key="" face="1" team="1" x="2" index="2" y="3" />
+      <role key="温方达" face="0" team="2" x="5" y="0" />
+      <role key="温方义" face="0" team="2" x="5" y="2" />
+      <role key="温方施" face="0" team="2" x="5" y="3" />
+      <role key="温方悟" face="0" team="2" x="6" y="1" />
+      <role key="温方山" face="0" team="2" x="6" y="2" />
+      <role key="袁承志" face="0" team="2" x="6" y="3" />
+      <role key="石梁派弟子" face="0" team="2" x="3" y="3" />
+      <role key="石梁派弟子" face="0" team="2" x="3" y="2" />
+      <role key="石梁派弟子" face="0" team="2" x="3" y="1" />
+      <role key="石梁派弟子" face="0" team="2" x="3" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="石梁派_战斗5" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="0" />
+      <role key="温方达" face="0" team="2" x="6" y="1" />
+      <role key="温方义" face="0" team="2" x="6" y="2" />
+      <role key="温方施" face="0" team="2" x="6" y="3" />
+      <role key="温方悟" face="0" team="2" x="7" y="0" />
+      <role key="温方山" face="0" team="2" x="7" y="3" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="0" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="1" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="2" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="石梁派_战斗2" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="0" />
+      <role key="温方达" face="0" team="2" x="6" y="1" />
+      <role key="温方义" face="0" team="2" x="6" y="2" />
+      <role key="温方施" face="0" team="2" x="6" y="3" />
+      <role key="温方悟" face="0" team="2" x="7" y="0" />
+      <role key="温方山" face="0" team="2" x="7" y="3" />
+      <role key="袁承志" face="0" team="2" x="5" y="1" />
+      <role key="安小慧" face="0" team="2" x="5" y="3" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="0" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="1" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="2" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="石梁派_战斗3" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="" face="1" team="1" x="1" index="3" y="0" />
+      <role key="黄真" face="0" team="2" x="6" y="1" />
+      <role key="袁承志" face="0" team="2" x="6" y="2" />
+      <role key="安小慧" face="0" team="2" x="6" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="石梁派_战斗4" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="安小慧" face="1" team="1" x="1" index="" y="2" />
+      <role key="温方达" face="0" team="2" x="6" y="1" />
+      <role key="温方义" face="0" team="2" x="6" y="2" />
+      <role key="温方施" face="0" team="2" x="6" y="3" />
+      <role key="温方悟" face="0" team="2" x="7" y="0" />
+      <role key="温方山" face="0" team="2" x="7" y="3" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="0" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="1" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="2" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="石梁派_战斗6" music="" mapkey="zhulin" must="主角#袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="温方达" face="0" team="2" x="6" y="1" />
+      <role key="温方义" face="0" team="2" x="6" y="2" />
+      <role key="温方施" face="0" team="2" x="6" y="3" />
+      <role key="温方悟" face="0" team="2" x="7" y="0" />
+      <role key="温方山" face="0" team="2" x="7" y="3" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="0" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="1" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="2" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="石梁派_战斗7" music="" mapkey="zhulin" must="主角#袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="1" index="2" y="3" />
+      <role key="黄真" face="1" team="1" x="1" index="" y="2" />
+      <role key="温方达" face="0" team="2" x="6" y="1" />
+      <role key="温方义" face="0" team="2" x="6" y="2" />
+      <role key="温方施" face="0" team="2" x="6" y="3" />
+      <role key="温方悟" face="0" team="2" x="7" y="0" />
+      <role key="温方山" face="0" team="2" x="7" y="3" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="0" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="1" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="2" />
+      <role key="石梁派弟子" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山仙境_灭华山" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="0" index="3" y="0" />
+      <role key="炼狱穆人清" face="0" team="2" x="8" y="2" />
+      <role key="炼狱黄真" face="0" team="2" x="10" y="2" />
+      <role key="归辛树" face="0" team="2" x="7" y="1" />
+      <role key="袁承志" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山仙境_灭铁剑1" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="0" index="3" y="0" />
+      <role key="木桑道长" face="0" team="2" x="8" y="2" />
+      <role key="玉真子" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="华山仙境_灭铁剑2" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="0" index="3" y="0" />
+      <role key="炼狱玉真子" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="襄阳.战斗01" music="" mapkey="zhanchang" must="袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="0" index="3" y="0" />
+      <role key="神秘剑客" face="0" team="2" x="7" y="0" />
+      <role key="东厂杀手" face="0" team="2" x="7" y="1" />
+      <role key="东厂杀手" face="0" team="2" x="7" y="3" />
+      <role key="东厂杀手" face="0" team="2" x="7" y="2" />
+      <role key="东厂杀手" face="0" team="2" x="8" y="2" />
+      <role key="东厂杀手" face="0" team="2" x="8" y="3" />
+      <role key="东厂杀手" face="0" team="2" x="8" y="1" />
+      <role key="神秘剑客" face="0" team="2" x="8" y="0" />
+      <role key="东厂杀手" face="0" team="2" x="9" y="2" />
+      <role key="东厂杀手" face="0" team="2" x="9" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="襄阳.战斗02" music="" mapkey="zhanchang" must="主角#袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="1" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="归辛树" face="0" team="2" x="8" y="1" />
+      <role key="归二娘" face="0" team="2" x="8" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="襄阳.战斗03" music="" mapkey="zhanchang" must="袁承志">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="炼狱归辛树" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="崇祯_战斗" music="" mapkey="heiyijiao" must="袁承志#阿九">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="" face="1" team="1" x="0" index="1" y="2" />
+      <role key="" face="1" team="1" x="0" index="2" y="3" />
+      <role key="" face="1" team="1" x="0" index="3" y="0" />
+      <role key="崇祯皇帝" face="0" team="2" x="10" y="2" />
+      <role key="东厂杀手" face="0" team="2" x="9" y="0" />
+      <role key="东厂杀手" face="0" team="2" x="9" y="1" />
+      <role key="东厂杀手" face="0" team="2" x="9" y="3" />
+      <role key="东厂杀手" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random>
+      <role name="大内绝顶高手" level="3" face="0" x="6" y="0" />
+      <role name="大内绝顶高手" level="3" face="0" x="6" y="1" />
+      <role name="大内绝顶高手" level="3" face="0" x="6" y="3" />
+      <role name="大内绝顶高手" level="3" face="0" x="6" y="2" />
+      <role name="大内绝顶高手" level="3" face="0" x="7" y="0" />
+      <role name="大内绝顶高手" level="3" face="0" x="7" y="1" />
+      <role name="大内绝顶高手" level="3" face="0" x="7" y="3" />
+      <role name="大内绝顶高手" level="3" face="0" x="7" y="2" />
+    </random>
+  </battle>
+  <battle key="铁剑门_战斗1" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="2" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+      <role key="" face="1" team="1" x="1" index="3" y="2" />
+      <role key="玉真子" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="铁剑门_战斗2" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="炼狱玉真子" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="袁九变身_战斗" music="" mapkey="shanding" must="袁承志#九难">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="" face="1" team="1" x="2" index="1" y="3" />
+      <role key="炼狱金蛇郎君" face="0" team="2" x="8" y="1" />
+      <role key="炼狱金蛇郎君" face="0" team="2" x="8" y="3" />
+      <role key="炼狱金蛇郎君" face="0" team="2" x="9" y="2" />
+      <role key="炼狱金蛇郎君" face="0" team="2" x="9" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关.江湖异人.渔樵耕读" music="" mapkey="zhulin" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="2" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+      <role key="" face="1" team="1" x="1" index="3" y="3" />
+      <role key="褚万里" face="0" team="2" x="8" y="2" />
+      <role key="古笃诚" face="0" team="2" x="8" y="3" />
+      <role key="傅思归" face="0" team="2" x="9" y="1" />
+      <role key="朱丹臣" face="0" team="2" x="9" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关.江湖异人.高手来了！" music="" mapkey="simiao" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+    </roles>
+    <random>
+      <role name="神秘高手" level="3" boss="true" face="0" x="8" y="2" animation="" />
+    </random>
+  </battle>
+  <battle key="天关.江湖异人.四个和尚" music="" mapkey="simiao" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="玄慈方丈" face="0" team="2" x="9" y="1" />
+      <role key="玄难" face="0" team="2" x="9" y="3" />
+      <role key="玄寂" face="0" team="2" x="10" y="0" />
+      <role key="方证大师" face="0" team="2" x="10" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关.江湖异人.雁门关的雪？血？" music="" mapkey="heiyijiao" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="2" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+      <role key="" face="1" team="1" x="1" index="3" y="0" />
+    </roles>
+    <random>
+      <role name="神秘超级高手" level="4" boss="true" face="0" x="8" y="1" animation="" />
+      <role name="神秘超级高手" level="4" boss="true" face="0" x="8" y="3" animation="" />
+    </random>
+  </battle>
+  <battle key="天关.江湖异人.终章" music="" mapkey="shanding" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="2" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+      <role key="" face="1" team="1" x="1" index="3" y="0" />
+    </roles>
+    <random>
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="8" y="1" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="8" y="3" animation="" />
+    </random>
+  </battle>
+  <battle key="天关.炼狱.作为炼狱，一开始就应该很难" music="" mapkey="dongxue" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="2" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+    </roles>
+    <random>
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="9" y="2" animation="" />
+    </random>
+  </battle>
+  <battle key="天关.炼狱.来吧，小规模的华山论剑" music="" mapkey="shanding2" must="">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="2" />
+      <role key="" face="1" team="1" x="0" index="1" y="3" />
+      <role key="" face="1" team="1" x="1" index="2" y="1" />
+    </roles>
+    <random>
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="9" y="2" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="1" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="9" y="0" animation="" />
+    </random>
+  </battle>
+  <battle key="天关.炼狱.谁才是高手高手高高手" music="" mapkey="mojiao" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+    </roles>
+    <random>
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="8" y="2" animation="" />
+    </random>
+  </battle>
+  <battle key="天关.炼狱.又见血战重阳宫！" music="" mapkey="menpai3" must="">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+    </roles>
+    <random>
+      <role name="神秘绝顶高手" level="5" boss="true" face="1" x="0" y="0" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="1" x="0" y="3" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="0" animation="" />
+      <role name="神秘绝顶高手" level="5" boss="true" face="0" x="10" y="3" animation="" />
+    </random>
+  </battle>
+  <battle key="天关.决战光明顶" music="" mapkey="menpai3" must="">
+    <roles>
+      <role key="空性大师" face="0" team="1" x="8" index="" y="2" />
+      <role key="华山长老" face="0" team="1" x="8" index="" y="3" />
+      <role key="华山长老" face="0" team="1" x="8" index="" y="0" />
+      <role key="何太冲" face="0" team="1" x="7" index="" y="0" />
+      <role key="班淑娴" face="0" team="1" x="7" index="" y="3" />
+      <role key="灭绝师太" face="0" team="1" x="7" index="" y="2" />
+      <role key="光明顶张无忌" face="1" team="2" x="2" y="2" />
+      <role key="韦一笑" face="1" team="2" x="2" y="3" />
+      <role key="殷天正" face="1" team="2" x="2" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关.林平之的复仇" music="音乐.紧张感" mapkey="zhulin" must="">
+    <roles>
+      <role key="天关林平之" face="1" team="1" x="2" index="" y="1" />
+      <role key="岳灵珊" face="1" team="1" x="9" index="" y="3" />
+      <role key="木高峰" face="0" team="2" x="4" y="2" />
+      <role key="余沧海" face="0" team="2" x="4" y="3" />
+      <role key="青城派高手" face="1" team="2" x="7" y="0" />
+      <role key="青城派高手" face="1" team="2" x="7" y="3" />
+      <role key="青城派高手" face="0" team="2" x="10" y="1" />
+      <role key="青城派高手" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关.血战少室山" music="" mapkey="menpai3" must="">
+    <roles>
+      <role key="天关慕容复" face="0" team="1" x="8" index="" y="1" />
+      <role key="炼狱丁春秋" face="0" team="1" x="8" index="" y="2" />
+      <role key="天关庄聚贤" face="0" team="1" x="8" index="" y="3" />
+      <role key="天关乔峰" face="1" team="2" x="2" y="1" />
+      <role key="虚竹" face="1" team="2" x="2" y="2" />
+      <role key="天关段誉" face="1" team="2" x="2" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="天关.越女剑" music="音乐.刀间鼓" mapkey="zhulin" must="">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="" face="1" team="1" x="2" index="2" y="2" />
+      <role key="" face="1" team="1" x="2" index="3" y="3" />
+      <role key="" face="1" team="1" x="2" index="4" y="0" />
+      <role key="" face="1" team="1" x="2" index="5" y="1" />
+      <role key="" face="1" team="1" x="3" index="6" y="1" />
+      <role key="" face="1" team="1" x="3" index="7" y="2" />
+      <role key="" face="1" team="1" x="3" index="8" y="3" />
+      <role key="" face="1" team="1" x="3" index="9" y="0" />
+      <role key="阿青" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="星宿派_灭门" music="" mapkey="menpai3" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="1" />
+      <role key="" face="1" team="1" x="1" index="1" y="3" />
+      <role key="炼狱丁春秋" face="0" team="2" x="9" y="1" />
+      <role key="出尘子" face="0" team="2" x="9" y="3" />
+      <role key="天狼子" face="0" team="2" x="10" y="0" />
+      <role key="摘星子" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random>
+      <role name="星宿派弟子" level="2" face="0" x="6" y="0" />
+      <role name="星宿派弟子" level="2" face="0" x="6" y="1" />
+      <role name="星宿派弟子" level="2" face="0" x="6" y="3" />
+      <role name="星宿派弟子" level="2" face="0" x="6" y="2" />
+      <role name="星宿派弟子" level="2" face="0" x="7" y="0" />
+      <role name="星宿派弟子" level="2" face="0" x="7" y="1" />
+      <role name="星宿派弟子" level="2" face="0" x="7" y="3" />
+      <role name="星宿派弟子" level="2" face="0" x="7" y="2" />
+    </random>
+  </battle>
+  <battle key="东海剑池七伤拳" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="谢逊" face="1" team="1" x="2" index="" y="1" />
+      <role key="炼狱成昆" face="0" team="2" x="7" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池降龙十八掌" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="萧峰" face="1" team="1" x="2" index="" y="1" />
+      <role key="慕容复" face="0" team="2" x="7" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池夫妻刀法" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="萧中慧" face="1" team="1" x="2" index="" y="1" />
+      <role key="袁冠南" face="1" team="1" x="2" index="" y="0" />
+      <role key="卓天雄" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池胡家刀法" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="胡一刀" face="1" team="1" x="2" index="" y="1" />
+      <role key="苗人凤" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池鸳鸯刀法" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="鸳鸯刀传人" face="1" team="1" x="2" index="" y="1" />
+      <role key="神秘伍长" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池倚天屠龙笔法" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="张翠山" face="1" team="1" x="2" index="" y="1" />
+      <role key="何太冲" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池斗转星移" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="慕容博" face="1" team="1" x="2" index="" y="1" />
+      <role key="萧远山" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池打狗棒法" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="洪七公" face="1" team="1" x="2" index="" y="1" />
+      <role key="欧阳锋" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池太极剑法" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="莫声谷" face="1" team="1" x="2" index="" y="1" />
+      <role key="灭绝师太" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池狂风快剑" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="封不平" face="1" team="1" x="2" index="" y="1" />
+      <role key="岳不群" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="东海剑池独孤九剑" music="" mapkey="jianchi" must="">
+    <roles>
+      <role key="松鼠独孤求败" face="1" team="1" x="2" index="" y="1" />
+      <role key="炼狱东方不败" face="0" team="2" x="9" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="星宿派毒物1" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="毒猴子" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="星宿派毒物2" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="魔神" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="星宿派阿紫" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="阿紫" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="星宿派门比1" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="星宿弟子" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="星宿派门比2" music="" mapkey="zhulin" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="天狼子" face="0" team="2" x="8" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="星宿派擂鼓山之战" music="音乐.刀间鼓" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="丁春秋" face="1" team="1" x="2" index="" y="3" />
+      <role key="天狼子" face="1" team="1" x="3" index="" y="2" />
+      <role key="摘星子" face="1" team="1" x="3" index="" y="3" />
+      <role key="狮吼子" face="1" team="1" x="3" index="" y="1" />
+      <role key="出尘子" face="1" team="1" x="3" index="" y="0" />
+      <role key="苏星河" face="0" team="2" x="8" y="2" />
+      <role key="慕容复" face="0" team="2" x="8" y="3" />
+      <role key="段延庆" face="0" team="2" x="7" y="1" />
+      <role key="叶二娘" face="0" team="2" x="7" y="2" />
+      <role key="云中鹤" face="0" team="2" x="7" y="3" />
+      <role key="岳老三" face="0" team="2" x="7" y="0" />
+      <role key="玄难" face="0" team="2" x="8" y="1" />
+      <role key="鸠摩智" face="0" team="2" x="9" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_灭门武当" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="0" index="0" y="1" />
+      <role key="张召重" face="0" team="2" x="7" y="0" />
+      <role key="冲虚道长" face="0" team="2" x="7" y="1" />
+      <role key="炼狱张三丰" face="0" team="2" x="7" y="2" />
+      <role key="神级张无忌" face="0" team="2" x="7" y="3" />
+      <role key="宋远桥" face="0" team="2" x="8" y="0" />
+      <role key="俞莲舟" face="0" team="2" x="8" y="2" />
+      <role key="俞岱岩" face="0" team="2" x="8" y="1" />
+      <role key="张松溪" face="0" team="2" x="9" y="1" />
+      <role key="张翠山" face="0" team="2" x="9" y="2" />
+      <role key="殷梨亭" face="0" team="2" x="9" y="3" />
+      <role key="莫声谷" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_灭门少林" music="" mapkey="simiao" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="2" index="0" y="2" />
+      <role key="渡厄" face="0" team="2" x="3" y="2" />
+      <role key="渡劫" face="0" team="2" x="3" y="1" />
+      <role key="渡难" face="0" team="2" x="3" y="3" />
+      <role key="玄生" face="0" team="2" x="5" y="3" />
+      <role key="无名老僧" face="0" team="2" x="6" y="0" />
+      <role key="虚竹" face="0" team="2" x="7" y="0" />
+      <role key="方证大师" face="0" team="2" x="9" y="1" />
+      <role key="火工头陀" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_灭门日月" music="" mapkey="shanding" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="1" index="0" y="2" />
+      <role key="炼狱超级疯狂封不平" face="0" team="2" x="8" y="2" />
+      <role key="神林平之" face="1" team="2" x="8" y="3" />
+      <role key="炼狱东方不败" face="0" team="2" x="5" y="0" />
+      <role key="任我行" face="0" team="2" x="5" y="1" />
+      <role key="向问天" face="0" team="2" x="5" y="3" />
+      <role key="上官云" face="0" team="2" x="5" y="2" />
+      <role key="不败令狐冲" face="0" team="2" x="6" y="0" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_暗杀黄裳" music="" mapkey="heiyijiao" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="松鼠洪七公" face="1" team="2" x="2" y="1" />
+      <role key="松鼠郭靖" face="1" team="2" x="2" y="3" />
+      <role key="松鼠乔峰" face="0" team="2" x="10" y="1" />
+      <role key="松鼠黄裳" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_暗杀独孤求败" music="" mapkey="yewai2" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="4" index="0" y="1" />
+      <role key="松鼠独孤求败" face="1" team="2" x="0" y="0" />
+      <role key="松鼠风清扬" face="1" team="2" x="0" y="3" />
+      <role key="松鼠杨过" face="0" team="2" x="10" y="0" />
+      <role key="松鼠令狐冲" face="0" team="2" x="10" y="3" />
+      <role key="松鼠神雕" face="0" team="2" x="10" y="2" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_暗杀王重阳" music="" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="松鼠杨过" face="1" team="2" x="2" y="1" />
+      <role key="松鼠小龙女" face="1" team="2" x="2" y="3" />
+      <role key="松鼠王重阳" face="0" team="2" x="10" y="1" />
+      <role key="松鼠林朝英" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_对战黑衣使者" music="音乐.武林至尊" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="神秘使者" face="1" team="2" x="2" y="1" />
+      <role key="神秘刺史" face="1" team="2" x="2" y="3" />
+      <role key="神秘刺史" face="0" team="2" x="10" y="1" />
+      <role key="神秘刺史" face="0" team="2" x="10" y="3" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_对战魔君" music="音乐.武林至尊" mapkey="dongxue" must="主角">
+    <roles>
+      <role key="" face="0" team="1" x="5" index="0" y="1" />
+      <role key="魔君" face="1" team="2" x="2" y="1" />
+    </roles>
+    <random />
+  </battle>
+  <battle key="黑衣_华山" music="音乐.华山论剑" mapkey="shanding2" must="主角">
+    <roles>
+      <role key="" face="1" team="1" x="4" index="0" y="0" />
+      <role key="华山胡斐" face="1" team="2" x="1" y="1" />
+      <role key="华山狄云" face="1" team="2" x="1" y="2" />
+      <role key="华山段誉" face="1" team="2" x="1" y="3" />
+      <role key="松鼠乔峰" face="1" team="2" x="1" y="0" />
+      <role key="虚竹" face="1" team="2" x="2" y="0" />
+      <role key="松鼠郭靖" face="1" team="2" x="2" y="1" />
+      <role key="松鼠黄蓉" face="1" team="2" x="2" y="3" />
+      <role key="不败令狐冲" face="1" team="2" x="2" y="2" />
+      <role key="松鼠杨过" face="1" team="2" x="0" y="0" />
+      <role key="松鼠小龙女" face="1" team="2" x="0" y="3" />
+      <role key="华山郭襄" face="1" team="2" x="0" y="2" />
+      <role key="疯狂石破天" face="0" team="2" x="7" y="1" />
+      <role key="神级张无忌" face="0" team="2" x="7" y="2" />
+      <role key="华山袁承志" face="0" team="2" x="7" y="3" />
+    </roles>
+    <random />
+  </battle>
+</root>

@@ -1,0 +1,4009 @@
+[
+  {
+    "name": "小人物的愤怒",
+    "startSkill": "罗汉拳",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "松风剑法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "南山刀法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "袖箭",
+        "level": 10
+      }
+    ],
+    "powerExtra": 15.0,
+    "animation": null,
+    "id": "小人物的愤怒-罗汉拳"
+  },
+  {
+    "name": "小人物的愤怒",
+    "startSkill": "松风剑法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "罗汉拳",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "南山刀法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "袖箭",
+        "level": 10
+      }
+    ],
+    "powerExtra": 15.0,
+    "animation": null,
+    "id": "小人物的愤怒-松风剑法"
+  },
+  {
+    "name": "小人物的愤怒",
+    "startSkill": "南山刀法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "罗汉拳",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "松风剑法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "袖箭",
+        "level": 10
+      }
+    ],
+    "powerExtra": 15.0,
+    "animation": null,
+    "id": "小人物的愤怒-南山刀法"
+  },
+  {
+    "name": "小人物的愤怒",
+    "startSkill": "袖箭",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "罗汉拳",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "松风剑法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "南山刀法",
+        "level": 10
+      }
+    ],
+    "powerExtra": 15.0,
+    "animation": null,
+    "id": "小人物的愤怒-袖箭"
+  },
+  {
+    "name": "千手观音",
+    "startSkill": "大金刚掌",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 2,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "如来千手法",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_zhangblue",
+    "id": "千手观音-大金刚掌"
+  },
+  {
+    "name": "黑沼灵狐",
+    "startSkill": "佛光普照",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "轻身",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "峨眉剑法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "四象掌",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "飘雪穿云掌",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "zhang",
+    "id": "黑沼灵狐-佛光普照"
+  },
+  {
+    "name": "嵩山神掌",
+    "startSkill": "大嵩阳手",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "嵩山剑法",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_zhangblue",
+    "id": "嵩山神掌-大嵩阳手"
+  },
+  {
+    "name": "九阴白骨爪.九阴神爪",
+    "startSkill": "九阴白骨爪",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 3,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "九阴神功",
+        "level": 1
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "zhua",
+    "id": "九阴白骨爪.九阴神爪-九阴白骨爪"
+  },
+  {
+    "name": "九阴白骨爪.九阴魔爪",
+    "startSkill": "九阴白骨爪",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 8,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "毒圣"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_zhua",
+    "id": "九阴白骨爪.九阴魔爪-九阴白骨爪"
+  },
+  {
+    "name": "千噬万毒",
+    "startSkill": "灵蛇拳",
+    "probability": 0.3,
+    "requiredLevel": 8,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 6,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "蛤蟆功",
+        "level": 5
+      },
+      {
+        "type": "talent",
+        "targetId": "毒系精通"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "longjuanfeng_green",
+    "id": "千噬万毒-灵蛇拳"
+  },
+  {
+    "name": "千噬万毒",
+    "startSkill": "灵蛇拳",
+    "probability": 0.3,
+    "requiredLevel": 8,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 6,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "蛤蟆功",
+        "level": 1
+      },
+      {
+        "type": "talent",
+        "targetId": "毒圣"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "longjuanfeng_green",
+    "id": "千噬万毒-灵蛇拳-2"
+  },
+  {
+    "name": "千噬万毒",
+    "startSkill": "灵蛇拳",
+    "probability": 0.3,
+    "requiredLevel": 8,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 6,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "臭蛤蟆"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "longjuanfeng_green",
+    "id": "千噬万毒-灵蛇拳-3"
+  },
+  {
+    "name": "阴阳双指",
+    "startSkill": "幻阴指",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "重伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "一阳指",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "longjuanfeng2",
+    "id": "阴阳双指-幻阴指"
+  },
+  {
+    "name": "阴阳双指",
+    "startSkill": "一阳指",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "重伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "幻阴指",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "longjuanfeng2",
+    "id": "阴阳双指-一阳指"
+  },
+  {
+    "name": "天南一指",
+    "startSkill": "一阳指",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "攻击弱化",
+        "level": 3,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "大理世家"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "fo",
+    "id": "天南一指-一阳指"
+  },
+  {
+    "name": "纯阳一指",
+    "startSkill": "一阳指",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "攻击弱化",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "九阳神功",
+        "level": 9
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "yunshi",
+    "id": "纯阳一指-一阳指"
+  },
+  {
+    "name": "纯阳一指",
+    "startSkill": "一阳指",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "攻击弱化",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "纯阳无极功",
+        "level": 9
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "yunshi",
+    "id": "纯阳一指-一阳指-2"
+  },
+  {
+    "name": "先天一指",
+    "startSkill": "一阳指",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "攻击强化",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "先天功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "清心"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "yunshi_big",
+    "id": "先天一指-一阳指"
+  },
+  {
+    "name": "钢铁奔雷",
+    "startSkill": "铁掌",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 0,
+        "duration": 1,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "金钟罩"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baozhahuo",
+    "id": "钢铁奔雷-铁掌"
+  },
+  {
+    "name": "寒冰玄煞",
+    "startSkill": "寒冰神掌",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "寒冰真气",
+        "level": 10
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "bingkuai",
+    "id": "寒冰玄煞-寒冰神掌"
+  },
+  {
+    "name": "冰凛嵩山",
+    "startSkill": "嵩山剑法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "寒冰真气",
+        "level": 10
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "bingkuai",
+    "id": "冰凛嵩山-嵩山剑法"
+  },
+  {
+    "name": "空明神拳",
+    "startSkill": "空明拳",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "左右互搏"
+      }
+    ],
+    "powerExtra": 6.0,
+    "animation": "quanji",
+    "id": "空明神拳-空明拳"
+  },
+  {
+    "name": "大宗师",
+    "startSkill": "庖丁解牛",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "百花错拳",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "北冥神功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "quanji",
+    "id": "大宗师-庖丁解牛"
+  },
+  {
+    "name": "碧海潮生",
+    "startSkill": "弹指神通",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "轻身",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "落英神剑掌",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "玉箫剑法",
+        "level": 10
+      }
+    ],
+    "powerExtra": 6.0,
+    "animation": null,
+    "id": "碧海潮生-弹指神通"
+  },
+  {
+    "name": "华山一剑",
+    "startSkill": "狂风快剑",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "华山剑法",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "紫霞神功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "flower_jian",
+    "id": "华山一剑-狂风快剑"
+  },
+  {
+    "name": "华山一剑",
+    "startSkill": "狂风快剑",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "夺命连环三仙剑",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "紫霞神功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "flower_jian",
+    "id": "华山一剑-狂风快剑-2"
+  },
+  {
+    "name": "华山剑宗",
+    "startSkill": "狂风快剑",
+    "probability": 0.5,
+    "requiredLevel": 15,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "夺命连环三仙剑",
+        "level": 10
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "flower_jian",
+    "id": "华山剑宗-狂风快剑"
+  },
+  {
+    "name": "紫霞剑气",
+    "startSkill": "华山剑法",
+    "probability": 0.5,
+    "requiredLevel": 15,
+    "buffs": [
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "紫霞神功",
+        "level": 20
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "aoyi_jianpurple",
+    "id": "紫霞剑气-华山剑法"
+  },
+  {
+    "name": "潇湘夜雨.一剑落九雁",
+    "startSkill": "百变千幻云雾十三式",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "琴胆剑心",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "luoxing_purple",
+    "id": "潇湘夜雨.一剑落九雁-百变千幻云雾十三式"
+  },
+  {
+    "name": "金蛇郎君.金蛇剑法奥义",
+    "startSkill": "金蛇剑法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 3,
+        "duration": 2,
+        "chance": 100
+      },
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "金蛇郎君"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi3",
+    "id": "金蛇郎君.金蛇剑法奥义-金蛇剑法"
+  },
+  {
+    "name": "云意",
+    "startSkill": "柔云剑法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "缓速",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "内伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "武当心法",
+        "level": 10
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "dalei",
+    "id": "云意-柔云剑法"
+  },
+  {
+    "name": "两仪反转",
+    "startSkill": "两仪剑法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "缓速",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "内伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "反两仪刀法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "taiji3",
+    "id": "两仪反转-两仪剑法"
+  },
+  {
+    "name": "狂风",
+    "startSkill": "狂风快剑",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "狂风刀法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "longjuanfeng2",
+    "id": "狂风-狂风快剑"
+  },
+  {
+    "name": "万劫闪电貂",
+    "startSkill": "万劫刀法",
+    "probability": 0.3,
+    "requiredLevel": 1,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "special_skill",
+        "targetId": "闪电貂"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": null,
+    "id": "万劫闪电貂-万劫刀法"
+  },
+  {
+    "name": "狂风",
+    "startSkill": "狂风刀法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "狂风快剑",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "longjuanfeng2",
+    "id": "狂风-狂风刀法"
+  },
+  {
+    "name": "天山雪",
+    "startSkill": "草原刀法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "三分剑法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "bingdong",
+    "id": "天山雪-草原刀法"
+  },
+  {
+    "name": "两仪反转",
+    "startSkill": "反两仪刀法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "缓速",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "内伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "两仪剑法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "taiji3",
+    "id": "两仪反转-反两仪刀法"
+  },
+  {
+    "name": "达摩焚天",
+    "startSkill": "燃木刀法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "内伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "天竺佛指",
+        "level": 9
+      },
+      {
+        "type": "skill",
+        "targetId": "如来千手法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_fire",
+    "id": "达摩焚天-燃木刀法"
+  },
+  {
+    "name": "达摩千劫",
+    "startSkill": "达摩剑法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "内伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "大金刚掌",
+        "level": 9
+      },
+      {
+        "type": "skill",
+        "targetId": "如来千手法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "yunshi_big",
+    "id": "达摩千劫-达摩剑法"
+  },
+  {
+    "name": "玉蜂群",
+    "startSkill": "玉蜂针",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "玉女素心剑",
+        "level": 9
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "九阴神功",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "longjuanfeng2",
+    "id": "玉蜂群-玉蜂针"
+  },
+  {
+    "name": "黑血奇毒",
+    "startSkill": "黑血神针",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "毒龙鞭法",
+        "level": 9
+      },
+      {
+        "type": "skill",
+        "targetId": "五毒神掌",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "duyao2",
+    "id": "黑血奇毒-黑血神针"
+  },
+  {
+    "name": "日月魔剑",
+    "startSkill": "日月鞭法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "魔神降临",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "嵩山剑法",
+        "level": 9
+      },
+      {
+        "type": "skill",
+        "targetId": "华山剑法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_guangjian",
+    "id": "日月魔剑-日月鞭法"
+  },
+  {
+    "name": "古墓.森罗万象.天罗地网掌",
+    "startSkill": "天罗地网掌",
+    "probability": 0.3,
+    "requiredLevel": 5,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "轻身",
+        "level": 1,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "玉女剑法",
+        "level": 5
+      },
+      {
+        "type": "skill",
+        "targetId": "玉蜂针",
+        "level": 5
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "玉女心经",
+        "level": 5
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_flower",
+    "id": "古墓.森罗万象.天罗地网掌-天罗地网掌"
+  },
+  {
+    "name": "古墓.森罗万象.玉女剑法",
+    "startSkill": "玉女剑法",
+    "probability": 0.3,
+    "requiredLevel": 5,
+    "buffs": [
+      {
+        "id": "伤害加深",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "轻身",
+        "level": 1,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "天罗地网掌",
+        "level": 5
+      },
+      {
+        "type": "skill",
+        "targetId": "玉蜂针",
+        "level": 5
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "玉女心经",
+        "level": 5
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_flower",
+    "id": "古墓.森罗万象.玉女剑法-玉女剑法"
+  },
+  {
+    "name": "古墓.森罗万象.驱蜂术",
+    "startSkill": "玉蜂针",
+    "probability": 0.3,
+    "requiredLevel": 5,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "轻身",
+        "level": 1,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "玉女剑法",
+        "level": 5
+      },
+      {
+        "type": "skill",
+        "targetId": "天罗地网掌",
+        "level": 5
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "玉女心经",
+        "level": 5
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_flower",
+    "id": "古墓.森罗万象.驱蜂术-玉蜂针"
+  },
+  {
+    "name": "大轮.无上秘境.密宗大手印",
+    "startSkill": "密宗大手印",
+    "probability": 0.3,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "缓速",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "漫天花雨",
+        "level": 7
+      },
+      {
+        "type": "skill",
+        "targetId": "无上大力杵",
+        "level": 7
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_laolong",
+    "id": "大轮.无上秘境.密宗大手印-密宗大手印"
+  },
+  {
+    "name": "大轮.无上秘境.漫天花雨",
+    "startSkill": "漫天花雨",
+    "probability": 0.3,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "密宗大手印",
+        "level": 7
+      },
+      {
+        "type": "skill",
+        "targetId": "无上大力杵",
+        "level": 7
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_laolong",
+    "id": "大轮.无上秘境.漫天花雨-漫天花雨"
+  },
+  {
+    "name": "大轮.无上秘境.金刚神杵",
+    "startSkill": "无上大力杵",
+    "probability": 0.3,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "内伤",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "密宗大手印",
+        "level": 7
+      },
+      {
+        "type": "skill",
+        "targetId": "漫天花雨",
+        "level": 7
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_laolong",
+    "id": "大轮.无上秘境.金刚神杵-无上大力杵"
+  },
+  {
+    "name": "灵鹫宫绝学.天羽奇剑",
+    "startSkill": "归藏剑",
+    "probability": 0.3,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "天山掌法",
+        "level": 7
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "天山心法",
+        "level": 7
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "longjuanfeng2",
+    "id": "灵鹫宫绝学.天羽奇剑-归藏剑"
+  },
+  {
+    "name": "灵鹫宫绝学.逍遥游",
+    "startSkill": "天山掌法",
+    "probability": 0.3,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "轻身",
+        "level": 3,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "归藏剑",
+        "level": 7
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "天山心法",
+        "level": 7
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "longjuanfeng2",
+    "id": "灵鹫宫绝学.逍遥游-天山掌法"
+  },
+  {
+    "name": "灵鹫宫绝学.北冥一剑",
+    "startSkill": "归藏剑",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "北冥真气"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_jianpurple",
+    "id": "灵鹫宫绝学.北冥一剑-归藏剑"
+  },
+  {
+    "name": "灵鹫宫绝学.北冥神掌",
+    "startSkill": "天山掌法",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "北冥真气"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_banruozhang",
+    "id": "灵鹫宫绝学.北冥神掌-天山掌法"
+  },
+  {
+    "name": "逍遥绝学.信天游",
+    "startSkill": "天山六阳掌",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "北冥真气"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_hongzha",
+    "id": "逍遥绝学.信天游-天山六阳掌"
+  },
+  {
+    "name": "灵鹫宫绝学.北冥神掌",
+    "startSkill": "天山折梅手",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "北冥真气"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_banruozhang",
+    "id": "灵鹫宫绝学.北冥神掌-天山折梅手"
+  },
+  {
+    "name": "灵鹫宫绝学.天地唯我独尊",
+    "startSkill": "天山折梅手",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "恢复",
+        "level": 6,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "伤害加深",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "八荒六合唯我独尊功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": null,
+    "id": "灵鹫宫绝学.天地唯我独尊-天山折梅手"
+  },
+  {
+    "name": "星宿派绝学.幽冥神掌",
+    "startSkill": "三阴蜈蚣爪",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 7,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "伤害加深",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "化功大法",
+        "level": 10
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_baozhahuo",
+    "id": "星宿派绝学.幽冥神掌-三阴蜈蚣爪"
+  },
+  {
+    "name": "星宿派绝学.幽冥神掌",
+    "startSkill": "抽髓掌",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 7,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "伤害加深",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "化功大法",
+        "level": 10
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_baozhahuo",
+    "id": "星宿派绝学.幽冥神掌-抽髓掌"
+  },
+  {
+    "name": "星宿派绝学.幽冥神掌",
+    "startSkill": "三阴蜈蚣爪",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 7,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "伤害加深",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "抽髓掌",
+        "level": 10
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_baozhahuo",
+    "id": "星宿派绝学.幽冥神掌-三阴蜈蚣爪-2"
+  },
+  {
+    "name": "全真绝学.太乙剑诀",
+    "startSkill": "一剑化三清",
+    "probability": 0.2,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 4,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "全真剑法",
+        "level": 7
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "全真心法",
+        "level": 7
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "taiji3",
+    "id": "全真绝学.太乙剑诀-一剑化三清"
+  },
+  {
+    "name": "全真绝学.太乙剑诀",
+    "startSkill": "七星七绝剑",
+    "probability": 0.3,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 4,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "全真剑法",
+        "level": 7
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "全真心法",
+        "level": 7
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "taiji3",
+    "id": "全真绝学.太乙剑诀-七星七绝剑"
+  },
+  {
+    "name": "全真绝学.重阳剑法",
+    "startSkill": "七星七绝剑",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 0,
+        "duration": 1,
+        "chance": 100
+      },
+      {
+        "id": "重伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "全真剑法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "一剑化三清",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "先天功",
+        "level": 5
+      }
+    ],
+    "powerExtra": 6.0,
+    "animation": "aoyi_fire",
+    "id": "全真绝学.重阳剑法-七星七绝剑"
+  },
+  {
+    "name": "全真绝学.三花聚顶",
+    "startSkill": "三花聚顶掌",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 0,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "昊天掌",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "全真心法",
+        "level": 10
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "hua",
+    "id": "全真绝学.三花聚顶-三花聚顶掌"
+  },
+  {
+    "name": "全真绝学.三花聚顶.炼神返虚",
+    "startSkill": "三花聚顶掌",
+    "probability": 0.3,
+    "requiredLevel": 16,
+    "buffs": [
+      {
+        "id": "集气",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "昊天掌",
+        "level": 16
+      }
+    ],
+    "powerExtra": 7.0,
+    "animation": "aoyi_long2",
+    "id": "全真绝学.三花聚顶.炼神返虚-三花聚顶掌"
+  },
+  {
+    "name": "大理绝学.六脉神剑奥义",
+    "startSkill": "六脉神剑",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "神速攻击",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "大理世家"
+      }
+    ],
+    "powerExtra": 6.0,
+    "animation": "aoyi_bluelight",
+    "id": "大理绝学.六脉神剑奥义-六脉神剑"
+  },
+  {
+    "name": "大理绝学.六脉神剑奥义",
+    "startSkill": "六脉神剑",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "神速攻击",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "一阳指",
+        "level": 10
+      }
+    ],
+    "powerExtra": 6.0,
+    "animation": "aoyi_bluelight",
+    "id": "大理绝学.六脉神剑奥义-六脉神剑-2"
+  },
+  {
+    "name": "丐帮绝学.打狗棒法奥义",
+    "startSkill": "打狗棒法",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "集气",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "降龙十八掌",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "臭叫花"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_dagoubang",
+    "id": "丐帮绝学.打狗棒法奥义-打狗棒法"
+  },
+  {
+    "name": "丐帮绝学.打狗棒法奥义",
+    "startSkill": "打狗棒法",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "集气",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "降龙十八掌",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_dagoubang",
+    "id": "丐帮绝学.打狗棒法奥义-打狗棒法-2"
+  },
+  {
+    "name": "丐帮绝学.打狗棒法奥义",
+    "startSkill": "打狗棒法",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "集气",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "玲珑璇玑"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_dagoubang",
+    "id": "丐帮绝学.打狗棒法奥义-打狗棒法-3"
+  },
+  {
+    "name": "古墓绝学.双剑合璧",
+    "startSkill": "玉女素心剑",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "致盲",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "缓速",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "玉女剑法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "天罗地网掌",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "玉蜂针",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "玉女心经",
+        "level": 10
+      }
+    ],
+    "powerExtra": 6.0,
+    "animation": "aoyi_flower",
+    "id": "古墓绝学.双剑合璧-玉女素心剑"
+  },
+  {
+    "name": "慕容绝学.离合参商",
+    "startSkill": "斗转星移",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "斗转星移"
+      },
+      {
+        "type": "talent",
+        "targetId": "慕容世家"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_hongzha",
+    "id": "慕容绝学.离合参商-斗转星移"
+  },
+  {
+    "name": "慕容绝学.离合参商",
+    "startSkill": "斗转星移",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "斗转星移"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_hongzha",
+    "id": "慕容绝学.离合参商-斗转星移-2"
+  },
+  {
+    "name": "逍遥绝学.生死符",
+    "startSkill": "天山六阳掌",
+    "probability": 0.5,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 18,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "天山折梅手",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "北冥神功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_shengsifu",
+    "id": "逍遥绝学.生死符-天山六阳掌"
+  },
+  {
+    "name": "逍遥绝学.生死符",
+    "startSkill": "天山折梅手",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "中毒",
+        "level": 18,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "天山六阳掌",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "北冥神功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_shengsifu",
+    "id": "逍遥绝学.生死符-天山折梅手"
+  },
+  {
+    "name": "华山绝学.独孤九剑奥义",
+    "startSkill": "独孤九剑",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "神行",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "华山剑法",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "狂风快剑",
+        "level": 10
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi3",
+    "id": "华山绝学.独孤九剑奥义-独孤九剑"
+  },
+  {
+    "name": "华山绝学.独孤九剑奥义",
+    "startSkill": "独孤九剑",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "神行",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "华山剑法",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "紫霞神功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi3",
+    "id": "华山绝学.独孤九剑奥义-独孤九剑-2"
+  },
+  {
+    "name": "绝户虎爪手.断子绝孙爪",
+    "startSkill": "绝户虎爪手",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 0,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "太极神功",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "绵掌",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baozhahuo",
+    "id": "绝户虎爪手.断子绝孙爪-绝户虎爪手"
+  },
+  {
+    "name": "武当绝学.太极拳奥义",
+    "startSkill": "太极拳",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "太极神功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "太极宗师",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baguajian",
+    "id": "武当绝学.太极拳奥义-太极拳"
+  },
+  {
+    "name": "武当绝学.太极拳奥义",
+    "startSkill": "太极拳",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "太极神功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "太极高手",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baguajian",
+    "id": "武当绝学.太极拳奥义-太极拳-2"
+  },
+  {
+    "name": "武当绝学.太极拳奥义",
+    "startSkill": "太极拳",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "太极剑",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baguajian",
+    "id": "武当绝学.太极拳奥义-太极拳-3"
+  },
+  {
+    "name": "武当绝学.太极剑奥义",
+    "startSkill": "太极剑",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "太极神功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "太极宗师",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baguajian",
+    "id": "武当绝学.太极剑奥义-太极剑"
+  },
+  {
+    "name": "武当绝学.太极剑奥义",
+    "startSkill": "太极剑",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "太极神功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "太极高手",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baguajian",
+    "id": "武当绝学.太极剑奥义-太极剑-2"
+  },
+  {
+    "name": "武当绝学.太极剑奥义",
+    "startSkill": "太极剑",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "太极拳",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baguajian",
+    "id": "武当绝学.太极剑奥义-太极剑-3"
+  },
+  {
+    "name": "纯阳无极功.太极拳奥义",
+    "startSkill": "太极拳",
+    "probability": 1.0,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "纯阳无极功",
+        "level": 15
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baguajian",
+    "id": "纯阳无极功.太极拳奥义-太极拳"
+  },
+  {
+    "name": "纯阳无极功.太极剑奥义",
+    "startSkill": "太极剑",
+    "probability": 1.0,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "麻痹",
+        "level": 2,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "纯阳无极功",
+        "level": 15
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_baguajian",
+    "id": "纯阳无极功.太极剑奥义-太极剑"
+  },
+  {
+    "name": "大轮绝学.般若火舞",
+    "startSkill": "火焰刀法",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 0,
+        "duration": 1,
+        "chance": 100
+      },
+      {
+        "id": "中毒",
+        "level": 10,
+        "duration": 2,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "龙象般若功",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "密宗大手印",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "漫天花雨",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "无上大力杵",
+        "level": 10
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_fire",
+    "id": "大轮绝学.般若火舞-火焰刀法"
+  },
+  {
+    "name": "龙象般若功奥义.象跌势",
+    "startSkill": "龙象般若功.龙象秘境",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 0,
+        "duration": 1,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "龙象般若功",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "密宗大手印",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "漫天花雨",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "无上大力杵",
+        "level": 10
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_jinzhong",
+    "id": "龙象般若功奥义.象跌势-龙象般若功.龙象秘境"
+  },
+  {
+    "name": "龙象般若功奥义.龙吞势",
+    "startSkill": "龙象般若功.庄严宝相",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "伤害加深",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "龙象般若功",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "密宗大手印",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "漫天花雨",
+        "level": 10
+      },
+      {
+        "type": "skill",
+        "targetId": "无上大力杵",
+        "level": 10
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_long",
+    "id": "龙象般若功奥义.龙吞势-龙象般若功.庄严宝相"
+  },
+  {
+    "name": "少林阵法.金刚伏魔圈",
+    "startSkill": "日月神鞭",
+    "probability": 0.9,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "缓速",
+        "level": 10,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "防御强化",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "金刚伏魔圈"
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "易筋经",
+        "level": 10
+      }
+    ],
+    "powerExtra": 10.0,
+    "animation": "foxiang",
+    "id": "少林阵法.金刚伏魔圈-日月神鞭"
+  },
+  {
+    "name": "明教.大光明圣火",
+    "startSkill": "弹指神通",
+    "probability": 0.5,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "防御强化",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "光明圣火阵"
+      }
+    ],
+    "powerExtra": 1.0,
+    "animation": "aoyi_fire",
+    "id": "明教.大光明圣火-弹指神通"
+  },
+  {
+    "name": "明教.大光明圣火",
+    "startSkill": "须弥山掌",
+    "probability": 0.5,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "防御强化",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "光明圣火阵"
+      }
+    ],
+    "powerExtra": 1.0,
+    "animation": "aoyi_fire",
+    "id": "明教.大光明圣火-须弥山掌"
+  },
+  {
+    "name": "降龙十八掌.履霜冰至",
+    "startSkill": "降龙十八掌",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "麻痹",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "神行",
+        "level": 1,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "擒龙功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "天龙.盖世英雄"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "bingkuai",
+    "id": "降龙十八掌.履霜冰至-降龙十八掌"
+  },
+  {
+    "name": "降龙十八掌.震惊百里",
+    "startSkill": "降龙十八掌",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 0,
+        "duration": 1,
+        "chance": 100
+      },
+      {
+        "id": "神行",
+        "level": 1,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "擒龙功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "天龙.盖世英雄"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_long2",
+    "id": "降龙十八掌.震惊百里-降龙十八掌"
+  },
+  {
+    "name": "降龙十八掌.密云不雨",
+    "startSkill": "降龙十八掌",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "缓速",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "神行",
+        "level": 1,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "擒龙功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "天龙.盖世英雄"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "dalei",
+    "id": "降龙十八掌.密云不雨-降龙十八掌"
+  },
+  {
+    "name": "降龙十八掌.突如其来",
+    "startSkill": "降龙十八掌",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "伤害加深",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "神行",
+        "level": 1,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "擒龙功",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "天龙.盖世英雄"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_long3",
+    "id": "降龙十八掌.突如其来-降龙十八掌"
+  },
+  {
+    "name": "降龙十八掌.时乘六龙",
+    "startSkill": "降龙十八掌",
+    "probability": 0.15,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "神行",
+        "level": 1,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "擒龙功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_long3",
+    "id": "降龙十八掌.时乘六龙-降龙十八掌"
+  },
+  {
+    "name": "降龙十八掌奥义式",
+    "startSkill": "降龙十八掌",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "重伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "魔神降临",
+        "level": 1,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "射雕英雄"
+      }
+    ],
+    "powerExtra": 6.0,
+    "animation": "aoyi_long4",
+    "id": "降龙十八掌奥义式-降龙十八掌"
+  },
+  {
+    "name": "绝学.无招胜有招",
+    "startSkill": "独孤九剑",
+    "probability": 0.4,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 10,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "缓速",
+        "level": 10,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "玄铁剑法",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "孤独求败"
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_jianying",
+    "id": "绝学.无招胜有招-独孤九剑"
+  },
+  {
+    "name": "绝学.无招胜有招",
+    "startSkill": "独孤九剑",
+    "probability": 0.2,
+    "requiredLevel": 12,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 10,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "缓速",
+        "level": 10,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "浪子剑客"
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_jianying",
+    "id": "绝学.无招胜有招-独孤九剑-2"
+  },
+  {
+    "name": "绝学.无招胜有招",
+    "startSkill": "玄铁剑法",
+    "probability": 0.4,
+    "requiredLevel": 12,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 10,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "缓速",
+        "level": 10,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "神雕大侠"
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_jianying",
+    "id": "绝学.无招胜有招-玄铁剑法"
+  },
+  {
+    "name": "绝学.刀剑归真",
+    "startSkill": "胡家刀法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "轻身",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "神速攻击",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "苗家剑法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 8.0,
+    "animation": "aoyi_baguadao",
+    "id": "绝学.刀剑归真-胡家刀法"
+  },
+  {
+    "name": "绝学.刀剑归真",
+    "startSkill": "苗家剑法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "轻身",
+        "level": 1,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "神速攻击",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "飘渺",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "胡家刀法",
+        "level": 9
+      }
+    ],
+    "powerExtra": 8.0,
+    "animation": "aoyi_baguajian",
+    "id": "绝学.刀剑归真-苗家剑法"
+  },
+  {
+    "name": "胡家刀法奥义.穿手藏刀",
+    "startSkill": "胡家刀法",
+    "probability": 0.1,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "伤害加深",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "雪山飞狐"
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_jianguangblue",
+    "id": "胡家刀法奥义.穿手藏刀-胡家刀法"
+  },
+  {
+    "name": "胡家刀法奥义.鹞子翻身刀",
+    "startSkill": "胡家刀法",
+    "probability": 0.1,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "雪山飞狐"
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_jianguangblue",
+    "id": "胡家刀法奥义.鹞子翻身刀-胡家刀法"
+  },
+  {
+    "name": "胡家刀法奥义.怀中抱月",
+    "startSkill": "胡家刀法",
+    "probability": 0.1,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "轻身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "雪山飞狐"
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_jianguangblue",
+    "id": "胡家刀法奥义.怀中抱月-胡家刀法"
+  },
+  {
+    "name": "草头百姓的逆袭.百姓也有春天",
+    "startSkill": "野球拳",
+    "probability": 0.4,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "草头百姓",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_guangzhu",
+    "id": "草头百姓的逆袭.百姓也有春天-野球拳"
+  },
+  {
+    "name": "草头百姓的逆袭.这下子逆天了",
+    "startSkill": "野球拳",
+    "probability": 0.4,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "圣战",
+        "level": 0,
+        "duration": 4,
+        "chance": 100
+      },
+      {
+        "id": "魔神降临",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "九阴神功",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "九阳神功",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "易筋经",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "草头百姓",
+        "level": 10
+      }
+    ],
+    "powerExtra": 6.0,
+    "animation": "aoyi_guangzhu",
+    "id": "草头百姓的逆袭.这下子逆天了-野球拳"
+  },
+  {
+    "name": "黯然销魂.左手帝",
+    "startSkill": "黯然销魂掌",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "防御强化",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "神雕大侠"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_hongzha",
+    "id": "黯然销魂.左手帝-黯然销魂掌"
+  },
+  {
+    "name": "黯然销魂掌奥义式",
+    "startSkill": "黯然销魂掌",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "玄铁剑法",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "神雕大侠"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_banruozhang",
+    "id": "黯然销魂掌奥义式-黯然销魂掌"
+  },
+  {
+    "name": "辟邪剑法奥义式",
+    "startSkill": "辟邪剑法",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 4,
+        "duration": 3
+      },
+      {
+        "id": "飘渺",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "轻身",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "魔神降临",
+        "level": 3,
+        "duration": 3,
+        "chance": 30
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "阉人"
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "葵花宝典",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_kuihua",
+    "id": "辟邪剑法奥义式-辟邪剑法"
+  },
+  {
+    "name": "辟邪剑法奥义式",
+    "startSkill": "葵花宝典.真辟邪剑法",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 4,
+        "duration": 3
+      },
+      {
+        "id": "飘渺",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "轻身",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "魔神降临",
+        "level": 3,
+        "duration": 3,
+        "chance": 30
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "阉人"
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "葵花宝典",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_kuihua",
+    "id": "辟邪剑法奥义式-葵花宝典.真辟邪剑法"
+  },
+  {
+    "name": "辟邪剑法.阴凛玄煞.电光火石",
+    "startSkill": "辟邪剑法",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "致盲",
+        "level": 4,
+        "duration": 3
+      },
+      {
+        "id": "飘渺",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "轻身",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "狂风快剑",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "阉人"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_kuihua",
+    "id": "辟邪剑法.阴凛玄煞.电光火石-辟邪剑法"
+  },
+  {
+    "name": "绝学.形意八卦掌",
+    "startSkill": "八卦游身掌",
+    "probability": 0.25,
+    "requiredLevel": 7,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "八卦刀法",
+        "level": 7
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "taiji3",
+    "id": "绝学.形意八卦掌-八卦游身掌"
+  },
+  {
+    "name": "绝学.八卦无双",
+    "startSkill": "八卦刀法",
+    "probability": 0.25,
+    "requiredLevel": 7,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "八卦游身掌",
+        "level": 7
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "taiji3",
+    "id": "绝学.八卦无双-八卦刀法"
+  },
+  {
+    "name": "奥义.缠丝擒拿手",
+    "startSkill": "太祖长拳",
+    "probability": 0.25,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "疯魔杖法",
+        "level": 7
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_gunzibaozha",
+    "id": "奥义.缠丝擒拿手-太祖长拳"
+  },
+  {
+    "name": "混元掌奥义.劈石破玉拳",
+    "startSkill": "混元掌",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "伤害加深",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "混元功",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_quanpurple",
+    "id": "混元掌奥义.劈石破玉拳-混元掌"
+  },
+  {
+    "name": "血刀大法奥义.血海无边",
+    "startSkill": "血刀大法",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "伤害加深",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "魔神降临",
+        "level": 3,
+        "duration": 3,
+        "chance": 50
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "血海魔功"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_huanrao",
+    "id": "血刀大法奥义.血海无边-血刀大法"
+  },
+  {
+    "name": "血刀大法奥义.血海无边",
+    "startSkill": "血刀大法",
+    "probability": 0.35,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "伤害加深",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "魔神降临",
+        "level": 3,
+        "duration": 3,
+        "chance": 50
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "血魔刀法"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_huanrao",
+    "id": "血刀大法奥义.血海无边-血刀大法-2"
+  },
+  {
+    "name": "绝学.唐诗剑法",
+    "startSkill": "连城剑法",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "伤害加深",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "神照功"
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_jianguangblue",
+    "id": "绝学.唐诗剑法-连城剑法"
+  },
+  {
+    "name": "绝学.罗汉伏魔拳",
+    "startSkill": "青莲掌法",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "罗汉伏魔功"
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "aoyi_quanpurple",
+    "id": "绝学.罗汉伏魔拳-青莲掌法"
+  },
+  {
+    "name": "绝学.罗汉伏魔剑",
+    "startSkill": "太白剑法",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "罗汉伏魔功"
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "aoyi_quanpurple",
+    "id": "绝学.罗汉伏魔剑-太白剑法"
+  },
+  {
+    "name": "绝学.罗汉伏魔刀",
+    "startSkill": "金乌刀法",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "罗汉伏魔功"
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "longjuanfeng2",
+    "id": "绝学.罗汉伏魔刀-金乌刀法"
+  },
+  {
+    "name": "绝学.罗汉伏魔拳",
+    "startSkill": "青莲掌法",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "罗汉伏魔功"
+      },
+      {
+        "type": "talent",
+        "targetId": "狗杂种"
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "aoyi_quanpurple",
+    "id": "绝学.罗汉伏魔拳-青莲掌法-2"
+  },
+  {
+    "name": "绝学.罗汉伏魔剑",
+    "startSkill": "太白剑法",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "罗汉伏魔功"
+      },
+      {
+        "type": "talent",
+        "targetId": "狗杂种"
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "aoyi_quanpurple",
+    "id": "绝学.罗汉伏魔剑-太白剑法-2"
+  },
+  {
+    "name": "绝学.罗汉伏魔刀",
+    "startSkill": "金乌刀法",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "罗汉伏魔功"
+      },
+      {
+        "type": "talent",
+        "targetId": "狗杂种"
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "longjuanfeng2",
+    "id": "绝学.罗汉伏魔刀-金乌刀法-2"
+  },
+  {
+    "name": "太玄神功奥义式",
+    "startSkill": "太玄神功",
+    "probability": 0.5,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "攻击强化",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "太玄神功"
+      },
+      {
+        "type": "talent",
+        "targetId": "狗杂种"
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_fire",
+    "id": "太玄神功奥义式-太玄神功"
+  },
+  {
+    "name": "奥义.逍遥无极剑",
+    "startSkill": "上清剑法",
+    "probability": 0.25,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "归藏剑",
+        "level": 7
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "dalei",
+    "id": "奥义.逍遥无极剑-上清剑法"
+  },
+  {
+    "name": "少林.观照般若",
+    "startSkill": "般若掌",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "internal_skill",
+        "targetId": "少林心法"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_banruozhang",
+    "id": "少林.观照般若-般若掌"
+  },
+  {
+    "name": "少林.横扫千军",
+    "startSkill": "韦陀棍",
+    "probability": 0.2,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "俗家弟子"
+      }
+    ],
+    "powerExtra": 0.0,
+    "animation": "aoyi_gunzibaozha",
+    "id": "少林.横扫千军-韦陀棍"
+  },
+  {
+    "name": "少林.醉梦罗汉拳",
+    "startSkill": "罗汉拳",
+    "probability": 0.2,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "攻击强化",
+        "level": 2,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "无相"
+      }
+    ],
+    "powerExtra": 4.0,
+    "animation": "aoyi_quanpurple",
+    "id": "少林.醉梦罗汉拳-罗汉拳"
+  },
+  {
+    "name": "少林.韦陀伏魔",
+    "startSkill": "伏魔棍",
+    "probability": 0.2,
+    "requiredLevel": 7,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "俗家弟子"
+      },
+      {
+        "type": "skill",
+        "targetId": "韦陀棍",
+        "level": 7
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_gunzibaozha",
+    "id": "少林.韦陀伏魔-伏魔棍"
+  },
+  {
+    "name": "少林.伏魔禅杖",
+    "startSkill": "伏魔棍",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "talent",
+        "targetId": "俗家弟子"
+      },
+      {
+        "type": "skill",
+        "targetId": "韦陀棍",
+        "level": 10
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_jinzhong",
+    "id": "少林.伏魔禅杖-伏魔棍"
+  },
+  {
+    "name": "福建少林.工字伏虎",
+    "startSkill": "小洪拳",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "小洪拳",
+        "level": 7
+      }
+    ],
+    "powerExtra": 2.0,
+    "animation": "quanji",
+    "id": "福建少林.工字伏虎-小洪拳"
+  },
+  {
+    "name": "福建少林.虎鹤双形",
+    "startSkill": "大洪拳",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "大洪拳",
+        "level": 7
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "quanji",
+    "id": "福建少林.虎鹤双形-大洪拳"
+  },
+  {
+    "name": "如来神掌.万佛朝宗",
+    "startSkill": "如来神掌",
+    "probability": 0.3,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "诸般封印",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "定身",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "麻痹",
+        "level": 1,
+        "duration": 3
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "小洪拳",
+        "level": 15
+      },
+      {
+        "type": "skill",
+        "targetId": "大洪拳",
+        "level": 15
+      }
+    ],
+    "powerExtra": 5.0,
+    "animation": "aoyi_banruozhang",
+    "id": "如来神掌.万佛朝宗-如来神掌"
+  },
+  {
+    "name": "拈花一指",
+    "startSkill": "拈花指",
+    "probability": 0.2,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "拳掌封印",
+        "level": 1,
+        "duration": 3
+      },
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "拈花指",
+        "level": 10
+      },
+      {
+        "type": "talent",
+        "targetId": "无相"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_hongzha",
+    "id": "拈花一指-拈花指"
+  },
+  {
+    "name": "西域少林绝学.大力金刚指",
+    "startSkill": "大力金刚指",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "定身",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "内伤",
+        "level": 5,
+        "duration": 3,
+        "chance": 100
+      },
+      {
+        "id": "重伤",
+        "level": 3,
+        "duration": 3,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "大力金刚指",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "九阳神功"
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_zhua",
+    "id": "西域少林绝学.大力金刚指-大力金刚指"
+  },
+  {
+    "name": "越女剑法奥义式",
+    "startSkill": "越女剑法",
+    "probability": 0.25,
+    "requiredLevel": 10,
+    "buffs": [
+      {
+        "id": "晕眩",
+        "level": 0,
+        "duration": 1,
+        "chance": 100
+      }
+    ],
+    "conditions": [
+      {
+        "type": "skill",
+        "targetId": "越女剑法",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "九阴神功",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "九阳神功",
+        "level": 10
+      },
+      {
+        "type": "internal_skill",
+        "targetId": "易筋经",
+        "level": 10
+      }
+    ],
+    "powerExtra": 3.0,
+    "animation": "aoyi_guangjian",
+    "id": "越女剑法奥义式-越女剑法"
+  }
+]

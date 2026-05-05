@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://d2rvluypwdsrg"]
+
+[ext_resource type="Script" uid="uid://hyowcnqtdd4m" path="res://src/Game.Godot/UI/Battle/BattleFloatText.cs" id="1_float_text"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_float_text"]
+font_size = 18
+font_color = Color(1, 1, 1, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="BattleFloatText" type="Node2D"]
+script = ExtResource("1_float_text")
+
+[node name="TextLabel" type="Label" parent="." unique_id=1012725082]
+unique_name_in_owner = true
+offset_left = -291.5
+offset_top = -91.5
+offset_right = 291.5
+offset_bottom = 91.5
+mouse_filter = 2
+text = "-hp 300"
+label_settings = SubResource("LabelSettings_float_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2

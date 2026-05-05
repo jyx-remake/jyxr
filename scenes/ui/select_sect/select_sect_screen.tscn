@@ -1,0 +1,192 @@
+[gd_scene format=3 uid="uid://cqj0ggeob6p6r"]
+
+[ext_resource type="Texture2D" uid="uid://jsmmfitkrv5x" path="res://assets/art/misc/dikuang2.png" id="1_panel"]
+[ext_resource type="Script" uid="uid://b8rlntlsothvr" path="res://src/Game.Godot/UI/SelectSect/SelectSectScreen.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://r3uusveb0rxt" path="res://assets/art/misc/duiwu_yidong.png" id="2_arrow"]
+[ext_resource type="Texture2D" uid="uid://drx7o46xwypla" path="res://assets/art/map/wudang.jpg" id="2_bg"]
+[ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="3_button"]
+[ext_resource type="PackedScene" uid="uid://cveba3f8kxvxc" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="4_avatar"]
+[ext_resource type="Texture2D" uid="uid://db82ulbrpujgy" path="res://assets/art/misc/btn-cross.png" id="7_ack"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_08y17"]
+bg_color = Color(0.78431374, 0.78431374, 0.78431374, 0.5019608)
+
+[node name="SelectSectScreen" type="Control" unique_id=1234931509]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=625933947]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PanelTextureRect" type="TextureRect" parent="." unique_id=1902059500]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_panel")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MasterAvatarBox" parent="." unique_id=1022648307 instance=ExtResource("4_avatar")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 433.00003
+offset_top = 381.0
+offset_right = 433.00003
+offset_bottom = 381.0
+scale = Vector2(0.36806536, 0.36806536)
+
+[node name="SectNameLabel" type="Label" parent="." unique_id=543866879]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 833.0
+offset_top = 164.0
+offset_right = 1073.0
+offset_bottom = 259.0
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 80
+text = "武当派"
+
+[node name="NextButton" parent="." unique_id=1876499738 instance=ExtResource("3_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1699.0
+offset_top = 440.0
+offset_right = 1787.0
+offset_bottom = 645.0
+texture_normal = ExtResource("2_arrow")
+stretch_mode = 5
+
+[node name="PrevButton" parent="." unique_id=156801039 instance=ExtResource("3_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 208.0
+offset_top = 440.0
+offset_right = 296.0
+offset_bottom = 645.0
+scale = Vector2(-1, 1)
+texture_normal = ExtResource("2_arrow")
+stretch_mode = 5
+
+[node name="AckButton" parent="." unique_id=393640726 instance=ExtResource("3_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1582.0
+offset_top = 768.0
+offset_right = 1775.0
+offset_bottom = 975.0
+texture_normal = ExtResource("7_ack")
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=909666036]
+layout_mode = 0
+offset_left = 609.0
+offset_top = 256.0
+offset_right = 859.0
+offset_bottom = 526.0
+theme_override_constants/separation = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=700249577]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=1729669086]
+layout_mode = 2
+theme_override_font_sizes/font_size = 45
+text = "师父："
+
+[node name="MasterLabel" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=1932898279]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 45
+text = "小虾米"
+autowrap_mode = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer" unique_id=1856156656]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer2" unique_id=687010651]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 45
+text = "顶级武学："
+
+[node name="TopSkillLabel" type="Label" parent="VBoxContainer/HBoxContainer2" unique_id=1973202449]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 45
+text = "野球拳、神山剑法"
+autowrap_mode = 3
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer" unique_id=1988068930]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer3" unique_id=1815888113]
+layout_mode = 2
+theme_override_font_sizes/font_size = 45
+text = "主修："
+
+[node name="MajorLabel" type="Label" parent="VBoxContainer/HBoxContainer3" unique_id=697728043]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5019608, 0, 0.5019608, 1)
+theme_override_font_sizes/font_size = 45
+text = "拳、剑"
+autowrap_mode = 3
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="VBoxContainer" unique_id=1744246036]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="VBoxContainer/HBoxContainer4" unique_id=59371549]
+layout_mode = 2
+theme_override_font_sizes/font_size = 45
+text = "门派特点："
+
+[node name="FeatureLabel" type="Label" parent="VBoxContainer/HBoxContainer4" unique_id=768250130]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_font_sizes/font_size = 45
+text = "顶级武学"
+autowrap_mode = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=325817307]
+layout_mode = 0
+offset_left = 303.0
+offset_top = 562.0
+offset_right = 1597.0
+offset_bottom = 851.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_08y17")
+
+[node name="DescLabel" type="Label" parent="ScrollContainer" unique_id=785071198]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 40
+text = "武道尽头谁为峰？"
+autowrap_mode = 3

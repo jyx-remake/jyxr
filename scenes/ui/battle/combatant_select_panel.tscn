@@ -1,0 +1,118 @@
+[gd_scene format=3 uid="uid://brnaq54kgocs"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://cdrh1oim004f" path="res://src/Game.Godot/UI/Battle/CombatantSelectPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://dx4b6fc1h0q45" path="res://scenes/ui/battle/combatant_select_card.tscn" id="3_card"]
+[ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="4_button"]
+[ext_resource type="LabelSettings" uid="uid://c1rrni2e1gbhl" path="res://assets/theme/panel_title_label_settings.tres" id="4_mfbij"]
+[ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="5_button_texture"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_shdk0"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_confirm"]
+font_size = 44
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[node name="CombatantSelectPanel" unique_id=1760982645 instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+CharacterCardScene = ExtResource("3_card")
+PreviewBattleId = ""
+
+[node name="CloseButton" parent="." index="2" unique_id=962603895]
+visible = false
+PressOffset = Vector2(2, 2)
+PressColor = Color(0.8, 0.8, 0.8, 1)
+
+[node name="TitleLabel" type="Label" parent="." index="3" unique_id=1117418853]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 640.0
+offset_top = 78.0
+offset_right = 1280.0
+offset_bottom = 136.0
+theme_override_colors/font_color = Color(0.07, 0.045, 0.025, 1)
+theme_override_font_sizes/font_size = 44
+text = "出战人物选择"
+label_settings = ExtResource("4_mfbij")
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." index="4" unique_id=200625378]
+layout_mode = 0
+offset_left = 153.0
+offset_top = 154.0
+offset_right = 1463.0
+offset_bottom = 912.0
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer" index="0" unique_id=1023698332]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="CombatantSelectCard" parent="ScrollContainer/GridContainer" index="0" unique_id=785250075 instance=ExtResource("3_card")]
+layout_mode = 2
+
+[node name="SidePanel" type="Panel" parent="." index="5" unique_id=388389115]
+layout_mode = 0
+offset_left = 1482.0
+offset_top = 300.0
+offset_right = 1764.0
+offset_bottom = 668.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_shdk0")
+
+[node name="CapacityLabel" type="Label" parent="SidePanel" index="0" unique_id=1127869345]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 77.0
+offset_right = 242.0
+offset_bottom = 137.0
+theme_override_colors/font_color = Color(0.07, 0.045, 0.025, 1)
+theme_override_font_sizes/font_size = 50
+text = "可选择0人"
+
+[node name="SelectedCountLabel" type="Label" parent="SidePanel" index="1" unique_id=106996361]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 149.0
+offset_right = 242.0
+offset_bottom = 209.0
+theme_override_colors/font_color = Color(0.62, 0.06, 0.035, 1)
+theme_override_font_sizes/font_size = 50
+text = "已选择0人"
+
+[node name="WarningLabel" type="Label" parent="SidePanel" index="2" unique_id=78567775]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 28.0
+offset_top = 204.0
+offset_right = 270.0
+offset_bottom = 318.0
+theme_override_colors/font_color = Color(0.86, 0.12, 0.07, 1)
+theme_override_font_sizes/font_size = 24
+text = "提示"
+autowrap_mode = 3
+
+[node name="ConfirmButton" parent="." index="6" unique_id=476300778 instance=ExtResource("4_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1469.0
+offset_top = 738.0
+offset_right = 1763.0
+offset_bottom = 836.0
+texture_normal = ExtResource("5_button_texture")
+
+[node name="ConfirmButtonLabel" type="Label" parent="ConfirmButton" index="0" unique_id=330114959]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "出战"
+label_settings = SubResource("LabelSettings_confirm")
+horizontal_alignment = 1
+vertical_alignment = 1

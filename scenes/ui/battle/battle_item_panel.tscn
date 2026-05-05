@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://oei4u3648ovq"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" uid="uid://rm6t8qr5eysm" path="res://src/Game.Godot/UI/Battle/BattleItemPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/inventory_item_box.tscn" id="3_item_box"]
+
+[node name="BattleItemPanel" unique_id=786201079 instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+InventoryItemBoxScene = ExtResource("3_item_box")
+
+[node name="TitleLabel" type="Label" parent="." index="3" unique_id=1529059448]
+layout_mode = 0
+offset_left = 760.0
+offset_top = 66.0
+offset_right = 1160.0
+offset_bottom = 148.0
+theme_override_colors/font_color = Color(0.93, 0.88, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 58
+text = "战斗物品"
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="." index="4" unique_id=1203727619]
+layout_mode = 0
+offset_left = 354.0
+offset_top = 129.0
+offset_right = 1634.0
+offset_bottom = 177.0
+theme_override_colors/font_color = Color(0.93, 0.88, 0.7, 1)
+theme_override_font_sizes/font_size = 30
+text = "选择消耗品后，回到战场选择目标。"
+horizontal_alignment = 1
+
+[node name="CountLabel" type="Label" parent="." index="5" unique_id=488390383]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 354.0
+offset_top = 178.0
+offset_right = 1634.0
+offset_bottom = 226.0
+theme_override_colors/font_color = Color(0.78, 0.7, 0.53, 1)
+theme_override_font_sizes/font_size = 28
+text = "0 项"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." index="6" unique_id=2060500211]
+layout_mode = 0
+offset_left = 368.0
+offset_top = 236.0
+offset_right = 1664.0
+offset_bottom = 920.0
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer" index="0" unique_id=154975767]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 34
+columns = 6
+
+[node name="EmptyLabel" type="Label" parent="." index="7" unique_id=735392614]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 520.0
+offset_top = 420.0
+offset_right = 1500.0
+offset_bottom = 478.0
+theme_override_colors/font_color = Color(0.78, 0.7, 0.53, 1)
+theme_override_font_sizes/font_size = 32
+text = "当前没有可用的消耗品。"
+horizontal_alignment = 1

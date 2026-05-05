@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Character/CharacterBiographyTab.cs" id="1_script"]
+
+[node name="BiographyTab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BiographyLabel" type="RichTextLabel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/default_color = Color(0.08, 0.08, 0.08, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+scroll_following = true
+autowrap_mode = 3
+text = "暂无人物传记。"

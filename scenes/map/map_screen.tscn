@@ -1,0 +1,181 @@
+[gd_scene format=3 uid="uid://cx0h6a41fqirj"]
+
+[ext_resource type="Script" uid="uid://dsbitu5c6u6hw" path="res://src/Game.Godot/Map/MapScreen.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://jl0mhh433a7u" path="res://scenes/map/map_entity_slot.tscn" id="2_slot"]
+[ext_resource type="PackedScene" uid="uid://ddj5n2c43qsj6" path="res://scenes/map/map_entity_box.tscn" id="3_box"]
+[ext_resource type="Texture2D" uid="uid://cltnrkehfughq" path="res://assets/art/ui/bigmap_yun.png" id="4_cloud"]
+[ext_resource type="Texture2D" uid="uid://cc3wboaaf4svd" path="res://assets/art/misc/story/dibukuang.png" id="5_bottom_frame"]
+[ext_resource type="Texture2D" uid="uid://dlkp8qcmfkcfa" path="res://assets/art/misc/story/camera.png" id="6_camera"]
+[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="7_pin_avatar"]
+
+[sub_resource type="Animation" id="Animation_pin_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PinAvatar:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_pin_bounce"]
+resource_name = "default"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PinAvatar:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -40), Vector2(0, -30)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pin"]
+_data = {
+&"RESET": SubResource("Animation_pin_reset"),
+&"default": SubResource("Animation_pin_bounce")
+}
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_description_shadow"]
+bg_color = Color(0, 0, 0, 0.627451)
+
+[node name="MapScreen" type="Control" unique_id=2062229598]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+MapEntitySlotScene = ExtResource("2_slot")
+MapEntityBoxScene = ExtResource("3_box")
+
+[node name="MapBigTab" type="Control" parent="." unique_id=411197870]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Cloud" type="TextureRect" parent="MapBigTab" unique_id=1116946840]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_cloud")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Control" type="Control" parent="MapBigTab" unique_id=325343108]
+anchors_preset = 0
+offset_left = -15.0
+offset_top = -52.0
+offset_right = -15.0
+offset_bottom = -52.0
+
+[node name="MapEntitySlots" type="Control" parent="MapBigTab/Control" unique_id=356276484]
+unique_name_in_owner = true
+anchors_preset = 0
+
+[node name="MapPin" type="Control" parent="MapBigTab/Control" unique_id=1444961703]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_right = 76.0
+offset_bottom = 75.0
+mouse_filter = 2
+
+[node name="PinAvatar" type="TextureRect" parent="MapBigTab/Control/MapPin" unique_id=1626363249]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 76.0
+offset_bottom = 75.0
+mouse_filter = 2
+texture = ExtResource("7_pin_avatar")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MapBigTab/Control/MapPin" unique_id=1840084638]
+libraries/ = SubResource("AnimationLibrary_pin")
+autoplay = &"default"
+
+[node name="MapSmallTab" type="Control" parent="." unique_id=1873506715]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CameraButton" type="TextureButton" parent="MapSmallTab" unique_id=1253279403]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 1776.0
+offset_top = 180.0
+offset_right = 2036.0
+offset_bottom = 396.0
+rotation = 0.5235988
+scale = Vector2(0.4255765, 0.4255765)
+texture_normal = ExtResource("6_camera")
+
+[node name="MapEntityList" type="HBoxContainer" parent="MapSmallTab" unique_id=274914384]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 110.0
+offset_top = 362.0
+offset_right = 1810.0
+offset_bottom = 688.0
+theme_override_constants/separation = 80
+
+[node name="BottomBox" type="Control" parent="MapSmallTab" unique_id=294292032]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 35.0
+offset_top = 733.0
+offset_right = 1827.0
+offset_bottom = 1066.0
+mouse_filter = 2
+
+[node name="DialogueShadowPanel" type="Panel" parent="MapSmallTab/BottomBox" unique_id=627662737]
+layout_mode = 0
+offset_left = 170.0
+offset_top = 100.0
+offset_right = 1774.0
+offset_bottom = 321.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_description_shadow")
+
+[node name="Frame" type="TextureRect" parent="MapSmallTab/BottomBox" unique_id=1253864497]
+layout_mode = 0
+offset_right = 4144.0
+offset_bottom = 880.0
+scale = Vector2(0.43190765, 0.37521958)
+mouse_filter = 2
+texture = ExtResource("5_bottom_frame")
+
+[node name="MapDescriptionLabel" type="RichTextLabel" parent="MapSmallTab/BottomBox" unique_id=527718196]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+offset_left = 227.0
+offset_top = 135.0
+offset_right = 1453.0
+offset_bottom = 317.0
+mouse_filter = 2
+bbcode_enabled = true

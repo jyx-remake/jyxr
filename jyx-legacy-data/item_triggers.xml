@@ -1,0 +1,115 @@
+<root>
+  <item_trigger minlevel="1" maxlevel="3">
+    <trigger name="attack" w="30"/>
+    <trigger name="defence" w="30">
+      <param pool="" min="3" max="10" />
+      <param pool="" min="0" max="5" />
+    </trigger>
+    <trigger name="attribute" w="100"/>
+    <trigger name="talent" w="20">
+      <param pool="暴躁,老江湖,左手剑,神兵,宝甲,鲁莽,锐眼" min="-1" max="-1" />
+    </trigger>
+    <trigger name="mingzhong" w="10">
+      <param pool="" min="5" max="10" />
+    </trigger>
+	<trigger name="powerup_skill" w="20"/>
+    <trigger name="powerup_internalskill" w="20"/>
+	<trigger name="powerup_uniqueskill" w="20"/>
+  </item_trigger>
+  <item_trigger minlevel="4" maxlevel="5">
+    <trigger name="criticalp" w="10"/>
+    <trigger name="attack" w="30">
+      <param pool="" min="8" max="15" />
+      <param pool="" min="0" max="5" />
+    </trigger>
+    <trigger name="defence" w="30">
+      <param pool="" min="8" max="15" />
+      <param pool="" min="0" max="5" />
+    </trigger>
+    <trigger name="attribute" w="100"/>
+    <trigger name="talent" w="20">
+      <param pool="暴躁,老江湖,左手剑,神兵,宝甲,鲁莽,锐眼" min="-1" max="-1" />
+    </trigger>
+    <trigger name="xi" w="20">
+      <param pool="" min="1" max="3" />
+    </trigger>
+    <trigger name="critical" w="20">
+      <param pool="" min="1" max="5" />
+    </trigger>
+    <trigger name="powerup_quanzhang" w="5">
+      <param pool="" min="3" max="5" />
+    </trigger>
+    <trigger name="powerup_jianfa" w="5">
+      <param pool="" min="3" max="5" />
+    </trigger>
+    <trigger name="powerup_daofa" w="5">
+      <param pool="" min="3" max="5" />
+    </trigger>
+    <trigger name="powerup_qimen" w="5">
+      <param pool="" min="3" max="5" />
+    </trigger>
+    <trigger name="powerup_aoyi" w="100"/>
+    <trigger name="mingzhong" w="20">
+      <param pool="" min="7" max="14" />
+    </trigger>
+  </item_trigger>
+  <item_trigger minlevel="6" maxlevel="7">
+	<trigger name="criticalp" w="10"/>
+    <trigger name="attack" w="30"/>
+    <trigger name="defence" w="30">
+      <param pool="" min="10" max="30" />
+      <param pool="" min="3" max="10" />
+    </trigger>
+    <trigger name="attribute" w="100"/>
+    <trigger name="talent" w="50">
+      <param pool="心眼通明,拳掌增益,剑法增益,刀法增益,奇门增益,奋战,真气护体" min="-1" max="-1" />
+    </trigger>
+    <trigger name="xi" w="20">
+      <param pool="" min="1" max="5" />
+    </trigger>
+    <trigger name="critical" w="20">
+      <param pool="" min="5" max="10" />
+    </trigger>
+    <trigger name="mingzhong" w="20">
+      <param pool="" min="5" max="15" />
+    </trigger>
+    <trigger name="powerup_quanzhang" w="5">
+      <param pool="" min="3" max="10" />
+    </trigger>
+    <trigger name="powerup_jianfa" w="5">
+      <param pool="" min="3" max="10" />
+    </trigger>
+    <trigger name="powerup_daofa" w="5">
+      <param pool="" min="3" max="10" />
+    </trigger>
+    <trigger name="powerup_qimen" w="5">
+      <param pool="" min="3" max="10" />
+    </trigger>
+    <trigger name="powerup_aoyi" w="20"/>
+    <trigger name="powerup_skill" w="20"/>
+    <trigger name="powerup_internalskill" w="20"/>
+	<trigger name="powerup_uniqueskill" w="20"/>
+    <trigger name="sp" w="20">
+      <param pool="0.1,0.15" min="-1" max="-1" />
+    </trigger>
+    <trigger name="anti_debuff" w="20">
+      <param pool="" min="3" max="6" />
+    </trigger>
+  </item_trigger>
+  <item_trigger minlevel="7" maxlevel="7">
+    <trigger name="powerup_aoyi" w="100"/>
+    <trigger name="powerup_skill" w="20"/>
+    <trigger name="powerup_internalskill" w="20"/>
+	<trigger name="powerup_uniqueskill" w="20"/>
+	<trigger name="criticalp" w="10"/>
+    <trigger name="xi" w="20">
+      <param pool="" min="2" max="6" />
+    </trigger>
+    <trigger name="sp" w="20">
+      <param pool="0.1,0.15,0.2,0.25,0.3" min="-1" max="-1" />
+    </trigger>
+    <trigger name="anti_debuff" w="20">
+      <param pool="" min="5" max="12" />
+    </trigger>
+  </item_trigger>
+</root>
