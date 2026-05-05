@@ -63,6 +63,9 @@ public partial class UIRoot : Control
 	[Export]
 	public PackedScene GameOverScreenScene { get; set; } = null!;
 
+	[Export]
+	public PackedScene GameFinScreenScene { get; set; } = null!;
+
 	public CanvasLayer HudLayer { get; private set; } = null!;
 	public CanvasLayer PanelLayer { get; private set; } = null!;
 	public CanvasLayer ModalLayer { get; private set; } = null!;
@@ -203,6 +206,8 @@ public partial class UIRoot : Control
 	public Control ShowSystemPanel() => ShowMainPanel(SystemPanelScene, "system panel");
 
 	public Control ShowGameOverScreen() => ShowMainPanel(GameOverScreenScene, "game over screen");
+
+	public Control ShowGameFinScreen() => ShowMainPanel(GameFinScreenScene, "game fin screen");
 
 	public Control ShowSaveSlotSelectionPanel(SaveSlotPanelMode mode) =>
 		ShowPopupPanel(SaveSlotSelectionPanelScene, "save slot selection panel", panel =>

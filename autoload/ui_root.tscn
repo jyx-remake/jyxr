@@ -15,15 +15,16 @@
 [ext_resource type="PackedScene" uid="uid://brltgo8b2opqk" path="res://scenes/ui/system_panel/save_slot_selection_panel.tscn" id="10_save_slots"]
 [ext_resource type="PackedScene" uid="uid://b4kveik4eci2d" path="res://scenes/ui/base/confirm_dialog.tscn" id="11_confirm_dialog"]
 [ext_resource type="PackedScene" uid="uid://bs35w4y4foane" path="res://scenes/ui/inventory_panel/inventory_panel.tscn" id="12_inventory_panel"]
-[ext_resource type="PackedScene" path="res://scenes/ui/shop_panel/shop_panel.tscn" id="13_shop_panel"]
-[ext_resource type="PackedScene" path="res://scenes/ui/chest_panel/chest_panel.tscn" id="13_chest_panel"]
-[ext_resource type="PackedScene" path="res://scenes/ui/select_sect/select_sect_screen.tscn" id="14_select_sect"]
+[ext_resource type="PackedScene" uid="uid://bhe7ohx87bpf8" path="res://scenes/ui/shop_panel/shop_panel.tscn" id="13_shop_panel"]
+[ext_resource type="PackedScene" uid="uid://cpw5uh28ivr5j" path="res://scenes/ui/chest_panel/chest_panel.tscn" id="13_chest_panel"]
+[ext_resource type="PackedScene" uid="uid://cqj0ggeob6p6r" path="res://scenes/ui/select_sect/select_sect_screen.tscn" id="14_select_sect"]
 [ext_resource type="PackedScene" path="res://scenes/ui/start_question/input_name_panel.tscn" id="15_input_name"]
 [ext_resource type="PackedScene" path="res://scenes/ui/start_question/select_head_panel.tscn" id="16_select_head"]
 [ext_resource type="PackedScene" path="res://scenes/ui/start_question/roll_stats_panel.tscn" id="17_roll_stats"]
-[ext_resource type="PackedScene" path="res://scenes/ui/gameover/gameover_screen.tscn" id="18_gameover"]
-[ext_resource type="PackedScene" path="res://scenes/ui/battle/combatant_select_panel.tscn" id="19_combatant_select"]
-[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_screen.tscn" id="20_battle_screen"]
+[ext_resource type="PackedScene" uid="uid://bln8qsr5mtxvm" path="res://scenes/ui/game_flow/gameover_screen.tscn" id="18_gameover"]
+[ext_resource type="PackedScene" uid="uid://v4yc2ec3v1o8" path="res://scenes/ui/game_flow/game_fin.tscn" id="19_gamefin"]
+[ext_resource type="PackedScene" uid="uid://brnaq54kgocs" path="res://scenes/ui/battle/combatant_select_panel.tscn" id="19_combatant_select"]
+[ext_resource type="PackedScene" uid="uid://di28xqh0osmwk" path="res://scenes/ui/battle/battle_screen.tscn" id="20_battle_screen"]
 
 [node name="UIRoot" type="Control" unique_id=684934628]
 layout_mode = 3
@@ -50,6 +51,7 @@ InputNamePanelScene = ExtResource("15_input_name")
 SelectHeadPanelScene = ExtResource("16_select_head")
 RollStatsPanelScene = ExtResource("17_roll_stats")
 GameOverScreenScene = ExtResource("18_gameover")
+GameFinScreenScene = ExtResource("19_gamefin")
 
 [node name="HudLayer" type="CanvasLayer" parent="." unique_id=1159616672]
 unique_name_in_owner = true

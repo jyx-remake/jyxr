@@ -43,7 +43,7 @@ theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_font_sizes/font_size = 80
 text = "胜败乃兵家常事，大侠请重新来过！"
 
-[node name="DatetLabel" type="Label" parent="." unique_id=429813897]
+[node name="DateLabel" type="Label" parent="." unique_id=429813897]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1052.0
@@ -87,7 +87,7 @@ offset_right = 1546.0
 offset_bottom = 1000.0
 theme_override_constants/separation = 50
 
-[node name="RestarButton" type="TextureButton" parent="HBoxContainer" unique_id=205531626]
+[node name="RestartButton" type="TextureButton" parent="HBoxContainer" unique_id=205531626]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(342, 112)
 layout_mode = 2
@@ -98,7 +98,7 @@ stretch_mode = 5
 script = ExtResource("2_esgjf")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="HBoxContainer/RestarButton" unique_id=2012652437]
+[node name="Label" type="Label" parent="HBoxContainer/RestartButton" unique_id=2012652437]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

@@ -16,9 +16,9 @@ public partial class GameOverScreen : Control
 
 	public override void _Ready()
 	{
-		_dateLabel = GetNode<Label>("%DatetLabel");
+		_dateLabel = GetNode<Label>("%DateLabel");
 		_deathInfoLabel = GetNode<Label>("%DeathInfoLabel");
-		_restartButton = GetNode<TextureButton>("%RestarButton");
+		_restartButton = GetNode<TextureButton>("%RestartButton");
 		_loadGameButton = GetNode<TextureButton>("%LoadGameButton");
 		_exitButton = GetNode<TextureButton>("%ExitButton");
 
@@ -52,31 +52,13 @@ public partial class GameOverScreen : Control
 
 		_isStarting = true;
 		SetButtonsDisabled(true);
-
-		try
-		{
-			await GameFlow.StartNewGameAsync();
-		}
-		catch (Exception exception)
-		{
-			Game.Logger.Error("Restarting after game over failed.", exception);
-			UIRoot.Instance.ShowSuggestion(exception.Message);
-			_isStarting = false;
-			SetButtonsDisabled(false);
-		}
+		
+		await GameFlow.StartNewGameAsync();
 	}
 
 	private void OnLoadGamePressed()
 	{
-		try
-		{
-			UIRoot.Instance.ShowSaveSlotSelectionPanel(SaveSlotPanelMode.Load);
-		}
-		catch (Exception exception)
-		{
-			Game.Logger.Error("Opening load slot panel from game over failed.", exception);
-			UIRoot.Instance.ShowSuggestion(exception.Message);
-		}
+		UIRoot.Instance.ShowSaveSlotSelectionPanel(SaveSlotPanelMode.Load);
 	}
 
 	private void OnExitPressed() => GetTree().Quit();

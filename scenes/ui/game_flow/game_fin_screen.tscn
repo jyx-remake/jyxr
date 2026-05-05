@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://v4yc2ec3v1o8"]
+
+[ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="1_8ryr2"]
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="2_4v0n6"]
+[ext_resource type="Script" uid="uid://xrmyg6wulot" path="res://src/Game.Godot/UI/GameFinScreen.cs" id="3_10lbf"]
+
+[node name="GameFin" type="Control" unique_id=464009357]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_10lbf")
+
+[node name="BackgroundDim" type="ColorRect" parent="." unique_id=1350825731]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="." unique_id=493274857]
+layout_mode = 0
+offset_left = 812.0
+offset_top = 401.0
+offset_right = 1156.0
+offset_bottom = 530.0
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 100
+text = "全剧终"
+autowrap_mode = 3
+
+[node name="MainMenuButton" type="TextureButton" parent="." unique_id=1229064302]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(342, 112)
+layout_mode = 0
+offset_left = 404.0
+offset_top = 889.0
+offset_right = 1530.0
+offset_bottom = 1001.0
+size_flags_horizontal = 3
+texture_normal = ExtResource("1_8ryr2")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("2_4v0n6")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="MainMenuButton" unique_id=1414625951]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 60
+text = "返回主菜单"
+horizontal_alignment = 1
+vertical_alignment = 1
