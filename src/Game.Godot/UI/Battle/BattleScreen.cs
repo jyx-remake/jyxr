@@ -53,6 +53,7 @@ public partial class BattleScreen : Control
 	private bool _isConfigured;
 	private GridPosition? _hoveredCellPosition;
 
+	private TextureRect _background = null!;
 	private Label _titleLabel = null!;
 	private Label _subtitleLabel = null!;
 	private BattleBoardView _boardGrid = null!;
@@ -72,6 +73,7 @@ public partial class BattleScreen : Control
 
 	public override void _Ready()
 	{
+		_background = GetNode<TextureRect>("%Background");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
 		_boardGrid = GetNode<BattleBoardView>("%BoardGrid");
@@ -192,11 +194,24 @@ public partial class BattleScreen : Control
 			throw new InvalidOperationException("Battle screen has not been configured.");
 		}
 
+		ApplyBattlePresentation(_battleDefinition);
 		_state = BuildBattleState(_battleDefinition, _selectedCharacterIds);
 		_logLines.Clear();
 		AppendLog($"战斗开始：{_battleDefinition.Name}");
 		_uiState.WaitTimeline();
 		AdvanceToNextPlayerAction();
+	}
+
+	private void ApplyBattlePresentation(BattleDefinition battle)
+	{
+		_background.Texture = AssetResolver.LoadBattleBackgroundResource(battle.MapId);
+		if (!string.IsNullOrWhiteSpace(battle.Music))
+		{
+			GameRoot.Audio.PlayBgm(battle.Music);
+			return;
+		}
+
+		GameRoot.Audio.PlayBgm(GameRoot.Config.RandomBattleMusics);
 	}
 
 	private BattleState BuildBattleState(BattleDefinition battle, IReadOnlyList<string> selectedCharacterIds)

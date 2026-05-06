@@ -32,6 +32,9 @@ public static class AssetResolver
 		return LoadTextureResource(resourceId);
 	}
 
+	public static Texture2D? LoadBattleBackgroundResource(string? mapId) =>
+		LoadAsset<Texture2D>(ResolveConventionalTexturePath(mapId, $"{ArtDirectoryPath}/battle_bg"), "Texture");
+
 	public static AudioStream? LoadAudioResource(string? resourceId) =>
 		LoadAsset<AudioStream>(ResolveAssetPath(resourceId, AudioDirectoryPath, AudioExtensions, "Audio"), "Audio");
 

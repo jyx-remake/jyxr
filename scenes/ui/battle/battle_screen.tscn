@@ -66,6 +66,7 @@ BattleSkillBoxScene = ExtResource("18_skill_box")
 BattleItemPanelScene = ExtResource("20_item_panel")
 
 [node name="Background" type="TextureRect" parent="." unique_id=372176778]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
