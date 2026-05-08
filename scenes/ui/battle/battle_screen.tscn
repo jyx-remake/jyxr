@@ -306,6 +306,7 @@ stretch_mode = 5
 
 [node name="EndButton" type="Button" parent="BottomHud" unique_id=890715130]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(132, 56)
 layout_mode = 0
 offset_left = 1707.0
