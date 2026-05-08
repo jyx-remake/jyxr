@@ -221,7 +221,7 @@ public sealed class InventoryTests
             items: [potion],
             equipment: [sword]);
 
-        var saveGame = SaveGame.Create(new AdventureState(), party, inventory, new ChestState(), equipmentInstanceFactory, new CurrencyState(), new ClockState(), new LocationState(), new MapEventProgressState());
+        var saveGame = SaveGame.Create(new AdventureState(), party, inventory, new ChestState(), equipmentInstanceFactory, new CurrencyState(), new ClockState(), new LocationState(), new MapEventProgressState(), new WorldTriggerState());
         var restoredCharacters = saveGame.RestoreCharacters(repository);
         var restoredInventory = saveGame.RestoreInventory(repository);
         var restoredEquipmentInstanceFactory = saveGame.RestoreEquipmentInstanceFactory();
@@ -253,7 +253,7 @@ public sealed class InventoryTests
             items: [potion],
             equipment: [sword]);
 
-        var json = JsonSerializer.Serialize(SaveGame.Create(new AdventureState(), party, inventory, new ChestState(), equipmentInstanceFactory, new CurrencyState(), new ClockState(), new LocationState(), new MapEventProgressState()), GameJson.Default);
+        var json = JsonSerializer.Serialize(SaveGame.Create(new AdventureState(), party, inventory, new ChestState(), equipmentInstanceFactory, new CurrencyState(), new ClockState(), new LocationState(), new MapEventProgressState(), new WorldTriggerState()), GameJson.Default);
         var roundTripped = JsonSerializer.Deserialize<SaveGame>(json, GameJson.Default);
         Assert.NotNull(roundTripped);
 

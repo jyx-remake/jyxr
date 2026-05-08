@@ -803,7 +803,8 @@ public sealed class SessionEventsTests
             restoredState.Clock,
             restoredState.Location,
             restoredState.MapEventProgress,
-            restoredState.Story);
+            restoredState.WorldTriggers,
+            storyState: restoredState.Story);
 
         session.SaveGameService.LoadSave(saveGame);
 

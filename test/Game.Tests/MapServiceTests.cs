@@ -8,8 +8,6 @@ namespace Game.Tests;
 public sealed class MapServiceTests
 {
     private const string WorldVillageEventKey = "world|village|0";
-    private const string WorldTriggerEventKey = "$world|story_global";
-
     [Fact]
     public void EnterMap_LargeMap_UsesRememberedPositionWithoutConsumingTime()
     {
@@ -69,7 +67,7 @@ public sealed class MapServiceTests
         Assert.NotNull(result.PendingInteraction);
         Assert.Equal(MapService.MapInteractionOutcome.StoryRequested, result.PendingInteraction!.Outcome);
         Assert.Equal("story_global", result.PendingInteraction.TargetId);
-        Assert.True(state.MapEventProgress.IsCompleted(WorldTriggerEventKey));
+        Assert.True(state.WorldTriggers.IsCompleted("story_global"));
     }
 
     [Fact]

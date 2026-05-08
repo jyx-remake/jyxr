@@ -96,7 +96,7 @@ public sealed class SaveGameTests
         inventory.AddItem(repository.GetItem("iron_blade"), 2);
         inventory.AddItem(healingPotion, 3);
 
-        var saveGame = SaveGame.Create(new AdventureState(), party, inventory, new ChestState(), equipmentInstanceFactory, new CurrencyState(), new ClockState(), new LocationState(), new MapEventProgressState());
+        var saveGame = SaveGame.Create(new AdventureState(), party, inventory, new ChestState(), equipmentInstanceFactory, new CurrencyState(), new ClockState(), new LocationState(), new MapEventProgressState(), new WorldTriggerState());
         var restoredCharacters = saveGame.RestoreCharacters(repository);
         var restoredParty = saveGame.RestoreParty(restoredCharacters);
         var restoredInventory = saveGame.RestoreInventory(repository);
@@ -145,7 +145,8 @@ public sealed class SaveGameTests
             new CurrencyState(),
             new ClockState(),
             new LocationState(),
-            new MapEventProgressState());
+            new MapEventProgressState(),
+            new WorldTriggerState());
 
         var restored = saveGame.RestoreCharacters(repository)["hero"];
 
@@ -162,7 +163,7 @@ public sealed class SaveGameTests
         character.GrantStatPoints(2);
         character.AllocateStat(StatType.Bili, 2);
 
-        var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), new CurrencyState(), new ClockState(), new LocationState(), new MapEventProgressState());
+        var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), new CurrencyState(), new ClockState(), new LocationState(), new MapEventProgressState(), new WorldTriggerState());
         var json = JsonSerializer.Serialize(saveGame, GameJson.Default);
 
         Assert.Contains("\"bili\":2", json, StringComparison.Ordinal);
@@ -224,7 +225,7 @@ public sealed class SaveGameTests
         currency.AddSilver(320);
         currency.AddGold(12);
 
-        var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), currency, new ClockState(), new LocationState(), new MapEventProgressState());
+        var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), currency, new ClockState(), new LocationState(), new MapEventProgressState(), new WorldTriggerState());
         var json = JsonSerializer.Serialize(saveGame, GameJson.Default);
         var roundTripped = JsonSerializer.Deserialize<SaveGame>(json, GameJson.Default);
 
@@ -246,7 +247,7 @@ public sealed class SaveGameTests
         clock.AdvanceTimeSlots(10);
         clock.AdvanceDays(397);
 
-        var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), new CurrencyState(), clock, new LocationState(), new MapEventProgressState());
+        var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), new CurrencyState(), clock, new LocationState(), new MapEventProgressState(), new WorldTriggerState());
         var json = JsonSerializer.Serialize(saveGame, GameJson.Default);
         var roundTripped = JsonSerializer.Deserialize<SaveGame>(json, GameJson.Default);
 
@@ -274,7 +275,7 @@ public sealed class SaveGameTests
         location.SetLargeMapPosition("world", new MapPosition(512, 410));
         location.SetLargeMapPosition("jiangnan", new MapPosition(24, 36));
 
-        var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), new CurrencyState(), new ClockState(), location, new MapEventProgressState());
+        var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), new CurrencyState(), new ClockState(), location, new MapEventProgressState(), new WorldTriggerState());
         var json = JsonSerializer.Serialize(saveGame, GameJson.Default);
         var roundTripped = JsonSerializer.Deserialize<SaveGame>(json, GameJson.Default);
 
@@ -310,7 +311,8 @@ public sealed class SaveGameTests
             new CurrencyState(),
             new ClockState(),
             new LocationState(),
-            mapEventProgress);
+            mapEventProgress,
+            new WorldTriggerState());
         var json = JsonSerializer.Serialize(saveGame, GameJson.Default);
         var roundTripped = JsonSerializer.Deserialize<SaveGame>(json, GameJson.Default);
 
@@ -348,7 +350,8 @@ public sealed class SaveGameTests
             clock,
             new LocationState(),
             new MapEventProgressState(),
-            story);
+            new WorldTriggerState(),
+            storyState: story);
         var json = JsonSerializer.Serialize(saveGame, GameJson.Default);
         var roundTripped = JsonSerializer.Deserialize<SaveGame>(json, GameJson.Default);
 
@@ -395,8 +398,9 @@ public sealed class SaveGameTests
             new ClockState(),
             new LocationState(),
             new MapEventProgressState(),
-            new StoryState(),
-            journal);
+            new WorldTriggerState(),
+            storyState: new StoryState(),
+            journal: journal);
         var json = JsonSerializer.Serialize(saveGame, GameJson.Default);
         var roundTripped = JsonSerializer.Deserialize<SaveGame>(json, GameJson.Default);
 
@@ -434,7 +438,8 @@ public sealed class SaveGameTests
             new CurrencyState(),
             new ClockState(),
             new LocationState(),
-            new MapEventProgressState());
+            new MapEventProgressState(),
+            new WorldTriggerState());
 
         var restored = saveGame.RestoreCharacters(repository)["char_001"];
 
