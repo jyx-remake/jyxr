@@ -3,10 +3,14 @@ using Game.Core.Model.Character;
 
 namespace Game.Core.Model.Skills;
 
-public sealed record LegendSkillInstance(
-    LegendSkillDefinition Definition,
-    SkillInstance Parent) : SkillInstance(Parent.Owner)
+public sealed class LegendSkillInstance(
+    LegendSkillDefinition definition,
+    SkillInstance parent) : SkillInstance(parent?.Owner ?? throw new ArgumentNullException(nameof(parent)))
 {
+    public LegendSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
+
+    public SkillInstance Parent { get; } = parent;
+
     public override string Id => Definition.Id;
     public override string Name => Definition.Name;
     public override string Animation => Definition.Animation??Parent.Animation;
@@ -14,7 +18,19 @@ public sealed record LegendSkillInstance(
     public override int Level
     {
         get => 0;
-        set => throw new NotImplementedException();
+        set => throw new NotSupportedException($"{nameof(LegendSkillInstance)} does not support level changes.");
+    }
+
+    public override int MaxLevel
+    {
+        get => 0;
+        set => throw new NotSupportedException($"{nameof(LegendSkillInstance)} does not support max level changes.");
+    }
+
+    public override int Exp
+    {
+        get => 0;
+        set => throw new NotSupportedException($"{nameof(LegendSkillInstance)} does not support experience changes.");
     }
 
     public override double Power => (Parent.Power + Definition.PowerExtra) * (1 + Bonus);

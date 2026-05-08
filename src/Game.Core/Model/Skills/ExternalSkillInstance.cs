@@ -5,36 +5,21 @@ using Game.Core.Model.Character;
 
 namespace Game.Core.Model.Skills;
 
-public sealed record ExternalSkillInstance : SkillInstance
+public sealed class ExternalSkillInstance(
+    ExternalSkillDefinition definition,
+    CharacterInstance owner,
+    bool active) : SkillInstance(owner)
 {
-    private bool _isActive;
+    private bool _isActive = active;
 
-    public ExternalSkillInstance(
-        ExternalSkillDefinition definition,
-        int level,
-        int exp,
-        bool isActive,
-        CharacterInstance owner,
-        int? maxLevel = null)
-        : base(owner)
-    {
-        Definition = definition;
-        Level = level;
-        Exp = exp;
-        MaxLevel = maxLevel ?? DefaultMaxLevel;
-        _isActive = isActive;
-    }
+    public ExternalSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
 
-    public ExternalSkillDefinition Definition { get; }
     public override string Id => Definition.Id;
     public override string Name => Definition.Name;
     public override string Description => Definition.Description;
     public override string Icon => Definition.Icon;
     public override string Animation => CurrentLevelOverride?.Animation ?? Definition.Animation;
     public override string Audio => Definition.Audio;
-    public override int Level { get; set; }
-    public override int MaxLevel { get; }
-    public override int Exp { get; set; }
     public override int CurrentCooldown { get; set; }
     public override SkillKind SkillKind => SkillKind.External;
     public override WeaponType WeaponType => Definition.Type;
@@ -82,6 +67,30 @@ public sealed record ExternalSkillInstance : SkillInstance
         return true;
     }
 
+    public void SetState(int level, int exp, bool isActive, int? maxLevel = null)
+    {
+        MaxLevel = maxLevel ?? DefaultMaxLevel;
+        Level = level;
+        Exp = exp;
+        _isActive = isActive;
+    }
+
+    public SkillLevelChange<ExternalSkillInstance> UpgradeLevel(int levels)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
+
+        var oldLevel = Level;
+        var targetLevel = Math.Min(checked(oldLevel + levels), MaxLevel);
+        if (targetLevel == oldLevel)
+        {
+            return new SkillLevelChange<ExternalSkillInstance>(this, oldLevel, targetLevel, false);
+        }
+
+        Level = targetLevel;
+        Exp = 0;
+        return new SkillLevelChange<ExternalSkillInstance>(this, oldLevel, targetLevel, false);
+    }
+
     public int LevelUpExp => GetLevelUpExp(Level);
 
     public int GetLevelUpExp(int currentLevel)
@@ -95,4 +104,5 @@ public sealed record ExternalSkillInstance : SkillInstance
 
     private SkillTargetingDefinition CurrentTargeting =>
         CurrentLevelOverride?.Targeting ?? Definition.Targeting;
+
 }

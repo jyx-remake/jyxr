@@ -12,10 +12,14 @@ public enum FormSkillInstanceState
 	SourceNotEquipped,
 }
 
-public sealed record FormSkillInstance(
-	FormSkillDefinition Definition,
-	SkillInstance Parent) : SkillInstance(Parent.Owner)
+public sealed class FormSkillInstance(
+	FormSkillDefinition definition,
+	SkillInstance parent) : SkillInstance(parent?.Owner ?? throw new ArgumentNullException(nameof(parent)))
 {
+	public FormSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
+
+	public SkillInstance Parent { get; } = parent;
+
 	public override string Id => Definition.Id;
 
 	public override string Name => Definition.Name;
@@ -30,7 +34,19 @@ public sealed record FormSkillInstance(
 	public override int Level
 	{
 		get => Parent.Level;
-		set => throw new NotImplementedException();
+		set => Parent.Level = value;
+	}
+
+	public override int MaxLevel
+	{
+		get => Parent.MaxLevel;
+		set => Parent.MaxLevel = value;
+	}
+
+	public override int Exp
+	{
+		get => Parent.Exp;
+		set => Parent.Exp = value;
 	}
 
 	public override int CurrentCooldown { get; set; }

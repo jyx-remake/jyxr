@@ -370,6 +370,85 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
+    public async Task RunAsync_UpgradeCommandSupportsStatsAndSkillLevels()
+    {
+        var externalAffix = new SkillAffixDefinition(
+            new StatModifierAffix(StatType.Gengu, ModifierValue.Add(5)),
+            MinimumLevel: 5);
+        var externalSkill = TestContentFactory.CreateExternalSkill(
+            "focus_strike",
+            affixes: [externalAffix]);
+        var internalAffix = new SkillAffixDefinition(
+            new StatModifierAffix(StatType.Dingli, ModifierValue.Add(7)),
+            MinimumLevel: 4);
+        var internalSkill = TestContentFactory.CreateInternalSkill(
+            "breath_control",
+            affixes: [internalAffix]);
+        var characterDefinition = TestContentFactory.CreateCharacterDefinition(
+            "hero",
+            new Dictionary<StatType, int>
+            {
+                [StatType.MaxHp] = 20,
+                [StatType.Gengu] = 10,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(externalSkill, Level: 3)]);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [characterDefinition],
+            externalSkills: [externalSkill],
+            internalSkills: [internalSkill],
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "upgrade_growth",
+                            [
+                                new CommandStep(
+                                    "upgrade",
+                                    [
+                                        new LiteralExprNode(ExprValue.FromString("hero")),
+                                        new LiteralExprNode(ExprValue.FromString("maxhp")),
+                                        new LiteralExprNode(ExprValue.FromNumber(10)),
+                                    ]),
+                                new CommandStep(
+                                    "upgrade",
+                                    [
+                                        new LiteralExprNode(ExprValue.FromString("hero")),
+                                        new LiteralExprNode(ExprValue.FromString("skill")),
+                                        new LiteralExprNode(ExprValue.FromString("focus_strike")),
+                                        new LiteralExprNode(ExprValue.FromNumber(2)),
+                                    ]),
+                                new CommandStep(
+                                    "upgrade",
+                                    [
+                                        new LiteralExprNode(ExprValue.FromString("hero")),
+                                        new LiteralExprNode(ExprValue.FromString("internalskill")),
+                                        new LiteralExprNode(ExprValue.FromString("breath_control")),
+                                        new LiteralExprNode(ExprValue.FromNumber(4)),
+                                    ]),
+                            ]),
+                    ]),
+            ]);
+        var state = new GameState();
+        var hero = TestContentFactory.CreateCharacterInstance("hero", characterDefinition, state.EquipmentInstanceFactory);
+        var party = new Party();
+        party.AddMember(hero);
+        state.SetParty(party);
+        var session = new GameSession(state, repository, new RecordingRuntimeHost());
+
+        await foreach (var _ in session.StoryService.RunAsync("upgrade_growth"))
+        {
+        }
+
+        Assert.Equal(30, hero.GetBaseStat(StatType.MaxHp));
+        Assert.Equal(5, hero.GetExternalSkillLevel("focus_strike"));
+        Assert.Equal(4, hero.GetInternalSkillLevel("breath_control"));
+        Assert.Equal(15, hero.GetStat(StatType.Gengu));
+        Assert.Equal(7, hero.GetStat(StatType.Dingli));
+    }
+
+    [Fact]
     public async Task RunAsync_SupportsLegacyWeaponStatAndYuanbaoPredicates()
     {
         var repository = TestContentFactory.CreateRepository(

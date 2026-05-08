@@ -50,8 +50,11 @@ public sealed class SkillDescriptionFormatterTests
         skill.Resolve(repository);
 
         var owner = CreateOwner();
-        var instance = new ExternalSkillInstance(skill, 4, 18, true, owner, 8)
+        var instance = new ExternalSkillInstance(skill, owner, true)
         {
+            Level = 4,
+            Exp = 18,
+            MaxLevel = 8,
             CurrentCooldown = 1,
         };
 
@@ -95,7 +98,12 @@ public sealed class SkillDescriptionFormatterTests
         skill.Resolve(repository);
 
         var owner = CreateOwner();
-        var instance = new InternalSkillInstance(skill, 12, 90, owner, 15);
+        var instance = new InternalSkillInstance(skill, owner)
+        {
+            Level = 12,
+            Exp = 90,
+            MaxLevel = 15,
+        };
 
         var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository);
 
@@ -171,7 +179,12 @@ public sealed class SkillDescriptionFormatterTests
         legend.Resolve(repository);
 
         var owner = CreateOwner();
-        var parent = new ExternalSkillInstance(startSkill, 4, 0, true, owner, 8);
+        var parent = new ExternalSkillInstance(startSkill, owner, true)
+        {
+            Level = 4,
+            Exp = 0,
+            MaxLevel = 8,
+        };
         var instance = new LegendSkillInstance(legend, parent);
 
         var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository);
@@ -215,7 +228,12 @@ public sealed class SkillDescriptionFormatterTests
         external.Resolve(repository);
 
         var owner = CreateOwner();
-        var parent = new ExternalSkillInstance(external, 6, 18, true, owner, 10);
+        var parent = new ExternalSkillInstance(external, owner, true)
+        {
+            Level = 6,
+            Exp = 18,
+            MaxLevel = 10,
+        };
         var instance = Assert.Single(parent.GetFormSkills());
 
         var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository);
@@ -254,7 +272,7 @@ public sealed class SkillDescriptionFormatterTests
             buffs: [buff]);
         skill.Resolve(repository);
 
-        var instance = new SpecialSkillInstance(skill, true, CreateOwner())
+        var instance = new SpecialSkillInstance(skill, CreateOwner(), true)
         {
             CurrentCooldown = 0,
         };

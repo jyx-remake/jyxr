@@ -3,21 +3,14 @@ using Game.Core.Model.Character;
 
 namespace Game.Core.Model.Skills;
 
-public sealed record SpecialSkillInstance : SkillInstance
+public sealed class SpecialSkillInstance(
+    SpecialSkillDefinition definition,
+    CharacterInstance owner,
+    bool active) : SkillInstance(owner)
 {
-    private bool _isActive;
+    private bool _isActive = active;
 
-    public SpecialSkillInstance(
-        SpecialSkillDefinition definition,
-        bool isActive,
-        CharacterInstance owner)
-        : base(owner)
-    {
-        Definition = definition;
-        _isActive = isActive;
-    }
-
-    public SpecialSkillDefinition Definition { get; }
+    public SpecialSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
 
     public override string Id => Definition.Id;
     public override string Name => Definition.Name;
@@ -25,12 +18,6 @@ public sealed record SpecialSkillInstance : SkillInstance
     public override string Icon => Definition.Icon;
     public override string Animation => Definition.Animation;
     public override string Audio => Definition.Audio;
-    public override int Level
-    {
-        get => 1;
-        set => throw new NotImplementedException();
-    }
-
     public override int Cooldown => Definition.Cooldown;
     public override int CastSize => Definition.Targeting?.CastSize ?? 0;
     public override SkillImpactType ImpactType => Definition.Targeting?.ImpactType ?? SkillImpactType.Single;

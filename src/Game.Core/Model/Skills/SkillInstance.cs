@@ -12,9 +12,15 @@ public enum SkillKind
     Legend,
 }
 
-public abstract record SkillInstance(CharacterInstance Owner)
+public abstract class SkillInstance(CharacterInstance owner)
 {
     public const int DefaultMaxLevel = 20;
+
+    private int _level = 1;
+    private int _maxLevel = DefaultMaxLevel;
+    private int _exp;
+
+    public CharacterInstance Owner { get; } = owner ?? throw new ArgumentNullException(nameof(owner));
 
     public virtual double Bonus => Owner.GetSkillBonusValue(Id);
     public abstract string Id { get; }
@@ -23,12 +29,34 @@ public abstract record SkillInstance(CharacterInstance Owner)
     public virtual string Icon => string.Empty;
     public abstract string Animation { get; }
     public abstract string Audio { get; }
-    public abstract int Level { get; set; }
-    public virtual int MaxLevel => DefaultMaxLevel;
+    public virtual int Level
+    {
+        get => _level;
+        set
+        {
+            ValidateLevel(value);
+            _level = value;
+        }
+    }
+
+    public virtual int MaxLevel
+    {
+        get => _maxLevel;
+        set
+        {
+            ValidateMaxLevel(value);
+            _maxLevel = value;
+        }
+    }
+
     public virtual int Exp
     {
-        get => 0;
-        set => throw new NotImplementedException();
+        get => _exp;
+        set
+        {
+            ValidateExperience(value);
+            _exp = value;
+        }
     }
 
     public virtual string CooldownKey => Id;
@@ -46,4 +74,10 @@ public abstract record SkillInstance(CharacterInstance Owner)
     public abstract bool IsHarmony { get; }
     public abstract double Affinity { get; }
     public abstract bool IsActive { get; }
+
+    protected static void ValidateLevel(int level) => ArgumentOutOfRangeException.ThrowIfLessThan(level, 1);
+
+    protected static void ValidateExperience(int exp) => ArgumentOutOfRangeException.ThrowIfNegative(exp);
+
+    protected static void ValidateMaxLevel(int maxLevel) => ArgumentOutOfRangeException.ThrowIfLessThan(maxLevel, 1);
 }

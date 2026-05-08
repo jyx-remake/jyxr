@@ -180,10 +180,34 @@ public sealed class StoryCommandDispatcher
     }
 
     [StoryCommand("upgrade")]
-    private ValueTask ExecuteUpgradeAsync(string characterId, string statName, int value)
+    private ValueTask ExecuteUpgradeAsync(string characterId, string target, params ExprValue[] args)
     {
-        _session.CharacterService.AddBaseStat(characterId, statName, value);
-        return ValueTask.CompletedTask;
+        if (StatCatalog.TryParse(target, out _))
+        {
+            var value = checked((int)args[0].AsNumber("Invocation 'upgrade' argument 'value'"));
+            _session.CharacterService.AddBaseStat(characterId, target, value);
+            return ValueTask.CompletedTask;
+        }
+
+        switch (target)
+        {
+            case "skill":
+            {
+                var skillId = args[0].AsString("Invocation 'upgrade' argument 'skillId'");
+                var levels = checked((int)args[1].AsNumber("Invocation 'upgrade' argument 'levels'"));
+                _session.CharacterService.UpgradeExternalSkillLevel(characterId, skillId, levels);
+                return ValueTask.CompletedTask;
+            }
+            case "internalskill" or "internal_skill":
+            {
+                var skillId = args[0].AsString("Invocation 'upgrade' argument 'skillId'");
+                var levels = checked((int)args[1].AsNumber("Invocation 'upgrade' argument 'levels'"));
+                _session.CharacterService.UpgradeInternalSkillLevel(characterId, skillId, levels);
+                return ValueTask.CompletedTask;
+            }
+            default:
+                throw new InvalidOperationException($"Unsupported upgrade target '{target}'.");
+        }
     }
 
     [StoryCommand("minus_maxpoints")]

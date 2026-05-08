@@ -27,9 +27,17 @@ public static class CharacterMapper
 
         EnsureSingleEquippedInternalSkill(definition.InternalSkills.Count(skill => skill.Equipped));
         character.ExternalSkills.AddRange(definition.ExternalSkills.Select(skill =>
-            new ExternalSkillInstance(skill.Skill, skill.Level, 0, true, character)));
+            new ExternalSkillInstance(skill.Skill, character, true)
+            {
+                Level = skill.Level,
+                Exp = 0,
+            }));
         character.InternalSkills.AddRange(definition.InternalSkills.Select(skill =>
-            new InternalSkillInstance(skill.Skill, skill.Level, 0, character)));
+            new InternalSkillInstance(skill.Skill, character)
+            {
+                Level = skill.Level,
+                Exp = 0,
+            }));
 
         var equippedInternalSkill = definition.InternalSkills.FirstOrDefault(skill => skill.Equipped);
         if (equippedInternalSkill is not null)
@@ -38,7 +46,7 @@ public static class CharacterMapper
         }
 
         character.UnlockedTalents.AddRange(definition.Talents);
-        character.SpecialSkills.AddRange(definition.SpecialSkills.Select(skill => new SpecialSkillInstance(skill, true, character)));
+        character.SpecialSkills.AddRange(definition.SpecialSkills.Select(skill => new SpecialSkillInstance(skill, character, true)));
         foreach (var equipmentDefinition in definition.Equipments)
         {
             character.AddEquipmentInstance(equipmentInstanceFactory.Create(equipmentDefinition));
@@ -70,21 +78,25 @@ public static class CharacterMapper
         character.SpecialSkills.AddRange(record.SpecialSkills.Select(skill =>
             new SpecialSkillInstance(
                 contentRepository.GetSpecialSkill(skill.SpecialSkillDefinitionId),
-                skill.IsActive,
-                character)));
+                character,
+                skill.IsActive)));
         character.ExternalSkills.AddRange(record.ExternalSkills.Select(skill =>
             new ExternalSkillInstance(
                 contentRepository.GetExternalSkill(skill.ExternalSkillDefinitionId),
-                skill.Level,
-                skill.Exp,
-                skill.IsActive,
-                character)));
+                character,
+                skill.IsActive)
+            {
+                Level = skill.Level,
+                Exp = skill.Exp,
+            }));
         character.InternalSkills.AddRange(record.InternalSkills.Select(skill =>
             new InternalSkillInstance(
                 contentRepository.GetInternalSkill(skill.InternalSkillDefinitionId),
-                skill.Level,
-                skill.Exp,
-                character)));
+                character)
+            {
+                Level = skill.Level,
+                Exp = skill.Exp,
+            }));
 
         var equippedInternalSkill = record.InternalSkills.FirstOrDefault(skill => skill.Equipped);
         if (equippedInternalSkill is not null)

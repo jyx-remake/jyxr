@@ -88,36 +88,50 @@ public sealed class CharacterInstance
 
     public void SetExternalSkillState(ExternalSkillDefinition definition, int level, int exp, bool active, int? maxLevel = null)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(level, 1);
-
-        if (exp < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(exp));
-        }
-
-        var index = ExternalSkills.FindIndex(skill => string.Equals(skill.Definition.Id, definition.Id, StringComparison.Ordinal));
-        if (index < 0)
+        ArgumentNullException.ThrowIfNull(definition);
+        var skill = SkillListMutation.Find(ExternalSkills, definition.Id);
+        if (skill is null)
         {
             ExternalSkills.Add(CreateExternalSkill(definition, level, exp, active, maxLevel));
-            RebuildSnapshot();
-            return;
+        }
+        else
+        {
+            skill.SetState(level, exp, active, maxLevel);
         }
 
-        ExternalSkills[index] = CreateExternalSkill(definition, level, exp, active, maxLevel);
         RebuildSnapshot();
+    }
+
+    public SkillLevelChange<ExternalSkillInstance> UpgradeExternalSkillLevel(
+        ExternalSkillDefinition definition,
+        int levels)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        var skill = SkillListMutation.Find(ExternalSkills, definition.Id);
+        if (skill is null)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
+            var createdLevel = Math.Min(levels, SkillInstance.DefaultMaxLevel);
+            skill = CreateExternalSkill(definition, createdLevel, 0, true);
+            ExternalSkills.Add(skill);
+            RebuildSnapshot();
+            return new SkillLevelChange<ExternalSkillInstance>(skill, 0, createdLevel, true);
+        }
+
+        var change = skill.UpgradeLevel(levels);
+        if (change.NewLevel != change.OldLevel)
+        {
+            RebuildSnapshot();
+        }
+
+        return change;
     }
 
     public bool SetExternalSkillActive(string skillId, bool isActive)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
 
-        var skill = ExternalSkills.FirstOrDefault(skill => string.Equals(skill.Definition.Id, skillId, StringComparison.Ordinal));
-        if (skill is null)
-        {
-            throw new InvalidOperationException($"External skill '{skillId}' is not unlocked.");
-        }
-
-        return skill.SetActive(isActive);
+        return SkillListMutation.GetRequired(ExternalSkills, skillId, "External skill").SetActive(isActive);
     }
 
     public void LevelUpAllSkillsMaxLevel()
@@ -135,41 +149,48 @@ public sealed class CharacterInstance
 
     public bool RemoveExternalSkill(string skillId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
-
-        var index = ExternalSkills.FindIndex(skill => string.Equals(skill.Definition.Id, skillId, StringComparison.Ordinal));
-        if (index < 0)
-        {
-            return false;
-        }
-
-        ExternalSkills.RemoveAt(index);
-        RebuildSnapshot();
-        return true;
+        return SkillListMutation.Remove(ExternalSkills, skillId, beforeRemove: null, onChanged: RebuildSnapshot);
     }
 
     public void SetInternalSkillState(InternalSkillDefinition definition, int level, int exp, int? maxLevel = null)
     {
-        if (level < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(level));
-        }
-
-        if (exp < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(exp));
-        }
-
-        var index = InternalSkills.FindIndex(skill => string.Equals(skill.Definition.Id, definition.Id, StringComparison.Ordinal));
-        if (index < 0)
+        ArgumentNullException.ThrowIfNull(definition);
+        var skill = SkillListMutation.Find(InternalSkills, definition.Id);
+        if (skill is null)
         {
             InternalSkills.Add(CreateInternalSkill(definition, level, exp, maxLevel));
-            RebuildSnapshot();
-            return;
+        }
+        else
+        {
+            skill.SetState(level, exp, maxLevel);
         }
 
-        InternalSkills[index] = CreateInternalSkill(definition, level, exp, maxLevel);
         RebuildSnapshot();
+    }
+
+    public SkillLevelChange<InternalSkillInstance> UpgradeInternalSkillLevel(
+        InternalSkillDefinition definition,
+        int levels)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        var skill = SkillListMutation.Find(InternalSkills, definition.Id);
+        if (skill is null)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
+            var createdLevel = Math.Min(levels, SkillInstance.DefaultMaxLevel);
+            skill = CreateInternalSkill(definition, createdLevel, 0);
+            InternalSkills.Add(skill);
+            RebuildSnapshot();
+            return new SkillLevelChange<InternalSkillInstance>(skill, 0, createdLevel, true);
+        }
+
+        var change = skill.UpgradeLevel(levels);
+        if (change.NewLevel != change.OldLevel)
+        {
+            RebuildSnapshot();
+        }
+
+        return change;
     }
 
     public bool EquipInternalSkill(string? internalSkillId)
@@ -186,7 +207,7 @@ public sealed class CharacterInstance
             return true;
         }
 
-        if (!InternalSkills.Any(skill => string.Equals(skill.Definition.Id, internalSkillId, StringComparison.Ordinal)))
+        if (SkillListMutation.Find(InternalSkills, internalSkillId) is null)
         {
             throw new InvalidOperationException($"Internal skill '{internalSkillId}' is not unlocked.");
         }
@@ -203,30 +224,20 @@ public sealed class CharacterInstance
 
     public bool RemoveInternalSkill(string skillId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
-
-        var index = InternalSkills.FindIndex(skill => string.Equals(skill.Definition.Id, skillId, StringComparison.Ordinal));
-        if (index < 0)
+        return SkillListMutation.Remove(InternalSkills, skillId, removedSkill =>
         {
-            return false;
-        }
-
-        var removedSkillId = InternalSkills[index].Definition.Id;
-        InternalSkills.RemoveAt(index);
-        if (string.Equals(EquippedInternalSkillId, removedSkillId, StringComparison.Ordinal))
-        {
-            EquippedInternalSkillId = null;
-        }
-
-        RebuildSnapshot();
-        return true;
+            if (string.Equals(EquippedInternalSkillId, removedSkill.Id, StringComparison.Ordinal))
+            {
+                EquippedInternalSkillId = null;
+            }
+        }, RebuildSnapshot);
     }
 
     public int? GetExternalSkillLevel(string externalSkillId) =>
-        ExternalSkills.FirstOrDefault(skill => string.Equals(skill.Definition.Id, externalSkillId, StringComparison.Ordinal))?.Level;
+        SkillListMutation.Find(ExternalSkills, externalSkillId)?.Level;
 
     public int? GetInternalSkillLevel(string internalSkillId) =>
-        InternalSkills.FirstOrDefault(skill => string.Equals(skill.Definition.Id, internalSkillId, StringComparison.Ordinal))?.Level;
+        SkillListMutation.Find(InternalSkills, internalSkillId)?.Level;
 
     public IReadOnlyList<FormSkillInstance> GetFormSkills() =>
         ExternalSkills.SelectMany(skill => skill.GetFormSkills())
@@ -276,7 +287,7 @@ public sealed class CharacterInstance
             return false;
         }
 
-        SpecialSkills.Add(new SpecialSkillInstance(definition, isActive, this));
+        SpecialSkills.Add(new SpecialSkillInstance(definition, this, isActive));
         return true;
     }
 
@@ -284,27 +295,14 @@ public sealed class CharacterInstance
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
 
-        var skill = SpecialSkills.FirstOrDefault(skill => string.Equals(skill.Definition.Id, skillId, StringComparison.Ordinal));
-        if (skill is null)
-        {
-            throw new InvalidOperationException($"Special skill '{skillId}' is not unlocked.");
-        }
-
-        return skill.SetActive(isActive);
+        return SkillListMutation.GetRequired(SpecialSkills, skillId, "Special skill").SetActive(isActive);
     }
 
     public bool RemoveSpecialSkill(string skillId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
 
-        var index = SpecialSkills.FindIndex(skill => string.Equals(skill.Definition.Id, skillId, StringComparison.Ordinal));
-        if (index < 0)
-        {
-            return false;
-        }
-
-        SpecialSkills.RemoveAt(index);
-        return true;
+        return SkillListMutation.Remove(SpecialSkills, skillId, beforeRemove: null);
     }
 
     public void AddEquipmentInstance(EquipmentInstance equipmentInstance)
@@ -406,8 +404,18 @@ public sealed class CharacterInstance
         buckets.TryGetValue(key, out var bucket) ? bucket : ModifierBucket.Empty;
 
     private ExternalSkillInstance CreateExternalSkill(ExternalSkillDefinition definition, int level, int exp, bool canUseInBattle, int? maxLevel = null) =>
-        new(definition, level, exp, canUseInBattle, this, maxLevel);
+        new(definition, this, canUseInBattle)
+        {
+            Level = level,
+            Exp = exp,
+            MaxLevel = maxLevel ?? SkillInstance.DefaultMaxLevel,
+        };
 
     private InternalSkillInstance CreateInternalSkill(InternalSkillDefinition definition, int level, int exp, int? maxLevel = null) =>
-        new(definition, level, exp, this, maxLevel);
+        new(definition, this)
+        {
+            Level = level,
+            Exp = exp,
+            MaxLevel = maxLevel ?? SkillInstance.DefaultMaxLevel,
+        };
 }

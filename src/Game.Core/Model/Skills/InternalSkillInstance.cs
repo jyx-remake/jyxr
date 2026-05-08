@@ -3,23 +3,11 @@ using Game.Core.Model.Character;
 
 namespace Game.Core.Model.Skills;
 
-public sealed record InternalSkillInstance : SkillInstance
+public sealed class InternalSkillInstance(
+    InternalSkillDefinition definition,
+    CharacterInstance owner) : SkillInstance(owner)
 {
-    public InternalSkillInstance(
-        InternalSkillDefinition definition,
-        int level,
-        int exp,
-        CharacterInstance owner,
-        int? maxLevel = null)
-        : base(owner)
-    {
-        Definition = definition;
-        Level = level;
-        Exp = exp;
-        MaxLevel = maxLevel ?? DefaultMaxLevel;
-    }
-
-    public InternalSkillDefinition Definition { get; }
+    public InternalSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
 
     public override string Id => Definition.Id;
 
@@ -35,9 +23,6 @@ public sealed record InternalSkillInstance : SkillInstance
     public override int CurrentCooldown { get; set; }
     public override SkillKind SkillKind => SkillKind.Internal;
     public override WeaponType WeaponType => WeaponType.InternalSkill;
-    public override int Level { get; set; }
-    public override int MaxLevel { get; }
-    public override int Exp { get; set; }
 
     public int Yin => Definition.Yin * Level / 10;
 
@@ -77,5 +62,28 @@ public sealed record InternalSkillInstance : SkillInstance
         }
 
         return (int)(((currentLevel + 4d) / 4d) * ((Definition.Hard + 4d) / 4d) * 40d);
+    }
+
+    public void SetState(int level, int exp, int? maxLevel = null)
+    {
+        MaxLevel = maxLevel ?? DefaultMaxLevel;
+        Level = level;
+        Exp = exp;
+    }
+
+    public SkillLevelChange<InternalSkillInstance> UpgradeLevel(int levels)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
+
+        var oldLevel = Level;
+        var targetLevel = Math.Min(checked(oldLevel + levels), MaxLevel);
+        if (targetLevel == oldLevel)
+        {
+            return new SkillLevelChange<InternalSkillInstance>(this, oldLevel, targetLevel, false);
+        }
+
+        Level = targetLevel;
+        Exp = 0;
+        return new SkillLevelChange<InternalSkillInstance>(this, oldLevel, targetLevel, false);
     }
 }

@@ -3,6 +3,7 @@ using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 using Game.Core.Model.Character;
+using Game.Core.Model.Skills;
 
 namespace Game.Application;
 
@@ -26,7 +27,7 @@ public sealed class CharacterService
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         var character = GetPartyMember(characterId);
         character.Name = name;
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void SetCharacterPortrait(string characterId, string portrait)
@@ -34,7 +35,7 @@ public sealed class CharacterService
         ArgumentException.ThrowIfNullOrWhiteSpace(portrait);
         var character = GetPartyMember(characterId);
         character.Portrait = portrait;
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void SetCharacterModel(string characterId, string model)
@@ -42,7 +43,7 @@ public sealed class CharacterService
         ArgumentException.ThrowIfNullOrWhiteSpace(model);
         var character = GetPartyMember(characterId);
         character.Model = model;
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void SetGrowTemplate(string characterId, string growTemplateId)
@@ -50,7 +51,7 @@ public sealed class CharacterService
         ArgumentException.ThrowIfNullOrWhiteSpace(growTemplateId);
         var character = GetPartyMember(characterId);
         character.GrowTemplateId = growTemplateId;
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void ReplaceBaseStats(string characterId, IReadOnlyDictionary<StatType, int> stats)
@@ -72,15 +73,14 @@ public sealed class CharacterService
         }
 
         // character.RebuildSnapshot();
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void AddBaseStat(string characterId, string statName, int value)
     {
         var character = GetPartyMember(characterId);
         character.AddBaseStat(StatCatalog.Parse(statName), value);
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} {statName} {value:+0;-0;0}"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} {statName} {value:+0;-0;0}");
     }
 
     public void ScaleLegacyMinusMaxPoints(string characterId, int tenths)
@@ -108,23 +108,21 @@ public sealed class CharacterService
         {
             character.SetUnspentStatPoints(targetPoints);
         }
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 所有属性减半"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} 所有属性减半");
     }
 
     public void AllocateStat(string characterId, StatType statType, int points = 1)
     {
         var character = GetPartyMember(characterId);
         character.AllocateStat(statType, points);
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void GrantStatPoints(string characterId, int points)
     {
         var character = GetPartyMember(characterId);
         character.GrantStatPoints(points);
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 自由属性点 +{points}"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} 自由属性点 +{points}");
     }
 
     public void GainExperience(string characterId, int experience)
@@ -146,7 +144,7 @@ public sealed class CharacterService
             _session.Events.Publish(new CharacterLeveledUpEvent(character.Id, oldLevel, resolvedLevel));
         }
 
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void LevelUp(string characterId, int levels = 1)
@@ -195,27 +193,31 @@ public sealed class CharacterService
     public void LearnExternalSkill(CharacterInstance character, string skillId, int level = 1)
     {
         ArgumentNullException.ThrowIfNull(character);
-        if (!ContentRepository.TryGetExternalSkill(skillId, out var externalSkill))
-        {
-            throw new InvalidOperationException($"Unknown external skill '{skillId}'.");
-        }
-
+        var externalSkill = ContentRepository.GetExternalSkill(skillId);
         character.SetExternalSkillState(externalSkill, level, 0, true);
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 习得外功【{skillId}】 {level}级"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} 习得外功【{externalSkill.Name}】 {level}级");
     }
 
     public void LearnInternalSkill(CharacterInstance character, string skillId, int level = 1)
     {
         ArgumentNullException.ThrowIfNull(character);
-        if (!ContentRepository.TryGetInternalSkill(skillId, out var internalSkill))
-        {
-            throw new InvalidOperationException($"Unknown internal skill '{skillId}'.");
-        }
-
+        var internalSkill = ContentRepository.GetInternalSkill(skillId);
         character.SetInternalSkillState(internalSkill, level, 0);
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 习得内功【{skillId}】 {level}级"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} 习得内功【{internalSkill.Name}】 {level}级");
+    }
+
+    public void UpgradeExternalSkillLevel(string characterId, string skillId, int levels)
+    {
+        var character = GetPartyMember(characterId);
+        var definition = ContentRepository.GetExternalSkill(skillId);
+        PublishSkillUpgradeResult(character, character.UpgradeExternalSkillLevel(definition, levels), "外功");
+    }
+
+    public void UpgradeInternalSkillLevel(string characterId, string skillId, int levels)
+    {
+        var character = GetPartyMember(characterId);
+        var definition = ContentRepository.GetInternalSkill(skillId);
+        PublishSkillUpgradeResult(character, character.UpgradeInternalSkillLevel(definition, levels), "内功");
     }
 
     public void LearnTalent(CharacterInstance character, string talentId)
@@ -223,8 +225,7 @@ public sealed class CharacterService
         ArgumentNullException.ThrowIfNull(character);
         if (character.LearnTalent(ContentRepository.GetTalent(talentId)))
         {
-            _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 获得天赋【{talentId}】"));
-            _session.Events.Publish(new CharacterChangedEvent(character.Id));
+            PublishToastAndCharacterChanged(character, $"{character.Name} 获得天赋【{talentId}】");
         }
     }
 
@@ -233,8 +234,7 @@ public sealed class CharacterService
         ArgumentNullException.ThrowIfNull(character);
         if (character.LearnSpecialSkill(ContentRepository.GetSpecialSkill(specialSkillId)))
         {
-            _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 习得特技【{specialSkillId}】"));
-            _session.Events.Publish(new CharacterChangedEvent(character.Id));
+            PublishToastAndCharacterChanged(character, $"{character.Name} 习得特技【{specialSkillId}】");
         }
     }
 
@@ -263,29 +263,19 @@ public sealed class CharacterService
     public void RemoveExternalSkill(CharacterInstance character, string skillId)
     {
         ArgumentNullException.ThrowIfNull(character);
-        if (!ContentRepository.TryGetExternalSkill(skillId, out _))
-        {
-            throw new InvalidOperationException($"Unknown external skill '{skillId}'.");
-        }
-
+        ContentRepository.GetExternalSkill(skillId);
         if (!character.RemoveExternalSkill(skillId)) return;
 
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 移除外功【{skillId}】"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} 移除外功【{skillId}】");
     }
 
     public void RemoveInternalSkill(CharacterInstance character, string skillId)
     {
         ArgumentNullException.ThrowIfNull(character);
-        if (!ContentRepository.TryGetInternalSkill(skillId, out _))
-        {
-            throw new InvalidOperationException($"Unknown internal skill '{skillId}'.");
-        }
-
+        ContentRepository.GetInternalSkill(skillId);
         if (!character.RemoveInternalSkill(skillId)) return;
 
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 移除内功【{skillId}】"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} 移除内功【{skillId}】");
     }
 
     public void RemoveTalent(CharacterInstance character, string talentId)
@@ -295,8 +285,7 @@ public sealed class CharacterService
         ContentRepository.GetTalent(talentId);
         if (!character.RemoveTalent(talentId)) return;
 
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 移除天赋【{talentId}】"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} 移除天赋【{talentId}】");
     }
 
     public void RemoveSpecialSkill(CharacterInstance character, string specialSkillId)
@@ -306,8 +295,7 @@ public sealed class CharacterService
         ContentRepository.GetSpecialSkill(specialSkillId);
         if (!character.RemoveSpecialSkill(specialSkillId)) return;
 
-        _session.Events.Publish(new ToastRequestedEvent($"{character.Name} 移除特技【{specialSkillId}】"));
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishToastAndCharacterChanged(character, $"{character.Name} 移除特技【{specialSkillId}】");
     }
 
     public void SetExternalSkillActive(string characterId, string skillId, bool isActive)
@@ -318,7 +306,7 @@ public sealed class CharacterService
             return;
         }
 
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void SetSpecialSkillActive(string characterId, string skillId, bool isActive)
@@ -329,7 +317,7 @@ public sealed class CharacterService
             return;
         }
 
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
 
     public void EquipInternalSkill(string characterId, string skillId)
@@ -340,8 +328,34 @@ public sealed class CharacterService
             return;
         }
 
-        _session.Events.Publish(new CharacterChangedEvent(character.Id));
+        PublishCharacterChanged(character);
     }
+
+    private void PublishSkillUpgradeResult<TSkill>(
+        CharacterInstance character,
+        SkillLevelChange<TSkill> change,
+        string skillKind)
+        where TSkill : SkillInstance
+    {
+        if (!change.Created && change.NewLevel == change.OldLevel)
+        {
+            return;
+        }
+
+        var message = change.Created
+            ? $"{character.Name} 习得{skillKind}【{change.Skill.Name}】 {change.NewLevel}级"
+            : $"{character.Name} {skillKind}【{change.Skill.Name}】 +{change.NewLevel - change.OldLevel}";
+        PublishToastAndCharacterChanged(character, message);
+    }
+
+    private void PublishToastAndCharacterChanged(CharacterInstance character, string message)
+    {
+        _session.Events.Publish(new ToastRequestedEvent(message));
+        PublishCharacterChanged(character);
+    }
+
+    private void PublishCharacterChanged(CharacterInstance character) =>
+        _session.Events.Publish(new CharacterChangedEvent(character.Id));
 
     private CharacterInstance GetPartyMember(string characterId)
     {
@@ -402,3 +416,4 @@ public sealed class CharacterService
         }
     }
 }
+
