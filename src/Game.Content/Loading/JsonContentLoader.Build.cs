@@ -24,6 +24,7 @@ public sealed partial class JsonContentLoader
             InternalSkills = IndexById(package.InternalSkills, "InternalSkill"),
             LegendSkills = package.LegendSkills.ToList(),
             Maps = IndexById(package.Maps, "Map"),
+            WorldTriggers = package.WorldTriggers.ToList(),
             Resources = IndexById(package.Resources, "Resource"),
             Sects = IndexOrderedById(package.Sects, "Sect"),
             Shops = IndexById(package.Shops, "Shop"),

@@ -17,8 +17,6 @@ public sealed record MapDefinition
 
     public IReadOnlyList<string> Musics { get; init; } = [];
 
-    public IReadOnlyList<MapEventDefinition> EnterEvents { get; init; } = [];
-
     public IReadOnlyList<MapLocationDefinition> Locations { get; init; } = [];
 }
 

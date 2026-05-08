@@ -19,7 +19,18 @@ public sealed partial class JsonContentLoader
         ValidateItemReferences(repository);
         ValidateShops(repository);
         ValidateLegendSkills(repository);
+        ValidateWorldTriggers(repository);
         ValidateStoryContent(repository);
+    }
+
+    private static void ValidateWorldTriggers(InMemoryContentRepository repository)
+    {
+        var ids = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var trigger in repository.WorldTriggers)
+        {
+            Ensure(!string.IsNullOrWhiteSpace(trigger.Id), "WorldTrigger definition has empty id.");
+            Ensure(ids.Add(trigger.Id), $"WorldTrigger '{trigger.Id}' is duplicated.");
+        }
     }
 
     private static void ValidateCharacters(InMemoryContentRepository repository)
@@ -464,13 +475,13 @@ public sealed partial class JsonContentLoader
 
     private static void ValidateMapStoryReferences(InMemoryContentRepository repository)
     {
+        foreach (var trigger in repository.WorldTriggers)
+        {
+            ValidateWorldTriggerStoryReference(repository, trigger);
+        }
+
         foreach (var map in repository.Maps.Values)
         {
-            foreach (var mapEvent in map.EnterEvents)
-            {
-                ValidateMapStoryReference(repository, map.Id, "$enter", mapEvent);
-            }
-
             foreach (var location in map.Locations)
             {
                 foreach (var mapEvent in location.Events)
@@ -494,5 +505,18 @@ public sealed partial class JsonContentLoader
 
         Ensure(repository.StorySegments.ContainsKey(mapEvent.TargetId),
             $"Map '{mapId}' location '{locationId}' references missing story segment '{mapEvent.TargetId}'.");
+    }
+
+    private static void ValidateWorldTriggerStoryReference(
+        InMemoryContentRepository repository,
+        WorldTriggerDefinition trigger)
+    {
+        if (!string.Equals(trigger.Type, "story", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        Ensure(repository.StorySegments.ContainsKey(trigger.TargetId),
+            $"World trigger '{trigger.Id}' references missing story segment '{trigger.TargetId}'.");
     }
 }

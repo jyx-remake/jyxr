@@ -23,6 +23,7 @@ public interface IContentRepository
     bool TryGetInternalSkill(string id, [NotNullWhen(true)] out InternalSkillDefinition? definition);
     MapDefinition GetMap(string id);
     bool TryGetMap(string id, [NotNullWhen(true)] out MapDefinition? definition);
+    IReadOnlyList<WorldTriggerDefinition> GetWorldTriggers();
     ResourceDefinition GetResource(string id);
     bool TryGetResource(string id, [NotNullWhen(true)] out ResourceDefinition? definition);
     SectDefinition GetSect(string id);

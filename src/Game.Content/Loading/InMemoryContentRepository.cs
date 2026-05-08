@@ -15,6 +15,7 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public required Dictionary<string, GrowTemplateDefinition> GrowTemplates { get; init; }
 	public required Dictionary<string, InternalSkillDefinition> InternalSkills { get; init; }
 	public required Dictionary<string, MapDefinition> Maps { get; init; }
+	public required List<WorldTriggerDefinition> WorldTriggers { get; init; }
 	public required Dictionary<string, ResourceDefinition> Resources { get; init; }
 	public required OrderedDictionary<string, SectDefinition> Sects { get; init; }
 	public required Dictionary<string, ShopDefinition> Shops { get; init; }
@@ -55,6 +56,8 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public MapDefinition GetMap(string id) => Maps[id];
 	public bool TryGetMap(string id, [NotNullWhen(true)] out MapDefinition? definition) =>
 		Maps.TryGetValue(id, out definition);
+
+	public IReadOnlyList<WorldTriggerDefinition> GetWorldTriggers() => WorldTriggers;
 
 	public ResourceDefinition GetResource(string id) => Resources[id];
 	public bool TryGetResource(string id, [NotNullWhen(true)] out ResourceDefinition? definition) =>

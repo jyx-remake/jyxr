@@ -19,6 +19,7 @@ public sealed class GodotContentPackageLoader
 	private const string InternalSkillsFileName = "internal-skills.json";
 	private const string LegendSkillsFileName = "legend-skills.json";
 	private const string MapsFileName = "maps.json";
+	private const string WorldTriggersFileName = "world-triggers.json";
 	private const string ResourcesFileName = "resources.json";
 	private const string SectsFileName = "sects.json";
 	private const string ShopsFileName = "shops.json";
@@ -55,6 +56,7 @@ public sealed class GodotContentPackageLoader
 			InternalSkills = LoadRequiredList<InternalSkillDefinition>(InternalSkillsFileName),
 			LegendSkills = LoadRequiredList<LegendSkillDefinition>(LegendSkillsFileName),
 			Maps = LoadRequiredList<MapDefinition>(MapsFileName),
+			WorldTriggers = LoadRequiredList<WorldTriggerDefinition>(WorldTriggersFileName),
 			Resources = LoadRequiredList<ResourceDefinition>(ResourcesFileName),
 			Sects = LoadRequiredList<SectDefinition>(SectsFileName),
 			Shops = LoadRequiredList<ShopDefinition>(ShopsFileName),

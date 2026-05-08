@@ -52,7 +52,7 @@ public sealed class MapService
             Map = map,
             HeroPosition = currentPosition,
             ConsumedTimeSlots = 0,
-            PendingInteraction = ResolveEnterEvent(map),
+            PendingInteraction = _session.WorldTriggerService.ResolvePendingTrigger(),
             Locations = BuildLocations(map),
         };
     }
@@ -116,34 +116,6 @@ public sealed class MapService
             {
                 return (mapEvent, mapEvent.RepeatMode == RepeatMode.Once ? index : -1);
             }
-        }
-
-        return null;
-    }
-
-    private MapInteractionResult? ResolveEnterEvent(MapDefinition map)
-    {
-        for (var index = 0; index < map.EnterEvents.Count; index++)
-        {
-            var mapEvent = map.EnterEvents[index];
-            if (mapEvent.RepeatMode == RepeatMode.Once &&
-                State.MapEventProgress.IsCompleted(BuildEnterEventKey(map.Id, index)))
-            {
-                continue;
-            }
-
-            if (!_conditionEvaluator.AreSatisfied(mapEvent.Conditions))
-            {
-                continue;
-            }
-
-            if (!RollChance(mapEvent.Probability))
-            {
-                continue;
-            }
-
-            MarkEventCompletedIfNeeded(mapEvent, index, BuildEnterEventKey(map.Id, index));
-            return ResolveMapEvent(mapEvent, 0);
         }
 
         return null;
@@ -223,8 +195,6 @@ public sealed class MapService
     private static string BuildLocationEventKey(string mapId, string locationId, int eventIndex) =>
         $"{mapId}|{locationId}|{eventIndex}";
 
-    private static string BuildEnterEventKey(string mapId, int eventIndex) =>
-        $"{mapId}|$enter|{eventIndex}";
 }
 
 public sealed record MapEnterResult

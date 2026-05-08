@@ -8,6 +8,7 @@ namespace Game.Tests;
 public sealed class MapServiceTests
 {
     private const string WorldVillageEventKey = "world|village|0";
+    private const string WorldTriggerEventKey = "$world|story_global";
 
     [Fact]
     public void EnterMap_LargeMap_UsesRememberedPositionWithoutConsumingTime()
@@ -33,29 +34,28 @@ public sealed class MapServiceTests
     }
 
     [Fact]
-    public void EnterMap_WhenEnterStoryConditionMatches_ReturnsPendingStoryInteraction()
+    public void EnterMap_WhenWorldTriggerConditionMatches_ReturnsPendingStoryInteraction()
     {
         var worldMap = CreateMap(
             "world",
             MapKind.Large,
+            CreateLocation("village", position: new MapPosition(10, 20)));
+        var worldTrigger = new WorldTriggerDefinition
+        {
+            Id = "story_global",
+            Type = "story",
+            TargetId = "story_global",
+            Probability = 100,
+            Conditions =
             [
-                new MapEventDefinition
+                new MapEventConditionDefinition
                 {
-                    Type = "story",
-                    TargetId = "story_global",
-                    Probability = 100,
-                    Conditions =
-                    [
-                        new MapEventConditionDefinition
-                        {
-                            Type = "friendCount",
-                            Value = "4",
-                        },
-                    ],
+                    Type = "friendCount",
+                    Value = "4",
                 },
             ],
-            CreateLocation("village", position: new MapPosition(10, 20)));
-        var repository = TestContentFactory.CreateRepository(maps: [worldMap]);
+        };
+        var repository = TestContentFactory.CreateRepository(maps: [worldMap], worldTriggers: [worldTrigger]);
 
         var state = new GameState();
         state.Party.AddMember(CreateCharacter("hero"));
@@ -69,32 +69,32 @@ public sealed class MapServiceTests
         Assert.NotNull(result.PendingInteraction);
         Assert.Equal(MapService.MapInteractionOutcome.StoryRequested, result.PendingInteraction!.Outcome);
         Assert.Equal("story_global", result.PendingInteraction.TargetId);
+        Assert.True(state.MapEventProgress.IsCompleted(WorldTriggerEventKey));
     }
 
     [Fact]
-    public void EnterMap_FriendCount_DoesNotCountFollowers()
+    public void EnterMap_WorldTriggerFriendCount_DoesNotCountFollowers()
     {
         var worldMap = CreateMap(
             "world",
             MapKind.Large,
+            CreateLocation("village", position: new MapPosition(10, 20)));
+        var worldTrigger = new WorldTriggerDefinition
+        {
+            Id = "story_global",
+            Type = "story",
+            TargetId = "story_global",
+            Probability = 100,
+            Conditions =
             [
-                new MapEventDefinition
+                new MapEventConditionDefinition
                 {
-                    Type = "story",
-                    TargetId = "story_global",
-                    Probability = 100,
-                    Conditions =
-                    [
-                        new MapEventConditionDefinition
-                        {
-                            Type = "friendCount",
-                            Value = "4",
-                        },
-                    ],
+                    Type = "friendCount",
+                    Value = "4",
                 },
             ],
-            CreateLocation("village", position: new MapPosition(10, 20)));
-        var repository = TestContentFactory.CreateRepository(maps: [worldMap]);
+        };
+        var repository = TestContentFactory.CreateRepository(maps: [worldMap], worldTriggers: [worldTrigger]);
 
         var state = new GameState();
         state.Party.AddMember(CreateCharacter("hero"));
@@ -374,21 +374,6 @@ public sealed class MapServiceTests
             Id = id,
             Name = id,
             Kind = kind,
-            EnterEvents = [],
-            Locations = locations,
-        };
-
-    private static MapDefinition CreateMap(
-        string id,
-        MapKind kind,
-        IReadOnlyList<MapEventDefinition> enterEvents,
-        params MapLocationDefinition[] locations) =>
-        new()
-        {
-            Id = id,
-            Name = id,
-            Kind = kind,
-            EnterEvents = enterEvents,
             Locations = locations,
         };
 

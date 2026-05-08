@@ -1054,7 +1054,7 @@ public sealed class ContentLoadingTests
     }
 
     [Fact]
-    public void JsonLoader_RejectsMissingStoryReferencedByMapEnterEvent()
+    public void JsonLoader_RejectsMissingStoryReferencedByWorldTrigger()
     {
         var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)
         {
@@ -1065,14 +1065,18 @@ public sealed class ContentLoadingTests
                     "id": "world_map",
                     "name": "World Map",
                     "kind": "large",
-                    "enterEvents": [
-                      {
-                        "type": "story",
-                        "targetId": "story_missing",
-                        "probability": 100
-                      }
-                    ],
                     "locations": []
+                  }
+                ]
+                """,
+            ["world-triggers.json"] =
+                """
+                [
+                  {
+                    "id": "story_missing",
+                    "type": "story",
+                    "targetId": "story_missing",
+                    "probability": 100
                   }
                 ]
                 """,
@@ -1133,6 +1137,7 @@ public sealed class ContentLoadingTests
             ["internal-skills.json"] = "[]",
             ["legend-skills.json"] = "[]",
             ["maps.json"] = "[]",
+            ["world-triggers.json"] = "[]",
             ["resources.json"] = "[]",
             ["sects.json"] = "[]",
             ["shops.json"] = "[]",

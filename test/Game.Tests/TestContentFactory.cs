@@ -147,6 +147,7 @@ internal static class TestContentFactory
         IEnumerable<ItemDefinition>? items = null,
         IEnumerable<BuffDefinition>? buffs = null,
         IEnumerable<MapDefinition>? maps = null,
+        IEnumerable<WorldTriggerDefinition>? worldTriggers = null,
         IEnumerable<ResourceDefinition>? resources = null,
         IEnumerable<ShopDefinition>? shops = null) =>
         CreateRepositoryInternal(
@@ -162,6 +163,7 @@ internal static class TestContentFactory
             items,
             buffs,
             maps,
+            worldTriggers,
             resources,
             shops);
 
@@ -178,6 +180,7 @@ internal static class TestContentFactory
         IEnumerable<ItemDefinition>? items,
         IEnumerable<BuffDefinition>? buffs,
         IEnumerable<MapDefinition>? maps,
+        IEnumerable<WorldTriggerDefinition>? worldTriggers,
         IEnumerable<ResourceDefinition>? resources,
         IEnumerable<ShopDefinition>? shops)
     {
@@ -206,6 +209,7 @@ internal static class TestContentFactory
             InternalSkills = (internalSkills ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             LegendSkills = (legendSkills ?? []).ToList(),
             Maps = (maps ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
+            WorldTriggers = (worldTriggers ?? []).ToList(),
             Resources = (resources ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Sects = new OrderedDictionary<string, SectDefinition>(StringComparer.Ordinal),
             Shops = (shops ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),

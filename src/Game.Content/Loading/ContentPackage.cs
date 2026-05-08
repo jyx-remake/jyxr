@@ -14,6 +14,7 @@ public sealed class ContentPackage
     public List<InternalSkillDefinition> InternalSkills { get; init; } = [];
     public List<LegendSkillDefinition> LegendSkills { get; init; } = [];
     public List<MapDefinition> Maps { get; init; } = [];
+    public List<WorldTriggerDefinition> WorldTriggers { get; init; } = [];
     public List<ResourceDefinition> Resources { get; init; } = [];
     public List<SectDefinition> Sects { get; init; } = [];
     public List<ShopDefinition> Shops { get; init; } = [];

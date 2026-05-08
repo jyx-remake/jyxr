@@ -16,6 +16,7 @@ public sealed partial class JsonContentLoader
     private const string InternalSkillsFileName = "internal-skills.json";
     private const string LegendSkillsFileName = "legend-skills.json";
     private const string MapsFileName = "maps.json";
+    private const string WorldTriggersFileName = "world-triggers.json";
     private const string ResourcesFileName = "resources.json";
     private const string SectsFileName = "sects.json";
     private const string ShopsFileName = "shops.json";
@@ -44,6 +45,7 @@ public sealed partial class JsonContentLoader
             InternalSkills = LoadRequiredList<InternalSkillDefinition>(directoryPath, InternalSkillsFileName),
             LegendSkills = LoadRequiredList<LegendSkillDefinition>(directoryPath, LegendSkillsFileName),
             Maps = LoadRequiredList<MapDefinition>(directoryPath, MapsFileName),
+            WorldTriggers = LoadRequiredList<WorldTriggerDefinition>(directoryPath, WorldTriggersFileName),
             Resources = LoadRequiredList<ResourceDefinition>(directoryPath, ResourcesFileName),
             Sects = LoadRequiredList<SectDefinition>(directoryPath, SectsFileName),
             Shops = LoadRequiredList<ShopDefinition>(directoryPath, ShopsFileName),
