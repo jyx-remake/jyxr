@@ -20,6 +20,8 @@ public sealed class GameState
 
     public MapEventProgressState MapEventProgress { get; private set; } = new();
 
+    public WorldTriggerState WorldTriggers { get; private set; } = new();
+
     public ShopState Shop { get; private set; } = new();
 
     public StoryState Story { get; private set; } = new();
@@ -44,6 +46,8 @@ public sealed class GameState
     public void SetLocation(LocationState location) => Location = location;
 
     public void SetMapEventProgress(MapEventProgressState mapEventProgress) => MapEventProgress = mapEventProgress;
+
+    public void SetWorldTriggers(WorldTriggerState worldTriggers) => WorldTriggers = worldTriggers;
 
     public void SetShop(ShopState shop) => Shop = shop;
 

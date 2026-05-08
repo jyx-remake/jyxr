@@ -16,11 +16,12 @@ public sealed record SaveGame(
     ClockRecord Clock,
     LocationRecord Location,
     MapEventProgressRecord MapEventProgress,
+    WorldTriggerStateRecord? WorldTriggerState = null,
     StoryStateRecord? StoryState = null,
     JournalRecord? Journal = null,
     ShopStateRecord? ShopState = null)
 {
-    public const int CurrentVersion = 18;
+    public const int CurrentVersion = 19;
 
     public static SaveGame Create(
         AdventureState adventure,
@@ -32,6 +33,7 @@ public sealed record SaveGame(
         ClockState clock,
         LocationState location,
         MapEventProgressState mapEventProgress,
+        WorldTriggerState worldTriggerState,
         StoryState? storyState = null,
         JournalState? journal = null,
         ShopState? shopState = null)
@@ -45,6 +47,7 @@ public sealed record SaveGame(
         ArgumentNullException.ThrowIfNull(clock);
         ArgumentNullException.ThrowIfNull(location);
         ArgumentNullException.ThrowIfNull(mapEventProgress);
+        ArgumentNullException.ThrowIfNull(worldTriggerState);
 
         return new SaveGame(
             CurrentVersion,
@@ -58,6 +61,7 @@ public sealed record SaveGame(
             clock.ToRecord(),
             location.ToRecord(),
             mapEventProgress.ToRecord(),
+            worldTriggerState.ToRecord(),
             (storyState ?? new StoryState()).ToRecord(),
             (journal ?? new JournalState()).ToRecord(),
             (shopState ?? new ShopState()).ToRecord());
@@ -96,6 +100,9 @@ public sealed record SaveGame(
 
     public MapEventProgressState RestoreMapEventProgress() =>
         MapEventProgressState.Restore(MapEventProgress);
+
+    public WorldTriggerState RestoreWorldTriggerState() =>
+        Game.Core.Model.WorldTriggerState.Restore(WorldTriggerState);
 
     public ShopState RestoreShopState() =>
         Game.Core.Model.ShopState.Restore(ShopState);

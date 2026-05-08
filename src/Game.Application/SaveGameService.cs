@@ -30,6 +30,7 @@ public sealed class SaveGameService
 			State.Clock,
 			State.Location,
 			State.MapEventProgress,
+			State.WorldTriggers,
 			State.Story,
 			State.Journal,
 			State.Shop);
@@ -49,8 +50,9 @@ public sealed class SaveGameService
 		var clock = saveGame.RestoreClock();
 		var location = saveGame.RestoreLocation();
 		var mapEventProgress = saveGame.RestoreMapEventProgress();
-		var shop = saveGame.RestoreShopState();
 		var story = saveGame.RestoreStoryState();
+		var worldTriggers = saveGame.RestoreWorldTriggerState();
+		var shop = saveGame.RestoreShopState();
 		var journal = saveGame.RestoreJournal();
 		var state = new GameState();
 		state.SetAdventure(adventure);
@@ -62,6 +64,7 @@ public sealed class SaveGameService
 		state.SetClock(clock);
 		state.SetLocation(location);
 		state.SetMapEventProgress(mapEventProgress);
+		state.SetWorldTriggers(worldTriggers);
 		state.SetShop(shop);
 		state.SetStory(story);
 		state.SetJournal(journal);

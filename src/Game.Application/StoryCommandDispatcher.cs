@@ -138,6 +138,26 @@ public sealed class StoryCommandDispatcher
         return ValueTask.CompletedTask;
     }
 
+    [StoryCommand("world_trigger")]
+    private ValueTask ExecuteWorldTriggerAsync(string mode)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(mode);
+
+        switch (mode.Trim())
+        {
+            case "on":
+                _session.WorldTriggerService.Unblock();
+                break;
+            case "off":
+                _session.WorldTriggerService.Block();
+                break;
+            default:
+                throw new InvalidOperationException($"Unsupported world_trigger mode '{mode}'.");
+        }
+
+        return ValueTask.CompletedTask;
+    }
+
     [StoryCommand("daode")]
     private ValueTask ExecuteChangeDaodeAsync(int delta)
     {

@@ -19,6 +19,11 @@ public sealed class WorldTriggerService
 
     public MapInteractionResult? ResolvePendingTrigger()
     {
+        if (State.WorldTriggers.IsBlocked)
+        {
+            return null;
+        }
+
         foreach (var trigger in _session.ContentRepository.GetWorldTriggers())
         {
             if (IsCompleted(trigger))
@@ -50,7 +55,7 @@ public sealed class WorldTriggerService
             return false;
         }
 
-        if (State.MapEventProgress.IsCompleted(BuildTriggerKey(trigger.Id)))
+        if (State.WorldTriggers.IsCompleted(trigger.Id))
         {
             return true;
         }
@@ -63,9 +68,13 @@ public sealed class WorldTriggerService
     {
         if (trigger.RepeatMode == RepeatMode.Once)
         {
-            State.MapEventProgress.MarkCompleted(BuildTriggerKey(trigger.Id));
+            State.WorldTriggers.MarkCompleted(trigger.Id);
         }
     }
+
+    public void Block() => State.WorldTriggers.Block();
+
+    public void Unblock() => State.WorldTriggers.Unblock();
 
     private static MapInteractionResult BuildInteractionResult(WorldTriggerDefinition trigger) =>
         trigger.Type switch
@@ -91,5 +100,4 @@ public sealed class WorldTriggerService
     private static bool RollChance(int probability) =>
         Random.Shared.Next(100) < probability;
 
-    private static string BuildTriggerKey(string triggerId) => $"$world|{triggerId}";
 }
