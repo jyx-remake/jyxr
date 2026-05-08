@@ -1,3 +1,4 @@
+using Game.Application.Formatters;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Godot.Assets;
@@ -73,8 +74,9 @@ public partial class CombatantSelectCard : Button
 
 		_nameLabel.Text = _character.Name;
 		_levelLabel.Text = $"等级:{_character.Level}";
-		_attackLabel.Text = $"攻:{ToDisplayStat(_character.GetStat(StatType.Attack))}";
-		_defenceLabel.Text = $"防:{ToDisplayStat(_character.GetStat(StatType.Defence))}";
+		var combatStats = CharacterCombatStatFormatter.Calculate(_character);
+		_attackLabel.Text = $"攻:{combatStats.Attack}";
+		_defenceLabel.Text = $"防:{combatStats.Defence}";
 		_selectedMark.Visible = _isSelected;
 		TooltipText = _isRequired ? "剧情要求出战" : _character.Name;
 
@@ -87,6 +89,4 @@ public partial class CombatantSelectCard : Button
 		_maleLogo.Visible = _character.Definition.Gender == CharacterGender.Male;
 		_femaleLogo.Visible = _character.Definition.Gender == CharacterGender.Female;
 	}
-
-	private static int ToDisplayStat(double value) => Mathf.RoundToInt(value);
 }

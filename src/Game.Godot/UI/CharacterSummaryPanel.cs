@@ -1,4 +1,5 @@
 using System.Text;
+using Game.Application.Formatters;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Godot.Assets;
@@ -66,10 +67,11 @@ public partial class CharacterSummaryPanel : Control
 
 	private static string BuildStatsText(CharacterInstance character)
 	{
+		var combatStats = CharacterCombatStatFormatter.Calculate(character);
 		var builder = new StringBuilder();
-		builder.Append($"攻击 {ToDisplayStat(character.GetStat(StatType.Attack))}");
+		builder.Append($"攻击 {combatStats.Attack}");
 		builder.Append("  ");
-		builder.Append($"防御 {ToDisplayStat(character.GetStat(StatType.Defence))}");
+		builder.Append($"防御 {combatStats.Defence}");
 		builder.Append("  ");
 		builder.Append($"轻功 {ToDisplayStat(character.GetStat(StatType.Speed))}");
 		builder.Append("  ");

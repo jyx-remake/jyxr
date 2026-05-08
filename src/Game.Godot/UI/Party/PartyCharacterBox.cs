@@ -1,3 +1,4 @@
+using Game.Application.Formatters;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Godot.Assets;
@@ -63,8 +64,9 @@ public partial class PartyCharacterBox : Button
 
 		_nameLabel.Text = _character.Name;
 		_levelLabel.Text = $"等级:{_character.Level}";
-		_attackLabel.Text = $"攻:{ToDisplayStat(_character.GetStat(StatType.Attack))}";
-		_defenceLabel.Text = $"防:{ToDisplayStat(_character.GetStat(StatType.Defence))}";
+		var combatStats = CharacterCombatStatFormatter.Calculate(_character);
+		_attackLabel.Text = $"攻:{combatStats.Attack}";
+		_defenceLabel.Text = $"防:{combatStats.Defence}";
 		_lockLabel.Visible = IsHeroLocked;
 		TooltipText = string.Empty;
 
@@ -184,6 +186,4 @@ public partial class PartyCharacterBox : Button
 			_dragHighlight.Visible = highlighted;
 		}
 	}
-
-	private static int ToDisplayStat(double value) => Mathf.RoundToInt(value);
 }

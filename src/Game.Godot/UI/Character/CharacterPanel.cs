@@ -119,8 +119,9 @@ public partial class CharacterPanel : JyPanel
 		_xpValueLabel.Text = character.Level >= CharacterLevelProgression.MaxLevel
 			? "-/-"
 			: FormatExperienceProgress(character);
-		_attackValueLabel.Text = ToDisplayStat(character.GetStat(StatType.Attack)).ToString();
-		_defenceValueLabel.Text = ToDisplayStat(character.GetStat(StatType.Defence)).ToString();
+		var combatStats = CharacterCombatStatFormatter.Calculate(character);
+		_attackValueLabel.Text = combatStats.Attack.ToString();
+		_defenceValueLabel.Text = combatStats.Defence.ToString();
 		UpdateNavigationButtons();
 
 		_attributeTab.Setup(character);

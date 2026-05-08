@@ -1,5 +1,5 @@
 using Game.Application;
-using Game.Core.Model;
+using Game.Application.Formatters;
 using Game.Core.Model.Character;
 using Game.Godot.Assets;
 using Godot;
@@ -51,8 +51,9 @@ public partial class ItemTargetCharacterBox : Button
 
 		_nameLabel.Text = _character.Name;
 		_levelLabel.Text = $"等级:{_character.Level}";
-		_attackLabel.Text = $"攻:{ToDisplayStat(_character.GetStat(StatType.Attack))}";
-		_defenceLabel.Text = $"防:{ToDisplayStat(_character.GetStat(StatType.Defence))}";
+		var combatStats = CharacterCombatStatFormatter.Calculate(_character);
+		_attackLabel.Text = $"攻:{combatStats.Attack}";
+		_defenceLabel.Text = $"防:{combatStats.Defence}";
 
 		var portrait = AssetResolver.LoadCharacterPortrait(_character);
 		if (portrait is not null)
@@ -81,6 +82,4 @@ public partial class ItemTargetCharacterBox : Button
 
 		EmitSignal(SignalName.TargetSelected, _character.Id);
 	}
-
-	private static int ToDisplayStat(double value) => Mathf.RoundToInt(value);
 }
