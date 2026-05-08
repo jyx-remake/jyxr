@@ -1,10 +1,10 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://cn1marksgcufq"]
 
-[ext_resource type="Script" path="res://src/Game.Godot/UI/Skills/SkillBox.cs" id="1_script"]
-[ext_resource type="PackedScene" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="2_tooltip"]
-[ext_resource type="Texture2D" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_avatar"]
-[ext_resource type="Texture2D" path="res://assets/art/misc/btn-cross.png" id="4_check"]
-[ext_resource type="Texture2D" path="res://assets/art/misc/touxiangbiankuang.png" id="5_badge"]
+[ext_resource type="Script" uid="uid://ebh2ojwcneg" path="res://src/Game.Godot/UI/Skills/SkillBox.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://cao7kwtub078m" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="2_tooltip"]
+[ext_resource type="Texture2D" uid="uid://iuhrh668ir72" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_avatar"]
+[ext_resource type="Texture2D" uid="uid://db82ulbrpujgy" path="res://assets/art/misc/btn-cross.png" id="4_check"]
+[ext_resource type="Texture2D" uid="uid://4dgk8dxbjd1i" path="res://assets/art/misc/touxiangbiankuang.png" id="5_badge"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
 bg_color = Color(0, 0, 0, 1)
@@ -23,16 +23,17 @@ font_size = 50
 outline_size = 3
 outline_color = Color(0, 0, 0, 1)
 
-[node name="SkillBox" type="Control"]
+[node name="SkillBox" type="Control" unique_id=1974211336]
 custom_minimum_size = Vector2(210, 210)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 210.0
 offset_bottom = 210.0
+mouse_filter = 1
 script = ExtResource("1_script")
 TooltipScene = ExtResource("2_tooltip")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="." unique_id=522610076]
 layout_mode = 0
 offset_left = 34.0
 offset_top = 34.0
@@ -41,7 +42,7 @@ offset_bottom = 173.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("1")
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=721593724]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -53,14 +54,14 @@ theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="Avatar" type="TextureRect" parent="Panel/MarginContainer"]
+[node name="Avatar" type="TextureRect" parent="Panel/MarginContainer" unique_id=771043580]
 unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("3_avatar")
 expand_mode = 1
 stretch_mode = 4
 
-[node name="NameLabel" type="Label" parent="."]
+[node name="NameLabel" type="Label" parent="." unique_id=538279911]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 26.0
@@ -73,7 +74,7 @@ horizontal_alignment = 1
 vertical_alignment = 2
 autowrap_mode = 3
 
-[node name="FormNameLabel" type="Label" parent="."]
+[node name="FormNameLabel" type="Label" parent="." unique_id=2137593919]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -87,7 +88,7 @@ horizontal_alignment = 1
 vertical_alignment = 2
 autowrap_mode = 3
 
-[node name="LevelLabel" type="Label" parent="."]
+[node name="LevelLabel" type="Label" parent="." unique_id=180606153]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 140.0
@@ -98,19 +99,18 @@ text = "20"
 label_settings = SubResource("3")
 horizontal_alignment = 1
 
-[node name="ActiveButton" type="TextureButton" parent="."]
+[node name="ActiveButton" type="TextureButton" parent="." unique_id=94328384]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = -1.0
 offset_top = -3.0
 offset_right = 79.0
 offset_bottom = 79.0
-mouse_filter = 0
+texture_normal = ExtResource("5_badge")
 ignore_texture_size = true
 stretch_mode = 5
-texture_normal = ExtResource("5_badge")
 
-[node name="CheckMark" type="TextureRect" parent="."]
+[node name="CheckMark" type="TextureRect" parent="." unique_id=1121567523]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 12.0

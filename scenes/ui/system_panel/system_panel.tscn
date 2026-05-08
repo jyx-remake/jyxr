@@ -47,6 +47,25 @@ shadow_color = Color(0.28, 0.14, 0.08, 0.38)
 shadow_size = 12
 shadow_offset = Vector2(0, 6)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_delete"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.99, 0.95, 0.84)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.68, 0.17, 0.14, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0.39, 0.09, 0.08, 0.34)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_load"]
 content_margin_left = 16.0
 content_margin_top = 16.0
@@ -82,25 +101,6 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 26
 corner_radius_bottom_left = 26
 shadow_color = Color(0.05, 0.24, 0.38, 0.34)
-shadow_size = 12
-shadow_offset = Vector2(0, 6)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_delete"]
-content_margin_left = 16.0
-content_margin_top = 16.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
-bg_color = Color(1, 0.99, 0.95, 0.84)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.68, 0.17, 0.14, 1)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 26
-corner_radius_bottom_left = 26
-shadow_color = Color(0.39, 0.09, 0.08, 0.34)
 shadow_size = 12
 shadow_offset = Vector2(0, 6)
 
@@ -300,13 +300,76 @@ theme_override_font_sizes/font_size = 44
 text = "退出游戏"
 horizontal_alignment = 1
 
-[node name="LoadButton" type="Button" parent="ActionRow" unique_id=871097712]
+[node name="DeleteSaveButton" type="Button" parent="ActionRow" unique_id=208159084]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 255)
 layout_mode = 0
 offset_left = 235.0
 offset_top = 53.0
 offset_right = 435.0
+offset_bottom = 308.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_transparent_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_transparent_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_transparent_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_transparent_hover")
+
+[node name="DeleteLayout" type="MarginContainer" parent="ActionRow/DeleteSaveButton" unique_id=1478004255]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="DeleteVBox" type="VBoxContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout" unique_id=701538260]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DeleteCard" type="PanelContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox" unique_id=1058307990]
+custom_minimum_size = Vector2(170, 140)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_action_delete")
+
+[node name="DeleteIconMargin" type="MarginContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox/DeleteCard" unique_id=598491738]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="DeleteIcon" type="TextureRect" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox/DeleteCard/DeleteIconMargin" unique_id=955616295]
+custom_minimum_size = Vector2(104, 104)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_delete_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DeleteLabel" type="Label" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox" unique_id=588494603]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.09, 0.07, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.95, 0.88, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 44
+text = "删档"
+horizontal_alignment = 1
+
+[node name="LoadButton" type="Button" parent="ActionRow" unique_id=871097712]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 255)
+layout_mode = 0
+offset_left = 675.0
+offset_top = 53.0
+offset_right = 875.0
 offset_bottom = 308.0
 theme_override_styles/normal = SubResource("StyleBoxFlat_transparent_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_transparent_pressed")
@@ -424,67 +487,4 @@ theme_override_colors/font_outline_color = Color(0.96, 0.95, 0.88, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 44
 text = "存档"
-horizontal_alignment = 1
-
-[node name="DeleteSaveButton" type="Button" parent="ActionRow" unique_id=208159084]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 255)
-layout_mode = 0
-offset_left = 675.0
-offset_top = 53.0
-offset_right = 875.0
-offset_bottom = 308.0
-theme_override_styles/normal = SubResource("StyleBoxFlat_transparent_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_transparent_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_transparent_hover")
-theme_override_styles/focus = SubResource("StyleBoxFlat_transparent_hover")
-
-[node name="DeleteLayout" type="MarginContainer" parent="ActionRow/DeleteSaveButton" unique_id=1478004255]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="DeleteVBox" type="VBoxContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout" unique_id=701538260]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 14
-alignment = 1
-
-[node name="DeleteCard" type="PanelContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox" unique_id=1058307990]
-custom_minimum_size = Vector2(170, 140)
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_action_delete")
-
-[node name="DeleteIconMargin" type="MarginContainer" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox/DeleteCard" unique_id=598491738]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 18
-
-[node name="DeleteIcon" type="TextureRect" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox/DeleteCard/DeleteIconMargin" unique_id=955616295]
-custom_minimum_size = Vector2(104, 104)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("6_delete_icon")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="DeleteLabel" type="Label" parent="ActionRow/DeleteSaveButton/DeleteLayout/DeleteVBox" unique_id=588494603]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.09, 0.07, 0.05, 1)
-theme_override_colors/font_outline_color = Color(0.96, 0.95, 0.88, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 44
-text = "删档"
 horizontal_alignment = 1

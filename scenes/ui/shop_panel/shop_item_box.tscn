@@ -18,6 +18,7 @@ corner_radius_bottom_left = 4
 custom_minimum_size = Vector2(180, 218)
 offset_right = 180.0
 offset_bottom = 218.0
+mouse_filter = 1
 ignore_texture_size = true
 stretch_mode = 4
 script = ExtResource("1_script")

@@ -109,6 +109,7 @@ public sealed partial class JsonContentLoader
             definition => definition.Id,
             StringComparer.Ordinal);
 
+    // TODO remove?
     private static void NormalizeCharacterStats(List<CharacterDefinition> characters)
     {
         for (var index = 0; index < characters.Count; index++)

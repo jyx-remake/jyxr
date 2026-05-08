@@ -14,7 +14,10 @@ artifacts/
 coverage/
 *.coverage
 *.coveragexml
-/assets/
+/assets/animation
+/assets/art
+/assets/audio
+/assets/font
 .godot/
 .import/
 mono_crash.*.json

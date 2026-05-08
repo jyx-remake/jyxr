@@ -1,0 +1,48 @@
+[gd_resource type="Theme" format=3 uid="uid://dlcvf85pnfgve"]
+
+[ext_resource type="FontFile" uid="uid://cdfrmippp180d" path="res://assets/font/LXGWWenKaiMonoGBLite-Medium.ttf" id="1_ag65a"]
+[ext_resource type="Texture2D" uid="uid://dm0vjpb2ne3ac" path="res://assets/art/ui/checkbox_checked.svg" id="1_xul1n"]
+[ext_resource type="Texture2D" uid="uid://caaqngs56a3px" path="res://assets/art/ui/checkbox_empty.svg" id="2_ehq15"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ehq15"]
+bg_color = Color(0, 0, 0, 0.627451)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xul1n"]
+content_margin_left = 2.0
+bg_color = Color(1, 1, 1, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_il5tp"]
+bg_color = Color(1, 1, 1, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4tj8r"]
+bg_color = Color(1, 1, 1, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ni34w"]
+bg_color = Color(0, 0, 0, 0.627451)
+
+[resource]
+default_font_size = 25
+Button/font_sizes/font_size = 50
+Button/styles/focus = SubResource("StyleBoxFlat_ehq15")
+Button/styles/hover = SubResource("StyleBoxFlat_ehq15")
+Button/styles/normal = SubResource("StyleBoxFlat_ehq15")
+Button/styles/pressed = SubResource("StyleBoxFlat_ehq15")
+CheckBox/font_sizes/font_size = 50
+CheckBox/icons/checked = ExtResource("1_xul1n")
+CheckBox/icons/unchecked = ExtResource("2_ehq15")
+CheckBox/styles/hover = SubResource("StyleBoxFlat_xul1n")
+CheckBox/styles/hover_pressed = SubResource("StyleBoxFlat_xul1n")
+CheckBox/styles/normal = SubResource("StyleBoxFlat_il5tp")
+CheckBox/styles/pressed = SubResource("StyleBoxFlat_4tj8r")
+Label/font_sizes/font_size = 25
+Label/fonts/font = ExtResource("1_ag65a")
+LineEdit/font_sizes/font_size = 60
+Panel/styles/panel = SubResource("StyleBoxFlat_ni34w")
+RichTextLabel/constants/line_separation = 12
+RichTextLabel/font_sizes/normal_font_size = 40
+TooltipLabel/font_sizes/font_size = 40
+VBoxContainer/constants/separation = 20

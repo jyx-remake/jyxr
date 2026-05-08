@@ -1,12 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bbbfr2yrgntxf"]
 
-[ext_resource type="Script" path="res://src/Game.Godot/UI/Journal/JournalEntryLabel.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://bdvxixwjg0btl" path="res://src/Game.Godot/UI/Journal/JournalEntryLabel.cs" id="1_script"]
 
-[node name="JournalEntryLabel" type="Label"]
+[node name="JournalEntryLabel" type="Label" unique_id=448500108]
+custom_minimum_size = Vector2(0, 42)
 offset_right = 1.0
 offset_bottom = 31.0
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 42)
+mouse_filter = 1
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 28
 autowrap_mode = 3

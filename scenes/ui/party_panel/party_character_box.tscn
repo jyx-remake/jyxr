@@ -14,6 +14,7 @@
 custom_minimum_size = Vector2(280, 280)
 offset_right = 280.0
 offset_bottom = 280.0
+mouse_filter = 1
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 flat = true
 script = ExtResource("1_npk1i")

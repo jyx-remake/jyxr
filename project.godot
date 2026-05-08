@@ -14,10 +14,12 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="engine-free-rpg"
+config/name="金庸群侠传XR"
 config/description="金庸群侠传x Godot C# 重置版"
 config/version="0.1"
 run/main_scene="res://scenes/main_menu/main_menu.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="jyxr"
 config/features=PackedStringArray("4.6", "C#")
 run/max_fps=60
 config/icon="uid://cvs3nr6ssgkoh"
