@@ -36,10 +36,12 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public CharacterDefinition GetCharacter(string id) => Characters[id];
 	public bool TryGetCharacter(string id, [NotNullWhen(true)] out CharacterDefinition? definition) =>
 		Characters.TryGetValue(id, out definition);
+	public IReadOnlyCollection<CharacterDefinition> GetCharacters() => Characters.Values;
 
 	public ExternalSkillDefinition GetExternalSkill(string id) => ExternalSkills[id];
 	public bool TryGetExternalSkill(string id, [NotNullWhen(true)] out ExternalSkillDefinition? definition) =>
 		ExternalSkills.TryGetValue(id, out definition);
+	public IReadOnlyCollection<ExternalSkillDefinition> GetExternalSkills() => ExternalSkills.Values;
 
 	public GameTipDefinition GetGameTip(string id) => GameTips[id];
 	public bool TryGetGameTip(string id, [NotNullWhen(true)] out GameTipDefinition? definition) =>

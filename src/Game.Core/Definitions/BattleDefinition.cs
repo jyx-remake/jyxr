@@ -37,13 +37,15 @@ public sealed record BattleRandomParticipantDefinition
 {
     public required GridPosition Position { get; init; }
 
+    public int Team { get; init; } = 2;
+
     public int Facing { get; init; }
 
-    public required string CharacterId { get; init; }
+    public string? Name { get; init; }
 
-    public int Level { get; init; }
+    public int Tier { get; init; }
 
-    public string? Animation { get; init; }
+    public string? Model { get; init; }
 
     public bool Boss { get; init; }
 }

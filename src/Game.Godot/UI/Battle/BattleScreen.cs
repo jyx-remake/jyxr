@@ -2,7 +2,6 @@ using Game.Core.Battle;
 using Game.Core.Affix;
 using Game.Core.Definitions;
 using Game.Core.Model;
-using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 using Game.Godot.Assets;
 using Game.Godot.Audio;
@@ -14,8 +13,6 @@ namespace Game.Godot.UI.Battle;
 public partial class BattleScreen : Control
 {
 	private const int PlayerTeam = 1;
-	private const int FixedGridWidth = 11;
-	private const int FixedGridHeight = 4;
 	private const int GridCellWidth = 144;
 	private const int GridCellHeight = 144;
 	private static readonly Color DefaultCellColor = new(0.2f, 0.2f, 0.2f, 0.2f);
@@ -195,7 +192,7 @@ public partial class BattleScreen : Control
 		}
 
 		ApplyBattlePresentation(_battleDefinition);
-		_state = BuildBattleState(_battleDefinition, _selectedCharacterIds);
+		_state = GameRoot.BattleService.BuildBattleState(_battleDefinition, _selectedCharacterIds);
 		_logLines.Clear();
 		AppendLog($"战斗开始：{_battleDefinition.Name}");
 		_uiState.WaitTimeline();
@@ -212,117 +209,6 @@ public partial class BattleScreen : Control
 		}
 
 		GameRoot.Audio.PlayBgm(GameRoot.Config.RandomBattleMusics);
-	}
-
-	private BattleState BuildBattleState(BattleDefinition battle, IReadOnlyList<string> selectedCharacterIds)
-	{
-		var units = new List<BattleUnit>();
-		var gridSize = ResolveGridSize(battle);
-		var tempFactory = new EquipmentInstanceFactory();
-		var slotCharacters = selectedCharacterIds
-			.Select(ResolvePartyCharacter)
-			.ToArray();
-
-		for (var index = 0; index < battle.Participants.Count; index++)
-		{
-			var participant = battle.Participants[index];
-			var character = ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory);
-			if (character is null)
-			{
-				continue;
-			}
-
-			units.Add(CreateUnit(
-				$"participant_{index}_{character.Id}",
-				character,
-				participant.Team,
-				participant.Position,
-				participant.Facing));
-		}
-
-		for (var index = 0; index < battle.RandomParticipants.Count; index++)
-		{
-			var participant = battle.RandomParticipants[index];
-			var definition = GameRoot.ContentRepository.GetCharacter(participant.CharacterId);
-			var character = CharacterMapper.CreateInitial(
-				$"random_{index}_{definition.Id}",
-				definition,
-				tempFactory);
-			character.SetLevel(Math.Max(1, participant.Level));
-			units.Add(CreateUnit(
-				$"random_{index}_{character.Id}",
-				character,
-				team: 2,
-				participant.Position,
-				participant.Facing));
-		}
-
-		return new BattleState(new BattleGrid(gridSize.Width, gridSize.Height), units);
-	}
-
-	private CharacterInstance? ResolveParticipantCharacter(
-		BattleParticipantDefinition participant,
-		int index,
-		IReadOnlyList<CharacterInstance?> slotCharacters,
-		EquipmentInstanceFactory tempFactory)
-	{
-		if (!string.IsNullOrWhiteSpace(participant.CharacterId))
-		{
-			if (participant.Team == PlayerTeam &&
-				GameRoot.State.Party.TryGetCharacter(participant.CharacterId, out var partyCharacter))
-			{
-				return partyCharacter;
-			}
-
-			var definition = GameRoot.ContentRepository.GetCharacter(participant.CharacterId);
-			return CharacterMapper.CreateInitial(
-				$"battle_{index}_{definition.Id}",
-				definition,
-				tempFactory);
-		}
-
-		if (participant.PartyIndex is not { } partyIndex ||
-			partyIndex < 0 ||
-			partyIndex >= slotCharacters.Count)
-		{
-			return null;
-		}
-
-		return slotCharacters[partyIndex];
-	}
-
-	private static BattleUnit CreateUnit(
-		string id,
-		CharacterInstance character,
-		int team,
-		GridPosition position,
-		int facing) =>
-		new(
-			id,
-			character,
-			team,
-			position,
-			facing <= 0 ? BattleFacing.Left : BattleFacing.Right);
-
-	private static CharacterInstance? ResolvePartyCharacter(string characterId) =>
-		GameRoot.State.Party.TryGetCharacter(characterId, out var character) ? character : null;
-
-	private static (int Width, int Height) ResolveGridSize(BattleDefinition battle)
-	{
-		var positions = battle.Participants.Select(static participant => participant.Position)
-			.Concat(battle.RandomParticipants.Select(static participant => participant.Position))
-			.ToArray();
-		foreach (var position in positions)
-		{
-			if (position.X < 0 || position.X >= FixedGridWidth ||
-				position.Y < 0 || position.Y >= FixedGridHeight)
-			{
-				throw new InvalidOperationException(
-					$"Battle participant position ({position.X}, {position.Y}) exceeds fixed grid size {FixedGridWidth}x{FixedGridHeight}.");
-			}
-		}
-
-		return (FixedGridWidth, FixedGridHeight);
 	}
 
 	private void AdvanceToNextPlayerAction()

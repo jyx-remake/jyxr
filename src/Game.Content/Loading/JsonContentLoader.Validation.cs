@@ -14,6 +14,7 @@ public sealed partial class JsonContentLoader
     private static void ValidateRepository(InMemoryContentRepository repository)
     {
         ValidateCharacters(repository);
+        ValidateBattles(repository);
         ValidateBattleHookAffixes(repository);
         ValidateSkillAffixes(repository);
         ValidateItemReferences(repository);
@@ -40,6 +41,47 @@ public sealed partial class JsonContentLoader
             Ensure(character.InternalSkills.Count(skill => skill.Equipped) <= 1,
                 $"Character '{character.Id}' has more than one equipped internal skill.");
         }
+    }
+
+    private static void ValidateBattles(InMemoryContentRepository repository)
+    {
+        foreach (var battle in repository.Battles.Values)
+        {
+            var occupiedPositions = new HashSet<GridPosition>();
+            foreach (var participant in battle.Participants)
+            {
+                ValidateBattlePosition(
+                    participant.Position,
+                    occupiedPositions,
+                    $"Battle '{battle.Id}' participant");
+            }
+
+            foreach (var participant in battle.RandomParticipants)
+            {
+                ValidateBattlePosition(
+                    participant.Position,
+                    occupiedPositions,
+                    $"Battle '{battle.Id}' random participant");
+
+                Ensure(participant.Tier >= 0,
+                    $"Battle '{battle.Id}' random participant tier '{participant.Tier}' must be non-negative.");
+                Ensure(participant.Boss || participant.Tier <= 3,
+                    $"Battle '{battle.Id}' non-boss random participant tier '{participant.Tier}' must be between 0 and 3.");
+                Ensure(participant.Team is 1 or 2,
+                    $"Battle '{battle.Id}' random participant team '{participant.Team}' is unsupported.");
+            }
+        }
+    }
+
+    private static void ValidateBattlePosition(
+        GridPosition position,
+        ISet<GridPosition> occupiedPositions,
+        string ownerName)
+    {
+        Ensure(position.X >= 0 && position.X < 11 && position.Y >= 0 && position.Y < 4,
+            $"{ownerName} position ({position.X}, {position.Y}) exceeds battle grid size 11x4.");
+        Ensure(occupiedPositions.Add(position),
+            $"{ownerName} position ({position.X}, {position.Y}) overlaps another participant.");
     }
 
     private static void ValidateSkillAffixes(InMemoryContentRepository repository)

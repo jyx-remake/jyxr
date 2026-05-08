@@ -39,6 +39,7 @@ public sealed class GameSession
         CharacterService = new CharacterService(this);
         ItemUseService = new ItemUseService(this);
         ShopService = new ShopService(this);
+        BattleService = new BattleService(this);
         WorldTriggerService = new WorldTriggerService(this);
         MapService = new MapService(this);
         StoryTimeKeyExpirationService = new StoryTimeKeyExpirationService(this);
@@ -59,6 +60,7 @@ public sealed class GameSession
     public CharacterService CharacterService { get; }
     public ItemUseService ItemUseService { get; }
     public ShopService ShopService { get; }
+    public BattleService BattleService { get; }
     public WorldTriggerService WorldTriggerService { get; }
     public MapService MapService { get; }
     public StoryTimeKeyExpirationService StoryTimeKeyExpirationService { get; }

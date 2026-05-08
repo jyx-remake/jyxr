@@ -13,8 +13,10 @@ public interface IContentRepository
     bool TryGetBattle(string id, [NotNullWhen(true)] out BattleDefinition? definition);
     CharacterDefinition GetCharacter(string id);
     bool TryGetCharacter(string id, [NotNullWhen(true)] out CharacterDefinition? definition);
+    IReadOnlyCollection<CharacterDefinition> GetCharacters();
     ExternalSkillDefinition GetExternalSkill(string id);
     bool TryGetExternalSkill(string id, [NotNullWhen(true)] out ExternalSkillDefinition? definition);
+    IReadOnlyCollection<ExternalSkillDefinition> GetExternalSkills();
     GameTipDefinition GetGameTip(string id);
     bool TryGetGameTip(string id, [NotNullWhen(true)] out GameTipDefinition? definition);
     GrowTemplateDefinition GetGrowTemplate(string id);
