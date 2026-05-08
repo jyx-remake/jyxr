@@ -101,11 +101,6 @@ public static class PreviewGameBootstrap
 	private static void LoadPersistentProfile()
 	{
 		var profileStore = new LocalProfileStore();
-		if (!profileStore.HasProfile())
-		{
-			return;
-		}
-
-		Game.ProfileService.LoadProfile(profileStore.Load());
+		Game.ProfileService.LoadProfile(profileStore.LoadOrEmpty());
 	}
 }

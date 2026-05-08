@@ -42,7 +42,7 @@ public partial class SaveSlotCard : Button
 		Disabled = mode switch
 		{
 			SaveSlotPanelMode.Save => false,
-			SaveSlotPanelMode.Load => !summary.HasSave,
+			SaveSlotPanelMode.Load => !summary.CanLoad,
 			SaveSlotPanelMode.Delete => !summary.HasSave,
 			_ => throw new InvalidOperationException($"Unsupported save slot panel mode: {mode}"),
 		};
@@ -65,6 +65,27 @@ public partial class SaveSlotCard : Button
 			_hintLabel.Text = mode == SaveSlotPanelMode.Save
 				? "点击写入当前进度"
 				: "该槽位暂无存档";
+			return;
+		}
+
+		if (!summary.CanLoad)
+		{
+			_portrait.Texture = null;
+			_nameLabel.Text = "不可读取";
+			_partyCountLabel.Text = string.Empty;
+			_gameTimeLabel.Text = string.Empty;
+			_difficultyLabel.Text = string.Empty;
+			_roundLabel.Text = string.Empty;
+			_locationLabel.Text = string.Empty;
+			_savedAtLabel.Text = string.Empty;
+			_hintLabel.Modulate = new Color(0.98f, 0.72f, 0.24f);
+			_hintLabel.Text = mode switch
+			{
+				SaveSlotPanelMode.Save => "该槽位存档不兼容，点击覆盖",
+				SaveSlotPanelMode.Load => BuildInvalidSlotHint(summary.FailureReason),
+				SaveSlotPanelMode.Delete => "该存档无法读取，点击删除",
+				_ => throw new InvalidOperationException($"Unsupported save slot panel mode: {mode}"),
+			};
 			return;
 		}
 
@@ -122,5 +143,14 @@ public partial class SaveSlotCard : Button
 		GameDifficulty.Hard => "进阶",
 		GameDifficulty.Crazy => "炼狱",
 		_ => throw new InvalidOperationException($"Unsupported difficulty: {difficulty}"),
+	};
+
+	private static string BuildInvalidSlotHint(LocalSaveReadFailureReason failureReason) => failureReason switch
+	{
+		LocalSaveReadFailureReason.EnvelopeVersionMismatch or LocalSaveReadFailureReason.SaveVersionMismatch
+			=> "该存档版本不兼容",
+		LocalSaveReadFailureReason.InvalidFormat => "该存档已损坏或格式错误",
+		LocalSaveReadFailureReason.MissingFile => "该槽位暂无存档",
+		_ => "该存档无法读取",
 	};
 }

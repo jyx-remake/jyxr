@@ -36,37 +36,52 @@ public sealed class LocalProfileStore
 		return absolutePath;
 	}
 
-	public GameProfileRecord Load()
+	public bool TryLoad(out GameProfileRecord? profile)
 	{
 		var absolutePath = ResolveAbsolutePath();
 		if (!File.Exists(absolutePath))
 		{
-			throw new InvalidOperationException($"未找到全局档案文件：{absolutePath}");
+			profile = null;
+			return false;
 		}
 
-		var json = File.ReadAllText(absolutePath);
-		var profile = JsonSerializer.Deserialize<GameProfileRecord>(json, GameJson.Default)
-			?? throw new InvalidOperationException("全局档案文件解析失败。");
-		ValidateProfile(profile);
-		Game.Logger.Info($"Loaded global profile from '{absolutePath}'.");
-		return profile;
+		try
+		{
+			var json = File.ReadAllText(absolutePath);
+			var loadedProfile = JsonSerializer.Deserialize<GameProfileRecord>(json, GameJson.Default);
+			if (loadedProfile is null)
+			{
+				Game.Logger.Warning($"Global profile could not be deserialized: {absolutePath}");
+				profile = null;
+				return false;
+			}
+
+			if (loadedProfile.Version != GameProfileRecord.CurrentVersion)
+			{
+				Game.Logger.Warning(
+					$"Global profile version mismatch: {loadedProfile.Version}, supported {GameProfileRecord.CurrentVersion}. Falling back to empty profile.");
+				profile = null;
+				return false;
+			}
+
+			Game.Logger.Info($"Loaded global profile from '{absolutePath}'.");
+			profile = loadedProfile;
+			return true;
+		}
+		catch (Exception exception)
+		{
+			Game.Logger.Warning($"Global profile read failed: {absolutePath}. {exception.Message}");
+			profile = null;
+			return false;
+		}
 	}
 
 	public bool HasProfile() => File.Exists(ResolveAbsolutePath());
 
 	public GameProfileRecord LoadOrEmpty() =>
-		HasProfile()
-			? Load()
+		TryLoad(out var profile) && profile is not null
+			? profile
 			: GameProfileRecord.Create(new GameProfile());
 
 	private string ResolveAbsolutePath() => ProjectSettings.GlobalizePath(_profilePath);
-
-	private static void ValidateProfile(GameProfileRecord profile)
-	{
-		if (profile.Version != GameProfileRecord.CurrentVersion)
-		{
-			throw new InvalidOperationException(
-				$"全局档案版本不匹配：{profile.Version}，当前支持 {GameProfileRecord.CurrentVersion}。");
-		}
-	}
 }

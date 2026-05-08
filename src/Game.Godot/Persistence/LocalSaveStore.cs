@@ -8,11 +8,19 @@ using Godot;
 
 namespace Game.Godot.Persistence;
 
+public enum LocalSaveReadFailureReason
+{
+	None = 0,
+	MissingFile,
+	InvalidFormat,
+	EnvelopeVersionMismatch,
+	SaveVersionMismatch,
+}
+
 public sealed class LocalSaveStore
 {
 	public const int SlotCount = 4;
-	public const string DefaultSavePath = "user://saves/quicksave.json";
-	private const string AdditionalSlotPathFormat = "user://saves/save-slot-{0}.json";
+	private const string SavePathFormat = "user://saves/save-slot-{0}.json";
 
 	public string SaveCurrentSession(int slotIndex)
 	{
@@ -20,8 +28,7 @@ public sealed class LocalSaveStore
 		var envelope = new LocalSaveEnvelope(
 			LocalSaveEnvelope.CurrentVersion,
 			Game.SaveGameService.CreateSave(),
-			DateTimeOffset.UtcNow,
-			null);
+			DateTimeOffset.UtcNow);
 
 		var absolutePath = ResolveAbsolutePath(slotIndex);
 		var directoryPath = Path.GetDirectoryName(absolutePath);
@@ -37,12 +44,16 @@ public sealed class LocalSaveStore
 		return absolutePath;
 	}
 
-	public LocalSaveEnvelope Load(int slotIndex)
+	public bool TryLoad(int slotIndex, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
 	{
 		var absolutePath = ResolveAbsolutePath(slotIndex);
-		var envelope = ReadEnvelope(slotIndex);
+		if (!TryReadEnvelope(slotIndex, out envelope, out failureReason))
+		{
+			return false;
+		}
+
 		Game.Logger.Info($"Loaded slot {slotIndex} from '{absolutePath}'.");
-		return envelope;
+		return true;
 	}
 
 	public bool DeleteSave(int slotIndex)
@@ -75,10 +86,14 @@ public sealed class LocalSaveStore
 	{
 		if (!HasSave(slotIndex))
 		{
-			return LocalSaveSlotSummary.Empty(slotIndex);
+			return new LocalSaveSlotSummary(slotIndex);
 		}
 
-		var envelope = ReadEnvelope(slotIndex);
+		if (!TryReadEnvelope(slotIndex, out var envelope, out var failureReason) || envelope is null)
+		{
+			return new LocalSaveSlotSummary(slotIndex, HasSave: true, FailureReason: failureReason);
+		}
+
 		return BuildSummary(slotIndex, envelope);
 	}
 
@@ -113,81 +128,85 @@ public sealed class LocalSaveStore
 	}
 
 	private static string ResolveSavePath(int slotIndex) =>
-		slotIndex == 1
-			? DefaultSavePath
-			: string.Format(AdditionalSlotPathFormat, slotIndex);
+		string.Format(SavePathFormat, slotIndex);
 
 	private static string ResolveAbsolutePath(int slotIndex) => ProjectSettings.GlobalizePath(ResolveSavePath(slotIndex));
 
-	private static LocalSaveEnvelope ReadEnvelope(int slotIndex)
+	private static bool TryReadEnvelope(int slotIndex, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
 	{
 		ValidateSlotIndex(slotIndex);
 		var absolutePath = ResolveAbsolutePath(slotIndex);
 		if (!File.Exists(absolutePath))
 		{
-			throw new InvalidOperationException($"未找到存档文件：{absolutePath}");
+			return Fail(out envelope, out failureReason, LocalSaveReadFailureReason.MissingFile);
 		}
 
-		var json = File.ReadAllText(absolutePath);
-		var envelope = JsonSerializer.Deserialize<LocalSaveEnvelope>(json, GameJson.Default)
-			?? throw new InvalidOperationException("存档文件解析失败。");
-		ValidateEnvelope(envelope);
-		return envelope;
+		try
+		{
+			var json = File.ReadAllText(absolutePath);
+			var rawEnvelope = JsonSerializer.Deserialize<LocalSaveEnvelope>(json, GameJson.Default);
+			if (rawEnvelope is null)
+			{
+				Game.Logger.Warning($"Save slot {slotIndex} could not be deserialized: {absolutePath}");
+				return Fail(out envelope, out failureReason, LocalSaveReadFailureReason.InvalidFormat);
+			}
+
+			if (rawEnvelope.Version is < 1 or > LocalSaveEnvelope.CurrentVersion)
+			{
+				Game.Logger.Warning(
+					$"Save slot {slotIndex} envelope version mismatch: {rawEnvelope.Version}, supported 1..{LocalSaveEnvelope.CurrentVersion}.");
+				return Fail(out envelope, out failureReason, LocalSaveReadFailureReason.EnvelopeVersionMismatch);
+			}
+
+			if (rawEnvelope.SaveGame.Version != SaveGame.CurrentVersion)
+			{
+				Game.Logger.Warning(
+					$"Save slot {slotIndex} save version mismatch: {rawEnvelope.SaveGame.Version}, supported {SaveGame.CurrentVersion}.");
+				return Fail(out envelope, out failureReason, LocalSaveReadFailureReason.SaveVersionMismatch);
+			}
+
+			envelope = rawEnvelope;
+			failureReason = LocalSaveReadFailureReason.None;
+			return true;
+		}
+		catch (Exception exception)
+		{
+			Game.Logger.Warning($"Save slot {slotIndex} read failed: {absolutePath}. {exception.Message}");
+			return Fail(out envelope, out failureReason, LocalSaveReadFailureReason.InvalidFormat);
+		}
 	}
 
-	private static void ValidateEnvelope(LocalSaveEnvelope envelope)
+	private static bool Fail(
+		out LocalSaveEnvelope? envelope,
+		out LocalSaveReadFailureReason failureReason,
+		LocalSaveReadFailureReason reason)
 	{
-		if (envelope.Version is < 1 or > LocalSaveEnvelope.CurrentVersion)
-		{
-			throw new InvalidOperationException(
-				$"存档封包版本不匹配：{envelope.Version}，当前支持 1 到 {LocalSaveEnvelope.CurrentVersion}。");
-		}
-
-		if (envelope.SaveGame.Version != SaveGame.CurrentVersion)
-		{
-			throw new InvalidOperationException(
-				$"存档版本不匹配：{envelope.SaveGame.Version}，当前支持 {SaveGame.CurrentVersion}。");
-		}
-
-		if (envelope.Profile is not null && envelope.Profile.Version != GameProfileRecord.CurrentVersion)
-		{
-			throw new InvalidOperationException(
-				$"档案版本不匹配：{envelope.Profile.Version}，当前支持 {GameProfileRecord.CurrentVersion}。");
-		}
+		envelope = null;
+		failureReason = reason;
+		return false;
 	}
 }
 
 public sealed record LocalSaveSlotSummary(
 	int SlotIndex,
-	bool HasSave,
-	string? LeaderName,
-	string? LeaderPortrait,
-	int PartyMemberCount,
-	int Round,
-	GameDifficulty Difficulty,
-	ClockRecord? Clock,
-	string? CurrentMapId,
-	DateTimeOffset? SavedAtUtc)
+	bool HasSave = false,
+	string? LeaderName = null,
+	string? LeaderPortrait = null,
+	int PartyMemberCount = 0,
+	int Round = 1,
+	GameDifficulty Difficulty = GameDifficulty.Normal,
+	ClockRecord? Clock = null,
+	string? CurrentMapId = null,
+	DateTimeOffset? SavedAtUtc = null,
+	LocalSaveReadFailureReason FailureReason = LocalSaveReadFailureReason.None)
 {
-	public static LocalSaveSlotSummary Empty(int slotIndex) =>
-		new(
-			slotIndex,
-			false,
-			null,
-			null,
-			0,
-			1,
-			GameDifficulty.Normal,
-			null,
-			null,
-			null);
+	public bool CanLoad => HasSave && FailureReason == LocalSaveReadFailureReason.None;
 }
 
 public sealed record LocalSaveEnvelope(
 	int Version,
 	SaveGame SaveGame,
-	DateTimeOffset SavedAtUtc,
-	GameProfileRecord? Profile = null)
+	DateTimeOffset SavedAtUtc)
 {
 	public const int CurrentVersion = 2;
 }

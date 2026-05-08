@@ -154,25 +154,25 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private void LoadFromSlot(int slotIndex)
 	{
-		var envelope = _saveStore.Load(slotIndex);
+		if (!_saveStore.TryLoad(slotIndex, out var envelope, out var failureReason) || envelope is null)
+		{
+			UIRoot.Instance.ShowSuggestion(BuildLoadFailureText(slotIndex, failureReason));
+			RefreshSlots();
+			return;
+		}
+
 		Game.LoadSave(envelope.SaveGame);
-		LoadProfile(envelope);
+		LoadProfile();
 		ReloadCurrentMap();
 		UIRoot.Instance.ShowToast($"已读取存档{slotIndex}");
 		QueueFree();
 	}
 
-	private void LoadProfile(LocalSaveEnvelope envelope)
+	private void LoadProfile()
 	{
-		if (_profileStore.HasProfile())
+		if (_profileStore.TryLoad(out var profile) && profile is not null)
 		{
-			Game.ProfileService.LoadProfile(_profileStore.Load());
-			return;
-		}
-
-		if (envelope.Profile is not null)
-		{
-			Game.ProfileService.LoadProfile(envelope.Profile);
+			Game.ProfileService.LoadProfile(profile);
 			return;
 		}
 
@@ -201,4 +201,13 @@ public partial class SaveSlotSelectionPanel : JyPanel
 	{
 		return $"确认删除存档{slotIndex}吗？";
 	}
+
+	private static string BuildLoadFailureText(int slotIndex, LocalSaveReadFailureReason failureReason) => failureReason switch
+	{
+		LocalSaveReadFailureReason.MissingFile => $"存档{slotIndex}不存在。",
+		LocalSaveReadFailureReason.EnvelopeVersionMismatch or LocalSaveReadFailureReason.SaveVersionMismatch
+			=> $"存档{slotIndex}版本不兼容，无法读取。",
+		LocalSaveReadFailureReason.InvalidFormat => $"存档{slotIndex}解析失败，无法读取。",
+		_ => $"存档{slotIndex}无法读取。",
+	};
 }
