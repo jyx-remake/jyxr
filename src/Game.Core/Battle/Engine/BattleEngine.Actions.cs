@@ -181,16 +181,18 @@ public sealed partial class BattleEngine
         var unit = state.GetUnit(unitId);
         TriggerHooks(state, HookTiming.BeforeRest, unit);
 
-        var hpRecovery = Math.Max(1, unit.MaxHp / 20);
-        var mpRecovery = unit.MaxMp > 0 ? Math.Max(1, unit.MaxMp / 20) : 0;
-        unit.RestoreHp(hpRecovery);
-        unit.RestoreMp(mpRecovery);
+        var recovery = BattleRestCalculator.Roll(unit, _random);
+        var restoredHp = unit.RestoreHp(recovery.Hp);
+        var restoredMp = unit.RestoreMp(recovery.Mp);
 
-        var battleEvent = new BattleEvent(BattleEventKind.Rested, unit.Id);
+        var battleEvent = new BattleEvent(
+            BattleEventKind.Rested,
+            unit.Id,
+            Rest: new BattleRestRecovery(restoredHp, restoredMp));
         AddEvent(state, battleEvent);
         TriggerHooks(state, HookTiming.AfterRest, unit);
         EndActionCore(state, unit, committedMainAction: true);
-        return BattleActionResult.Succeeded("Rested.", [unit.Id], [battleEvent]);
+        return BattleActionResult.Succeeded(string.Empty, [unit.Id], [battleEvent]);
     }
 
     public BattleActionResult EndAction(BattleState state, string unitId)

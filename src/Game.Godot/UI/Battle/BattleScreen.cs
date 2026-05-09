@@ -34,6 +34,7 @@ public partial class BattleScreen : Control
 	private static readonly Color FloatStateColor = Colors.Red;
 	private static readonly Color FloatSpecialColor = Colors.Magenta;
 	private static readonly Color FloatInfoColor = Colors.Yellow;
+	private const string RestSfxId = "音效.休息";
 	private const double SkillNameFloatDelaySeconds = 0.1d;
 	private const double SkillImpactDelaySeconds = 0.8d;
 	private const double SkillImpactFloatDelaySeconds = 0.1d;
@@ -797,7 +798,7 @@ public partial class BattleScreen : Control
 				_boardGrid.PlayFloatText(battleEvent.UnitId, $"{expiredBuffName}解除", FloatInfoColor);
 				break;
 			case BattleEventKind.Rested:
-				_boardGrid.PlayFloatText(battleEvent.UnitId, "回复", FloatHealColor);
+				AppendRestEvent(battleEvent);
 				break;
 			case BattleEventKind.ItemUsed:
 				_boardGrid.PlayFloatText(battleEvent.UnitId, ResolveItemName(battleEvent.Detail), FloatInfoColor);
@@ -808,6 +809,31 @@ public partial class BattleScreen : Control
 					_boardGrid.PlaySpeech(battleEvent.UnitId, battleEvent.Speech.Text);
 				}
 				break;
+		}
+	}
+
+	private void AppendRestEvent(BattleEvent battleEvent)
+	{
+		var unitName = _state?.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
+		var hp = battleEvent.Rest?.Hp ?? 0;
+		var mp = battleEvent.Rest?.Mp ?? 0;
+
+		AppendLog($"{unitName}休息。");
+		if (hp > 0)
+		{
+			_boardGrid.PlayFloatText(battleEvent.UnitId, $"+{hp}", FloatHealColor);
+			AppendLog($"{unitName}回复生命值{hp}");
+		}
+
+		if (mp > 0)
+		{
+			_boardGrid.PlayFloatText(battleEvent.UnitId, $"+{mp}", FloatManaColor);
+			AppendLog($"{unitName}回复内力{mp}");
+		}
+
+		if (hp > 0 || mp > 0)
+		{
+			AudioManager.Instance.PlaySfx(RestSfxId);
 		}
 	}
 

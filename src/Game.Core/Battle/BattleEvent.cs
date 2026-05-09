@@ -10,7 +10,8 @@ public sealed record BattleEvent(
     string? Detail = null,
     BattleSpeechCue? Speech = null,
     BattleSkillCastInfo? SkillCast = null,
-    BattleDamageEvent? Damage = null);
+    BattleDamageEvent? Damage = null,
+    BattleRestRecovery? Rest = null);
 
 public sealed record BattleSpeechCue(string Text);
 

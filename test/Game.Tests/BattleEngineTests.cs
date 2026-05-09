@@ -102,6 +102,39 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void Rest_UsesLegacyBaseFormula()
+    {
+        var internalSkill = TestContentFactory.CreateInternalSkill("inner", yin: 150);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxHp: 1000,
+            maxMp: 500,
+            hp: 400,
+            mp: 100,
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Gengu] = 100,
+            },
+            internalSkills: [new InitialInternalSkillEntryDefinition(internalSkill, Level: 10, Equipped: true)]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(random: new FixedRandomService(0.5d));
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.Rest(state, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(575, hero.Hp);
+        Assert.Equal(430, hero.Mp);
+        Assert.Equal(string.Empty, result.Message);
+        var restEvent = Assert.Single(result.Events.Where(static battleEvent => battleEvent.Kind == BattleEventKind.Rested));
+        Assert.Equal(new BattleRestRecovery(175, 330), restEvent.Rest);
+        Assert.Null(state.CurrentAction);
+    }
+
+    [Fact]
     public void MoveTo_ChargesExtraCost_WhenEnteringEnemyZone()
     {
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 1), movePower: 3);

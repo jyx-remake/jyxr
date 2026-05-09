@@ -63,10 +63,7 @@ public sealed class BasicEnemyBattleAgent : IBattleAgent
 
     private static int ResolveRestRecovery(BattleUnit unit)
     {
-        var hpRecovery = Math.Max(1, unit.MaxHp / 20);
-        var mpRecovery = unit.MaxMp > 0 ? Math.Max(1, unit.MaxMp / 20) : 0;
-        var restoredHp = Math.Min(hpRecovery, Math.Max(0, unit.MaxHp - unit.Hp));
-        var restoredMp = Math.Min(mpRecovery, Math.Max(0, unit.MaxMp - unit.Mp));
-        return restoredHp + restoredMp;
+        var recovery = BattleRestCalculator.EstimateAverage(unit);
+        return recovery.Hp + recovery.Mp;
     }
 }
