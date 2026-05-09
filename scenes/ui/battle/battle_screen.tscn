@@ -21,6 +21,11 @@
 [ext_resource type="PackedScene" uid="uid://d1qdddofh12io" path="res://scenes/ui/battle/battle_board_view.tscn" id="19_board_view"]
 [ext_resource type="PackedScene" uid="uid://oei4u3648ovq" path="res://scenes/ui/battle/battle_item_panel.tscn" id="20_item_panel"]
 [ext_resource type="PackedScene" uid="uid://b77m8rj4t6o0x" path="res://scenes/ui/battle/battle_legend_overlay.tscn" id="21_legend_overlay"]
+[ext_resource type="Texture2D" uid="uid://cy8b0ml1bq8e0" path="res://assets/art/ui/battle/battle_jiasu.png" id="22_speed_button"]
+[ext_resource type="Texture2D" uid="uid://ck4dvgt1nywut" path="res://assets/art/ui/battle/battle_jiasuhong.png" id="23_speed_active"]
+[ext_resource type="Texture2D" uid="uid://ba8m81qumgdct" path="res://assets/art/ui/battle/battle_zidong.png" id="24_auto_button"]
+[ext_resource type="Texture2D" uid="uid://bc8dyte7msrvf" path="res://assets/art/ui/battle/battle_zidonghong.png" id="25_auto_active"]
+[ext_resource type="Texture2D" uid="uid://dukqh5gd77ixk" path="res://assets/art/ui/battle/touxiang.png" id="26_surrender_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
 bg_color = Color(0.18, 0.14, 0.1, 0.92)
@@ -125,6 +130,68 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 24
+
+[node name="AutoBattleButton" type="TextureButton" parent="." unique_id=1003218841]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1554.0
+offset_top = 23.0
+offset_right = 1739.0
+offset_bottom = 181.0
+tooltip_text = "自动战斗"
+texture_normal = ExtResource("24_auto_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AutoBattleActive" type="TextureRect" parent="AutoBattleButton" unique_id=743190248]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 18.0
+offset_top = 20.0
+offset_right = 156.0
+offset_bottom = 135.0
+mouse_filter = 2
+texture = ExtResource("25_auto_active")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SurrenderButton" type="TextureButton" parent="." unique_id=1078304102]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1363.0
+offset_top = 29.0
+offset_right = 1550.0
+offset_bottom = 204.0
+tooltip_text = "投降"
+texture_normal = ExtResource("26_surrender_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="SpeedUpButton" type="TextureButton" parent="." unique_id=1052298601]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1748.0
+offset_top = 30.0
+offset_right = 1906.0
+offset_bottom = 166.0
+tooltip_text = "战斗加速"
+texture_normal = ExtResource("22_speed_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="SpeedUpActive" type="TextureRect" parent="SpeedUpButton" unique_id=1743614407]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 8.0
+offset_top = 7.0
+offset_right = 136.0
+offset_bottom = 132.0
+mouse_filter = 2
+texture = ExtResource("23_speed_active")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="FinishButton" type="Button" parent="." unique_id=507302681]
 unique_name_in_owner = true

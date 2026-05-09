@@ -13,6 +13,7 @@ namespace Game.Godot.UI.Battle;
 public partial class BattleScreen : Control
 {
 	private const int PlayerTeam = 1;
+	private const double BattleSpeedUpMultiplier = 2d;
 	private const int GridCellWidth = 144;
 	private const int GridCellHeight = 144;
 	private const BattleMovementPresentationMode MovementPresentationMode = BattleMovementPresentationMode.Step;
@@ -85,12 +86,19 @@ public partial class BattleScreen : Control
 	private BattleFlowOrchestrator? _orchestrator;
 	private bool _isConfigured;
 	private bool _isResolvingSkillPresentation;
+	private bool _isSpeedUpEnabled;
+	private double _initialTimeScale = 1d;
 	private SkillPresentationContext? _activeSkillPresentation;
 	private GridPosition? _hoveredCellPosition;
 
 	private TextureRect _background = null!;
 	private Label _titleLabel = null!;
 	private Label _subtitleLabel = null!;
+	private BaseButton _surrenderButton = null!;
+	private BaseButton _speedUpButton = null!;
+	private CanvasItem _speedUpActive = null!;
+	private BaseButton _autoBattleButton = null!;
+	private CanvasItem _autoBattleActive = null!;
 	private BattleBoardView _boardGrid = null!;
 	private TextureRect _selectedSkillIcon = null!;
 	private Label _selectedSkillNameLabel = null!;
@@ -108,9 +116,15 @@ public partial class BattleScreen : Control
 
 	public override void _Ready()
 	{
+		_initialTimeScale = Engine.TimeScale;
 		_background = GetNode<TextureRect>("%Background");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
+		_surrenderButton = GetNode<BaseButton>("%SurrenderButton");
+		_speedUpButton = GetNode<BaseButton>("%SpeedUpButton");
+		_speedUpActive = GetNode<CanvasItem>("%SpeedUpActive");
+		_autoBattleButton = GetNode<BaseButton>("%AutoBattleButton");
+		_autoBattleActive = GetNode<CanvasItem>("%AutoBattleActive");
 		_boardGrid = GetNode<BattleBoardView>("%BoardGrid");
 		_selectedSkillIcon = GetNode<TextureRect>("%SelectedSkillIcon");
 		_selectedSkillNameLabel = GetNode<Label>("%SelectedSkillNameLabel");
@@ -127,6 +141,9 @@ public partial class BattleScreen : Control
 		_overlayRoot = GetNode<Control>("%OverlayRoot");
 		_boardGrid.CellPressed += OnCellPressed;
 		_boardGrid.HoveredCellChanged += OnBoardHoveredCellChanged;
+		_surrenderButton.Pressed += SurrenderBattle;
+		_speedUpButton.Pressed += ToggleSpeedUp;
+		_autoBattleButton.Pressed += async () => await ToggleAutoBattleAsync();
 
 		_moveButton.Pressed += async () =>
 		{
@@ -170,6 +187,7 @@ public partial class BattleScreen : Control
 			await _orchestrator.TryEndActionAsync();
 		};
 		_finishButton.Pressed += FinishBattle;
+		RefreshToggleButtons();
 
 		if (_isConfigured)
 		{
@@ -209,6 +227,7 @@ public partial class BattleScreen : Control
 
 	public override void _ExitTree()
 	{
+		RestoreTimeScale();
 		base._ExitTree();
 		if (!_battleCompletion.Task.IsCompleted)
 		{
@@ -267,6 +286,7 @@ public partial class BattleScreen : Control
 		RefreshList();
 		RefreshAvatar();
 		RefreshLog();
+		RefreshToggleButtons();
 	}
 
 	private void RefreshSelectedSkill()
@@ -483,12 +503,15 @@ public partial class BattleScreen : Control
 		var actingUnit = _state is not null ? BattlePresenter.TryGetActingUnit(_state) : null;
 		var isActing = actingUnit is { Team: PlayerTeam } &&
 			_uiState.Mode != BattleUiMode.BattleEnded &&
-			!_isResolvingSkillPresentation;
+			!_isResolvingSkillPresentation &&
+			!IsAutoBattleEnabled();
 		_moveButton.Disabled = !isActing;
 		_skillButton.Disabled = !isActing;
 		_itemButton.Disabled = !isActing;
 		_restButton.Disabled = !isActing;
 		_endButton.Disabled = !isActing;
+		_surrenderButton.Disabled = _uiState.Mode == BattleUiMode.BattleEnded;
+		_surrenderButton.Visible = _uiState.Mode != BattleUiMode.BattleEnded;
 		_finishButton.Visible = _uiState.Mode == BattleUiMode.BattleEnded;
 	}
 
@@ -783,6 +806,11 @@ public partial class BattleScreen : Control
 		{
 			_logLines.RemoveAt(0);
 		}
+
+		if (IsNodeReady())
+		{
+			RefreshLog();
+		}
 	}
 
 	private void RefreshLog()
@@ -1062,6 +1090,72 @@ public partial class BattleScreen : Control
 		}
 	}
 
+	private void ToggleSpeedUp()
+	{
+		_isSpeedUpEnabled = !_isSpeedUpEnabled;
+		ApplyTimeScale();
+		RefreshToggleButtons();
+		AppendLog(_isSpeedUpEnabled ? "已开启战斗加速。" : "已关闭战斗加速。");
+	}
+
+	private Task ToggleAutoBattleAsync()
+	{
+		if (_orchestrator is null)
+		{
+			return Task.CompletedTask;
+		}
+
+		var enabled = !_orchestrator.IsAutoBattleEnabled;
+		_orchestrator.SetAutoBattleEnabled(enabled);
+		AppendLog(enabled ? "已开启自动战斗。" : "已关闭自动战斗。");
+		if (IsInsideTree())
+		{
+			RefreshActions();
+			RefreshToggleButtons();
+		}
+
+		if (enabled && !_isResolvingSkillPresentation)
+		{
+			_ = _orchestrator.ContinueBattleFlowAsync();
+		}
+
+		return Task.CompletedTask;
+	}
+
+	private void RefreshToggleButtons()
+	{
+		if (!IsInsideTree())
+		{
+			return;
+		}
+
+		_speedUpActive.Visible = _isSpeedUpEnabled;
+		_autoBattleActive.Visible = IsAutoBattleEnabled();
+	}
+
+	private void ApplyTimeScale()
+	{
+		Engine.TimeScale = _isSpeedUpEnabled
+			? _initialTimeScale * BattleSpeedUpMultiplier
+			: _initialTimeScale;
+	}
+
+	private void RestoreTimeScale()
+	{
+		Engine.TimeScale = _initialTimeScale;
+	}
+
+	private void SurrenderBattle()
+	{
+		if (_uiState.Mode == BattleUiMode.BattleEnded || _orchestrator is null)
+		{
+			return;
+		}
+
+		_orchestrator.Surrender();
+		RefreshAll();
+	}
+
 	internal void BindState(BattleState state)
 	{
 		_state = state;
@@ -1160,6 +1254,8 @@ public partial class BattleScreen : Control
 
 		return DefaultCellColor;
 	}
+
+	private bool IsAutoBattleEnabled() => _orchestrator?.IsAutoBattleEnabled ?? false;
 
 	private sealed class BoardHighlights
 	{

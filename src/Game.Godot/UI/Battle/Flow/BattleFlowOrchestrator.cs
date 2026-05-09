@@ -11,7 +11,10 @@ internal sealed class BattleFlowOrchestrator
 
     private readonly BattleScreen _screen;
     private readonly BattleEngine _engine;
-    private readonly IBattleAgent _enemyAgent;
+    private readonly IBattleAgent _battleAgent;
+    private bool _autoBattleEnabled;
+    private bool _isContinuingFlow;
+    private bool? _forcedBattleResult;
 
     public BattleFlowOrchestrator(BattleScreen screen, BattleState state)
     {
@@ -20,11 +23,13 @@ internal sealed class BattleFlowOrchestrator
         _engine = new BattleEngine(
             buffResolver: buffId => GameRoot.ContentRepository.GetBuff(buffId),
             legendSkillsProvider: () => GameRoot.ContentRepository.GetLegendSkills());
-        _enemyAgent = new BasicEnemyBattleAgent(new BattleTurnCandidateGenerator(_engine));
+        _battleAgent = new BasicEnemyBattleAgent(new BattleTurnCandidateGenerator(_engine));
         _screen.BindState(State);
     }
 
     public BattleState State { get; }
+
+    public bool IsAutoBattleEnabled => _autoBattleEnabled;
 
     public IReadOnlyDictionary<GridPosition, int> GetReachablePositions()
     {
@@ -39,7 +44,20 @@ internal sealed class BattleFlowOrchestrator
 
     public async Task StartAsync()
     {
-        await AdvanceUntilPlayerTurnAsync();
+        await ContinueBattleFlowAsync();
+    }
+
+    public void Surrender()
+    {
+        _autoBattleEnabled = false;
+        _forcedBattleResult = false;
+        _screen.AppendLog("我方选择投降。");
+        _screen.ShowBattleEnded(isWin: false);
+    }
+
+    public void SetAutoBattleEnabled(bool enabled)
+    {
+        _autoBattleEnabled = enabled;
     }
 
     public Task TryRollbackMoveAsync()
@@ -78,13 +96,12 @@ internal sealed class BattleFlowOrchestrator
         }
 
         await _screen.PlayMoveAsync(actingUnit, movementPath);
-        _screen.ShowPlayerPostMove(actingUnit);
+        await HandlePlayerPostMoveAsync(actingUnit);
     }
 
     public async Task TryCastSkillAsync(SkillInstance skill, GridPosition target)
     {
         ArgumentNullException.ThrowIfNull(skill);
-
         var actingUnit = BattlePresenter.TryGetActingUnit(State);
         if (actingUnit is null || actingUnit.Team != PlayerTeam)
         {
@@ -101,14 +118,13 @@ internal sealed class BattleFlowOrchestrator
         }
 
         await _screen.PlaySkillAsync(actingUnit, skill, result, eventStart);
-        await AdvanceUntilPlayerTurnAsync();
+        await ContinueAfterResolvedPlayerActionAsync();
     }
 
     public async Task TryUseItemAsync(InventoryEntry item, string targetUnitId)
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentException.ThrowIfNullOrWhiteSpace(targetUnitId);
-
         var actingUnit = BattlePresenter.TryGetActingUnit(State);
         if (actingUnit is null || actingUnit.Team != PlayerTeam)
         {
@@ -130,7 +146,7 @@ internal sealed class BattleFlowOrchestrator
         }
 
         GameRoot.InventoryService.RemoveItem(item.Definition);
-        await AdvanceUntilPlayerTurnAsync();
+        await ContinueAfterResolvedPlayerActionAsync();
     }
 
     public async Task TryRestAsync()
@@ -150,7 +166,7 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
-        await AdvanceUntilPlayerTurnAsync();
+        await ContinueAfterResolvedPlayerActionAsync();
     }
 
     public async Task TryEndActionAsync()
@@ -170,34 +186,85 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
-        await AdvanceUntilPlayerTurnAsync();
+        await ContinueAfterResolvedPlayerActionAsync();
     }
 
-    private async Task AdvanceUntilPlayerTurnAsync()
+    public async Task ContinueBattleFlowAsync()
     {
-        while (true)
+        if (_isContinuingFlow)
         {
-            if (TryCompleteBattle())
-            {
-                return;
-            }
+            return;
+        }
 
-            _screen.ShowWaitingTimeline();
-            var actingUnit = _engine.AdvanceUntilNextAction(State);
-            if (actingUnit.Team == PlayerTeam)
+        _isContinuingFlow = true;
+        try
+        {
+            while (true)
             {
-                _screen.ShowPlayerTurn(actingUnit);
-                return;
-            }
+                if (TryCompleteBattle())
+                {
+                    return;
+                }
 
-            _screen.AppendLog($"轮到 {actingUnit.Character.Name} 行动。");
-            await ExecuteEnemyTurnAsync(actingUnit);
+                var actingUnit = State.CurrentAction is null
+                    ? AdvanceTimelineToNextAction()
+                    : BattlePresenter.TryGetActingUnit(State) ??
+                        throw new InvalidOperationException("Current action does not have a valid acting unit.");
+
+                if (actingUnit.Team == PlayerTeam && !_autoBattleEnabled)
+                {
+                    _screen.ShowPlayerTurn(actingUnit);
+                    return;
+                }
+
+                _screen.ShowWaitingTimeline();
+                _screen.AppendLog(actingUnit.Team == PlayerTeam
+                    ? $"轮到 {actingUnit.Character.Name} 自动行动。"
+                    : $"轮到 {actingUnit.Character.Name} 行动。");
+                await ExecuteAutomatedTurnAsync(actingUnit);
+            }
+        }
+        finally
+        {
+            _isContinuingFlow = false;
         }
     }
 
-    private async Task ExecuteEnemyTurnAsync(BattleUnit actingUnit)
+    private BattleUnit AdvanceTimelineToNextAction()
     {
-        var plan = _enemyAgent.Decide(State, actingUnit.Id);
+        _screen.ShowWaitingTimeline();
+        return _engine.AdvanceUntilNextAction(State);
+    }
+
+    private async Task HandlePlayerPostMoveAsync(BattleUnit actingUnit)
+    {
+        if (TryCompleteBattle())
+        {
+            return;
+        }
+
+        if (_autoBattleEnabled)
+        {
+            await ContinueBattleFlowAsync();
+            return;
+        }
+
+        _screen.ShowPlayerPostMove(actingUnit);
+    }
+
+    private async Task ContinueAfterResolvedPlayerActionAsync()
+    {
+        if (TryCompleteBattle())
+        {
+            return;
+        }
+
+        await ContinueBattleFlowAsync();
+    }
+
+    private async Task ExecuteAutomatedTurnAsync(BattleUnit actingUnit)
+    {
+        var plan = _battleAgent.Decide(State, actingUnit.Id);
         if (plan.MoveDestination != actingUnit.Position)
         {
             var moveEventStart = State.Events.Count;
@@ -209,6 +276,10 @@ internal sealed class BattleFlowOrchestrator
             if (moveResult.Success)
             {
                 await _screen.PlayMoveAsync(actingUnit, movementPath);
+                if (TryCompleteBattle())
+                {
+                    return;
+                }
             }
         }
 
@@ -233,6 +304,13 @@ internal sealed class BattleFlowOrchestrator
 
     private bool TryCompleteBattle()
     {
+        if (_forcedBattleResult is { } forcedBattleResult)
+        {
+            _autoBattleEnabled = false;
+            _screen.ShowBattleEnded(forcedBattleResult);
+            return true;
+        }
+
         var playerAlive = State.Units.Any(static unit => unit.Team == PlayerTeam && unit.IsAlive);
         var enemyAlive = State.Units.Any(static unit => unit.Team != PlayerTeam && unit.IsAlive);
         if (playerAlive && enemyAlive)
@@ -240,6 +318,7 @@ internal sealed class BattleFlowOrchestrator
             return false;
         }
 
+        _autoBattleEnabled = false;
         _screen.ShowBattleEnded(playerAlive);
         return true;
     }
