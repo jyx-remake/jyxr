@@ -7,6 +7,8 @@ public sealed class InternalSkillInstance(
     InternalSkillDefinition definition,
     CharacterInstance owner) : SkillInstance(owner)
 {
+    private IReadOnlyList<FormSkillInstance>? _formSkills;
+
     public InternalSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
 
     public override string Id => Definition.Id;
@@ -52,7 +54,7 @@ public sealed class InternalSkillInstance(
     public int LevelUpExp => GetLevelUpExp(Level);
 
     public IReadOnlyList<FormSkillInstance> GetFormSkills() =>
-        Definition.FormSkills.Select(definition => new FormSkillInstance(definition, this)).ToList();
+        _formSkills ??= Definition.FormSkills.Select(definition => new FormSkillInstance(definition, this)).ToList();
 
     public int GetLevelUpExp(int currentLevel)
     {

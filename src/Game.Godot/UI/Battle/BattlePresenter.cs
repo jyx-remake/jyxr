@@ -101,11 +101,20 @@ public sealed class BattlePresenter
 			? state.TryGetUnit(context.ActingUnitId)
 			: null;
 
-	private static IEnumerable<SkillInstance> CollectUsableSkills(BattleUnit unit) =>
-		unit.Character.GetExternalSkills()
+	private static IEnumerable<SkillInstance> CollectUsableSkills(BattleUnit unit)
+	{
+		var character = unit.Character;
+		return character.GetSpecialSkills()
 			.Where(static skill => skill.IsActive)
 			.Cast<SkillInstance>()
-			.Concat(unit.Character.GetSpecialSkills().Where(static skill => skill.IsActive));
+			.Concat(character.GetExternalSkills()
+				.Where(static skill => skill.IsActive)
+				.SelectMany(static skill => new[] { (SkillInstance)skill }
+					.Concat(skill.GetFormSkills().Where(static formSkill => formSkill.IsActive))))
+			.Concat(character.GetInternalSkills()
+				.Where(static skill => skill.IsEquipped)
+				.SelectMany(static skill => skill.GetFormSkills().Where(static formSkill => formSkill.IsActive)));
+	}
 
 	private static string FormatInventoryEntry(InventoryEntry entry) =>
 		entry switch

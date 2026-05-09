@@ -918,13 +918,6 @@ public partial class BattleScreen : Control
 				_ => FloatInfoColor,
 			};
 
-	private static IEnumerable<SkillInstance> EnumerateBattleSkills(BattleUnit unit) =>
-		unit.Character.GetExternalSkills()
-			.Cast<SkillInstance>()
-			.Concat(unit.Character.GetInternalSkills())
-			.Concat(unit.Character.GetSpecialSkills())
-			.Concat(unit.Character.GetFormSkills());
-
 	private static int ResolveDamageAmount(string? detail)
 	{
 		if (string.IsNullOrWhiteSpace(detail))

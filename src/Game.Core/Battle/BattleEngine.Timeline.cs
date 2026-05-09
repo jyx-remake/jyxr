@@ -95,6 +95,14 @@ public sealed partial class BattleEngine
                 {
                     skill.CurrentCooldown--;
                 }
+
+                foreach (var formSkill in skill.GetFormSkills())
+                {
+                    if (formSkill.CurrentCooldown > 0)
+                    {
+                        formSkill.CurrentCooldown--;
+                    }
+                }
             }
 
             foreach (var skill in unit.Character.GetInternalSkills())
@@ -102,6 +110,14 @@ public sealed partial class BattleEngine
                 if (skill.CurrentCooldown > 0)
                 {
                     skill.CurrentCooldown--;
+                }
+
+                foreach (var formSkill in skill.GetFormSkills())
+                {
+                    if (formSkill.CurrentCooldown > 0)
+                    {
+                        formSkill.CurrentCooldown--;
+                    }
                 }
             }
 

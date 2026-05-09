@@ -11,6 +11,82 @@ namespace Game.Tests;
 public sealed class BattleEngineTests
 {
     [Fact]
+    public void GetImpactPositions_ReturnsLegacyFaceSquare()
+    {
+        var target = new GridPosition(3, 3);
+
+        var positions = BattleEngine.GetImpactPositions(
+            new GridPosition(0, 0),
+            target,
+            SkillImpactType.Square,
+            impactSize: 3);
+
+        var expected = new HashSet<GridPosition>
+        {
+            new(2, 2),
+            new(3, 2),
+            new(4, 2),
+            new(2, 3),
+            new(3, 3),
+            new(4, 3),
+            new(2, 4),
+            new(3, 4),
+            new(4, 4),
+        };
+
+        Assert.Equal(expected.Count, positions.Count);
+        foreach (var position in expected)
+        {
+            Assert.Contains(position, positions);
+        }
+
+        Assert.DoesNotContain(new GridPosition(1, 3), positions);
+        Assert.DoesNotContain(new GridPosition(5, 3), positions);
+    }
+
+    [Fact]
+    public void GetImpactPositions_ReturnsEightDirectionStar()
+    {
+        var target = new GridPosition(3, 3);
+
+        var positions = BattleEngine.GetImpactPositions(
+            new GridPosition(0, 0),
+            target,
+            SkillImpactType.Star,
+            impactSize: 2);
+
+        var expected = new HashSet<GridPosition>
+        {
+            new(3, 3),
+            new(3, 1),
+            new(3, 2),
+            new(3, 4),
+            new(3, 5),
+            new(1, 3),
+            new(2, 3),
+            new(4, 3),
+            new(5, 3),
+            new(1, 1),
+            new(2, 2),
+            new(4, 4),
+            new(5, 5),
+            new(1, 5),
+            new(2, 4),
+            new(4, 2),
+            new(5, 1),
+        };
+
+        Assert.Equal(expected.Count, positions.Count);
+        foreach (var position in expected)
+        {
+            Assert.Contains(position, positions);
+        }
+
+        Assert.DoesNotContain(new GridPosition(2, 1), positions);
+        Assert.DoesNotContain(new GridPosition(4, 5), positions);
+    }
+
+    [Fact]
     public void AdvanceUntilNextAction_SelectsHighestReadyGauge()
     {
         var slow = CreateUnit("slow", team: 1, new GridPosition(0, 0), actionSpeed: 10);

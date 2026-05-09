@@ -11,6 +11,7 @@ public sealed class ExternalSkillInstance(
     bool active) : SkillInstance(owner)
 {
     private bool _isActive = active;
+    private IReadOnlyList<FormSkillInstance>? _formSkills;
 
     public ExternalSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
 
@@ -54,7 +55,7 @@ public sealed class ExternalSkillInstance(
     public override double Affinity => Definition.Affinity;
 
     public IReadOnlyList<FormSkillInstance> GetFormSkills() =>
-        Definition.FormSkills.Select(definition => new FormSkillInstance(definition, this)).ToList();
+        _formSkills ??= Definition.FormSkills.Select(definition => new FormSkillInstance(definition, this)).ToList();
 
     public bool SetActive(bool isActive)
     {

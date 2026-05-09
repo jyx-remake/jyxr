@@ -26,9 +26,13 @@ public sealed partial class BattleEngine
                 .Where(position => position.X == target.X || position.Y == target.Y)
                 .ToHashSet(),
             SkillImpactType.Star => EnumerateSquare(target, size)
-                .Where(position => position.ManhattanDistanceTo(target) <= size)
+                .Where(position =>
+                    position.X == target.X ||
+                    position.Y == target.Y ||
+                    Math.Abs(position.X - target.X) == Math.Abs(position.Y - target.Y))
                 .ToHashSet(),
-            SkillImpactType.Square => EnumerateSquare(target, size).ToHashSet(),
+            // TODO: Square should use radius semantics after skill data is migrated from legacy cover size.
+            SkillImpactType.Square => EnumerateSquare(target, size / 2).ToHashSet(),
             SkillImpactType.Ring => EnumerateSquare(target, size)
                 .Where(position => position.ManhattanDistanceTo(target) == size)
                 .ToHashSet(),
