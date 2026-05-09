@@ -134,6 +134,16 @@ public partial class BattleBoardView : Control
 		}
 	}
 
+	public void ApplyUnitFacing(string unitId, BattleFacing facing)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
+
+		if (_unitViews.TryGetValue(unitId, out var unitView))
+		{
+			unitView.ApplyFacing(facing);
+		}
+	}
+
 	public void PlaySkillImpact(
 		IReadOnlyList<string> targetUnitIds,
 		IReadOnlyList<GridPosition> impactPositions,

@@ -112,6 +112,11 @@ public partial class BattleUnitView : Node2D
 		completed?.Invoke();
 	}
 
+	public void ApplyFacing(BattleFacing facing)
+	{
+		SetFacing(facing);
+	}
+
 	private void SetAnimationSet(AnimationLibrary? animationLibrary)
 	{
 		if (ReferenceEquals(_animationLibrary, animationLibrary) ||

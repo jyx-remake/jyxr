@@ -512,6 +512,7 @@ public partial class BattleScreen : Control
 				result = _engine.CastSkill(_state, actingUnit.Id, skill, position);
 				if (result.Success)
 				{
+					_boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
 					_isResolvingSkillPresentation = true;
 					RefreshActions();
 					_activeSkillPresentation = new SkillPresentationContext(
@@ -558,6 +559,10 @@ public partial class BattleScreen : Control
 					actingUnit.Id,
 					item.Definition,
 					target.Id);
+				if (result.Success)
+				{
+					_boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
+				}
 				AppendResult(result, itemEventStart);
 				if (result.Success)
 				{
