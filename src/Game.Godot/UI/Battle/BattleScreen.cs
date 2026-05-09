@@ -943,11 +943,12 @@ public partial class BattleScreen : Control
 				AudioManager.Instance.PlaySfx(SkillCast.AudioId);
 			}
 
-			_boardGrid.PlaySkillImpact(_targetUnitIds, _impactPositions, SkillCast.ImpactAnimationId);
+			var impactTask = _boardGrid.PlaySkillImpactAsync(_targetUnitIds, _impactPositions, SkillCast.ImpactAnimationId);
 			Flush(_impactActions);
 
 			await _owner.WaitForSecondsAsync(SkillImpactFloatDelaySeconds);
 			Flush(_impactFloatActions);
+			await impactTask;
 		}
 
 		private static void Flush(List<Action> actions)

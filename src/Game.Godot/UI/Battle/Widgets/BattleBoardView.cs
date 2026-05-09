@@ -184,7 +184,7 @@ public partial class BattleBoardView : Control
 		}
 	}
 
-	public void PlaySkillImpact(
+	public async Task PlaySkillImpactAsync(
 		IReadOnlyList<string> targetUnitIds,
 		IReadOnlyList<GridPosition> impactPositions,
 		string? skillAnimationId)
@@ -192,9 +192,18 @@ public partial class BattleBoardView : Control
 		ArgumentNullException.ThrowIfNull(targetUnitIds);
 		ArgumentNullException.ThrowIfNull(impactPositions);
 
+		Task? firstImpactTask = null;
 		foreach (var impactPosition in impactPositions)
 		{
-			PlaySkillAnimationAt(ResolveUnitAnchor(impactPosition), skillAnimationId);
+			var impactTask = PlaySkillAnimationAtAsync(ResolveUnitAnchor(impactPosition), skillAnimationId);
+			if (firstImpactTask is null)
+			{
+				firstImpactTask = impactTask;
+			}
+			else
+			{
+				_ = impactTask;
+			}
 		}
 
 		foreach (var targetUnitId in targetUnitIds)
@@ -204,14 +213,19 @@ public partial class BattleBoardView : Control
 				targetView.PlayHit();
 			}
 		}
+
+		if (firstImpactTask is not null)
+		{
+			await firstImpactTask;
+		}
 	}
 
-	public void PlaySkillAnimationAt(Vector2 position, string? skillAnimationId)
+	public Task PlaySkillAnimationAtAsync(Vector2 position, string? skillAnimationId)
 	{
 		var skillAnimation = AssetResolver.LoadSkillAnimation(skillAnimationId);
 		if (skillAnimation is null)
 		{
-			return;
+			return Task.CompletedTask;
 		}
 
 		if (BattleSkillViewScene is null)
@@ -228,7 +242,7 @@ public partial class BattleBoardView : Control
 
 		effectView.Position = position;
 		_effectLayer.AddChild(effectView);
-		effectView.Play(skillAnimation);
+		return effectView.PlayAsync(skillAnimation);
 	}
 
 	public void PlayFloatText(string unitId, string text, Color color)
