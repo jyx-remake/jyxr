@@ -71,10 +71,11 @@ public sealed partial class BattleEngine
                 buff.Duration,
                 source.Id,
                 state.ActionSerial);
+            var buffTarget = buff.Buff.IsDebuff ? target : source;
             var hookContext = TriggerHooks(state, HookTiming.BeforeBuffApplied, source, context =>
             {
                 context.Source = source;
-                context.Target = target;
+                context.Target = buffTarget;
                 context.Buff = instance;
             });
             if (hookContext.Cancel)
@@ -82,11 +83,11 @@ public sealed partial class BattleEngine
                 continue;
             }
 
-            target.ApplyBuff(instance);
+            buffTarget.ApplyBuff(instance);
 
-            var battleEvent = new BattleEvent(BattleEventKind.BuffApplied, target.Id, Detail: buff.Id);
+            var battleEvent = new BattleEvent(BattleEventKind.BuffApplied, buffTarget.Id, Detail: buff.Id);
             AddEvent(state, battleEvent);
-            TriggerHooks(state, HookTiming.OnBuffApplied, target);
+            TriggerHooks(state, HookTiming.OnBuffApplied, buffTarget);
         }
     }
 

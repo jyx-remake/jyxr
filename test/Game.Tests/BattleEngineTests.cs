@@ -791,6 +791,47 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_AppliesDebuffsToTargetAndBuffsToSource()
+    {
+        var poison = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var recovery = new BuffDefinition { Id = "恢复", Name = "恢复", IsDebuff = false };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "mixed_buff_strike",
+            powerBase: 1,
+            buffs:
+            [
+                new SkillBuffDefinition(poison, level: 2, duration: 3),
+                new SkillBuffDefinition(recovery, level: 1, duration: 2),
+            ],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(new BattleDamageCalculator(new FixedRandomService(0.5d)));
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
+
+        Assert.True(result.Success);
+        var sourceBuff = Assert.Single(hero.Buffs);
+        Assert.Equal(recovery.Id, sourceBuff.Definition.Id);
+        var targetBuff = Assert.Single(enemy.Buffs);
+        Assert.Equal(poison.Id, targetBuff.Definition.Id);
+    }
+
+    [Fact]
     public void BeginAction_PuzhaoAppliesRecoveryBuffToNearbyAllies()
     {
         var talent = new TalentDefinition
