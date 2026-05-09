@@ -15,6 +15,7 @@ public partial class BattleScreen : Control
 	private const int PlayerTeam = 1;
 	private const int GridCellWidth = 144;
 	private const int GridCellHeight = 144;
+	private const BattleMovementPresentationMode MovementPresentationMode = BattleMovementPresentationMode.Step;
 	private static readonly Color DefaultCellColor = new(0.2f, 0.2f, 0.2f, 0.2f);
 	private static readonly Color MoveHighlightColor = new(0.2f, 0.6f, 1f, 0.35f);
 	private static readonly Color ActingUnitColor = new(1f, 1f, 0.2f, 0.5f);
@@ -503,8 +504,21 @@ public partial class BattleScreen : Control
 			case BattleUiMode.SelectingMove:
 				var moveEventStart = _state.Events.Count;
 				result = _engine.MoveTo(_state, actingUnit.Id, position);
+				var movementPath = result.Success && _state.CurrentAction is not null
+					? _state.CurrentAction.MovementTrace.ToArray()
+					: Array.Empty<GridPosition>();
 				AppendResult(result, moveEventStart);
+				if (!result.Success)
+				{
+					RefreshAll();
+					return;
+				}
+
 				SelectDefaultPostMoveMode(actingUnit);
+				_isResolvingSkillPresentation = true;
+				RefreshActions();
+				await _boardGrid.PlayUnitMoveAsync(actingUnit.Id, movementPath, MovementPresentationMode);
+				_isResolvingSkillPresentation = false;
 				RefreshAll();
 				return;
 			case BattleUiMode.SelectingSkillTarget when _uiState.SelectedSkill is { } skill:

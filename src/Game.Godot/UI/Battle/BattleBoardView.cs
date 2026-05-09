@@ -8,6 +8,7 @@ namespace Game.Godot.UI.Battle;
 public partial class BattleBoardView : Control
 {
 	private const int CellTextFontSize = 13;
+	private const double StepMoveDurationSeconds = 0.3d;
 	private const double FloatTextQueueSpacingSeconds = 0.4d;
 	private static readonly Color BorderColor = new(0f, 0f, 0f, 0.45f);
 	private static readonly Color TextColor = Colors.White;
@@ -122,6 +123,45 @@ public partial class BattleBoardView : Control
 			_queuedFloatTexts.Remove(staleUnitId);
 			_processingFloatTextUnits.Remove(staleUnitId);
 		}
+	}
+
+	public async Task PlayUnitMoveAsync(
+		string unitId,
+		IReadOnlyList<GridPosition> path,
+		BattleMovementPresentationMode mode)
+	{
+		if (!_unitViews.TryGetValue(unitId, out var unitView) || path.Count == 0)
+		{
+			return;
+		}
+
+		unitView.PlayMoveLoop();
+		foreach (var position in mode == BattleMovementPresentationMode.Instant ? [path[^1]] : path)
+		{
+			var targetPosition = ResolveUnitAnchor(position);
+			if (targetPosition.X < unitView.Position.X)
+			{
+				unitView.ApplyFacing(BattleFacing.Left);
+			}
+			else if (targetPosition.X > unitView.Position.X)
+			{
+				unitView.ApplyFacing(BattleFacing.Right);
+			}
+
+			if (mode == BattleMovementPresentationMode.Instant)
+			{
+				unitView.Position = targetPosition;
+				break;
+			}
+
+			var tween = CreateTween();
+			tween.TweenProperty(unitView, "position", targetPosition, StepMoveDurationSeconds)
+				.SetTrans(Tween.TransitionType.Linear)
+				.SetEase(Tween.EaseType.InOut);
+			await ToSignal(tween, Tween.SignalName.Finished);
+		}
+
+		unitView.PlayIdle();
 	}
 
 	public void PlayAttack(string actingUnitId)
@@ -488,3 +528,9 @@ public sealed record BattleBoardBuffVisual(
 	bool IsDebuff,
 	int Level,
 	int RemainingTurns);
+
+public enum BattleMovementPresentationMode
+{
+	Instant,
+	Step,
+}
