@@ -4,7 +4,7 @@ namespace Game.Core.Battle;
 
 public static class BattleSkillCatalog
 {
-    public static IReadOnlyList<SkillInstance> CollectUsableSkills(BattleUnit unit)
+    public static IReadOnlyList<SkillInstance> CollectSelectableSkills(BattleUnit unit)
     {
         ArgumentNullException.ThrowIfNull(unit);
 

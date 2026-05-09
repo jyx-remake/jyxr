@@ -75,13 +75,17 @@ public sealed class BattlePresenter
 		return new BattleUnitPanelView(unit.Character.Name, detail);
 	}
 
-	public IReadOnlyList<BattleSkillOptionView> CreateSkillList(BattleUnit unit)
+	public IReadOnlyList<BattleSkillOptionView> CreateSkillList(BattleState state, BattleEngine engine, BattleUnit unit)
 	{
+		ArgumentNullException.ThrowIfNull(state);
+		ArgumentNullException.ThrowIfNull(engine);
 		ArgumentNullException.ThrowIfNull(unit);
-		return BattleSkillCatalog.CollectUsableSkills(unit)
-			.Select(skill => new BattleSkillOptionView(
-				skill,
-				$"{skill.Name}  MP {skill.MpCost}  怒 {skill.RageCost}"))
+
+		return BattleSkillCatalog.CollectSelectableSkills(unit)
+			.Select(skill => engine.EvaluateSkillAvailability(state, unit.Id, skill))
+			.Select(availability => new BattleSkillOptionView(
+				availability,
+				$"{availability.Skill.Name}  MP {availability.MpCost}  怒 {availability.Skill.RageCost}"))
 			.ToList();
 	}
 
@@ -122,6 +126,11 @@ public sealed record BattleCellView(
 
 public sealed record BattleUnitPanelView(string Title, string Detail);
 
-public sealed record BattleSkillOptionView(SkillInstance Skill, string Label);
+public sealed record BattleSkillOptionView(BattleSkillAvailability Availability, string Label)
+{
+	public SkillInstance Skill => Availability.Skill;
+
+	public bool IsAvailable => Availability.IsAvailable;
+}
 
 public sealed record BattleItemView(InventoryEntry Entry, string Label);

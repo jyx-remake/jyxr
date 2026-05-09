@@ -29,12 +29,13 @@ public sealed partial class BattleEngine
             return BattleActionResult.Failed("Skill is not active.");
         }
 
-        if (skill.CurrentCooldown > 0 || unit.DisabledSkillIds.Contains(skill.Id))
+        var availability = EvaluateSkillAvailabilityCore(state, unit, skill);
+        if (!availability.IsAvailable)
         {
-            return BattleActionResult.Failed("Skill is disabled.");
+            return BattleActionResult.Failed(GetSkillUnavailableMessage(availability));
         }
 
-        var mpCost = ResolveSkillMpCost(state, unit, skill);
+        var mpCost = ResolveSkillMpCostExecute(state, unit, skill);
         if (unit.Mp < mpCost)
         {
             return BattleActionResult.Failed("Not enough MP.");
@@ -100,6 +101,16 @@ public sealed partial class BattleEngine
             impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList(),
             skillCastInfo);
     }
+
+    private static string GetSkillUnavailableMessage(BattleSkillAvailability availability) =>
+        availability.Status switch
+        {
+            BattleSkillAvailabilityStatus.Cooldown => "Skill is disabled.",
+            BattleSkillAvailabilityStatus.Disabled => "Skill is disabled.",
+            BattleSkillAvailabilityStatus.NotEnoughMp => "Not enough MP.",
+            BattleSkillAvailabilityStatus.NotEnoughRage => "Not enough rage.",
+            _ => "Skill is not available.",
+        };
 
     public BattleActionResult UseItem(
         BattleState state,

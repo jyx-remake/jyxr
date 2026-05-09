@@ -30,13 +30,10 @@ public sealed class BattleTurnCandidateGenerator
 
         foreach (var destination in reachablePositions)
         {
-            foreach (var skill in BattleSkillCatalog.CollectUsableSkills(unit))
+            foreach (var skill in BattleSkillCatalog.CollectSelectableSkills(unit))
             {
-                if (skill is SpecialSkillInstance ||
-                    skill.CurrentCooldown > 0 ||
-                    unit.DisabledSkillIds.Contains(skill.Id) ||
-                    unit.Mp < skill.MpCost ||
-                    unit.Rage < skill.RageCost)
+                var availability = _engine.EvaluateSkillAvailability(state, unit.Id, skill);
+                if (skill is SpecialSkillInstance || !availability.IsAvailable)
                 {
                     continue;
                 }

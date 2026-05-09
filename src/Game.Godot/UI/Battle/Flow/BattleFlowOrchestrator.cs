@@ -29,6 +29,8 @@ internal sealed class BattleFlowOrchestrator
 
     public BattleState State { get; }
 
+    internal BattleEngine Engine => _engine;
+
     public bool IsAutoBattleEnabled => _autoBattleEnabled;
 
     public IReadOnlyDictionary<GridPosition, int> GetReachablePositions()
@@ -330,7 +332,7 @@ internal sealed class BattleFlowOrchestrator
             return null;
         }
 
-        return BattleSkillCatalog.CollectUsableSkills(actingUnit)
+        return BattleSkillCatalog.CollectSelectableSkills(actingUnit)
             .FirstOrDefault(skill => string.Equals(skill.Id, skillId, StringComparison.Ordinal));
     }
 }

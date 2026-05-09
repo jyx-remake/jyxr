@@ -10,9 +10,10 @@ public sealed partial class BattleEngine
         HookTiming timing,
         BattleUnit unit,
         Action<BattleHookContext>? configure = null,
+        BattleHookExecutionMode executionMode = BattleHookExecutionMode.Execute,
         bool recordEvents = true)
     {
-        var context = CreateHookContext(state, timing, unit);
+        var context = CreateHookContext(state, timing, unit, executionMode);
         configure?.Invoke(context);
         var hooks = unit.Character.GetHooks(timing)
             .ToList();
@@ -60,7 +61,17 @@ public sealed partial class BattleEngine
         return context;
     }
 
-    private int ResolveSkillMpCost(BattleState state, BattleUnit unit, SkillInstance skill)
+    private int ResolveSkillMpCostPreview(BattleState state, BattleUnit unit, SkillInstance skill) =>
+        ResolveSkillMpCost(state, unit, skill, BattleHookExecutionMode.Preview);
+
+    private int ResolveSkillMpCostExecute(BattleState state, BattleUnit unit, SkillInstance skill) =>
+        ResolveSkillMpCost(state, unit, skill, BattleHookExecutionMode.Execute);
+
+    private int ResolveSkillMpCost(
+        BattleState state,
+        BattleUnit unit,
+        SkillInstance skill,
+        BattleHookExecutionMode executionMode)
     {
         var context = TriggerHooks(
             state,
@@ -71,12 +82,17 @@ public sealed partial class BattleEngine
                 hookContext.Skill = skill;
                 hookContext.MpCost = skill.MpCost;
             },
+            executionMode,
             recordEvents: false);
         return Math.Max(0, context.MpCost ?? skill.MpCost);
     }
 
-    private BattleHookContext CreateHookContext(BattleState state, HookTiming timing, BattleUnit unit) =>
-        new(state, timing, unit, _random)
+    private BattleHookContext CreateHookContext(
+        BattleState state,
+        HookTiming timing,
+        BattleUnit unit,
+        BattleHookExecutionMode executionMode) =>
+        new(state, timing, unit, _random, executionMode)
         {
             BuffResolver = _buffResolver,
         };

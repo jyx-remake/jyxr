@@ -7,6 +7,8 @@ namespace Game.Godot.UI.Battle;
 
 public partial class BattleSkillBox : TextureButton
 {
+	private static readonly Color DisabledModulate = new(0.35f, 0.35f, 0.35f, 0.95f);
+
 	[Export]
 	public PackedScene TooltipScene { get; set; } = null!;
 
@@ -16,6 +18,7 @@ public partial class BattleSkillBox : TextureButton
 	private Panel _selectedFrame = null!;
 
 	private SkillInstance? _skill;
+	private bool _available = true;
 	private bool _selected;
 
 	public override void _Ready()
@@ -27,10 +30,11 @@ public partial class BattleSkillBox : TextureButton
 		Refresh();
 	}
 
-	public void Setup(SkillInstance skill, bool selected)
+	public void Setup(SkillInstance skill, bool selected, bool available)
 	{
 		ArgumentNullException.ThrowIfNull(skill);
 		_skill = skill;
+		_available = available;
 		_selected = selected;
 		TooltipText = skill.Name;
 		Refresh();
@@ -60,6 +64,13 @@ public partial class BattleSkillBox : TextureButton
 		}
 
 		_selectedFrame.Visible = _selected;
+		Disabled = !_available;
+		MouseDefaultCursorShape = _available
+			? CursorShape.PointingHand
+			: CursorShape.Arrow;
+		Modulate = _available
+			? Colors.White
+			: DisabledModulate;
 		_avatar.Texture = AssetResolver.LoadSkillIconResource(_skill.Icon);
 		ApplySplitName(_skill.Name);
 	}

@@ -192,6 +192,7 @@ public sealed class SkillDescriptionFormatterTests
         Assert.Contains("[color=white]所属武学[/color] [color=red]start_skill[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=white]绝技解锁等级[/color] [color=red]6[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=red]触发概率 15%[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]消耗怒气 4[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=black]需要外功「required_skill」达到8级[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=black]需要内功「required_internal」达到6级[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=black]需要特殊技能「凌波微步」[/color]", text, StringComparison.Ordinal);

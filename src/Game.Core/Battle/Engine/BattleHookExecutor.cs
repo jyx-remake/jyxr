@@ -14,6 +14,8 @@ public sealed class BattleHookExecutor
             throw new InvalidOperationException($"Hook timing '{hook.Timing}' does not match context timing '{context.Timing}'.");
         }
 
+        EnsurePreviewSafe(context, hook);
+
         if (hook.Conditions.Any(condition => !EvaluateCondition(context, condition)))
         {
             return;
@@ -48,6 +50,47 @@ public sealed class BattleHookExecutor
                 skillWeaponType.WeaponTypes.Contains(context.Skill.WeaponType),
             _ => throw new NotSupportedException($"Unsupported battle hook condition '{condition.GetType().Name}'.")
         };
+
+    private static void EnsurePreviewSafe(BattleHookContext context, HookAffix hook)
+    {
+        if (!context.IsPreview)
+        {
+            return;
+        }
+
+        if (hook.Speech is not null)
+        {
+            throw new InvalidOperationException(
+                $"Preview battle hook execution does not support speech on timing '{hook.Timing}'.");
+        }
+
+        foreach (var condition in hook.Conditions)
+        {
+            if (condition is ChanceBattleHookConditionDefinition)
+            {
+                throw new InvalidOperationException(
+                    $"Preview battle hook execution does not support random chance conditions on timing '{hook.Timing}'.");
+            }
+        }
+
+        foreach (var effect in hook.Effects)
+        {
+            switch (effect)
+            {
+                case ModifyDamageBattleHookEffectDefinition:
+                case ModifyDamageContextBattleHookEffectDefinition:
+                case ModifyMpCostBattleHookEffectDefinition:
+                    continue;
+                case StrengthenContextBuffBattleHookEffectDefinition:
+                case ApplyBuffBattleHookEffectDefinition:
+                    throw new InvalidOperationException(
+                        $"Preview battle hook execution does not support side-effect effect '{effect.GetType().Name}' on timing '{hook.Timing}'.");
+                default:
+                    throw new NotSupportedException(
+                        $"Unsupported preview battle hook effect '{effect.GetType().Name}'.");
+            }
+        }
+    }
 
     private static void ApplyEffect(BattleHookContext context, BattleHookEffectDefinition effect)
     {

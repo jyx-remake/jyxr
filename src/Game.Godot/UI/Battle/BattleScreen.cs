@@ -542,9 +542,9 @@ public partial class BattleScreen : Control
 				AddCancelButton();
 				break;
 			default:
-				foreach (var skillView in _presenter.CreateSkillList(actingUnit))
+				foreach (var skillView in GetSkillOptions(actingUnit))
 				{
-					AddSkillButton(skillView.Skill, skillView.Label);
+					AddSkillButton(skillView);
 				}
 				if (_uiState.Mode is BattleUiMode.SelectingMove or BattleUiMode.SelectingSkillTarget)
 				{
@@ -586,20 +586,24 @@ public partial class BattleScreen : Control
 		_listContainer.AddChild(button);
 	}
 
-	private void AddSkillButton(SkillInstance skill, string text)
+	private void AddSkillButton(BattleSkillOptionView skillView)
 	{
 		if (BattleSkillBoxScene.Instantiate() is not BattleSkillBox button)
 		{
 			throw new InvalidOperationException("BattleSkillBox scene root must be BattleSkillBox.");
 		}
 
-		button.Setup(skill, ReferenceEquals(_uiState.SelectedSkill, skill));
-		button.TooltipText = text;
-		button.Pressed += () =>
+		button.Setup(skillView.Skill, ReferenceEquals(_uiState.SelectedSkill, skillView.Skill), skillView.IsAvailable);
+		button.TooltipText = BuildSkillTooltip(skillView);
+		if (skillView.IsAvailable)
 		{
-			_uiState.SelectSkillTarget(skill);
-			RefreshAll();
-		};
+			button.Pressed += () =>
+			{
+				_uiState.SelectSkillTarget(skillView.Skill);
+				RefreshAll();
+			};
+		}
+
 		_listContainer.AddChild(button);
 	}
 
@@ -820,13 +824,45 @@ public partial class BattleScreen : Control
 
 	private SkillInstance? ResolvePreviewSkill(BattleUnit? actingUnit)
 	{
-		if (actingUnit is null)
+		var skillOptions = actingUnit is null ? [] : GetSkillOptions(actingUnit);
+		if (_uiState.SelectedSkill is { } selectedSkill &&
+			skillOptions.Any(skill => skill.IsAvailable && ReferenceEquals(skill.Skill, selectedSkill)))
 		{
-			return null;
+			return selectedSkill;
 		}
 
-		return _uiState.SelectedSkill ?? _presenter.CreateSkillList(actingUnit).FirstOrDefault()?.Skill;
+		return skillOptions.FirstOrDefault(static skill => skill.IsAvailable)?.Skill;
 	}
+
+	private IReadOnlyList<BattleSkillOptionView> GetSkillOptions(BattleUnit actingUnit)
+	{
+		if (_state is null || _orchestrator is null)
+		{
+			return [];
+		}
+
+		return _presenter.CreateSkillList(_state, _orchestrator.Engine, actingUnit);
+	}
+
+	private static string BuildSkillTooltip(BattleSkillOptionView skillView)
+	{
+		if (skillView.IsAvailable)
+		{
+			return skillView.Label;
+		}
+
+		return $"{skillView.Label}\n{ResolveUnavailableSkillText(skillView.Availability)}";
+	}
+
+	private static string ResolveUnavailableSkillText(BattleSkillAvailability availability) =>
+		availability.Status switch
+		{
+			BattleSkillAvailabilityStatus.Cooldown => $"不可用：冷却中（剩余 {availability.RemainingCooldown} 回合）",
+			BattleSkillAvailabilityStatus.Disabled => "不可用：当前被封招",
+			BattleSkillAvailabilityStatus.NotEnoughMp => "不可用：MP 不足",
+			BattleSkillAvailabilityStatus.NotEnoughRage => "不可用：怒气不足",
+			_ => "可用",
+		};
 
 	private static Color ResolveSkillColor(BattleSkillCastInfo skillCast) =>
 		skillCast.IsLegend
@@ -1055,8 +1091,9 @@ public partial class BattleScreen : Control
 
 	private void SelectDefaultPostMoveMode(BattleUnit actingUnit)
 	{
-		var availableSkills = _presenter.CreateSkillList(actingUnit);
-		var defaultSkill = availableSkills.FirstOrDefault()?.Skill;
+		var defaultSkill = GetSkillOptions(actingUnit)
+			.FirstOrDefault(static skill => skill.IsAvailable)
+			?.Skill;
 		if (defaultSkill is null)
 		{
 			_uiState.ActUnit();

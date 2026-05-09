@@ -38,7 +38,7 @@ public sealed class LegendSkillInstance(
 
     public override double Power => (Parent.Power + Definition.PowerExtra) * (1 + Bonus);
     public override int MpCost => Parent.MpCost;
-    public override int RageCost => 0;
+    public override int RageCost => Parent.RageCost;
     public override int Cooldown => 0;
     public override int CastSize => Parent.CastSize;
     public override SkillImpactType ImpactType => Parent.ImpactType;

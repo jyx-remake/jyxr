@@ -5,13 +5,20 @@ using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
 
+public enum BattleHookExecutionMode
+{
+    Execute,
+    Preview,
+}
+
 public sealed class BattleHookContext
 {
     internal BattleHookContext(
         BattleState state,
         HookTiming timing,
         BattleUnit unit,
-        IRandomService random)
+        IRandomService random,
+        BattleHookExecutionMode executionMode)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(unit);
@@ -21,6 +28,7 @@ public sealed class BattleHookContext
         Timing = timing;
         Unit = unit;
         Random = random;
+        ExecutionMode = executionMode;
         BuffResolver = MissingBuffResolver;
     }
 
@@ -31,6 +39,10 @@ public sealed class BattleHookContext
     public BattleUnit Unit { get; }
 
     public IRandomService Random { get; }
+
+    public BattleHookExecutionMode ExecutionMode { get; }
+
+    public bool IsPreview => ExecutionMode == BattleHookExecutionMode.Preview;
 
     public BattleUnit? Source { get; set; }
 

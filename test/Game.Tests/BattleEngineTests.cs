@@ -228,7 +228,7 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
-    public void CastSkill_ResolvesLegendSkillBeforeRageValidation()
+    public void CastSkill_RequiresBaseRageBeforeLegendResolution()
     {
         var stagger = new BuffDefinition { Id = "stagger", Name = "stagger", IsDebuff = true };
         var heroic = new TalentDefinition { Id = "heroic", Name = "heroic" };
@@ -280,23 +280,13 @@ public sealed class BattleEngineTests
         var skill = hero.Character.GetExternalSkills().Single();
         var result = engine.CastSkill(state, hero.Id, skill, enemy.Position);
 
-        Assert.True(result.Success);
-        Assert.NotNull(result.SkillCast);
-        Assert.True(result.SkillCast.IsLegend);
-        Assert.Equal("strike", result.SkillCast.BaseSkillId);
-        Assert.Equal("strike_legend", result.SkillCast.ResolvedSkillId);
-        Assert.Equal("奥义.天外流星", result.SkillCast.ResolvedSkillName);
-        Assert.Equal("base_anim", result.SkillCast.ImpactAnimationId);
-        Assert.Equal("aoyi_fx", result.SkillCast.ScreenEffectAnimationId);
-        Assert.Equal("base_audio", result.SkillCast.AudioId);
-        Assert.Equal(7, hero.Mp);
+        Assert.False(result.Success);
+        Assert.Equal("Not enough rage.", result.Message);
         Assert.Equal(0, hero.Rage);
+        Assert.Equal(10, hero.Mp);
         Assert.Equal(0, skill.CurrentCooldown);
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.SkillCast &&
-            battleEvent.SkillCast is { IsLegend: true, ResolvedSkillId: "strike_legend" });
-        var appliedBuff = Assert.Single(enemy.Buffs);
-        Assert.Equal("stagger", appliedBuff.Definition.Id);
+        Assert.DoesNotContain(state.Events, battleEvent => battleEvent.Kind == BattleEventKind.SkillCast);
+        Assert.Empty(enemy.Buffs);
     }
 
     [Fact]
@@ -368,7 +358,7 @@ public sealed class BattleEngineTests
             "hero",
             team: 1,
             new GridPosition(0, 0),
-            rage: 0,
+            rage: 2,
             stats: new Dictionary<StatType, int>
             {
                 [StatType.Quanzhang] = 100,
@@ -390,6 +380,7 @@ public sealed class BattleEngineTests
 
         Assert.True(result.Success);
         Assert.True(result.SkillCast?.IsLegend);
+        Assert.Equal(0, hero.Rage);
         Assert.Equal(500, ally.Hp);
         Assert.True(enemy.Hp < 500);
         Assert.DoesNotContain(ally.Id, result.AffectedUnitIds);
@@ -646,6 +637,115 @@ public sealed class BattleEngineTests
         Assert.False(result.Success);
         Assert.Equal("Not enough MP.", result.Message);
         Assert.Equal(11, hero.Mp);
+    }
+
+    [Fact]
+    public void EvaluateSkillAvailability_UsesResolvedMpCostAndReportsUnavailableStatus()
+    {
+        var internalInjury = new BuffDefinition
+        {
+            Id = "内伤",
+            Name = "内伤",
+            IsDebuff = true,
+            Affixes = [CreateInternalInjuryCostHook()],
+        };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            mpCost: 10,
+            powerBase: 1,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxMp: 30,
+            mp: 11,
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
+        hero.ApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, enemy.Id, 1));
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine();
+
+        var availability = engine.EvaluateSkillAvailability(state, hero.Id, hero.Character.GetExternalSkills().Single());
+
+        Assert.Equal(12, availability.MpCost);
+        Assert.False(availability.IsAvailable);
+        Assert.Equal(BattleSkillAvailabilityStatus.NotEnoughMp, availability.Status);
+    }
+
+    [Fact]
+    public void EvaluateSkillAvailability_ReportsCooldownBeforeAllowingSelection()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            mpCost: 3,
+            cooldown: 2,
+            powerBase: 1,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var skill = hero.Character.GetExternalSkills().Single();
+        skill.CurrentCooldown = 2;
+        var engine = new BattleEngine();
+
+        var availability = engine.EvaluateSkillAvailability(state, hero.Id, skill);
+
+        Assert.False(availability.IsAvailable);
+        Assert.Equal(BattleSkillAvailabilityStatus.Cooldown, availability.Status);
+        Assert.Equal(2, availability.RemainingCooldown);
+    }
+
+    [Fact]
+    public void EvaluateSkillAvailability_RejectsRandomBeforeSkillCostHookInPreviewMode()
+    {
+        var randomCostBuff = new BuffDefinition
+        {
+            Id = "random_cost",
+            Name = "random_cost",
+            IsDebuff = true,
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeSkillCost,
+                    Conditions =
+                    [
+                        new ChanceBattleHookConditionDefinition(0.5d),
+                    ],
+                    Effects =
+                    [
+                        new ModifyMpCostBattleHookEffectDefinition(ModifierOp.Increase, Delta: 0.5d),
+                    ],
+                },
+            ],
+        };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            mpCost: 10,
+            powerBase: 1,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
+        hero.ApplyBuff(new BattleBuffInstance(randomCostBuff, level: 1, remainingTurns: 3, enemy.Id, 1));
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            engine.EvaluateSkillAvailability(state, hero.Id, hero.Character.GetExternalSkills().Single()));
     }
 
     [Fact]
