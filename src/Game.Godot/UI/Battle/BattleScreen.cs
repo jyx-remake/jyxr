@@ -30,6 +30,9 @@ public partial class BattleScreen : Control
 	private static readonly Color FloatStateColor = Colors.Red;
 	private static readonly Color FloatSpecialColor = Colors.Magenta;
 	private static readonly Color FloatInfoColor = Colors.Yellow;
+	private const double SkillNameFloatDelaySeconds = 0.1d;
+	private const double SkillImpactDelaySeconds = 0.8d;
+	private const double SkillImpactFloatDelaySeconds = 0.1d;
 
 	[Export]
 	public PackedScene BattleSkillBoxScene { get; set; } = null!;
@@ -48,6 +51,8 @@ public partial class BattleScreen : Control
 	private IReadOnlyList<string> _selectedCharacterIds = [];
 	private BattleState? _state;
 	private bool _isConfigured;
+	private bool _isResolvingSkillPresentation;
+	private SkillPresentationContext? _activeSkillPresentation;
 	private GridPosition? _hoveredCellPosition;
 
 	private TextureRect _background = null!;
@@ -445,9 +450,9 @@ public partial class BattleScreen : Control
 		highlights.SkillTargets.Contains(position) ||
 		highlights.ItemTargets.Contains(position);
 
-	private void OnCellPressed(GridPosition position)
+	private async void OnCellPressed(GridPosition position)
 	{
-		if (_state is null)
+		if (_state is null || _isResolvingSkillPresentation)
 		{
 			return;
 		}
@@ -471,19 +476,36 @@ public partial class BattleScreen : Control
 			case BattleUiMode.SelectingSkillTarget when _uiState.SelectedSkill is { } skill:
 				var skillEventStart = _state.Events.Count;
 				result = _engine.CastSkill(_state, actingUnit.Id, skill, position);
-				AppendResult(result, skillEventStart);
 				if (result.Success)
 				{
-					AudioManager.Instance.PlaySfx(skill.Audio);
-					_boardGrid.PlaySkillCast(
+					_isResolvingSkillPresentation = true;
+					RefreshActions();
+					_activeSkillPresentation = new SkillPresentationContext(
+						this,
+						_boardGrid,
 						actingUnit.Id,
+						skill.Id,
 						result.AffectedUnitIds,
 						result.ImpactedPositions,
-						skill.Animation);
-					AdvanceToNextPlayerAction();
+						skill.Animation,
+						skill.Audio);
+					var presentationTask = _activeSkillPresentation.RunAsync();
+					AppendResult(result, skillEventStart);
+					try
+					{
+						await presentationTask;
+						AdvanceToNextPlayerAction();
+					}
+					finally
+					{
+						_activeSkillPresentation = null;
+						_isResolvingSkillPresentation = false;
+						RefreshActions();
+					}
 				}
 				else
 				{
+					AppendResult(result, skillEventStart);
 					RefreshAll();
 				}
 				return;
@@ -531,7 +553,9 @@ public partial class BattleScreen : Control
 
 	private void RefreshActions()
 	{
-		var isActing = _state?.CurrentAction is not null && _uiState.Mode != BattleUiMode.BattleEnded;
+		var isActing = _state?.CurrentAction is not null &&
+			_uiState.Mode != BattleUiMode.BattleEnded &&
+			!_isResolvingSkillPresentation;
 		_moveButton.Disabled = !isActing;
 		_skillButton.Disabled = !isActing;
 		_itemButton.Disabled = !isActing;
@@ -726,6 +750,52 @@ public partial class BattleScreen : Control
 			return;
 		}
 
+		if (TryScheduleSkillPresentationEvent(battleEvent))
+		{
+			return;
+		}
+
+		AppendEventImmediate(battleEvent);
+	}
+
+	private bool TryScheduleSkillPresentationEvent(BattleEvent battleEvent)
+	{
+		if (_activeSkillPresentation is not { } presentation)
+		{
+			return false;
+		}
+
+		switch (battleEvent.Kind)
+		{
+			case BattleEventKind.SkillCast when
+				string.Equals(battleEvent.UnitId, presentation.ActingUnitId, StringComparison.Ordinal) &&
+				string.Equals(battleEvent.Detail, presentation.SkillId, StringComparison.Ordinal):
+				presentation.EnqueueSkillName(() => AppendEventImmediate(battleEvent));
+				return true;
+			case BattleEventKind.SpeechRequested:
+				presentation.EnqueueImpact(() => AppendEventImmediate(battleEvent));
+				return true;
+			case BattleEventKind.Damaged:
+			case BattleEventKind.BuffApplied:
+			case BattleEventKind.BuffExpired:
+			case BattleEventKind.Healed:
+			case BattleEventKind.MpDamaged:
+			case BattleEventKind.Rested:
+			case BattleEventKind.ItemUsed:
+				presentation.EnqueueImpactFloat(() => AppendEventImmediate(battleEvent));
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private void AppendEventImmediate(BattleEvent battleEvent)
+	{
+		if (_state is null)
+		{
+			return;
+		}
+
 		switch (battleEvent.Kind)
 		{
 			case BattleEventKind.SkillCast:
@@ -861,6 +931,89 @@ public partial class BattleScreen : Control
 		return GameRoot.ContentRepository.TryGetItem(itemId, out var definition)
 			? definition.Name
 			: itemId;
+	}
+
+	private sealed class SkillPresentationContext
+	{
+		private readonly BattleScreen _owner;
+		private readonly BattleBoardView _boardGrid;
+		private readonly IReadOnlyList<string> _targetUnitIds;
+		private readonly IReadOnlyList<GridPosition> _impactPositions;
+		private readonly string? _skillAnimationId;
+		private readonly string? _skillAudioId;
+		private readonly List<Action> _skillNameActions = [];
+		private readonly List<Action> _impactActions = [];
+		private readonly List<Action> _impactFloatActions = [];
+
+		public SkillPresentationContext(
+			BattleScreen owner,
+			BattleBoardView boardGrid,
+			string actingUnitId,
+			string skillId,
+			IReadOnlyList<string> targetUnitIds,
+			IReadOnlyList<GridPosition> impactPositions,
+			string? skillAnimationId,
+			string? skillAudioId)
+		{
+			_owner = owner;
+			_boardGrid = boardGrid;
+			ActingUnitId = actingUnitId;
+			SkillId = skillId;
+			_targetUnitIds = targetUnitIds;
+			_impactPositions = impactPositions;
+			_skillAnimationId = skillAnimationId;
+			_skillAudioId = skillAudioId;
+		}
+
+		public string ActingUnitId { get; }
+
+		public string SkillId { get; }
+
+		public void EnqueueSkillName(Action action) => _skillNameActions.Add(action);
+
+		public void EnqueueImpact(Action action) => _impactActions.Add(action);
+
+		public void EnqueueImpactFloat(Action action) => _impactFloatActions.Add(action);
+
+		public async Task RunAsync()
+		{
+			_boardGrid.PlayAttack(ActingUnitId);
+
+			await _owner.WaitForSecondsAsync(SkillNameFloatDelaySeconds);
+			Flush(_skillNameActions);
+
+			await _owner.WaitForSecondsAsync(SkillImpactDelaySeconds - SkillNameFloatDelaySeconds);
+			if (!string.IsNullOrWhiteSpace(_skillAudioId))
+			{
+				AudioManager.Instance.PlaySfx(_skillAudioId);
+			}
+
+			_boardGrid.PlaySkillImpact(_targetUnitIds, _impactPositions, _skillAnimationId);
+			Flush(_impactActions);
+
+			await _owner.WaitForSecondsAsync(SkillImpactFloatDelaySeconds);
+			Flush(_impactFloatActions);
+		}
+
+		private static void Flush(List<Action> actions)
+		{
+			foreach (var action in actions)
+			{
+				action();
+			}
+
+			actions.Clear();
+		}
+	}
+
+	private async Task WaitForSecondsAsync(double seconds)
+	{
+		if (seconds <= 0d)
+		{
+			return;
+		}
+
+		await ToSignal(GetTree().CreateTimer(seconds), SceneTreeTimer.SignalName.Timeout);
 	}
 
 	private void SelectDefaultPostMoveMode(BattleUnit actingUnit)

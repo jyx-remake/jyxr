@@ -8,6 +8,7 @@ namespace Game.Godot.UI.Battle;
 public partial class BattleBoardView : Control
 {
 	private const int CellTextFontSize = 13;
+	private const double FloatTextQueueSpacingSeconds = 0.4d;
 	private static readonly Color BorderColor = new(0f, 0f, 0f, 0.45f);
 	private static readonly Color TextColor = Colors.White;
 
@@ -22,6 +23,8 @@ public partial class BattleBoardView : Control
 
 	private readonly Dictionary<GridPosition, BattleBoardCellVisual> _cells = [];
 	private readonly Dictionary<string, BattleUnitView> _unitViews = new(StringComparer.Ordinal);
+	private readonly Dictionary<string, Queue<QueuedFloatText>> _queuedFloatTexts = new(StringComparer.Ordinal);
+	private readonly HashSet<string> _processingFloatTextUnits = new(StringComparer.Ordinal);
 
 	private int _gridWidth;
 	private int _gridHeight;
@@ -31,6 +34,8 @@ public partial class BattleBoardView : Control
 	private GridPosition? _hoveredCell;
 	private Node2D _combatantLayer = null!;
 	private Node2D _effectLayer = null!;
+
+	private sealed record QueuedFloatText(string Text, Color Color);
 
 	public event Action<GridPosition>? CellPressed;
 
@@ -113,22 +118,33 @@ public partial class BattleBoardView : Control
 			{
 				staleView.QueueFree();
 			}
+
+			_queuedFloatTexts.Remove(staleUnitId);
+			_processingFloatTextUnits.Remove(staleUnitId);
 		}
 	}
 
-	public void PlaySkillCast(
-		string actingUnitId,
-		IReadOnlyList<string> targetUnitIds,
-		IReadOnlyList<GridPosition> impactPositions,
-		string? skillAnimationId)
+	public void PlayAttack(string actingUnitId)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(actingUnitId);
-		ArgumentNullException.ThrowIfNull(targetUnitIds);
-		ArgumentNullException.ThrowIfNull(impactPositions);
 
 		if (_unitViews.TryGetValue(actingUnitId, out var actingView))
 		{
 			actingView.PlayAttack();
+		}
+	}
+
+	public void PlaySkillImpact(
+		IReadOnlyList<string> targetUnitIds,
+		IReadOnlyList<GridPosition> impactPositions,
+		string? skillAnimationId)
+	{
+		ArgumentNullException.ThrowIfNull(targetUnitIds);
+		ArgumentNullException.ThrowIfNull(impactPositions);
+
+		foreach (var impactPosition in impactPositions)
+		{
+			PlaySkillAnimationAt(ResolveUnitAnchor(impactPosition), skillAnimationId);
 		}
 
 		foreach (var targetUnitId in targetUnitIds)
@@ -137,11 +153,6 @@ public partial class BattleBoardView : Control
 			{
 				targetView.PlayHit();
 			}
-		}
-
-		foreach (var impactPosition in impactPositions)
-		{
-			PlaySkillAnimationAt(ResolveUnitAnchor(impactPosition), skillAnimationId);
 		}
 	}
 
@@ -175,12 +186,22 @@ public partial class BattleBoardView : Control
 		ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
 		ArgumentException.ThrowIfNullOrWhiteSpace(text);
 
-		if (!_unitViews.TryGetValue(unitId, out var unitView))
+		if (!_unitViews.ContainsKey(unitId))
 		{
 			return;
 		}
 
-		PlayFloatTextAt(unitView.Position + new Vector2(0f, -90f), text, color);
+		if (!_queuedFloatTexts.TryGetValue(unitId, out var queue))
+		{
+			queue = new Queue<QueuedFloatText>();
+			_queuedFloatTexts[unitId] = queue;
+		}
+
+		queue.Enqueue(new QueuedFloatText(text, color));
+		if (_processingFloatTextUnits.Add(unitId))
+		{
+			ProcessFloatTextQueueAsync(unitId);
+		}
 	}
 
 	public void PlayPopupText(string text, Color color)
@@ -367,6 +388,38 @@ public partial class BattleBoardView : Control
 		}
 
 		floatText.Play(text, color);
+	}
+
+	private async void ProcessFloatTextQueueAsync(string unitId)
+	{
+		try
+		{
+			while (_queuedFloatTexts.TryGetValue(unitId, out var queue) && queue.Count > 0)
+			{
+				var item = queue.Dequeue();
+				if (_unitViews.TryGetValue(unitId, out var unitView))
+				{
+					PlayFloatTextAt(unitView.Position + new Vector2(0f, -90f), item.Text, item.Color);
+				}
+
+				await ToSignal(GetTree().CreateTimer(FloatTextQueueSpacingSeconds), SceneTreeTimer.SignalName.Timeout);
+			}
+		}
+		finally
+		{
+			_processingFloatTextUnits.Remove(unitId);
+			if (_queuedFloatTexts.TryGetValue(unitId, out var queue) && queue.Count == 0)
+			{
+				_queuedFloatTexts.Remove(unitId);
+			}
+
+			if (_queuedFloatTexts.TryGetValue(unitId, out var pendingQueue) &&
+				pendingQueue.Count > 0 &&
+				_processingFloatTextUnits.Add(unitId))
+			{
+				ProcessFloatTextQueueAsync(unitId);
+			}
+		}
 	}
 
 	private void DrawCellText(Font font, Rect2 rect, string text)
