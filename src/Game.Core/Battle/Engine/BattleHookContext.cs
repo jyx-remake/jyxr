@@ -91,7 +91,12 @@ public sealed class BattleHookContext
         ArgumentOutOfRangeException.ThrowIfNegative(amount);
 
         var damage = target.TakeDamage(amount);
-        State.AddEvent(new BattleEvent(BattleEventKind.Damaged, target.Id, Detail: detail ?? damage.ToString()));
+        State.AddEvent(new BattleEvent(
+            BattleEventKind.Damaged,
+            target.Id,
+            Timing,
+            Detail: detail,
+            Damage: new BattleDamageEvent(damage, SourceUnitId: Source?.Id)));
         return damage;
     }
 

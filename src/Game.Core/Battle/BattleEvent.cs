@@ -9,9 +9,15 @@ public sealed record BattleEvent(
     IReadOnlyList<string>? HookLabels = null,
     string? Detail = null,
     BattleSpeechCue? Speech = null,
-    BattleSkillCastInfo? SkillCast = null);
+    BattleSkillCastInfo? SkillCast = null,
+    BattleDamageEvent? Damage = null);
 
 public sealed record BattleSpeechCue(string Text);
+
+public sealed record BattleDamageEvent(
+    int Amount,
+    bool IsCritical = false,
+    string? SourceUnitId = null);
 
 public enum BattleEventKind
 {

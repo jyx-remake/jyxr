@@ -26,7 +26,8 @@ public sealed partial class BattleEngine
         AddEvent(state, new BattleEvent(
             BattleEventKind.Damaged,
             target.Id,
-            Detail: $"{source.Id}:{damage}"));
+            Detail: source.Id,
+            Damage: new BattleDamageEvent(damage, result.IsCritical, source.Id)));
         return damage;
     }
 
@@ -202,7 +203,11 @@ public sealed partial class BattleEngine
         }
 
         unit.TakeDamage(damage);
-        AddEvent(state, new BattleEvent(BattleEventKind.Damaged, unit.Id, Detail: $"{buff.Definition.Id}:{damage}"));
+        AddEvent(state, new BattleEvent(
+            BattleEventKind.Damaged,
+            unit.Id,
+            Detail: buff.Definition.Id,
+            Damage: new BattleDamageEvent(damage, SourceUnitId: buff.SourceUnitId)));
     }
 
     private void ApplyRecoveryTick(BattleState state, BattleUnit unit, BattleBuffInstance buff)

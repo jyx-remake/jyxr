@@ -772,12 +772,15 @@ public partial class BattleScreen : Control
 				break;
 			case BattleEventKind.Damaged:
 				var unitName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
-				var damage = ResolveDamageAmount(battleEvent.Detail);
+				var damage = battleEvent.Damage?.Amount ?? 0;
+				var isCritical = damage > 0 && battleEvent.Damage?.IsCritical == true;
 				_boardGrid.PlayFloatText(
 					battleEvent.UnitId,
-					damage <= 0 ? "MISS" : $"-{damage}",
-					FloatDamageColor);
-				AppendLog($"{unitName} 受到 {damage} 点伤害。");
+					ResolveDamageFloatText(damage, isCritical),
+					isCritical ? FloatCriticalColor : FloatDamageColor);
+				AppendLog(isCritical
+					? $"暴击！！{unitName} 受到 {damage} 点伤害。"
+					: $"{unitName} 受到 {damage} 点伤害。");
 				break;
 			case BattleEventKind.BuffApplied:
 				var buffName = ResolveBuffName(battleEvent.Detail);
@@ -874,16 +877,10 @@ public partial class BattleScreen : Control
 				_ => FloatInfoColor,
 			};
 
-	private static int ResolveDamageAmount(string? detail)
-	{
-		if (string.IsNullOrWhiteSpace(detail))
-		{
-			return 0;
-		}
-
-		var value = detail.Split(':').LastOrDefault();
-		return int.TryParse(value, out var damage) ? damage : 0;
-	}
+	private static string ResolveDamageFloatText(int damage, bool isCritical) =>
+		damage <= 0
+			? "MISS"
+			: isCritical ? $"暴击 -{damage}" : $"-{damage}";
 
 	private static string ResolveBuffName(string? buffId)
 	{

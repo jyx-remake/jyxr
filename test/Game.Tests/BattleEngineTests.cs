@@ -228,6 +228,44 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_RecordsCriticalDamageEvent()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+                [StatType.CritChance] = 1,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0), maxHp: 500);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(new BattleDamageCalculator(new FixedRandomService(0.5d)));
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
+
+        Assert.True(result.Success);
+        var damageEvent = Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == enemy.Id));
+        Assert.NotNull(damageEvent.Damage);
+        Assert.True(damageEvent.Damage.IsCritical);
+        Assert.Equal(hero.Id, damageEvent.Damage.SourceUnitId);
+        Assert.True(damageEvent.Damage.Amount > 0);
+    }
+
+    [Fact]
     public void CastSkill_RequiresBaseRageBeforeLegendResolution()
     {
         var stagger = new BuffDefinition { Id = "stagger", Name = "stagger", IsDebuff = true };
@@ -470,7 +508,8 @@ public sealed class BattleEngineTests
         Assert.Contains(state.Events, battleEvent =>
             battleEvent.Kind == BattleEventKind.Damaged &&
             battleEvent.UnitId == hero.Id &&
-            battleEvent.Detail == "中毒:52");
+            battleEvent.Detail == "中毒" &&
+            battleEvent.Damage is { Amount: 52, IsCritical: false });
     }
 
     [Fact]
