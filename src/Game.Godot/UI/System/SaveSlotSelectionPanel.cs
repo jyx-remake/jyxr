@@ -1,6 +1,4 @@
 using Game.Application;
-using Game.Core.Model;
-using Game.Core.Persistence;
 using Game.Godot.Persistence;
 using Godot;
 
@@ -16,7 +14,6 @@ public enum SaveSlotPanelMode
 public partial class SaveSlotSelectionPanel : JyPanel
 {
 	private readonly LocalSaveStore _saveStore = new();
-	private readonly LocalProfileStore _profileStore = new();
 
 	private SaveSlotPanelMode _mode;
 	private Label _titleLabel = null!;
@@ -120,7 +117,6 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		}
 
 		_saveStore.SaveCurrentSession(slotIndex);
-		_profileStore.SaveCurrentProfile();
 		UIRoot.Instance.ShowToast($"已写入存档{slotIndex}");
 		QueueFree();
 	}
@@ -162,21 +158,9 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		}
 
 		Game.LoadSave(envelope.SaveGame);
-		LoadProfile();
 		ReloadCurrentMap();
 		UIRoot.Instance.ShowToast($"已读取存档{slotIndex}");
 		QueueFree();
-	}
-
-	private void LoadProfile()
-	{
-		if (_profileStore.TryLoad(out var profile) && profile is not null)
-		{
-			Game.ProfileService.LoadProfile(profile);
-			return;
-		}
-
-		Game.ProfileService.LoadProfile(GameProfileRecord.Create(new GameProfile()));
 	}
 
 	private static void ReloadCurrentMap()
