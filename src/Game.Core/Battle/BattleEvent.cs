@@ -8,7 +8,8 @@ public sealed record BattleEvent(
     HookTiming? Timing = null,
     IReadOnlyList<string>? HookLabels = null,
     string? Detail = null,
-    BattleSpeechCue? Speech = null);
+    BattleSpeechCue? Speech = null,
+    BattleSkillCastInfo? SkillCast = null);
 
 public sealed record BattleSpeechCue(string Text);
 

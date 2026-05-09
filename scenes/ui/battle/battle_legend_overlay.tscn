@@ -1,0 +1,158 @@
+[gd_scene format=3 uid="uid://b77m8rj4t6o0x"]
+
+[ext_resource type="Script" uid="uid://dwx0ahuvu6ips" path="res://src/Game.Godot/UI/Battle/BattleLegendOverlay.cs" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="2_font"]
+[ext_resource type="PackedScene" uid="uid://nurcdlqh47ai" path="res://scenes/ui/battle/battle_skill_view.tscn" id="3_skill_view"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_skill"]
+font = ExtResource("2_font")
+font_size = 108
+font_color = Color(1, 0, 1, 1)
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Animation" id="Animation_legend_intro"]
+resource_name = "legend_intro"
+length = 1.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DesignRoot/SkillNameLabel:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(3, 3), Vector2(1, 1), Vector2(1.2, 1.2)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("DesignRoot/Portrait:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.45, 0.85, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(4.8, 4.8), Vector2(1.55, 1.52), Vector2(1.85, 1.9), Vector2(2.45, 3)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("DesignRoot/Portrait:modulate:a")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("DesignRoot/SkillNameLabel:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_legend_overlay"]
+_data = {
+&"legend_intro": SubResource("Animation_legend_intro")
+}
+
+[node name="BattleLegendOverlay" type="Control" unique_id=29118753]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=100000001]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.32)
+
+[node name="DesignRoot" type="Control" parent="." unique_id=100000002]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -540.0
+offset_right = 960.0
+offset_bottom = 540.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(960, 540)
+mouse_filter = 2
+
+[node name="EffectAnchor" type="Control" parent="DesignRoot" unique_id=867031428]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="EffectView" parent="DesignRoot/EffectAnchor" unique_id=1239023016 instance=ExtResource("3_skill_view")]
+unique_name_in_owner = true
+
+[node name="Portrait" type="TextureRect" parent="DesignRoot" unique_id=2074728330]
+unique_name_in_owner = true
+z_index = 2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -160.0
+offset_right = 160.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(160, 160)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SkillNameLabel" type="Label" parent="DesignRoot" unique_id=91268500]
+unique_name_in_owner = true
+z_index = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(960, 540)
+text = "奥义"
+label_settings = SubResource("LabelSettings_skill")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LegendAnimationPlayer" type="AnimationPlayer" parent="." unique_id=100000003]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_legend_overlay")

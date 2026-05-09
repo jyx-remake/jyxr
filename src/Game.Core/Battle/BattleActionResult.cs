@@ -7,15 +7,17 @@ public sealed record BattleActionResult(
     string Message,
     IReadOnlyList<string> AffectedUnitIds,
     IReadOnlyList<BattleEvent> Events,
-    IReadOnlyList<GridPosition> ImpactedPositions)
+    IReadOnlyList<GridPosition> ImpactedPositions,
+    BattleSkillCastInfo? SkillCast = null)
 {
     public static BattleActionResult Succeeded(
         string message,
         IReadOnlyList<string>? affectedUnitIds = null,
         IReadOnlyList<BattleEvent>? events = null,
-        IReadOnlyList<GridPosition>? impactedPositions = null) =>
-        new(true, message, affectedUnitIds ?? [], events ?? [], impactedPositions ?? []);
+        IReadOnlyList<GridPosition>? impactedPositions = null,
+        BattleSkillCastInfo? skillCast = null) =>
+        new(true, message, affectedUnitIds ?? [], events ?? [], impactedPositions ?? [], skillCast);
 
     public static BattleActionResult Failed(string message) =>
-        new(false, message, [], [], []);
+        new(false, message, [], [], [], null);
 }

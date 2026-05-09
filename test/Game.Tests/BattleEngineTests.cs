@@ -152,6 +152,175 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_ResolvesLegendSkillBeforeRageValidation()
+    {
+        var stagger = new BuffDefinition { Id = "stagger", Name = "stagger", IsDebuff = true };
+        var heroic = new TalentDefinition { Id = "heroic", Name = "heroic" };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            mpCost: 3,
+            rageCost: 4,
+            cooldown: 2,
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3,
+            audio: "base_audio",
+            animation: "base_anim");
+        var legendSkill = new LegendSkillDefinition(
+            Id: "strike_legend",
+            Name: "奥义.天外流星",
+            StartSkill: "strike",
+            Probability: 1d,
+            Conditions: [new RequiredTalentLegendConditionDefinition("heroic")],
+            Buffs: [new SkillBuffDefinition(stagger, level: 2, duration: 2)],
+            PowerExtra: 12d,
+            RequiredLevel: 1,
+            Animation: "aoyi_fx");
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxMp: 20,
+            mp: 10,
+            rage: 0,
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+                [StatType.Wuxing] = 100,
+            },
+            talents: [heroic],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0), maxHp: 500);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(1d),
+            legendSkillsProvider: () => [legendSkill]);
+        engine.BeginAction(state, hero.Id);
+
+        var skill = hero.Character.GetExternalSkills().Single();
+        var result = engine.CastSkill(state, hero.Id, skill, enemy.Position);
+
+        Assert.True(result.Success);
+        Assert.NotNull(result.SkillCast);
+        Assert.True(result.SkillCast.IsLegend);
+        Assert.Equal("strike", result.SkillCast.BaseSkillId);
+        Assert.Equal("strike_legend", result.SkillCast.ResolvedSkillId);
+        Assert.Equal("奥义.天外流星", result.SkillCast.ResolvedSkillName);
+        Assert.Equal("base_anim", result.SkillCast.ImpactAnimationId);
+        Assert.Equal("aoyi_fx", result.SkillCast.ScreenEffectAnimationId);
+        Assert.Equal("base_audio", result.SkillCast.AudioId);
+        Assert.Equal(7, hero.Mp);
+        Assert.Equal(0, hero.Rage);
+        Assert.Equal(0, skill.CurrentCooldown);
+        Assert.Contains(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.SkillCast &&
+            battleEvent.SkillCast is { IsLegend: true, ResolvedSkillId: "strike_legend" });
+        var appliedBuff = Assert.Single(enemy.Buffs);
+        Assert.Equal("stagger", appliedBuff.Definition.Id);
+    }
+
+    [Fact]
+    public void CastSkill_UsesBaseRageValidationWhenLegendConditionsAreNotMet()
+    {
+        var heroic = new TalentDefinition { Id = "heroic", Name = "heroic" };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            mpCost: 3,
+            rageCost: 4,
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var legendSkill = new LegendSkillDefinition(
+            Id: "strike_legend",
+            Name: "奥义.天外流星",
+            StartSkill: "strike",
+            Probability: 1d,
+            Conditions: [new RequiredTalentLegendConditionDefinition("heroic")],
+            Buffs: [],
+            PowerExtra: 12d,
+            RequiredLevel: 1,
+            Animation: "aoyi_fx");
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxMp: 20,
+            mp: 10,
+            rage: 0,
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0), maxHp: 500);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(
+            random: new FixedRandomService(1d),
+            legendSkillsProvider: () => [legendSkill]);
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
+
+        Assert.False(result.Success);
+        Assert.Equal("Not enough rage.", result.Message);
+    }
+
+    [Fact]
+    public void CastSkill_LegendAreaSkillDoesNotDamageAllies()
+    {
+        var heroic = new TalentDefinition { Id = "heroic", Name = "heroic" };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            rageCost: 2,
+            powerBase: 10,
+            impactType: SkillImpactType.Square,
+            impactSize: 1,
+            castSize: 3);
+        var legendSkill = new LegendSkillDefinition(
+            Id: "strike_legend",
+            Name: "奥义.天外流星",
+            StartSkill: "strike",
+            Probability: 1d,
+            Conditions: [new RequiredTalentLegendConditionDefinition("heroic")],
+            Buffs: [],
+            PowerExtra: 12d,
+            RequiredLevel: 1,
+            Animation: "aoyi_fx");
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            rage: 0,
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents: [heroic],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var ally = CreateUnit("ally", team: 1, new GridPosition(1, 1), maxHp: 500);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0), maxHp: 500);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(5, 5), [hero, ally, enemy]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(1d),
+            legendSkillsProvider: () => [legendSkill]);
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
+
+        Assert.True(result.Success);
+        Assert.True(result.SkillCast?.IsLegend);
+        Assert.Equal(500, ally.Hp);
+        Assert.True(enemy.Hp < 500);
+        Assert.DoesNotContain(ally.Id, result.AffectedUnitIds);
+        Assert.Contains(enemy.Id, result.AffectedUnitIds);
+    }
+
+    [Fact]
     public void ActiveBuffs_ReturnOnlyHighestLevelPerBuffDefinition()
     {
         var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };

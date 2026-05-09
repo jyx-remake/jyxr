@@ -13,8 +13,11 @@ public sealed class LegendSkillInstance(
 
     public override string Id => Definition.Id;
     public override string Name => Definition.Name;
-    public override string Animation => Definition.Animation??Parent.Animation;
+    public override string Description => Parent.Description;
+    public override string Icon => Parent.Icon;
+    public override string Animation => Parent.Animation;
     public override string Audio => Parent.Audio;
+    public string? ScreenEffectAnimation => Definition.Animation;
     public override int Level
     {
         get => 0;
@@ -35,7 +38,7 @@ public sealed class LegendSkillInstance(
 
     public override double Power => (Parent.Power + Definition.PowerExtra) * (1 + Bonus);
     public override int MpCost => Parent.MpCost;
-    public override int RageCost => Parent.RageCost;
+    public override int RageCost => 0;
     public override int Cooldown => 0;
     public override int CastSize => Parent.CastSize;
     public override SkillImpactType ImpactType => Parent.ImpactType;
@@ -45,7 +48,7 @@ public sealed class LegendSkillInstance(
     public override double Affinity => Parent.Affinity;
     public override bool IsActive => Parent.IsActive;
     public override int CurrentCooldown { get; set; }
-    public override SkillKind SkillKind => Parent.SkillKind;
+    public override SkillKind SkillKind => SkillKind.Legend;
     public override WeaponType WeaponType => Parent.WeaponType;
 
 }

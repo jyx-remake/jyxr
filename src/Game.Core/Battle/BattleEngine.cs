@@ -1,6 +1,7 @@
 using Game.Core.Abstractions;
 using Game.Core.Affix;
 using Game.Core.Definitions;
+using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 
 namespace Game.Core.Battle;
@@ -12,6 +13,8 @@ public sealed partial class BattleEngine
 
     private readonly BattleDamageCalculator _damageCalculator;
     private readonly BattleHookExecutor _hookExecutor;
+    private readonly LegendSkillResolver _legendSkillResolver;
+    private readonly Func<IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
     private readonly IRandomService _random;
     private readonly Func<string, BuffDefinition> _buffResolver;
 
@@ -19,10 +22,14 @@ public sealed partial class BattleEngine
         BattleDamageCalculator? damageCalculator = null,
         BattleHookExecutor? hookExecutor = null,
         IRandomService? random = null,
-        Func<string, BuffDefinition>? buffResolver = null)
+        Func<string, BuffDefinition>? buffResolver = null,
+        LegendSkillResolver? legendSkillResolver = null,
+        Func<IReadOnlyList<LegendSkillDefinition>>? legendSkillsProvider = null)
     {
         _damageCalculator = damageCalculator ?? new BattleDamageCalculator();
         _hookExecutor = hookExecutor ?? new BattleHookExecutor();
+        _legendSkillResolver = legendSkillResolver ?? new LegendSkillResolver();
+        _legendSkillsProvider = legendSkillsProvider ?? EmptyLegendSkillProvider;
         _random = random ?? SharedRandomService.Instance;
         _buffResolver = buffResolver ?? MissingBuffResolver;
     }
@@ -103,4 +110,6 @@ public sealed partial class BattleEngine
 
     private static BuffDefinition MissingBuffResolver(string buffId) =>
         throw new InvalidOperationException($"Battle engine cannot resolve buff '{buffId}'.");
+
+    private static IReadOnlyList<LegendSkillDefinition> EmptyLegendSkillProvider() => [];
 }

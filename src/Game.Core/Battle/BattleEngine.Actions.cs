@@ -40,7 +40,10 @@ public sealed partial class BattleEngine
             return BattleActionResult.Failed("Not enough MP.");
         }
 
-        if (unit.Rage < skill.RageCost)
+        var resolvedSkill = _legendSkillResolver.Resolve(_legendSkillsProvider(), skill, _random);
+        var skillCastInfo = BattleSkillCastInfo.Create(skill, resolvedSkill);
+
+        if (unit.Rage < resolvedSkill.RageCost)
         {
             return BattleActionResult.Failed("Not enough rage.");
         }
@@ -53,26 +56,27 @@ public sealed partial class BattleEngine
         TriggerHooks(state, HookTiming.BeforeSkillCast, unit, context =>
         {
             context.Source = unit;
-            context.Skill = skill;
+            context.Skill = resolvedSkill;
         });
 
         unit.SpendMp(mpCost);
-        unit.SpendRage(skill.RageCost);
-        skill.CurrentCooldown = skill.Cooldown;
+        unit.SpendRage(resolvedSkill.RageCost);
+        resolvedSkill.CurrentCooldown = resolvedSkill.Cooldown;
         UpdateFacingByTarget(unit, target);
 
-        var impactedPositions = ResolveImpactPositions(unit.Position, target, skill.ImpactType, skill.ImpactSize)
+        var impactedPositions = ResolveImpactPositions(unit.Position, target, resolvedSkill.ImpactType, resolvedSkill.ImpactSize)
             .Where(state.Grid.Contains)
             .ToHashSet();
         var targets = state.Units
             .Where(targetUnit => targetUnit.IsAlive && impactedPositions.Contains(targetUnit.Position))
+            .Where(targetUnit => resolvedSkill is not LegendSkillInstance || state.AreEnemies(unit, targetUnit))
             .ToList();
 
         foreach (var targetUnit in targets)
         {
-            var damage = ApplySkillDamage(state, unit, targetUnit, skill);
+            var damage = ApplySkillDamage(state, unit, targetUnit, resolvedSkill);
             TryGainRageFromTakingDamage(state, unit, targetUnit, damage);
-            ApplySkillBuffs(state, unit, targetUnit, skill.Buffs);
+            ApplySkillBuffs(state, unit, targetUnit, resolvedSkill.Buffs);
         }
 
         if (targets.Any(targetUnit => state.AreEnemies(unit, targetUnit)))
@@ -83,19 +87,21 @@ public sealed partial class BattleEngine
         var battleEvent = new BattleEvent(
             BattleEventKind.SkillCast,
             unit.Id,
-            Detail: skill.Id);
+            Detail: resolvedSkill.Id,
+            SkillCast: skillCastInfo);
         AddEvent(state, battleEvent);
         TriggerHooks(state, HookTiming.AfterSkillCast, unit, context =>
         {
             context.Source = unit;
-            context.Skill = skill;
+            context.Skill = resolvedSkill;
         });
         EndActionCore(state, unit, committedMainAction: true);
         return BattleActionResult.Succeeded(
-            "Skill cast.",
+            string.Empty,
             targets.Select(static targetUnit => targetUnit.Id).ToList(),
             [battleEvent],
-            impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList());
+            impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList(),
+            skillCastInfo);
     }
 
     public BattleActionResult UseItem(

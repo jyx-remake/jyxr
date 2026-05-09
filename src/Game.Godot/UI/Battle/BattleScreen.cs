@@ -33,6 +33,35 @@ public partial class BattleScreen : Control
 	private const double SkillNameFloatDelaySeconds = 0.1d;
 	private const double SkillImpactDelaySeconds = 0.8d;
 	private const double SkillImpactFloatDelaySeconds = 0.1d;
+	private static readonly string[] LegendEffectSfxIds =
+	[
+		"音效.奥义1",
+		"音效.奥义2",
+		"音效.奥义3",
+		"音效.奥义4",
+		"音效.奥义5",
+		"音效.奥义6",
+	];
+	private static readonly string[] LegendMaleVoiceSfxIds =
+	[
+		"音效.猛男",
+		"音效.男",
+		"音效.男2",
+		"音效.男3",
+		"音效.男4",
+		"音效.男5",
+		"音效.男-哼",
+		"音效.年轻男",
+	];
+	private static readonly string[] LegendFemaleVoiceSfxIds =
+	[
+		"音效.女",
+		"音效.女2",
+		"音效.女3",
+		"音效.女4",
+		"音效.女的奸笑",
+		"音效.敢点老娘",
+	];
 
 	[Export]
 	public PackedScene BattleSkillBoxScene { get; set; } = null!;
@@ -40,7 +69,12 @@ public partial class BattleScreen : Control
 	[Export]
 	public PackedScene BattleItemPanelScene { get; set; } = null!;
 
-	private readonly BattleEngine _engine = new(buffResolver: buffId => GameRoot.ContentRepository.GetBuff(buffId));
+	[Export]
+	public PackedScene BattleLegendOverlayScene { get; set; } = null!;
+
+	private readonly BattleEngine _engine = new(
+		buffResolver: buffId => GameRoot.ContentRepository.GetBuff(buffId),
+		legendSkillsProvider: () => GameRoot.ContentRepository.GetLegendSkills());
 	private readonly BattlePresenter _presenter = new();
 	private readonly BattleUiStateMachine _uiState = new();
 	private readonly TaskCompletionSource<bool> _battleCompletion =
@@ -483,12 +517,14 @@ public partial class BattleScreen : Control
 					_activeSkillPresentation = new SkillPresentationContext(
 						this,
 						_boardGrid,
+						_overlayRoot,
 						actingUnit.Id,
-						skill.Id,
+						actingUnit.Character.Name,
+						actingUnit.Character.Definition.Gender,
+						AssetResolver.LoadCharacterPortrait(actingUnit.Character),
+						result.SkillCast ?? BattleSkillCastInfo.Create(skill, skill),
 						result.AffectedUnitIds,
-						result.ImpactedPositions,
-						skill.Animation,
-						skill.Audio);
+						result.ImpactedPositions);
 					var presentationTask = _activeSkillPresentation.RunAsync();
 					AppendResult(result, skillEventStart);
 					try
@@ -769,7 +805,10 @@ public partial class BattleScreen : Control
 		{
 			case BattleEventKind.SkillCast when
 				string.Equals(battleEvent.UnitId, presentation.ActingUnitId, StringComparison.Ordinal) &&
-				string.Equals(battleEvent.Detail, presentation.SkillId, StringComparison.Ordinal):
+				string.Equals(
+					battleEvent.SkillCast?.ResolvedSkillId ?? battleEvent.Detail,
+					presentation.SkillCast.ResolvedSkillId,
+					StringComparison.Ordinal):
 				presentation.EnqueueSkillName(() => AppendEventImmediate(battleEvent));
 				return true;
 			case BattleEventKind.SpeechRequested:
@@ -799,10 +838,17 @@ public partial class BattleScreen : Control
 		switch (battleEvent.Kind)
 		{
 			case BattleEventKind.SkillCast:
-				var skillName = ResolveSkillName(battleEvent.UnitId, battleEvent.Detail);
-				if (!string.IsNullOrWhiteSpace(skillName))
+				var skillCast = battleEvent.SkillCast;
+				if (skillCast is not null)
 				{
-					_boardGrid.PlayFloatText(battleEvent.UnitId, skillName, ResolveSkillColor(battleEvent.UnitId, battleEvent.Detail));
+					var casterName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
+					_boardGrid.PlayFloatText(
+						battleEvent.UnitId,
+						skillCast.ResolvedSkillName,
+						ResolveSkillColor(skillCast));
+					AppendLog(skillCast.IsLegend
+						? $"{casterName} 施展奥义【{skillCast.ResolvedSkillName}】。"
+						: $"{casterName} 施展【{skillCast.ResolvedSkillName}】。");
 				}
 				break;
 			case BattleEventKind.Damaged:
@@ -862,34 +908,15 @@ public partial class BattleScreen : Control
 		return _uiState.SelectedSkill ?? _presenter.CreateSkillList(actingUnit).FirstOrDefault()?.Skill;
 	}
 
-	private string ResolveSkillName(string unitId, string? skillId)
-	{
-		if (string.IsNullOrWhiteSpace(skillId) || _state?.TryGetUnit(unitId) is not { } unit)
-		{
-			return skillId ?? string.Empty;
-		}
-
-		return EnumerateBattleSkills(unit)
-			.FirstOrDefault(skill => string.Equals(skill.Id, skillId, StringComparison.Ordinal))
-			?.Name ?? skillId;
-	}
-
-	private Color ResolveSkillColor(string unitId, string? skillId)
-	{
-		if (string.IsNullOrWhiteSpace(skillId) || _state?.TryGetUnit(unitId) is not { } unit)
-		{
-			return FloatInfoColor;
-		}
-
-		return EnumerateBattleSkills(unit)
-			.FirstOrDefault(skill => string.Equals(skill.Id, skillId, StringComparison.Ordinal))
-			?.SkillKind switch
+	private static Color ResolveSkillColor(BattleSkillCastInfo skillCast) =>
+		skillCast.IsLegend
+			? FloatSpecialColor
+			: skillCast.ResolvedSkillKind switch
 			{
-				SkillKind.Special or SkillKind.Legend => FloatSpecialColor,
+				SkillKind.Special => FloatSpecialColor,
 				SkillKind.Internal => FloatManaColor,
 				_ => FloatInfoColor,
 			};
-	}
 
 	private static IEnumerable<SkillInstance> EnumerateBattleSkills(BattleUnit unit) =>
 		unit.Character.GetExternalSkills()
@@ -937,10 +964,12 @@ public partial class BattleScreen : Control
 	{
 		private readonly BattleScreen _owner;
 		private readonly BattleBoardView _boardGrid;
+		private readonly Control _overlayRoot;
+		private readonly string _actingUnitName;
+		private readonly CharacterGender _actingUnitGender;
+		private readonly Texture2D? _actingUnitPortrait;
 		private readonly IReadOnlyList<string> _targetUnitIds;
 		private readonly IReadOnlyList<GridPosition> _impactPositions;
-		private readonly string? _skillAnimationId;
-		private readonly string? _skillAudioId;
 		private readonly List<Action> _skillNameActions = [];
 		private readonly List<Action> _impactActions = [];
 		private readonly List<Action> _impactFloatActions = [];
@@ -948,26 +977,30 @@ public partial class BattleScreen : Control
 		public SkillPresentationContext(
 			BattleScreen owner,
 			BattleBoardView boardGrid,
+			Control overlayRoot,
 			string actingUnitId,
-			string skillId,
+			string actingUnitName,
+			CharacterGender actingUnitGender,
+			Texture2D? actingUnitPortrait,
+			BattleSkillCastInfo skillCast,
 			IReadOnlyList<string> targetUnitIds,
-			IReadOnlyList<GridPosition> impactPositions,
-			string? skillAnimationId,
-			string? skillAudioId)
+			IReadOnlyList<GridPosition> impactPositions)
 		{
 			_owner = owner;
 			_boardGrid = boardGrid;
+			_overlayRoot = overlayRoot;
 			ActingUnitId = actingUnitId;
-			SkillId = skillId;
+			_actingUnitName = actingUnitName;
+			_actingUnitGender = actingUnitGender;
+			_actingUnitPortrait = actingUnitPortrait;
+			SkillCast = skillCast;
 			_targetUnitIds = targetUnitIds;
 			_impactPositions = impactPositions;
-			_skillAnimationId = skillAnimationId;
-			_skillAudioId = skillAudioId;
 		}
 
 		public string ActingUnitId { get; }
 
-		public string SkillId { get; }
+		public BattleSkillCastInfo SkillCast { get; }
 
 		public void EnqueueSkillName(Action action) => _skillNameActions.Add(action);
 
@@ -977,18 +1010,27 @@ public partial class BattleScreen : Control
 
 		public async Task RunAsync()
 		{
+			if (SkillCast.IsLegend)
+			{
+				PlayLegendIntroSfx(_actingUnitGender);
+				if (!string.IsNullOrWhiteSpace(SkillCast.ScreenEffectAnimationId))
+				{
+					await _owner.ShowLegendOverlayAsync(_overlayRoot, _actingUnitName, _actingUnitPortrait, SkillCast);
+				}
+			}
+
 			_boardGrid.PlayAttack(ActingUnitId);
 
 			await _owner.WaitForSecondsAsync(SkillNameFloatDelaySeconds);
 			Flush(_skillNameActions);
 
 			await _owner.WaitForSecondsAsync(SkillImpactDelaySeconds - SkillNameFloatDelaySeconds);
-			if (!string.IsNullOrWhiteSpace(_skillAudioId))
+			if (!string.IsNullOrWhiteSpace(SkillCast.AudioId))
 			{
-				AudioManager.Instance.PlaySfx(_skillAudioId);
+				AudioManager.Instance.PlaySfx(SkillCast.AudioId);
 			}
 
-			_boardGrid.PlaySkillImpact(_targetUnitIds, _impactPositions, _skillAnimationId);
+			_boardGrid.PlaySkillImpact(_targetUnitIds, _impactPositions, SkillCast.ImpactAnimationId);
 			Flush(_impactActions);
 
 			await _owner.WaitForSecondsAsync(SkillImpactFloatDelaySeconds);
@@ -1004,6 +1046,17 @@ public partial class BattleScreen : Control
 
 			actions.Clear();
 		}
+
+		private static void PlayLegendIntroSfx(CharacterGender gender)
+		{
+			AudioManager.Instance.PlaySfx(PickRandom(gender == CharacterGender.Female
+				? LegendFemaleVoiceSfxIds
+				: LegendMaleVoiceSfxIds));
+			AudioManager.Instance.PlaySfx(PickRandom(LegendEffectSfxIds));
+		}
+
+		private static string PickRandom(IReadOnlyList<string> resourceIds) =>
+			resourceIds[Random.Shared.Next(resourceIds.Count)];
 	}
 
 	private async Task WaitForSecondsAsync(double seconds)
@@ -1014,6 +1067,28 @@ public partial class BattleScreen : Control
 		}
 
 		await ToSignal(GetTree().CreateTimer(seconds), SceneTreeTimer.SignalName.Timeout);
+	}
+
+	private async Task ShowLegendOverlayAsync(
+		Control overlayRoot,
+		string actingUnitName,
+		Texture2D? portrait,
+		BattleSkillCastInfo skillCast)
+	{
+		if (BattleLegendOverlayScene is null)
+		{
+			throw new InvalidOperationException("BattleLegendOverlayScene is not assigned.");
+		}
+
+		var instance = BattleLegendOverlayScene.Instantiate();
+		if (instance is not BattleLegendOverlay overlay)
+		{
+			instance.QueueFree();
+			throw new InvalidOperationException("Battle legend overlay scene root must be BattleLegendOverlay.");
+		}
+
+		overlayRoot.AddChild(overlay);
+		await overlay.PlayAsync(actingUnitName, portrait, skillCast, FloatSpecialColor);
 	}
 
 	private void SelectDefaultPostMoveMode(BattleUnit actingUnit)

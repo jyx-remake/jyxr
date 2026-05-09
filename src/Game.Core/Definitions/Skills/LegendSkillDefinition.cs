@@ -2,6 +2,8 @@ using Game.Core.Abstractions;
 
 namespace Game.Core.Definitions.Skills;
 
+// TODO: Add an explicit priority field when multiple legend skills can match the same start skill.
+// Current design intentionally does not implement this yet.
 public sealed record LegendSkillDefinition(
     string Id,
     string Name,

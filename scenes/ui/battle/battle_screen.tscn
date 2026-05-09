@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_skill_box.tscn" id="18_skill_box"]
 [ext_resource type="PackedScene" uid="uid://d1qdddofh12io" path="res://scenes/ui/battle/battle_board_view.tscn" id="19_board_view"]
 [ext_resource type="PackedScene" uid="uid://oei4u3648ovq" path="res://scenes/ui/battle/battle_item_panel.tscn" id="20_item_panel"]
+[ext_resource type="PackedScene" uid="uid://b77m8rj4t6o0x" path="res://scenes/ui/battle/battle_legend_overlay.tscn" id="21_legend_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
 bg_color = Color(0.18, 0.14, 0.1, 0.92)
@@ -64,6 +65,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 BattleSkillBoxScene = ExtResource("18_skill_box")
 BattleItemPanelScene = ExtResource("20_item_panel")
+BattleLegendOverlayScene = ExtResource("21_legend_overlay")
 
 [node name="Background" type="TextureRect" parent="." unique_id=372176778]
 unique_name_in_owner = true

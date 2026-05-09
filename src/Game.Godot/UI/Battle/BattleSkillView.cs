@@ -14,6 +14,11 @@ public partial class BattleSkillView : Node2D
 
 	public void Play(AnimationLibrary? animationLibrary)
 	{
+		_ = PlayAsync(animationLibrary);
+	}
+
+	public async Task PlayAsync(AnimationLibrary? animationLibrary)
+	{
 		if (animationLibrary is null)
 		{
 			QueueFree();
@@ -34,12 +39,10 @@ public partial class BattleSkillView : Node2D
 		}
 
 		_animationPlayer.Play(defaultAnimation);
-		AwaitAnimationFinished();
-	}
-
-	private async void AwaitAnimationFinished()
-	{
 		await ToSignal(_animationPlayer, AnimationMixer.SignalName.AnimationFinished);
-		QueueFree();
+		if (GodotObject.IsInstanceValid(this))
+		{
+			QueueFree();
+		}
 	}
 }

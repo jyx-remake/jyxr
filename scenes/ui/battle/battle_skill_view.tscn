@@ -8,10 +8,11 @@
 script = ExtResource("1_skill_view")
 
 [node name="AnimationSlot" type="Node2D" parent="." unique_id=1299562833]
-scale = Vector2(2.5, 2.5)
+scale = Vector2(1.66, 1.66)
 
 [node name="Sprite" type="Sprite2D" parent="AnimationSlot" unique_id=826931294]
 unique_name_in_owner = true
+scale = Vector2(1.369863, 1.369863)
 texture = ExtResource("2_logri")
 centered = false
 offset = Vector2(-72.61325, -111.77588)
