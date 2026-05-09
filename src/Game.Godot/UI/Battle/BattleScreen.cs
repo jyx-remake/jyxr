@@ -5,6 +5,7 @@ using Game.Core.Model;
 using Game.Core.Model.Skills;
 using Game.Godot.Assets;
 using Game.Godot.Audio;
+using Game.Godot.Persistence;
 using Godot;
 using GameRoot = Game.Godot.Game;
 
@@ -13,7 +14,8 @@ namespace Game.Godot.UI.Battle;
 public partial class BattleScreen : Control
 {
 	private const int PlayerTeam = 1;
-	private const double BattleSpeedUpMultiplier = 2d;
+	private const int MinBattleSpeedMultiplier = 1;
+	private const int MaxBattleSpeedMultiplier = 5;
 	private const int GridCellWidth = 144;
 	private const int GridCellHeight = 144;
 	private const BattleMovementPresentationMode MovementPresentationMode = BattleMovementPresentationMode.Step;
@@ -76,6 +78,7 @@ public partial class BattleScreen : Control
 
 	private readonly BattlePresenter _presenter = new();
 	private readonly BattleUiStateMachine _uiState = new();
+	private readonly LocalUserSettingsStore _settingsStore = new();
 	private readonly TaskCompletionSource<bool> _battleCompletion =
 		new(TaskCreationOptions.RunContinuationsAsynchronously);
 	private readonly List<string> _logLines = [];
@@ -88,6 +91,7 @@ public partial class BattleScreen : Control
 	private bool _isResolvingSkillPresentation;
 	private bool _isSpeedUpEnabled;
 	private double _initialTimeScale = 1d;
+	private int _battleSpeedMultiplier = 2;
 	private SkillPresentationContext? _activeSkillPresentation;
 	private GridPosition? _hoveredCellPosition;
 
@@ -245,6 +249,7 @@ public partial class BattleScreen : Control
 		ApplyBattlePresentation(_battleDefinition);
 		_state = GameRoot.BattleService.BuildBattleState(_battleDefinition, _selectedCharacterIds);
 		_orchestrator = new BattleFlowOrchestrator(this, _state);
+		ApplyBattleSettings(_settingsStore.LoadOrDefault());
 		_logLines.Clear();
 		AppendLog($"战斗开始：{_battleDefinition.Name}");
 		_uiState.WaitTimeline();
@@ -1129,6 +1134,7 @@ public partial class BattleScreen : Control
 	{
 		_isSpeedUpEnabled = !_isSpeedUpEnabled;
 		ApplyTimeScale();
+		SaveBattleSettings();
 		RefreshToggleButtons();
 		AppendLog(_isSpeedUpEnabled ? "已开启战斗加速。" : "已关闭战斗加速。");
 	}
@@ -1142,6 +1148,7 @@ public partial class BattleScreen : Control
 
 		var enabled = !_orchestrator.IsAutoBattleEnabled;
 		_orchestrator.SetAutoBattleEnabled(enabled);
+		SaveBattleSettings();
 		AppendLog(enabled ? "已开启自动战斗。" : "已关闭自动战斗。");
 		if (IsInsideTree())
 		{
@@ -1171,9 +1178,31 @@ public partial class BattleScreen : Control
 	private void ApplyTimeScale()
 	{
 		Engine.TimeScale = _isSpeedUpEnabled
-			? _initialTimeScale * BattleSpeedUpMultiplier
+			? _initialTimeScale * _battleSpeedMultiplier
 			: _initialTimeScale;
 	}
+
+	private void ApplyBattleSettings(UserSettingsRecord settings)
+	{
+		_isSpeedUpEnabled = settings.BattleSpeedUp;
+		_battleSpeedMultiplier = ClampBattleSpeedMultiplier(settings.BattleSpeedMultiplier);
+		_orchestrator?.SetAutoBattleEnabled(settings.AutoBattle);
+		ApplyTimeScale();
+	}
+
+	private void SaveBattleSettings()
+	{
+		var settings = _settingsStore.LoadOrDefault();
+		_settingsStore.Save(settings with
+		{
+			AutoBattle = IsAutoBattleEnabled(),
+			BattleSpeedUp = _isSpeedUpEnabled,
+			BattleSpeedMultiplier = _battleSpeedMultiplier,
+		});
+	}
+
+	private static int ClampBattleSpeedMultiplier(int multiplier) =>
+		Math.Clamp(multiplier, MinBattleSpeedMultiplier, MaxBattleSpeedMultiplier);
 
 	private void RestoreTimeScale()
 	{

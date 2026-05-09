@@ -152,37 +152,69 @@ offset_top = 489.0
 offset_right = 768.0
 offset_bottom = 1009.0
 size_flags_vertical = 3
-theme_override_constants/separation = 26
+theme_override_constants/separation = 12
 
 [node name="ShowBattleHpCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=241839893]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 text = "战斗血条显示"
 
 [node name="AutoSaveCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=1547401015]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 button_pressed = true
 text = "自动存档"
 
 [node name="AutoBattleCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=1797562101]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 text = "自动战斗"
 
+[node name="BattleSpeedUpCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=602575964]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+text = "战斗加速"
+
+[node name="BattleSpeedMultiplierRow" type="HBoxContainer" parent="SettingsVBox" unique_id=1372084744]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BattleSpeedMultiplierTitle" type="Label" parent="SettingsVBox/BattleSpeedMultiplierRow" unique_id=1850405269]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "加速倍率"
+
+[node name="BattleSpeedMultiplierSlider" type="HSlider" parent="SettingsVBox/BattleSpeedMultiplierRow" unique_id=6818955]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 1.0
+max_value = 5.0
+value = 2.0
+
+[node name="BattleSpeedMultiplierValueLabel" type="Label" parent="SettingsVBox/BattleSpeedMultiplierRow" unique_id=1441750479]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "2倍"
+
 [node name="MusicCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=485689480]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 button_pressed = true
 text = "音乐"
 
 [node name="SfxCheckBox" type="CheckBox" parent="SettingsVBox" unique_id=2144269868]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 button_pressed = true
 text = "音效"
@@ -223,12 +255,10 @@ text = "执行"
 
 [node name="ConsoleOutput" type="RichTextLabel" parent="ConsoleVBox" unique_id=1236216528]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 86)
+custom_minimum_size = Vector2(0, 256)
 layout_mode = 2
 size_flags_horizontal = 3
 bbcode_enabled = true
-fit_content = true
-scroll_active = false
 
 [node name="ActionRow" type="Control" parent="." unique_id=1158134751]
 anchors_preset = 0

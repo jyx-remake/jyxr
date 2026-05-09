@@ -1,16 +1,9 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://cstdi8n6cph7k"]
 
-[ext_resource type="Script" path="res://src/Game.Godot/UI/Battle/Widgets/BattleSkillBox.cs" id="1_script"]
-[ext_resource type="PackedScene" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="2_tooltip"]
-[ext_resource type="Texture2D" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_avatar"]
-[ext_resource type="FontFile" path="res://assets/font/行楷简.otf" id="4_font"]
-
-[sub_resource type="StyleBoxFlat" id="1_panel"]
-bg_color = Color(0, 0, 0, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[ext_resource type="Script" uid="uid://dwaq2gsykq0gf" path="res://src/Game.Godot/UI/Battle/Widgets/BattleSkillBox.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://cao7kwtub078m" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="2_tooltip"]
+[ext_resource type="Texture2D" uid="uid://iuhrh668ir72" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_avatar"]
+[ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="4_font"]
 
 [sub_resource type="StyleBoxFlat" id="2_selected"]
 draw_center = false
@@ -24,6 +17,13 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 
+[sub_resource type="StyleBoxFlat" id="1_panel"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
 [sub_resource type="LabelSettings" id="3_name"]
 line_spacing = -18.0
 font = ExtResource("4_font")
@@ -31,10 +31,16 @@ font_size = 40
 outline_size = 3
 outline_color = Color(0, 0, 0, 1)
 
-[node name="BattleSkillBox" type="TextureButton"]
+[sub_resource type="LabelSettings" id="LabelSettings_h87qj"]
+line_spacing = -18.0
+font = ExtResource("4_font")
+font_size = 40
+font_color = Color(1, 0, 0, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="BattleSkillBox" type="TextureButton" unique_id=1951422030]
 custom_minimum_size = Vector2(180, 270)
-layout_mode = 3
-anchors_preset = 0
 offset_right = 180.0
 offset_bottom = 270.0
 ignore_texture_size = true
@@ -42,7 +48,7 @@ stretch_mode = 5
 script = ExtResource("1_script")
 TooltipScene = ExtResource("2_tooltip")
 
-[node name="SelectedFrame" type="Panel" parent="."]
+[node name="SelectedFrame" type="Panel" parent="." unique_id=1521652100]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -54,7 +60,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("2_selected")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="." unique_id=1260509028]
 layout_mode = 0
 offset_left = 37.0
 offset_top = 61.0
@@ -63,7 +69,7 @@ offset_bottom = 200.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("1_panel")
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=757450276]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -75,14 +81,14 @@ theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="Avatar" type="TextureRect" parent="Panel/MarginContainer"]
+[node name="Avatar" type="TextureRect" parent="Panel/MarginContainer" unique_id=250477625]
 unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("3_avatar")
 expand_mode = 1
 stretch_mode = 4
 
-[node name="NameLabel" type="Label" parent="."]
+[node name="NameLabel" type="Label" parent="." unique_id=2144378873]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = -4.0
@@ -95,7 +101,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 1
 
-[node name="FormNameLabel" type="Label" parent="."]
+[node name="FormNameLabel" type="Label" parent="." unique_id=2075600546]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -104,7 +110,7 @@ offset_top = 14.0
 offset_right = 77.0
 offset_bottom = 283.0
 text = "亢龙有悔"
-label_settings = SubResource("3_name")
+label_settings = SubResource("LabelSettings_h87qj")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 1

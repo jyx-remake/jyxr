@@ -105,7 +105,7 @@ public sealed class BattleDamageCalculator
             1d,
             context.Evaluate(BattleDamageContextField.CriticalMultiplier, context.CriticalMultiplier));
         var defence = Math.Max(0d, context.Evaluate(BattleDamageContextField.TargetDefence, context.Defence));
-        var isCritical = _random.NextDouble() < criticalChance;
+        var isCritical = _random.RollChance(criticalChance);
         var rolledAttack = Roll(attackLow, attackHigh);
         var defenceReduction = Math.Clamp(CalculateDefenceReduction(defence), 0d, 0.9d);
         var baseAmount = rolledAttack * (isCritical ? criticalMultiplier : 1d) * (1d - defenceReduction);

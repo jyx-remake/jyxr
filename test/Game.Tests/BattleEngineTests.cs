@@ -228,6 +228,69 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_DoesNotApplyBuff_WhenChanceRollFails()
+    {
+        var buff = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            buffs: [new SkillBuffDefinition(buff, level: 1, duration: 2, chance: 50)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(random: new FixedRandomService(0.75d));
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
+
+        Assert.True(result.Success);
+        Assert.Empty(enemy.Buffs);
+        Assert.DoesNotContain(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.BuffApplied &&
+            battleEvent.UnitId == enemy.Id &&
+            battleEvent.Detail == "中毒");
+    }
+
+    [Fact]
+    public void CastSkill_AppliesBuff_WhenChanceRollSucceeds()
+    {
+        var buff = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            buffs: [new SkillBuffDefinition(buff, level: 1, duration: 2, chance: 50)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(random: new FixedRandomService(0.25d));
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
+
+        Assert.True(result.Success);
+        var appliedBuff = Assert.Single(enemy.Buffs);
+        Assert.Equal("中毒", appliedBuff.Definition.Id);
+        Assert.Contains(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.BuffApplied &&
+            battleEvent.UnitId == enemy.Id &&
+            battleEvent.Detail == "中毒");
+    }
+
+    [Fact]
     public void CastSkill_RecordsCriticalDamageEvent()
     {
         var skillDefinition = TestContentFactory.CreateExternalSkill(

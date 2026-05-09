@@ -1,26 +1,29 @@
 using Game.Application;
 using Game.Core.Story;
+using Game.Godot.Persistence;
+using Game.Godot.Settings;
 using Godot;
 
 namespace Game.Godot.UI;
 
 public partial class SystemPanel : Control
 {
-	private const string SettingsFilePath = "user://settings.cfg";
-	private const string SettingsSection = "system_panel";
-	private const string ShowBattleHpKey = "show_battle_hp";
-	private const string AutoSaveKey = "auto_save";
-	private const string AutoBattleKey = "auto_battle";
-	private const string MusicEnabledKey = "music_enabled";
-	private const string SfxEnabledKey = "sfx_enabled";
-	private const string BgmBusName = "Bgm";
-	private const string SfxBusName = "SFX";
 	private const int MaxConsoleLineCount = 8;
+	private const int MinBattleSpeedMultiplier = 1;
+	private const int MaxBattleSpeedMultiplier = 5;
 
-	private readonly Dictionary<string, CheckBox> _checkboxesByKey = [];
-	private readonly Dictionary<string, bool> _defaultSettings = [];
+	private readonly LocalUserSettingsStore _settingsStore = new();
 	private readonly List<string> _consoleLines = [];
 
+	private UserSettingsRecord _settings = UserSettingsRecord.Default;
+	private CheckBox _showBattleHpCheckBox = null!;
+	private CheckBox _autoSaveCheckBox = null!;
+	private CheckBox _autoBattleCheckBox = null!;
+	private CheckBox _battleSpeedUpCheckBox = null!;
+	private HSlider _battleSpeedMultiplierSlider = null!;
+	private Label _battleSpeedMultiplierValueLabel = null!;
+	private CheckBox _musicCheckBox = null!;
+	private CheckBox _sfxCheckBox = null!;
 	private LineEdit _consoleInput = null!;
 	private RichTextLabel _consoleOutput = null!;
 	private Button _executeButton = null!;
@@ -41,11 +44,14 @@ public partial class SystemPanel : Control
 		_saveButton = GetNode<Button>("%SaveButton");
 		_deleteSaveButton = GetNode<Button>("%DeleteSaveButton");
 
-		RegisterSetting(ShowBattleHpKey, GetNode<CheckBox>("%ShowBattleHpCheckBox"));
-		RegisterSetting(AutoSaveKey, GetNode<CheckBox>("%AutoSaveCheckBox"));
-		RegisterSetting(AutoBattleKey, GetNode<CheckBox>("%AutoBattleCheckBox"));
-		RegisterSetting(MusicEnabledKey, GetNode<CheckBox>("%MusicCheckBox"));
-		RegisterSetting(SfxEnabledKey, GetNode<CheckBox>("%SfxCheckBox"));
+		_showBattleHpCheckBox = GetNode<CheckBox>("%ShowBattleHpCheckBox");
+		_autoSaveCheckBox = GetNode<CheckBox>("%AutoSaveCheckBox");
+		_autoBattleCheckBox = GetNode<CheckBox>("%AutoBattleCheckBox");
+		_battleSpeedUpCheckBox = GetNode<CheckBox>("%BattleSpeedUpCheckBox");
+		_battleSpeedMultiplierSlider = GetNode<HSlider>("%BattleSpeedMultiplierSlider");
+		_battleSpeedMultiplierValueLabel = GetNode<Label>("%BattleSpeedMultiplierValueLabel");
+		_musicCheckBox = GetNode<CheckBox>("%MusicCheckBox");
+		_sfxCheckBox = GetNode<CheckBox>("%SfxCheckBox");
 
 		_executeButton.Pressed += OnExecutePressed;
 		_consoleInput.TextSubmitted += OnConsoleTextSubmitted;
@@ -55,99 +61,90 @@ public partial class SystemPanel : Control
 		_saveButton.Pressed += OnSavePressed;
 		_deleteSaveButton.Pressed += OnDeleteSavePressed;
 
+		_showBattleHpCheckBox.Toggled += enabled => OnSettingToggled("战斗血条显示", enabled);
+		_autoSaveCheckBox.Toggled += enabled => OnSettingToggled("自动存档", enabled);
+		_autoBattleCheckBox.Toggled += enabled => OnSettingToggled("自动战斗", enabled);
+		_battleSpeedUpCheckBox.Toggled += enabled => OnSettingToggled("战斗加速", enabled);
+		_battleSpeedMultiplierSlider.ValueChanged += OnBattleSpeedMultiplierChanged;
+		_musicCheckBox.Toggled += enabled => OnSettingToggled("音乐", enabled);
+		_sfxCheckBox.Toggled += enabled => OnSettingToggled("音效", enabled);
+
 		LoadSettings();
 		AppendConsoleLine("系统", "命令行执行剧本指令，当前不支持 jump。");
 		AppendConsoleLine("系统", "示例：item 道口烧鸡 / log \"踏入江湖\"");
 	}
 
-	private void RegisterSetting(string key, CheckBox checkBox)
-	{
-		_checkboxesByKey.Add(key, checkBox);
-		_defaultSettings.Add(key, checkBox.ButtonPressed);
-		checkBox.Toggled += enabled => OnSettingToggled(key, enabled);
-	}
-
 	private void LoadSettings()
 	{
-		var config = new ConfigFile();
-		var loadResult = config.Load(SettingsFilePath);
-
-		foreach (var (key, checkBox) in _checkboxesByKey)
-		{
-			var fallbackValue = _defaultSettings[key];
-			var enabled = loadResult == Error.Ok
-				? (bool)config.GetValue(SettingsSection, key, fallbackValue)
-				: fallbackValue;
-
-			checkBox.SetPressedNoSignal(enabled);
-			ApplySetting(key, enabled);
-		}
-
-		if (loadResult != Error.Ok)
-		{
-			SaveSettings();
-		}
+		_settings = _settingsStore.LoadOrDefault();
+		ApplySettingsToControls(_settings);
+		UserSettingsApplier.Apply(_settings);
 	}
 
-	private void SaveSettings()
+	private void SaveSettings(UserSettingsRecord settings)
 	{
-		var config = new ConfigFile();
-		foreach (var (key, checkBox) in _checkboxesByKey)
-		{
-			config.SetValue(SettingsSection, key, checkBox.ButtonPressed);
-		}
-
-		var saveResult = config.Save(SettingsFilePath);
-		if (saveResult != Error.Ok)
-		{
-			throw new InvalidOperationException($"保存设置失败：{saveResult}");
-		}
+		_settingsStore.Save(settings);
 	}
 
-	private void OnSettingToggled(string key, bool enabled)
+	private void OnSettingToggled(string displayName, bool enabled)
 	{
 		try
 		{
-			ApplySetting(key, enabled);
-			SaveSettings();
-			AppendConsoleLine("设置", $"{GetSettingDisplayName(key)}：{(enabled ? "开启" : "关闭")}");
+			_settings = ReadSettingsFromControls();
+			UserSettingsApplier.Apply(_settings);
+			SaveSettings(_settings);
+			AppendConsoleLine("设置", $"{displayName}：{(enabled ? "开启" : "关闭")}");
 		}
 		catch (Exception exception)
 		{
-			Game.Logger.Error($"Failed to apply setting '{key}'.", exception);
+			Game.Logger.Error($"Failed to apply setting '{displayName}'.", exception);
 			AppendConsoleLine("错误", exception.Message);
 		}
 	}
 
-	private void ApplySetting(string key, bool enabled)
+	private void ApplySettingsToControls(UserSettingsRecord settings)
 	{
-		switch (key)
-		{
-			case MusicEnabledKey:
-				ApplyBusEnabled(BgmBusName, enabled);
-				return;
-			case SfxEnabledKey:
-				ApplyBusEnabled(SfxBusName, enabled);
-				return;
-			case ShowBattleHpKey:
-			case AutoSaveKey:
-			case AutoBattleKey:
-				return;
-			default:
-				throw new InvalidOperationException($"Unknown system setting key: {key}");
-		}
+		_showBattleHpCheckBox.SetPressedNoSignal(settings.ShowBattleHp);
+		_autoSaveCheckBox.SetPressedNoSignal(settings.AutoSave);
+		_autoBattleCheckBox.SetPressedNoSignal(settings.AutoBattle);
+		_battleSpeedUpCheckBox.SetPressedNoSignal(settings.BattleSpeedUp);
+		_battleSpeedMultiplierSlider.SetValueNoSignal(ClampBattleSpeedMultiplier(settings.BattleSpeedMultiplier));
+		UpdateBattleSpeedMultiplierLabel((int)_battleSpeedMultiplierSlider.Value);
+		_musicCheckBox.SetPressedNoSignal(settings.MusicEnabled);
+		_sfxCheckBox.SetPressedNoSignal(settings.SfxEnabled);
 	}
 
-	private static void ApplyBusEnabled(string busName, bool enabled)
+	private void OnBattleSpeedMultiplierChanged(double value)
 	{
-		var busIndex = AudioServer.GetBusIndex(busName);
-		if (busIndex < 0)
+		var multiplier = ClampBattleSpeedMultiplier((int)Math.Round(value));
+		_battleSpeedMultiplierSlider.SetValueNoSignal(multiplier);
+		UpdateBattleSpeedMultiplierLabel(multiplier);
+		if (_settings.BattleSpeedMultiplier == multiplier)
 		{
-			throw new InvalidOperationException($"音频总线不存在：{busName}");
+			return;
 		}
-
-		AudioServer.SetBusMute(busIndex, !enabled);
+		_settings = ReadSettingsFromControls();
+		UserSettingsApplier.Apply(_settings);
+		SaveSettings(_settings);
 	}
+
+	private UserSettingsRecord ReadSettingsFromControls() => new(
+		UserSettingsRecord.CurrentVersion,
+		_showBattleHpCheckBox.ButtonPressed,
+		_autoSaveCheckBox.ButtonPressed,
+		_autoBattleCheckBox.ButtonPressed,
+		_battleSpeedUpCheckBox.ButtonPressed,
+		ClampBattleSpeedMultiplier((int)Math.Round(_battleSpeedMultiplierSlider.Value)),
+		_musicCheckBox.ButtonPressed,
+		_sfxCheckBox.ButtonPressed);
+
+	private void UpdateBattleSpeedMultiplierLabel(int multiplier)
+	{
+		_battleSpeedMultiplierValueLabel.Text = $"{multiplier}倍";
+	}
+
+	private static int ClampBattleSpeedMultiplier(int multiplier) =>
+		Math.Clamp(multiplier, MinBattleSpeedMultiplier, MaxBattleSpeedMultiplier);
 
 	private void OnExecutePressed() => SubmitConsoleCommand(_consoleInput.Text);
 
@@ -234,17 +231,6 @@ public partial class SystemPanel : Control
 			_consoleOutput.AppendText(line + "\n");
 		}
 	}
-
-	private static string GetSettingDisplayName(string key) =>
-		key switch
-		{
-			ShowBattleHpKey => "战斗血条显示",
-			AutoSaveKey => "自动存档",
-			AutoBattleKey => "自动战斗",
-			MusicEnabledKey => "音乐",
-			SfxEnabledKey => "音效",
-			_ => key,
-		};
 
 	private static string FormatInvocation(StoryCommandInvocation invocation)
 	{

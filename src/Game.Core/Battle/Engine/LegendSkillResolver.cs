@@ -25,7 +25,7 @@ public sealed class LegendSkillResolver
             }
 
             var triggerChance = ResolveTriggerChance(definition, baseSkill.Owner);
-            if (random.NextDouble() > triggerChance)
+            if (!random.RollChance(triggerChance))
             {
                 continue;
             }

@@ -4,6 +4,7 @@ using Game.Application;
 using Game.Core.Model;
 using Game.Core.Serialization;
 using Game.Godot.Persistence;
+using Game.Godot.Settings;
 using Game.Godot.Story;
 using Game.Godot.UI;
 using Godot;
@@ -29,6 +30,7 @@ public static class PreviewGameBootstrap
 		var session = BuildSession(repository, logger, config, new GameProfile());
 
 		Game.Initialize(session, logger);
+		ApplyPersistentUserSettings();
 		LoadPersistentProfile();
 		BindUiToSession(session);
 	}
@@ -102,5 +104,11 @@ public static class PreviewGameBootstrap
 	{
 		var profileStore = new LocalProfileStore();
 		Game.ProfileService.LoadProfile(profileStore.LoadOrEmpty());
+	}
+
+	private static void ApplyPersistentUserSettings()
+	{
+		var settingsStore = new LocalUserSettingsStore();
+		UserSettingsApplier.Apply(settingsStore.LoadOrDefault());
 	}
 }

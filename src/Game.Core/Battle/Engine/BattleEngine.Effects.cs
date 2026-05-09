@@ -1,4 +1,5 @@
 using Game.Core.Affix;
+using Game.Core.Abstractions;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
@@ -61,7 +62,7 @@ public sealed partial class BattleEngine
     {
         foreach (var buff in buffs)
         {
-            if (buff.Chance <= 0)
+            if (!_random.RollPercentage(buff.Chance))
             {
                 continue;
             }
@@ -230,7 +231,7 @@ public sealed partial class BattleEngine
     private void ApplyChargeTick(BattleState state, BattleUnit unit, BattleBuffInstance buff)
     {
         var chance = 0.15d + 0.2d * buff.Level;
-        if (_random.NextDouble() > chance)
+        if (!_random.RollChance(chance))
         {
             return;
         }
@@ -264,6 +265,6 @@ public sealed partial class BattleEngine
     private bool RollRageGain(BattleUnit unit)
     {
         var chance = 0.5d + unit.GetStat(StatType.Fuyuan) / 1000d;
-        return _random.NextDouble() < Math.Clamp(chance, 0d, 1d);
+        return _random.RollChance(chance);
     }
 }

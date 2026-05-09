@@ -9,7 +9,9 @@ public partial class BattleBoardView : Control
 {
 	private const int CellTextFontSize = 13;
 	private const double StepMoveDurationSeconds = 0.3d;
+	private const double FloatTextQueueInitialDelaySeconds = 0.1d;
 	private const double FloatTextQueueSpacingSeconds = 0.4d;
+	private const float FloatTextHeadOffsetY = 90f;
 	private static readonly Color BorderColor = new(0f, 0f, 0f, 0.45f);
 	private static readonly Color TextColor = Colors.White;
 
@@ -458,12 +460,13 @@ public partial class BattleBoardView : Control
 	{
 		try
 		{
+			await ToSignal(GetTree().CreateTimer(FloatTextQueueInitialDelaySeconds), SceneTreeTimer.SignalName.Timeout);
 			while (_queuedFloatTexts.TryGetValue(unitId, out var queue) && queue.Count > 0)
 			{
 				var item = queue.Dequeue();
 				if (_unitViews.TryGetValue(unitId, out var unitView))
 				{
-					PlayFloatTextAt(unitView.Position + new Vector2(0f, -90f), item.Text, item.Color);
+					PlayFloatTextAt(unitView.Position + new Vector2(0f, -FloatTextHeadOffsetY), item.Text, item.Color);
 				}
 
 				await ToSignal(GetTree().CreateTimer(FloatTextQueueSpacingSeconds), SceneTreeTimer.SignalName.Timeout);

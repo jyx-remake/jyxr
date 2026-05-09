@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bhwyiutc87gtc" path="res://src/Game.Godot/UI/Battle/Widgets/BattleUnitView.cs" id="1_script"]
 [ext_resource type="AnimationLibrary" uid="uid://bbw02vxa8nxa6" path="res://assets/animation/combatant/zyjk.tres" id="3_p1k0d"]
-[ext_resource type="Texture2D" path="res://assets/art/atlas_texture/zyjk/zyjk-stand001.tres" id="4_0y46n"]
+[ext_resource type="Texture2D" path="res://assets/art/atlas_texture/zyjk/zyjk-stand005.tres" id="4_0y46n"]
 [ext_resource type="Texture2D" uid="uid://cs45878e3n7p6" path="res://assets/art/ui/battle/yinyingxiao.png" id="4_shadow"]
 [ext_resource type="Texture2D" uid="uid://ctf1yvtn7ngc1" path="res://assets/art/ui/battle/arrow.png" id="5_arrow"]
 [ext_resource type="Texture2D" uid="uid://b3pmv2oib5y05" path="res://assets/art/ui/battle/battle_duihuakuang.png" id="6_speech_bg"]
@@ -245,8 +245,8 @@ stretch_mode = 5
 [node name="SpeechHead" type="TextureRect" parent="Overlay/SpeechBubble" unique_id=1067522290]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 9.0
-offset_top = 11.8
+offset_left = 7.300003
+offset_top = 7.8
 offset_right = 49.0
 offset_bottom = 51.8
 mouse_filter = 2
@@ -257,9 +257,10 @@ stretch_mode = 5
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 60.0
-offset_top = 11.8
-offset_right = 176.8
+offset_top = 9.8
+offset_right = 171.3
 offset_bottom = 51.8
+text = "绝不会倒下！"
 label_settings = SubResource("6_speech_label")
 autowrap_mode = 2
 
@@ -307,7 +308,7 @@ scale = Vector2(1.5, 1.5)
 unique_name_in_owner = true
 texture = ExtResource("4_0y46n")
 centered = false
-offset = Vector2(-28.952295, -115.97324)
+offset = Vector2(-28.952295, -116.923874)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="AnimationSlot" unique_id=74145691]
 unique_name_in_owner = true
