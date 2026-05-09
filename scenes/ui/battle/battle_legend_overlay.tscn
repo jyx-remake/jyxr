@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b77m8rj4t6o0x"]
 
-[ext_resource type="Script" uid="uid://dwx0ahuvu6ips" path="res://src/Game.Godot/UI/Battle/BattleLegendOverlay.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://dwx0ahuvu6ips" path="res://src/Game.Godot/UI/Battle/Widgets/BattleLegendOverlay.cs" id="1_script"]
 [ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="2_font"]
 [ext_resource type="PackedScene" uid="uid://nurcdlqh47ai" path="res://scenes/ui/battle/battle_skill_view.tscn" id="3_skill_view"]
 

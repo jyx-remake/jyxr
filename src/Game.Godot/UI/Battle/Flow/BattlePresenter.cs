@@ -78,7 +78,7 @@ public sealed class BattlePresenter
 	public IReadOnlyList<BattleSkillOptionView> CreateSkillList(BattleUnit unit)
 	{
 		ArgumentNullException.ThrowIfNull(unit);
-		return CollectUsableSkills(unit)
+		return BattleSkillCatalog.CollectUsableSkills(unit)
 			.Select(skill => new BattleSkillOptionView(
 				skill,
 				$"{skill.Name}  MP {skill.MpCost}  怒 {skill.RageCost}"))
@@ -100,21 +100,6 @@ public sealed class BattlePresenter
 		state.CurrentAction is { } context
 			? state.TryGetUnit(context.ActingUnitId)
 			: null;
-
-	private static IEnumerable<SkillInstance> CollectUsableSkills(BattleUnit unit)
-	{
-		var character = unit.Character;
-		return character.GetSpecialSkills()
-			.Where(static skill => skill.IsActive)
-			.Cast<SkillInstance>()
-			.Concat(character.GetExternalSkills()
-				.Where(static skill => skill.IsActive)
-				.SelectMany(static skill => new[] { (SkillInstance)skill }
-					.Concat(skill.GetFormSkills().Where(static formSkill => formSkill.IsActive))))
-			.Concat(character.GetInternalSkills()
-				.Where(static skill => skill.IsEquipped)
-				.SelectMany(static skill => skill.GetFormSkills().Where(static formSkill => formSkill.IsActive)));
-	}
 
 	private static string FormatInventoryEntry(InventoryEntry entry) =>
 		entry switch

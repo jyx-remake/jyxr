@@ -1,5 +1,5 @@
-using Game.Core.Battle;
 using Game.Core.Affix;
+using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
@@ -73,9 +73,6 @@ public partial class BattleScreen : Control
 	[Export]
 	public PackedScene BattleLegendOverlayScene { get; set; } = null!;
 
-	private readonly BattleEngine _engine = new(
-		buffResolver: buffId => GameRoot.ContentRepository.GetBuff(buffId),
-		legendSkillsProvider: () => GameRoot.ContentRepository.GetLegendSkills());
 	private readonly BattlePresenter _presenter = new();
 	private readonly BattleUiStateMachine _uiState = new();
 	private readonly TaskCompletionSource<bool> _battleCompletion =
@@ -85,6 +82,7 @@ public partial class BattleScreen : Control
 	private BattleDefinition? _battleDefinition;
 	private IReadOnlyList<string> _selectedCharacterIds = [];
 	private BattleState? _state;
+	private BattleFlowOrchestrator? _orchestrator;
 	private bool _isConfigured;
 	private bool _isResolvingSkillPresentation;
 	private SkillPresentationContext? _activeSkillPresentation;
@@ -130,20 +128,18 @@ public partial class BattleScreen : Control
 		_boardGrid.CellPressed += OnCellPressed;
 		_boardGrid.HoveredCellChanged += OnBoardHoveredCellChanged;
 
-		_moveButton.Pressed += () =>
+		_moveButton.Pressed += async () =>
 		{
+			if (_orchestrator is null)
+			{
+				return;
+			}
+
 			if (_state is not null &&
-				BattlePresenter.TryGetActingUnit(_state) is { } unit &&
+				BattlePresenter.TryGetActingUnit(_state) is not null &&
 				_state.CurrentAction is { HasMoved: true, HasCommittedMainAction: false })
 			{
-				var eventStart = _state.Events.Count;
-				var rollbackResult = _engine.RollbackMove(_state, unit.Id);
-				AppendResult(rollbackResult, eventStart);
-				if (!rollbackResult.Success)
-				{
-					RefreshAll();
-					return;
-				}
+				await _orchestrator.TryRollbackMoveAsync();
 			}
 
 			_uiState.SelectMove();
@@ -155,27 +151,23 @@ public partial class BattleScreen : Control
 			RefreshAll();
 		};
 		_itemButton.Pressed += async () => await OpenItemPanelAsync();
-		_restButton.Pressed += () =>
+		_restButton.Pressed += async () =>
 		{
-			if (_state is null || BattlePresenter.TryGetActingUnit(_state) is not { } unit)
+			if (_orchestrator is null)
 			{
 				return;
 			}
 
-			var eventStart = _state.Events.Count;
-			AppendResult(_engine.Rest(_state, unit.Id), eventStart);
-			AdvanceToNextPlayerAction();
+			await _orchestrator.TryRestAsync();
 		};
-		_endButton.Pressed += () =>
+		_endButton.Pressed += async () =>
 		{
-			if (_state is null || BattlePresenter.TryGetActingUnit(_state) is not { } unit)
+			if (_orchestrator is null)
 			{
 				return;
 			}
 
-			var eventStart = _state.Events.Count;
-			AppendResult(_engine.EndAction(_state, unit.Id), eventStart);
-			AdvanceToNextPlayerAction();
+			await _orchestrator.TryEndActionAsync();
 		};
 		_finishButton.Pressed += FinishBattle;
 
@@ -224,7 +216,7 @@ public partial class BattleScreen : Control
 		}
 	}
 
-	private void StartBattle()
+	private async void StartBattle()
 	{
 		if (_battleDefinition is null)
 		{
@@ -233,10 +225,12 @@ public partial class BattleScreen : Control
 
 		ApplyBattlePresentation(_battleDefinition);
 		_state = GameRoot.BattleService.BuildBattleState(_battleDefinition, _selectedCharacterIds);
+		_orchestrator = new BattleFlowOrchestrator(this, _state);
 		_logLines.Clear();
 		AppendLog($"战斗开始：{_battleDefinition.Name}");
 		_uiState.WaitTimeline();
-		AdvanceToNextPlayerAction();
+		RefreshAll();
+		await _orchestrator.StartAsync();
 	}
 
 	private void ApplyBattlePresentation(BattleDefinition battle)
@@ -251,56 +245,7 @@ public partial class BattleScreen : Control
 		GameRoot.Audio.PlayBgm(GameRoot.Config.RandomBattleMusics);
 	}
 
-	private void AdvanceToNextPlayerAction()
-	{
-		if (_state is null || CompleteIfBattleEnded())
-		{
-			return;
-		}
-
-		_uiState.WaitTimeline();
-		var actingUnit = _engine.AdvanceUntilNextAction(_state);
-		while (actingUnit.Team != PlayerTeam)
-		{
-			AppendLog($"{actingUnit.Character.Name} 观望。");
-			_engine.EndAction(_state, actingUnit.Id);
-			if (CompleteIfBattleEnded())
-			{
-				return;
-			}
-
-			actingUnit = _engine.AdvanceUntilNextAction(_state);
-		}
-
-		_uiState.SelectMove();
-		AppendLog($"轮到 {actingUnit.Character.Name} 行动。");
-		RefreshAll();
-	}
-
-	private bool CompleteIfBattleEnded()
-	{
-		if (_state is null)
-		{
-			return false;
-		}
-
-		var playerAlive = _state.Units.Any(static unit => unit.Team == PlayerTeam && unit.IsAlive);
-		var enemyAlive = _state.Units.Any(static unit => unit.Team != PlayerTeam && unit.IsAlive);
-		if (playerAlive && enemyAlive)
-		{
-			return false;
-		}
-
-		var isWin = playerAlive;
-		_uiState.EndBattle();
-		AppendLog(isWin ? "战斗胜利。" : "战斗失败。");
-		RefreshAll();
-		_finishButton.Text = isWin ? "胜利返回" : "失败返回";
-		_finishButton.Disabled = false;
-		return true;
-	}
-
-	private void RefreshAll()
+	internal void RefreshAll()
 	{
 		if (_state is null || !IsInsideTree())
 		{
@@ -408,7 +353,7 @@ public partial class BattleScreen : Control
 		return _uiState.Mode switch
 		{
 			BattleUiMode.SelectingMove => new BoardHighlights(
-				moveTargets: _engine.GetReachablePositions(_state, actingUnit.Id).Keys.ToHashSet()),
+				moveTargets: (_orchestrator?.GetReachablePositions().Keys ?? Array.Empty<GridPosition>()).ToHashSet()),
 			BattleUiMode.SelectingSkillTarget when _uiState.SelectedSkill is { } skill => ResolveSkillHighlights(_state, actingUnit, skill),
 			BattleUiMode.SelectingItemTarget => new BoardHighlights(
 				itemTargets: ResolveItemTargetPositions(_state, actingUnit)),
@@ -487,7 +432,7 @@ public partial class BattleScreen : Control
 
 	private async void OnCellPressed(GridPosition position)
 	{
-		if (_state is null || _isResolvingSkillPresentation)
+		if (_state is null || _orchestrator is null || _isResolvingSkillPresentation)
 		{
 			return;
 		}
@@ -498,67 +443,13 @@ public partial class BattleScreen : Control
 			return;
 		}
 
-		BattleActionResult result;
 		switch (_uiState.Mode)
 		{
 			case BattleUiMode.SelectingMove:
-				var moveEventStart = _state.Events.Count;
-				result = _engine.MoveTo(_state, actingUnit.Id, position);
-				var movementPath = result.Success && _state.CurrentAction is not null
-					? _state.CurrentAction.MovementTrace.ToArray()
-					: Array.Empty<GridPosition>();
-				AppendResult(result, moveEventStart);
-				if (!result.Success)
-				{
-					RefreshAll();
-					return;
-				}
-
-				SelectDefaultPostMoveMode(actingUnit);
-				_isResolvingSkillPresentation = true;
-				RefreshActions();
-				await _boardGrid.PlayUnitMoveAsync(actingUnit.Id, movementPath, MovementPresentationMode);
-				_isResolvingSkillPresentation = false;
-				RefreshAll();
+				await _orchestrator.TryMoveAsync(position);
 				return;
 			case BattleUiMode.SelectingSkillTarget when _uiState.SelectedSkill is { } skill:
-				var skillEventStart = _state.Events.Count;
-				result = _engine.CastSkill(_state, actingUnit.Id, skill, position);
-				if (result.Success)
-				{
-					_boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
-					_isResolvingSkillPresentation = true;
-					RefreshActions();
-					_activeSkillPresentation = new SkillPresentationContext(
-						this,
-						_boardGrid,
-						_overlayRoot,
-						actingUnit.Id,
-						actingUnit.Character.Name,
-						actingUnit.Character.Definition.Gender,
-						AssetResolver.LoadCharacterPortrait(actingUnit.Character),
-						result.SkillCast ?? BattleSkillCastInfo.Create(skill, skill),
-						result.AffectedUnitIds,
-						result.ImpactedPositions);
-					var presentationTask = _activeSkillPresentation.RunAsync();
-					AppendResult(result, skillEventStart);
-					try
-					{
-						await presentationTask;
-						AdvanceToNextPlayerAction();
-					}
-					finally
-					{
-						_activeSkillPresentation = null;
-						_isResolvingSkillPresentation = false;
-						RefreshActions();
-					}
-				}
-				else
-				{
-					AppendResult(result, skillEventStart);
-					RefreshAll();
-				}
+				await _orchestrator.TryCastSkillAsync(skill, position);
 				return;
 			case BattleUiMode.SelectingItemTarget when _uiState.SelectedItem is { } item:
 				var target = _state.GetUnitAt(position);
@@ -567,26 +458,7 @@ public partial class BattleScreen : Control
 					return;
 				}
 
-				var itemEventStart = _state.Events.Count;
-				result = _engine.UseItem(
-					_state,
-					actingUnit.Id,
-					item.Definition,
-					target.Id);
-				if (result.Success)
-				{
-					_boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
-				}
-				AppendResult(result, itemEventStart);
-				if (result.Success)
-				{
-					GameRoot.InventoryService.RemoveItem(item.Definition);
-					AdvanceToNextPlayerAction();
-				}
-				else
-				{
-					RefreshAll();
-				}
+				await _orchestrator.TryUseItemAsync(item, target.Id);
 				return;
 		}
 	}
@@ -608,7 +480,8 @@ public partial class BattleScreen : Control
 
 	private void RefreshActions()
 	{
-		var isActing = _state?.CurrentAction is not null &&
+		var actingUnit = _state is not null ? BattlePresenter.TryGetActingUnit(_state) : null;
+		var isActing = actingUnit is { Team: PlayerTeam } &&
 			_uiState.Mode != BattleUiMode.BattleEnded &&
 			!_isResolvingSkillPresentation;
 		_moveButton.Disabled = !isActing;
@@ -628,7 +501,7 @@ public partial class BattleScreen : Control
 		}
 
 		var actingUnit = BattlePresenter.TryGetActingUnit(_state);
-		if (actingUnit is null)
+		if (actingUnit is null || actingUnit.Team != PlayerTeam)
 		{
 			AddListLabel("无可选项");
 			return;
@@ -777,7 +650,7 @@ public partial class BattleScreen : Control
 			: AssetResolver.LoadCharacterPortrait(actingUnit.Character);
 	}
 
-	private void AppendResult(BattleActionResult result, int stateEventStartIndex)
+	internal void AppendResult(BattleActionResult result, int stateEventStartIndex)
 	{
 		if (!string.IsNullOrWhiteSpace(result.Message))
 		{
@@ -903,7 +776,7 @@ public partial class BattleScreen : Control
 		}
 	}
 
-	private void AppendLog(string text)
+	internal void AppendLog(string text)
 	{
 		_logLines.Add(text);
 		if (_logLines.Count > 12)
@@ -1103,6 +976,54 @@ public partial class BattleScreen : Control
 		await overlay.PlayAsync(actingUnitName, portrait, skillCast, FloatSpecialColor);
 	}
 
+	private async Task PlayMovePresentationAsync(BattleUnit actingUnit, IReadOnlyList<GridPosition> movementPath)
+	{
+		_isResolvingSkillPresentation = true;
+		RefreshActions();
+		try
+		{
+			await _boardGrid.PlayUnitMoveAsync(actingUnit.Id, movementPath, MovementPresentationMode);
+		}
+		finally
+		{
+			_isResolvingSkillPresentation = false;
+		}
+
+		RefreshAll();
+	}
+
+	private async Task PlaySkillPresentationAsync(BattleUnit actingUnit, SkillInstance skill, BattleActionResult result, int stateEventStartIndex)
+	{
+		_boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
+		_isResolvingSkillPresentation = true;
+		RefreshActions();
+		_activeSkillPresentation = new SkillPresentationContext(
+			this,
+			_boardGrid,
+			_overlayRoot,
+			actingUnit.Id,
+			actingUnit.Character.Name,
+			actingUnit.Character.Definition.Gender,
+			AssetResolver.LoadCharacterPortrait(actingUnit.Character),
+			result.SkillCast ?? BattleSkillCastInfo.Create(skill, skill),
+			result.AffectedUnitIds,
+			result.ImpactedPositions);
+		var presentationTask = _activeSkillPresentation.RunAsync();
+		AppendResult(result, stateEventStartIndex);
+		try
+		{
+			await presentationTask;
+		}
+		finally
+		{
+			_activeSkillPresentation = null;
+			_isResolvingSkillPresentation = false;
+			RefreshActions();
+		}
+
+		RefreshAll();
+	}
+
 	private void SelectDefaultPostMoveMode(BattleUnit actingUnit)
 	{
 		var availableSkills = _presenter.CreateSkillList(actingUnit);
@@ -1140,6 +1061,48 @@ public partial class BattleScreen : Control
 			child.QueueFree();
 		}
 	}
+
+	internal void BindState(BattleState state)
+	{
+		_state = state;
+		RefreshAll();
+	}
+
+	internal void ShowWaitingTimeline()
+	{
+		_uiState.WaitTimeline();
+		RefreshAll();
+	}
+
+	internal void ShowPlayerTurn(BattleUnit actingUnit)
+	{
+		_uiState.SelectMove();
+		AppendLog($"轮到 {actingUnit.Character.Name} 行动。");
+		RefreshAll();
+	}
+
+	internal void ShowPlayerPostMove(BattleUnit actingUnit)
+	{
+		SelectDefaultPostMoveMode(actingUnit);
+		RefreshAll();
+	}
+
+	internal void ShowBattleEnded(bool isWin)
+	{
+		_uiState.EndBattle();
+		AppendLog(isWin ? "战斗胜利。" : "战斗失败。");
+		RefreshAll();
+		_finishButton.Text = isWin ? "胜利返回" : "失败返回";
+		_finishButton.Disabled = false;
+	}
+
+	internal void ApplyActingUnitFacing(BattleUnit actingUnit) => _boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
+
+	internal Task PlayMoveAsync(BattleUnit actingUnit, IReadOnlyList<GridPosition> movementPath) =>
+		PlayMovePresentationAsync(actingUnit, movementPath);
+
+	internal Task PlaySkillAsync(BattleUnit actingUnit, SkillInstance skill, BattleActionResult result, int stateEventStartIndex) =>
+		PlaySkillPresentationAsync(actingUnit, skill, result, stateEventStartIndex);
 
 	private void FinishBattle()
 	{

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://yd52w6eba8oa"]
 
-[ext_resource type="Script" uid="uid://bhwyiutc87gtc" path="res://src/Game.Godot/UI/Battle/BattleUnitView.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://bhwyiutc87gtc" path="res://src/Game.Godot/UI/Battle/Widgets/BattleUnitView.cs" id="1_script"]
 [ext_resource type="AnimationLibrary" uid="uid://bbw02vxa8nxa6" path="res://assets/animation/combatant/zyjk.tres" id="3_p1k0d"]
 [ext_resource type="Texture2D" path="res://assets/art/atlas_texture/zyjk/zyjk-stand001.tres" id="4_0y46n"]
 [ext_resource type="Texture2D" uid="uid://cs45878e3n7p6" path="res://assets/art/ui/battle/yinyingxiao.png" id="4_shadow"]

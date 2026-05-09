@@ -13,14 +13,16 @@ public sealed partial class BattleEngine
         var damageCalculation = _damageCalculator.CreateSkillDamageContext(new BattleDamageContext(source, target, skill));
         ConfigureDamageCalculationHooks(state, source, target, skill, damageCalculation);
         var result = _damageCalculator.CalculateSkillDamage(damageCalculation);
+        var damageMultiplier = BattleDamageRules.GetSkillDamageMultiplier(source, target);
+        var resolvedDamageAmount = (int)Math.Floor(result.Amount * damageMultiplier);
         var hookContext = TriggerHooks(state, HookTiming.OnDamageTaken, target, context =>
         {
             context.Source = source;
             context.Target = target;
             context.Skill = skill;
-            context.DamageAmount = result.Amount;
+            context.DamageAmount = resolvedDamageAmount;
         });
-        var damage = target.TakeDamage(Math.Max(0, hookContext.DamageAmount ?? result.Amount));
+        var damage = target.TakeDamage(Math.Max(0, hookContext.DamageAmount ?? resolvedDamageAmount));
         AddEvent(state, new BattleEvent(
             BattleEventKind.Damaged,
             target.Id,

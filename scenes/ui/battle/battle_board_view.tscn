@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d1qdddofh12io"]
 
-[ext_resource type="Script" uid="uid://duemfd5pub805" path="res://src/Game.Godot/UI/Battle/BattleBoardView.cs" id="1_board_view"]
+[ext_resource type="Script" uid="uid://duemfd5pub805" path="res://src/Game.Godot/UI/Battle/Widgets/BattleBoardView.cs" id="1_board_view"]
 [ext_resource type="PackedScene" uid="uid://yd52w6eba8oa" path="res://scenes/ui/battle/battle_unit_view.tscn" id="2_unit_view"]
 [ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_skill_view.tscn" id="3_skill_view"]
 [ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_float_text.tscn" id="4_float_text"]

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://brnaq54kgocs"]
 
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_base"]
-[ext_resource type="Script" uid="uid://cdrh1oim004f" path="res://src/Game.Godot/UI/Battle/CombatantSelectPanel.cs" id="2_script"]
+[ext_resource type="Script" uid="uid://cdrh1oim004f" path="res://src/Game.Godot/UI/Battle/Selection/CombatantSelectPanel.cs" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://dx4b6fc1h0q45" path="res://scenes/ui/battle/combatant_select_card.tscn" id="3_card"]
 [ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="4_button"]
 [ext_resource type="LabelSettings" uid="uid://c1rrni2e1gbhl" path="res://assets/theme/panel_title_label_settings.tres" id="4_mfbij"]

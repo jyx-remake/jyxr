@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dx4b6fc1h0q45"]
 
-[ext_resource type="Script" uid="uid://ho2npj0rig4e" path="res://src/Game.Godot/UI/Battle/CombatantSelectCard.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://ho2npj0rig4e" path="res://src/Game.Godot/UI/Battle/Selection/CombatantSelectCard.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://b173d0wt20k3t" path="res://assets/art/misc/biankuang.png" id="2_frame"]
 [ext_resource type="Texture2D" uid="uid://hhslflvjkysr" path="res://assets/art/misc/dise.png" id="3_mask"]
 [ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="4_avatar"]

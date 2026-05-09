@@ -67,10 +67,7 @@ public sealed partial class BattleEngine
         var impactedPositions = ResolveImpactPositions(unit.Position, target, resolvedSkill.ImpactType, resolvedSkill.ImpactSize)
             .Where(state.Grid.Contains)
             .ToHashSet();
-        var targets = state.Units
-            .Where(targetUnit => targetUnit.IsAlive && impactedPositions.Contains(targetUnit.Position))
-            .Where(targetUnit => resolvedSkill is not LegendSkillInstance || state.AreEnemies(unit, targetUnit))
-            .ToList();
+        var targets = BattleSkillTargeting.ResolveEffectiveTargets(state, unit, resolvedSkill, impactedPositions);
 
         foreach (var targetUnit in targets)
         {

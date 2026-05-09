@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d2rvluypwdsrg"]
 
-[ext_resource type="Script" uid="uid://hyowcnqtdd4m" path="res://src/Game.Godot/UI/Battle/BattleFloatText.cs" id="1_float_text"]
+[ext_resource type="Script" uid="uid://hyowcnqtdd4m" path="res://src/Game.Godot/UI/Battle/Widgets/BattleFloatText.cs" id="1_float_text"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_float_text"]
 font_size = 18

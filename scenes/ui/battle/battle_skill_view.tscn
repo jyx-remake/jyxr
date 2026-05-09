@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://nurcdlqh47ai"]
 
-[ext_resource type="Script" uid="uid://w5lsteeu1tcd" path="res://src/Game.Godot/UI/Battle/BattleSkillView.cs" id="1_skill_view"]
+[ext_resource type="Script" uid="uid://w5lsteeu1tcd" path="res://src/Game.Godot/UI/Battle/Widgets/BattleSkillView.cs" id="1_skill_view"]
 [ext_resource type="Texture2D" path="res://assets/art/atlas_texture/gunzi-skill/gunzi-skill-0.tres" id="2_logri"]
 [ext_resource type="AnimationLibrary" uid="uid://dg5ad8mj3jdf4" path="res://assets/animation/skill/gunzi.tres" id="3_72ynb"]
 
