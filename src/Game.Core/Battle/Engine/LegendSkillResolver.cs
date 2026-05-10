@@ -1,4 +1,5 @@
 using Game.Core.Abstractions;
+using Game.Core.Affix;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 using Game.Core.Model.Character;
@@ -55,8 +56,13 @@ public sealed class LegendSkillResolver
     private static double ResolveTriggerChance(LegendSkillDefinition definition, CharacterInstance owner)
     {
         var wuxingMultiplier = 1d + owner.GetStat(StatType.Wuxing) / 150d * 0.2d;
-        var chance = definition.Probability * wuxingMultiplier;
-        chance = owner.GetLegendChanceValue(definition.Id, chance);
+        var chanceMultiplier = owner.GetLegendChanceValue(definition.Id, wuxingMultiplier);
+        if (owner.Traits.Contains(TraitId.BroadLearning))
+        {
+            chanceMultiplier += 0.5d;
+        }
+
+        var chance = definition.Probability * chanceMultiplier;
         return Math.Clamp(chance, 0d, 1d);
     }
 

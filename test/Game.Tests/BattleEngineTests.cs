@@ -468,6 +468,118 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_AppliesLegendChanceBonusAsProbabilityMultiplier()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var legendSkill = new LegendSkillDefinition(
+            Id: "strike_legend",
+            Name: "奥义.天外流星",
+            StartSkill: "strike",
+            Probability: 0.2d,
+            Conditions: [],
+            Buffs: [],
+            PowerExtra: 12d,
+            RequiredLevel: 1,
+            Animation: "aoyi_fx");
+        var chanceAffix = new SkillAffixDefinition(
+            new LegendSkillChanceModifierAffix("strike_legend", ModifierValue.Add(0.1d)));
+        var chanceSkillDefinition = TestContentFactory.CreateExternalSkill(
+            "chance_source",
+            affixes: [chanceAffix]);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills:
+            [
+                new InitialExternalSkillEntryDefinition(skillDefinition, 1),
+                new InitialExternalSkillEntryDefinition(chanceSkillDefinition, 1),
+            ]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0), maxHp: 500);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.25d),
+            legendSkillsProvider: () => [legendSkill]);
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(
+            state,
+            hero.Id,
+            hero.Character.GetExternalSkills().Single(skill => skill.Id == "strike"),
+            enemy.Position);
+
+        Assert.True(result.Success);
+        Assert.False(result.SkillCast?.IsLegend);
+    }
+
+    [Fact]
+    public void CastSkill_BroadLearningTraitAddsLegendChanceMultiplier()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var legendSkill = new LegendSkillDefinition(
+            Id: "strike_legend",
+            Name: "奥义.天外流星",
+            StartSkill: "strike",
+            Probability: 0.2d,
+            Conditions: [],
+            Buffs: [],
+            PowerExtra: 12d,
+            RequiredLevel: 1,
+            Animation: "aoyi_fx");
+        var broadLearning = new TalentDefinition
+        {
+            Id = "broad_learning",
+            Name = "博览群书",
+            Affixes = [new TraitAffix(TraitId.BroadLearning)],
+        };
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents: [broadLearning],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0), maxHp: 500);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.25d),
+            legendSkillsProvider: () => [legendSkill]);
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(
+            state,
+            hero.Id,
+            hero.Character.GetExternalSkills().Single(),
+            enemy.Position);
+
+        Assert.True(result.Success);
+        Assert.True(result.SkillCast?.IsLegend);
+    }
+
+    [Fact]
     public void CastSkill_LegendAreaSkillDoesNotDamageAllies()
     {
         var heroic = new TalentDefinition { Id = "heroic", Name = "heroic" };

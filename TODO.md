@@ -4,6 +4,7 @@
 - 技能等级上限目前统一使用 `SkillInstance.DefaultMaxLevel = 20`。legacy `maxlevel` 剧情命令当前只做技能存在性校验并发 toast，不写入技能实例；后续如要支持动态突破上限，需要重新建模“技能精通/上限提升”的持久化归属。
 - 内容加载目前只是“DTO 校验 + 按顺序构建 runtime definitions”，还不是真正的二阶段加载。后续如需支持定义间循环依赖，应改成“先注册 runtime definition 空壳，再统一 resolve 引用”的两阶段装配流程。
 - 当前 affix 引用解析集中在 `JsonContentLoader.ResolveAffixes(...)`，而不是各 definition 自己的 `Resolve(...)` 方法。后续如继续扩展 affix 来源，应把 affix 引用解析入口收敛成更明确的专门服务或 definition 统一协议，避免新增来源时漏掉 `GrantTalentAffix` 等需要 resolve 的条目。
+- `博览群书` 当前先用现有无参数 trait 表达，并在奥义触发率计算中写死触发倍率 `+0.5`；后续如果类似规则增多，可考虑把 trait 升级为带参数规则 trait，避免规则数值长期散落在代码里。
 - `IContentRepository` 在真实游戏中是否需要全局可访问，后续需要结合地图、事件、宿主装配再判断。
 - 当前 `Party` 是全局队伍，无队伍 id/name；如果后续支持多队伍/多编队，需要重新建模队伍集合、队伍标识与存档结构。
 - 统一空值校验策略：内部代码以 C# nullable reference types 为主，边界层（宿主入口、内容加载入口、外部输入入口）保留显式运行时校验，避免在内部领域代码中堆积大量 `ArgumentNullException.ThrowIfNull`。

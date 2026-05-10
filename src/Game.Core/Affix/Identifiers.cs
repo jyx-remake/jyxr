@@ -53,7 +53,8 @@ public enum TraitId
     IgnoreZoneOfControl,
     CanUseItemOnAlly,
     IgnoreItemCooldown,
-    Ghost
+    Ghost,
+    BroadLearning
 }
 
 public enum BattleDamageContextField
