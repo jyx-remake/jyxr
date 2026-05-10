@@ -29,7 +29,7 @@ public static class AffixFormatter
             GrantModelAffix grantModel => $"时装「{GetModelDisplayText(grantModel)}」",
             SkillBonusModifierAffix skillBonus => $"技能「{FormatterTextCn.ResolveSkillName(skillBonus.SkillId, contentRepository)}」威力{FormatModifierValueCn(skillBonus.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
             WeaponBonusModifierAffix weaponBonus => $"{FormatterTextCn.GetWeaponTypeNameCn(weaponBonus.WeaponType)}类武功威力{FormatModifierValueCn(weaponBonus.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
-            LegendSkillChanceModifierAffix legendChance => $"绝技「{FormatterTextCn.ResolveSkillName(legendChance.SkillId, contentRepository)}」触发率{FormatModifierValueCn(legendChance.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
+            LegendSkillChanceModifierAffix legendChance => $"奥义「{FormatterTextCn.ResolveSkillName(legendChance.SkillId, contentRepository)}」触发率{FormatModifierValueCn(legendChance.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
             _ => throw new NotSupportedException($"Unsupported affix type '{affix.GetType().Name}'.")
         };
     }
@@ -66,6 +66,32 @@ public static class AffixFormatter
         return affixes.Select(affix => FormatCn(affix, contentRepository)).ToList();
     }
 
+    public static IReadOnlyList<string> FormatEquipmentLinesCn(
+        IEnumerable<AffixDefinition> affixes,
+        IContentRepository contentRepository)
+    {
+        ArgumentNullException.ThrowIfNull(affixes);
+        ArgumentNullException.ThrowIfNull(contentRepository);
+
+        var list = affixes.ToList();
+        var lines = new List<string>(list.Count);
+
+        for (var index = 0; index < list.Count; index++)
+        {
+            var current = list[index];
+            if (TryFormatMergedEquipmentLine(list, index, contentRepository, out var mergedLine, out var consumedCount))
+            {
+                lines.Add(mergedLine);
+                index += consumedCount - 1;
+                continue;
+            }
+
+            lines.Add(FormatCn(current, contentRepository));
+        }
+
+        return lines;
+    }
+
     public static IReadOnlyList<string> FormatLinesCn(
         IEnumerable<SkillAffixDefinition> affixes,
         IContentRepository contentRepository)
@@ -78,6 +104,54 @@ public static class AffixFormatter
 
     private static string GetModelDisplayText(GrantModelAffix affix) =>
         string.IsNullOrWhiteSpace(affix.Description) ? affix.ModelId : affix.Description;
+
+    private static bool TryFormatMergedEquipmentLine(
+        IReadOnlyList<AffixDefinition> affixes,
+        int index,
+        IContentRepository contentRepository,
+        out string line,
+        out int consumedCount)
+    {
+        line = string.Empty;
+        consumedCount = 0;
+
+        if (index + 1 >= affixes.Count)
+        {
+            return false;
+        }
+
+        if (affixes[index] is StatModifierAffix attack
+            && attack.Stat == StatType.Attack
+            && affixes[index + 1] is StatModifierAffix critChance
+            && critChance.Stat == StatType.CritChance)
+        {
+            line = $"攻击力{FormatStatModifierValueCn(StatType.Attack, attack.Value)}，暴击率{FormatStatModifierValueCn(StatType.CritChance, critChance.Value)}";
+            consumedCount = 2;
+            return true;
+        }
+
+        if (affixes[index] is StatModifierAffix defence
+            && defence.Stat == StatType.Defence
+            && affixes[index + 1] is StatModifierAffix antiCritChance
+            && antiCritChance.Stat == StatType.AntiCritChance)
+        {
+            line = $"防御力{FormatStatModifierValueCn(StatType.Defence, defence.Value)}，抗暴击率{FormatStatModifierValueCn(StatType.AntiCritChance, antiCritChance.Value)}";
+            consumedCount = 2;
+            return true;
+        }
+
+        if (affixes[index] is SkillBonusModifierAffix legendSkillBonus
+            && affixes[index + 1] is LegendSkillChanceModifierAffix legendSkillChance
+            && string.Equals(legendSkillBonus.SkillId, legendSkillChance.SkillId, StringComparison.Ordinal))
+        {
+            var skillName = FormatterTextCn.ResolveSkillName(legendSkillBonus.SkillId, contentRepository);
+            line = $"奥义「{skillName}」威力{FormatModifierValueCn(legendSkillBonus.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}，触发率{FormatModifierValueCn(legendSkillChance.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}";
+            consumedCount = 2;
+            return true;
+        }
+
+        return false;
+    }
 
     private static string FormatStatModifierValueCn(StatType statType, ModifierValue value) =>
         FormatModifierValueCn(value, GetStatValueDisplaySpec(statType));

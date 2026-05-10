@@ -1,4 +1,5 @@
 using Game.Application.Formatters;
+using Game.Application;
 using Game.Content.Loading;
 using Game.Core.Affix;
 using Game.Core.Definitions;
@@ -77,7 +78,7 @@ public sealed class AffixFormatterTests
         Assert.Equal("奇门类武功威力 +3%", AffixFormatter.FormatCn(
             new WeaponBonusModifierAffix(WeaponType.Qimen, ModifierValue.Add(0.03)),
             repository));
-        Assert.Equal("绝技「无招胜有招」触发率提高12.5%", AffixFormatter.FormatCn(
+        Assert.Equal("奥义「无招胜有招」触发率提高12.5%", AffixFormatter.FormatCn(
             new LegendSkillChanceModifierAffix("legend_001", ModifierValue.Increase(0.125)),
             repository));
         Assert.Equal("技能「凌波微步」威力 +6%", AffixFormatter.FormatCn(
@@ -141,6 +142,56 @@ public sealed class AffixFormatterTests
     }
 
     [Fact]
+    public void AffixFormatter_FormatsEquipmentLinesWithLegacyMergedPairs()
+    {
+        var legendSkill = new LegendSkillDefinition(
+            "legend_001",
+            "无招胜有招",
+            "skill_001",
+            0.15d,
+            [],
+            []);
+        var repository = TestContentFactory.CreateRepository(
+            legendSkills: [legendSkill]);
+
+        var lines = AffixFormatter.FormatEquipmentLinesCn(
+            [
+                new StatModifierAffix(StatType.Attack, ModifierValue.Add(10)),
+                new StatModifierAffix(StatType.CritChance, ModifierValue.Add(0.02)),
+                new StatModifierAffix(StatType.Defence, ModifierValue.Add(12)),
+                new StatModifierAffix(StatType.AntiCritChance, ModifierValue.Add(0.03)),
+                new SkillBonusModifierAffix("legend_001", ModifierValue.Add(0.15)),
+                new LegendSkillChanceModifierAffix("legend_001", ModifierValue.Add(0.05)),
+            ],
+            repository);
+
+        Assert.Equal(
+            [
+                "攻击力 +10，暴击率 +2%",
+                "防御力 +12，抗暴击率 +3%",
+                "奥义「无招胜有招」威力 +15%，触发率 +5%",
+            ],
+            lines);
+    }
+
+    [Fact]
+    public void EquipmentAffixGroupCounter_CountsLegacyMergedPairsAsSingleGroups()
+    {
+        var count = EquipmentAffixGroupCounter.Count(
+            [
+                new StatModifierAffix(StatType.Attack, ModifierValue.Add(10)),
+                new StatModifierAffix(StatType.CritChance, ModifierValue.Add(0.02)),
+                new StatModifierAffix(StatType.Defence, ModifierValue.Add(12)),
+                new StatModifierAffix(StatType.AntiCritChance, ModifierValue.Add(0.03)),
+                new SkillBonusModifierAffix("legend_001", ModifierValue.Add(0.15)),
+                new LegendSkillChanceModifierAffix("legend_001", ModifierValue.Add(0.05)),
+                new GrantTalentAffix("talent_001"),
+            ]);
+
+        Assert.Equal(4, count);
+    }
+
+    [Fact]
     public void AffixFormatter_UsesReadableFallbackForUnresolvedSkillIds()
     {
         var repository = TestContentFactory.CreateRepository();
@@ -177,7 +228,7 @@ public sealed class AffixFormatterTests
             "攻击力 +40",
             AffixFormatter.FormatCn(equipment.Affixes[0], repository));
         Assert.Equal(
-            "15级解锁：绝技「草头百姓的逆袭.这下子逆天了」触发率 +5%",
+            "15级解锁：奥义「草头百姓的逆袭.这下子逆天了」触发率 +5%",
             AffixFormatter.FormatCn(externalSkill.Affixes[3], repository));
     }
 

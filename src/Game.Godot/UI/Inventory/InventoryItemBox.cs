@@ -14,6 +14,8 @@ public partial class InventoryItemBox : TextureButton
 	private TextureRect _avatar = null!;
 	private Label _nameLabel = null!;
 	private Label _stackLabel = null!;
+	private Panel _rarityBand = null!;
+	private StyleBoxFlat _rarityBandStyle = null!;
 	private InventoryEntry? _entry;
 
 	public override void _Ready()
@@ -21,6 +23,8 @@ public partial class InventoryItemBox : TextureButton
 		_avatar = GetNode<TextureRect>("%Avatar");
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_stackLabel = GetNode<Label>("%StackLabel");
+		_rarityBand = GetNode<Panel>("%RarityBand");
+		_rarityBandStyle = DuplicateBandStyle(_rarityBand);
 		Pressed += OnPressed;
 		Refresh();
 	}
@@ -73,7 +77,16 @@ public partial class InventoryItemBox : TextureButton
 
 		_avatar.Texture = AssetResolver.LoadTextureResource(_entry.Definition.Picture);
 		_nameLabel.Text = _entry.Definition.Name;
+		_rarityBandStyle.BgColor = ItemRarityBandColorResolver.Resolve(_entry);
 		var quantity = _entry is StackInventoryEntry stack ? stack.Quantity : 1;
 		_stackLabel.Text = quantity > 1 ? quantity.ToString() : string.Empty;
+	}
+
+	private static StyleBoxFlat DuplicateBandStyle(Panel band)
+	{
+		var style = band.GetThemeStylebox("panel") as StyleBoxFlat;
+		var duplicate = style?.Duplicate() as StyleBoxFlat ?? new StyleBoxFlat();
+		band.AddThemeStyleboxOverride("panel", duplicate);
+		return duplicate;
 	}
 }

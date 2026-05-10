@@ -46,8 +46,8 @@ public static class ItemDescriptionFormatter
         AppendDescription(builder, equipment.Description);
         AppendSection(builder, "装备要求：", ItemRequirementFormatter.FormatLinesCn(equipment.Requirements, contentRepository), "red");
         AppendSection(builder, "使用效果：", ItemUseEffectFormatter.FormatLinesCn(equipment.UseEffects, contentRepository), "yellow");
-        AppendSection(builder, "装备词条：", AffixFormatter.FormatLinesCn(equipment.Affixes, contentRepository), "yellow");
-        AppendSection(builder, "附加词条：", AffixFormatter.FormatLinesCn(extraAffixes, contentRepository), "green");
+        AppendSection(builder, "装备词条：", AffixFormatter.FormatEquipmentLinesCn(equipment.Affixes, contentRepository), "yellow");
+        AppendSection(builder, "附加词条：", AffixFormatter.FormatEquipmentLinesCn(extraAffixes, contentRepository), "green");
         AppendCooldown(builder, equipment.Cooldown);
         return builder.ToString().TrimEnd('\n');
     }

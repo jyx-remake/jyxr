@@ -18,6 +18,8 @@ public partial class ShopItemBox : TextureButton
 	private Label _nameLabel = null!;
 	private Label _priceLabel = null!;
 	private Label _limitLabel = null!;
+	private Panel _rarityBand = null!;
+	private StyleBoxFlat _rarityBandStyle = null!;
 	private ItemDefinition? _item;
 	private EquipmentInstance? _equipment;
 	private ShopProductView? _product;
@@ -30,6 +32,8 @@ public partial class ShopItemBox : TextureButton
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_priceLabel = GetNode<Label>("%PriceLabel");
 		_limitLabel = GetNode<Label>("%LimitLabel");
+		_rarityBand = GetNode<Panel>("%RarityBand");
+		_rarityBandStyle = DuplicateBandStyle(_rarityBand);
 		Pressed += OnPressed;
 		Refresh();
 	}
@@ -125,6 +129,7 @@ public partial class ShopItemBox : TextureButton
 
 		_avatar.Texture = AssetResolver.LoadTextureResource(_product?.Picture ?? _item?.Picture);
 		_nameLabel.Text = _product?.DisplayName ?? _item!.Name;
+		_rarityBandStyle.BgColor = ResolveBandColor();
 
 		if (_product is not null)
 		{
@@ -139,6 +144,24 @@ public partial class ShopItemBox : TextureButton
 		_limitLabel.Text = _entry is StackInventoryEntry stack && stack.Quantity > 1
 			? $"x{stack.Quantity}"
 			: string.Empty;
+	}
+
+	private Color ResolveBandColor()
+	{
+		if (_equipment is not null)
+		{
+			return ItemRarityBandColorResolver.Resolve(_equipment);
+		}
+
+		return ItemRarityBandColorResolver.Resolve(_item!);
+	}
+
+	private static StyleBoxFlat DuplicateBandStyle(Panel band)
+	{
+		var style = band.GetThemeStylebox("panel") as StyleBoxFlat;
+		var duplicate = style?.Duplicate() as StyleBoxFlat ?? new StyleBoxFlat();
+		band.AddThemeStyleboxOverride("panel", duplicate);
+		return duplicate;
 	}
 
 	private static string FormatProductPrice(ShopProductView product)

@@ -2,6 +2,7 @@ using Game.Application.Formatters;
 using Game.Content.Loading;
 using Game.Core.Affix;
 using Game.Core.Definitions;
+using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 
 namespace Game.Tests;
@@ -123,8 +124,7 @@ public sealed class ItemDescriptionFormatterTests
         Assert.Contains("[color=red]剑法 >= 25[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=red]身法 >= 20[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=yellow]装备词条：[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]攻击力 +40[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]暴击率 +2%[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]攻击力 +40，暴击率 +2%[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=yellow]天赋「剑系装备」[/color]", text, StringComparison.Ordinal);
     }
 
@@ -140,21 +140,40 @@ public sealed class ItemDescriptionFormatterTests
                 new StatModifierAffix(StatType.Defence, ModifierValue.Add(18)),
             ]
         };
-        var repository = TestContentFactory.CreateRepository(equipment: [equipment]);
         var instance = new EquipmentInstance(
             "ward_charm_00000001",
             equipment,
             [
-                new StatModifierAffix(StatType.CritChance, ModifierValue.Add(0.05)),
+                new SkillBonusModifierAffix("legend_step", ModifierValue.Add(0.12)),
+                new LegendSkillChanceModifierAffix("legend_step", ModifierValue.Add(0.05)),
                 new GrantTalentAffix("ghost_step"),
             ]);
 
-        var text = ItemDescriptionFormatter.FormatBbCodeCn(instance, repository);
+        var legendSkill = new LegendSkillDefinition(
+            "legend_step",
+            "鬼影迷踪",
+            "legend_step_start",
+            0.2d,
+            [],
+            []);
+        var fullRepository = TestContentFactory.CreateRepository(
+            equipment: [equipment],
+            legendSkills: [legendSkill],
+            talents:
+            [
+                new TalentDefinition
+                {
+                    Id = "ghost_step",
+                    Name = "ghost_step",
+                },
+            ]);
+
+        var text = ItemDescriptionFormatter.FormatBbCodeCn(instance, fullRepository);
 
         Assert.Contains("[color=yellow]装备词条：[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=yellow]防御力 +18[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=green]附加词条：[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=green]暴击率 +5%[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=green]奥义「鬼影迷踪」威力 +12%，触发率 +5%[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=green]天赋「ghost_step」[/color]", text, StringComparison.Ordinal);
     }
 
@@ -171,8 +190,7 @@ public sealed class ItemDescriptionFormatterTests
         var woodenBlade = repository.GetEquipment("木刀");
         var equipmentText = ItemDescriptionFormatter.FormatBbCodeCn(woodenBlade, repository);
         Assert.Contains("[color=yellow]装备词条：[/color]", equipmentText, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]攻击力 +8[/color]", equipmentText, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]暴击率 +1%[/color]", equipmentText, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]攻击力 +8，暴击率 +1%[/color]", equipmentText, StringComparison.Ordinal);
         Assert.Contains("[color=yellow]天赋「刀系装备」[/color]", equipmentText, StringComparison.Ordinal);
     }
 }

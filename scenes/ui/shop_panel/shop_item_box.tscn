@@ -7,6 +7,13 @@
 [ext_resource type="LabelSettings" uid="uid://bq4vwt6mmhytg" path="res://assets/theme/item_name.tres" id="5_label"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/inventory_item_tooltip.tscn" id="6_tooltip"]
 
+[sub_resource type="StyleBoxFlat" id="2_rarity_band"]
+bg_color = Color(0, 0, 1, 0.3)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
 [sub_resource type="StyleBoxFlat" id="1_price_bg"]
 bg_color = Color(0, 0, 0, 0.52)
 corner_radius_top_left = 4
@@ -42,6 +49,16 @@ mouse_filter = 2
 texture = ExtResource("3_mask")
 expand_mode = 1
 
+[node name="RarityBand" type="Panel" parent="." unique_id=529476308]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 2.0
+offset_top = 110.0
+offset_right = 177.0
+offset_bottom = 179.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("2_rarity_band")
+
 [node name="Avatar" type="TextureRect" parent="." unique_id=1664133321]
 unique_name_in_owner = true
 layout_mode = 0
@@ -57,10 +74,10 @@ stretch_mode = 4
 [node name="NameLabel" type="Label" parent="." unique_id=1461701637]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -31.0
-offset_top = 131.0
-offset_right = 209.0
-offset_bottom = 189.0
+offset_left = -12.0
+offset_top = 127.0
+offset_right = 192.0
+offset_bottom = 177.0
 text = "物品"
 label_settings = ExtResource("5_label")
 horizontal_alignment = 1
