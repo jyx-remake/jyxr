@@ -2,6 +2,9 @@
 
 [ext_resource type="Script" path="res://src/Game.Godot/Audio/AudioManager.cs" id="1_audio_manager"]
 
+[sub_resource type="AudioStreamPolyphonic" id="AudioStreamPolyphonic_sfx"]
+polyphony = 4
+
 [node name="AudioManager" type="Node"]
 script = ExtResource("1_audio_manager")
 
@@ -9,17 +12,7 @@ script = ExtResource("1_audio_manager")
 unique_name_in_owner = true
 bus = &"Bgm"
 
-[node name="SfxPlayers" type="Node" parent="."]
+[node name="SfxPlayer" type="AudioStreamPlayer" parent="."]
 unique_name_in_owner = true
-
-[node name="SfxPlayer1" type="AudioStreamPlayer" parent="SfxPlayers"]
 bus = &"SFX"
-
-[node name="SfxPlayer2" type="AudioStreamPlayer" parent="SfxPlayers"]
-bus = &"SFX"
-
-[node name="SfxPlayer3" type="AudioStreamPlayer" parent="SfxPlayers"]
-bus = &"SFX"
-
-[node name="SfxPlayer4" type="AudioStreamPlayer" parent="SfxPlayers"]
-bus = &"SFX"
+stream = SubResource("AudioStreamPolyphonic_sfx")

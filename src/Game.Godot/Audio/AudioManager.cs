@@ -6,11 +6,13 @@ namespace Game.Godot.Audio;
 
 public partial class AudioManager : Node
 {
+	private const string SfxBusName = "SFX";
+
 	public static AudioManager Instance { get; private set; } = null!;
 
 	private AudioStreamPlayer _bgmPlayer = null!;
-	private Node _sfxPlayersRoot = null!;
-	private AudioStreamPlayer[] _sfxPlayers = [];
+	private AudioStreamPlayer _sfxPlayer = null!;
+	private AudioStreamPlaybackPolyphonic _sfxPlayback = null!;
 	private string? _currentBgmResourceId;
 	private string[] _bgmPlaylist = [];
 	private int _lastPlaylistIndex = -1;
@@ -18,9 +20,9 @@ public partial class AudioManager : Node
 	public override void _Ready()
 	{
 		_bgmPlayer = GetNode<AudioStreamPlayer>("%BgmPlayer");
-		_sfxPlayersRoot = GetNode<Node>("%SfxPlayers");
-		_sfxPlayers = _sfxPlayersRoot.GetChildren().OfType<AudioStreamPlayer>().ToArray();
+		_sfxPlayer = GetNode<AudioStreamPlayer>("%SfxPlayer");
 		_bgmPlayer.Finished += OnBgmPlayerFinished;
+		InitializeSfxPlayback();
 		Instance = this;
 	}
 
@@ -82,10 +84,11 @@ public partial class AudioManager : Node
 			return;
 		}
 
-		var player = GetAvailableSfxPlayer();
-		player.Stop();
-		player.Stream = stream;
-		player.Play();
+		var playbackId = _sfxPlayback.PlayStream(stream, bus: SfxBusName);
+		if (playbackId == AudioStreamPlaybackPolyphonic.InvalidId)
+		{
+			Game.Logger.Warning($"SFX polyphony exhausted, dropped sound: {resourceId}");
+		}
 	}
 
 	private void OnBgmPlayerFinished()
@@ -143,16 +146,15 @@ public partial class AudioManager : Node
 		Game.Logger.Info($"Playing BGM: {resourceId}");
 	}
 
-	private AudioStreamPlayer GetAvailableSfxPlayer()
+	private void InitializeSfxPlayback()
 	{
-		foreach (var player in _sfxPlayers)
+		if (_sfxPlayer.Stream is not AudioStreamPolyphonic)
 		{
-			if (!player.Playing)
-			{
-				return player;
-			}
+			throw new InvalidOperationException("SfxPlayer must use an AudioStreamPolyphonic stream.");
 		}
 
-		return _sfxPlayers[0];
+		_sfxPlayer.Play();
+		_sfxPlayback = _sfxPlayer.GetStreamPlayback() as AudioStreamPlaybackPolyphonic
+			?? throw new InvalidOperationException("SfxPlayer playback is not AudioStreamPlaybackPolyphonic.");
 	}
 }
