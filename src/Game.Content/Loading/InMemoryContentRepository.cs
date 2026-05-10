@@ -23,6 +23,7 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public required Dictionary<string, StoryScript> StoryScripts { get; init; }
 	public required Dictionary<string, StorySegmentEntry> StorySegments { get; init; }
 	public required Dictionary<string, ItemDefinition> Items { get; init; }
+	public required List<EquipmentRandomAffixTableDefinition> EquipmentRandomAffixTables { get; init; }
 	public required Dictionary<string, BuffDefinition> Buffs { get; init; }
 	public required Dictionary<string, TalentDefinition> Talents { get; init; }
 	public required Dictionary<string, EquipmentDefinition> Equipments { get; init; }
@@ -37,6 +38,7 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public bool TryGetCharacter(string id, [NotNullWhen(true)] out CharacterDefinition? definition) =>
 		Characters.TryGetValue(id, out definition);
 	public IReadOnlyCollection<CharacterDefinition> GetCharacters() => Characters.Values;
+	public IReadOnlyCollection<ItemDefinition> GetItems() => Items.Values;
 
 	public ExternalSkillDefinition GetExternalSkill(string id) => ExternalSkills[id];
 	public bool TryGetExternalSkill(string id, [NotNullWhen(true)] out ExternalSkillDefinition? definition) =>
@@ -54,6 +56,7 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public InternalSkillDefinition GetInternalSkill(string id) => InternalSkills[id];
 	public bool TryGetInternalSkill(string id, [NotNullWhen(true)] out InternalSkillDefinition? definition) =>
 		InternalSkills.TryGetValue(id, out definition);
+	public IReadOnlyCollection<InternalSkillDefinition> GetInternalSkills() => InternalSkills.Values;
 
 	public MapDefinition GetMap(string id) => Maps[id];
 	public bool TryGetMap(string id, [NotNullWhen(true)] out MapDefinition? definition) =>
@@ -100,6 +103,7 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public EquipmentDefinition GetEquipment(string id) => Equipments[id];
 	public bool TryGetEquipment(string id, [NotNullWhen(true)] out EquipmentDefinition? definition) =>
 		Equipments.TryGetValue(id, out definition);
+	public IReadOnlyList<EquipmentRandomAffixTableDefinition> GetEquipmentRandomAffixTables() => EquipmentRandomAffixTables;
 
 	public IReadOnlyList<LegendSkillDefinition> GetLegendSkills() => LegendSkills;
 	public IReadOnlyList<ResourceDefinition> GetResourcesByGroup(string group)

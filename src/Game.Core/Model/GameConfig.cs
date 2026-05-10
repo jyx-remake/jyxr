@@ -9,6 +9,8 @@ public sealed class GameConfig
 	public int MaxHpMp { get; init; } = 10000;
 	public int MaxHpMpPerRound { get; init; } = 1000;
 	public int MaxLevel { get; init; } = 30;
+	public int BattlePlayerTeam { get; init; } = 1;
+	public double BattleGoldDropChance { get; init; } = 0.005d;
 	public string InitialStorySegmentId { get; init; } = "开局答题";
 
 	public List<string> RandomBattleMusics { get; init; } = [

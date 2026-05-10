@@ -1143,6 +1143,7 @@ public sealed class ContentLoadingTests
             ["shops.json"] = "[]",
             ["special-skills.json"] = "[]",
             ["items.json"] = "[]",
+            ["equipment-random-affixes.json"] = "[]",
             ["buffs.json"] = "[]",
             ["talents.json"] = "[]",
             ["towers.json"] = "[]",

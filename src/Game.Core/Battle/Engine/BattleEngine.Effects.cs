@@ -4,6 +4,7 @@ using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
+using Game.Core;
 
 namespace Game.Core.Battle;
 
@@ -56,7 +57,7 @@ public sealed partial class BattleEngine
         var hitState = BattleHitState.Hit;
         var suppressHitEffects = false;
 
-        if (_random.RollChance(target.GetStat(StatType.Evasion)))
+        if (Probability.RollChance(_random, target.GetStat(StatType.Evasion)))
         {
             hitState = BattleHitState.Miss;
             suppressHitEffects = true;
@@ -98,7 +99,7 @@ public sealed partial class BattleEngine
                     .Any()));
         }
 
-        if (hitState == BattleHitState.Miss && _random.RollChance(source.GetStat(StatType.Accuracy)))
+        if (hitState == BattleHitState.Miss && Probability.RollChance(_random, source.GetStat(StatType.Accuracy)))
         {
             hitState = BattleHitState.Hit;
             suppressHitEffects = false;
@@ -137,7 +138,7 @@ public sealed partial class BattleEngine
     {
         foreach (var buff in buffs)
         {
-            if (!_random.RollPercentage(buff.Chance))
+            if (!Probability.RollPercentage(_random, buff.Chance))
             {
                 continue;
             }
@@ -309,7 +310,7 @@ public sealed partial class BattleEngine
             case ApplyBuffBattleEffectDefinition addBuff:
             {
                 var buffDefinition = addBuff.Buff ?? _buffResolver(addBuff.BuffId);
-                if (!_random.RollPercentage(addBuff.Chance))
+                if (!Probability.RollPercentage(_random, addBuff.Chance))
                 {
                     break;
                 }
@@ -538,7 +539,7 @@ public sealed partial class BattleEngine
     private void ApplyChargeTick(BattleState state, BattleUnit unit, BattleBuffInstance buff)
     {
         var chance = 0.15d + 0.2d * buff.Level;
-        if (!_random.RollChance(chance))
+        if (!Probability.RollChance(_random, chance))
         {
             return;
         }
@@ -572,6 +573,6 @@ public sealed partial class BattleEngine
     private bool RollRageGain(BattleUnit unit)
     {
         var chance = 0.5d + unit.GetStat(StatType.Fuyuan) / 1000d;
-        return _random.RollChance(chance);
+        return Probability.RollChance(_random, chance);
     }
 }

@@ -20,6 +20,7 @@ public sealed partial class JsonContentLoader
         ValidateSkillAffixes(repository);
         ValidateSpecialSkills(repository);
         ValidateItemReferences(repository);
+        ValidateEquipmentRandomAffixTables(repository);
         ValidateShops(repository);
         ValidateLegendSkills(repository);
         ValidateWorldTriggers(repository);
@@ -42,6 +43,44 @@ public sealed partial class JsonContentLoader
         {
             Ensure(character.InternalSkills.Count(skill => skill.Equipped) <= 1,
                 $"Character '{character.Id}' has more than one equipped internal skill.");
+        }
+    }
+
+    private static void ValidateEquipmentRandomAffixTables(InMemoryContentRepository repository)
+    {
+        foreach (var table in repository.EquipmentRandomAffixTables)
+        {
+            Ensure(table.MinItemLevel > 0,
+                "Equipment random affix table minItemLevel must be positive.");
+            Ensure(table.MaxItemLevel >= table.MinItemLevel,
+                $"Equipment random affix table level range '{table.MinItemLevel}-{table.MaxItemLevel}' is invalid.");
+            Ensure(table.Options.Count > 0,
+                $"Equipment random affix table level range '{table.MinItemLevel}-{table.MaxItemLevel}' has no options.");
+
+            foreach (var option in table.Options)
+            {
+                Ensure(option.Weight > 0,
+                    $"Equipment random affix option '{option.Kind}' must have positive weight.");
+
+                if (option.Kind == EquipmentRandomAffixKind.Talent)
+                {
+                    Ensure(option.Pool.Count > 0,
+                        "Equipment random affix talent option must have a non-empty pool.");
+                    foreach (var talentId in option.Pool)
+                    {
+                        Ensure(repository.Talents.ContainsKey(talentId),
+                            $"Equipment random affix talent '{talentId}' does not exist.");
+                    }
+                }
+
+                if (option.Kind == EquipmentRandomAffixKind.WeaponBonus)
+                {
+                    Ensure(option.WeaponType is not null,
+                        "Equipment random affix weapon bonus option must declare weaponType.");
+                    Ensure(option.Ranges.Count > 0,
+                        "Equipment random affix weapon bonus option must declare at least one range.");
+                }
+            }
         }
     }
 

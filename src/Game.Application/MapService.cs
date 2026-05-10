@@ -1,4 +1,5 @@
 using Game.Core.Abstractions;
+using Game.Core;
 using Game.Core.Definitions;
 using Game.Core.Model;
 
@@ -112,7 +113,7 @@ public sealed class MapService
                 continue;
             }
 
-            if (RollChance(mapEvent.Probability))
+            if (Probability.RollPercentage(mapEvent.Probability))
             {
                 return (mapEvent, mapEvent.RepeatMode == RepeatMode.Once ? index : -1);
             }
@@ -188,9 +189,6 @@ public sealed class MapService
             ConsumedTimeSlots = consumedTimeSlots,
         };
     }
-
-    private static bool RollChance(int probability) =>
-        Random.Shared.Next(100) < probability;
 
     private static string BuildLocationEventKey(string mapId, string locationId, int eventIndex) =>
         $"{mapId}|{locationId}|{eventIndex}";

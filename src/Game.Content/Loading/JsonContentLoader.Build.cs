@@ -32,6 +32,7 @@ public sealed partial class JsonContentLoader
             StoryScripts = new Dictionary<string, StoryScript>(package.StoryScripts, StringComparer.Ordinal),
             StorySegments = BuildStorySegments(package.StoryScripts),
             Items = BuildItems(package),
+            EquipmentRandomAffixTables = package.EquipmentRandomAffixTables.ToList(),
             Buffs = IndexById(package.Buffs, "Buff"),
             Talents = IndexById(package.Talents, "Talent"),
             Equipments = IndexById(package.Items.OfType<EquipmentDefinition>(), "Equipment"),

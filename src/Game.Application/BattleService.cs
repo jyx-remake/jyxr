@@ -12,7 +12,6 @@ public sealed class BattleService
 {
     private const int GridWidth = 11;
     private const int GridHeight = 4;
-    private const int PlayerTeam = 1;
     private const string BasicInternalSkillId = "基本内功";
     private static readonly string[] RandomBaseTemplateIds =
     [
@@ -77,6 +76,8 @@ public sealed class BattleService
 
     private GameState State => _session.State;
     private IContentRepository ContentRepository => _session.ContentRepository;
+    private CharacterService CharacterService => _session.CharacterService;
+    private int PlayerTeam => _session.Config.BattlePlayerTeam;
 
     public BattleState BuildBattleState(string battleId, IReadOnlyList<string> selectedCharacterIds)
     {
@@ -123,6 +124,56 @@ public sealed class BattleService
         }
 
         return new BattleState(new BattleGrid(GridWidth, GridHeight), units);
+    }
+
+    public OrdinaryBattleVictorySettlement PreviewOrdinaryVictorySettlement(
+        BattleState state)
+    {
+        var rewardUnits = GetRewardEligiblePlayerUnits(state).ToArray();
+        var settlement = OrdinaryBattleVictorySettlementCalculator.Calculate(
+            state,
+            _session.Config.BattleGoldDropChance,
+            PlayerTeam,
+            rewardUnits.Length);
+        var drops = OrdinaryBattleLootGenerator.Generate(
+            state,
+            ContentRepository,
+            State.Adventure.Round,
+            PlayerTeam);
+
+        return settlement with { Drops = drops };
+    }
+
+    public void ApplyOrdinaryVictorySettlement(
+        BattleState state,
+        OrdinaryBattleVictorySettlement settlement)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(settlement);
+
+        foreach (var playerUnit in GetRewardEligiblePlayerUnits(state))
+        {
+            CharacterService.GainExperience(playerUnit.Character.Id, settlement.ExperiencePerMember);
+        }
+
+        if (settlement.Silver > 0 || settlement.Gold > 0)
+        {
+            State.Currency.AddSilver(settlement.Silver);
+            State.Currency.AddGold(settlement.Gold);
+            _session.Events.Publish(new CurrencyChangedEvent());
+        }
+
+        if (settlement.Drops.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var drop in settlement.Drops)
+        {
+            ApplyRewardDrop(drop);
+        }
+
+        _session.Events.Publish(new InventoryChangedEvent());
     }
 
     private CharacterInstance CreateRandomParticipantCharacter(
@@ -381,6 +432,32 @@ public sealed class BattleService
 
     private CharacterInstance? ResolvePartyCharacter(string characterId) =>
         State.Party.TryGetCharacter(characterId, out var character) ? character : null;
+
+    private IEnumerable<BattleUnit> GetRewardEligiblePlayerUnits(BattleState state) =>
+        state.Units.Where(unit =>
+            unit.Team == PlayerTeam &&
+            State.Party.ContainsMember(unit.Character.Id));
+
+    private void ApplyRewardDrop(OrdinaryBattleRewardDrop drop)
+    {
+        switch (drop)
+        {
+            case OrdinaryBattleStackRewardDrop stack:
+                State.Inventory.AddItem(stack.Item, stack.Quantity);
+                return;
+
+            case OrdinaryBattleEquipmentRewardDrop equipment:
+                var extraAffixes = equipment.Rolls
+                    .SelectMany(static roll => roll.Affixes)
+                    .ToArray();
+                var equipmentInstance = State.EquipmentInstanceFactory.Create(equipment.Equipment, extraAffixes);
+                State.Inventory.AddEquipmentInstance(equipmentInstance);
+                return;
+
+            default:
+                throw new InvalidOperationException($"Unsupported ordinary battle reward drop type '{drop.GetType().Name}'.");
+        }
+    }
 
     private static BattleUnit CreateUnit(
         string id,

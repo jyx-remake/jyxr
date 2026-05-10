@@ -1,5 +1,6 @@
 using Game.Core.Affix;
 using Game.Core.Abstractions;
+using Game.Core;
 
 namespace Game.Core.Battle;
 
@@ -33,7 +34,7 @@ public sealed class BattleHookExecutor
     private static bool EvaluateCondition(BattleHookContext context, BattleHookConditionDefinition condition) =>
         condition switch
         {
-            ChanceBattleHookConditionDefinition chance => context.Random.RollChance(chance.Value),
+            ChanceBattleHookConditionDefinition chance => Probability.RollChance(context.Random, chance.Value),
             DamagePositiveBattleHookConditionDefinition => context.DamageAmount is > 0,
             ContextBuffIdBattleHookConditionDefinition buffId => context.Buff is not null &&
                 string.Equals(context.Buff.Definition.Id, buffId.BuffId, StringComparison.Ordinal),
@@ -134,7 +135,7 @@ public sealed class BattleHookExecutor
             case ApplyBuffBattleEffectDefinition applyBuff:
                 ApplyToSelectedTargets(context, applyBuff.Target, target =>
                 {
-                    if (context.Random.RollPercentage(applyBuff.Chance))
+                    if (Probability.RollPercentage(context.Random, applyBuff.Chance))
                     {
                         context.Engine.ApplyHookBuffEffect(context, target, applyBuff);
                     }

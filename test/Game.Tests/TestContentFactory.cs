@@ -144,6 +144,7 @@ internal static class TestContentFactory
         IEnumerable<StoryScript>? storyScripts = null,
         IEnumerable<TalentDefinition>? talents = null,
         IEnumerable<EquipmentDefinition>? equipment = null,
+        IEnumerable<EquipmentRandomAffixTableDefinition>? equipmentRandomAffixTables = null,
         IEnumerable<ItemDefinition>? items = null,
         IEnumerable<BuffDefinition>? buffs = null,
         IEnumerable<MapDefinition>? maps = null,
@@ -160,6 +161,7 @@ internal static class TestContentFactory
             storyScripts,
             talents,
             equipment,
+            equipmentRandomAffixTables,
             items,
             buffs,
             maps,
@@ -177,6 +179,7 @@ internal static class TestContentFactory
         IEnumerable<StoryScript>? storyScripts,
         IEnumerable<TalentDefinition>? talents,
         IEnumerable<EquipmentDefinition>? equipment,
+        IEnumerable<EquipmentRandomAffixTableDefinition>? equipmentRandomAffixTables,
         IEnumerable<ItemDefinition>? items,
         IEnumerable<BuffDefinition>? buffs,
         IEnumerable<MapDefinition>? maps,
@@ -217,6 +220,7 @@ internal static class TestContentFactory
             StoryScripts = storyScriptMap,
             StorySegments = storySegments,
             Items = (items ?? []).Concat(equipment ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
+            EquipmentRandomAffixTables = (equipmentRandomAffixTables ?? []).ToList(),
             Buffs = (buffs ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Talents = (talents ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Equipments = (equipment ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
@@ -236,12 +240,16 @@ internal static class TestContentFactory
 
     public static EquipmentDefinition CreateEquipment(
         string id,
-        EquipmentSlotType slotType = EquipmentSlotType.Weapon) =>
+        EquipmentSlotType slotType = EquipmentSlotType.Weapon,
+        int level = 1,
+        bool canDrop = true) =>
         new()
         {
             Id = id,
             Name = id,
             Type = ItemType.Equipment,
+            Level = level,
+            CanDrop = canDrop,
             SlotType = slotType,
         };
 }

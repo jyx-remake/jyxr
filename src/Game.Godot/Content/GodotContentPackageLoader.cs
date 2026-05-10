@@ -27,6 +27,7 @@ public sealed class GodotContentPackageLoader
 	private const string StoryDirectoryName = "story";
 	private const string StoryFileSuffix = ".story.json";
 	private const string ItemsFileName = "items.json";
+	private const string EquipmentRandomAffixTablesFileName = "equipment-random-affixes.json";
 	private const string BuffsFileName = "buffs.json";
 	private const string TalentsFileName = "talents.json";
 	private const string TowersFileName = "towers.json";
@@ -63,6 +64,7 @@ public sealed class GodotContentPackageLoader
 			SpecialSkills = LoadRequiredList<SpecialSkillDefinition>(SpecialSkillsFileName),
 			StoryScripts = LoadStoryScripts(),
 			Items = LoadRequiredList<ItemDefinition>(ItemsFileName),
+			EquipmentRandomAffixTables = LoadRequiredList<EquipmentRandomAffixTableDefinition>(EquipmentRandomAffixTablesFileName),
 			Buffs = LoadRequiredList<BuffDefinition>(BuffsFileName),
 			Talents = LoadRequiredList<TalentDefinition>(TalentsFileName),
 			Towers = LoadRequiredList<TowerDefinition>(TowersFileName),

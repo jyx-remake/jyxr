@@ -14,6 +14,7 @@ public interface IContentRepository
     CharacterDefinition GetCharacter(string id);
     bool TryGetCharacter(string id, [NotNullWhen(true)] out CharacterDefinition? definition);
     IReadOnlyCollection<CharacterDefinition> GetCharacters();
+    IReadOnlyCollection<ItemDefinition> GetItems();
     ExternalSkillDefinition GetExternalSkill(string id);
     bool TryGetExternalSkill(string id, [NotNullWhen(true)] out ExternalSkillDefinition? definition);
     IReadOnlyCollection<ExternalSkillDefinition> GetExternalSkills();
@@ -23,6 +24,7 @@ public interface IContentRepository
     bool TryGetGrowTemplate(string id, [NotNullWhen(true)] out GrowTemplateDefinition? definition);
     InternalSkillDefinition GetInternalSkill(string id);
     bool TryGetInternalSkill(string id, [NotNullWhen(true)] out InternalSkillDefinition? definition);
+    IReadOnlyCollection<InternalSkillDefinition> GetInternalSkills();
     MapDefinition GetMap(string id);
     bool TryGetMap(string id, [NotNullWhen(true)] out MapDefinition? definition);
     IReadOnlyList<WorldTriggerDefinition> GetWorldTriggers();
@@ -46,6 +48,7 @@ public interface IContentRepository
     bool TryGetTalent(string id, [NotNullWhen(true)] out TalentDefinition? definition);
     EquipmentDefinition GetEquipment(string id);
     bool TryGetEquipment(string id, [NotNullWhen(true)] out EquipmentDefinition? definition);
+    IReadOnlyList<EquipmentRandomAffixTableDefinition> GetEquipmentRandomAffixTables();
     IReadOnlyList<LegendSkillDefinition> GetLegendSkills();
     IReadOnlyList<ResourceDefinition> GetResourcesByGroup(string group);
     TowerDefinition GetTower(string id);

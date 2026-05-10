@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Game.Core;
 using Game.Core.Abstractions;
 using Game.Core.Affix;
 
@@ -31,7 +32,7 @@ public static class BattleSpeechRuntime
             return null;
         }
 
-        if (!random.RollChance(speech.Chance))
+        if (!Probability.RollChance(random, speech.Chance))
         {
             return null;
         }

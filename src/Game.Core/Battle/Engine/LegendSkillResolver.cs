@@ -3,6 +3,7 @@ using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
+using Game.Core;
 
 namespace Game.Core.Battle;
 
@@ -25,7 +26,7 @@ public sealed class LegendSkillResolver
             }
 
             var triggerChance = ResolveTriggerChance(definition, baseSkill.Owner);
-            if (!random.RollChance(triggerChance))
+            if (!Probability.RollChance(random, triggerChance))
             {
                 continue;
             }

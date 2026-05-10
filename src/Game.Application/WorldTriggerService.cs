@@ -1,4 +1,5 @@
 using Game.Core.Definitions;
+using Game.Core;
 using Game.Core.Model;
 
 namespace Game.Application;
@@ -36,7 +37,7 @@ public sealed class WorldTriggerService
                 continue;
             }
 
-            if (!RollChance(trigger.Probability))
+            if (!Probability.RollPercentage(trigger.Probability))
             {
                 continue;
             }
@@ -96,8 +97,5 @@ public sealed class WorldTriggerService
             TargetId = trigger.TargetId,
             ConsumedTimeSlots = 0,
         };
-
-    private static bool RollChance(int probability) =>
-        Random.Shared.Next(100) < probability;
 
 }
