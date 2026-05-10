@@ -42,6 +42,7 @@ public sealed partial class BattleEngine
         }
 
         var resolvedSkill = _legendSkillResolver.Resolve(_legendSkillsProvider(), skill, _random);
+        var resolvedSpecialSkill = resolvedSkill as SpecialSkillInstance;
         var skillCastInfo = BattleSkillCastInfo.Create(skill, resolvedSkill);
 
         if (unit.Rage < resolvedSkill.RageCost)
@@ -60,6 +61,11 @@ public sealed partial class BattleEngine
             context.Skill = resolvedSkill;
         });
 
+        if (resolvedSpecialSkill is not null)
+        {
+            TryRequestSpecialSkillSpeech(state, unit, resolvedSpecialSkill);
+        }
+
         unit.SpendMp(mpCost);
         unit.SpendRage(resolvedSkill.RageCost);
         resolvedSkill.CurrentCooldown = resolvedSkill.Cooldown;
@@ -72,9 +78,28 @@ public sealed partial class BattleEngine
 
         foreach (var targetUnit in targets)
         {
-            var damage = ApplySkillDamage(state, unit, targetUnit, resolvedSkill);
-            TryGainRageFromTakingDamage(state, unit, targetUnit, damage);
-            ApplySkillBuffs(state, unit, targetUnit, resolvedSkill.Buffs);
+            var hit = ApplySkillDamage(state, unit, targetUnit, resolvedSkill);
+            TryGainRageFromTakingDamage(state, unit, targetUnit, hit.Damage);
+            if (hit.IsHitConfirmed)
+            {
+                TriggerHooks(state, HookTiming.OnHitConfirmed, unit, context =>
+                {
+                    context.Source = unit;
+                    context.Target = targetUnit;
+                    context.Skill = resolvedSkill;
+                    context.DamageAmount = hit.Damage;
+                });
+            }
+
+            if (!hit.SuppressHitEffects)
+            {
+                ApplySkillBuffs(state, unit, targetUnit, resolvedSkill.Buffs);
+            }
+        }
+
+        if (resolvedSpecialSkill is not null)
+        {
+            ApplySpecialSkillEffects(state, unit, targets, resolvedSpecialSkill.Definition.Effects);
         }
 
         if (targets.Any(targetUnit => state.AreEnemies(unit, targetUnit)))
@@ -100,6 +125,15 @@ public sealed partial class BattleEngine
             [battleEvent],
             impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList(),
             skillCastInfo);
+    }
+
+    private void TryRequestSpecialSkillSpeech(
+        BattleState state,
+        BattleUnit source,
+        SpecialSkillInstance specialSkill)
+    {
+        var line = BattleSpeechRuntime.TryPickLine(specialSkill.Definition.Speech, _random);
+        BattleSpeechRuntime.TryEmit(state, source, line);
     }
 
     private static string GetSkillUnavailableMessage(BattleSkillAvailability availability) =>

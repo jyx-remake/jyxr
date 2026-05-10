@@ -67,6 +67,7 @@ public abstract class SkillInstance(CharacterInstance owner)
     public abstract int MpCost { get; }
     public abstract int RageCost { get; }
     public abstract int Cooldown { get; }
+    public abstract bool CanTargetSelf { get; }
     public abstract int CastSize { get; }
     public abstract SkillImpactType ImpactType { get; }
     public abstract int ImpactSize { get; }

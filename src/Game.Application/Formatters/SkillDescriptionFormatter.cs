@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using Game.Core.Abstractions;
 using Game.Core.Affix;
+using Game.Core.Battle;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
@@ -102,6 +103,7 @@ public static class SkillDescriptionFormatter
         AppendDescription(builder, skill.Description);
         AppendBaseCombatLines(builder, skill);
         AppendBuffLines(builder, skill.Buffs);
+        AppendSpecialSkillEffectLines(builder, skill.Definition.Effects);
         return builder.ToString().TrimEnd('\n');
     }
 
@@ -150,6 +152,51 @@ public static class SkillDescriptionFormatter
             AppendLine(builder, FormatBuffBbCode(buff));
         }
     }
+
+    private static void AppendSpecialSkillEffectLines(
+        StringBuilder builder,
+        IReadOnlyList<BattleEffectDefinition>? effects)
+    {
+        foreach (var effect in effects ?? [])
+        {
+            AppendLine(builder, effect switch
+            {
+                RemoveBuffBattleEffectDefinition removeBuff =>
+                    FormatTargetedEffectCn($"移除状态「{removeBuff.Buff.Name}」", removeBuff.Target),
+                RemoveNegativeBuffsBattleEffectDefinition removeNegativeBuffs =>
+                    FormatTargetedEffectCn("移除异常状态", removeNegativeBuffs.Target),
+                RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs =>
+                    FormatTargetedEffectCn("移除增益状态", removePositiveBuffs.Target),
+                AddRageBattleEffectDefinition addRage =>
+                    FormatTargetedEffectCn($"怒气 +{addRage.Value}", addRage.Target),
+                SetRageBattleEffectDefinition setRage =>
+                    FormatTargetedEffectCn($"怒气设为 {setRage.Value}", setRage.Target),
+                SetActionGaugeBattleEffectDefinition setActionGauge =>
+                    FormatTargetedEffectCn($"行动值设为 {setActionGauge.Value}", setActionGauge.Target),
+                AddHpBattleEffectDefinition addHp =>
+                    FormatTargetedEffectCn($"恢复气血 {addHp.Value}", addHp.Target),
+                AddMpBattleEffectDefinition addMp =>
+                    FormatTargetedEffectCn($"恢复内力 {addMp.Value}", addMp.Target),
+                ApplyBuffBattleEffectDefinition addBuff =>
+                    FormatTargetedEffectCn($"附加状态「{addBuff.Buff.Name}」", addBuff.Target) +
+                    $"（等级 {addBuff.Level}，持续 {addBuff.Duration} 回合）",
+                _ => throw new NotSupportedException($"Unsupported special skill effect '{effect.GetType().Name}'.")
+            });
+        }
+    }
+
+    private static string FormatTargetedEffectCn(string text, BattleTargetSelectorDefinition target) =>
+        target switch
+        {
+            SelfBattleTargetSelectorDefinition => $"对自身{text}",
+            SourceBattleTargetSelectorDefinition => $"对施法者{text}",
+            TargetBattleTargetSelectorDefinition => $"对命中目标{text}",
+            AllAlliesBattleTargetSelectorDefinition => $"对全体友军{text}",
+            AllEnemiesBattleTargetSelectorDefinition => $"对全体敌军{text}",
+            NearbyAlliesBattleTargetSelectorDefinition nearbyAllies =>
+                $"对{nearbyAllies.Radius}格内友军{text}",
+            _ => text
+        };
 
     private static void AppendPassiveAffixLines(
         StringBuilder builder,

@@ -18,7 +18,9 @@ public static class BattleSkillTargeting
 
         return state.Units
             .Where(targetUnit => targetUnit.IsAlive && impactedPositions.Contains(targetUnit.Position))
-            .Where(targetUnit => !string.Equals(targetUnit.Id, source.Id, StringComparison.Ordinal))
+            .Where(targetUnit =>
+                !string.Equals(targetUnit.Id, source.Id, StringComparison.Ordinal) ||
+                skill.CanTargetSelf)
             .Where(targetUnit => skill is not LegendSkillInstance || state.AreEnemies(source, targetUnit))
             .ToList();
     }

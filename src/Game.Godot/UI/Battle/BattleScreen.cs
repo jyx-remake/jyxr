@@ -741,7 +741,7 @@ public partial class BattleScreen : Control
 				return true;
 			case BattleEventKind.Damaged:
 			case BattleEventKind.BuffApplied:
-			case BattleEventKind.BuffExpired:
+			case BattleEventKind.BuffRemoved:
 			case BattleEventKind.Healed:
 			case BattleEventKind.MpDamaged:
 			case BattleEventKind.Rested:
@@ -793,7 +793,7 @@ public partial class BattleScreen : Control
 				_boardGrid.PlayFloatText(battleEvent.UnitId, buffName, FloatStateColor);
 				AppendLog($"{battleEvent.UnitId} 获得状态 {buffName}。");
 				break;
-			case BattleEventKind.BuffExpired:
+			case BattleEventKind.BuffRemoved:
 				var expiredBuffName = ResolveBuffName(battleEvent.Detail);
 				_boardGrid.PlayFloatText(battleEvent.UnitId, $"{expiredBuffName}解除", FloatInfoColor);
 				break;

@@ -42,7 +42,14 @@ public sealed class BattleHookExecutor
                 talent.TalentIds.Any(context.Unit.Character.HasEffectiveTalent),
             ContextUnitEquippedInternalSkillBattleHookConditionDefinition internalSkill =>
                 internalSkill.InternalSkillIds.Any(id => string.Equals(id, GetEquippedInternalSkillId(context.Unit), StringComparison.Ordinal)),
+            ContextUnitRelationBattleHookConditionDefinition relation =>
+                IsContextUnitRelation(context, relation),
             ContextUnitRoleBattleHookConditionDefinition unitRole => IsContextUnitRole(context, unitRole.Role),
+            ContextUnitGenderBattleHookConditionDefinition gender => IsContextUnitGender(context, gender),
+            ContextHitStateBattleHookConditionDefinition hitState => context.HitState == hitState.State,
+            ContextSkillNameEqualsBattleHookConditionDefinition skillName =>
+                context.Skill is not null &&
+                skillName.Values.Any(value => string.Equals(context.Skill.Name, value, StringComparison.Ordinal)),
             ContextSkillNameContainsBattleHookConditionDefinition skillName =>
                 context.Skill is not null &&
                 skillName.Values.Any(value => context.Skill.Name.Contains(value, StringComparison.Ordinal)),
@@ -83,7 +90,17 @@ public sealed class BattleHookExecutor
                 case ModifyMpCostBattleHookEffectDefinition:
                     continue;
                 case StrengthenContextBuffBattleHookEffectDefinition:
-                case ApplyBuffBattleHookEffectDefinition:
+                case ApplyBuffBattleEffectDefinition:
+                case RemoveBuffBattleEffectDefinition:
+                case RemoveNegativeBuffsBattleEffectDefinition:
+                case RemovePositiveBuffsBattleEffectDefinition:
+                case AddRageBattleEffectDefinition:
+                case SetRageBattleEffectDefinition:
+                case SetActionGaugeBattleEffectDefinition:
+                case AddHpBattleEffectDefinition:
+                case AddMpBattleEffectDefinition:
+                case CancelHitBattleHookEffectDefinition:
+                case SetHitSuccessBattleHookEffectDefinition:
                     throw new InvalidOperationException(
                         $"Preview battle hook execution does not support side-effect effect '{effect.GetType().Name}' on timing '{hook.Timing}'.");
                 default:
@@ -93,7 +110,7 @@ public sealed class BattleHookExecutor
         }
     }
 
-    private static void ApplyEffect(BattleHookContext context, BattleHookEffectDefinition effect)
+    private static void ApplyEffect(BattleHookContext context, BattleEffectDefinition effect)
     {
         switch (effect)
         {
@@ -114,8 +131,88 @@ public sealed class BattleHookExecutor
                 buff.Strengthen(strengthenBuff.LevelDelta, strengthenBuff.TurnDelta);
                 break;
 
-            case ApplyBuffBattleHookEffectDefinition applyBuff:
-                ApplyBuff(context, applyBuff);
+            case ApplyBuffBattleEffectDefinition applyBuff:
+                ApplyToSelectedTargets(context, applyBuff.Target, target =>
+                {
+                    if (context.Random.RollPercentage(applyBuff.Chance))
+                    {
+                        context.Engine.ApplyHookBuffEffect(context, target, applyBuff);
+                    }
+                });
+                break;
+
+            case RemoveBuffBattleEffectDefinition removeBuff:
+                ApplyToSelectedTargets(context, removeBuff.Target, target =>
+                {
+                    context.Engine.RemoveHookBuffById(
+                        context,
+                        target,
+                        removeBuff.BuffId,
+                        context.Timing.ToString());
+                });
+                break;
+
+            case RemoveNegativeBuffsBattleEffectDefinition removeNegativeBuffs:
+                ApplyToSelectedTargets(context, removeNegativeBuffs.Target, target =>
+                {
+                    context.Engine.RemoveHookNegativeBuffs(context, target, context.Timing.ToString());
+                });
+                break;
+
+            case RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs:
+                ApplyToSelectedTargets(context, removePositiveBuffs.Target, target =>
+                {
+                    context.Engine.RemoveHookPositiveBuffs(context, target, context.Timing.ToString());
+                });
+                break;
+
+            case AddRageBattleEffectDefinition addRage:
+                ApplyToSelectedTargets(context, addRage.Target, target =>
+                {
+                    target.AddRage(addRage.Value);
+                    context.State.AddEvent(new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"{context.Timing}:{addRage.Value}"));
+                });
+                break;
+
+            case SetRageBattleEffectDefinition setRage:
+                ApplyToSelectedTargets(context, setRage.Target, target =>
+                {
+                    target.SetRage(setRage.Value);
+                    context.State.AddEvent(new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"{context.Timing}:set:{setRage.Value}"));
+                });
+                break;
+
+            case SetActionGaugeBattleEffectDefinition setActionGauge:
+                ApplyToSelectedTargets(context, setActionGauge.Target, target =>
+                {
+                    target.SetActionGauge(setActionGauge.Value);
+                });
+                break;
+
+            case AddHpBattleEffectDefinition addHp:
+                ApplyToSelectedTargets(context, addHp.Target, target =>
+                {
+                    var restored = target.RestoreHp(addHp.Value);
+                    context.State.AddEvent(new BattleEvent(BattleEventKind.Healed, target.Id, Detail: $"{context.Timing}:{restored}"));
+                });
+                break;
+
+            case AddMpBattleEffectDefinition addMp:
+                ApplyToSelectedTargets(context, addMp.Target, target =>
+                {
+                    target.RestoreMp(addMp.Value);
+                });
+                break;
+
+            case CancelHitBattleHookEffectDefinition cancelHit:
+                context.HitState = BattleHitState.Miss;
+                context.DamageAmount = 0;
+                context.SuppressHitEffects = cancelHit.SuppressHitEffects;
+                break;
+
+            case SetHitSuccessBattleHookEffectDefinition:
+                context.HitState = BattleHitState.Hit;
+                context.SuppressHitEffects = false;
                 break;
 
             default:
@@ -129,10 +226,29 @@ public sealed class BattleHookExecutor
     {
         var damageCalculation = context.DamageCalculation
             ?? throw new InvalidOperationException("Battle hook effect requires a damage calculation context.");
-        var delta = effect.Delta
+        var delta = ResolveDamageContextDelta(context, effect)
             + effect.DeltaPerUnitLevel * context.Unit.Character.Level
             + effect.DeltaPerBuffLevel * (context.Buff?.Level ?? 0);
         damageCalculation.AddModifier(effect.Field, effect.Op, delta);
+    }
+
+    private static double ResolveDamageContextDelta(
+        BattleHookContext context,
+        ModifyDamageContextBattleHookEffectDefinition effect)
+    {
+        if (effect.DeltaMin is null || effect.DeltaMax is null)
+        {
+            return effect.Delta;
+        }
+
+        if (context.IsPreview)
+        {
+            return (effect.DeltaMin.Value + effect.DeltaMax.Value) / 2d;
+        }
+
+        var min = effect.DeltaMin.Value;
+        var max = effect.DeltaMax.Value;
+        return min + (max - min) * context.Random.NextDouble();
     }
 
     private static int? ApplyModifier(
@@ -171,14 +287,14 @@ public sealed class BattleHookExecutor
             _ => throw new ArgumentOutOfRangeException(nameof(rounding), rounding, null)
         };
 
-    private static void ApplyBuff(BattleHookContext context, ApplyBuffBattleHookEffectDefinition effect)
+    private static void ApplyToSelectedTargets(
+        BattleHookContext context,
+        BattleTargetSelectorDefinition selector,
+        Action<BattleUnit> apply)
     {
-        var definition = context.BuffResolver(effect.BuffId);
-        var sourceUnitId = context.Source?.Id ?? context.Unit.Id;
-        foreach (var target in SelectTargets(context, effect.Target))
+        foreach (var target in SelectTargets(context, selector))
         {
-            target.ApplyBuff(new BattleBuffInstance(definition, effect.Level, effect.Duration, sourceUnitId, context.State.ActionSerial));
-            context.State.AddEvent(new BattleEvent(BattleEventKind.BuffApplied, target.Id, Detail: $"{context.Timing}:{effect.BuffId}"));
+            apply(target);
         }
     }
 
@@ -188,6 +304,13 @@ public sealed class BattleHookExecutor
             SelfBattleTargetSelectorDefinition => [context.Unit],
             SourceBattleTargetSelectorDefinition => context.Source is null ? [] : [context.Source],
             TargetBattleTargetSelectorDefinition => context.Target is null ? [] : [context.Target],
+            AllAlliesBattleTargetSelectorDefinition allAllies => context.State.GetLivingUnits()
+                .Where(unit => unit.Team == context.Unit.Team)
+                .Where(unit => allAllies.IncludeSelf || !string.Equals(unit.Id, context.Unit.Id, StringComparison.Ordinal))
+                .ToList(),
+            AllEnemiesBattleTargetSelectorDefinition => context.State.GetLivingUnits()
+                .Where(unit => unit.Team != context.Unit.Team)
+                .ToList(),
             NearbyAlliesBattleTargetSelectorDefinition nearbyAllies => context.State.GetLivingUnits()
                 .Where(unit => unit.Team == context.Unit.Team)
                 .Where(unit => nearbyAllies.IncludeSelf || !string.Equals(unit.Id, context.Unit.Id, StringComparison.Ordinal))
@@ -198,41 +321,25 @@ public sealed class BattleHookExecutor
 
     private static void TryRequestSpeech(
         BattleHookContext context,
-        BattleHookSpeechDefinition? speech)
+        BattleSpeechDefinition? speech)
     {
         if (speech is null)
         {
             return;
         }
 
-        if (!context.Random.RollChance(speech.Chance))
-        {
-            return;
-        }
-
         var speaker = ResolveSpeaker(context, speech.Speaker);
-        if (speaker is null || !speaker.IsAlive || speech.Lines.Count == 0)
-        {
-            return;
-        }
-
-        var line = speech.Lines.Count == 1
-            ? speech.Lines[0]
-            : speech.Lines[context.Random.Next(0, speech.Lines.Count)];
-        if (string.IsNullOrWhiteSpace(line))
-        {
-            return;
-        }
-
-        context.RequestSpeech(speaker, line);
+        var line = BattleSpeechRuntime.TryPickLine(speech, context.Random);
+        line = BattleSpeechRuntime.FormatText(line, context.Unit, context.Source, context.Target);
+        BattleSpeechRuntime.TryEmit(context.State, speaker, line, context.Timing);
     }
 
-    private static BattleUnit? ResolveSpeaker(BattleHookContext context, BattleHookSpeechSpeaker speaker) =>
+    private static BattleUnit? ResolveSpeaker(BattleHookContext context, BattleSpeechSpeaker speaker) =>
         speaker switch
         {
-            BattleHookSpeechSpeaker.HookOwner => context.Unit,
-            BattleHookSpeechSpeaker.Source => context.Source,
-            BattleHookSpeechSpeaker.Target => context.Target,
+            BattleSpeechSpeaker.Owner => context.Unit,
+            BattleSpeechSpeaker.Source => context.Source,
+            BattleSpeechSpeaker.Target => context.Target,
             _ => throw new ArgumentOutOfRangeException(nameof(speaker), speaker, null)
         };
 
@@ -251,6 +358,45 @@ public sealed class BattleHookExecutor
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
         };
 
+    private static bool IsContextUnitRelation(
+        BattleHookContext context,
+        ContextUnitRelationBattleHookConditionDefinition condition)
+    {
+        var otherUnit = condition.Role switch
+        {
+            BattleHookContextUnitRole.Source => context.Source,
+            BattleHookContextUnitRole.Target => context.Target,
+            _ => throw new ArgumentOutOfRangeException(nameof(condition.Role), condition.Role, null)
+        };
+
+        if (otherUnit is null)
+        {
+            return false;
+        }
+
+        var areAllies = context.Unit.Team == otherUnit.Team;
+        return condition.Relation switch
+        {
+            BattleHookRelation.Ally => areAllies,
+            BattleHookRelation.Enemy => !areAllies,
+            _ => throw new ArgumentOutOfRangeException(nameof(condition.Relation), condition.Relation, null)
+        };
+    }
+
+    private static bool IsContextUnitGender(
+        BattleHookContext context,
+        ContextUnitGenderBattleHookConditionDefinition condition)
+    {
+        var unit = condition.Role switch
+        {
+            BattleHookContextUnitRole.Source => context.Source,
+            BattleHookContextUnitRole.Target => context.Target,
+            _ => throw new ArgumentOutOfRangeException(nameof(condition.Role), condition.Role, null)
+        };
+
+        return unit is not null && condition.Genders.Contains(unit.Character.Definition.Gender);
+    }
+
     private static bool IsContextUnitHpRatio(
         BattleHookContext context,
         ContextUnitHpRatioBattleHookConditionDefinition condition)
@@ -258,7 +404,17 @@ public sealed class BattleHookExecutor
         var ratio = context.Unit.MaxHp <= 0
             ? 0d
             : (double)context.Unit.Hp / context.Unit.MaxHp;
+        if (condition.MinInclusive is { } minInclusive && ratio < minInclusive)
+        {
+            return false;
+        }
+
         if (condition.MinExclusive is { } minExclusive && ratio <= minExclusive)
+        {
+            return false;
+        }
+
+        if (condition.MaxExclusive is { } maxExclusive && ratio >= maxExclusive)
         {
             return false;
         }

@@ -94,6 +94,8 @@ public enum StatType
     Attack,
     [JsonStringEnumMemberName("defence")]
     Defence,
+    [JsonStringEnumMemberName("evasion")]
+    Evasion,
     [JsonStringEnumMemberName("accuracy")]
     Accuracy,
     [JsonStringEnumMemberName("crit_chance")]

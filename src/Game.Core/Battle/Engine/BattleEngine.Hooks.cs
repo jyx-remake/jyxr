@@ -11,11 +11,13 @@ public sealed partial class BattleEngine
         BattleUnit unit,
         Action<BattleHookContext>? configure = null,
         BattleHookExecutionMode executionMode = BattleHookExecutionMode.Execute,
-        bool recordEvents = true)
+        bool recordEvents = true,
+        Func<HookAffix, bool>? hookFilter = null)
     {
         var context = CreateHookContext(state, timing, unit, executionMode);
         configure?.Invoke(context);
         var hooks = unit.Character.GetHooks(timing)
+            .Where(hook => hookFilter is null || hookFilter(hook))
             .ToList();
         if (hooks.Count > 0)
         {
@@ -35,6 +37,7 @@ public sealed partial class BattleEngine
             var buffHooks = buff.Definition.Affixes
                 .OfType<HookAffix>()
                 .Where(hook => hook.Timing == timing)
+                .Where(hook => hookFilter is null || hookFilter(hook))
                 .ToList();
             if (buffHooks.Count == 0)
             {
@@ -92,14 +95,13 @@ public sealed partial class BattleEngine
         HookTiming timing,
         BattleUnit unit,
         BattleHookExecutionMode executionMode) =>
-        new(state, timing, unit, _random, executionMode)
-        {
-            BuffResolver = _buffResolver,
-        };
+        new(this, state, timing, unit, _random, executionMode);
 
     private static IReadOnlyList<string> BuildHookLabels(IReadOnlyList<HookAffix> hooks) =>
         hooks.Select(hook => hook.Effects.Count == 0
             ? hook.Timing.ToString()
-            : $"{hook.Timing}:{string.Join('+', hook.Effects.Select(static effect => effect.GetType().Name.Replace("BattleHookEffectDefinition", string.Empty, StringComparison.Ordinal)))}")
+            : $"{hook.Timing}:{string.Join('+', hook.Effects.Select(static effect => effect.GetType().Name
+                .Replace("BattleHookEffectDefinition", string.Empty, StringComparison.Ordinal)
+                .Replace("BattleEffectDefinition", string.Empty, StringComparison.Ordinal)))}")
             .ToList();
 }

@@ -36,6 +36,7 @@ public sealed class InternalSkillInstance(
     public override int MpCost => (int)Definition.Hard * Level * 4;
     public override int RageCost => 0;
     public override int Cooldown => 0;
+    public override bool CanTargetSelf => false;
     public override int CastSize => 0;
     public override SkillImpactType ImpactType => SkillImpactType.Single;
     public override int ImpactSize => 0;

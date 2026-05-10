@@ -9,8 +9,23 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
-    private int ApplySkillDamage(BattleState state, BattleUnit source, BattleUnit target, SkillInstance skill)
+    private readonly record struct BattleSkillHitResolution(bool IsHitConfirmed, int Damage, bool SuppressHitEffects);
+
+    private readonly record struct BattleSkillHitCheck(bool IsCancelled, bool SuppressHitEffects);
+
+    private BattleSkillHitResolution ApplySkillDamage(BattleState state, BattleUnit source, BattleUnit target, SkillInstance skill)
     {
+        var hitCheck = ResolveSkillHit(state, source, target, skill);
+        if (hitCheck.IsCancelled)
+        {
+            AddEvent(state, new BattleEvent(
+                BattleEventKind.Damaged,
+                target.Id,
+                Detail: source.Id,
+                Damage: new BattleDamageEvent(0, SourceUnitId: source.Id)));
+            return new BattleSkillHitResolution(false, 0, hitCheck.SuppressHitEffects);
+        }
+
         var damageCalculation = _damageCalculator.CreateSkillDamageContext(new BattleDamageContext(source, target, skill));
         ConfigureDamageCalculationHooks(state, source, target, skill, damageCalculation);
         var result = _damageCalculator.CalculateSkillDamage(damageCalculation);
@@ -29,7 +44,67 @@ public sealed partial class BattleEngine
             target.Id,
             Detail: source.Id,
             Damage: new BattleDamageEvent(damage, result.IsCritical, source.Id)));
-        return damage;
+        return new BattleSkillHitResolution(true, damage, hitCheck.SuppressHitEffects || hookContext.SuppressHitEffects);
+    }
+
+    private BattleSkillHitCheck ResolveSkillHit(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        SkillInstance skill)
+    {
+        var hitState = BattleHitState.Hit;
+        var suppressHitEffects = false;
+
+        if (_random.RollChance(target.GetStat(StatType.Evasion)))
+        {
+            hitState = BattleHitState.Miss;
+            suppressHitEffects = true;
+        }
+
+        void Configure(BattleHookContext context)
+        {
+            context.Source = source;
+            context.Target = target;
+            context.Skill = skill;
+            context.HitState = hitState;
+            context.SuppressHitEffects = suppressHitEffects;
+        }
+
+        void Apply(BattleHookContext context)
+        {
+            hitState = context.HitState;
+            suppressHitEffects = context.SuppressHitEffects;
+        }
+
+        Apply(TriggerHooks(state, HookTiming.BeforeHitResolved, target, Configure));
+        if (!string.Equals(source.Id, target.Id, StringComparison.Ordinal))
+        {
+            Apply(TriggerHooks(
+                state,
+                HookTiming.BeforeHitResolved,
+                source,
+                Configure,
+                hookFilter: static hook => hook.Conditions
+                    .OfType<ContextHitStateBattleHookConditionDefinition>()
+                    .Any(condition => condition.State == BattleHitState.Miss)));
+            Apply(TriggerHooks(
+                state,
+                HookTiming.BeforeHitResolved,
+                source,
+                Configure,
+                hookFilter: static hook => !hook.Conditions
+                    .OfType<ContextHitStateBattleHookConditionDefinition>()
+                    .Any()));
+        }
+
+        if (hitState == BattleHitState.Miss && _random.RollChance(source.GetStat(StatType.Accuracy)))
+        {
+            hitState = BattleHitState.Hit;
+            suppressHitEffects = false;
+        }
+
+        return new BattleSkillHitCheck(hitState == BattleHitState.Miss, suppressHitEffects);
     }
 
     private void ConfigureDamageCalculationHooks(
@@ -67,29 +142,268 @@ public sealed partial class BattleEngine
                 continue;
             }
 
-            var instance = new BattleBuffInstance(
-                buff.Buff,
-                buff.Level,
-                buff.Duration,
-                source.Id,
-                state.ActionSerial);
             var buffTarget = buff.Buff.IsDebuff ? target : source;
-            var hookContext = TriggerHooks(state, HookTiming.BeforeBuffApplied, source, context =>
+            ApplyBattleBuff(state, source, buffTarget, buff.Buff, buff.Level, buff.Duration, buff.Id);
+        }
+    }
+
+    private bool ApplyBattleBuff(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        BuffDefinition buffDefinition,
+        int level,
+        int duration,
+        string detail)
+    {
+        var instance = new BattleBuffInstance(
+            buffDefinition,
+            level,
+            duration,
+            source.Id,
+            state.ActionSerial);
+        var hookContext = TriggerHooks(state, HookTiming.BeforeBuffApplied, source, context =>
+        {
+            context.Source = source;
+            context.Target = target;
+            context.Buff = instance;
+        });
+        if (hookContext.Cancel)
+        {
+            return false;
+        }
+
+        target.ApplyBuff(instance);
+        AddEvent(state, new BattleEvent(BattleEventKind.BuffApplied, target.Id, Detail: detail));
+        TriggerHooks(state, HookTiming.OnBuffApplied, target, context =>
+        {
+            context.Source = source;
+            context.Target = target;
+            context.Buff = instance;
+        });
+        return true;
+    }
+
+    internal bool ApplyHookBuffEffect(
+        BattleHookContext context,
+        BattleUnit target,
+        ApplyBuffBattleEffectDefinition effect)
+    {
+        var source = context.Source ?? context.Unit;
+        var buffDefinition = effect.Buff ?? _buffResolver(effect.BuffId);
+        return ApplyBattleBuff(
+            context.State,
+            source,
+            target,
+            buffDefinition,
+            effect.Level,
+            effect.Duration,
+            $"{context.Timing}:{effect.BuffId}");
+    }
+
+    internal IReadOnlyList<BattleBuffInstance> RemoveHookBuffById(
+        BattleHookContext context,
+        BattleUnit target,
+        string buffId,
+        string? detailPrefix)
+    {
+        var source = context.Source ?? context.Unit;
+        return RemoveBattleBuffs(
+            context.State,
+            source,
+            target,
+            buff => string.Equals(buff.Definition.Id, buffId, StringComparison.Ordinal),
+            detailPrefix);
+    }
+
+    internal IReadOnlyList<BattleBuffInstance> RemoveHookNegativeBuffs(
+        BattleHookContext context,
+        BattleUnit target,
+        string? detailPrefix)
+    {
+        var source = context.Source ?? context.Unit;
+        return RemoveBattleBuffs(
+            context.State,
+            source,
+            target,
+            buff => buff.Definition.IsDebuff,
+            detailPrefix);
+    }
+
+    internal IReadOnlyList<BattleBuffInstance> RemoveHookPositiveBuffs(
+        BattleHookContext context,
+        BattleUnit target,
+        string? detailPrefix)
+    {
+        var source = context.Source ?? context.Unit;
+        return RemoveBattleBuffs(
+            context.State,
+            source,
+            target,
+            buff => !buff.Definition.IsDebuff,
+            detailPrefix);
+    }
+
+    private void ApplySpecialSkillEffects(
+        BattleState state,
+        BattleUnit source,
+        IReadOnlyList<BattleUnit> targets,
+        IReadOnlyList<BattleEffectDefinition>? effects)
+    {
+        if (effects is null || effects.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var effect in effects)
+        {
+            foreach (var target in SelectSpecialSkillEffectTargets(state, source, targets, effect))
+            {
+                ApplySpecialSkillEffect(state, source, target, effect);
+            }
+        }
+    }
+
+    private void ApplySpecialSkillEffect(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        BattleEffectDefinition effect)
+    {
+        switch (effect)
+        {
+            case RemoveBuffBattleEffectDefinition removeBuff:
+                RemoveBattleBuffs(
+                    state,
+                    source,
+                    target,
+                    buff => string.Equals(buff.Definition.Id, removeBuff.BuffId, StringComparison.Ordinal),
+                    "special_skill");
+                break;
+            case RemoveNegativeBuffsBattleEffectDefinition:
+                RemoveBattleBuffs(state, source, target, buff => buff.Definition.IsDebuff, "special_skill");
+                break;
+            case RemovePositiveBuffsBattleEffectDefinition:
+                RemoveBattleBuffs(state, source, target, buff => !buff.Definition.IsDebuff, "special_skill");
+                break;
+            case AddRageBattleEffectDefinition rage:
+                target.AddRage(rage.Value);
+                AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"special_skill:{rage.Value}"));
+                break;
+            case SetRageBattleEffectDefinition rage:
+                target.SetRage(rage.Value);
+                AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"special_skill:set:{rage.Value}"));
+                break;
+            case SetActionGaugeBattleEffectDefinition gauge:
+                target.SetActionGauge(gauge.Value);
+                break;
+            case AddHpBattleEffectDefinition hp:
+            {
+                var restored = target.RestoreHp(hp.Value);
+                AddEvent(state, new BattleEvent(BattleEventKind.Healed, target.Id, Detail: $"special_skill:{restored}"));
+                break;
+            }
+            case AddMpBattleEffectDefinition mp:
+                target.RestoreMp(mp.Value);
+                break;
+            case ApplyBuffBattleEffectDefinition addBuff:
+            {
+                var buffDefinition = addBuff.Buff ?? _buffResolver(addBuff.BuffId);
+                if (!_random.RollPercentage(addBuff.Chance))
+                {
+                    break;
+                }
+
+                ApplyBattleBuff(
+                    state,
+                    source,
+                    target,
+                    buffDefinition,
+                    addBuff.Level,
+                    addBuff.Duration,
+                    addBuff.BuffId);
+                break;
+            }
+            default:
+                throw new NotSupportedException($"Unsupported special skill effect '{effect.GetType().Name}'.");
+        }
+    }
+
+    private static IReadOnlyList<BattleUnit> SelectSpecialSkillEffectTargets(
+        BattleState state,
+        BattleUnit source,
+        IReadOnlyList<BattleUnit> impactedTargets,
+        BattleEffectDefinition effect) =>
+        effect switch
+        {
+            ApplyBuffBattleEffectDefinition applyBuff => SelectSpecialSkillEffectTargets(state, source, impactedTargets, applyBuff.Target),
+            RemoveBuffBattleEffectDefinition removeBuff => SelectSpecialSkillEffectTargets(state, source, impactedTargets, removeBuff.Target),
+            RemoveNegativeBuffsBattleEffectDefinition removeNegativeBuffs => SelectSpecialSkillEffectTargets(state, source, impactedTargets, removeNegativeBuffs.Target),
+            RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs => SelectSpecialSkillEffectTargets(state, source, impactedTargets, removePositiveBuffs.Target),
+            AddRageBattleEffectDefinition addRage => SelectSpecialSkillEffectTargets(state, source, impactedTargets, addRage.Target),
+            SetRageBattleEffectDefinition setRage => SelectSpecialSkillEffectTargets(state, source, impactedTargets, setRage.Target),
+            SetActionGaugeBattleEffectDefinition setActionGauge => SelectSpecialSkillEffectTargets(state, source, impactedTargets, setActionGauge.Target),
+            AddHpBattleEffectDefinition addHp => SelectSpecialSkillEffectTargets(state, source, impactedTargets, addHp.Target),
+            AddMpBattleEffectDefinition addMp => SelectSpecialSkillEffectTargets(state, source, impactedTargets, addMp.Target),
+            _ => throw new NotSupportedException($"Unsupported special skill effect '{effect.GetType().Name}'.")
+        };
+
+    private static IReadOnlyList<BattleUnit> SelectSpecialSkillEffectTargets(
+        BattleState state,
+        BattleUnit source,
+        IReadOnlyList<BattleUnit> impactedTargets,
+        BattleTargetSelectorDefinition selector) =>
+        selector switch
+        {
+            SelfBattleTargetSelectorDefinition => [source],
+            SourceBattleTargetSelectorDefinition => [source],
+            TargetBattleTargetSelectorDefinition => impactedTargets,
+            AllAlliesBattleTargetSelectorDefinition allAllies => state.GetLivingUnits()
+                .Where(unit => unit.Team == source.Team)
+                .Where(unit => allAllies.IncludeSelf || !string.Equals(unit.Id, source.Id, StringComparison.Ordinal))
+                .ToList(),
+            AllEnemiesBattleTargetSelectorDefinition => state.GetLivingUnits()
+                .Where(unit => unit.Team != source.Team)
+                .ToList(),
+            NearbyAlliesBattleTargetSelectorDefinition nearbyAllies => state.GetLivingUnits()
+                .Where(unit => unit.Team == source.Team)
+                .Where(unit => nearbyAllies.IncludeSelf || !string.Equals(unit.Id, source.Id, StringComparison.Ordinal))
+                .Where(unit => unit.Position.ManhattanDistanceTo(source.Position) <= nearbyAllies.Radius)
+                .ToList(),
+            _ => throw new NotSupportedException($"Unsupported battle target selector '{selector.GetType().Name}'.")
+        };
+
+    private IReadOnlyList<BattleBuffInstance> RemoveBattleBuffs(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        Func<BattleBuffInstance, bool> predicate,
+        string? detailPrefix = null)
+    {
+        var removedBuffs = target.RemoveBuffs(predicate);
+        EmitBuffRemovedEvents(state, source, target, removedBuffs, detailPrefix);
+        return removedBuffs;
+    }
+
+    private void EmitBuffRemovedEvents(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        IReadOnlyList<BattleBuffInstance> removedBuffs,
+        string? detailPrefix = null)
+    {
+        foreach (var removedBuff in removedBuffs)
+        {
+            var detail = string.IsNullOrWhiteSpace(detailPrefix)
+                ? removedBuff.Definition.Id
+                : $"{detailPrefix}:{removedBuff.Definition.Id}";
+            AddEvent(state, new BattleEvent(BattleEventKind.BuffRemoved, target.Id, Detail: detail));
+            TriggerHooks(state, HookTiming.OnBuffRemoved, target, context =>
             {
                 context.Source = source;
-                context.Target = buffTarget;
-                context.Buff = instance;
+                context.Target = target;
+                context.Buff = removedBuff;
             });
-            if (hookContext.Cancel)
-            {
-                continue;
-            }
-
-            buffTarget.ApplyBuff(instance);
-
-            var battleEvent = new BattleEvent(BattleEventKind.BuffApplied, buffTarget.Id, Detail: buff.Id);
-            AddEvent(state, battleEvent);
-            TriggerHooks(state, HookTiming.OnBuffApplied, buffTarget);
         }
     }
 
@@ -121,21 +435,14 @@ public sealed partial class BattleEngine
                 case AddBuffItemUseEffectDefinition addBuff:
                 {
                     var definition = _buffResolver(addBuff.BuffId);
-                    var instance = new BattleBuffInstance(definition, addBuff.Level, addBuff.Duration, source.Id, state.ActionSerial);
-                    var hookContext = TriggerHooks(state, HookTiming.BeforeBuffApplied, source, context =>
-                    {
-                        context.Source = source;
-                        context.Target = target;
-                        context.Buff = instance;
-                    });
-                    if (hookContext.Cancel)
-                    {
-                        break;
-                    }
-
-                    target.ApplyBuff(instance);
-                    AddEvent(state, new BattleEvent(BattleEventKind.BuffApplied, target.Id, Detail: addBuff.BuffId));
-                    TriggerHooks(state, HookTiming.OnBuffApplied, target);
+                    ApplyBattleBuff(
+                        state,
+                        source,
+                        target,
+                        definition,
+                        addBuff.Level,
+                        addBuff.Duration,
+                        addBuff.BuffId);
                     break;
                 }
             }
@@ -158,8 +465,8 @@ public sealed partial class BattleEngine
         var expired = unit.RemoveExpiredBuffs();
         foreach (var buff in expired)
         {
-            AddEvent(state, new BattleEvent(BattleEventKind.BuffExpired, unit.Id, Detail: buff.Definition.Id));
-            TriggerHooks(state, HookTiming.OnBuffExpired, unit);
+            var source = state.TryGetUnit(buff.SourceUnitId) ?? unit;
+            EmitBuffRemovedEvents(state, source, unit, [buff]);
         }
     }
 

@@ -19,6 +19,7 @@ public sealed class SpecialSkillInstance(
     public override string Animation => Definition.Animation;
     public override string Audio => Definition.Audio;
     public override int Cooldown => Definition.Cooldown;
+    public override bool CanTargetSelf => Definition.Targeting?.CanTargetSelf ?? false;
     public override int CastSize => Definition.Targeting?.CastSize ?? 0;
     public override SkillImpactType ImpactType => Definition.Targeting?.ImpactType ?? SkillImpactType.Single;
     public override int ImpactSize => Definition.Targeting?.ImpactSize??0;

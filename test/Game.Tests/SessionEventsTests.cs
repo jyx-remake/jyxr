@@ -285,6 +285,7 @@ public sealed class SessionEventsTests
             new SkillTargetingDefinition(),
             "",
             "",
+            null,
             []);
         var heroDefinition = TestContentFactory.CreateCharacterDefinition(
             "hero",
@@ -694,6 +695,7 @@ public sealed class SessionEventsTests
             null,
             "",
             "",
+            null,
             []);
         var heroDefinition = TestContentFactory.CreateCharacterDefinition(
             "hero",

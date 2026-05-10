@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Game.Core.Affix;
+using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
@@ -17,6 +18,7 @@ public sealed partial class JsonContentLoader
         ValidateBattles(repository);
         ValidateBattleHookAffixes(repository);
         ValidateSkillAffixes(repository);
+        ValidateSpecialSkills(repository);
         ValidateItemReferences(repository);
         ValidateShops(repository);
         ValidateLegendSkills(repository);
@@ -41,6 +43,46 @@ public sealed partial class JsonContentLoader
             Ensure(character.InternalSkills.Count(skill => skill.Equipped) <= 1,
                 $"Character '{character.Id}' has more than one equipped internal skill.");
         }
+    }
+
+    private static void ValidateSpecialSkills(InMemoryContentRepository repository)
+    {
+        foreach (var skill in repository.SpecialSkills.Values)
+        {
+            ValidateSpecialSkillSpeech(skill, repository);
+
+            foreach (var effect in skill.Effects ?? [])
+            {
+                switch (effect)
+                {
+                    case ModifyDamageBattleHookEffectDefinition:
+                    case ModifyDamageContextBattleHookEffectDefinition:
+                    case ModifyMpCostBattleHookEffectDefinition:
+                    case StrengthenContextBuffBattleHookEffectDefinition:
+                    case CancelHitBattleHookEffectDefinition:
+                    case SetHitSuccessBattleHookEffectDefinition:
+                        throw new InvalidOperationException(
+                            $"SpecialSkill '{skill.Id}' uses unsupported hook-only effect '{effect.GetType().Name}'.");
+                    default:
+                        ValidateSharedBattleEffect(effect, $"SpecialSkill '{skill.Id}'", repository);
+                        break;
+                }
+            }
+        }
+    }
+
+    private static void ValidateSpecialSkillSpeech(
+        SpecialSkillDefinition skill,
+        InMemoryContentRepository repository)
+    {
+        if (skill.Speech is null)
+        {
+            return;
+        }
+
+        ValidateBattleSpeech(skill.Speech, $"SpecialSkill '{skill.Id}'");
+        Ensure(skill.Speech.Speaker == BattleSpeechSpeaker.Owner,
+            $"SpecialSkill '{skill.Id}' speech speaker must be owner.");
     }
 
     private static void ValidateBattles(InMemoryContentRepository repository)
@@ -178,12 +220,28 @@ public sealed partial class JsonContentLoader
                     }
                     break;
                 case ContextUnitHpRatioBattleHookConditionDefinition hpRatioCondition:
-                    Ensure(hpRatioCondition.MinExclusive is not null || hpRatioCondition.MaxInclusive is not null,
+                    Ensure(
+                        hpRatioCondition.MinInclusive is not null ||
+                        hpRatioCondition.MinExclusive is not null ||
+                        hpRatioCondition.MaxExclusive is not null ||
+                        hpRatioCondition.MaxInclusive is not null,
                         $"{ownerName} has battle hook '{hook.Timing}' hp ratio condition without bounds.");
+                    if (hpRatioCondition.MinInclusive is { } minInclusive)
+                    {
+                        Ensure(minInclusive >= 0d && minInclusive <= 1d,
+                            $"{ownerName} has battle hook '{hook.Timing}' hp ratio condition with invalid minInclusive '{minInclusive}'.");
+                    }
+
                     if (hpRatioCondition.MinExclusive is { } minExclusive)
                     {
                         Ensure(minExclusive >= 0d && minExclusive <= 1d,
                             $"{ownerName} has battle hook '{hook.Timing}' hp ratio condition with invalid minExclusive '{minExclusive}'.");
+                    }
+
+                    if (hpRatioCondition.MaxExclusive is { } maxExclusive)
+                    {
+                        Ensure(maxExclusive >= 0d && maxExclusive <= 1d,
+                            $"{ownerName} has battle hook '{hook.Timing}' hp ratio condition with invalid maxExclusive '{maxExclusive}'.");
                     }
 
                     if (hpRatioCondition.MaxInclusive is { } maxInclusive)
@@ -192,7 +250,9 @@ public sealed partial class JsonContentLoader
                             $"{ownerName} has battle hook '{hook.Timing}' hp ratio condition with invalid maxInclusive '{maxInclusive}'.");
                     }
 
-                    if (hpRatioCondition.MinExclusive is { } min && hpRatioCondition.MaxInclusive is { } max)
+                    var lowerBound = hpRatioCondition.MinInclusive ?? hpRatioCondition.MinExclusive;
+                    var upperBound = hpRatioCondition.MaxExclusive ?? hpRatioCondition.MaxInclusive;
+                    if (lowerBound is { } min && upperBound is { } max)
                     {
                         Ensure(min < max,
                             $"{ownerName} has battle hook '{hook.Timing}' hp ratio condition with invalid range '{min}'..'{max}'.");
@@ -228,7 +288,24 @@ public sealed partial class JsonContentLoader
                         }
                     }
                     break;
+                case ContextUnitRelationBattleHookConditionDefinition:
+                    break;
+                case ContextUnitGenderBattleHookConditionDefinition genderCondition:
+                    Ensure(genderCondition.Genders.Count > 0,
+                        $"{ownerName} has battle hook '{hook.Timing}' unit gender condition without genders.");
+                    break;
+                case ContextHitStateBattleHookConditionDefinition:
+                    break;
                 case ContextUnitRoleBattleHookConditionDefinition:
+                    break;
+                case ContextSkillNameEqualsBattleHookConditionDefinition skillNameEqualsCondition:
+                    Ensure(skillNameEqualsCondition.Values.Count > 0,
+                        $"{ownerName} has battle hook '{hook.Timing}' skill name equals condition without values.");
+                    foreach (var value in skillNameEqualsCondition.Values)
+                    {
+                        Ensure(!string.IsNullOrWhiteSpace(value),
+                            $"{ownerName} has battle hook '{hook.Timing}' skill name equals condition with empty value.");
+                    }
                     break;
                 case ContextSkillNameContainsBattleHookConditionDefinition skillNameCondition:
                     Ensure(skillNameCondition.Values.Count > 0,
@@ -258,8 +335,10 @@ public sealed partial class JsonContentLoader
             switch (effect)
             {
                 case ModifyDamageBattleHookEffectDefinition:
-                case ModifyDamageContextBattleHookEffectDefinition:
                 case ModifyMpCostBattleHookEffectDefinition:
+                    break;
+                case ModifyDamageContextBattleHookEffectDefinition modifyDamageContext:
+                    ValidateModifyDamageContextEffect(modifyDamageContext, $"{ownerName} battle hook '{hook.Timing}'");
                     break;
                 case StrengthenContextBuffBattleHookEffectDefinition strengthenBuff:
                     Ensure(strengthenBuff.LevelDelta >= 0,
@@ -267,22 +346,110 @@ public sealed partial class JsonContentLoader
                     Ensure(strengthenBuff.TurnDelta >= 0,
                         $"{ownerName} has battle hook '{hook.Timing}' with invalid buff turn delta '{strengthenBuff.TurnDelta}'.");
                     break;
-                case ApplyBuffBattleHookEffectDefinition applyBuff:
-                    Ensure(applyBuff.Target is not null, $"{ownerName} has battle hook '{hook.Timing}' apply_buff without target.");
-                    Ensure(!string.IsNullOrWhiteSpace(applyBuff.BuffId),
-                        $"{ownerName} has battle hook '{hook.Timing}' apply_buff with empty buffId.");
-                    Ensure(applyBuff.Level >= 0, $"{ownerName} has battle hook '{hook.Timing}' apply_buff with invalid level '{applyBuff.Level}'.");
-                    Ensure(applyBuff.Duration >= 1, $"{ownerName} has battle hook '{hook.Timing}' apply_buff with invalid duration '{applyBuff.Duration}'.");
-                    if (repository is not null)
-                    {
-                        Ensure(repository.Buffs.ContainsKey(applyBuff.BuffId),
-                            $"{ownerName} has battle hook '{hook.Timing}' apply_buff referencing missing buff '{applyBuff.BuffId}'.");
-                    }
-                    ValidateBattleTargetSelector(applyBuff.Target!, ownerName, hook.Timing);
+                case ApplyBuffBattleEffectDefinition:
+                case RemoveBuffBattleEffectDefinition:
+                case RemoveNegativeBuffsBattleEffectDefinition:
+                case RemovePositiveBuffsBattleEffectDefinition:
+                case AddRageBattleEffectDefinition:
+                case SetRageBattleEffectDefinition:
+                case SetActionGaugeBattleEffectDefinition:
+                case AddHpBattleEffectDefinition:
+                case AddMpBattleEffectDefinition:
+                case CancelHitBattleHookEffectDefinition:
+                case SetHitSuccessBattleHookEffectDefinition:
+                    ValidateSharedBattleEffect(effect, $"{ownerName} battle hook '{hook.Timing}'", repository);
                     break;
                 default:
                     throw new InvalidOperationException($"{ownerName} has unsupported battle hook effect '{effect.GetType().Name}'.");
             }
+        }
+    }
+
+    private static void ValidateModifyDamageContextEffect(
+        ModifyDamageContextBattleHookEffectDefinition effect,
+        string ownerName)
+    {
+        var hasRange = effect.DeltaMin is not null || effect.DeltaMax is not null;
+        if (!hasRange)
+        {
+            return;
+        }
+
+        Ensure(effect.DeltaMin is not null && effect.DeltaMax is not null,
+            $"{ownerName} modify_damage_context effect must provide both deltaMin and deltaMax.");
+        Ensure(Math.Abs(effect.Delta) <= double.Epsilon,
+            $"{ownerName} modify_damage_context effect cannot combine delta with deltaMin/deltaMax.");
+        Ensure(effect.DeltaMin <= effect.DeltaMax,
+            $"{ownerName} modify_damage_context effect has invalid range '{effect.DeltaMin}'..'{effect.DeltaMax}'.");
+    }
+
+    private static void ValidateSharedBattleEffect(
+        BattleEffectDefinition effect,
+        string ownerName,
+        InMemoryContentRepository? repository)
+    {
+        switch (effect)
+        {
+            case ApplyBuffBattleEffectDefinition applyBuff:
+                Ensure(applyBuff.Target is not null, $"{ownerName} apply_buff effect is missing target.");
+                Ensure(!string.IsNullOrWhiteSpace(applyBuff.BuffId), $"{ownerName} apply_buff effect is missing buffId.");
+                if (repository is not null)
+                {
+                    Ensure(repository.Buffs.ContainsKey(applyBuff.BuffId), $"{ownerName} references missing buff '{applyBuff.BuffId}'.");
+                }
+                Ensure(applyBuff.Level >= 0, $"{ownerName} apply_buff effect has invalid level '{applyBuff.Level}'.");
+                Ensure(applyBuff.Duration >= 1, $"{ownerName} apply_buff effect has invalid duration '{applyBuff.Duration}'.");
+                Ensure(applyBuff.Chance is >= 0 and <= 100, $"{ownerName} apply_buff effect has invalid chance '{applyBuff.Chance}'.");
+                ValidateBattleTargetSelector(applyBuff.Target!, ownerName, null);
+                break;
+            case RemoveBuffBattleEffectDefinition removeBuff:
+                Ensure(removeBuff.Target is not null, $"{ownerName} remove_buff effect is missing target.");
+                Ensure(!string.IsNullOrWhiteSpace(removeBuff.BuffId), $"{ownerName} remove_buff effect is missing buffId.");
+                if (repository is not null)
+                {
+                    Ensure(repository.Buffs.ContainsKey(removeBuff.BuffId), $"{ownerName} references missing buff '{removeBuff.BuffId}'.");
+                }
+                ValidateBattleTargetSelector(removeBuff.Target!, ownerName, null);
+                break;
+            case RemoveNegativeBuffsBattleEffectDefinition removeNegativeBuffs:
+                Ensure(removeNegativeBuffs.Target is not null, $"{ownerName} remove_negative_buffs effect is missing target.");
+                ValidateBattleTargetSelector(removeNegativeBuffs.Target!, ownerName, null);
+                break;
+            case RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs:
+                Ensure(removePositiveBuffs.Target is not null, $"{ownerName} remove_positive_buffs effect is missing target.");
+                ValidateBattleTargetSelector(removePositiveBuffs.Target!, ownerName, null);
+                break;
+            case AddRageBattleEffectDefinition addRage:
+                Ensure(addRage.Target is not null, $"{ownerName} add_rage effect is missing target.");
+                Ensure(addRage.Value >= 0, $"{ownerName} add_rage effect has invalid value '{addRage.Value}'.");
+                ValidateBattleTargetSelector(addRage.Target!, ownerName, null);
+                break;
+            case SetRageBattleEffectDefinition setRage:
+                Ensure(setRage.Target is not null, $"{ownerName} set_rage effect is missing target.");
+                Ensure(setRage.Value >= 0 && setRage.Value <= BattleUnit.MaxRage,
+                    $"{ownerName} set_rage effect has invalid value '{setRage.Value}'.");
+                ValidateBattleTargetSelector(setRage.Target!, ownerName, null);
+                break;
+            case SetActionGaugeBattleEffectDefinition setActionGauge:
+                Ensure(setActionGauge.Target is not null, $"{ownerName} set_action_gauge effect is missing target.");
+                Ensure(setActionGauge.Value >= 0, $"{ownerName} set_action_gauge effect has invalid value '{setActionGauge.Value}'.");
+                ValidateBattleTargetSelector(setActionGauge.Target!, ownerName, null);
+                break;
+            case AddHpBattleEffectDefinition addHp:
+                Ensure(addHp.Target is not null, $"{ownerName} add_hp effect is missing target.");
+                Ensure(addHp.Value >= 0, $"{ownerName} add_hp effect has invalid value '{addHp.Value}'.");
+                ValidateBattleTargetSelector(addHp.Target!, ownerName, null);
+                break;
+            case AddMpBattleEffectDefinition addMp:
+                Ensure(addMp.Target is not null, $"{ownerName} add_mp effect is missing target.");
+                Ensure(addMp.Value >= 0, $"{ownerName} add_mp effect has invalid value '{addMp.Value}'.");
+                ValidateBattleTargetSelector(addMp.Target!, ownerName, null);
+                break;
+            case CancelHitBattleHookEffectDefinition:
+            case SetHitSuccessBattleHookEffectDefinition:
+                break;
+            default:
+                throw new InvalidOperationException($"{ownerName} has unsupported shared battle effect '{effect.GetType().Name}'.");
         }
     }
 
@@ -293,35 +460,43 @@ public sealed partial class JsonContentLoader
             return;
         }
 
-        Ensure(hook.Speech.Lines.Count > 0,
-            $"{ownerName} has battle hook '{hook.Timing}' speech without lines.");
-        Ensure(hook.Speech.Chance >= 0d && hook.Speech.Chance <= 1d,
-            $"{ownerName} has battle hook '{hook.Timing}' speech with invalid chance '{hook.Speech.Chance}'.");
+        ValidateBattleSpeech(hook.Speech, $"{ownerName} battle hook '{hook.Timing}'");
+    }
 
-        foreach (var line in hook.Speech.Lines)
+    private static void ValidateBattleSpeech(BattleSpeechDefinition speech, string ownerName)
+    {
+        Ensure(speech.Lines.Count > 0,
+            $"{ownerName} speech without lines.");
+        Ensure(speech.Chance >= 0d && speech.Chance <= 1d,
+            $"{ownerName} speech with invalid chance '{speech.Chance}'.");
+
+        foreach (var line in speech.Lines)
         {
             Ensure(!string.IsNullOrWhiteSpace(line),
-                $"{ownerName} has battle hook '{hook.Timing}' speech with empty line.");
+                $"{ownerName} speech with empty line.");
         }
     }
 
     private static void ValidateBattleTargetSelector(
         BattleTargetSelectorDefinition selector,
         string ownerName,
-        HookTiming timing)
+        HookTiming? timing)
     {
+        var scope = timing is null ? ownerName : $"{ownerName} '{timing}'";
         switch (selector)
         {
             case SelfBattleTargetSelectorDefinition:
             case SourceBattleTargetSelectorDefinition:
             case TargetBattleTargetSelectorDefinition:
+            case AllAlliesBattleTargetSelectorDefinition:
+            case AllEnemiesBattleTargetSelectorDefinition:
                 break;
             case NearbyAlliesBattleTargetSelectorDefinition nearbyAllies:
                 Ensure(nearbyAllies.Radius >= 0,
-                    $"{ownerName} has battle hook '{timing}' nearby_allies selector with invalid radius '{nearbyAllies.Radius}'.");
+                    $"{scope} nearby_allies selector has invalid radius '{nearbyAllies.Radius}'.");
                 break;
             default:
-                throw new InvalidOperationException($"{ownerName} has unsupported battle hook target selector '{selector.GetType().Name}'.");
+                throw new InvalidOperationException($"{scope} has unsupported battle target selector '{selector.GetType().Name}'.");
         }
     }
 

@@ -311,6 +311,7 @@ public sealed class StoryServiceTests
             new SkillTargetingDefinition(),
             "",
             "",
+            null,
             []);
         var characterDefinition = TestContentFactory.CreateCharacterDefinition("hero");
         var repository = TestContentFactory.CreateRepository(

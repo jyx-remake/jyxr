@@ -31,7 +31,7 @@ public enum BattleEventKind
     Rested,
     ActionEnded,
     BuffApplied,
-    BuffExpired,
+    BuffRemoved,
     HooksTriggered,
     Healed,
     MpDamaged,

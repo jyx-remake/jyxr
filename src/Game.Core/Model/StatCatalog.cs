@@ -27,6 +27,7 @@ public static class StatCatalog
         new(StatType.MaxMp, "内力上限"),
         new(StatType.Attack, "攻击力"),
         new(StatType.Defence, "防御力"),
+        new(StatType.Evasion, "闪避率"),
         new(StatType.Accuracy, "命中率"),
         new(StatType.CritChance, "暴击率"),
         new(StatType.CritMult, "暴击伤害"),

@@ -41,6 +41,7 @@ public sealed class SaveGameTests
             new SkillTargetingDefinition(),
             "",
             "",
+            null,
             []);
         var ironBlade = TestContentFactory.CreateEquipment("iron_blade", EquipmentSlotType.Weapon);
         var wardCharm = TestContentFactory.CreateEquipment("ward_charm", EquipmentSlotType.Accessory);

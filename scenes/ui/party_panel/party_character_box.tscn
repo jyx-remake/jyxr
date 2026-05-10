@@ -129,17 +129,17 @@ stretch_mode = 5
 
 [node name="LockLabel" type="Label" parent="Content" unique_id=1579312415]
 unique_name_in_owner = true
-visible = false
 layout_mode = 0
-offset_left = 12.0
-offset_top = 240.0
-offset_right = 124.0
-offset_bottom = 269.0
+offset_left = 83.0
+offset_top = 248.0
+offset_right = 195.0
+offset_bottom = 277.0
 theme_override_colors/font_color = Color(1, 0.92549, 0.647059, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 18
-text = "主角锁定"
+text = "主角"
+horizontal_alignment = 1
 
 [node name="DragHighlight" type="ColorRect" parent="Content" unique_id=1991012401]
 unique_name_in_owner = true

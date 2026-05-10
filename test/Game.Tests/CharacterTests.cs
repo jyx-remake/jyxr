@@ -25,6 +25,7 @@ public sealed class CharacterTests
             new SkillTargetingDefinition(),
             "",
             "",
+            null,
             []);
         var definition = TestContentFactory.CreateCharacterDefinition(
             "hero_knight",
@@ -200,6 +201,7 @@ public sealed class CharacterTests
             null,
             "",
             "",
+            null,
             []);
         var character = TestContentFactory.CreateCharacterInstance(
             "char_001",

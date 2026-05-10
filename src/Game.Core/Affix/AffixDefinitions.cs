@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Game.Core.Abstractions;
+using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Model;
 
@@ -70,19 +71,20 @@ public sealed record HookAffix : AffixDefinition
 
     public IReadOnlyList<BattleHookConditionDefinition> Conditions { get; init; } = [];
 
-    public IReadOnlyList<BattleHookEffectDefinition> Effects { get; init; } = [];
+    public IReadOnlyList<BattleEffectDefinition> Effects { get; init; } = [];
 
-    public BattleHookSpeechDefinition? Speech { get; init; }
+    public BattleSpeechDefinition? Speech { get; init; }
+
+    public override void Resolve(IContentRepository contentRepository)
+    {
+        foreach (var effect in Effects)
+        {
+            effect.Resolve(contentRepository);
+        }
+    }
 }
 
 public sealed record TraitAffix(TraitId TraitId) : AffixDefinition;
-
-public sealed record BattleHookSpeechDefinition
-{
-    public BattleHookSpeechSpeaker Speaker { get; init; } = BattleHookSpeechSpeaker.HookOwner;
-    public required IReadOnlyList<string> Lines { get; init; }
-    public double Chance { get; init; } = 1d;
-}
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(ChanceBattleHookConditionDefinition), "chance")]
@@ -91,7 +93,11 @@ public sealed record BattleHookSpeechDefinition
 [JsonDerivedType(typeof(ContextUnitHpRatioBattleHookConditionDefinition), "context_unit_hp_ratio")]
 [JsonDerivedType(typeof(ContextUnitEffectiveTalentBattleHookConditionDefinition), "context_unit_effective_talent")]
 [JsonDerivedType(typeof(ContextUnitEquippedInternalSkillBattleHookConditionDefinition), "context_unit_equipped_internal_skill")]
+[JsonDerivedType(typeof(ContextUnitRelationBattleHookConditionDefinition), "context_unit_relation")]
 [JsonDerivedType(typeof(ContextUnitRoleBattleHookConditionDefinition), "context_unit_role")]
+[JsonDerivedType(typeof(ContextUnitGenderBattleHookConditionDefinition), "context_unit_gender")]
+[JsonDerivedType(typeof(ContextHitStateBattleHookConditionDefinition), "context_hit_state")]
+[JsonDerivedType(typeof(ContextSkillNameEqualsBattleHookConditionDefinition), "context_skill_name_equals")]
 [JsonDerivedType(typeof(ContextSkillNameContainsBattleHookConditionDefinition), "context_skill_name_contains")]
 [JsonDerivedType(typeof(ContextSkillWeaponTypeBattleHookConditionDefinition), "context_skill_weapon_type")]
 public abstract record BattleHookConditionDefinition;
@@ -104,7 +110,12 @@ public sealed record ContextBuffIdBattleHookConditionDefinition(string BuffId) :
 
 public sealed record ContextUnitHpRatioBattleHookConditionDefinition(
     double? MinExclusive = null,
-    double? MaxInclusive = null) : BattleHookConditionDefinition;
+    double? MaxInclusive = null) : BattleHookConditionDefinition
+{
+    public double? MinInclusive { get; init; }
+
+    public double? MaxExclusive { get; init; }
+}
 
 public sealed record ContextUnitEffectiveTalentBattleHookConditionDefinition(
     IReadOnlyList<string> TalentIds) : BattleHookConditionDefinition;
@@ -112,21 +123,27 @@ public sealed record ContextUnitEffectiveTalentBattleHookConditionDefinition(
 public sealed record ContextUnitEquippedInternalSkillBattleHookConditionDefinition(
     IReadOnlyList<string> InternalSkillIds) : BattleHookConditionDefinition;
 
+public sealed record ContextUnitRelationBattleHookConditionDefinition(
+    BattleHookContextUnitRole Role,
+    BattleHookRelation Relation) : BattleHookConditionDefinition;
+
 public sealed record ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole Role) : BattleHookConditionDefinition;
+
+public sealed record ContextUnitGenderBattleHookConditionDefinition(
+    BattleHookContextUnitRole Role,
+    IReadOnlyList<CharacterGender> Genders) : BattleHookConditionDefinition;
+
+public sealed record ContextHitStateBattleHookConditionDefinition(
+    BattleHitState State) : BattleHookConditionDefinition;
+
+public sealed record ContextSkillNameEqualsBattleHookConditionDefinition(
+    IReadOnlyList<string> Values) : BattleHookConditionDefinition;
 
 public sealed record ContextSkillNameContainsBattleHookConditionDefinition(
     IReadOnlyList<string> Values) : BattleHookConditionDefinition;
 
 public sealed record ContextSkillWeaponTypeBattleHookConditionDefinition(
     IReadOnlyList<WeaponType> WeaponTypes) : BattleHookConditionDefinition;
-
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(ModifyDamageBattleHookEffectDefinition), "modify_damage")]
-[JsonDerivedType(typeof(ModifyDamageContextBattleHookEffectDefinition), "modify_damage_context")]
-[JsonDerivedType(typeof(ModifyMpCostBattleHookEffectDefinition), "modify_mp_cost")]
-[JsonDerivedType(typeof(StrengthenContextBuffBattleHookEffectDefinition), "strengthen_context_buff")]
-[JsonDerivedType(typeof(ApplyBuffBattleHookEffectDefinition), "apply_buff")]
-public abstract record BattleHookEffectDefinition;
 
 public enum BattleHookRounding
 {
@@ -140,44 +157,25 @@ public sealed record ModifyDamageBattleHookEffectDefinition(
     ModifierOp Op,
     double Delta = 0d,
     double DeltaPerBuffLevel = 0d,
-    BattleHookRounding Rounding = BattleHookRounding.Truncate) : BattleHookEffectDefinition;
+    BattleHookRounding Rounding = BattleHookRounding.Truncate) : BattleEffectDefinition;
 
 public sealed record ModifyDamageContextBattleHookEffectDefinition(
     BattleDamageContextField Field,
     ModifierOp Op,
-    double Delta,
+    double Delta = 0d,
     double DeltaPerUnitLevel = 0d,
-    double DeltaPerBuffLevel = 0d) : BattleHookEffectDefinition;
+    double DeltaPerBuffLevel = 0d,
+    double? DeltaMin = null,
+    double? DeltaMax = null) : BattleEffectDefinition;
 
 public sealed record ModifyMpCostBattleHookEffectDefinition(
     ModifierOp Op,
     double Delta = 0d,
     double DeltaPerBuffLevel = 0d,
-    BattleHookRounding Rounding = BattleHookRounding.Ceiling) : BattleHookEffectDefinition;
+    BattleHookRounding Rounding = BattleHookRounding.Ceiling) : BattleEffectDefinition;
+
+public sealed record SetHitSuccessBattleHookEffectDefinition : BattleEffectDefinition;
 
 public sealed record StrengthenContextBuffBattleHookEffectDefinition(
     int LevelDelta = 0,
-    int TurnDelta = 0) : BattleHookEffectDefinition;
-
-public sealed record ApplyBuffBattleHookEffectDefinition(
-    BattleTargetSelectorDefinition Target,
-    string BuffId,
-    int Level,
-    int Duration) : BattleHookEffectDefinition;
-
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(SelfBattleTargetSelectorDefinition), "self")]
-[JsonDerivedType(typeof(SourceBattleTargetSelectorDefinition), "source")]
-[JsonDerivedType(typeof(TargetBattleTargetSelectorDefinition), "target")]
-[JsonDerivedType(typeof(NearbyAlliesBattleTargetSelectorDefinition), "nearby_allies")]
-public abstract record BattleTargetSelectorDefinition;
-
-public sealed record SelfBattleTargetSelectorDefinition : BattleTargetSelectorDefinition;
-
-public sealed record SourceBattleTargetSelectorDefinition : BattleTargetSelectorDefinition;
-
-public sealed record TargetBattleTargetSelectorDefinition : BattleTargetSelectorDefinition;
-
-public sealed record NearbyAlliesBattleTargetSelectorDefinition(
-    int Radius,
-    bool IncludeSelf = true) : BattleTargetSelectorDefinition;
+    int TurnDelta = 0) : BattleEffectDefinition;

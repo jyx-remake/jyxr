@@ -32,6 +32,7 @@ public sealed class AffixFormatterTests
             null,
             "",
             "",
+            null,
             []);
         var legendSkill = new LegendSkillDefinition(
             "legend_001",
@@ -52,8 +53,14 @@ public sealed class AffixFormatterTests
         Assert.Equal("命中率 +12.5%", AffixFormatter.FormatCn(
             new StatModifierAffix(StatType.Accuracy, ModifierValue.Add(0.125)),
             repository));
+        Assert.Equal("闪避率 +8%", AffixFormatter.FormatCn(
+            new StatModifierAffix(StatType.Evasion, ModifierValue.Add(0.08)),
+            repository));
         Assert.Equal("集气速度 +0.125", AffixFormatter.FormatCn(
             new StatModifierAffix(StatType.Speed, ModifierValue.Add(0.125)),
+            repository));
+        Assert.Equal("闪避率 每级 +7%", AffixFormatter.FormatCn(
+            new BuffLevelStatModifierAffix(StatType.Evasion, AddPerLevel: 0.07),
             repository));
         Assert.Equal("集气速度提高5%", AffixFormatter.FormatCn(
             new StatModifierAffix(StatType.Speed, ModifierValue.Increase(0.05)),

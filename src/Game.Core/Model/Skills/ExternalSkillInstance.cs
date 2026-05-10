@@ -47,6 +47,7 @@ public sealed class ExternalSkillInstance(
     public override int MpCost => Definition.Cost?.Mp ?? SkillHelper.GetMpCost(this);
     public override int RageCost => Definition.Cost.Rage;
     public override int Cooldown => CurrentLevelOverride?.Cooldown ?? Definition.Cooldown;
+    public override bool CanTargetSelf => CurrentTargeting.CanTargetSelf;
     public override int CastSize => CurrentTargeting.CastSize ?? SkillHelper.GetCastSize(this);
     public override SkillImpactType ImpactType => CurrentTargeting.ImpactType ?? SkillHelper.GetImpactType(this);
     public override int ImpactSize => CurrentTargeting.ImpactSize ?? SkillHelper.GetImpactSize(this);

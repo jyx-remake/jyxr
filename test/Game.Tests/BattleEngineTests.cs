@@ -926,6 +926,124 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void BeginAction_HookAppliedBuffRunsBeforeBuffAppliedLifecycle()
+    {
+        var recovery = new BuffDefinition { Id = "恢复", Name = "恢复", IsDebuff = false };
+        var applyBuffHook = new HookAffix
+        {
+            Timing = HookTiming.BeforeActionStart,
+            Effects =
+            [
+                new ApplyBuffBattleEffectDefinition(
+                    new SelfBattleTargetSelectorDefinition(),
+                    recovery.Id,
+                    Level: 1,
+                    Duration: 2),
+            ],
+        };
+        var strengthenHook = new HookAffix
+        {
+            Timing = HookTiming.BeforeBuffApplied,
+            Conditions = [new ContextBuffIdBattleHookConditionDefinition(recovery.Id)],
+            Effects = [new StrengthenContextBuffBattleHookEffectDefinition(LevelDelta: 2, TurnDelta: 1)],
+        };
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            talents:
+            [
+                CreateDamageContextTalent("普照", applyBuffHook),
+                CreateDamageContextTalent("疗伤精通", strengthenHook),
+            ]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(buffResolver: id => id == recovery.Id ? recovery : throw new KeyNotFoundException(id));
+
+        var action = engine.BeginAction(state, hero.Id);
+
+        Assert.NotNull(action);
+        var applied = Assert.Single(hero.Buffs);
+        Assert.Equal(3, applied.Level);
+        Assert.Equal(3, applied.RemainingTurns);
+        Assert.Contains(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.BuffApplied &&
+            battleEvent.UnitId == hero.Id &&
+            battleEvent.Detail == "BeforeActionStart:恢复");
+    }
+
+    [Fact]
+    public void CastSkill_HookRemovedBuffRunsOnBuffRemovedLifecycle()
+    {
+        var poison = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var removeBuffHook = new HookAffix
+        {
+            Timing = HookTiming.OnHitConfirmed,
+            Effects =
+            [
+                new RemoveBuffBattleEffectDefinition(
+                    new TargetBattleTargetSelectorDefinition(),
+                    poison.Id),
+            ],
+        };
+        var removedRageHook = new HookAffix
+        {
+            Timing = HookTiming.OnBuffRemoved,
+            Conditions = [new ContextBuffIdBattleHookConditionDefinition(poison.Id)],
+            Effects =
+            [
+                new AddRageBattleEffectDefinition(
+                    new SelfBattleTargetSelectorDefinition(),
+                    Value: 2),
+            ],
+        };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 1,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents: [CreateDamageContextTalent("净化攻击", removeBuffHook)],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit(
+            "target",
+            team: 2,
+            new GridPosition(1, 0),
+            maxHp: 500,
+            talents: [CreateDamageContextTalent("去毒回怒", removedRageHook)]);
+        target.ApplyBuff(new BattleBuffInstance(poison, level: 1, remainingTurns: 3, source.Id, 1));
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Empty(target.Buffs);
+        Assert.Equal(3, target.Rage);
+        Assert.Contains(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.BuffRemoved &&
+            battleEvent.UnitId == target.Id &&
+            battleEvent.Detail == "OnHitConfirmed:中毒");
+        Assert.Contains(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.RageChanged &&
+            battleEvent.UnitId == target.Id &&
+            battleEvent.Detail == "OnBuffRemoved:2");
+    }
+
+    [Fact]
     public void CastSkill_AppliesDebuffsToTargetAndBuffsToSource()
     {
         var poison = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
@@ -1059,6 +1177,429 @@ public sealed class BattleEngineTests
 
         Assert.True(result.Success);
         Assert.Equal(500 - expected / 2, qiankunTarget.Hp);
+    }
+
+    [Fact]
+    public void CastSkill_BeforeHitResolvedCancelHit_SuppressesHitEffectsAndSkipsOnDamageTaken()
+    {
+        var debuff = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            buffs: [new SkillBuffDefinition(debuff, level: 1, duration: 2)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit(
+            "target",
+            team: 2,
+            new GridPosition(1, 0),
+            maxHp: 500,
+            talents:
+            [
+                CreateDamageContextTalent("易容", CreateBeforeHitCancelHook()),
+                CreateDamageContextTalent(
+                    "受击回怒",
+                    new HookAffix
+                    {
+                        Timing = HookTiming.OnDamageTaken,
+                        Conditions = [new DamagePositiveBattleHookConditionDefinition()],
+                        Effects =
+                        [
+                            new AddRageBattleEffectDefinition(
+                                new SelfBattleTargetSelectorDefinition(),
+                                Value: 2),
+                        ],
+                    }),
+            ]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(500, target.Hp);
+        Assert.Equal(0, target.Rage);
+        Assert.Empty(target.Buffs);
+
+        var damageEvent = Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == target.Id));
+        Assert.Equal(0, damageEvent.Damage?.Amount ?? -1);
+        Assert.DoesNotContain(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.RageChanged &&
+            battleEvent.UnitId == target.Id &&
+            string.Equals(battleEvent.Detail, "OnDamageTaken:2", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void CastSkill_BeforeHitResolvedSourceOverrideAndFumbleUseLegacyOrder()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents:
+            [
+                CreateDamageContextTalent("破闪避", CreateSetHitSuccessWhenMissHook()),
+                CreateDamageContextTalent("白内障", CreateSourceFumbleHook()),
+            ],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit(
+            "target",
+            team: 2,
+            new GridPosition(1, 0),
+            maxHp: 500,
+            talents:
+            [
+                CreateDamageContextTalent("闪避", CreateBeforeHitCancelHook()),
+            ]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(500, target.Hp);
+        var damageEvent = Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == target.Id));
+        Assert.Equal(0, damageEvent.Damage?.Amount ?? -1);
+    }
+
+    [Fact]
+    public void CastSkill_BeforeHitResolvedSetHitSuccessRestoresHitEffects()
+    {
+        var debuff = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            buffs: [new SkillBuffDefinition(debuff, level: 1, duration: 2)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents:
+            [
+                CreateDamageContextTalent("破闪避", CreateSetHitSuccessWhenMissHook()),
+            ],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit(
+            "target",
+            team: 2,
+            new GridPosition(1, 0),
+            maxHp: 500,
+            talents:
+            [
+                CreateDamageContextTalent("闪避", CreateBeforeHitCancelHook()),
+            ]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.True(target.Hp < 500);
+        var buff = Assert.Single(target.Buffs);
+        Assert.Equal("中毒", buff.Definition.Id);
+    }
+
+    [Fact]
+    public void CastSkill_BeforeHitResolvedGenderConditionMatchesFemaleAndEunuch()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var talent = CreateDamageContextTalent("段王爷的电眼", CreateFemaleOrEunuchMissHook());
+        var femaleSource = CreateUnit(
+            "female_source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            gender: CharacterGender.Female);
+        var eunuchSource = CreateUnit(
+            "eunuch_source",
+            team: 1,
+            new GridPosition(0, 1),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            gender: CharacterGender.Eunuch);
+        var maleSource = CreateUnit(
+            "male_source",
+            team: 1,
+            new GridPosition(0, 2),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            gender: CharacterGender.Male);
+        var femaleTarget = CreateUnit("female_target", team: 2, new GridPosition(1, 0), maxHp: 500, talents: [talent]);
+        var eunuchTarget = CreateUnit("eunuch_target", team: 2, new GridPosition(1, 1), maxHp: 500, talents: [talent]);
+        var maleTarget = CreateUnit("male_target", team: 2, new GridPosition(1, 2), maxHp: 500, talents: [talent]);
+        var state = new BattleState(new BattleGrid(4, 4), [femaleSource, eunuchSource, maleSource, femaleTarget, eunuchTarget, maleTarget]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d));
+
+        femaleSource.ActionGauge = 100;
+        engine.BeginAction(state, femaleSource.Id);
+        var femaleResult = engine.CastSkill(state, femaleSource.Id, femaleSource.Character.GetExternalSkills().Single(), femaleTarget.Position);
+
+        eunuchSource.ActionGauge = 100;
+        engine.BeginAction(state, eunuchSource.Id);
+        var eunuchResult = engine.CastSkill(state, eunuchSource.Id, eunuchSource.Character.GetExternalSkills().Single(), eunuchTarget.Position);
+
+        maleSource.ActionGauge = 100;
+        engine.BeginAction(state, maleSource.Id);
+        var maleResult = engine.CastSkill(state, maleSource.Id, maleSource.Character.GetExternalSkills().Single(), maleTarget.Position);
+
+        Assert.True(femaleResult.Success);
+        Assert.True(eunuchResult.Success);
+        Assert.True(maleResult.Success);
+        Assert.Equal(500, femaleTarget.Hp);
+        Assert.Equal(500, eunuchTarget.Hp);
+        Assert.True(maleTarget.Hp < 500);
+    }
+
+    [Fact]
+    public void CastSkill_OnHitConfirmedRunsBeforeSkillBuffsAndSkipsOnMiss()
+    {
+        var stun = new BuffDefinition { Id = "晕眩", Name = "晕眩", IsDebuff = true };
+        var poison = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            buffs: [new SkillBuffDefinition(poison, level: 1, duration: 2)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents:
+            [
+                CreateDamageContextTalent("段王爷的电眼", CreateOnHitConfirmedTargetStunHook(stun)),
+            ],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var hitTarget = CreateUnit(
+            "hit_target",
+            team: 2,
+            new GridPosition(1, 0),
+            maxHp: 500,
+            gender: CharacterGender.Female);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, hitTarget]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d),
+            buffResolver: buffId => string.Equals(buffId, stun.Id, StringComparison.Ordinal)
+                ? stun
+                : throw new InvalidOperationException($"Unexpected buff '{buffId}'."));
+        engine.BeginAction(state, source.Id);
+
+        var hitResult = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), hitTarget.Position);
+
+        Assert.True(hitResult.Success);
+        Assert.Equal(["晕眩", "中毒"], hitTarget.Buffs.Select(buff => buff.Definition.Id).ToArray());
+
+        var missSource = CreateUnit(
+            "miss_source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents:
+            [
+                CreateDamageContextTalent("段王爷的电眼", CreateOnHitConfirmedTargetStunHook(stun)),
+            ],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var missTarget = CreateUnit(
+            "miss_target",
+            team: 2,
+            new GridPosition(1, 0),
+            maxHp: 500,
+            talents:
+            [
+                CreateDamageContextTalent("易容", CreateBeforeHitCancelHook()),
+            ],
+            gender: CharacterGender.Female);
+        missSource.ActionGauge = 100;
+        var missState = new BattleState(new BattleGrid(4, 4), [missSource, missTarget]);
+        var missEngine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d),
+            buffResolver: buffId => string.Equals(buffId, stun.Id, StringComparison.Ordinal)
+                ? stun
+                : throw new InvalidOperationException($"Unexpected buff '{buffId}'."));
+        missEngine.BeginAction(missState, missSource.Id);
+
+        var missResult = missEngine.CastSkill(missState, missSource.Id, missSource.Character.GetExternalSkills().Single(), missTarget.Position);
+
+        Assert.True(missResult.Success);
+        Assert.Empty(missTarget.Buffs);
+    }
+
+    [Fact]
+    public void CastSkill_EvasionBuffCanCauseMissBeforeHooks()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500);
+        target.ApplyBuff(new BattleBuffInstance(
+            new BuffDefinition
+            {
+                Id = "飘渺",
+                Name = "飘渺",
+                IsDebuff = false,
+                Affixes = [new BuffLevelStatModifierAffix(StatType.Evasion, AddPerLevel: 0.07)],
+            },
+            level: 8,
+            remainingTurns: 3,
+            sourceUnitId: source.Id,
+            appliedAtActionSerial: 0));
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.2d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(500, target.Hp);
+        var damageEvent = Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == target.Id));
+        Assert.Equal(0, damageEvent.Damage?.Amount ?? -1);
+    }
+
+    [Fact]
+    public void CastSkill_AccuracyCanTurnMissBackIntoHit()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+                [StatType.Accuracy] = 1,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500);
+        target.ApplyBuff(new BattleBuffInstance(
+            new BuffDefinition
+            {
+                Id = "飘渺",
+                Name = "飘渺",
+                IsDebuff = false,
+                Affixes = [new BuffLevelStatModifierAffix(StatType.Evasion, AddPerLevel: 0.07)],
+            },
+            level: 8,
+            remainingTurns: 3,
+            sourceUnitId: source.Id,
+            appliedAtActionSerial: 0));
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.2d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.True(target.Hp < 500);
+        Assert.DoesNotContain(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == target.Id &&
+            battleEvent.Damage?.Amount == 0);
     }
 
     [Fact]
@@ -1683,7 +2224,7 @@ public sealed class BattleEngineTests
             ],
             Effects =
             [
-                new ApplyBuffBattleHookEffectDefinition(
+                new ApplyBuffBattleEffectDefinition(
                     new NearbyAlliesBattleTargetSelectorDefinition(Radius: 2, IncludeSelf: true),
                     "恢复",
                     Level: 2,
@@ -1703,6 +2244,86 @@ public sealed class BattleEngineTests
             Effects =
             [
                 new ModifyDamageBattleHookEffectDefinition(ModifierOp.Increase, Delta: -0.5d),
+            ],
+        };
+
+    private static HookAffix CreateBeforeHitCancelHook(bool suppressHitEffects = true) =>
+        new()
+        {
+            Timing = HookTiming.BeforeHitResolved,
+            Conditions =
+            [
+                new ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole.Target),
+            ],
+            Effects =
+            [
+                new CancelHitBattleHookEffectDefinition(suppressHitEffects),
+            ],
+        };
+
+    private static HookAffix CreateSetHitSuccessWhenMissHook() =>
+        new()
+        {
+            Timing = HookTiming.BeforeHitResolved,
+            Conditions =
+            [
+                new ContextHitStateBattleHookConditionDefinition(BattleHitState.Miss),
+            ],
+            Effects =
+            [
+                new SetHitSuccessBattleHookEffectDefinition(),
+            ],
+        };
+
+    private static HookAffix CreateSourceFumbleHook() =>
+        new()
+        {
+            Timing = HookTiming.BeforeHitResolved,
+            Conditions =
+            [
+                new ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole.Source),
+                new ChanceBattleHookConditionDefinition(1d),
+            ],
+            Effects =
+            [
+                new CancelHitBattleHookEffectDefinition(),
+            ],
+        };
+
+    private static HookAffix CreateFemaleOrEunuchMissHook() =>
+        new()
+        {
+            Timing = HookTiming.BeforeHitResolved,
+            Conditions =
+            [
+                new ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole.Target),
+                new ContextUnitRelationBattleHookConditionDefinition(BattleHookContextUnitRole.Source, BattleHookRelation.Enemy),
+                new ContextUnitGenderBattleHookConditionDefinition(BattleHookContextUnitRole.Source, [CharacterGender.Female, CharacterGender.Eunuch]),
+            ],
+            Effects =
+            [
+                new CancelHitBattleHookEffectDefinition(),
+            ],
+        };
+
+    private static HookAffix CreateOnHitConfirmedTargetStunHook(BuffDefinition stun) =>
+        new()
+        {
+            Timing = HookTiming.OnHitConfirmed,
+            Conditions =
+            [
+                new ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole.Source),
+                new ContextUnitGenderBattleHookConditionDefinition(BattleHookContextUnitRole.Target, [CharacterGender.Female, CharacterGender.Eunuch]),
+                new ChanceBattleHookConditionDefinition(1d),
+            ],
+            Effects =
+            [
+                new ApplyBuffBattleEffectDefinition(
+                    new TargetBattleTargetSelectorDefinition(),
+                    stun.Id,
+                    Level: 0,
+                    Duration: 2,
+                    Chance: 100),
             ],
         };
 
@@ -1839,7 +2460,7 @@ public sealed class BattleEngineTests
             [
                 new ContextSkillWeaponTypeBattleHookConditionDefinition([weaponType]),
             ],
-            Speech = new BattleHookSpeechDefinition
+            Speech = new BattleSpeechDefinition
             {
                 Lines = [line], Chance= 0.1d
             }
@@ -1962,7 +2583,8 @@ public sealed class BattleEngineTests
         IReadOnlyList<TalentDefinition>? talents = null,
         IReadOnlyList<InitialExternalSkillEntryDefinition>? externalSkills = null,
         IReadOnlyList<InitialInternalSkillEntryDefinition>? internalSkills = null,
-        int level = 1)
+        int level = 1,
+        CharacterGender gender = CharacterGender.Neutral)
     {
         var mergedStats = new Dictionary<StatType, int>
         {
@@ -1990,7 +2612,8 @@ public sealed class BattleEngineTests
             externalSkills: externalSkills,
             internalSkills: internalSkills,
             talents: talents,
-            level: level);
+            level: level,
+            gender: gender);
         var character = TestContentFactory.CreateCharacterInstance(id, definition);
         return new BattleUnit(
             id,

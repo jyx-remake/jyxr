@@ -145,6 +145,18 @@ public sealed class BattleUnit
         Rage = Math.Min(MaxRage, Rage + amount);
     }
 
+    public void SetRage(int value)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(value);
+        Rage = Math.Clamp(value, 0, MaxRage);
+    }
+
+    public void SetActionGauge(double value)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(value);
+        ActionGauge = value;
+    }
+
     public void AddItemCooldown(int cooldown)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(cooldown);
@@ -171,6 +183,25 @@ public sealed class BattleUnit
     {
         ArgumentNullException.ThrowIfNull(buff);
         _buffs.Add(buff);
+    }
+
+    public IReadOnlyList<BattleBuffInstance> RemoveBuffs(Func<BattleBuffInstance, bool> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        var removed = _buffs
+            .Where(predicate)
+            .ToList();
+        _buffs.RemoveAll(buff => removed.Contains(buff));
+        return removed
+            .Where(static buff => !buff.IsExpired)
+            .ToList();
+    }
+
+    public IReadOnlyList<BattleBuffInstance> RemoveBuffsById(string buffId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(buffId);
+        return RemoveBuffs(buff => string.Equals(buff.Definition.Id, buffId, StringComparison.Ordinal));
     }
 
     public IReadOnlyList<BattleBuffInstance> GetActiveBuffs() =>

@@ -123,6 +123,7 @@ public sealed class ItemUseServiceTests
             null,
             "",
             "",
+            null,
             []);
         var book = CreateItem(
             "special_book",

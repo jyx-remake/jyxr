@@ -24,6 +24,7 @@ public static class AffixFormatter
         return affix switch
         {
             StatModifierAffix statModifier => $"{FormatterTextCn.GetStatNameCn(statModifier.Stat)}{FormatStatModifierValueCn(statModifier.Stat, statModifier.Value)}",
+            BuffLevelStatModifierAffix buffLevelStatModifier => FormatBuffLevelStatModifierCn(buffLevelStatModifier),
             GrantTalentAffix grantTalent => $"天赋「{FormatterTextCn.ResolveTalentName(grantTalent.TalentId, contentRepository)}」",
             GrantModelAffix grantModel => $"时装「{GetModelDisplayText(grantModel)}」",
             SkillBonusModifierAffix skillBonus => $"技能「{FormatterTextCn.ResolveSkillName(skillBonus.SkillId, contentRepository)}」威力{FormatModifierValueCn(skillBonus.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
@@ -134,9 +135,38 @@ public static class AffixFormatter
         return rounded.ToString("0.######", CultureInfo.InvariantCulture);
     }
 
+    private static string FormatBuffLevelStatModifierCn(BuffLevelStatModifierAffix affix)
+    {
+        var parts = new List<string>(3);
+        var displaySpec = GetStatValueDisplaySpec(affix.Stat);
+
+        if (Math.Abs(affix.AddBase) > double.Epsilon)
+        {
+            parts.Add(FormatAdditiveValueCn(affix.AddBase, displaySpec).TrimStart());
+        }
+
+        if (Math.Abs(affix.AddPerLevel) > double.Epsilon)
+        {
+            parts.Add($"每级{FormatAdditiveValueCn(affix.AddPerLevel, displaySpec)}");
+        }
+
+        if (Math.Abs(affix.MulPerLevel) > double.Epsilon)
+        {
+            parts.Add($"每级{FormatMultiplierValueCn(affix.MulPerLevel)}");
+        }
+
+        if (parts.Count == 0)
+        {
+            parts.Add("+0");
+        }
+
+        return $"{FormatterTextCn.GetStatNameCn(affix.Stat)} {string.Join('，', parts)}";
+    }
+
     private static ValueDisplaySpec GetStatValueDisplaySpec(StatType statType) =>
         statType switch
         {
+            StatType.Evasion => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
             StatType.Accuracy => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
             StatType.CritChance => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),
             StatType.CritMult => new ValueDisplaySpec(ValueDisplayKind.Percentage, 100d),

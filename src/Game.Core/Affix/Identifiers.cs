@@ -32,17 +32,18 @@ public enum HookTiming
     BeforeMove,
     AfterMove,
     BeforeSkillCost,
+    BeforeHitResolved,
     BeforeDamageCalculation,
     BeforeSkillCast,
     AfterSkillCast,
-    AfterSkillHit,
+    OnHitConfirmed,
     BeforeItemUse,
     AfterItemUse,
     BeforeRest,
     AfterRest,
     BeforeBuffApplied,
     OnBuffApplied,
-    OnBuffExpired,
+    OnBuffRemoved,
     OnDamageTaken
 }
 
@@ -81,14 +82,20 @@ public enum BattleHookContextUnitRole
     Target
 }
 
-public enum BattleHookSpeechSpeaker
+public enum BattleHitState
 {
-    [JsonStringEnumMemberName("hook_owner")]
-    HookOwner,
-    [JsonStringEnumMemberName("source")]
-    Source,
-    [JsonStringEnumMemberName("target")]
-    Target
+    [JsonStringEnumMemberName("hit")]
+    Hit,
+    [JsonStringEnumMemberName("miss")]
+    Miss
+}
+
+public enum BattleHookRelation
+{
+    [JsonStringEnumMemberName("ally")]
+    Ally,
+    [JsonStringEnumMemberName("enemy")]
+    Enemy
 }
 
 public readonly record struct ModifierValue(ModifierOp Op, double Delta)

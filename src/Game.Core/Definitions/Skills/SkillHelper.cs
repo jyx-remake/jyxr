@@ -48,6 +48,7 @@ public static class SkillHelper
         _ => throw new ArgumentOutOfRangeException(nameof(impactType), impactType, null),
     };
 
+    // X 类型消耗内力不对吧
     public static int GetMpCost(SkillInstance skill)
     {
         var baseCost = 8 * (int)skill.Power;

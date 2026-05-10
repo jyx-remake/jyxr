@@ -20,6 +20,8 @@
 - 物品使用后续待建模：普通消耗品、功能道具、剧情物品、战斗内使用上下文、目标选择规则与效果执行器。目前只接入装备、武学书、绝技书、天赋书和基础强化道具。
 - 装备选择 UI 当前直接复用背包物品格与 tooltip，后续如装备比较、替换确认、套装/词条高亮变复杂，应抽专门 presenter，而不是把规则继续堆在 Godot 控件脚本里。
 - 战场系统后续按 `docs/battlefield-system-design.md` 重建，不保留旧 `BattleEngine` / `CombatantState` / battle hook 运行实现的兼容层。
+- 当前轻量战斗内核的命中结算暂按 legacy 顺序处理：目标侧 `BeforeHitResolved` 闪避/反制先落地，来源侧破闪避/失手后处理。因此可能出现“最终命中但目标闪避反制副作用已生效”的结果；后续正式战场系统重建时需明确这是保留为原版结算顺序，还是拆成命中状态解析与最终结果副作用两阶段。
+- `BeforeHitResolved` 应只承载命中结果确定前的闪避、破闪避、失手等逻辑。后续内容校验应禁止来源侧 `context_hit_state == hit` 的 hook，命中确认后的追加效果应使用 `OnHitConfirmed`，避免数据写法被运行时静默跳过。
 - Attachment 系统后续按 `docs/attachment-design.md` 重建；当前旧 `IAttachmentSourceDefinition` / `ModifierDefinition` / `AttachmentResolver` 实现已删除，不保留兼容层。
 - 持久化层后续可能要补：`MapStateRecord`、`InteractableRecord`、`StoryFlagRecord`，用于把地图交互进度、机关状态、剧情标记纳入存档。
 - 当前诊断日志抽象暂放在 `Game.Application`，后续如补齐 `Infrastructure` / `Hosting` 层，应迁移 `IDiagnosticLogger` 及相关实现的抽象边界，避免应用层长期承载宿主/基础设施能力接口。

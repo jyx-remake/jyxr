@@ -140,6 +140,7 @@ public sealed class SkillDescriptionFormatterTests
             null,
             "",
             "",
+            null,
             []);
         var talent = new TalentDefinition
         {
@@ -267,6 +268,7 @@ public sealed class SkillDescriptionFormatterTests
             new SkillTargetingDefinition(CastSize: 1, ImpactType: SkillImpactType.Single, ImpactSize: 2),
             "heal_anim",
             "heal_audio",
+            null,
             [new SkillBuffDefinition(buff, 3, 2, 100)]);
         var repository = TestContentFactory.CreateRepository(
             specialSkills: [skill],

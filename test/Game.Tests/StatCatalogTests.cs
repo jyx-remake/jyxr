@@ -9,6 +9,8 @@ public sealed class StatCatalogTests
     {
         Assert.Equal(StatType.Bili, StatCatalog.Parse("bili"));
         Assert.Equal(StatType.Bili, StatCatalog.Parse("臂力"));
+        Assert.Equal(StatType.Evasion, StatCatalog.Parse("evasion"));
+        Assert.Equal(StatType.Evasion, StatCatalog.Parse("闪避率"));
         Assert.Equal(StatType.MaxHp, StatCatalog.Parse("max_hp"));
         Assert.Equal(StatType.MaxHp, StatCatalog.Parse("气血上限"));
     }
@@ -18,6 +20,8 @@ public sealed class StatCatalogTests
     {
         Assert.Equal("bili", StatCatalog.GetCode(StatType.Bili));
         Assert.Equal("臂力", StatCatalog.GetDisplayNameCn(StatType.Bili));
+        Assert.Equal("evasion", StatCatalog.GetCode(StatType.Evasion));
+        Assert.Equal("闪避率", StatCatalog.GetDisplayNameCn(StatType.Evasion));
         Assert.Equal(
             [
                 StatType.Quanzhang,
