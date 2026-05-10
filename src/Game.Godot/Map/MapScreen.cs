@@ -281,8 +281,7 @@ public partial class MapScreen : Control
 		}
 
 		var selected = await UIRoot.Instance.ShowCombatantSelectPanelAsync(battleId);
-		var isWin = await UIRoot.Instance.ShowBattleScreenAsync(battleId, selected);
-		UIRoot.Instance.ShowToast(isWin ? "战斗胜利" : "战斗失败");
+		await UIRoot.Instance.ShowBattleScreenAsync(battleId, selected);
 	}
 
 	private async Task RunStoryAsync(string? storyId)

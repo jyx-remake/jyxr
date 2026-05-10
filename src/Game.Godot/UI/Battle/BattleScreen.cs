@@ -3,6 +3,7 @@ using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
+using Game.Application;
 using Game.Godot.Assets;
 using Game.Godot.Audio;
 using Game.Godot.Persistence;
@@ -13,7 +14,6 @@ namespace Game.Godot.UI.Battle;
 
 public partial class BattleScreen : Control
 {
-	private const int PlayerTeam = 1;
 	private const int MinBattleSpeedMultiplier = 1;
 	private const int MaxBattleSpeedMultiplier = 5;
 	private const int GridCellWidth = 144;
@@ -77,7 +77,10 @@ public partial class BattleScreen : Control
 	[Export]
 	public PackedScene BattleLegendOverlayScene { get; set; } = null!;
 
-	private readonly BattlePresenter _presenter = new();
+	[Export]
+	public PackedScene BattleSettlementPanelScene { get; set; } = null!;
+
+	private BattlePresenter _presenter = null!;
 	private readonly BattleUiStateMachine _uiState = new();
 	private readonly LocalUserSettingsStore _settingsStore = new();
 	private readonly TaskCompletionSource<bool> _battleCompletion =
@@ -90,6 +93,7 @@ public partial class BattleScreen : Control
 	private BattleFlowOrchestrator? _orchestrator;
 	private bool _isConfigured;
 	private bool _isResolvingSkillPresentation;
+	private bool _isEndingBattle;
 	private bool _isSpeedUpEnabled;
 	private double _initialTimeScale = 1d;
 	private int _battleSpeedMultiplier = 2;
@@ -116,12 +120,13 @@ public partial class BattleScreen : Control
 	private TextureRect _avatar = null!;
 	private HBoxContainer _listContainer = null!;
 	private RichTextLabel _logLabel = null!;
-	private Button _finishButton = null!;
 	private Control _overlayRoot = null!;
+	private int PlayerTeam => GameRoot.Config.BattlePlayerTeam;
 
 	public override void _Ready()
 	{
 		_initialTimeScale = Engine.TimeScale;
+		_presenter = new BattlePresenter(PlayerTeam);
 		_background = GetNode<TextureRect>("%Background");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
@@ -142,7 +147,6 @@ public partial class BattleScreen : Control
 		_avatar = GetNode<TextureRect>("%Avatar");
 		_listContainer = GetNode<HBoxContainer>("%ListContainer");
 		_logLabel = GetNode<RichTextLabel>("%LogLabel");
-		_finishButton = GetNode<Button>("%FinishButton");
 		_overlayRoot = GetNode<Control>("%OverlayRoot");
 		_boardGrid.CellPressed += OnCellPressed;
 		_boardGrid.HoveredCellChanged += OnBoardHoveredCellChanged;
@@ -189,9 +193,8 @@ public partial class BattleScreen : Control
 				return;
 			}
 
-			await _orchestrator.TryEndActionAsync();
+				await _orchestrator.TryEndActionAsync();
 		};
-		_finishButton.Pressed += FinishBattle;
 		RefreshToggleButtons();
 
 		if (_isConfigured)
@@ -252,6 +255,7 @@ public partial class BattleScreen : Control
 		_orchestrator = new BattleFlowOrchestrator(this, _state);
 		ApplyBattleSettings(_settingsStore.LoadOrDefault());
 		_logLines.Clear();
+		_isEndingBattle = false;
 		AppendLog($"战斗开始：{_battleDefinition.Name}");
 		_uiState.WaitTimeline();
 		RefreshAll();
@@ -507,7 +511,8 @@ public partial class BattleScreen : Control
 	private void RefreshActions()
 	{
 		var actingUnit = _state is not null ? BattlePresenter.TryGetActingUnit(_state) : null;
-		var isActing = actingUnit is { Team: PlayerTeam } &&
+		var isActing = actingUnit is not null &&
+			actingUnit.Team == PlayerTeam &&
 			_uiState.Mode != BattleUiMode.BattleEnded &&
 			!_isResolvingSkillPresentation &&
 			!IsAutoBattleEnabled();
@@ -518,7 +523,6 @@ public partial class BattleScreen : Control
 		_endButton.Disabled = !isActing;
 		_surrenderButton.Disabled = _uiState.Mode == BattleUiMode.BattleEnded;
 		_surrenderButton.Visible = _uiState.Mode != BattleUiMode.BattleEnded;
-		_finishButton.Visible = _uiState.Mode == BattleUiMode.BattleEnded;
 	}
 
 	private void RefreshList()
@@ -1272,13 +1276,32 @@ public partial class BattleScreen : Control
 		RefreshAll();
 	}
 
-	internal void ShowBattleEnded(bool isWin)
+	internal async void ShowBattleEnded(bool isWin)
 	{
+		if (_isEndingBattle)
+		{
+			return;
+		}
+
+		_isEndingBattle = true;
 		_uiState.EndBattle();
 		AppendLog(isWin ? "战斗胜利。" : "战斗失败。");
+		OrdinaryBattleVictorySettlement? settlement = null;
+		if (isWin && _state is not null)
+		{
+			settlement = GameRoot.BattleService.PreviewOrdinaryVictorySettlement(_state);
+			GameRoot.BattleService.ApplyOrdinaryVictorySettlement(_state, settlement);
+		}
+
 		RefreshAll();
-		_finishButton.Text = isWin ? "胜利返回" : "失败返回";
-		_finishButton.Disabled = false;
+		try
+		{
+			await ShowSettlementPanelAsync(isWin, settlement);
+		}
+		finally
+		{
+			FinishBattle();
+		}
 	}
 
 	internal void ApplyActingUnitFacing(BattleUnit actingUnit) => _boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
@@ -1297,11 +1320,30 @@ public partial class BattleScreen : Control
 			return;
 		}
 
-		var playerAlive = _state.Units.Any(static unit => unit.Team == PlayerTeam && unit.IsAlive);
+		var playerAlive = _state.Units.Any(unit => unit.Team == PlayerTeam && unit.IsAlive);
 		if (_battleCompletion.TrySetResult(playerAlive))
 		{
 			QueueFree();
 		}
+	}
+
+	private async Task ShowSettlementPanelAsync(bool isWin, OrdinaryBattleVictorySettlement? settlement)
+	{
+		if (BattleSettlementPanelScene is null)
+		{
+			throw new InvalidOperationException("BattleSettlementPanelScene is not assigned.");
+		}
+
+		var instance = BattleSettlementPanelScene.Instantiate();
+		if (instance is not BattleSettlementPanel panel)
+		{
+			instance.QueueFree();
+			throw new InvalidOperationException("Battle settlement panel scene root must be BattleSettlementPanel.");
+		}
+
+		panel.Configure(_presenter.CreateSettlementView(isWin, settlement));
+		_overlayRoot.AddChild(panel);
+		await panel.AwaitConfirmationAsync();
 	}
 
 	private static Color ResolveCellColor(BattleCellView cell, BoardHighlights highlights)

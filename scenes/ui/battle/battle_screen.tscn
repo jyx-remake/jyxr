@@ -26,6 +26,7 @@
 [ext_resource type="Texture2D" uid="uid://ba8m81qumgdct" path="res://assets/art/ui/battle/battle_zidong.png" id="24_auto_button"]
 [ext_resource type="Texture2D" uid="uid://bc8dyte7msrvf" path="res://assets/art/ui/battle/battle_zidonghong.png" id="25_auto_active"]
 [ext_resource type="Texture2D" uid="uid://dukqh5gd77ixk" path="res://assets/art/ui/battle/touxiang.png" id="26_surrender_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
 bg_color = Color(0.18, 0.14, 0.1, 0.92)
@@ -71,6 +72,7 @@ script = ExtResource("1_script")
 BattleSkillBoxScene = ExtResource("18_skill_box")
 BattleItemPanelScene = ExtResource("20_item_panel")
 BattleLegendOverlayScene = ExtResource("21_legend_overlay")
+BattleSettlementPanelScene = ExtResource("27_settlement_panel")
 
 [node name="Background" type="TextureRect" parent="." unique_id=372176778]
 unique_name_in_owner = true
@@ -192,22 +194,6 @@ mouse_filter = 2
 texture = ExtResource("23_speed_active")
 expand_mode = 1
 stretch_mode = 5
-
-[node name="FinishButton" type="Button" parent="." unique_id=507302681]
-unique_name_in_owner = true
-visible = false
-layout_mode = 0
-offset_left = 1628.0
-offset_top = 34.0
-offset_right = 1860.0
-offset_bottom = 106.0
-theme_override_font_sizes/font_size = 26
-theme_override_styles/normal = SubResource("StyleBoxFlat_action")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
-theme_override_styles/hover = SubResource("StyleBoxFlat_action")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
-disabled = true
-text = "返回"
 
 [node name="BattleLogTag" type="TextureRect" parent="." unique_id=1046574722]
 layout_mode = 0

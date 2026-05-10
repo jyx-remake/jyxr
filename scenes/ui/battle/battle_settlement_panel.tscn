@@ -1,0 +1,125 @@
+[gd_scene format=3 uid="uid://dtbij03bvh027"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" uid="uid://c0y7bfr4042d5" path="res://src/Game.Godot/UI/Battle/Widgets/BattleSettlementPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://bhq13l0u7c1hg" path="res://scenes/ui/inventory_panel/inventory_item_box.tscn" id="3_item_box"]
+[ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="4_button"]
+[ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="5_button_texture"]
+[ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="6_font"]
+
+[sub_resource type="LabelSettings" id="1_title"]
+font = ExtResource("6_font")
+font_size = 58
+outline_size = 6
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="2_confirm"]
+font_size = 44
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[node name="BattleSettlementPanel" unique_id=2072633636 instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+InventoryItemBoxScene = ExtResource("3_item_box")
+
+[node name="CloseButton" parent="." index="2" unique_id=962603895]
+visible = false
+
+[node name="TitleLabel" type="Label" parent="." index="3" unique_id=1998335815]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 760.0
+offset_top = 66.0
+offset_right = 1160.0
+offset_bottom = 148.0
+theme_override_colors/font_color = Color(0.93, 0.88, 0.7, 1)
+text = "战斗胜利"
+label_settings = SubResource("1_title")
+horizontal_alignment = 1
+
+[node name="DetailLabel" type="Label" parent="." index="4" unique_id=1366637210]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 360.0
+offset_top = 150.0
+offset_right = 1660.0
+offset_bottom = 226.0
+theme_override_colors/font_color = Color(0.2, 0.17, 0.12, 1)
+theme_override_font_sizes/font_size = 34
+text = "获得金钱：0           获得经验：0/每人"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RewardHeaderLabel" type="Label" parent="." index="5" unique_id=1962746852]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 372.0
+offset_top = 244.0
+offset_right = 692.0
+offset_bottom = 292.0
+theme_override_colors/font_color = Color(0.12, 0.08, 0.04, 1)
+theme_override_font_sizes/font_size = 34
+text = "获得物品"
+
+[node name="CountLabel" type="Label" parent="." index="6" unique_id=195187860]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1390.0
+offset_top = 248.0
+offset_right = 1648.0
+offset_bottom = 292.0
+theme_override_colors/font_color = Color(0.35, 0.29, 0.21, 1)
+theme_override_font_sizes/font_size = 28
+text = "0 项"
+horizontal_alignment = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." index="7" unique_id=295024919]
+layout_mode = 0
+offset_left = 368.0
+offset_top = 304.0
+offset_right = 1664.0
+offset_bottom = 856.0
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer" index="0" unique_id=1977328070]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 34
+columns = 6
+
+[node name="EmptyLabel" type="Label" parent="." index="8" unique_id=1807244912]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 520.0
+offset_top = 522.0
+offset_right = 1500.0
+offset_bottom = 580.0
+theme_override_colors/font_color = Color(0.35, 0.29, 0.21, 1)
+theme_override_font_sizes/font_size = 32
+text = "未获得额外物品。"
+horizontal_alignment = 1
+
+[node name="ConfirmButton" parent="." index="9" unique_id=1858360694 instance=ExtResource("4_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 104)
+layout_mode = 0
+offset_left = 826.0
+offset_top = 853.0
+offset_right = 1126.0
+offset_bottom = 957.0
+texture_normal = ExtResource("5_button_texture")
+
+[node name="ConfirmButtonLabel" type="Label" parent="ConfirmButton" index="0" unique_id=920890203]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "确定"
+label_settings = SubResource("2_confirm")
+horizontal_alignment = 1
+vertical_alignment = 1

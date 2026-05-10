@@ -7,8 +7,6 @@ namespace Game.Godot.UI.Battle;
 
 internal sealed class BattleFlowOrchestrator
 {
-    private const int PlayerTeam = 1;
-
     private readonly BattleScreen _screen;
     private readonly BattleEngine _engine;
     private readonly IBattleAgent _battleAgent;
@@ -32,6 +30,8 @@ internal sealed class BattleFlowOrchestrator
     internal BattleEngine Engine => _engine;
 
     public bool IsAutoBattleEnabled => _autoBattleEnabled;
+
+    private int PlayerTeam => GameRoot.Config.BattlePlayerTeam;
 
     public IReadOnlyDictionary<GridPosition, int> GetReachablePositions()
     {
@@ -313,8 +313,8 @@ internal sealed class BattleFlowOrchestrator
             return true;
         }
 
-        var playerAlive = State.Units.Any(static unit => unit.Team == PlayerTeam && unit.IsAlive);
-        var enemyAlive = State.Units.Any(static unit => unit.Team != PlayerTeam && unit.IsAlive);
+        var playerAlive = State.Units.Any(unit => unit.Team == PlayerTeam && unit.IsAlive);
+        var enemyAlive = State.Units.Any(unit => unit.Team != PlayerTeam && unit.IsAlive);
         if (playerAlive && enemyAlive)
         {
             return false;

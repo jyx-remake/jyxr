@@ -1,12 +1,18 @@
 using Game.Core.Battle;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
+using Game.Application;
 
 namespace Game.Godot.UI.Battle;
 
 public sealed class BattlePresenter
 {
-	private const int PlayerTeam = 1;
+	private readonly int _playerTeam;
+
+	public BattlePresenter(int playerTeam)
+	{
+		_playerTeam = playerTeam;
+	}
 
 	public BattleHeaderView CreateHeader(BattleState state, BattleUiMode mode)
 	{
@@ -47,7 +53,7 @@ public sealed class BattlePresenter
 					position,
 					string.Empty,
 					unit is not null,
-					unit?.Team == PlayerTeam,
+					unit?.Team == _playerTeam,
 					unit is not null && !unit.IsAlive,
 					unit is not null && string.Equals(unit.Id, actingUnitId, StringComparison.Ordinal)));
 			}
@@ -100,6 +106,32 @@ public sealed class BattlePresenter
 			.ToList();
 	}
 
+	public BattleSettlementView CreateSettlementView(bool isWin, OrdinaryBattleVictorySettlement? settlement)
+	{
+		if (!isWin || settlement is null)
+		{
+			return new BattleSettlementView(
+				"战斗失败",
+				string.Empty,
+				string.Empty,
+				[],
+				"确定");
+		}
+
+		var detail = $"获得金钱：{settlement.Silver}           获得经验：{settlement.ExperiencePerMember}/每人";
+		if (settlement.Gold > 0)
+		{
+			detail += $"           获得元宝：{settlement.Gold}";
+		}
+
+		return new BattleSettlementView(
+			"战斗胜利",
+			detail,
+			"获得物品",
+			CreateRewardEntries(settlement.Drops),
+			"确定");
+	}
+
 	public static BattleUnit? TryGetActingUnit(BattleState state) =>
 		state.CurrentAction is { } context
 			? state.TryGetUnit(context.ActingUnitId)
@@ -112,6 +144,35 @@ public sealed class BattlePresenter
 			EquipmentInstanceInventoryEntry equipment => equipment.Equipment.Definition.Name,
 			_ => entry.Definition.Name,
 		};
+
+	private static IReadOnlyList<InventoryEntry> CreateRewardEntries(IReadOnlyList<OrdinaryBattleRewardDrop> drops)
+	{
+		ArgumentNullException.ThrowIfNull(drops);
+
+		var entries = new List<InventoryEntry>(drops.Count);
+		long entryNumber = 1;
+		foreach (var drop in drops)
+		{
+			switch (drop)
+			{
+				case OrdinaryBattleStackRewardDrop stack:
+					entries.Add(new StackInventoryEntry(entryNumber++, stack.Item, stack.Quantity));
+					break;
+				case OrdinaryBattleEquipmentRewardDrop equipment:
+					var extraAffixes = equipment.Rolls.SelectMany(static roll => roll.Affixes).ToArray();
+					var equipmentInstance = new EquipmentInstance(
+						$"settlement_reward_{entryNumber:D8}",
+						equipment.Equipment,
+						extraAffixes);
+					entries.Add(new EquipmentInstanceInventoryEntry(entryNumber++, equipmentInstance));
+					break;
+				default:
+					throw new NotSupportedException($"Unsupported reward drop type '{drop.GetType().Name}'.");
+			}
+		}
+
+		return entries;
+	}
 }
 
 public sealed record BattleHeaderView(string Title, string Subtitle);
@@ -134,3 +195,10 @@ public sealed record BattleSkillOptionView(BattleSkillAvailability Availability,
 }
 
 public sealed record BattleItemView(InventoryEntry Entry, string Label);
+
+public sealed record BattleSettlementView(
+	string Title,
+	string Detail,
+	string RewardHeader,
+	IReadOnlyList<InventoryEntry> RewardEntries,
+	string ConfirmText);

@@ -2,13 +2,12 @@ using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Model.Character;
 using Godot;
+using GameRoot = Game.Godot.Game;
 
 namespace Game.Godot.UI;
 
 public partial class CombatantSelectPanel : JyPanel
 {
-	private const int PlayerTeam = 1;
-
 	[Export]
 	public PackedScene CharacterCardScene { get; set; } = null!;
 
@@ -31,6 +30,7 @@ public partial class CombatantSelectPanel : JyPanel
 	private bool _isConfigured;
 	private readonly TaskCompletionSource<IReadOnlyList<string>> _deploymentCompletion =
 		new(TaskCreationOptions.RunContinuationsAsynchronously);
+	private int PlayerTeam => GameRoot.Config.BattlePlayerTeam;
 
 	public IReadOnlyList<string> SelectedCharacterIds => GetSelectedCharacterIds();
 
@@ -271,8 +271,8 @@ public partial class CombatantSelectPanel : JyPanel
 		}
 	}
 
-	private static int CountPlayerDeploySlots(BattleDefinition battle) =>
-		battle.Participants.Count(static participant =>
+	private int CountPlayerDeploySlots(BattleDefinition battle) =>
+		battle.Participants.Count(participant =>
 			participant.Team == PlayerTeam &&
 			participant.PartyIndex is not null &&
 			participant.CharacterId is null);
