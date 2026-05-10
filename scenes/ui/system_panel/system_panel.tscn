@@ -246,6 +246,7 @@ custom_minimum_size = Vector2(0, 84)
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "输入指令..."
+keep_editing_on_text_submit = true
 
 [node name="ExecuteButton" type="Button" parent="ConsoleVBox/InputRow" unique_id=681298942]
 unique_name_in_owner = true

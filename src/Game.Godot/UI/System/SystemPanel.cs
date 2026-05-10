@@ -72,6 +72,7 @@ public partial class SystemPanel : Control
 		LoadSettings();
 		AppendConsoleLine("系统", "命令行执行剧本指令，当前不支持 jump。");
 		AppendConsoleLine("系统", "示例：item 道口烧鸡 / log \"踏入江湖\"");
+		_consoleInput.CallDeferred(Control.MethodName.GrabFocus);
 	}
 
 	private void LoadSettings()
