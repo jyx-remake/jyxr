@@ -131,7 +131,7 @@ public sealed class SessionEventsTests
         await dispatcher.ExecuteCommandAsync("daode", [ExprValue.FromNumber(5)], default);
         await dispatcher.ExecuteCommandAsync("haogan", [ExprValue.FromNumber(12)], default);
         await dispatcher.ExecuteCommandAsync("get_point", [ExprValue.FromString("hero"), ExprValue.FromNumber(3)], default);
-        await dispatcher.ExecuteCommandAsync("upgrade", [ExprValue.FromString("hero"), ExprValue.FromString("bili"), ExprValue.FromNumber(2)], default);
+        await dispatcher.ExecuteCommandAsync("upgrade", [ExprValue.FromString("bili"), ExprValue.FromString("hero"), ExprValue.FromNumber(2)], default);
         await dispatcher.ExecuteCommandAsync("nick", [ExprValue.FromString("初出茅庐")], default);
         await dispatcher.ExecuteCommandAsync("join", [ExprValue.FromString("ally")], default);
 
@@ -314,19 +314,19 @@ public sealed class SessionEventsTests
 
         await dispatcher.ExecuteCommandAsync(
             "remove",
-            [ExprValue.FromString("hero"), ExprValue.FromString("skill"), ExprValue.FromString("starter_sword")],
+            [ExprValue.FromString("skill"), ExprValue.FromString("hero"), ExprValue.FromString("starter_sword")],
             default);
         await dispatcher.ExecuteCommandAsync(
             "remove",
-            [ExprValue.FromString("hero"), ExprValue.FromString("internalskill"), ExprValue.FromString("guarded")],
+            [ExprValue.FromString("internal"), ExprValue.FromString("hero"), ExprValue.FromString("guarded")],
             default);
         await dispatcher.ExecuteCommandAsync(
             "remove",
-            [ExprValue.FromString("hero"), ExprValue.FromString("talent"), ExprValue.FromString("iron_body")],
+            [ExprValue.FromString("talent"), ExprValue.FromString("hero"), ExprValue.FromString("iron_body")],
             default);
         await dispatcher.ExecuteCommandAsync(
             "remove",
-            [ExprValue.FromString("hero"), ExprValue.FromString("specialskill"), ExprValue.FromString("flash_step")],
+            [ExprValue.FromString("skill"), ExprValue.FromString("hero"), ExprValue.FromString("flash_step")],
             default);
 
         Assert.Null(hero.GetExternalSkillLevel("starter_sword"));

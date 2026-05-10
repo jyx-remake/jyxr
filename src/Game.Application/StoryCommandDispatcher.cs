@@ -200,7 +200,7 @@ public sealed class StoryCommandDispatcher
     }
 
     [StoryCommand("upgrade")]
-    private ValueTask ExecuteUpgradeAsync(string characterId, string target, params ExprValue[] args)
+    private ValueTask ExecuteUpgradeAsync(string target, string characterId, params ExprValue[] args)
     {
         if (StatCatalog.TryParse(target, out _))
         {
@@ -215,10 +215,17 @@ public sealed class StoryCommandDispatcher
             {
                 var skillId = args[0].AsString("Invocation 'upgrade' argument 'skillId'");
                 var levels = checked((int)args[1].AsNumber("Invocation 'upgrade' argument 'levels'"));
+                UpgradeSkillLevel(characterId, skillId, levels);
+                return ValueTask.CompletedTask;
+            }
+            case "external":
+            {
+                var skillId = args[0].AsString("Invocation 'upgrade' argument 'skillId'");
+                var levels = checked((int)args[1].AsNumber("Invocation 'upgrade' argument 'levels'"));
                 _session.CharacterService.UpgradeExternalSkillLevel(characterId, skillId, levels);
                 return ValueTask.CompletedTask;
             }
-            case "internalskill" or "internal_skill":
+            case "internal":
             {
                 var skillId = args[0].AsString("Invocation 'upgrade' argument 'skillId'");
                 var levels = checked((int)args[1].AsNumber("Invocation 'upgrade' argument 'levels'"));
@@ -228,6 +235,23 @@ public sealed class StoryCommandDispatcher
             default:
                 throw new InvalidOperationException($"Unsupported upgrade target '{target}'.");
         }
+    }
+
+    private void UpgradeSkillLevel(string characterId, string skillId, int levels)
+    {
+        if (ContentRepository.TryGetExternalSkill(skillId, out _))
+        {
+            _session.CharacterService.UpgradeExternalSkillLevel(characterId, skillId, levels);
+            return;
+        }
+
+        if (ContentRepository.TryGetInternalSkill(skillId, out _))
+        {
+            _session.CharacterService.UpgradeInternalSkillLevel(characterId, skillId, levels);
+            return;
+        }
+
+        throw new InvalidOperationException($"Command 'upgrade skill' references unknown external/internal skill '{skillId}'.");
     }
 
     [StoryCommand("minus_maxpoints")]
@@ -308,14 +332,14 @@ public sealed class StoryCommandDispatcher
     }
 
     [StoryCommand("learn")]
-    private ValueTask ExecuteLearnAsync(string characterId, string learnType, string targetId, int level = 1)
+    private ValueTask ExecuteLearnAsync(string learnType, string characterId, string targetId, int level = 1)
     {
         _session.CharacterService.Learn(characterId, learnType, targetId, level);
         return ValueTask.CompletedTask;
     }
 
     [StoryCommand("remove")]
-    private ValueTask ExecuteRemoveAsync(string characterId, string removeType, string targetId)
+    private ValueTask ExecuteRemoveAsync(string removeType, string characterId, string targetId)
     {
         _session.CharacterService.Remove(characterId, removeType, targetId);
         return ValueTask.CompletedTask;

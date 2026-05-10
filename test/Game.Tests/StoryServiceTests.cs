@@ -295,6 +295,7 @@ public sealed class StoryServiceTests
     public async Task RunAsync_LearnCommandSupportsSkillsTalentsAndSpecialSkills()
     {
         var externalSkill = TestContentFactory.CreateExternalSkill("starter_sword");
+        var internalSkill = TestContentFactory.CreateInternalSkill("inner_breath");
         var talent = new TalentDefinition
         {
             Id = "iron_body",
@@ -317,6 +318,7 @@ public sealed class StoryServiceTests
         var repository = TestContentFactory.CreateRepository(
             characters: [characterDefinition],
             externalSkills: [externalSkill],
+            internalSkills: [internalSkill],
             talents: [talent],
             specialSkills: [specialSkill],
             storyScripts:
@@ -330,23 +332,31 @@ public sealed class StoryServiceTests
                                 new CommandStep(
                                     "learn",
                                     [
-                                        new LiteralExprNode(ExprValue.FromString("hero")),
                                         new LiteralExprNode(ExprValue.FromString("skill")),
+                                        new LiteralExprNode(ExprValue.FromString("hero")),
                                         new LiteralExprNode(ExprValue.FromString("starter_sword")),
                                         new LiteralExprNode(ExprValue.FromNumber(5)),
                                     ]),
                                 new CommandStep(
                                     "learn",
                                     [
+                                        new LiteralExprNode(ExprValue.FromString("skill")),
                                         new LiteralExprNode(ExprValue.FromString("hero")),
+                                        new LiteralExprNode(ExprValue.FromString("inner_breath")),
+                                        new LiteralExprNode(ExprValue.FromNumber(4)),
+                                    ]),
+                                new CommandStep(
+                                    "learn",
+                                    [
                                         new LiteralExprNode(ExprValue.FromString("talent")),
+                                        new LiteralExprNode(ExprValue.FromString("hero")),
                                         new LiteralExprNode(ExprValue.FromString("iron_body")),
                                     ]),
                                 new CommandStep(
                                     "learn",
                                     [
+                                        new LiteralExprNode(ExprValue.FromString("skill")),
                                         new LiteralExprNode(ExprValue.FromString("hero")),
-                                        new LiteralExprNode(ExprValue.FromString("specialskill")),
                                         new LiteralExprNode(ExprValue.FromString("flash_step")),
                                     ]),
                             ]),
@@ -364,6 +374,7 @@ public sealed class StoryServiceTests
         }
 
         Assert.Equal(5, hero.GetExternalSkillLevel("starter_sword"));
+        Assert.Equal(4, hero.GetInternalSkillLevel("inner_breath"));
         Assert.True(hero.HasTalent("iron_body"));
         Assert.True(hero.HasEffectiveTalent("iron_body"));
         Assert.Equal(3, hero.GetStat(StatType.Gengu));
@@ -408,23 +419,23 @@ public sealed class StoryServiceTests
                                 new CommandStep(
                                     "upgrade",
                                     [
-                                        new LiteralExprNode(ExprValue.FromString("hero")),
                                         new LiteralExprNode(ExprValue.FromString("maxhp")),
+                                        new LiteralExprNode(ExprValue.FromString("hero")),
                                         new LiteralExprNode(ExprValue.FromNumber(10)),
                                     ]),
                                 new CommandStep(
                                     "upgrade",
                                     [
+                                        new LiteralExprNode(ExprValue.FromString("external")),
                                         new LiteralExprNode(ExprValue.FromString("hero")),
-                                        new LiteralExprNode(ExprValue.FromString("skill")),
                                         new LiteralExprNode(ExprValue.FromString("focus_strike")),
                                         new LiteralExprNode(ExprValue.FromNumber(2)),
                                     ]),
                                 new CommandStep(
                                     "upgrade",
                                     [
+                                        new LiteralExprNode(ExprValue.FromString("skill")),
                                         new LiteralExprNode(ExprValue.FromString("hero")),
-                                        new LiteralExprNode(ExprValue.FromString("internalskill")),
                                         new LiteralExprNode(ExprValue.FromString("breath_control")),
                                         new LiteralExprNode(ExprValue.FromNumber(4)),
                                     ]),

@@ -174,20 +174,46 @@ public sealed class CharacterService
         switch (learnType)
         {
             case "skill":
+                LearnSkill(character, targetId, level);
+                return;
+            case "external":
                 LearnExternalSkill(character, targetId, level);
                 return;
-            case "internalskill" or "internal_skill":
+            case "internal":
                 LearnInternalSkill(character, targetId, level);
                 return;
             case "talent":
                 LearnTalent(character, targetId);
                 return;
-            case "specialskill" or "special_skill":
+            case "special":
                 LearnSpecialSkill(character, targetId);
                 return;
             default:
                 throw new InvalidOperationException($"Unsupported learn type '{learnType}'.");
         }
+    }
+
+    private void LearnSkill(CharacterInstance character, string skillId, int level)
+    {
+        if (ContentRepository.TryGetExternalSkill(skillId, out _))
+        {
+            LearnExternalSkill(character, skillId, level);
+            return;
+        }
+
+        if (ContentRepository.TryGetInternalSkill(skillId, out _))
+        {
+            LearnInternalSkill(character, skillId, level);
+            return;
+        }
+
+        if (ContentRepository.TryGetSpecialSkill(skillId, out _))
+        {
+            LearnSpecialSkill(character, skillId);
+            return;
+        }
+
+        throw new InvalidOperationException($"Command 'learn skill' references unknown skill '{skillId}'.");
     }
 
     public void LearnExternalSkill(CharacterInstance character, string skillId, int level = 1)
@@ -244,20 +270,46 @@ public sealed class CharacterService
         switch (removeType)
         {
             case "skill":
+                RemoveSkill(character, targetId);
+                return;
+            case "external":
                 RemoveExternalSkill(character, targetId);
                 return;
-            case "internalskill" or "internal_skill":
+            case "internal":
                 RemoveInternalSkill(character, targetId);
                 return;
             case "talent":
                 RemoveTalent(character, targetId);
                 return;
-            case "specialskill" or "special_skill":
+            case "special":
                 RemoveSpecialSkill(character, targetId);
                 return;
             default:
                 throw new InvalidOperationException($"Unsupported remove type '{removeType}'.");
         }
+    }
+
+    private void RemoveSkill(CharacterInstance character, string skillId)
+    {
+        if (ContentRepository.TryGetExternalSkill(skillId, out _))
+        {
+            RemoveExternalSkill(character, skillId);
+            return;
+        }
+
+        if (ContentRepository.TryGetInternalSkill(skillId, out _))
+        {
+            RemoveInternalSkill(character, skillId);
+            return;
+        }
+
+        if (ContentRepository.TryGetSpecialSkill(skillId, out _))
+        {
+            RemoveSpecialSkill(character, skillId);
+            return;
+        }
+
+        throw new InvalidOperationException($"Command 'remove skill' references unknown skill '{skillId}'.");
     }
 
     public void RemoveExternalSkill(CharacterInstance character, string skillId)
