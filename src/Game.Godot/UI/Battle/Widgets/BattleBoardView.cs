@@ -176,6 +176,16 @@ public partial class BattleBoardView : Control
 		}
 	}
 
+	public void PlayHit(string unitId)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
+
+		if (_unitViews.TryGetValue(unitId, out var unitView))
+		{
+			unitView.PlayHit();
+		}
+	}
+
 	public void ApplyUnitFacing(string unitId, BattleFacing facing)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
@@ -187,11 +197,9 @@ public partial class BattleBoardView : Control
 	}
 
 	public async Task PlaySkillImpactAsync(
-		IReadOnlyList<string> targetUnitIds,
 		IReadOnlyList<GridPosition> impactPositions,
 		string? skillAnimationId)
 	{
-		ArgumentNullException.ThrowIfNull(targetUnitIds);
 		ArgumentNullException.ThrowIfNull(impactPositions);
 
 		Task? firstImpactTask = null;
@@ -205,14 +213,6 @@ public partial class BattleBoardView : Control
 			else
 			{
 				_ = impactTask;
-			}
-		}
-
-		foreach (var targetUnitId in targetUnitIds)
-		{
-			if (_unitViews.TryGetValue(targetUnitId, out var targetView))
-			{
-				targetView.PlayHit();
 			}
 		}
 

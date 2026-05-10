@@ -780,6 +780,11 @@ public partial class BattleScreen : Control
 				var unitName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 				var damage = battleEvent.Damage?.Amount ?? 0;
 				var isCritical = damage > 0 && battleEvent.Damage?.IsCritical == true;
+				if (damage > 0 &&
+					!string.Equals(battleEvent.Damage?.SourceUnitId, battleEvent.UnitId, StringComparison.Ordinal))
+				{
+					_boardGrid.PlayHit(battleEvent.UnitId);
+				}
 				_boardGrid.PlayFloatText(
 					battleEvent.UnitId,
 					ResolveDamageFloatText(damage, isCritical),
@@ -945,7 +950,6 @@ public partial class BattleScreen : Control
 		private readonly string _actingUnitName;
 		private readonly CharacterGender _actingUnitGender;
 		private readonly Texture2D? _actingUnitPortrait;
-		private readonly IReadOnlyList<string> _targetUnitIds;
 		private readonly IReadOnlyList<GridPosition> _impactPositions;
 		private readonly List<Action> _skillNameActions = [];
 		private readonly List<Action> _impactActions = [];
@@ -960,7 +964,6 @@ public partial class BattleScreen : Control
 			CharacterGender actingUnitGender,
 			Texture2D? actingUnitPortrait,
 			BattleSkillCastInfo skillCast,
-			IReadOnlyList<string> targetUnitIds,
 			IReadOnlyList<GridPosition> impactPositions)
 		{
 			_owner = owner;
@@ -971,7 +974,6 @@ public partial class BattleScreen : Control
 			_actingUnitGender = actingUnitGender;
 			_actingUnitPortrait = actingUnitPortrait;
 			SkillCast = skillCast;
-			_targetUnitIds = targetUnitIds;
 			_impactPositions = impactPositions;
 		}
 
@@ -1007,7 +1009,7 @@ public partial class BattleScreen : Control
 				AudioManager.Instance.PlaySfx(SkillCast.AudioId);
 			}
 
-			var impactTask = _boardGrid.PlaySkillImpactAsync(_targetUnitIds, _impactPositions, SkillCast.ImpactAnimationId);
+			var impactTask = _boardGrid.PlaySkillImpactAsync(_impactPositions, SkillCast.ImpactAnimationId);
 			Flush(_impactActions);
 
 			await _owner.WaitForSecondsAsync(SkillImpactFloatDelaySeconds);
@@ -1099,7 +1101,6 @@ public partial class BattleScreen : Control
 			actingUnit.Character.Definition.Gender,
 			AssetResolver.LoadCharacterPortrait(actingUnit.Character),
 			result.SkillCast ?? BattleSkillCastInfo.Create(skill, skill),
-			result.AffectedUnitIds,
 			result.ImpactedPositions);
 		var presentationTask = _activeSkillPresentation.RunAsync();
 		AppendResult(result, stateEventStartIndex);
