@@ -118,7 +118,107 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_ResolvesCurrencyProjectionVariablesFromGameState()
+    public async Task ExecuteAsync_ExecutesBuiltInStoryFlowAndUpdatesStoryState()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "story_intro",
+                            [
+                                new DialogueStep("旁白", "开场"),
+                                new CommandStep("set_flag", [new LiteralExprNode(ExprValue.FromString("opened"))]),
+                                new CommandStep("log", [new LiteralExprNode(ExprValue.FromString("踏入江湖"))]),
+                                new JumpStep("story_second"),
+                            ]),
+                        new Segment(
+                            "story_second",
+                            [
+                                new BranchStep(
+                                    [
+                                        new BranchCase(
+                                            new PredicateExprNode(
+                                                "should_finish",
+                                                [new LiteralExprNode(ExprValue.FromString("story_intro"))]),
+                                            [
+                                                new CommandStep(
+                                                    "custom_cmd",
+                                                    [new VariableExprNode("external_number")]),
+                                                new CommandStep(
+                                                    "item",
+                                                    [
+                                                        new LiteralExprNode(ExprValue.FromString("quest_token")),
+                                                        new LiteralExprNode(ExprValue.FromNumber(2)),
+                                                    ]),
+                                            ]),
+                                    ],
+                                    null),
+                                new BranchStep(
+                                    [
+                                        new BranchCase(
+                                            new PredicateExprNode(
+                                                "have_item",
+                                                [
+                                                    new LiteralExprNode(ExprValue.FromString("quest_token")),
+                                                    new LiteralExprNode(ExprValue.FromNumber(2)),
+                                                ]),
+                                            [
+                                                new CommandStep(
+                                                    "get_money",
+                                                    [new LiteralExprNode(ExprValue.FromNumber(50))]),
+                                            ]),
+                                    ],
+                                    null),
+                                new CommandStep("map", [new LiteralExprNode(ExprValue.FromString("town"))]),
+                            ]),
+                    ]),
+            ],
+            items:
+            [
+                new NormalItemDefinition
+                {
+                    Id = "quest_token",
+                    Name = "quest_token",
+                    Type = ItemType.QuestItem,
+                },
+            ],
+            maps:
+            [
+                new MapDefinition
+                {
+                    Id = "town",
+                    Name = "town",
+                    Kind = MapKind.Small,
+                },
+            ]);
+
+        var host = new RecordingRuntimeHost();
+        var session = new GameSession(new GameState(), repository, host);
+
+        await session.StoryService.ExecuteAsync("story_intro");
+
+        Assert.Single(host.Dialogues);
+        Assert.Equal(2, host.CustomCommands.Count);
+        Assert.Equal("custom_cmd", host.CustomCommands[0].Name);
+        Assert.Equal(7d, host.CustomCommands[0].Args[0].AsNumber("custom_cmd"));
+        Assert.Equal("map", host.CustomCommands[1].Name);
+        Assert.Equal("town", host.CustomCommands[1].Args[0].AsString("map"));
+        Assert.True(session.State.Story.IsStoryCompleted("story_intro"));
+        Assert.True(session.State.Story.IsStoryCompleted("story_second"));
+        Assert.Equal("story_second", session.State.Story.LastStoryId);
+        Assert.True(session.State.Story.TryGetVariable("opened", out var opened));
+        Assert.True(opened.AsBoolean("opened"));
+        var journalEntry = Assert.Single(session.State.Journal.Entries);
+        Assert.Equal("踏入江湖", journalEntry.Text);
+        Assert.True(session.State.Inventory.ContainsStack(repository.GetItem("quest_token"), 2));
+        Assert.Equal(50, session.State.Currency.Silver);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ResolvesCurrencyProjectionVariablesFromGameState()
     {
         var repository = TestContentFactory.CreateRepository(
             storyScripts:
@@ -147,9 +247,7 @@ public sealed class StoryServiceTests
         var host = new RecordingRuntimeHost();
         var session = new GameSession(state, repository, host);
 
-        await foreach (var _ in session.StoryService.RunAsync("currency_projection"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("currency_projection");
 
         var command = Assert.Single(host.CustomCommands);
         Assert.Equal("custom_cmd", command.Name);
@@ -160,7 +258,7 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_SetTimeKeyRegistersExpiringStoryTarget()
+    public async Task ExecuteAsync_SetTimeKeyRegistersExpiringStoryTarget()
     {
         var repository = TestContentFactory.CreateRepository(
             storyScripts:
@@ -188,9 +286,7 @@ public sealed class StoryServiceTests
             ]);
         var session = new GameSession(new GameState(), repository, new RecordingRuntimeHost());
 
-        await foreach (var _ in session.StoryService.RunAsync("start_timer"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("start_timer");
 
         var timeKey = Assert.Single(session.State.Story.TimeKeys.Values);
         Assert.Equal("rescue", timeKey.Key);
@@ -216,7 +312,7 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_ClearTimeKeyCancelsExpiration()
+    public async Task ExecuteAsync_ClearTimeKeyCancelsExpiration()
     {
         var repository = TestContentFactory.CreateRepository(
             storyScripts:
@@ -243,9 +339,7 @@ public sealed class StoryServiceTests
             ]);
         var session = new GameSession(new GameState(), repository, new RecordingRuntimeHost());
 
-        await foreach (var _ in session.StoryService.RunAsync("timer_flow"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("timer_flow");
 
         Assert.Empty(session.State.Story.TimeKeys);
         session.State.Clock.AdvanceDays(1);
@@ -253,7 +347,7 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_AllowsJumpingToSegmentFromAnotherStoryScript()
+    public async Task ExecuteAsync_AllowsJumpingToSegmentFromAnotherStoryScript()
     {
         var repository = TestContentFactory.CreateRepository(
             storyScripts:
@@ -280,9 +374,7 @@ public sealed class StoryServiceTests
         var host = new RecordingRuntimeHost();
         var session = new GameSession(new GameState(), repository, host);
 
-        await foreach (var _ in session.StoryService.RunAsync("start"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("start");
 
         var command = Assert.Single(host.CustomCommands);
         Assert.Equal("custom_cmd", command.Name);
@@ -292,7 +384,7 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_LearnCommandSupportsSkillsTalentsAndSpecialSkills()
+    public async Task ExecuteAsync_LearnCommandSupportsSkillsTalentsAndSpecialSkills()
     {
         var externalSkill = TestContentFactory.CreateExternalSkill("starter_sword");
         var internalSkill = TestContentFactory.CreateInternalSkill("inner_breath");
@@ -369,9 +461,7 @@ public sealed class StoryServiceTests
         state.SetParty(party);
         var session = new GameSession(state, repository, new RecordingRuntimeHost());
 
-        await foreach (var _ in session.StoryService.RunAsync("learn_all"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("learn_all");
 
         Assert.Equal(5, hero.GetExternalSkillLevel("starter_sword"));
         Assert.Equal(4, hero.GetInternalSkillLevel("inner_breath"));
@@ -382,7 +472,7 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_UpgradeCommandSupportsStatsAndSkillLevels()
+    public async Task ExecuteAsync_UpgradeCommandSupportsStatsAndSkillLevels()
     {
         var externalAffix = new SkillAffixDefinition(
             new StatModifierAffix(StatType.Gengu, ModifierValue.Add(5)),
@@ -449,9 +539,7 @@ public sealed class StoryServiceTests
         state.SetParty(party);
         var session = new GameSession(state, repository, new RecordingRuntimeHost());
 
-        await foreach (var _ in session.StoryService.RunAsync("upgrade_growth"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("upgrade_growth");
 
         Assert.Equal(30, hero.GetBaseStat(StatType.MaxHp));
         Assert.Equal(5, hero.GetExternalSkillLevel("focus_strike"));
@@ -461,7 +549,7 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_SupportsLegacyWeaponStatAndYuanbaoPredicates()
+    public async Task ExecuteAsync_SupportsLegacyWeaponStatAndYuanbaoPredicates()
     {
         var repository = TestContentFactory.CreateRepository(
             characters:
@@ -523,9 +611,7 @@ public sealed class StoryServiceTests
         var host = new RecordingRuntimeHost();
         var session = new GameSession(state, repository, host);
 
-        await foreach (var _ in session.StoryService.RunAsync("legacy_predicates"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("legacy_predicates");
 
         Assert.Equal(
             [
@@ -540,7 +626,7 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_InterpolatesMaleAndFemalePlaceholdersInDialogueAndChoice()
+    public async Task ExecuteAsync_InterpolatesMaleAndFemalePlaceholdersInDialogueAndChoice()
     {
         var heroDefinition = TestContentFactory.CreateCharacterDefinition(Party.HeroCharacterId);
         var femaleDefinition = TestContentFactory.CreateCharacterDefinition("女主");
@@ -583,9 +669,7 @@ public sealed class StoryServiceTests
         var host = new RecordingRuntimeHost();
         var session = new GameSession(state, repository, host);
 
-        await foreach (var _ in session.StoryService.RunAsync("interpolation"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("interpolation");
 
         var dialogue = Assert.Single(host.Dialogues);
         Assert.Equal("赵灵儿", dialogue.Speaker);
@@ -599,7 +683,7 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
-    public async Task RunAsync_InterpolatesPlaceholdersFromCharacterDefinitionsWhenRosterDoesNotContainCharacters()
+    public async Task ExecuteAsync_InterpolatesPlaceholdersFromCharacterDefinitionsWhenRosterDoesNotContainCharacters()
     {
         var repository = TestContentFactory.CreateRepository(
             characters:
@@ -623,9 +707,7 @@ public sealed class StoryServiceTests
         var host = new RecordingRuntimeHost();
         var session = new GameSession(new GameState(), repository, host);
 
-        await foreach (var _ in session.StoryService.RunAsync("interpolation_fallback"))
-        {
-        }
+        await session.StoryService.ExecuteAsync("interpolation_fallback");
 
         var dialogue = Assert.Single(host.Dialogues);
         Assert.Equal("主角与女主初次相遇。", dialogue.Text);

@@ -122,9 +122,7 @@ public partial class TimedStoryCoordinator : Node
 
 		try
 		{
-			await foreach (var _ in Game.StoryService.RunAsync(storyId))
-			{
-			}
+			await Game.StoryService.ExecuteAsync(storyId);
 		}
 		finally
 		{

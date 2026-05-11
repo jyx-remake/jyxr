@@ -48,9 +48,7 @@ public static class GameFlow
 		var storyId = Game.Config.InitialStorySegmentId;
 		try
 		{
-			await foreach (var _ in Game.StoryService.RunAsync(storyId, cancellationToken))
-			{
-			}
+			await Game.StoryService.ExecuteAsync(storyId, cancellationToken);
 		}
 		finally
 		{

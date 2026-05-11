@@ -135,9 +135,7 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost
 			throw new InvalidOperationException($"Sect '{sect.Id}' does not define an entry story.");
 		}
 
-		await foreach (var _ in Game.StoryService.RunAsync(sect.StoryId, cancellationToken))
-		{
-		}
+		await Game.StoryService.ExecuteAsync(sect.StoryId, cancellationToken);
 	}
 
 	[StoryCommand("input_name")]

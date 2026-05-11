@@ -296,9 +296,7 @@ public partial class MapScreen : Control
 
 		try
 		{
-			await foreach (var _ in Game.StoryService.RunAsync(storyId))
-			{
-			}
+			await Game.StoryService.ExecuteAsync(storyId);
 		}
 		finally
 		{

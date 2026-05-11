@@ -35,6 +35,15 @@ public sealed class StoryService
 
     public StoryCommandLineService CommandLine { get; }
 
+    public async Task ExecuteAsync(
+        string storyId,
+        CancellationToken cancellationToken = default)
+    {
+        await foreach (var _ in RunAsync(storyId, cancellationToken))
+        {
+        }
+    }
+
     public async IAsyncEnumerable<StoryEvent> RunAsync(
         string storyId,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
