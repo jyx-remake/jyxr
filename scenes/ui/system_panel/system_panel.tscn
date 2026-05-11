@@ -149,8 +149,8 @@ text = "返回游戏"
 layout_mode = 0
 offset_left = 78.0
 offset_top = 489.0
-offset_right = 768.0
-offset_bottom = 1009.0
+offset_right = 700.0
+offset_bottom = 1073.0
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
@@ -268,7 +268,7 @@ offset_top = 646.0
 offset_right = 1813.0
 offset_bottom = 1016.0
 
-[node name="QuitButton" type="Button" parent="ActionRow" unique_id=858266893]
+[node name="MainMenuButton" type="Button" parent="ActionRow" unique_id=858266893]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 255)
 layout_mode = 0
@@ -281,7 +281,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_transparent_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_transparent_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_transparent_hover")
 
-[node name="QuitLayout" type="MarginContainer" parent="ActionRow/QuitButton" unique_id=237040938]
+[node name="MainMenuLayout" type="MarginContainer" parent="ActionRow/MainMenuButton" unique_id=237040938]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -294,19 +294,19 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="QuitVBox" type="VBoxContainer" parent="ActionRow/QuitButton/QuitLayout" unique_id=523837735]
+[node name="MainMenuVBox" type="VBoxContainer" parent="ActionRow/MainMenuButton/MainMenuLayout" unique_id=523837735]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 14
 alignment = 1
 
-[node name="QuitCard" type="PanelContainer" parent="ActionRow/QuitButton/QuitLayout/QuitVBox" unique_id=1913598830]
+[node name="MainMenuCard" type="PanelContainer" parent="ActionRow/MainMenuButton/MainMenuLayout/MainMenuVBox" unique_id=1913598830]
 custom_minimum_size = Vector2(170, 140)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_action_quit")
 
-[node name="QuitIconMargin" type="MarginContainer" parent="ActionRow/QuitButton/QuitLayout/QuitVBox/QuitCard" unique_id=1423972117]
+[node name="MainMenuIconMargin" type="MarginContainer" parent="ActionRow/MainMenuButton/MainMenuLayout/MainMenuVBox/MainMenuCard" unique_id=1423972117]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 18
@@ -314,7 +314,7 @@ theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 18
 
-[node name="QuitIcon" type="TextureRect" parent="ActionRow/QuitButton/QuitLayout/QuitVBox/QuitCard/QuitIconMargin" unique_id=563417098]
+[node name="MainMenuIcon" type="TextureRect" parent="ActionRow/MainMenuButton/MainMenuLayout/MainMenuVBox/MainMenuCard/MainMenuIconMargin" unique_id=563417098]
 custom_minimum_size = Vector2(104, 104)
 layout_mode = 2
 mouse_filter = 2
@@ -322,13 +322,13 @@ texture = ExtResource("3_quit_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="QuitLabel" type="Label" parent="ActionRow/QuitButton/QuitLayout/QuitVBox" unique_id=1461312086]
+[node name="MainMenuLabel" type="Label" parent="ActionRow/MainMenuButton/MainMenuLayout/MainMenuVBox" unique_id=1461312086]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.09, 0.07, 0.05, 1)
 theme_override_colors/font_outline_color = Color(0.96, 0.95, 0.88, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 44
-text = "退出游戏"
+text = "主菜单"
 horizontal_alignment = 1
 
 [node name="DeleteSaveButton" type="Button" parent="ActionRow" unique_id=208159084]

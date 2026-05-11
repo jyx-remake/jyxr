@@ -28,7 +28,7 @@ public partial class SystemPanel : Control
 	private RichTextLabel _consoleOutput = null!;
 	private Button _executeButton = null!;
 	private Button _backButton = null!;
-	private Button _quitButton = null!;
+	private Button _mainMenuButton = null!;
 	private Button _loadButton = null!;
 	private Button _saveButton = null!;
 	private Button _deleteSaveButton = null!;
@@ -39,7 +39,7 @@ public partial class SystemPanel : Control
 		_consoleOutput = GetNode<RichTextLabel>("%ConsoleOutput");
 		_executeButton = GetNode<Button>("%ExecuteButton");
 		_backButton = GetNode<Button>("%BackButton");
-		_quitButton = GetNode<Button>("%QuitButton");
+		_mainMenuButton = GetNode<Button>("%MainMenuButton");
 		_loadButton = GetNode<Button>("%LoadButton");
 		_saveButton = GetNode<Button>("%SaveButton");
 		_deleteSaveButton = GetNode<Button>("%DeleteSaveButton");
@@ -56,7 +56,7 @@ public partial class SystemPanel : Control
 		_executeButton.Pressed += OnExecutePressed;
 		_consoleInput.TextSubmitted += OnConsoleTextSubmitted;
 		_backButton.Pressed += () => UIRoot.Instance.CloseMainPanel();
-		_quitButton.Pressed += OnQuitPressed;
+		_mainMenuButton.Pressed += OnMainMenuPressed;
 		_loadButton.Pressed += OnLoadPressed;
 		_saveButton.Pressed += OnSavePressed;
 		_deleteSaveButton.Pressed += OnDeleteSavePressed;
@@ -212,10 +212,10 @@ public partial class SystemPanel : Control
 		}
 	}
 
-	private void OnQuitPressed()
+	private void OnMainMenuPressed()
 	{
-		AppendConsoleLine("系统", "正在退出游戏。");
-		GetTree().Quit();
+		AppendConsoleLine("系统", "正在返回主菜单。");
+		GameFlow.ReturnToMainMenu();
 	}
 
 	private void AppendConsoleLine(string source, string message)
