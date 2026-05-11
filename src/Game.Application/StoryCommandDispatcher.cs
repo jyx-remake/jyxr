@@ -27,7 +27,7 @@ public sealed class StoryCommandDispatcher
     private GameState State => _session.State;
     private IContentRepository ContentRepository => _session.ContentRepository;
 
-    public ValueTask ExecuteCommandAsync(
+    public ValueTask<StoryCommandResult> ExecuteCommandAsync(
         string name,
         IReadOnlyList<ExprValue> args,
         CancellationToken cancellationToken)

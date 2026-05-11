@@ -26,7 +26,7 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost
 		CancellationToken cancellationToken) =>
 		ValueTask.FromException<bool>(new InvalidOperationException($"Story predicate '{name}' is not provided by Godot runtime host."));
 
-	public ValueTask ExecuteCommandAsync(
+	public ValueTask<StoryCommandResult> ExecuteCommandAsync(
 		string name,
 		IReadOnlyList<ExprValue> args,
 		CancellationToken cancellationToken)
@@ -39,7 +39,7 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost
 			return result;
 		}
 
-		return ValueTask.FromException(new InvalidOperationException($"Unsupported Godot story command '{name}'."));
+		return ValueTask.FromException<StoryCommandResult>(new InvalidOperationException($"Unsupported Godot story command '{name}'."));
 	}
 
 	public async ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken)

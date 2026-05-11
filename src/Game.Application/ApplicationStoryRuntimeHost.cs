@@ -46,7 +46,7 @@ internal sealed class ApplicationStoryRuntimeHost : IRuntimeHost
         CancellationToken cancellationToken) =>
         _conditionEvaluator.EvaluatePredicateAsync(name, args, cancellationToken);
 
-    public ValueTask ExecuteCommandAsync(
+    public ValueTask<StoryCommandResult> ExecuteCommandAsync(
         string name,
         IReadOnlyList<ExprValue> args,
         CancellationToken cancellationToken) =>

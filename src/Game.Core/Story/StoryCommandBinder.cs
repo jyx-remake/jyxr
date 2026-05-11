@@ -31,7 +31,7 @@ public sealed class StoryCommandBinder
         string name,
         IReadOnlyList<ExprValue> args,
         CancellationToken cancellationToken,
-        out ValueTask result)
+        out ValueTask<StoryCommandResult> result)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(args);
@@ -55,12 +55,27 @@ public sealed class StoryCommandBinder
 
         result = rawResult switch
         {
-            null => ValueTask.CompletedTask,
-            ValueTask valueTask => valueTask,
-            Task task => new ValueTask(task),
+            null => new ValueTask<StoryCommandResult>(StoryCommandResult.None),
+            StoryCommandResult commandResult => new ValueTask<StoryCommandResult>(commandResult),
+            ValueTask<StoryCommandResult> valueTask => valueTask,
+            Task<StoryCommandResult> task => new ValueTask<StoryCommandResult>(task),
+            ValueTask valueTask => AwaitVoidValueTaskAsync(valueTask),
+            Task task => AwaitTaskAsync(task),
             _ => throw new InvalidOperationException(
                 $"Story command '{name}' returned unsupported type '{rawResult.GetType().Name}'."),
         };
         return true;
+    }
+
+    private static async ValueTask<StoryCommandResult> AwaitVoidValueTaskAsync(ValueTask valueTask)
+    {
+        await valueTask;
+        return StoryCommandResult.None;
+    }
+
+    private static async ValueTask<StoryCommandResult> AwaitTaskAsync(Task task)
+    {
+        await task;
+        return StoryCommandResult.None;
     }
 }

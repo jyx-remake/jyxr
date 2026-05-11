@@ -18,6 +18,17 @@ public sealed record CommandStep(
     string Name,
     IReadOnlyList<ExprNode> Args) : Step;
 
+public readonly record struct StoryCommandResult(string? JumpTarget)
+{
+    public static StoryCommandResult None { get; } = new(null);
+
+    public static StoryCommandResult Jump(string target)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(target);
+        return new StoryCommandResult(target);
+    }
+}
+
 public sealed record JumpStep(
     string Target) : Step;
 

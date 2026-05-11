@@ -72,13 +72,13 @@ public sealed class StoryCommandLineServiceTests
 			CancellationToken cancellationToken) =>
 			ValueTask.FromException<bool>(new InvalidOperationException(name));
 
-		public ValueTask ExecuteCommandAsync(
+		public ValueTask<StoryCommandResult> ExecuteCommandAsync(
 			string name,
 			IReadOnlyList<ExprValue> args,
 			CancellationToken cancellationToken)
 		{
 			Commands.Add((name, args));
-			return ValueTask.CompletedTask;
+			return ValueTask.FromResult(StoryCommandResult.None);
 		}
 
 		public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken) =>

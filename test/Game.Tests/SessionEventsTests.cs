@@ -836,13 +836,13 @@ public sealed class SessionEventsTests
             CancellationToken cancellationToken) =>
             ValueTask.FromException<bool>(new InvalidOperationException($"Unknown predicate '{name}'."));
 
-        public ValueTask ExecuteCommandAsync(
+        public ValueTask<StoryCommandResult> ExecuteCommandAsync(
             string name,
             IReadOnlyList<ExprValue> args,
             CancellationToken cancellationToken)
         {
             Commands.Add((name, args));
-            return ValueTask.CompletedTask;
+            return ValueTask.FromResult(StoryCommandResult.None);
         }
 
         public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken) =>
@@ -866,11 +866,11 @@ public sealed class SessionEventsTests
             CancellationToken cancellationToken) =>
             ValueTask.FromException<bool>(new InvalidOperationException("Predicate evaluation should not be invoked."));
 
-        public ValueTask ExecuteCommandAsync(
+        public ValueTask<StoryCommandResult> ExecuteCommandAsync(
             string name,
             IReadOnlyList<ExprValue> args,
             CancellationToken cancellationToken) =>
-            ValueTask.FromException(new InvalidOperationException($"Host command '{name}' should not be invoked."));
+            ValueTask.FromException<StoryCommandResult>(new InvalidOperationException($"Host command '{name}' should not be invoked."));
 
         public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken) =>
             ValueTask.FromException<int>(new InvalidOperationException("Choice UI should not be invoked."));

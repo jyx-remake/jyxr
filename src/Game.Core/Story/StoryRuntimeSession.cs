@@ -99,8 +99,14 @@ internal sealed class StoryRuntimeSession(
             case CommandStep command:
             {
                 var args = await EvaluateValueArgsAsync(command.Args, ct);
-                await host.ExecuteCommandAsync(command.Name, args, ct);
+                var result = await host.ExecuteCommandAsync(command.Name, args, ct);
                 yield return StepResult.FromEvent(new CommandExecutedEvent(command.Name, args));
+                if (result.JumpTarget is not null)
+                {
+                    yield return StepResult.FromEvent(new JumpEvent(result.JumpTarget));
+                    yield return StepResult.FromJump(result.JumpTarget);
+                }
+
                 yield break;
             }
             case ChoiceStep choice:

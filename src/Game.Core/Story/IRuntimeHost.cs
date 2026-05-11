@@ -8,7 +8,7 @@ public interface IRuntimeHost
 
     ValueTask<bool> EvaluatePredicateAsync(string name, IReadOnlyList<ExprValue> args, CancellationToken cancellationToken);
 
-    ValueTask ExecuteCommandAsync(string name, IReadOnlyList<ExprValue> args, CancellationToken cancellationToken);
+    ValueTask<StoryCommandResult> ExecuteCommandAsync(string name, IReadOnlyList<ExprValue> args, CancellationToken cancellationToken);
 
     ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken);
 

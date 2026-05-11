@@ -118,6 +118,55 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
+    public async Task RunAsync_CommandResultJumpSwitchesToTargetSegment()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "start",
+                            [
+                                new CommandStep("jump_cmd", [new LiteralExprNode(ExprValue.FromString("target"))]),
+                                new CommandStep("custom_cmd", [new LiteralExprNode(ExprValue.FromString("should_not_run"))]),
+                            ]),
+                        new Segment(
+                            "target",
+                            [
+                                new CommandStep("custom_cmd", [new LiteralExprNode(ExprValue.FromString("landed"))]),
+                            ]),
+                    ]),
+            ]);
+
+        var host = new RecordingRuntimeHost();
+        host.CommandJumps["jump_cmd"] = "target";
+        var session = new GameSession(new GameState(), repository, host);
+
+        var events = new List<StoryEvent>();
+        await foreach (var storyEvent in session.StoryService.RunAsync("start"))
+        {
+            events.Add(storyEvent);
+        }
+
+        Assert.Collection(
+            events.OfType<SegmentStartedEvent>(),
+            started => Assert.Equal("start", started.SegmentId),
+            started => Assert.Equal("target", started.SegmentId));
+        Assert.Collection(
+            host.CustomCommands,
+            command => Assert.Equal("jump_cmd", command.Name),
+            command =>
+            {
+                Assert.Equal("custom_cmd", command.Name);
+                Assert.Equal("landed", command.Args[0].AsString("custom_cmd"));
+            });
+        var jump = Assert.Single(events.OfType<JumpEvent>());
+        Assert.Equal("target", jump.Target);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ExecutesBuiltInStoryFlowAndUpdatesStoryState()
     {
         var repository = TestContentFactory.CreateRepository(
@@ -742,6 +791,8 @@ public sealed class StoryServiceTests
 
         public List<(string Name, IReadOnlyList<ExprValue> Args)> CustomCommands { get; } = [];
 
+        public Dictionary<string, string> CommandJumps { get; } = new(StringComparer.Ordinal);
+
         public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken)
         {
             Dialogues.Add(dialogue);
@@ -761,13 +812,15 @@ public sealed class StoryServiceTests
             CancellationToken cancellationToken) =>
             ValueTask.FromException<bool>(new InvalidOperationException($"Unknown predicate '{name}'."));
 
-        public ValueTask ExecuteCommandAsync(
+        public ValueTask<StoryCommandResult> ExecuteCommandAsync(
             string name,
             IReadOnlyList<ExprValue> args,
             CancellationToken cancellationToken)
         {
             CustomCommands.Add((name, args));
-            return ValueTask.CompletedTask;
+            return CommandJumps.TryGetValue(name, out var target)
+                ? ValueTask.FromResult(StoryCommandResult.Jump(target))
+                : ValueTask.FromResult(StoryCommandResult.None);
         }
 
         public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken)

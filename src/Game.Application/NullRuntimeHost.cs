@@ -19,8 +19,8 @@ internal sealed class NullRuntimeHost : IRuntimeHost
     public ValueTask<bool> EvaluatePredicateAsync(string name, IReadOnlyList<ExprValue> args, CancellationToken cancellationToken) =>
         ValueTask.FromException<bool>(new InvalidOperationException("Story runtime host is not configured."));
 
-    public ValueTask ExecuteCommandAsync(string name, IReadOnlyList<ExprValue> args, CancellationToken cancellationToken) =>
-        ValueTask.FromException(new InvalidOperationException("Story runtime host is not configured."));
+    public ValueTask<StoryCommandResult> ExecuteCommandAsync(string name, IReadOnlyList<ExprValue> args, CancellationToken cancellationToken) =>
+        ValueTask.FromException<StoryCommandResult>(new InvalidOperationException("Story runtime host is not configured."));
 
     public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken) =>
         ValueTask.FromException<int>(new InvalidOperationException("Story runtime host is not configured."));
