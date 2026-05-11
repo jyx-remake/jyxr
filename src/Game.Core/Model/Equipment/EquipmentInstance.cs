@@ -3,7 +3,7 @@ using Game.Core.Definitions;
 
 namespace Game.Core.Model;
 
-public sealed record EquipmentInstance : IAffixProvider
+public sealed class EquipmentInstance : IAffixProvider
 {
     public EquipmentInstance(
         string id,
