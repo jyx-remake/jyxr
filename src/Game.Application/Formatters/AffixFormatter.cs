@@ -74,19 +74,18 @@ public static class AffixFormatter
         ArgumentNullException.ThrowIfNull(contentRepository);
 
         var list = affixes.ToList();
-        var lines = new List<string>(list.Count);
+        var groups = EquipmentAffixGroups.Group(list);
+        var lines = new List<string>(groups.Count);
 
-        for (var index = 0; index < list.Count; index++)
+        foreach (var group in groups)
         {
-            var current = list[index];
-            if (TryFormatMergedEquipmentLine(list, index, contentRepository, out var mergedLine, out var consumedCount))
+            if (TryFormatMergedEquipmentLine(list, group.StartIndex, contentRepository, out var mergedLine, out _))
             {
                 lines.Add(mergedLine);
-                index += consumedCount - 1;
                 continue;
             }
 
-            lines.Add(FormatCn(current, contentRepository));
+            lines.Add(FormatCn(group.Affixes.Single(), contentRepository));
         }
 
         return lines;

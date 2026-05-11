@@ -356,6 +356,187 @@ public sealed class SessionEventsTests
     }
 
     [Fact]
+    public async Task StoryCommandDispatcher_xilian_NoEligibleEquipment_JumpsNoEquipment_NoCharge_NoChoice()
+    {
+        var state = new GameState();
+        state.Currency.AddGold(1);
+        var session = new GameSession(state, TestContentFactory.CreateRepository());
+        var dispatcher = new StoryCommandDispatcher(session, new ThrowingRuntimeHost());
+        var publishedEvents = CollectPublishedEvents(session);
+
+        var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
+
+        Assert.Equal("洗练_没有装备", result.JumpTarget);
+        Assert.Equal(1, state.Currency.Gold);
+        Assert.Empty(publishedEvents);
+    }
+
+    [Fact]
+    public async Task xilian_CancelReplacement_ChargesGold_ReturnsXilianChoice_DoesNotChangeInventory()
+    {
+        var oldAffix = new StatModifierAffix(StatType.Attack, ModifierValue.Add(10));
+        var equipment = TestContentFactory.CreateEquipment("test_sword");
+        var repository = TestContentFactory.CreateRepository(
+            equipment: [equipment],
+            equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
+        var state = new GameState();
+        state.Currency.AddGold(1);
+        var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(
+            state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix])));
+        var host = new RecordingRuntimeHost(0, 0, 8);
+        var session = new GameSession(state, repository);
+        var dispatcher = new StoryCommandDispatcher(session, host);
+        var publishedEvents = CollectPublishedEvents(session);
+
+        var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
+
+        Assert.Equal("洗练选择", result.JumpTarget);
+        Assert.Equal(0, state.Currency.Gold);
+        Assert.Equal([oldAffix], entry.Equipment.ExtraAffixes);
+        Assert.Single(publishedEvents.OfType<CurrencyChangedEvent>());
+        Assert.Empty(publishedEvents.OfType<InventoryChangedEvent>());
+    }
+
+    [Fact]
+    public async Task xilian_ReplacesSelectedAffixGroup_PreservesEquipmentInstanceAndEntryOrder()
+    {
+        var oldAffix = new StatModifierAffix(StatType.Attack, ModifierValue.Add(10));
+        var equipment = TestContentFactory.CreateEquipment("test_sword");
+        var repository = TestContentFactory.CreateRepository(
+            equipment: [equipment],
+            equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
+        var state = new GameState();
+        state.Currency.AddGold(1);
+        var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(
+            state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix])));
+        var originalEquipment = entry.Equipment;
+        var originalEquipmentId = entry.Equipment.Id;
+        var originalEntryNumber = entry.EntryNumber;
+        var host = new RecordingRuntimeHost(0, 0, 0);
+        var session = new GameSession(state, repository);
+        var dispatcher = new StoryCommandDispatcher(session, host);
+        var publishedEvents = CollectPublishedEvents(session);
+
+        var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
+
+        Assert.Equal("洗练_洗练成功", result.JumpTarget);
+        var refinedEntry = Assert.IsType<EquipmentInstanceInventoryEntry>(Assert.Single(state.Inventory.Entries));
+        Assert.Equal(originalEntryNumber, refinedEntry.EntryNumber);
+        Assert.Equal(originalEquipmentId, refinedEntry.Equipment.Id);
+        Assert.Same(originalEquipment, refinedEntry.Equipment);
+        var speedAffix = Assert.IsType<StatModifierAffix>(Assert.Single(refinedEntry.Equipment.ExtraAffixes));
+        Assert.Equal(StatType.Speed, speedAffix.Stat);
+        Assert.Equal(0, state.Currency.Gold);
+        Assert.Single(publishedEvents.OfType<CurrencyChangedEvent>());
+        Assert.Single(publishedEvents.OfType<InventoryChangedEvent>());
+        Assert.Contains(host.Commands, static command => command.Name == "effect" && command.Args[0].AsString("effect") == "音效.装备");
+    }
+
+    [Fact]
+    public async Task xilian_GeneratesEightCandidatesPlusCancel_AllowsDuplicateCandidateTexts()
+    {
+        var oldAffix = new StatModifierAffix(StatType.Attack, ModifierValue.Add(10));
+        var equipment = TestContentFactory.CreateEquipment("test_sword");
+        var repository = TestContentFactory.CreateRepository(
+            equipment: [equipment],
+            equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
+        var state = new GameState();
+        state.Currency.AddGold(1);
+        state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix]));
+        var host = new RecordingRuntimeHost(0, 0, 8);
+        var session = new GameSession(state, repository);
+        var dispatcher = new StoryCommandDispatcher(session, host);
+
+        await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
+
+        var candidateChoice = host.Choices[2];
+        Assert.Equal(9, candidateChoice.Options.Count);
+        Assert.Equal(
+            Enumerable.Repeat("集气速度 +0.125", 8).Append("不替换了").ToArray(),
+            candidateChoice.Options.Select(static option => option.Text).ToArray());
+    }
+
+    [Fact]
+    public async Task xilian_AvoidsCurrentEquipmentAffixTexts_WhenGeneratingCandidates()
+    {
+        var oldAffix = new StatModifierAffix(StatType.Speed, ModifierValue.Add(0.125));
+        var equipment = TestContentFactory.CreateEquipment("test_sword");
+        var repository = TestContentFactory.CreateRepository(
+            equipment: [equipment],
+            equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
+        var state = new GameState();
+        state.Currency.AddGold(1);
+        state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix]));
+        var host = new RecordingRuntimeHost(0, 0);
+        var session = new GameSession(state, repository);
+        var dispatcher = new StoryCommandDispatcher(session, host);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default));
+
+        Assert.Equal(1, state.Currency.Gold);
+        Assert.Equal(2, host.Choices.Count);
+    }
+
+    [Fact]
+    public async Task xilian_ReplacesMergedPairAsOneLogicalAffix()
+    {
+        var equipment = TestContentFactory.CreateEquipment("test_sword");
+        var repository = TestContentFactory.CreateRepository(
+            equipment: [equipment],
+            equipmentRandomAffixTables:
+            [
+                new EquipmentRandomAffixTableDefinition
+                {
+                    MinItemLevel = 1,
+                    MaxItemLevel = 1,
+                    Options =
+                    [
+                        new EquipmentRandomAffixOptionDefinition
+                        {
+                            Kind = EquipmentRandomAffixKind.DefenceCombo,
+                            Weight = 1,
+                            Ranges =
+                            [
+                                new EquipmentRandomAffixRangeDefinition(8, 8),
+                                new EquipmentRandomAffixRangeDefinition(3, 3),
+                            ],
+                        },
+                    ],
+                },
+            ]);
+        var state = new GameState();
+        state.Currency.AddGold(1);
+        state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(
+            equipment,
+            [
+                new StatModifierAffix(StatType.Attack, ModifierValue.Add(10)),
+                new StatModifierAffix(StatType.CritChance, ModifierValue.Add(0.02)),
+            ]));
+        var host = new RecordingRuntimeHost(0, 0, 0);
+        var session = new GameSession(state, repository);
+        var dispatcher = new StoryCommandDispatcher(session, host);
+
+        var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
+
+        Assert.Equal("洗练_洗练成功", result.JumpTarget);
+        var refinedEntry = Assert.IsType<EquipmentInstanceInventoryEntry>(Assert.Single(state.Inventory.Entries));
+        Assert.Collection(
+            refinedEntry.Equipment.ExtraAffixes,
+            affix =>
+            {
+                var statAffix = Assert.IsType<StatModifierAffix>(affix);
+                Assert.Equal(StatType.Defence, statAffix.Stat);
+            },
+            affix =>
+            {
+                var statAffix = Assert.IsType<StatModifierAffix>(affix);
+                Assert.Equal(StatType.AntiCritChance, statAffix.Stat);
+            });
+        Assert.Equal(["攻击力 +10，暴击率 +2%"], host.Choices[1].Options.Select(static option => option.Text).ToArray());
+    }
+
+    [Fact]
     public async Task StoryCommandDispatcher_TodoCommands_PublishToast()
     {
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
@@ -364,7 +545,6 @@ public sealed class SessionEventsTests
 
         await dispatcher.ExecuteCommandAsync("game", [ExprValue.FromString("whac_a_mole")], default);
         await dispatcher.ExecuteCommandAsync("newbie", [], default);
-        await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromString("some_equipment")], default);
         await dispatcher.ExecuteCommandAsync("tower", [ExprValue.FromString("tower")], default);
         await dispatcher.ExecuteCommandAsync("huashan", [ExprValue.FromString("huashan")], default);
         await dispatcher.ExecuteCommandAsync("trial", [ExprValue.FromString("trial")], default);
@@ -375,7 +555,6 @@ public sealed class SessionEventsTests
             [
                 "game指令暂未实现",
                 "newbie指令暂未实现",
-                "xilian指令暂未实现",
                 "tower指令暂未实现",
                 "huashan指令暂未实现",
                 "trial指令暂未实现",
@@ -820,9 +999,36 @@ public sealed class SessionEventsTests
         return publishedEvents;
     }
 
+    private static EquipmentRandomAffixTableDefinition CreateSpeedAffixTable(string value) =>
+        new()
+        {
+            MinItemLevel = 1,
+            MaxItemLevel = 1,
+            Options =
+            [
+                new EquipmentRandomAffixOptionDefinition
+                {
+                    Kind = EquipmentRandomAffixKind.Speed,
+                    Weight = 1,
+                    Pool = [value],
+                },
+            ],
+        };
+
     private sealed class RecordingRuntimeHost : IRuntimeHost
     {
+        private readonly Queue<int> _choiceSelections = new();
+
+        public RecordingRuntimeHost(params int[] choiceSelections)
+        {
+            foreach (var choiceSelection in choiceSelections)
+            {
+                _choiceSelections.Enqueue(choiceSelection);
+            }
+        }
+
         public List<(string Name, IReadOnlyList<ExprValue> Args)> Commands { get; } = [];
+        public List<ChoiceContext> Choices { get; } = [];
 
         public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) =>
             ValueTask.CompletedTask;
@@ -845,8 +1051,11 @@ public sealed class SessionEventsTests
             return ValueTask.FromResult(StoryCommandResult.None);
         }
 
-        public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken) =>
-            ValueTask.FromResult(0);
+        public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken)
+        {
+            Choices.Add(choice);
+            return ValueTask.FromResult(_choiceSelections.TryDequeue(out var selectedIndex) ? selectedIndex : 0);
+        }
 
         public ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken) =>
             ValueTask.FromResult(BattleOutcome.Win);

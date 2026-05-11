@@ -377,9 +377,11 @@ public sealed class StoryCommandDispatcher
     [StoryCommand("newbie")]
     private ValueTask ExecuteNewbiePlaceholderAsync(params ExprValue[] _) => ExecuteTodoCommandAsync("newbie");
 
-    // TODO: 洗练系统需要独立 UI/流程接线，当前先给出占位提示。
     [StoryCommand("xilian")]
-    private ValueTask ExecuteXilianPlaceholderAsync(params ExprValue[] _) => ExecuteTodoCommandAsync("xilian");
+    private ValueTask<StoryCommandResult> ExecuteXilianAsync(
+        CancellationToken cancellationToken,
+        params ExprValue[] _) =>
+        _session.EquipmentRefinementService.RunAsync(_host, cancellationToken);
 
     // TODO: 爬塔玩法需要独立流程接线，当前先给出占位提示。
     [StoryCommand("tower")]
