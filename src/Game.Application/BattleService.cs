@@ -139,7 +139,8 @@ public sealed class BattleService
             state,
             ContentRepository,
             State.Adventure.Round,
-            PlayerTeam);
+            PlayerTeam,
+            _session.Config.OrdinaryBattleDropChance);
 
         return settlement with { Drops = drops };
     }

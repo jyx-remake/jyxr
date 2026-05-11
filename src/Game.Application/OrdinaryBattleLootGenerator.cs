@@ -7,22 +7,23 @@ namespace Game.Application;
 
 public static class OrdinaryBattleLootGenerator
 {
-    private const double ItemDropChance = 0.1d;
-
     public static IReadOnlyList<OrdinaryBattleRewardDrop> Generate(
         BattleState state,
         IContentRepository contentRepository,
         int round,
-        int playerTeam)
+        int playerTeam,
+        double dropChance)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(contentRepository);
         ArgumentOutOfRangeException.ThrowIfLessThan(round, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(dropChance, 0d);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(dropChance, 1d);
 
         var drops = new List<OrdinaryBattleRewardDrop>();
         foreach (var enemyUnit in state.Units.Where(unit => unit.Team != playerTeam))
         {
-            if (!Probability.RollChance(ItemDropChance))
+            if (!Probability.RollChance(dropChance))
             {
                 continue;
             }
