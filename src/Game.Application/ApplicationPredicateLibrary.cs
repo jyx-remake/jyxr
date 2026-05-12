@@ -32,8 +32,11 @@ internal sealed class ApplicationPredicateLibrary
     private bool FollowStory(string storyId) =>
         string.Equals(State.Story.LastStoryId, storyId, StringComparison.Ordinal);
 
+    [GamePredicate("has_time_key")]
+    private bool HasTimeKey(string key) => State.Story.HasTimeKey(key);
+
     [GamePredicate("not_has_time_key")]
-    private bool NotHasTimeKey(string variableName) => !GetBooleanStoryValue(variableName);
+    private bool NotHasTimeKey(string key) => !State.Story.HasTimeKey(key);
 
     [GamePredicate("have_item")]
     private bool HaveItem(string itemId, int quantity = 1)
@@ -238,11 +241,6 @@ internal sealed class ApplicationPredicateLibrary
     private CharacterInstance? GetMainCharacter() => State.Party.Members.FirstOrDefault();
 
     private double GetMainCharacterStat(StatType statType) => GetMainCharacter()?.GetBaseStat(statType) ?? 0d;
-
-    private bool GetBooleanStoryValue(string name) =>
-        State.Story.TryGetVariable(name, out var value) &&
-        value.Kind == ExprValueKind.Boolean &&
-        value.Boolean;
 
     private bool TryFindPartyMember(string idOrName, out CharacterInstance character)
     {

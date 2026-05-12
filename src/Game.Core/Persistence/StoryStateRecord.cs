@@ -13,9 +13,7 @@ public sealed record StoryTimeKeyRecord(
     ClockRecord StartedAt,
     int LimitDays,
     ClockRecord DeadlineAt,
-    string TargetStoryId,
-    bool Triggered,
-    ClockRecord? TriggeredAt);
+    string TargetStoryId);
 
 public sealed record StoryVariableRecord(
     ExprValueKind Kind,

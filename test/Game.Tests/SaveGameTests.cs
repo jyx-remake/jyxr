@@ -375,7 +375,6 @@ public sealed class SaveGameTests
         Assert.Equal(5, timeKey.LimitDays);
         Assert.Equal("襄阳_超时", timeKey.TargetStoryId);
         Assert.Equal(6, timeKey.DeadlineAt.Day);
-        Assert.False(timeKey.Triggered);
     }
 
     [Fact]

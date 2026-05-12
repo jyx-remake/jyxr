@@ -71,12 +71,11 @@ public sealed class StoryState
         string key,
         ClockState currentClock,
         int limitDays,
-        string targetStoryId)
+        string targetStoryId = "")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentNullException.ThrowIfNull(currentClock);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(limitDays);
-        ArgumentException.ThrowIfNullOrWhiteSpace(targetStoryId);
 
         var startedAt = currentClock.ToRecord();
         var deadlineClock = ClockState.Restore(startedAt);
@@ -86,9 +85,7 @@ public sealed class StoryState
             startedAt,
             limitDays,
             deadlineClock.ToRecord(),
-            targetStoryId,
-            triggered: false,
-            triggeredAt: null);
+            targetStoryId);
         _timeKeys[key] = timeKey;
         return timeKey;
     }
@@ -99,16 +96,10 @@ public sealed class StoryState
         return _timeKeys.Remove(key);
     }
 
-    public void MarkTimeKeyTriggered(string key, ClockRecord triggeredAt)
+    public bool HasTimeKey(string key)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
-        ArgumentNullException.ThrowIfNull(triggeredAt);
-        if (!_timeKeys.TryGetValue(key, out var timeKey))
-        {
-            throw new KeyNotFoundException($"Story time key '{key}' does not exist.");
-        }
-
-        timeKey.MarkTriggered(triggeredAt);
+        return _timeKeys.ContainsKey(key);
     }
 
     public bool IsStoryCompleted(string storyId)
@@ -153,23 +144,18 @@ public sealed class StoryTimeKeyState
         ClockRecord startedAt,
         int limitDays,
         ClockRecord deadlineAt,
-        string targetStoryId,
-        bool triggered,
-        ClockRecord? triggeredAt)
+        string targetStoryId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentNullException.ThrowIfNull(startedAt);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(limitDays);
         ArgumentNullException.ThrowIfNull(deadlineAt);
-        ArgumentException.ThrowIfNullOrWhiteSpace(targetStoryId);
 
         Key = key;
         StartedAt = startedAt;
         LimitDays = limitDays;
         DeadlineAt = deadlineAt;
         TargetStoryId = targetStoryId;
-        Triggered = triggered;
-        TriggeredAt = triggeredAt;
     }
 
     public string Key { get; }
@@ -182,10 +168,6 @@ public sealed class StoryTimeKeyState
 
     public string TargetStoryId { get; }
 
-    public bool Triggered { get; private set; }
-
-    public ClockRecord? TriggeredAt { get; private set; }
-
     public static StoryTimeKeyState Restore(StoryTimeKeyRecord record)
     {
         ArgumentNullException.ThrowIfNull(record);
@@ -194,18 +176,9 @@ public sealed class StoryTimeKeyState
             record.StartedAt,
             record.LimitDays,
             record.DeadlineAt,
-            record.TargetStoryId,
-            record.Triggered,
-            record.TriggeredAt);
-    }
-
-    public void MarkTriggered(ClockRecord triggeredAt)
-    {
-        ArgumentNullException.ThrowIfNull(triggeredAt);
-        Triggered = true;
-        TriggeredAt = triggeredAt;
+            record.TargetStoryId);
     }
 
     public StoryTimeKeyRecord ToRecord() =>
-        new(Key, StartedAt, LimitDays, DeadlineAt, TargetStoryId, Triggered, TriggeredAt);
+        new(Key, StartedAt, LimitDays, DeadlineAt, TargetStoryId);
 }

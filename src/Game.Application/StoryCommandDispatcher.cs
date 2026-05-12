@@ -119,9 +119,13 @@ public sealed class StoryCommandDispatcher
     }
 
     [StoryCommand("set_time_key")]
-    private ValueTask ExecuteSetTimeKeyAsync(string key, int limitDays, string targetStoryId)
+    private ValueTask ExecuteSetTimeKeyAsync(string key, int limitDays, string targetStoryId = "")
     {
-        ContentRepository.GetStorySegment(targetStoryId);
+        if (!string.IsNullOrWhiteSpace(targetStoryId))
+        {
+            ContentRepository.GetStorySegment(targetStoryId);
+        }
+
         State.Story.SetTimeKey(key, State.Clock, limitDays, targetStoryId);
         _session.Events.Publish(new StoryStateChangedEvent());
         return ValueTask.CompletedTask;

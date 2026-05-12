@@ -323,14 +323,8 @@ public sealed class MapServiceTests
     }
 
     [Fact]
-    public void EnterMap_SmallMap_NotHasTimeKeyCondition_StillUsesMissingItemSemantics()
+    public void EnterMap_SmallMap_TimeKeyConditionsUseActiveTimeKeySemantics()
     {
-        var keyItem = new NormalItemDefinition
-        {
-            Id = "quest_token",
-            Name = "quest_token",
-            Type = ItemType.QuestItem,
-        };
         var conditionedMap = CreateMap(
             "inn",
             MapKind.Small,
@@ -341,30 +335,49 @@ public sealed class MapServiceTests
                     new MapEventDefinition
                     {
                         Type = "story",
-                        TargetId = "story_keeper",
+                        TargetId = "story_without_key",
                         Probability = 100,
-                        Conditions =
-                        [
-                            new MapEventConditionDefinition
-                            {
-                                Type = "not_has_time_key",
-                                Value = "quest_token",
-                            },
-                        ],
+                        Conditions = [CreateCondition("not_has_time_key", "quest_cooldown")],
                     },
                 ]));
-        var repository = TestContentFactory.CreateRepository(maps: [conditionedMap], items: [keyItem]);
+        var hasKeyMap = CreateMap(
+            "inn_with_key",
+            MapKind.Small,
+            CreateLocation(
+                "keeper",
+                events:
+                [
+                    new MapEventDefinition
+                    {
+                        Type = "story",
+                        TargetId = "story_with_key",
+                        Probability = 100,
+                        Conditions = [CreateCondition("has_time_key", "quest_cooldown")],
+                    },
+                ]));
+        var repository = TestContentFactory.CreateRepository(maps: [conditionedMap, hasKeyMap]);
 
-        var withoutItem = new GameSession(new GameState(), repository);
-        var visibleLocations = withoutItem.MapService.EnterMap("inn").Locations;
+        var withoutTimeKey = new GameSession(new GameState(), repository);
+        var visibleLocations = withoutTimeKey.MapService.EnterMap("inn").Locations;
         Assert.Single(visibleLocations);
+        Assert.Equal("story_without_key", visibleLocations[0].Event!.TargetId);
 
-        var stateWithItem = new GameState();
-        stateWithItem.Inventory.AddItem(keyItem, 1);
-        var withItem = new GameSession(stateWithItem, repository);
-        var hiddenLocations = withItem.MapService.EnterMap("inn").Locations;
-        Assert.Empty(hiddenLocations);
+        var stateWithTimeKey = new GameState();
+        stateWithTimeKey.Story.SetTimeKey("quest_cooldown", stateWithTimeKey.Clock, 30);
+        var withTimeKey = new GameSession(stateWithTimeKey, repository);
+        Assert.Empty(withTimeKey.MapService.EnterMap("inn").Locations);
+
+        var hasKeyLocations = withTimeKey.MapService.EnterMap("inn_with_key").Locations;
+        Assert.Single(hasKeyLocations);
+        Assert.Equal("story_with_key", hasKeyLocations[0].Event!.TargetId);
     }
+
+    private static MapEventConditionDefinition CreateCondition(string type, string value) =>
+        new()
+        {
+            Type = type,
+            Value = value,
+        };
 
     private static MapDefinition CreateMap(string id, MapKind kind, params MapLocationDefinition[] locations) =>
         new()

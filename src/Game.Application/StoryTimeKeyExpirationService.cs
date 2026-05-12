@@ -17,7 +17,7 @@ public sealed class StoryTimeKeyExpirationService
     {
         var clock = _session.State.Clock;
         var expired = _session.State.Story.TimeKeys.Values
-            .Where(timeKey => !timeKey.Triggered && IsAtOrAfter(clock, timeKey.DeadlineAt))
+            .Where(timeKey => IsAfter(clock, timeKey.DeadlineAt))
             .OrderBy(static timeKey => GetTotalTimeSlots(timeKey.DeadlineAt))
             .ThenBy(static timeKey => timeKey.Key, StringComparer.Ordinal)
             .ToArray();
@@ -26,20 +26,22 @@ public sealed class StoryTimeKeyExpirationService
             return [];
         }
 
-        var triggeredAt = clock.ToRecord();
         var results = new List<ExpiredStoryTimeKey>(expired.Length);
         foreach (var timeKey in expired)
         {
-            _session.State.Story.MarkTimeKeyTriggered(timeKey.Key, triggeredAt);
-            results.Add(new ExpiredStoryTimeKey(timeKey.Key, timeKey.TargetStoryId));
+            _session.State.Story.RemoveTimeKey(timeKey.Key);
+            if (!string.IsNullOrWhiteSpace(timeKey.TargetStoryId))
+            {
+                results.Add(new ExpiredStoryTimeKey(timeKey.Key, timeKey.TargetStoryId));
+            }
         }
 
         _session.Events.Publish(new StoryStateChangedEvent());
         return results;
     }
 
-    private static bool IsAtOrAfter(ClockState current, ClockRecord deadline) =>
-        GetTotalTimeSlots(current) >= GetTotalTimeSlots(deadline);
+    private static bool IsAfter(ClockState current, ClockRecord deadline) =>
+        GetTotalTimeSlots(current) > GetTotalTimeSlots(deadline);
 
     private static int GetTotalTimeSlots(ClockState clock) =>
         checked(clock.TotalDays * ClockState.TimeSlotsPerDay + (int)clock.TimeSlot);

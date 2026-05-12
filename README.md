@@ -228,14 +228,14 @@
   - 当前通过 `StoryCommandAttribute` + `StoryCommandBinder` 绑定内建命令。
   - 当前内建处理物品、货币、日志、剧情变量、冒险状态、人物成长、入队/跟随/离队、学习、移除技能、称号解锁等剧情命令。
   - `log` 会把日志条目追加到 `GameState.Journal`。
-  - `set_time_key key limitDays targetStoryId` 会登记限时剧情 key；`clear_time_key key` 会取消登记。
+  - `set_time_key key limitDays [targetStoryId]` 会登记限时剧情 key；严格超过天数后移除，存在目标剧情时才触发跳转；`clear_time_key key` 会取消登记。
   - `change_female_name` 默认操作角色 id `女主`；如果该角色不在 `Party` 名册中，会创建角色实例并放入 `Reserves` 后再改名。
 - `StoryTextInterpolator`
   - 当前在应用层对白/选项进入宿主前处理 `$MALE$` 与 `$FEMALE$`。
   - 只解析主角和女主显示名，优先查 `Party` 全名册，其次查角色 definition；未知占位符保持原文本。
 - `StoryTimeKeyExpirationService`
-  - 根据当前 `ClockState` 检查未触发且已到截止时间的 story time key。
-  - 到期后标记 `Triggered`、发布 `StoryStateChangedEvent`，并返回要执行的目标 story id。
+  - 根据当前 `ClockState` 检查已严格超过期限的 story time key。
+  - 到期后移除 key、发布 `StoryStateChangedEvent`，并仅为非空目标返回要执行的 story id。
 - `StoryVariableResolver`
   - 当前把 `money` / `silver` / `gold` / `yuanbao` 直接投影到 `GameState.Currency`。
   - 当前把 `round` / `game_mode` 投影到 `GameState.Adventure`。

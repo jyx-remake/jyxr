@@ -346,18 +346,55 @@ public sealed class StoryServiceTests
         Assert.Equal(1, timeKey.StartedAt.Day);
         Assert.Equal(TimeSlot.Chen, timeKey.StartedAt.TimeSlot);
         Assert.Equal(4, timeKey.DeadlineAt.Day);
-        Assert.False(timeKey.Triggered);
 
-        session.State.Clock.AdvanceDays(2);
+        session.State.Clock.AdvanceDays(3);
         Assert.Empty(session.StoryTimeKeyExpirationService.CheckExpired());
 
-        session.State.Clock.AdvanceDays(1);
+        session.State.Clock.AdvanceTimeSlots(1);
         var expired = Assert.Single(session.StoryTimeKeyExpirationService.CheckExpired());
         Assert.Equal("rescue", expired.Key);
         Assert.Equal("rescue_timeout", expired.TargetStoryId);
-        Assert.True(timeKey.Triggered);
-        Assert.NotNull(timeKey.TriggeredAt);
+        Assert.Empty(session.State.Story.TimeKeys);
         Assert.Empty(session.StoryTimeKeyExpirationService.CheckExpired());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_SetTimeKeyWithoutStoryOnlyClearsExpiredKey()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "start_timer",
+                            [
+                                new CommandStep(
+                                    "set_time_key",
+                                    [
+                                        new LiteralExprNode(ExprValue.FromString("cooldown")),
+                                        new LiteralExprNode(ExprValue.FromNumber(1)),
+                                    ]),
+                            ]),
+                    ]),
+            ]);
+        var session = new GameSession(new GameState(), repository, new RecordingRuntimeHost());
+
+        await session.StoryService.ExecuteAsync("start_timer");
+
+        var timeKey = Assert.Single(session.State.Story.TimeKeys.Values);
+        Assert.Equal("cooldown", timeKey.Key);
+        Assert.Equal(1, timeKey.LimitDays);
+        Assert.Empty(timeKey.TargetStoryId);
+
+        session.State.Clock.AdvanceDays(1);
+        Assert.Empty(session.StoryTimeKeyExpirationService.CheckExpired());
+        Assert.True(session.State.Story.HasTimeKey("cooldown"));
+
+        session.State.Clock.AdvanceTimeSlots(1);
+        Assert.Empty(session.StoryTimeKeyExpirationService.CheckExpired());
+        Assert.False(session.State.Story.HasTimeKey("cooldown"));
     }
 
     [Fact]

@@ -205,6 +205,25 @@ public sealed class SessionEventsTests
     }
 
     [Fact]
+    public async Task StoryCommandDispatcher_SetTimeKeyAllowsMissingTargetStory()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var dispatcher = new StoryCommandDispatcher(session, new RecordingRuntimeHost());
+
+        await dispatcher.ExecuteCommandAsync(
+            "set_time_key",
+            [
+                ExprValue.FromString("cooldown"),
+                ExprValue.FromNumber(2),
+            ],
+            default);
+
+        var timeKey = Assert.Single(session.State.Story.TimeKeys.Values);
+        Assert.Equal("cooldown", timeKey.Key);
+        Assert.Equal(2, timeKey.LimitDays);
+        Assert.Empty(timeKey.TargetStoryId);
+    }
+    [Fact]
     public async Task StoryCommandDispatcher_ChangeFemaleName_CreatesReserveCharacterWhenInactive()
     {
         var femaleDefinition = TestContentFactory.CreateCharacterDefinition("女主");
