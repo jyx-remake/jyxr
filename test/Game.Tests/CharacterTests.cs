@@ -52,6 +52,7 @@ public sealed class CharacterTests
         Assert.Equal("hero_knight", character.Definition.Id);
         Assert.Equal("hero_knight", character.Name);
         Assert.Equal(3, character.Level);
+        Assert.Equal(CharacterLevelProgression.GetTotalExperienceRequiredForLevel(3), character.Experience);
         Assert.Single(character.ExternalSkills);
         Assert.Equal("basic_attack", character.ExternalSkills[0].Definition.Id);
         Assert.Equal(1, character.ExternalSkills[0].Level);

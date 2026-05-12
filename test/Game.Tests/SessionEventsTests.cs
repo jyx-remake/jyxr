@@ -741,6 +741,27 @@ public sealed class SessionEventsTests
     }
 
     [Fact]
+    public void CharacterService_LevelUp_ReachesMaxLevelForInitialHigherLevelCharacter()
+    {
+        var defaultGrowth = TestContentFactory.CreateGrowTemplate("default");
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero", level: 2);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            growTemplates: [defaultGrowth]);
+        var state = new GameState();
+        var hero = TestContentFactory.CreateCharacterInstance("hero", heroDefinition, state.EquipmentInstanceFactory);
+        state.Party.AddMember(hero);
+        var session = new GameSession(state, repository);
+
+        session.CharacterService.LevelUp("hero", 30);
+
+        Assert.Equal(CharacterLevelProgression.MaxLevel, hero.Level);
+        Assert.Equal(
+            CharacterLevelProgression.GetTotalExperienceRequiredForLevel(CharacterLevelProgression.MaxLevel),
+            hero.Experience);
+    }
+
+    [Fact]
     public void CharacterService_GainExperience_AppliesDefaultGrowTemplateAndPublishesLevelUpEvent()
     {
         var defaultGrowth = TestContentFactory.CreateGrowTemplate(

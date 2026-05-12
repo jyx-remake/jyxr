@@ -23,6 +23,7 @@ public static class CharacterMapper
             GrowTemplateId = definition.GrowTemplate
         };
         character.SetLevel(definition.Level);
+        EnsureMinimumExperienceForCurrentLevel(character);
         CopyStats(definition.Stats, character.BaseStats);
 
         EnsureSingleEquippedInternalSkill(definition.InternalSkills.Count(skill => skill.Equipped));
@@ -157,6 +158,15 @@ public static class CharacterMapper
         if (equippedCount > 1)
         {
             throw new InvalidOperationException("A character can equip only one internal skill.");
+        }
+    }
+
+    private static void EnsureMinimumExperienceForCurrentLevel(CharacterInstance character)
+    {
+        var requiredExperience = CharacterLevelProgression.GetTotalExperienceRequiredForLevel(character.Level);
+        if (character.Experience < requiredExperience)
+        {
+            character.GrantExperience(requiredExperience - character.Experience);
         }
     }
 }

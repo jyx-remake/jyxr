@@ -1,4 +1,4 @@
-namespace Game.Application;
+namespace Game.Core.Model.Character;
 
 public static class CharacterLevelProgression
 {

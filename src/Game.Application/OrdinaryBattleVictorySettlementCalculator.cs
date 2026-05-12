@@ -1,5 +1,6 @@
 using Game.Core;
 using Game.Core.Battle;
+using Game.Core.Model.Character;
 
 namespace Game.Application;
 

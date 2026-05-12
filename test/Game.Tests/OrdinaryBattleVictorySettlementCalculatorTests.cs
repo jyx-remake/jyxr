@@ -3,6 +3,7 @@ using Game.Core.Affix;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Application;
 
 namespace Game.Tests;
