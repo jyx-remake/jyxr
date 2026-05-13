@@ -11,6 +11,7 @@ public interface IContentRepository
 
     BattleDefinition GetBattle(string id);
     bool TryGetBattle(string id, [NotNullWhen(true)] out BattleDefinition? definition);
+    IReadOnlyCollection<BattleDefinition> GetBattles();
     CharacterDefinition GetCharacter(string id);
     bool TryGetCharacter(string id, [NotNullWhen(true)] out CharacterDefinition? definition);
     IReadOnlyCollection<CharacterDefinition> GetCharacters();
@@ -53,4 +54,5 @@ public interface IContentRepository
     IReadOnlyList<ResourceDefinition> GetResourcesByGroup(string group);
     TowerDefinition GetTower(string id);
     bool TryGetTower(string id, [NotNullWhen(true)] out TowerDefinition? definition);
+    IReadOnlyCollection<TowerDefinition> GetTowers();
 }

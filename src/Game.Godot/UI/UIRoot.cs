@@ -240,9 +240,16 @@ public partial class UIRoot : Control
 			}
 		});
 
-	public async Task<IReadOnlyList<string>> ShowCombatantSelectPanelAsync(string battleId, CancellationToken cancellationToken = default)
+	public async Task<IReadOnlyList<string>> ShowCombatantSelectPanelAsync(string battleId, CancellationToken cancellationToken = default) =>
+		await ShowCombatantSelectPanelAsync(battleId, EmptyForbiddenSet, cancellationToken);
+
+	public async Task<IReadOnlyList<string>> ShowCombatantSelectPanelAsync(
+		string battleId,
+		IReadOnlySet<string> forbiddenCharacterIds,
+		CancellationToken cancellationToken = default)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(battleId);
+		ArgumentNullException.ThrowIfNull(forbiddenCharacterIds);
 
 		if (CombatantSelectPanelScene.Instantiate() is not CombatantSelectPanel panel)
 		{
@@ -250,7 +257,7 @@ public partial class UIRoot : Control
 		}
 
 		ModalLayer.AddChild(panel);
-		panel.Configure(battleId);
+		panel.Configure(Game.ContentRepository.GetBattle(battleId), forbiddenCharacterIds);
 		return await panel.AwaitDeploymentAsync(cancellationToken);
 	}
 
@@ -262,14 +269,20 @@ public partial class UIRoot : Control
 		ArgumentException.ThrowIfNullOrWhiteSpace(battleId);
 		ArgumentNullException.ThrowIfNull(selectedCharacterIds);
 
-		if (BattleScreenScene.Instantiate() is not BattleScreen screen)
-		{
-			throw new InvalidOperationException("Battle screen scene root must be BattleScreen.");
-		}
+		return await ShowBattleScreenCoreAsync(
+			screen => screen.Configure(battleId, selectedCharacterIds),
+			cancellationToken);
+	}
 
-		ModalLayer.AddChild(screen);
-		screen.Configure(battleId, selectedCharacterIds);
-		return await screen.AwaitBattleAsync(cancellationToken);
+	public async Task<bool> ShowBattleScreenAsync(
+		SpecialBattleRequest request,
+		CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(request);
+
+		return await ShowBattleScreenCoreAsync(
+			screen => screen.Configure(request),
+			cancellationToken);
 	}
 
 	public async Task<SectDefinition> ShowSelectSectScreenAsync(CancellationToken cancellationToken = default)
@@ -406,6 +419,24 @@ public partial class UIRoot : Control
 		}
 
 		_toastPanel.Enqueue(text);
+	}
+
+	private static IReadOnlySet<string> EmptyForbiddenSet { get; } = new HashSet<string>(StringComparer.Ordinal);
+
+	private async Task<bool> ShowBattleScreenCoreAsync(
+		Action<BattleScreen> configure,
+		CancellationToken cancellationToken)
+	{
+		ArgumentNullException.ThrowIfNull(configure);
+
+		if (BattleScreenScene.Instantiate() is not BattleScreen screen)
+		{
+			throw new InvalidOperationException("Battle screen scene root must be BattleScreen.");
+		}
+
+		ModalLayer.AddChild(screen);
+		configure(screen);
+		return await screen.AwaitBattleAsync(cancellationToken);
 	}
 
 	private Control ShowMainPanel(PackedScene? scene, string description, Action<Control>? configure = null)

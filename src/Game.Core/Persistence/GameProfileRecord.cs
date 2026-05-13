@@ -6,9 +6,10 @@ public sealed record GameProfileRecord(
     int Version,
     IReadOnlyList<string> UnlockedAchievementIds,
     int DeathCount,
-    int KillCount)
+    int KillCount,
+    int ZhenlongqijuLevel = 0)
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public static GameProfileRecord Create(GameProfile profile)
     {
@@ -18,7 +19,8 @@ public sealed record GameProfileRecord(
             CurrentVersion,
             profile.UnlockedAchievementIds.OrderBy(static id => id, StringComparer.Ordinal).ToList(),
             profile.DeathCount,
-            profile.KillCount);
+            profile.KillCount,
+            profile.ZhenlongqijuLevel);
     }
 
     public GameProfile Restore()
@@ -26,6 +28,7 @@ public sealed record GameProfileRecord(
         var profile = new GameProfile();
         profile.SetUnlockedAchievementIds(UnlockedAchievementIds);
         profile.SetLifetimeStats(DeathCount, KillCount);
+        profile.SetZhenlongqijuLevel(ZhenlongqijuLevel);
         return profile;
     }
 }

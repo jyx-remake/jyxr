@@ -48,6 +48,9 @@ public sealed class StoryVariableResolver
             case "rank":
                 value = ExprValue.FromNumber(Adventure.Rank);
                 return true;
+            case "zhenlong_level":
+                value = ExprValue.FromNumber(_session.Profile.ZhenlongqijuLevel + 1);
+                return true;
             default:
                 value = default;
                 return false;

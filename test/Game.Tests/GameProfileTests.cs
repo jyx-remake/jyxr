@@ -16,6 +16,7 @@ public sealed class GameProfileTests
         profile.UnlockAchievement("jianghu_veteran");
         profile.AddDeaths(2);
         profile.AddKills(5);
+        profile.SetZhenlongqijuLevel(7);
 
         var record = GameProfileRecord.Create(profile);
         var json = JsonSerializer.Serialize(record, GameJson.Default);
@@ -26,12 +27,14 @@ public sealed class GameProfileTests
         Assert.Contains("\"UnlockedAchievementIds\"", json, StringComparison.Ordinal);
         Assert.Contains("\"DeathCount\":2", json, StringComparison.Ordinal);
         Assert.Contains("\"KillCount\":5", json, StringComparison.Ordinal);
+        Assert.Contains("\"ZhenlongqijuLevel\":7", json, StringComparison.Ordinal);
 
         var restored = roundTripped!.Restore();
         Assert.True(restored.IsAchievementUnlocked("first_blood"));
         Assert.True(restored.IsAchievementUnlocked("jianghu_veteran"));
         Assert.Equal(2, restored.DeathCount);
         Assert.Equal(5, restored.KillCount);
+        Assert.Equal(7, restored.ZhenlongqijuLevel);
     }
 
     [Fact]
@@ -63,6 +66,7 @@ public sealed class GameProfileTests
         sourceProfile.UnlockAchievement("jianghu_veteran");
         sourceProfile.AddDeaths(4);
         sourceProfile.AddKills(9);
+        sourceProfile.SetZhenlongqijuLevel(3);
         var record = GameProfileRecord.Create(sourceProfile);
 
         session.ProfileService.LoadProfile(record);
@@ -70,6 +74,7 @@ public sealed class GameProfileTests
         Assert.True(session.Profile.IsAchievementUnlocked("jianghu_veteran"));
         Assert.Equal(4, session.Profile.DeathCount);
         Assert.Equal(9, session.Profile.KillCount);
+        Assert.Equal(3, session.Profile.ZhenlongqijuLevel);
         Assert.Single(publishedEvents.OfType<ProfileLoadedEvent>());
         Assert.Empty(publishedEvents.OfType<ProfileChangedEvent>());
     }

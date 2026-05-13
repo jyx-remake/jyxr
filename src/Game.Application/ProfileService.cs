@@ -59,4 +59,11 @@ public sealed class ProfileService
         _session.Events.Publish(new ProfileChangedEvent());
         _logger.Info($"Added {count} kill(s) to game profile.");
     }
+
+    public void AdvanceZhenlongqijuLevel()
+    {
+        Profile.AdvanceZhenlongqijuLevel();
+        _session.Events.Publish(new ProfileChangedEvent());
+        _logger.Info($"Advanced zhenlongqiju level to {Profile.ZhenlongqijuLevel}.");
+    }
 }

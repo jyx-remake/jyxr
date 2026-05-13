@@ -33,6 +33,7 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public BattleDefinition GetBattle(string id) => Battles[id];
 	public bool TryGetBattle(string id, [NotNullWhen(true)] out BattleDefinition? definition) =>
 		Battles.TryGetValue(id, out definition);
+	public IReadOnlyCollection<BattleDefinition> GetBattles() => Battles.Values;
 
 	public CharacterDefinition GetCharacter(string id) => Characters[id];
 	public bool TryGetCharacter(string id, [NotNullWhen(true)] out CharacterDefinition? definition) =>
@@ -118,4 +119,5 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public TowerDefinition GetTower(string id) => Towers[id];
 	public bool TryGetTower(string id, [NotNullWhen(true)] out TowerDefinition? definition) =>
 		Towers.TryGetValue(id, out definition);
+	public IReadOnlyCollection<TowerDefinition> GetTowers() => Towers.Values;
 }

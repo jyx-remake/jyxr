@@ -10,6 +10,8 @@ public sealed class GameProfile
 
     public int KillCount { get; private set; }
 
+    public int ZhenlongqijuLevel { get; private set; }
+
     public bool IsAchievementUnlocked(string achievementId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(achievementId);
@@ -33,6 +35,14 @@ public sealed class GameProfile
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
         KillCount += count;
     }
+
+    public void SetZhenlongqijuLevel(int level)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(level);
+        ZhenlongqijuLevel = level;
+    }
+
+    public void AdvanceZhenlongqijuLevel() => ZhenlongqijuLevel++;
 
     public void SetUnlockedAchievementIds(IEnumerable<string> achievementIds)
     {

@@ -63,6 +63,7 @@ public static class Game
 	public static ItemUseService ItemUseService => Session.ItemUseService;
 	public static ShopService ShopService => Session.ShopService;
 	public static BattleService BattleService => Session.BattleService;
+	public static SpecialBattleService SpecialBattleService => Session.SpecialBattleService;
 	public static WorldTriggerService WorldTriggerService => Session.WorldTriggerService;
 	public static MapService MapService => Session.MapService;
 	public static StoryService StoryService => Session.StoryService;

@@ -8,7 +8,7 @@ internal sealed class StoryTextInterpolator
 {
     private const string HeroVariableName = "MALE";
     private const string FemaleVariableName = "FEMALE";
-    // private const string ZhenlongLevelVariableName = "ZHENLONG_LEVEL";
+    private const string ZhenlongLevelVariableName = "ZHENLONG_LEVEL";
     private static readonly Regex PlaceholderPattern = new(@"\$([A-Z_][A-Z0-9_]*)\$", RegexOptions.Compiled);
 
     private readonly GameSession _session;
@@ -49,6 +49,9 @@ internal sealed class StoryTextInterpolator
                 return TryResolveCharacterName(Party.HeroCharacterId, out value);
             case FemaleVariableName:
                 return TryResolveCharacterName(Party.HeroineCharacterId, out value);
+            case ZhenlongLevelVariableName:
+                value = (_session.Profile.ZhenlongqijuLevel + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                return true;
             default:
                 value = string.Empty;
                 return false;

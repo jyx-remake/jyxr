@@ -16,6 +16,7 @@ public sealed record TowerStageDefinition
     public string BattleId { get; init; } = "";
     public int Index { get; init; }
     public IReadOnlyList<TowerRewardDefinition> Rewards { get; init; } = [];
+    public IReadOnlyList<string> AchievementIds { get; init; } = [];
 }
 
 public sealed record TowerRewardDefinition
@@ -24,7 +25,7 @@ public sealed record TowerRewardDefinition
 
     public double Probability { get; init; }
 
-    public int? Count { get; init; }
+    public int? MaxClaims { get; init; }
 }
 
 public sealed record TowerUnlockConditionDefinition

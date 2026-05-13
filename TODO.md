@@ -24,6 +24,7 @@
 - 普通战斗装备掉落的随机词条抽样当前按 legacy `ItemInstance.GenerateRandomTrigger()` 复刻：合并匹配等级表后，按配置顺序逐项执行 `weight / totalWeight` 试投，未命中则整轮重试，重复词条再重抽。该行为不是标准权重轮盘抽样；后续如改成一次随机数累计权重命中，应作为明确设计变更评估掉落分布差异。
 - 当前轻量战斗内核的命中结算暂按 legacy 顺序处理：目标侧 `BeforeHitResolved` 闪避/反制先落地，来源侧破闪避/失手后处理。因此可能出现“最终命中但目标闪避反制副作用已生效”的结果；后续正式战场系统重建时需明确这是保留为原版结算顺序，还是拆成命中状态解析与最终结果副作用两阶段。
 - `BeforeHitResolved` 应只承载命中结果确定前的闪避、破闪避、失手等逻辑。后续内容校验应禁止来源侧 `context_hit_state == hit` 的 hook，命中确认后的追加效果应使用 `OnHitConfirmed`，避免数据写法被运行时静默跳过。
+- 天关 `achievementIds` 当前数据仍为空，legacy `nick` 未实际落入 `data/towers.json`。后续需要重新确认 legacy tower XML 的 `nick` 来源和转换逻辑，并补内容测试断言预期关卡能加载出成就。
 - Attachment 系统后续按 `docs/attachment-design.md` 重建；当前旧 `IAttachmentSourceDefinition` / `ModifierDefinition` / `AttachmentResolver` 实现已删除，不保留兼容层。
 - 持久化层后续可能要补：`MapStateRecord`、`InteractableRecord`、`StoryFlagRecord`，用于把地图交互进度、机关状态、剧情标记纳入存档。
 - 当前诊断日志抽象暂放在 `Game.Application`，后续如补齐 `Infrastructure` / `Hosting` 层，应迁移 `IDiagnosticLogger` 及相关实现的抽象边界，避免应用层长期承载宿主/基础设施能力接口。

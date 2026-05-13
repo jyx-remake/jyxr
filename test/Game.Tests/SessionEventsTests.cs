@@ -223,6 +223,7 @@ public sealed class SessionEventsTests
         Assert.Equal(2, timeKey.LimitDays);
         Assert.Empty(timeKey.TargetStoryId);
     }
+
     [Fact]
     public async Task StoryCommandDispatcher_ChangeFemaleName_CreatesReserveCharacterWhenInactive()
     {
@@ -564,21 +565,11 @@ public sealed class SessionEventsTests
 
         await dispatcher.ExecuteCommandAsync("game", [ExprValue.FromString("whac_a_mole")], default);
         await dispatcher.ExecuteCommandAsync("newbie", [], default);
-        await dispatcher.ExecuteCommandAsync("tower", [ExprValue.FromString("tower")], default);
-        await dispatcher.ExecuteCommandAsync("huashan", [ExprValue.FromString("huashan")], default);
-        await dispatcher.ExecuteCommandAsync("trial", [ExprValue.FromString("trial")], default);
-        await dispatcher.ExecuteCommandAsync("zhenlongqiju", [], default);
-        await dispatcher.ExecuteCommandAsync("arena", [ExprValue.FromString("arena_单挑战")], default);
 
         Assert.Equal(
             [
                 "game指令暂未实现",
                 "newbie指令暂未实现",
-                "tower指令暂未实现",
-                "huashan指令暂未实现",
-                "trial指令暂未实现",
-                "zhenlongqiju指令暂未实现",
-                "arena指令暂未实现",
             ],
             publishedEvents.OfType<ToastRequestedEvent>().Select(evt => evt.Message).ToArray());
     }

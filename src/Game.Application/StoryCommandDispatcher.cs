@@ -387,25 +387,35 @@ public sealed class StoryCommandDispatcher
         params ExprValue[] _) =>
         _session.EquipmentRefinementService.RunAsync(_host, cancellationToken);
 
-    // TODO: 爬塔玩法需要独立流程接线，当前先给出占位提示。
     [StoryCommand("tower")]
-    private ValueTask ExecuteTowerPlaceholderAsync(params ExprValue[] _) => ExecuteTodoCommandAsync("tower");
+    private ValueTask<StoryCommandResult> ExecuteTowerAsync(
+        CancellationToken cancellationToken,
+        params ExprValue[] _) =>
+        _session.SpecialBattleService.RunTowerAsync(_host, cancellationToken);
 
-    // TODO: 华山论剑玩法需要独立流程接线，当前先给出占位提示。
     [StoryCommand("huashan")]
-    private ValueTask ExecuteHuashanPlaceholderAsync(params ExprValue[] _) => ExecuteTodoCommandAsync("huashan");
+    private ValueTask<StoryCommandResult> ExecuteHuashanAsync(
+        CancellationToken cancellationToken,
+        params ExprValue[] _) =>
+        _session.SpecialBattleService.RunHuashanAsync(_host, cancellationToken);
 
-    // TODO: 试炼玩法需要独立流程接线，当前先给出占位提示。
     [StoryCommand("trial")]
-    private ValueTask ExecuteTrialPlaceholderAsync(params ExprValue[] _) => ExecuteTodoCommandAsync("trial");
+    private ValueTask<StoryCommandResult> ExecuteTrialAsync(
+        CancellationToken cancellationToken,
+        params ExprValue[] _) =>
+        _session.SpecialBattleService.RunTrialAsync(_host, cancellationToken);
 
-    // TODO: 珍珑棋局玩法需要独立流程接线，当前先给出占位提示。
     [StoryCommand("zhenlongqiju")]
-    private ValueTask ExecuteZhenlongqijuPlaceholderAsync(params ExprValue[] _) => ExecuteTodoCommandAsync("zhenlongqiju");
+    private ValueTask<StoryCommandResult> ExecuteZhenlongqijuAsync(
+        CancellationToken cancellationToken,
+        params ExprValue[] _) =>
+        _session.SpecialBattleService.RunZhenlongqijuAsync(_host, cancellationToken);
 
-    // TODO: 擂台玩法需要独立流程接线，当前先给出占位提示。
     [StoryCommand("arena")]
-    private ValueTask ExecuteArenaPlaceholderAsync(params ExprValue[] _) => ExecuteTodoCommandAsync("arena");
+    private ValueTask<StoryCommandResult> ExecuteArenaAsync(
+        string? callbackStoryId = null,
+        CancellationToken cancellationToken = default) =>
+        _session.SpecialBattleService.RunArenaAsync(_host, callbackStoryId, cancellationToken);
 
     private static string ResolveAchievementResourceId(string achievementId) =>
         AchievementResourcePrefix + achievementId;

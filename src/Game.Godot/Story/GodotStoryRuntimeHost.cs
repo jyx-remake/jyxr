@@ -1,3 +1,4 @@
+using Game.Application;
 using Game.Core.Story;
 using Game.Core.Model;
 using Game.Godot.UI;
@@ -5,7 +6,7 @@ using Godot;
 
 namespace Game.Godot.Story;
 
-public sealed class GodotStoryRuntimeHost : IRuntimeHost
+public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeHost
 {
 	private readonly StoryCommandBinder _binder;
 
@@ -58,6 +59,25 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost
 			selectedCharacterIds,
 			cancellationToken);
 		return isWin ? BattleOutcome.Win : BattleOutcome.Lose;
+	}
+
+	public async ValueTask<IReadOnlyList<string>> SelectCombatantsAsync(
+		CombatantSelectionRequest request,
+		CancellationToken cancellationToken)
+	{
+		ArgumentNullException.ThrowIfNull(request);
+		return await UIRoot.Instance.ShowCombatantSelectPanelAsync(
+			request.BattleId,
+			request.ForbiddenCharacterIds,
+			cancellationToken);
+	}
+
+	public async ValueTask<bool> RunBattleAsync(
+		SpecialBattleRequest request,
+		CancellationToken cancellationToken)
+	{
+		ArgumentNullException.ThrowIfNull(request);
+		return await UIRoot.Instance.ShowBattleScreenAsync(request, cancellationToken);
 	}
 
 	[StoryCommand("map", "set_map", "tutorial")]

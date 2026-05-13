@@ -11,6 +11,8 @@ namespace Game.Content.Loading;
 public sealed partial class JsonContentLoader
 {
     private const string GoldShopProductContentId = "元宝";
+    private const string AchievementResourceGroup = "nick";
+    private const string AchievementResourcePrefix = AchievementResourceGroup + ".";
 
     private static void ValidateRepository(InMemoryContentRepository repository)
     {
@@ -24,6 +26,7 @@ public sealed partial class JsonContentLoader
         ValidateShops(repository);
         ValidateLegendSkills(repository);
         ValidateWorldTriggers(repository);
+        ValidateTowers(repository);
         ValidateStoryContent(repository);
     }
 
@@ -620,6 +623,51 @@ public sealed partial class JsonContentLoader
     private static bool IsIgnoredShopProduct(string contentId) =>
         string.Equals(contentId, GoldShopProductContentId, StringComparison.Ordinal) ||
         contentId.EndsWith("残章", StringComparison.Ordinal);
+
+    private static void ValidateTowers(InMemoryContentRepository repository)
+    {
+        foreach (var tower in repository.Towers.Values)
+        {
+            Ensure(!string.IsNullOrWhiteSpace(tower.Id), "Tower definition has empty id.");
+
+            foreach (var stage in tower.Stages)
+            {
+                Ensure(!string.IsNullOrWhiteSpace(stage.Id), $"Tower '{tower.Id}' has a stage with empty id.");
+                Ensure(!string.IsNullOrWhiteSpace(stage.BattleId), $"Tower '{tower.Id}' stage '{stage.Id}' has empty battleId.");
+                Ensure(repository.Battles.ContainsKey(stage.BattleId),
+                    $"Tower '{tower.Id}' stage '{stage.Id}' references missing battle '{stage.BattleId}'.");
+
+                foreach (var reward in stage.Rewards)
+                {
+                    Ensure(!string.IsNullOrWhiteSpace(reward.ContentId),
+                        $"Tower '{tower.Id}' stage '{stage.Id}' has reward with empty contentId.");
+                    Ensure(repository.Items.ContainsKey(reward.ContentId) ||
+                           string.Equals(reward.ContentId, GoldShopProductContentId, StringComparison.Ordinal),
+                        $"Tower '{tower.Id}' stage '{stage.Id}' references missing reward item '{reward.ContentId}'.");
+                    Ensure(reward.Probability >= 0d && reward.Probability <= 1d,
+                        $"Tower '{tower.Id}' stage '{stage.Id}' reward '{reward.ContentId}' has invalid probability '{reward.Probability}'.");
+                    Ensure(reward.MaxClaims is null or >= 0,
+                        $"Tower '{tower.Id}' stage '{stage.Id}' reward '{reward.ContentId}' has invalid maxClaims '{reward.MaxClaims}'.");
+                }
+
+                foreach (var achievementId in stage.AchievementIds)
+                {
+                    Ensure(!string.IsNullOrWhiteSpace(achievementId),
+                        $"Tower '{tower.Id}' stage '{stage.Id}' has empty achievement id.");
+
+                    var resourceId = AchievementResourcePrefix + achievementId;
+                    if (!repository.Resources.TryGetValue(resourceId, out var resource))
+                    {
+                        throw new InvalidOperationException(
+                            $"Tower '{tower.Id}' stage '{stage.Id}' references missing achievement resource '{resourceId}'.");
+                    }
+
+                    Ensure(string.Equals(resource.Group, AchievementResourceGroup, StringComparison.Ordinal),
+                        $"Tower '{tower.Id}' stage '{stage.Id}' achievement '{achievementId}' must resolve to a '{AchievementResourceGroup}' resource.");
+                }
+            }
+        }
+    }
 
     private static void ValidateLegendSkills(InMemoryContentRepository repository)
     {

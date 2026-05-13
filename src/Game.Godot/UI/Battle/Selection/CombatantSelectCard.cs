@@ -20,6 +20,7 @@ public partial class CombatantSelectCard : Button
 	private CharacterInstance? _character;
 	private bool _isRequired;
 	private bool _isSelected;
+	private bool _isForbidden;
 
 	public event Action<string>? SelectionRequested;
 
@@ -40,12 +41,13 @@ public partial class CombatantSelectCard : Button
 		Refresh();
 	}
 
-	public void Setup(CharacterInstance character, bool isSelected, bool isRequired)
+	public void Setup(CharacterInstance character, bool isSelected, bool isRequired, bool isForbidden = false)
 	{
 		ArgumentNullException.ThrowIfNull(character);
 		_character = character;
 		_isSelected = isSelected;
 		_isRequired = isRequired;
+		_isForbidden = isForbidden;
 		Refresh();
 	}
 
@@ -57,7 +59,7 @@ public partial class CombatantSelectCard : Button
 
 	private void OnPressed()
 	{
-		if (_character is null || _isRequired)
+		if (_character is null || _isRequired || _isForbidden)
 		{
 			return;
 		}
@@ -78,7 +80,13 @@ public partial class CombatantSelectCard : Button
 		_attackLabel.Text = $"攻:{combatStats.Attack}";
 		_defenceLabel.Text = $"防:{combatStats.Defence}";
 		_selectedMark.Visible = _isSelected;
-		TooltipText = _isRequired ? "剧情要求出战" : _character.Name;
+		Disabled = _isForbidden;
+		Modulate = _isForbidden ? new Color(0.55f, 0.55f, 0.55f, 0.8f) : Colors.White;
+		TooltipText = _isForbidden
+			? "本轮不能重复出战"
+			: _isRequired
+				? "剧情要求出战"
+				: _character.Name;
 
 		var portrait = AssetResolver.LoadCharacterPortrait(_character);
 		if (portrait is not null)

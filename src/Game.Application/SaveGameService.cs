@@ -33,7 +33,8 @@ public sealed class SaveGameService
 			State.WorldTriggers,
 			State.Story,
 			State.Journal,
-			State.Shop);
+			State.Shop,
+			State.SpecialBattle);
 		_logger.Info($"Created save game with {saveGame.Characters.Count} character(s).");
 		return saveGame;
 	}
@@ -54,6 +55,7 @@ public sealed class SaveGameService
 		var worldTriggers = saveGame.RestoreWorldTriggerState();
 		var shop = saveGame.RestoreShopState();
 		var journal = saveGame.RestoreJournal();
+		var specialBattle = saveGame.RestoreSpecialBattleState();
 		var state = new GameState();
 		state.SetAdventure(adventure);
 		state.SetParty(party);
@@ -68,6 +70,7 @@ public sealed class SaveGameService
 		state.SetShop(shop);
 		state.SetStory(story);
 		state.SetJournal(journal);
+		state.SetSpecialBattle(specialBattle);
 		_session.ReplaceState(state);
 		_session.Events.Publish(new SaveLoadedEvent());
 		_logger.Info($"Loaded save game with {characters.Count} character(s).");
