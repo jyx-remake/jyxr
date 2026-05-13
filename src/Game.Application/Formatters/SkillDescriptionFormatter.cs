@@ -213,9 +213,23 @@ public static class SkillDescriptionFormatter
         builder.Append('\n');
         builder.Append("被动增益：\n");
 
-        foreach (var affix in affixes)
+        for (var index = 0; index < affixes.Count; index++)
         {
-            AppendLine(builder, FormatPassiveAffixBbCode(affix, level, maxLevel, contentRepository));
+            if (TryFormatMergedPassiveAffixBbCode(
+                    affixes,
+                    index,
+                    level,
+                    maxLevel,
+                    contentRepository,
+                    out var mergedLine,
+                    out var consumedCount))
+            {
+                AppendLine(builder, mergedLine);
+                index += consumedCount - 1;
+                continue;
+            }
+
+            AppendLine(builder, FormatPassiveAffixBbCode(affixes[index], level, maxLevel, contentRepository));
         }
     }
 
@@ -257,13 +271,80 @@ public static class SkillDescriptionFormatter
         return Colorize("red", $"(×)({affix.MinimumLevel}级解锁){FormatPassiveAffixBody(affix, contentRepository)}");
     }
 
+    private static bool TryFormatMergedPassiveAffixBbCode(
+        IReadOnlyList<SkillAffixDefinition> affixes,
+        int index,
+        int level,
+        int? maxLevel,
+        IContentRepository contentRepository,
+        out string line,
+        out int consumedCount)
+    {
+        line = string.Empty;
+        consumedCount = 0;
+
+        if (index + 1 >= affixes.Count)
+        {
+            return false;
+        }
+
+        var first = affixes[index];
+        var second = affixes[index + 1];
+        if (first.MinimumLevel != second.MinimumLevel
+            || first.RequiresEquippedInternalSkill != second.RequiresEquippedInternalSkill)
+        {
+            return false;
+        }
+
+        if (!AffixFormatter.TryFormatMergedLineCn(
+                [first.Effect, second.Effect],
+                0,
+                contentRepository,
+                out var body,
+                out consumedCount))
+        {
+            return false;
+        }
+
+        line = FormatPassiveAffixBbCode(
+            first.MinimumLevel,
+            first.RequiresEquippedInternalSkill,
+            body,
+            level,
+            maxLevel);
+        return true;
+    }
+
+    private static string FormatPassiveAffixBbCode(
+        int minimumLevel,
+        bool requiresEquippedInternalSkill,
+        string body,
+        int level,
+        int? maxLevel)
+    {
+        if (level >= minimumLevel)
+        {
+            return Colorize("green", $"(√)({minimumLevel}级解锁){FormatPassiveAffixBody(requiresEquippedInternalSkill, body)}");
+        }
+
+        if (maxLevel is not null && maxLevel.Value < minimumLevel)
+        {
+            return Colorize("red", $"(×)({minimumLevel}级解锁)???");
+        }
+
+        return Colorize("red", $"(×)({minimumLevel}级解锁){FormatPassiveAffixBody(requiresEquippedInternalSkill, body)}");
+    }
+
     private static string FormatPassiveAffixBody(SkillAffixDefinition affix, IContentRepository contentRepository)
     {
         var effectText = AffixFormatter.FormatCn(affix.Effect, contentRepository);
-        return affix.RequiresEquippedInternalSkill
+        return FormatPassiveAffixBody(affix.RequiresEquippedInternalSkill, effectText);
+    }
+
+    private static string FormatPassiveAffixBody(bool requiresEquippedInternalSkill, string effectText) =>
+        requiresEquippedInternalSkill
             ? $"装备生效：{effectText}"
             : effectText;
-    }
 
     private static string FormatBuffBbCode(SkillBuffDefinition buff)
     {

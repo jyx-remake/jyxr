@@ -41,6 +41,7 @@ public sealed class SkillDescriptionFormatterTests
             [
                 new SkillAffixDefinition(new GrantTalentAffix("battle_focus"), 3),
                 new SkillAffixDefinition(new StatModifierAffix(StatType.Attack, ModifierValue.Add(10f)), 5),
+                new SkillAffixDefinition(new StatModifierAffix(StatType.CritChance, ModifierValue.Add(0.02f)), 5),
                 new SkillAffixDefinition(new StatModifierAffix(StatType.Defence, ModifierValue.Add(12f)), 12),
             ]);
         var repository = TestContentFactory.CreateRepository(
@@ -68,8 +69,34 @@ public sealed class SkillDescriptionFormatterTests
         Assert.Contains("[color=yellow]适性:阳20%[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=yellow]特效：流血(2)[/color] [color=yellow]持续3回合[/color] [color=yellow]命中概率:75%[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=green](√)(3级解锁)天赋「战意高昂」[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=red](×)(5级解锁)攻击力 +10[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=red](×)(5级解锁)攻击力 +10，暴击率 +2%[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=red](×)(12级解锁)???[/color]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SkillDescriptionFormatter_MergesPassiveAffixesOnlyWhenLevelAndEquipConditionMatch()
+    {
+        var skill = TestContentFactory.CreateInternalSkill(
+            "mixed_internal",
+            affixes:
+            [
+                new SkillAffixDefinition(new StatModifierAffix(StatType.Defence, ModifierValue.Add(20)), 10, true),
+                new SkillAffixDefinition(new StatModifierAffix(StatType.AntiCritChance, ModifierValue.Add(0.05)), 10, true),
+                new SkillAffixDefinition(new StatModifierAffix(StatType.Attack, ModifierValue.Add(12)), 12),
+                new SkillAffixDefinition(new StatModifierAffix(StatType.CritChance, ModifierValue.Add(0.03)), 13),
+            ]);
+        var repository = TestContentFactory.CreateRepository(internalSkills: [skill]);
+        var instance = new InternalSkillInstance(skill, CreateOwner())
+        {
+            Level = 10,
+            MaxLevel = 20,
+        };
+
+        var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository);
+
+        Assert.Contains("[color=green](√)(10级解锁)装备生效：防御力 +20，抗暴击率 +5%[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=red](×)(12级解锁)攻击力 +12[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=red](×)(13级解锁)暴击率 +3%[/color]", text, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -79,7 +79,7 @@ public static class AffixFormatter
 
         foreach (var group in groups)
         {
-            if (TryFormatMergedEquipmentLine(list, group.StartIndex, contentRepository, out var mergedLine, out _))
+            if (TryFormatMergedLineCn(list, group.StartIndex, contentRepository, out var mergedLine, out _))
             {
                 lines.Add(mergedLine);
                 continue;
@@ -104,7 +104,7 @@ public static class AffixFormatter
     private static string GetModelDisplayText(GrantModelAffix affix) =>
         string.IsNullOrWhiteSpace(affix.Description) ? affix.ModelId : affix.Description;
 
-    private static bool TryFormatMergedEquipmentLine(
+    public static bool TryFormatMergedLineCn(
         IReadOnlyList<AffixDefinition> affixes,
         int index,
         IContentRepository contentRepository,
