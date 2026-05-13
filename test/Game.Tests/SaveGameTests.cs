@@ -160,8 +160,8 @@ public sealed class SaveGameTests
     {
         var specialBattle = new SpecialBattleState();
         specialBattle.MarkTrialCompleted("阿青");
-        specialBattle.AddTowerRewardClaim("倚天剑");
-        specialBattle.AddTowerRewardClaim("倚天剑");
+        specialBattle.AddTowerRewardClaim("华山论剑", "华山第一战", "倚天剑");
+        specialBattle.AddTowerRewardClaim("华山论剑", "华山第一战", "倚天剑");
 
         var saveGame = SaveGame.Create(
             new AdventureState(),
@@ -179,7 +179,7 @@ public sealed class SaveGameTests
         var restored = saveGame.RestoreSpecialBattleState();
 
         Assert.True(restored.IsTrialCompleted("阿青"));
-        Assert.Equal(2, restored.GetTowerRewardClaimCount("倚天剑"));
+        Assert.Equal(2, restored.GetTowerRewardClaimCount("华山论剑", "华山第一战", "倚天剑"));
     }
 
     [Fact]

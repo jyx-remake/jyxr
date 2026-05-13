@@ -150,7 +150,9 @@ internal static class TestContentFactory
         IEnumerable<MapDefinition>? maps = null,
         IEnumerable<WorldTriggerDefinition>? worldTriggers = null,
         IEnumerable<ResourceDefinition>? resources = null,
-        IEnumerable<ShopDefinition>? shops = null) =>
+        IEnumerable<ShopDefinition>? shops = null,
+        IEnumerable<BattleDefinition>? battles = null,
+        IEnumerable<TowerDefinition>? towers = null) =>
         CreateRepositoryInternal(
             characters,
             externalSkills,
@@ -167,7 +169,9 @@ internal static class TestContentFactory
             maps,
             worldTriggers,
             resources,
-            shops);
+            shops,
+            battles,
+            towers);
 
     private static InMemoryContentRepository CreateRepositoryInternal(
         IEnumerable<CharacterDefinition>? characters,
@@ -185,7 +189,9 @@ internal static class TestContentFactory
         IEnumerable<MapDefinition>? maps,
         IEnumerable<WorldTriggerDefinition>? worldTriggers,
         IEnumerable<ResourceDefinition>? resources,
-        IEnumerable<ShopDefinition>? shops)
+        IEnumerable<ShopDefinition>? shops,
+        IEnumerable<BattleDefinition>? battles,
+        IEnumerable<TowerDefinition>? towers)
     {
         var storyScriptMap = (storyScripts ?? [])
             .Select((script, index) => (Key: $"story_{index}", Script: script))
@@ -204,7 +210,7 @@ internal static class TestContentFactory
 
         return new InMemoryContentRepository
         {
-            Battles = new Dictionary<string, BattleDefinition>(StringComparer.Ordinal),
+            Battles = (battles ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Characters = (characters ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             ExternalSkills = (externalSkills ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             GameTips = new Dictionary<string, GameTipDefinition>(StringComparer.Ordinal),
@@ -224,7 +230,7 @@ internal static class TestContentFactory
             Buffs = (buffs ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Talents = (talents ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Equipments = (equipment ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
-            Towers = new Dictionary<string, TowerDefinition>(StringComparer.Ordinal),
+            Towers = (towers ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
         };
     }
 

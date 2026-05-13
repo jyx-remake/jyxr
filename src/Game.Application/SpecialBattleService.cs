@@ -58,7 +58,7 @@ public sealed class SpecialBattleService
         }
 
         var forbiddenCharacterIds = new HashSet<string>(StringComparer.Ordinal);
-        var pendingRewards = new List<string>();
+        var pendingRewards = new List<PendingTowerReward>();
         for (var index = 0; index < stages.Length; index++)
         {
             var stage = stages[index];
@@ -78,9 +78,9 @@ public sealed class SpecialBattleService
             }
 
             UnlockStageAchievements(stage);
-            var rewardId = RollTowerReward(stage);
-            pendingRewards.Add(rewardId);
-            await SayAsync(host, "北丑", $"恭喜你取得了胜利！你本场战斗的奖励为【{rewardId}】！", cancellationToken);
+            var reward = RollTowerReward(tower, stage);
+            pendingRewards.Add(reward);
+            await SayAsync(host, "北丑", $"恭喜你取得了胜利！你本场战斗的奖励为【{reward.ContentId}】！", cancellationToken);
 
             if (index == stages.Length - 1)
             {
@@ -309,7 +309,7 @@ public sealed class SpecialBattleService
         }
     }
 
-    private string RollTowerReward(TowerStageDefinition stage)
+    private PendingTowerReward RollTowerReward(TowerDefinition tower, TowerStageDefinition stage)
     {
         for (var attempt = 0; attempt < 100; attempt++)
         {
@@ -320,7 +320,7 @@ public sealed class SpecialBattleService
 
             var reward = stage.Rewards[Random.Shared.Next(stage.Rewards.Count)];
             if (reward.MaxClaims is > 0 &&
-                State.SpecialBattle.GetTowerRewardClaimCount(reward.ContentId) >= reward.MaxClaims.Value)
+                State.SpecialBattle.GetTowerRewardClaimCount(tower.Id, stage.Id, reward.ContentId) >= reward.MaxClaims.Value)
             {
                 continue;
             }
@@ -330,36 +330,49 @@ public sealed class SpecialBattleService
                 continue;
             }
 
-            if (reward.MaxClaims is > 0)
-            {
-                State.SpecialBattle.AddTowerRewardClaim(reward.ContentId);
-            }
-
-            return reward.ContentId;
+            return new PendingTowerReward(
+                tower.Id,
+                stage.Id,
+                reward.ContentId,
+                IsLimited: reward.MaxClaims is > 0);
         }
 
-        return DefaultTowerRewardId;
+        return new PendingTowerReward(
+            tower.Id,
+            stage.Id,
+            DefaultTowerRewardId,
+            IsLimited: false);
     }
 
-    private void GrantTowerRewards(IReadOnlyList<string> rewardIds)
+    private void GrantTowerRewards(IReadOnlyList<PendingTowerReward> rewards)
     {
-        foreach (var rewardId in rewardIds)
+        foreach (var reward in rewards)
         {
-            if (string.Equals(rewardId, "元宝", StringComparison.Ordinal))
+            if (string.Equals(reward.ContentId, "元宝", StringComparison.Ordinal))
             {
                 State.Currency.AddGold(1);
                 _session.Events.Publish(new CurrencyChangedEvent());
+                AddTowerRewardClaimIfNeeded(reward);
                 continue;
             }
 
-            _session.InventoryService.AddItem(rewardId);
+            _session.InventoryService.AddItem(reward.ContentId);
+            AddTowerRewardClaimIfNeeded(reward);
         }
     }
 
-    private static string BuildPendingTowerRewardText(IReadOnlyList<string> pendingRewards) =>
+    private void AddTowerRewardClaimIfNeeded(PendingTowerReward reward)
+    {
+        if (reward.IsLimited)
+        {
+            State.SpecialBattle.AddTowerRewardClaim(reward.TowerId, reward.StageId, reward.ContentId);
+        }
+    }
+
+    private static string BuildPendingTowerRewardText(IReadOnlyList<PendingTowerReward> pendingRewards) =>
         pendingRewards.Count == 0
             ? "截止目前，你还没有获得额外奖励。"
-            : $"截止目前，你的奖励有：{string.Join("、", pendingRewards.Select(static reward => $"【{reward}】"))}！";
+            : $"截止目前，你的奖励有：{string.Join("、", pendingRewards.Select(static reward => $"【{reward.ContentId}】"))}！";
 
     private static void AddSelectedToForbidden(
         ISet<string> forbiddenCharacterIds,
@@ -397,4 +410,10 @@ public sealed class SpecialBattleService
             : StoryCommandResult.Jump(callbackStoryId);
 
     private static IReadOnlySet<string> EmptyForbiddenSet { get; } = new HashSet<string>(StringComparer.Ordinal);
+
+    private sealed record PendingTowerReward(
+        string TowerId,
+        string StageId,
+        string ContentId,
+        bool IsLimited);
 }

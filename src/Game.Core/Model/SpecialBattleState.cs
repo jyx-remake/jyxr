@@ -24,11 +24,11 @@ public sealed class SpecialBattleState
             state.MarkTrialCompleted(characterId);
         }
 
-        foreach (var (contentId, count) in record.TowerRewardClaimCounts)
+        foreach (var (claimKey, count) in record.TowerRewardClaimCounts)
         {
             if (count > 0)
             {
-                state._towerRewardClaimCounts[contentId] = count;
+                state._towerRewardClaimCounts[claimKey] = count;
             }
         }
 
@@ -47,20 +47,28 @@ public sealed class SpecialBattleState
         return _trialCompletedCharacterIds.Add(characterId);
     }
 
-    public int GetTowerRewardClaimCount(string contentId)
+    public int GetTowerRewardClaimCount(string towerId, string stageId, string rewardId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(contentId);
-        return _towerRewardClaimCounts.GetValueOrDefault(contentId);
+        var claimKey = CreateTowerRewardClaimKey(towerId, stageId, rewardId);
+        return _towerRewardClaimCounts.GetValueOrDefault(claimKey);
     }
 
-    public void AddTowerRewardClaim(string contentId)
+    public void AddTowerRewardClaim(string towerId, string stageId, string rewardId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(contentId);
-        _towerRewardClaimCounts[contentId] = GetTowerRewardClaimCount(contentId) + 1;
+        var claimKey = CreateTowerRewardClaimKey(towerId, stageId, rewardId);
+        _towerRewardClaimCounts[claimKey] = GetTowerRewardClaimCount(towerId, stageId, rewardId) + 1;
     }
 
     public SpecialBattleStateRecord ToRecord() =>
         new(
             _trialCompletedCharacterIds.OrderBy(static id => id, StringComparer.Ordinal).ToArray(),
             new Dictionary<string, int>(_towerRewardClaimCounts, StringComparer.Ordinal));
+
+    private static string CreateTowerRewardClaimKey(string towerId, string stageId, string rewardId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(towerId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(stageId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(rewardId);
+        return string.Join('|', towerId, stageId, rewardId);
+    }
 }
