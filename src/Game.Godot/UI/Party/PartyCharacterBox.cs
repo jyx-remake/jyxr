@@ -44,7 +44,7 @@ public partial class PartyCharacterBox : Button
 		AddToGroup(DragTargetGroupName);
 		Pressed += OnPressed;
 		ClearDropHighlight();
-		Refresh();
+		RefreshView();
 	}
 
 	public void Setup(CharacterInstance character, int partyIndex)
@@ -52,10 +52,10 @@ public partial class PartyCharacterBox : Button
 		ArgumentNullException.ThrowIfNull(character);
 		_character = character;
 		_partyIndex = partyIndex;
-		Refresh();
+		RefreshView();
 	}
 
-	private void Refresh()
+	public void RefreshView()
 	{
 		if (_character is null || !IsInsideTree())
 		{

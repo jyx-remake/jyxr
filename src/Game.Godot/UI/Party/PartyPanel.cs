@@ -13,6 +13,7 @@ public partial class PartyPanel : JyPanel
 	private GridContainer _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private readonly List<IDisposable> _subscriptions = [];
+	private readonly Dictionary<string, PartyCharacterBox> _characterBoxes = [];
 
 	public override void _Ready()
 	{
@@ -20,6 +21,7 @@ public partial class PartyPanel : JyPanel
 		_gridContainer = GetNode<GridContainer>("%GridContainer");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_subscriptions.Add(Game.Session.Events.Subscribe<PartyChangedEvent>(OnPartyChanged));
+		_subscriptions.Add(Game.Session.Events.Subscribe<CharacterChangedEvent>(OnCharacterChanged));
 		_subscriptions.Add(Game.Session.Events.Subscribe<SaveLoadedEvent>(OnSaveLoaded));
 		Refresh();
 	}
@@ -37,6 +39,7 @@ public partial class PartyPanel : JyPanel
 	private void Refresh()
 	{
 		ClearGrid();
+		_characterBoxes.Clear();
 
 		var party = Game.State.Party;
 		if (party.Members.Count == 0)
@@ -49,6 +52,7 @@ public partial class PartyPanel : JyPanel
 		for (var index = 0; index < party.Members.Count; index += 1)
 		{
 			var characterBox = CreateCharacterBox(party.Members[index], index);
+			_characterBoxes[party.Members[index].Id] = characterBox;
 			_gridContainer.AddChild(characterBox);
 		}
 	}
@@ -84,6 +88,14 @@ public partial class PartyPanel : JyPanel
 	}
 
 	private void OnPartyChanged(PartyChangedEvent _) => Refresh();
+
+	private void OnCharacterChanged(CharacterChangedEvent sessionEvent)
+	{
+		if (_characterBoxes.TryGetValue(sessionEvent.CharacterId, out var characterBox))
+		{
+			characterBox.RefreshView();
+		}
+	}
 
 	private void OnSaveLoaded(SaveLoadedEvent _) => Refresh();
 
