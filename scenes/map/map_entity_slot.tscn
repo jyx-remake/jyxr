@@ -87,6 +87,7 @@ offset_bottom = 106.0
 text = "南贤居"
 label_settings = SubResource("LabelSettings_name")
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="Notice" type="TextureRect" parent="." unique_id=402496180]
 unique_name_in_owner = true

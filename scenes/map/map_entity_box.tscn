@@ -84,12 +84,14 @@ expand_mode = 1
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = -37.0
-offset_top = 215.0
+offset_top = 160.0
 offset_right = 288.0
-offset_bottom = 292.0
+offset_bottom = 324.0
 text = "长安城中心"
 label_settings = ExtResource("6_label")
 horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
 justification_flags = 161
 
 [node name="Notice" type="TextureRect" parent="." unique_id=376641715]
