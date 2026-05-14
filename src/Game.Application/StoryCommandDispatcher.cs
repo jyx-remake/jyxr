@@ -182,11 +182,26 @@ public sealed class StoryCommandDispatcher
     }
 
     [StoryCommand("haogan")]
-    private ValueTask ExecuteChangeHaoganAsync(int delta)
+    private ValueTask ExecuteChangeHaoganAsync(params ExprValue[] args)
     {
-        State.Adventure.ChangeFavorability(delta);
+        var (targetId, delta) = BindFavorabilityCommandArgs(args);
+        State.Adventure.ChangeFavorability(targetId, delta);
         _session.Events.Publish(new AdventureStateChangedEvent());
         return ValueTask.CompletedTask;
+    }
+
+    private static (string TargetId, int Delta) BindFavorabilityCommandArgs(IReadOnlyList<ExprValue> args)
+    {
+        return args.Count switch
+        {
+            1 => (
+                AdventureState.DefaultFavorabilityTargetId,
+                args[0].AsInt32("Invocation 'haogan' argument 'delta'")),
+            2 => (
+                args[0].AsString("Invocation 'haogan' argument 'targetId'"),
+                args[1].AsInt32("Invocation 'haogan' argument 'delta'")),
+            _ => throw new InvalidOperationException("Invocation 'haogan' requires either 'delta' or 'targetId, delta'."),
+        };
     }
 
     [StoryCommand("rank")]

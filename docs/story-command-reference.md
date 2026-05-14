@@ -88,7 +88,7 @@ command arg1 arg2 ...
 | 指令 | 参数 | 效果 | 示例 |
 | --- | --- | --- | --- |
 | `daode` | `delta` | 调整道德。 | `daode 5` |
-| `haogan` | `delta` | 调整好感。 | `haogan -3` |
+| `haogan` | `delta` / `targetId delta` | 调整默认女主好感，或调整指定剧情关系目标的好感。 | `haogan 李文秀 5` |
 | `menpai` | `sectId` | 设置门派 id。 | `menpai 星宿派` |
 | `rank` | `...` | 当前注册为空操作，用于兼容已有剧情。 | `rank 1` |
 | `touch` | `...` | 当前注册为空操作，用于兼容已有剧情。 | `touch foo` |

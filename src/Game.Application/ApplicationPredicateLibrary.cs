@@ -214,10 +214,35 @@ internal sealed class ApplicationPredicateLibrary
     private bool MoralityLessThan(double threshold) => Adventure.Morality < threshold;
 
     [GamePredicate("haogan_more_than")]
-    private bool FavorabilityMoreThan(double threshold) => Adventure.Favorability > threshold;
+    private bool FavorabilityMoreThan(params ExprValue[] args)
+    {
+        var (targetId, threshold) = BindFavorabilityPredicateArgs("haogan_more_than", args);
+        return Adventure.GetFavorability(targetId) >= threshold;
+    }
 
     [GamePredicate("haogan_less_than")]
-    private bool FavorabilityLessThan(double threshold) => Adventure.Favorability < threshold;
+    private bool FavorabilityLessThan(params ExprValue[] args)
+    {
+        var (targetId, threshold) = BindFavorabilityPredicateArgs("haogan_less_than", args);
+        return Adventure.GetFavorability(targetId) < threshold;
+    }
+
+    private static (string TargetId, int Threshold) BindFavorabilityPredicateArgs(
+        string predicateName,
+        IReadOnlyList<ExprValue> args)
+    {
+        return args.Count switch
+        {
+            1 => (
+                AdventureState.DefaultFavorabilityTargetId,
+                args[0].AsInt32($"Invocation '{predicateName}' argument 'threshold'")),
+            2 => (
+                args[0].AsString($"Invocation '{predicateName}' argument 'targetId'"),
+                args[1].AsInt32($"Invocation '{predicateName}' argument 'threshold'")),
+            _ => throw new InvalidOperationException(
+                $"Invocation '{predicateName}' requires either 'threshold' or 'targetId, threshold'."),
+        };
+    }
 
     [GamePredicate("rank")]
     private bool RankAtLeast(double threshold) => Adventure.Rank >= threshold;

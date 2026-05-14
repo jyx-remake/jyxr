@@ -7,5 +7,5 @@ public sealed record AdventureStateRecord(
     GameDifficulty Difficulty,
     string? SectId,
     int Morality,
-    int Favorability,
+    IReadOnlyDictionary<string, int>? FavorabilityByTarget,
     double Rank);

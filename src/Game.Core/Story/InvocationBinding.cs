@@ -104,14 +104,7 @@ internal static class InvocationBinding
 
         if (targetType == typeof(int))
         {
-            var number = value.AsNumber(context);
-            if (number % 1d != 0d)
-            {
-                throw new InvalidOperationException(
-                    $"Invocation '{invocationName}' requires an integer at index {index}.");
-            }
-
-            return checked((int)number);
+            return value.AsInt32(context);
         }
 
         if (targetType == typeof(double))

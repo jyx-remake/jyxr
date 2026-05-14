@@ -82,6 +82,17 @@ public readonly record struct ExprValue
         return Number;
     }
 
+    public int AsInt32(string context)
+    {
+        var number = AsNumber(context);
+        if (number % 1d != 0d)
+        {
+            throw new StoryRuntimeException($"{context} requires an integer value.");
+        }
+
+        return checked((int)number);
+    }
+
     public string AsString(string context)
     {
         if (Kind != ExprValueKind.String || Text is null)

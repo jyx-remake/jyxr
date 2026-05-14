@@ -5,6 +5,11 @@ namespace Game.Core.Model;
 
 public sealed class AdventureState
 {
+    public const string DefaultFavorabilityTargetId = "女主";
+    private const int DefaultFavorability = 50;
+
+    private readonly Dictionary<string, int> _favorabilityByTarget = new(StringComparer.Ordinal);
+
     public int Round { get; private set; } = 1;
 
     public GameDifficulty Difficulty { get; private set; } = GameDifficulty.Normal;
@@ -13,7 +18,9 @@ public sealed class AdventureState
 
     public int Morality { get; private set; } = 50;
 
-    public int Favorability { get; private set; } = 50;
+    public int Favorability => GetFavorability();
+
+    public IReadOnlyDictionary<string, int> FavorabilityByTarget => _favorabilityByTarget;
 
     public double Rank { get; private set; }
 
@@ -26,15 +33,21 @@ public sealed class AdventureState
             throw new ArgumentOutOfRangeException(nameof(record));
         }
 
-        return new AdventureState
+        var adventure = new AdventureState
         {
             Round = record.Round,
             Difficulty = record.Difficulty,
             SectId = string.IsNullOrWhiteSpace(record.SectId) ? null : record.SectId,
             Morality = record.Morality,
-            Favorability = record.Favorability,
             Rank = record.Rank,
         };
+
+        foreach (var (targetId, value) in record.FavorabilityByTarget ?? new Dictionary<string, int>())
+        {
+            adventure.SetFavorability(targetId, value);
+        }
+
+        return adventure;
     }
 
     public void SetRound(int round)
@@ -60,7 +73,25 @@ public sealed class AdventureState
 
     public void ChangeMorality(int delta) => Morality += delta;
 
-    public void ChangeFavorability(int delta) => Favorability += delta;
+    public int GetFavorability(string targetId = DefaultFavorabilityTargetId)
+    {
+        targetId = NormalizeFavorabilityTarget(targetId);
+        return _favorabilityByTarget.GetValueOrDefault(targetId, DefaultFavorability);
+    }
+
+    public void ChangeFavorability(int delta) => ChangeFavorability(DefaultFavorabilityTargetId, delta);
+
+    public void ChangeFavorability(string targetId, int delta)
+    {
+        targetId = NormalizeFavorabilityTarget(targetId);
+        _favorabilityByTarget[targetId] = checked(GetFavorability(targetId) + delta);
+    }
+
+    private void SetFavorability(string targetId, int value)
+    {
+        targetId = NormalizeFavorabilityTarget(targetId);
+        _favorabilityByTarget[targetId] = value;
+    }
 
     public void SetRank(double value) => Rank = value;
 
@@ -80,7 +111,21 @@ public sealed class AdventureState
     };
 
     public AdventureStateRecord ToRecord() =>
-        new(Round, Difficulty, SectId, Morality, Favorability, Rank);
+        new(
+            Round,
+            Difficulty,
+            SectId,
+            Morality,
+            _favorabilityByTarget
+                .OrderBy(static pair => pair.Key, StringComparer.Ordinal)
+                .ToDictionary(static pair => pair.Key, static pair => pair.Value, StringComparer.Ordinal),
+            Rank);
+
+    private static string NormalizeFavorabilityTarget(string targetId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetId);
+        return targetId;
+    }
 }
 
 public enum GameDifficulty

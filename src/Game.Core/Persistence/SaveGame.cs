@@ -22,7 +22,7 @@ public sealed record SaveGame(
     ShopStateRecord? ShopState = null,
     SpecialBattleStateRecord? SpecialBattleState = null)
 {
-    public const int CurrentVersion = 20;
+    public const int CurrentVersion = 21;
 
     public static SaveGame Create(
         AdventureState adventure,
