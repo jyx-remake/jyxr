@@ -32,6 +32,7 @@ theme_override_font_sizes/font_size = 26
 text = "选择一个槽位写入当前进度。"
 
 [node name="SlotsGrid" type="GridContainer" parent="." index="5" unique_id=645477168]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 250.0
 offset_top = 246.0

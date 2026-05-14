@@ -53,6 +53,15 @@ public static class Game
 		}
 	}
 
+	public static GameSettings Settings
+	{
+		get
+		{
+			EnsureInitialized();
+			return _currentSession.Settings;
+		}
+	}
+
 	public static SaveGameService SaveGameService => Session.SaveGameService;
 	public static ProfileService ProfileService => Session.ProfileService;
 	public static SessionFlowService SessionFlowService => Session.SessionFlowService;

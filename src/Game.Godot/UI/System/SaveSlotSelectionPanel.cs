@@ -16,10 +16,13 @@ public partial class SaveSlotSelectionPanel : JyPanel
 	private readonly LocalSaveStore _saveStore = new();
 
 	private SaveSlotPanelMode _mode;
+	private PackedScene _slotCardScene = null!;
+	private GridContainer _slotsGrid = null!;
 	private Label _titleLabel = null!;
 	private Label _subtitleLabel = null!;
 	private CheckBox _skipConfirmationCheckBox = null!;
 	private IReadOnlyList<SaveSlotCard> _slotCards = [];
+	private SaveSlotCard? _autoSaveCard;
 
 	public void Configure(SaveSlotPanelMode mode) => _mode = mode;
 
@@ -30,6 +33,8 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
 		_skipConfirmationCheckBox = GetNode<CheckBox>("%SkipConfirmationCheckBox");
+		_slotsGrid = GetNode<GridContainer>("%SlotsGrid");
+		_slotCardScene = GD.Load<PackedScene>("res://scenes/ui/system_panel/save_slot_card.tscn");
 		_slotCards =
 		[
 			GetNode<SaveSlotCard>("%SlotCard1"),
@@ -43,6 +48,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 			var slotIndex = index + 1;
 			_slotCards[index].Pressed += () => OnSlotPressed(slotIndex);
 		}
+		CreateAutoSaveCardIfNeeded();
 
 		ApplyModeText();
 		RefreshSlots();
@@ -74,10 +80,35 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private void RefreshSlots()
 	{
+		if (_autoSaveCard is not null)
+		{
+			_autoSaveCard.Configure(_saveStore.GetAutoSaveSummary(), _mode);
+		}
+
 		foreach (var summary in _saveStore.GetSlotSummaries())
 		{
 			_slotCards[summary.SlotIndex - 1].Configure(summary, _mode);
 		}
+	}
+
+	private void CreateAutoSaveCardIfNeeded()
+	{
+		if (_mode != SaveSlotPanelMode.Load)
+		{
+			return;
+		}
+
+		var instance = _slotCardScene.Instantiate();
+		if (instance is not SaveSlotCard card)
+		{
+			instance.QueueFree();
+			throw new InvalidOperationException("Save slot card scene root must be SaveSlotCard.");
+		}
+
+		_autoSaveCard = card;
+		_autoSaveCard.Pressed += () => LoadFromAutoSave();
+		_slotsGrid.AddChild(card);
+		_slotsGrid.MoveChild(card, 0);
 	}
 
 	private async void OnSlotPressed(int slotIndex)
@@ -103,6 +134,21 @@ public partial class SaveSlotSelectionPanel : JyPanel
 			Game.Logger.Error($"Save slot action failed: mode={_mode}, slot={slotIndex}", exception);
 			UIRoot.Instance.ShowSuggestion(exception.Message);
 		}
+	}
+
+	private void LoadFromAutoSave()
+	{
+		if (!_saveStore.TryLoadAutoSave(out var envelope, out var failureReason) || envelope is null)
+		{
+			UIRoot.Instance.ShowSuggestion(BuildLoadFailureText(LocalSaveStore.AutoSaveSlotIndex, failureReason));
+			RefreshSlots();
+			return;
+		}
+
+		Game.LoadSave(envelope.SaveGame);
+		ReloadCurrentMap();
+		UIRoot.Instance.ShowToast("已读取自动存档");
+		QueueFree();
 	}
 
 	private async Task SaveToSlotAsync(int slotIndex)
@@ -188,10 +234,15 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private static string BuildLoadFailureText(int slotIndex, LocalSaveReadFailureReason failureReason) => failureReason switch
 	{
+		LocalSaveReadFailureReason.MissingFile when slotIndex == LocalSaveStore.AutoSaveSlotIndex => "自动存档不存在。",
 		LocalSaveReadFailureReason.MissingFile => $"存档{slotIndex}不存在。",
 		LocalSaveReadFailureReason.EnvelopeVersionMismatch or LocalSaveReadFailureReason.SaveVersionMismatch
+			when slotIndex == LocalSaveStore.AutoSaveSlotIndex => "自动存档版本不兼容，无法读取。",
+		LocalSaveReadFailureReason.EnvelopeVersionMismatch or LocalSaveReadFailureReason.SaveVersionMismatch
 			=> $"存档{slotIndex}版本不兼容，无法读取。",
+		LocalSaveReadFailureReason.InvalidFormat when slotIndex == LocalSaveStore.AutoSaveSlotIndex => "自动存档解析失败，无法读取。",
 		LocalSaveReadFailureReason.InvalidFormat => $"存档{slotIndex}解析失败，无法读取。",
+		_ when slotIndex == LocalSaveStore.AutoSaveSlotIndex => "自动存档无法读取。",
 		_ => $"存档{slotIndex}无法读取。",
 	};
 }

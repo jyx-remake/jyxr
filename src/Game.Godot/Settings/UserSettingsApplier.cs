@@ -12,6 +12,11 @@ public static class UserSettingsApplier
 	{
 		ArgumentNullException.ThrowIfNull(settings);
 
+		if (Game.IsInitialized)
+		{
+			Game.Settings.AutoSave = settings.AutoSave;
+		}
+
 		ApplyBusEnabled(BgmBusName, settings.MusicEnabled);
 		ApplyBusEnabled(SfxBusName, settings.SfxEnabled);
 	}

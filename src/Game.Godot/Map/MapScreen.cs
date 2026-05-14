@@ -1,6 +1,7 @@
 using Game.Application;
 using Game.Core.Definitions;
 using Game.Godot.Assets;
+using Game.Godot.Persistence;
 using Game.Godot.UI;
 using Godot;
 
@@ -10,6 +11,7 @@ public partial class MapScreen : Control
 {
 	private const float LargeMapXScale = 2.4f;
 	private const float LargeMapYScale = 1.8f;
+	private readonly LocalSaveStore _saveStore = new();
 	private MapEnterResult? _pendingInitialResult;
 	private bool _isHandlingInteraction;
 
@@ -65,6 +67,23 @@ public partial class MapScreen : Control
 		ApplyStoryPresentationVisibility();
 	}
 
+	private void AutoSaveIfEnabled()
+	{
+		if (!Game.Settings.AutoSave)
+		{
+			return;
+		}
+
+		try
+		{
+			_saveStore.SaveCurrentSessionToAutoSave();
+		}
+		catch (Exception exception)
+		{
+			Game.Logger.Error("Auto save failed.", exception);
+		}
+	}
+
 	public void Initialize(MapEnterResult result)
 	{
 		ArgumentNullException.ThrowIfNull(result);
@@ -104,6 +123,7 @@ public partial class MapScreen : Control
 		}
 
 		ApplyStoryPresentationVisibility();
+		AutoSaveIfEnabled();
 	}
 
 	private void FillLargeMap(MapEnterResult result)

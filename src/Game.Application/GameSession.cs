@@ -21,7 +21,8 @@ public sealed class GameSession
         Game.Core.Story.IRuntimeHost storyRuntimeHost,
         IDiagnosticLogger? logger = null,
         GameProfile? initialProfile = null,
-        GameConfig? config = null)
+        GameConfig? config = null,
+        GameSettings? settings = null)
     {
         ArgumentNullException.ThrowIfNull(initialState);
         ArgumentNullException.ThrowIfNull(contentRepository);
@@ -29,6 +30,7 @@ public sealed class GameSession
         State = initialState;
         Profile = initialProfile ?? new GameProfile();
         Config = config ?? new GameConfig();
+        Settings = settings ?? new GameSettings();
         ContentRepository = contentRepository;
         SaveGameService = new SaveGameService(this, logger);
         ProfileService = new ProfileService(this, logger);
@@ -52,6 +54,7 @@ public sealed class GameSession
     public GameState State { get; private set; }
     public GameProfile Profile { get; private set; }
     public GameConfig Config { get; }
+    public GameSettings Settings { get; }
     public IContentRepository ContentRepository { get; }
     public SaveGameService SaveGameService { get; }
     public ProfileService ProfileService { get; }

@@ -49,7 +49,7 @@ public partial class SaveSlotCard : Button
 		Modulate = Disabled
 			? new Color(1f, 1f, 1f, 0.55f)
 			: Colors.White;
-		_titleLabel.Text = $"存档{summary.SlotIndex}";
+		_titleLabel.Text = summary.Title ?? $"存档{summary.SlotIndex}";
 
 		if (!summary.HasSave)
 		{
