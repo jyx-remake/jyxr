@@ -90,6 +90,11 @@ public partial class CombatantSelectPanel : JyPanel
 				continue;
 			}
 
+			if (!Game.State.Party.ContainsMember(characterId))
+			{
+				continue;
+			}
+
 			_requiredIds.Add(characterId);
 			_selectedIds.Add(characterId);
 		}
@@ -247,14 +252,6 @@ public partial class CombatantSelectPanel : JyPanel
 		if (_requiredIds.Count > _deploySlotCount)
 		{
 			return "必选角色数量超过可部署人数。";
-		}
-
-		var missingRequired = _requiredIds
-			.Where(requiredId => !Game.State.Party.ContainsMember(requiredId))
-			.ToArray();
-		if (missingRequired.Length > 0)
-		{
-			return $"必选角色不在当前队伍：{string.Join("、", missingRequired)}";
 		}
 
 		if (_selectedIds.Count == 0)
