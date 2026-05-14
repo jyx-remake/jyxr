@@ -68,16 +68,14 @@ public static class CharacterCombatStatFormatter
 
     private static double GetMaxUsableSkillPower(CharacterInstance character, InternalSkillInstance? equippedInternalSkill)
     {
-        var maxExternalOrFormPower = character.GetExternalSkills()
+        var maxExternalPower = character.GetExternalSkills()
             .Where(static skill => skill.IsActive)
-            .Cast<SkillInstance>()
-            .Concat(character.GetFormSkills().Where(static skill => skill.IsActive))
             .Select(static skill => skill.Power)
             .DefaultIfEmpty(0d)
             .Max();
 
-        return maxExternalOrFormPower > 0d
-            ? maxExternalOrFormPower
+        return maxExternalPower > 0d
+            ? maxExternalPower
             : equippedInternalSkill?.Power ?? 0d;
     }
 
