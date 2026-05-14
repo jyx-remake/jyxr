@@ -73,10 +73,12 @@ public sealed record SaveGame(
     public AdventureState RestoreAdventureState() =>
         Game.Core.Model.AdventureState.Restore(Adventure);
 
-    public IReadOnlyDictionary<string, CharacterInstance> RestoreCharacters(IContentRepository contentRepository)
+    public IReadOnlyDictionary<string, CharacterInstance> RestoreCharacters(
+        IContentRepository contentRepository,
+        GameConfig? config = null)
     {
         return Characters
-            .Select(record => CharacterMapper.FromRecord(record, contentRepository))
+            .Select(record => CharacterMapper.FromRecord(record, contentRepository, config))
             .ToDictionary(character => character.Id, StringComparer.Ordinal);
     }
 

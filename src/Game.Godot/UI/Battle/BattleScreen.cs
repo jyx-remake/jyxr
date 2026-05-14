@@ -38,36 +38,6 @@ public partial class BattleScreen : Control
 	private const double SkillNameFloatDelaySeconds = 0.1d;
 	private const double SkillImpactDelaySeconds = 0.8d;
 	private const double SkillImpactFloatDelaySeconds = 0.1d;
-	private static readonly string[] LegendEffectSfxIds =
-	[
-		"音效.奥义1",
-		"音效.奥义2",
-		"音效.奥义3",
-		"音效.奥义4",
-		"音效.奥义5",
-		"音效.奥义6",
-	];
-	private static readonly string[] LegendMaleVoiceSfxIds =
-	[
-		"音效.猛男",
-		"音效.男",
-		"音效.男2",
-		"音效.男3",
-		"音效.男4",
-		"音效.男5",
-		"音效.男-哼",
-		"音效.年轻男",
-	];
-	private static readonly string[] LegendFemaleVoiceSfxIds =
-	[
-		"音效.女",
-		"音效.女2",
-		"音效.女3",
-		"音效.女4",
-		"音效.女的奸笑",
-		"音效.敢点老娘",
-	];
-
 	[Export]
 	public PackedScene BattleSkillBoxScene { get; set; } = null!;
 
@@ -1043,9 +1013,9 @@ public partial class BattleScreen : Control
 		private static void PlayLegendIntroSfx(CharacterGender gender)
 		{
 			AudioManager.Instance.PlaySfx(PickRandom(gender == CharacterGender.Female
-				? LegendFemaleVoiceSfxIds
-				: LegendMaleVoiceSfxIds));
-			AudioManager.Instance.PlaySfx(PickRandom(LegendEffectSfxIds));
+				? GameRoot.Config.LegendFemaleVoiceSfxIds
+				: GameRoot.Config.LegendMaleVoiceSfxIds));
+			AudioManager.Instance.PlaySfx(PickRandom(GameRoot.Config.LegendEffectSfxIds));
 		}
 
 		private static string PickRandom(IReadOnlyList<string> resourceIds) =>

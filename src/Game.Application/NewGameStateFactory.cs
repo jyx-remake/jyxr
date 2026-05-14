@@ -7,11 +7,13 @@ namespace Game.Application;
 public sealed class NewGameStateFactory
 {
     private readonly IContentRepository _contentRepository;
+    private readonly GameConfig _config;
 
-    public NewGameStateFactory(IContentRepository contentRepository)
+    public NewGameStateFactory(IContentRepository contentRepository, GameConfig? config = null)
     {
         ArgumentNullException.ThrowIfNull(contentRepository);
         _contentRepository = contentRepository;
+        _config = config ?? new GameConfig();
     }
 
     public GameState Create(
@@ -38,7 +40,7 @@ public sealed class NewGameStateFactory
             }
 
             var definition = _contentRepository.GetCharacter(characterId);
-            var member = CharacterMapper.CreateInitial(characterId, definition, equipmentInstanceFactory);
+            var member = CharacterMapper.CreateInitial(characterId, definition, equipmentInstanceFactory, _config);
             member.LevelUpAllSkillsMaxLevel();
             party.AddMember(member);
         }

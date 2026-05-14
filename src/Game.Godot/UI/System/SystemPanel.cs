@@ -24,6 +24,7 @@ public partial class SystemPanel : Control
 	private Label _battleSpeedMultiplierValueLabel = null!;
 	private CheckBox _musicCheckBox = null!;
 	private CheckBox _sfxCheckBox = null!;
+	private Control _consoleRoot = null!;
 	private LineEdit _consoleInput = null!;
 	private RichTextLabel _consoleOutput = null!;
 	private Button _executeButton = null!;
@@ -35,6 +36,7 @@ public partial class SystemPanel : Control
 
 	public override void _Ready()
 	{
+		_consoleRoot = GetNode<Control>("ConsoleVBox");
 		_consoleInput = GetNode<LineEdit>("%ConsoleInput");
 		_consoleOutput = GetNode<RichTextLabel>("%ConsoleOutput");
 		_executeButton = GetNode<Button>("%ExecuteButton");
@@ -70,6 +72,19 @@ public partial class SystemPanel : Control
 		_sfxCheckBox.Toggled += enabled => OnSettingToggled("音效", enabled);
 
 		LoadSettings();
+		ApplyConsoleConfig();
+	}
+
+	private void ApplyConsoleConfig()
+	{
+		_consoleRoot.Visible = Game.Config.ConsoleEnabled;
+		_consoleInput.Editable = Game.Config.ConsoleEnabled;
+		_executeButton.Disabled = !Game.Config.ConsoleEnabled;
+		if (!Game.Config.ConsoleEnabled)
+		{
+			return;
+		}
+
 		AppendConsoleLine("系统", "命令行执行剧本指令，当前不支持 jump。");
 		AppendConsoleLine("系统", "示例：item 道口烧鸡 / log \"踏入江湖\"");
 		_consoleInput.CallDeferred(Control.MethodName.GrabFocus);
@@ -154,6 +169,11 @@ public partial class SystemPanel : Control
 	private async void SubmitConsoleCommand(string text)
 	{
 		var commandLine = text.Trim();
+		if (!Game.Config.ConsoleEnabled)
+		{
+			return;
+		}
+
 		if (string.IsNullOrWhiteSpace(commandLine))
 		{
 			AppendConsoleLine("控制台", "请输入有效指令。");

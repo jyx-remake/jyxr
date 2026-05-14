@@ -1,4 +1,5 @@
 using Game.Core.Definitions.Skills;
+using Game.Core.Model;
 using Game.Core.Model.Character;
 
 namespace Game.Core.Model.Skills;
@@ -14,7 +15,7 @@ public enum SkillKind
 
 public abstract class SkillInstance(CharacterInstance owner)
 {
-    public const int DefaultMaxLevel = 20;
+    public static int DefaultMaxLevel => new GameConfig().MaxExternalSkillLevel;
 
     private int _level = 1;
     private int _maxLevel = DefaultMaxLevel;

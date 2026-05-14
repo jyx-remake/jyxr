@@ -1,7 +1,6 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/Game.Godot/UI/MainMenu/MainMenu.cs" id="1_main_menu"]
-[ext_resource type="Texture2D" path="res://assets/art/map/taohuadao.jpg" id="2_background"]
 [ext_resource type="Texture2D" path="res://assets/art/misc/cross.png" id="3_cross"]
 [ext_resource type="Texture2D" path="res://assets/art/misc/title.png" id="4_title"]
 [ext_resource type="Texture2D" path="res://assets/art/misc/moji2.png" id="5_button"]
@@ -24,7 +23,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("2_background")
 expand_mode = 1
 stretch_mode = 5
 

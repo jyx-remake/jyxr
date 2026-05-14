@@ -21,6 +21,7 @@ public sealed class CharacterService
 
     private GameState State => _session.State;
     private IContentRepository ContentRepository => _session.ContentRepository;
+    private GameConfig Config => _session.Config;
 
     public void RenameCharacter(string characterId, string name)
     {
@@ -137,7 +138,7 @@ public sealed class CharacterService
         var oldLevel = character.Level;
         character.GrantExperience(experience);
 
-        var resolvedLevel = Math.Max(oldLevel, CharacterLevelProgression.ResolveLevel(character.Experience));
+        var resolvedLevel = Math.Max(oldLevel, CharacterLevelProgression.ResolveLevel(character.Experience, Config.MaxLevel));
         if (resolvedLevel > oldLevel)
         {
             ApplyLevelUps(character, oldLevel, resolvedLevel);
@@ -152,12 +153,12 @@ public sealed class CharacterService
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
 
         var character = GetPartyMember(characterId);
-        if (character.Level >= CharacterLevelProgression.MaxLevel)
+        if (character.Level >= Config.MaxLevel)
         {
             return;
         }
 
-        var targetLevel = Math.Min(character.Level + levels, CharacterLevelProgression.MaxLevel);
+        var targetLevel = Math.Min(character.Level + levels, Config.MaxLevel);
         if (targetLevel <= character.Level)
         {
             return;
@@ -220,7 +221,7 @@ public sealed class CharacterService
     {
         ArgumentNullException.ThrowIfNull(character);
         var externalSkill = ContentRepository.GetExternalSkill(skillId);
-        character.SetExternalSkillState(externalSkill, level, 0, true);
+        character.SetExternalSkillState(externalSkill, level, 0, true, Config.MaxExternalSkillLevel);
         PublishToastAndCharacterChanged(character, $"{character.Name} 习得外功【{externalSkill.Name}】 {level}级");
     }
 
@@ -228,7 +229,7 @@ public sealed class CharacterService
     {
         ArgumentNullException.ThrowIfNull(character);
         var internalSkill = ContentRepository.GetInternalSkill(skillId);
-        character.SetInternalSkillState(internalSkill, level, 0);
+        character.SetInternalSkillState(internalSkill, level, 0, Config.MaxInternalSkillLevel);
         PublishToastAndCharacterChanged(character, $"{character.Name} 习得内功【{internalSkill.Name}】 {level}级");
     }
 
@@ -236,14 +237,20 @@ public sealed class CharacterService
     {
         var character = GetPartyMember(characterId);
         var definition = ContentRepository.GetExternalSkill(skillId);
-        PublishSkillUpgradeResult(character, character.UpgradeExternalSkillLevel(definition, levels), "外功");
+        PublishSkillUpgradeResult(
+            character,
+            character.UpgradeExternalSkillLevel(definition, levels, Config.MaxExternalSkillLevel),
+            "外功");
     }
 
     public void UpgradeInternalSkillLevel(string characterId, string skillId, int levels)
     {
         var character = GetPartyMember(characterId);
         var definition = ContentRepository.GetInternalSkill(skillId);
-        PublishSkillUpgradeResult(character, character.UpgradeInternalSkillLevel(definition, levels), "内功");
+        PublishSkillUpgradeResult(
+            character,
+            character.UpgradeInternalSkillLevel(definition, levels, Config.MaxInternalSkillLevel),
+            "内功");
     }
 
     public void LearnTalent(CharacterInstance character, string talentId)

@@ -6,8 +6,6 @@ namespace Game.Application;
 
 public sealed class ItemUseService
 {
-    private const int DefaultLearnedSkillLevel = 20;
-
     private readonly GameSession _session;
 
     public ItemUseService(GameSession session)
@@ -17,6 +15,7 @@ public sealed class ItemUseService
     }
 
     private GameState State => _session.State;
+    private GameConfig Config => _session.Config;
 
     public ItemUseAnalysis Analyze(InventoryEntry entry)
     {
@@ -122,10 +121,10 @@ public sealed class ItemUseService
             {
                 case GrantExternalSkillItemUseEffectDefinition externalSkill:
                 {
-                    // var level = ResolveTargetSkillLevel(
-                    //     target.GetExternalSkillLevel(externalSkill.SkillId),
-                    //     externalSkill.Level);
-                    const int level = 20;
+                    var level = ResolveTargetSkillLevel(
+                        target.GetExternalSkillLevel(externalSkill.SkillId),
+                        externalSkill.Level,
+                        Config.MaxExternalSkillLevel);
                     _session.CharacterService.LearnExternalSkill(
                         target,
                         externalSkill.SkillId,
@@ -134,10 +133,10 @@ public sealed class ItemUseService
                 }
                 case GrantInternalSkillItemUseEffectDefinition internalSkill:
                 {
-                    // var level = ResolveTargetSkillLevel(
-                    //     target.GetInternalSkillLevel(internalSkill.SkillId),
-                    //     internalSkill.Level);
-                    const int level = 20;
+                    var level = ResolveTargetSkillLevel(
+                        target.GetInternalSkillLevel(internalSkill.SkillId),
+                        internalSkill.Level,
+                        Config.MaxInternalSkillLevel);
                     _session.CharacterService.LearnInternalSkill(
                         target,
                         internalSkill.SkillId,
@@ -268,7 +267,7 @@ public sealed class ItemUseService
         return null;
     }
 
-    private static string? ValidateSpecificTarget(
+    private string? ValidateSpecificTarget(
         ItemUseKind kind,
         IReadOnlyList<ItemUseEffectDefinition> effects,
         InventoryEntry entry,
@@ -283,7 +282,7 @@ public sealed class ItemUseService
             _ => "该物品暂不可使用。",
         };
 
-    private static string? ValidateSkillBookTarget(
+    private string? ValidateSkillBookTarget(
         IReadOnlyList<ItemUseEffectDefinition> effects,
         CharacterInstance target)
     {
@@ -294,7 +293,10 @@ public sealed class ItemUseService
                 case GrantExternalSkillItemUseEffectDefinition externalSkill:
                 {
                     var currentLevel = target.GetExternalSkillLevel(externalSkill.SkillId);
-                    if (currentLevel is not null && currentLevel.Value >= ResolveEffectiveMaxLevel(externalSkill.Level))
+                    if (currentLevel is not null &&
+                        currentLevel.Value >= ResolveEffectiveMaxLevel(
+                            externalSkill.Level,
+                            Config.MaxExternalSkillLevel))
                     {
                         return "该外功已达上限";
                     }
@@ -303,7 +305,10 @@ public sealed class ItemUseService
                 case GrantInternalSkillItemUseEffectDefinition internalSkill:
                 {
                     var currentLevel = target.GetInternalSkillLevel(internalSkill.SkillId);
-                    if (currentLevel is not null && currentLevel.Value >= ResolveEffectiveMaxLevel(internalSkill.Level))
+                    if (currentLevel is not null &&
+                        currentLevel.Value >= ResolveEffectiveMaxLevel(
+                            internalSkill.Level,
+                            Config.MaxInternalSkillLevel))
                     {
                         return "该内功已达上限";
                     }
@@ -347,16 +352,16 @@ public sealed class ItemUseService
 
     private static string FormatStatName(StatType statType) => StatCatalog.GetDisplayNameCn(statType);
 
-    private static int ResolveTargetSkillLevel(int? currentLevel, int? effectLevel)
+    private static int ResolveTargetSkillLevel(int? currentLevel, int? effectLevel, int configuredMaxLevel)
     {
-        var targetLevel = ResolveEffectiveMaxLevel(effectLevel);
+        var targetLevel = ResolveEffectiveMaxLevel(effectLevel, configuredMaxLevel);
         return currentLevel is null
             ? targetLevel
             : Math.Max(currentLevel.Value, targetLevel);
     }
 
-    private static int ResolveEffectiveMaxLevel(int? effectLevel) =>
-        effectLevel ?? DefaultLearnedSkillLevel;
+    private static int ResolveEffectiveMaxLevel(int? effectLevel, int configuredMaxLevel) =>
+        effectLevel ?? configuredMaxLevel;
 
     private enum ItemUseKind
     {

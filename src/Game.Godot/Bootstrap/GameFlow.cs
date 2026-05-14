@@ -6,7 +6,6 @@ namespace Game.Godot;
 public static class GameFlow
 {
 	public const string MainMenuScenePath = "res://scenes/main_menu/main_menu.tscn";
-	public const string MainMenuBgmId = "音乐.武侠回忆";
 
 	public static async Task StartNewGameAsync(CancellationToken cancellationToken = default)
 	{
@@ -25,7 +24,7 @@ public static class GameFlow
 		UIRoot.Instance.ClosePanel();
 		UIRoot.Instance.SetHudSuppressed(true);
 		UIRoot.Instance.SetStoryPresentationActive(false);
-		Game.Audio.PlayBgm(MainMenuBgmId);
+		Game.Audio.PlayBgm(Game.Config.MainMenuMusic);
 
 		if (Engine.GetMainLoop() is not SceneTree tree)
 		{

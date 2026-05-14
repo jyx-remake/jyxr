@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Core.Definitions;
+using Game.Godot.Assets;
 using Godot;
 
 namespace Game.Godot.UI;
@@ -9,10 +10,12 @@ public partial class MainMenu : Control
 	private TextureButton _startButton = null!;
 	private TextureButton _loadButton = null!;
 	private TextureButton _musicButton = null!;
+	private TextureRect _background = null!;
 	private bool _isStarting;
 
 	public override void _Ready()
 	{
+		_background = GetNode<TextureRect>("Bg");
 		_startButton = GetNode<TextureButton>("%StartButton");
 		_loadButton = GetNode<TextureButton>("%LoadButton");
 		_musicButton = GetNode<TextureButton>("%MusicButton");
@@ -22,8 +25,9 @@ public partial class MainMenu : Control
 		_musicButton.Pressed += OnMusicPressed;
 
 		PreviewGameBootstrap.Initialize();
+		_background.Texture = AssetResolver.LoadTextureResource(Game.Config.MainMenuBackground);
 		UIRoot.Instance.SetHudSuppressed(true);
-		Game.Audio.PlayBgm(GameFlow.MainMenuBgmId);
+		Game.Audio.PlayBgm(Game.Config.MainMenuMusic);
 	}
 
 	private async void OnStartPressed()

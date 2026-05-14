@@ -178,7 +178,7 @@ public sealed class PartyService
     private CharacterInstance CreateInitialCharacter(string characterId)
     {
         var definition = ContentRepository.GetCharacter(characterId);
-        var character = CharacterMapper.CreateInitial(characterId, definition, State.EquipmentInstanceFactory);
+        var character = CharacterMapper.CreateInitial(characterId, definition, State.EquipmentInstanceFactory, _session.Config);
         character.LevelUpAllSkillsMaxLevel();
         return character;
     }

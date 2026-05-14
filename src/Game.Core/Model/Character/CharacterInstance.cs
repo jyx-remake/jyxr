@@ -104,15 +104,17 @@ public sealed class CharacterInstance
 
     public SkillLevelChange<ExternalSkillInstance> UpgradeExternalSkillLevel(
         ExternalSkillDefinition definition,
-        int levels)
+        int levels,
+        int? maxLevel = null)
     {
         ArgumentNullException.ThrowIfNull(definition);
         var skill = SkillListMutation.Find(ExternalSkills, definition.Id);
         if (skill is null)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
-            var createdLevel = Math.Min(levels, SkillInstance.DefaultMaxLevel);
-            skill = CreateExternalSkill(definition, createdLevel, 0, true);
+            var effectiveMaxLevel = maxLevel ?? SkillInstance.DefaultMaxLevel;
+            var createdLevel = Math.Min(levels, effectiveMaxLevel);
+            skill = CreateExternalSkill(definition, createdLevel, 0, true, effectiveMaxLevel);
             ExternalSkills.Add(skill);
             RebuildSnapshot();
             return new SkillLevelChange<ExternalSkillInstance>(skill, 0, createdLevel, true);
@@ -170,15 +172,17 @@ public sealed class CharacterInstance
 
     public SkillLevelChange<InternalSkillInstance> UpgradeInternalSkillLevel(
         InternalSkillDefinition definition,
-        int levels)
+        int levels,
+        int? maxLevel = null)
     {
         ArgumentNullException.ThrowIfNull(definition);
         var skill = SkillListMutation.Find(InternalSkills, definition.Id);
         if (skill is null)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
-            var createdLevel = Math.Min(levels, SkillInstance.DefaultMaxLevel);
-            skill = CreateInternalSkill(definition, createdLevel, 0);
+            var effectiveMaxLevel = maxLevel ?? SkillInstance.DefaultMaxLevel;
+            var createdLevel = Math.Min(levels, effectiveMaxLevel);
+            skill = CreateInternalSkill(definition, createdLevel, 0, effectiveMaxLevel);
             InternalSkills.Add(skill);
             RebuildSnapshot();
             return new SkillLevelChange<InternalSkillInstance>(skill, 0, createdLevel, true);

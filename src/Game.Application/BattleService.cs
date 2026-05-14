@@ -31,41 +31,6 @@ public sealed class BattleService
         "五毒教弟子",
     ];
 
-    private static readonly string[] RandomTalentPoolIds =
-    [
-        "清心",
-        "自我主义",
-        "金钟罩",
-        "阴谋家",
-        "轻功大师",
-        "飘然",
-        "破甲",
-        "至空至明",
-        "好色",
-        "大小姐",
-    ];
-
-    private static readonly string[] CrazyAttackTalentPoolIds =
-    [
-        "破甲",
-        "铁拳无双",
-        "嗜血狂魔",
-    ];
-
-    private static readonly string[] CrazyDefenceTalentPoolIds =
-    [
-        "金钟罩",
-        "真气护体",
-        "清心",
-    ];
-
-    private static readonly string[] CrazyOtherTalentPoolIds =
-    [
-        "轻功大师",
-        "飘然",
-        "至空至明",
-    ];
-
     private readonly GameSession _session;
 
     public BattleService(GameSession session)
@@ -78,6 +43,7 @@ public sealed class BattleService
     private IContentRepository ContentRepository => _session.ContentRepository;
     private CharacterService CharacterService => _session.CharacterService;
     private int PlayerTeam => _session.Config.BattlePlayerTeam;
+    private GameConfig Config => _session.Config;
 
     public BattleState BuildBattleState(SpecialBattleRequest request)
     {
@@ -346,6 +312,7 @@ public sealed class BattleService
         character.InternalSkills.Clear();
         character.EquipInternalSkill(null);
 
+        // Legacy raises NPC skill levels by round and clamps levels globally; it does not assign per-instance max levels here.
         character.ExternalSkills.Add(new ExternalSkillInstance(externalSkill, character, true)
         {
             Level = Random.Shared.Next(1, 7),
@@ -450,12 +417,12 @@ public sealed class BattleService
         switch (State.Adventure.Difficulty)
         {
             case GameDifficulty.Hard:
-                TryAddRandomTalent(character, RandomTalentPoolIds);
+                TryAddRandomTalent(character, Config.EnemyRandomTalentIds);
                 break;
             case GameDifficulty.Crazy:
-                TryAddRandomTalent(character, CrazyAttackTalentPoolIds);
-                TryAddRandomTalent(character, CrazyDefenceTalentPoolIds);
-                TryAddRandomTalent(character, CrazyOtherTalentPoolIds);
+                TryAddRandomTalent(character, Config.EnemyRandomTalentCrazy1Ids);
+                TryAddRandomTalent(character, Config.EnemyRandomTalentCrazy2Ids);
+                TryAddRandomTalent(character, Config.EnemyRandomTalentCrazy3Ids);
                 break;
         }
     }
@@ -590,7 +557,7 @@ public sealed class BattleService
         {
             if (Random.Shared.NextDouble() < 0.3d)
             {
-                var equipment = PickRandomZhenlongqijuEquipment();
+                var equipment = PickConfiguredZhenlongqijuEquipment();
                 drops.Add(new OrdinaryBattleEquipmentRewardDrop(
                     equipment,
                     GenerateFixedEquipmentRolls(equipment, 4)));
@@ -619,18 +586,32 @@ public sealed class BattleService
         drops.Add(new OrdinaryBattleStackRewardDrop(PickRandom(candidates), 1));
     }
 
-    private EquipmentDefinition PickRandomZhenlongqijuEquipment()
+    private EquipmentDefinition PickConfiguredZhenlongqijuEquipment()
     {
-        var candidates = ContentRepository.GetItems()
-            .OfType<EquipmentDefinition>()
-            .Where(equipment => equipment.Level >= 4)
+        var candidates = Config.ZhenlongWeaponRewardIds
+            .Concat(Config.ZhenlongArmorRewardIds)
+            .Concat(Config.ZhenlongAccessoryRewardIds)
+            .Distinct(StringComparer.Ordinal)
+            .Select(ResolveConfiguredZhenlongEquipment)
             .ToArray();
         if (candidates.Length == 0)
         {
-            throw new InvalidOperationException("Zhenlongqiju equipment reward requires at least one level 4+ equipment definition.");
+            throw new InvalidOperationException("Zhenlongqiju equipment reward requires at least one configured equipment definition.");
         }
 
         return PickRandom(candidates);
+    }
+
+    private EquipmentDefinition ResolveConfiguredZhenlongEquipment(string equipmentId)
+    {
+        if (string.IsNullOrWhiteSpace(equipmentId))
+        {
+            throw new InvalidOperationException("Zhenlongqiju equipment reward id cannot be empty.");
+        }
+
+        return ContentRepository.GetItem(equipmentId.Trim()) as EquipmentDefinition
+            ?? throw new InvalidOperationException(
+                $"Zhenlongqiju equipment reward '{equipmentId}' is not an equipment definition.");
     }
 
     private IReadOnlyList<GeneratedEquipmentAffixRoll> GenerateFixedEquipmentRolls(

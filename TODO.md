@@ -1,7 +1,9 @@
 # TODO
 
 - 重新审视 `CharacterDefinition` 中初始技能/装备的表达方式：继续使用纯 `SkillIds` / `EquipmentIds`，还是引入定义侧条目对象来承载默认等级、开关、锻造等初始配置。
-- 技能等级上限目前统一使用 `SkillInstance.DefaultMaxLevel = 20`。legacy `maxlevel` 剧情命令当前只做技能存在性校验并发 toast，不写入技能实例；后续如要支持动态突破上限，需要重新建模“技能精通/上限提升”的持久化归属。
+- 技能等级上限目前已接入 `GameConfig.MaxExternalSkillLevel` / `GameConfig.MaxInternalSkillLevel` 作为普通技能实例默认上限。legacy `maxlevel` 剧情命令当前只做技能存在性校验并发 toast，不写入技能实例；后续如要支持动态突破上限，需要重新建模“技能精通/上限提升”的持久化归属。
+- 武学书授予等级与配置上限的关系仍待明确：如果物品效果显式授予等级高于 `GameConfig` 技能等级上限，当前应决定是把授予等级 clamp 到配置上限，还是允许该物品抬高单个技能实例上限。
+- 随机战斗临时敌人的技能上限不按玩家技能实例上限配置单独设置。legacy 行为是按 `NPC_SKILL_LEVEL_ADD_BY_ZHOUMU` 增加 NPC 实际技能等级，并 clamp 到 `MAX_SKILL_LEVEL` / `MAX_INTERNALSKILL_LEVEL`；后续如复刻高周目 NPC 强化，应接入等级加成规则，而不是简单给临时敌人写入配置化 `MaxLevel`。
 - 内容加载目前只是“DTO 校验 + 按顺序构建 runtime definitions”，还不是真正的二阶段加载。后续如需支持定义间循环依赖，应改成“先注册 runtime definition 空壳，再统一 resolve 引用”的两阶段装配流程。
 - 当前 affix 引用解析集中在 `JsonContentLoader.ResolveAffixes(...)`，而不是各 definition 自己的 `Resolve(...)` 方法。后续如继续扩展 affix 来源，应把 affix 引用解析入口收敛成更明确的专门服务或 definition 统一协议，避免新增来源时漏掉 `GrantTalentAffix` 等需要 resolve 的条目。
 - `博览群书` 当前先用现有无参数 trait 表达，并在奥义触发率计算中写死触发倍率 `+0.5`；后续如果类似规则增多，可考虑把 trait 升级为带参数规则 trait，避免规则数值长期散落在代码里。
@@ -24,6 +26,7 @@
 - 普通战斗装备掉落的随机词条抽样当前按 legacy `ItemInstance.GenerateRandomTrigger()` 复刻：合并匹配等级表后，按配置顺序逐项执行 `weight / totalWeight` 试投，未命中则整轮重试，重复词条再重抽。该行为不是标准权重轮盘抽样；后续如改成一次随机数累计权重命中，应作为明确设计变更评估掉落分布差异。
 - 当前轻量战斗内核的命中结算暂按 legacy 顺序处理：目标侧 `BeforeHitResolved` 闪避/反制先落地，来源侧破闪避/失手后处理。因此可能出现“最终命中但目标闪避反制副作用已生效”的结果；后续正式战场系统重建时需明确这是保留为原版结算顺序，还是拆成命中状态解析与最终结果副作用两阶段。
 - `BeforeHitResolved` 应只承载命中结果确定前的闪避、破闪避、失手等逻辑。后续内容校验应禁止来源侧 `context_hit_state == hit` 的 hook，命中确认后的追加效果应使用 `OnHitConfirmed`，避免数据写法被运行时静默跳过。
+- 奥义音效配置列表目前由 `GameConfig.LegendFemaleVoiceSfxIds` / `LegendMaleVoiceSfxIds` / `LegendEffectSfxIds` 驱动。后续需要在配置加载或内容校验阶段保证这些列表非空，避免运行时随机取值时因空列表崩溃。
 - 天关 `achievementIds` 当前数据仍为空，legacy `nick` 未实际落入 `data/towers.json`。后续需要重新确认 legacy tower XML 的 `nick` 来源和转换逻辑，并补内容测试断言预期关卡能加载出成就。
 - Attachment 系统后续按 `docs/attachment-design.md` 重建；当前旧 `IAttachmentSourceDefinition` / `ModifierDefinition` / `AttachmentResolver` 实现已删除，不保留兼容层。
 - 持久化层后续可能要补：`MapStateRecord`、`InteractableRecord`、`StoryFlagRecord`，用于把地图交互进度、机关状态、剧情标记纳入存档。

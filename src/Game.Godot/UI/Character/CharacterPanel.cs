@@ -116,7 +116,7 @@ public partial class CharacterPanel : JyPanel
 		_levelValueLabel.Text = character.Level.ToString();
 		_hpValueLabel.Text = ToDisplayStat(character.GetStat(StatType.MaxHp)).ToString();
 		_mpValueLabel.Text = ToDisplayStat(character.GetStat(StatType.MaxMp)).ToString();
-		_xpValueLabel.Text = character.Level >= CharacterLevelProgression.MaxLevel
+		_xpValueLabel.Text = character.Level >= Game.Config.MaxLevel
 			? "-/-"
 			: FormatExperienceProgress(character);
 		var combatStats = CharacterCombatStatFormatter.Calculate(character);
@@ -186,7 +186,10 @@ public partial class CharacterPanel : JyPanel
 
 	private static string FormatExperienceProgress(CharacterInstance character)
 	{
-		var experienceProgress = CharacterLevelProgression.GetDisplayProgress(character.Level, character.Experience);
+		var experienceProgress = CharacterLevelProgression.GetDisplayProgress(
+			character.Level,
+			character.Experience,
+			Game.Config.MaxLevel);
 		return $"{experienceProgress.CurrentExperience}/{experienceProgress.NextLevelExperience}";
 	}
 

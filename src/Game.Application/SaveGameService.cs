@@ -42,7 +42,7 @@ public sealed class SaveGameService
 	public void LoadSave(SaveGame saveGame)
 	{
 		var adventure = saveGame.RestoreAdventureState();
-		var characters = saveGame.RestoreCharacters(ContentRepository);
+		var characters = saveGame.RestoreCharacters(ContentRepository, _session.Config);
 		var party = saveGame.RestoreParty(characters);
 		var inventory = saveGame.RestoreInventory(ContentRepository);
 		var chest = saveGame.RestoreChestState(ContentRepository);

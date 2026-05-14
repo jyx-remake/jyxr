@@ -52,7 +52,7 @@ public static class PreviewGameBootstrap
 		GameConfig config,
 		GameProfile profile)
 	{
-		var state = new NewGameStateFactory(repository).Create(config.InitialPartyCharacterIds);
+		var state = new NewGameStateFactory(repository, config).Create(config.InitialPartyCharacterIds);
 		return new ApplicationGameSession(
 			state,
 			repository,

@@ -765,9 +765,9 @@ public sealed class SessionEventsTests
 
         session.CharacterService.LevelUp("hero", 30);
 
-        Assert.Equal(CharacterLevelProgression.MaxLevel, hero.Level);
+        Assert.Equal(CharacterLevelProgression.DefaultMaxLevel, hero.Level);
         Assert.Equal(
-            CharacterLevelProgression.GetTotalExperienceRequiredForLevel(CharacterLevelProgression.MaxLevel),
+            CharacterLevelProgression.GetTotalExperienceRequiredForLevel(CharacterLevelProgression.DefaultMaxLevel),
             hero.Experience);
     }
 
