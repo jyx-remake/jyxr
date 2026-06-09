@@ -2,12 +2,13 @@
 
 ## 当前阶段
 
-第六轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+第七轮已完成代码侧迁移，等待 Godot 运行时手动验证。
 
 本轮范围：
 
 - `JyPanel` 基础背景与关闭按钮进入设计画布。
 - 背包、商店、储物箱、队伍、日志、英雄面板主体内容进入各自 `DesignCanvas/DesignRoot`。
+- 角色主面板、装备选择、物品目标选择、出战选择、战斗物品、战斗结算等剩余 `JyPanel` 子面板主体内容进入各自 `DesignCanvas/DesignRoot`。
 - 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
 
 ## 已完成阶段
@@ -29,6 +30,9 @@
   - 用户已确认拉伸下视觉正常。
 - 第六轮：迁移 `JyPanel` 基础壳与第一批主面板。
   - 主要文件：`scenes/ui/base/jy_panel.tscn`、`scenes/ui/inventory_panel/inventory_panel.tscn`、`scenes/ui/shop_panel/shop_panel.tscn`、`scenes/ui/chest_panel/chest_panel.tscn`、`scenes/ui/party_panel/party_panel.tscn`、`scenes/ui/journal/journal_panel.tscn`、`scenes/ui/hero_panel/hero_panel.tscn`。
+  - 等待用户运行时手动验证。
+- 第七轮：迁移剩余 `JyPanel` 子面板。
+  - 主要文件：`scenes/ui/character_panel/character_panel.tscn`、`scenes/ui/character_panel/equipment_selection_panel.tscn`、`scenes/ui/inventory_panel/item_target_selection_panel.tscn`、`scenes/ui/battle/combatant_select_panel.tscn`、`scenes/ui/battle/battle_item_panel.tscn`、`scenes/ui/battle/battle_settlement_panel.tscn`。
   - 等待用户运行时手动验证。
 
 ## 验证矩阵
@@ -64,11 +68,11 @@
 | P1 | PartyPanel | 队伍内容直接挂根节点固定坐标 | 已完成 |
 | P1 | JournalPanel | 日志内容直接挂根节点固定坐标 | 已完成 |
 | P1 | HeroPanel | 英雄面板内容直接挂根节点固定坐标 | 已完成 |
-| P1 | CharacterPanel | 角色主面板仍有根级固定坐标内容 | 待处理 |
-| P1 | ItemTargetSelectionPanel | 物品目标选择弹窗仍有根级固定坐标内容 | 待处理 |
-| P1 | CharacterEquipmentSelectionPanel | 装备选择弹窗仍有根级固定坐标内容 | 待处理 |
-| P1 | CombatantSelectPanel | 出战选择面板仍有根级固定坐标内容 | 待处理 |
-| P1 | BattleItemPanel / BattleSettlementPanel | 战斗弹窗仍有根级固定坐标内容 | 待处理 |
+| P1 | CharacterPanel | 角色主面板仍有根级固定坐标内容 | 已完成 |
+| P1 | ItemTargetSelectionPanel | 物品目标选择弹窗仍有根级固定坐标内容 | 已完成 |
+| P1 | CharacterEquipmentSelectionPanel | 装备选择弹窗仍有根级固定坐标内容 | 已完成 |
+| P1 | CombatantSelectPanel | 出战选择面板仍有根级固定坐标内容 | 已完成 |
+| P1 | BattleItemPanel / BattleSettlementPanel | 战斗弹窗仍有根级固定坐标内容 | 已完成 |
 
 ## 第六轮改动记录
 
@@ -125,30 +129,58 @@
 - 打开英雄面板，确认 tab 按钮、江湖历练、成就、武学精通页位于设计区内，tab 切换仍正常。
 - 抽查继承 `JyPanel` 但内容尚未迁移的面板，确认关闭按钮仍可点击：角色面板、装备选择、目标选择、出战选择、战斗物品、战斗结算。
 
+## 第七轮改动记录
+
+- 修改 `scenes/ui/character_panel/character_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将头像区、角色基础属性文本、五个分页按钮、`TabContainer` 和底部队伍快切条迁入设计画布。
+  - 保持角色面板背景仍由 `JyPanel` 的 `PanelBackdropCanvas/DesignRoot/BackGround` 承载。
+- 修改 `scenes/ui/character_panel/equipment_selection_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将标题、提示、装备列表和空状态标签迁入设计画布。
+- 修改 `scenes/ui/inventory_panel/item_target_selection_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将标题、物品目标提示、角色列表和底部提示迁入设计画布。
+- 修改 `scenes/ui/battle/combatant_select_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将标题、出战卡片列表、右侧人数信息和出战按钮迁入设计画布。
+- 修改 `scenes/ui/battle/battle_item_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将标题、提示、数量、物品列表和空状态迁入设计画布。
+- 修改 `scenes/ui/battle/battle_settlement_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将标题、奖励详情、奖励列表、空状态和确认按钮迁入设计画布。
+
+## 第七轮静态检查
+
+- 角色主面板、装备选择、物品目标选择、出战选择、战斗物品、战斗结算场景根级内容只保留预期的 `DesignCanvas`。
+- 上述场景迁移后无旧的 `AvatarBox`、`Labels`、`Buttons`、`TabContainer`、`ScrollContainer`、`SidePanel`、`ConfirmButton` 父路径残留。
+- 脚本依赖节点仍保留 `unique_name_in_owner = true`。
+- 按用户要求，本轮不做构建验证。
+
+## 第七轮手动验证清单
+
+- 打开角色面板，确认头像、基础属性、五个分页按钮、分页内容区和底部队伍快切条都保持在居中 16:9 设计区内。
+- 角色面板属性、装备、技能、天赋、传记 tab 切换应不变。
+- 角色上一位 / 下一位切换应不变。
+- 装备 tab 中点击装备槽位打开装备选择弹窗，确认标题、提示、列表和空状态位于设计区内。
+- 背包使用物品打开目标选择弹窗，确认目标列表和提示位于设计区内。
+- 地图或剧情进入战斗前打开出战选择，确认卡片列表、人数提示和出战按钮位于设计区内。
+- 战斗中打开物品面板，确认标题、列表和空状态位于设计区内。
+- 战斗结算面板中奖励详情、奖励列表和确认按钮位于设计区内。
+
 ## 后续计划
 
-建议下一步继续补齐尚未迁完的 `JyPanel` 子面板，然后再进入剧情 UI：
+建议下一步进入剧情 UI 与开局流程：
 
-1. 迁移角色相关面板。
-   - `scenes/ui/character_panel/character_panel.tscn`
-   - `scenes/ui/character_panel/equipment_selection_panel.tscn`
-   - 目标：角色主面板、装备选择弹窗与 `JyPanel` 背景保持同一设计坐标系。
-2. 迁移物品目标选择弹窗。
-   - `scenes/ui/inventory_panel/item_target_selection_panel.tscn`
-   - 目标：背包使用物品后的目标选择不再停留在根级固定坐标。
-3. 迁移战斗入口与战斗弹窗。
-   - `scenes/ui/battle/combatant_select_panel.tscn`
-   - `scenes/ui/battle/battle_item_panel.tscn`
-   - `scenes/ui/battle/battle_settlement_panel.tscn`
-   - 目标：先处理 `JyPanel` 弹窗类战斗 UI，不碰战斗棋盘坐标系统。
-4. 迁移剧情对白与选项。
+1. 迁移剧情对白与选项。
    - `scenes/ui/story/story_dialogue_panel.tscn`
    - `scenes/ui/story/story_choice_panel.tscn`
    - 目标：对白框贴底部安全区，选项框与对白框关系稳定。
-5. 迁移开局流程。
+2. 迁移开局流程。
    - 门派选择、输入名字、头像选择、随机属性。
    - 目标：开局 UI 全部进入设计画布。
-6. 单独迁地图 UI。
+3. 单独迁地图 UI。
    - 地图背景显示 rect、点位、主角 pin、底部信息区共享坐标转换。
-7. 单独迁战斗棋盘和行动栏。
+4. 单独迁战斗棋盘和行动栏。
    - 棋盘格、单位、hover、可达区、飘字、技能动画共享同一个 transform。

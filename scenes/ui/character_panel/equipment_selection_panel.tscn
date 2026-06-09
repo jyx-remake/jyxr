@@ -3,12 +3,29 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
 [ext_resource type="Script" path="res://src/Game.Godot/UI/Character/CharacterEquipmentSelectionPanel.cs" id="2_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/inventory_item_box.tscn" id="3_item_box"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="4_design_canvas"]
 
 [node name="CharacterEquipmentSelectionPanel" instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
 InventoryItemBoxScene = ExtResource("3_item_box")
 
-[node name="TitleLabel" type="Label" parent="." index="3"]
+[node name="DesignCanvas" type="Control" parent="." index="3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" index="0"]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="TitleLabel" type="Label" parent="DesignCanvas/DesignRoot" index="0"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 760.0
@@ -22,7 +39,7 @@ theme_override_font_sizes/font_size = 58
 text = "选择装备"
 horizontal_alignment = 1
 
-[node name="HintLabel" type="Label" parent="." index="4"]
+[node name="HintLabel" type="Label" parent="DesignCanvas/DesignRoot" index="1"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 360.0
@@ -34,21 +51,21 @@ theme_override_font_sizes/font_size = 30
 text = "选择可装备的物品。"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." index="5"]
+[node name="ScrollContainer" type="ScrollContainer" parent="DesignCanvas/DesignRoot" index="2"]
 layout_mode = 0
 offset_left = 310.0
 offset_top = 238.0
 offset_right = 1660.0
 offset_bottom = 884.0
 
-[node name="GridContainer" type="GridContainer" parent="ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="DesignCanvas/DesignRoot/ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 40
 columns = 6
 
-[node name="EmptyLabel" type="Label" parent="." index="6"]
+[node name="EmptyLabel" type="Label" parent="DesignCanvas/DesignRoot" index="3"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0

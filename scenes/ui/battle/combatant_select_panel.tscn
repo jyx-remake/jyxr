@@ -7,6 +7,8 @@
 [ext_resource type="LabelSettings" uid="uid://c1rrni2e1gbhl" path="res://assets/theme/panel_title_label_settings.tres" id="4_mfbij"]
 [ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="5_button_texture"]
 
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="6_design_canvas"]
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_shdk0"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_confirm"]
@@ -24,7 +26,23 @@ visible = false
 PressOffset = Vector2(2, 2)
 PressColor = Color(0.8, 0.8, 0.8, 1)
 
-[node name="TitleLabel" type="Label" parent="." index="3" unique_id=1117418853]
+[node name="DesignCanvas" type="Control" parent="." index="3" unique_id=100000221]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" index="0" unique_id=100000222]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="TitleLabel" type="Label" parent="DesignCanvas/DesignRoot" index="0" unique_id=1117418853]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 640.0
@@ -37,24 +55,24 @@ text = "出战人物选择"
 label_settings = ExtResource("4_mfbij")
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." index="4" unique_id=200625378]
+[node name="ScrollContainer" type="ScrollContainer" parent="DesignCanvas/DesignRoot" index="1" unique_id=200625378]
 layout_mode = 0
 offset_left = 153.0
 offset_top = 154.0
 offset_right = 1463.0
 offset_bottom = 912.0
 
-[node name="GridContainer" type="GridContainer" parent="ScrollContainer" index="0" unique_id=1023698332]
+[node name="GridContainer" type="GridContainer" parent="DesignCanvas/DesignRoot/ScrollContainer" index="0" unique_id=1023698332]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 4
 
-[node name="CombatantSelectCard" parent="ScrollContainer/GridContainer" index="0" unique_id=785250075 instance=ExtResource("3_card")]
+[node name="CombatantSelectCard" parent="DesignCanvas/DesignRoot/ScrollContainer/GridContainer" index="0" unique_id=785250075 instance=ExtResource("3_card")]
 layout_mode = 2
 
-[node name="SidePanel" type="Panel" parent="." index="5" unique_id=388389115]
+[node name="SidePanel" type="Panel" parent="DesignCanvas/DesignRoot" index="2" unique_id=388389115]
 layout_mode = 0
 offset_left = 1482.0
 offset_top = 300.0
@@ -62,7 +80,7 @@ offset_right = 1764.0
 offset_bottom = 668.0
 theme_override_styles/panel = SubResource("StyleBoxEmpty_shdk0")
 
-[node name="CapacityLabel" type="Label" parent="SidePanel" index="0" unique_id=1127869345]
+[node name="CapacityLabel" type="Label" parent="DesignCanvas/DesignRoot/SidePanel" index="0" unique_id=1127869345]
 unique_name_in_owner = true
 layout_mode = 0
 offset_top = 77.0
@@ -72,7 +90,7 @@ theme_override_colors/font_color = Color(0.07, 0.045, 0.025, 1)
 theme_override_font_sizes/font_size = 50
 text = "可选择0人"
 
-[node name="SelectedCountLabel" type="Label" parent="SidePanel" index="1" unique_id=106996361]
+[node name="SelectedCountLabel" type="Label" parent="DesignCanvas/DesignRoot/SidePanel" index="1" unique_id=106996361]
 unique_name_in_owner = true
 layout_mode = 0
 offset_top = 149.0
@@ -82,7 +100,7 @@ theme_override_colors/font_color = Color(0.62, 0.06, 0.035, 1)
 theme_override_font_sizes/font_size = 50
 text = "已选择0人"
 
-[node name="WarningLabel" type="Label" parent="SidePanel" index="2" unique_id=78567775]
+[node name="WarningLabel" type="Label" parent="DesignCanvas/DesignRoot/SidePanel" index="2" unique_id=78567775]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -95,7 +113,7 @@ theme_override_font_sizes/font_size = 24
 text = "提示"
 autowrap_mode = 3
 
-[node name="ConfirmButton" parent="." index="6" unique_id=476300778 instance=ExtResource("4_button")]
+[node name="ConfirmButton" parent="DesignCanvas/DesignRoot" index="3" unique_id=476300778 instance=ExtResource("4_button")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1469.0
@@ -104,7 +122,7 @@ offset_right = 1763.0
 offset_bottom = 836.0
 texture_normal = ExtResource("5_button_texture")
 
-[node name="ConfirmButtonLabel" type="Label" parent="ConfirmButton" index="0" unique_id=330114959]
+[node name="ConfirmButtonLabel" type="Label" parent="DesignCanvas/DesignRoot/ConfirmButton" index="0" unique_id=330114959]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
