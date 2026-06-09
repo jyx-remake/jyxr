@@ -2,7 +2,13 @@
 
 ## 当前阶段
 
-第五轮：迁移 `SystemPanel` 主体内容到 `DesignCanvas`，让系统设置、命令行和存读档入口在拉伸窗口时保持设计区定位。
+第六轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+
+本轮范围：
+
+- `JyPanel` 基础背景与关闭按钮进入设计画布。
+- 背包、商店、储物箱、队伍、日志、英雄面板主体内容进入各自 `DesignCanvas/DesignRoot`。
+- 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
 
 ## 已完成阶段
 
@@ -18,26 +24,12 @@
 - 第四轮：审计 `JyPanel` 继承风险，并将存档槽选择面板扩展为 30 槽滚动列表。
   - 主要文件：`scenes/ui/system_panel/save_slot_selection_panel.tscn`、`src/Game.Godot/UI/System/SaveSlotSelectionPanel.cs`、`src/Game.Godot/UI/System/SaveSlotCard.cs`、`src/Game.Godot/Persistence/LocalSaveStore.cs`。
   - 存档槽位改为运行时动态生成，手动槽位为 `存档1` 到 `存档30`。
-
-## 第四轮目标
-
-- 审计 `JyPanel` 的继承场景和基础节点路径。
-- 不直接移动 `JyPanel` 的 `BackGround`、`CloseButton`，避免破坏继承场景覆盖。
-- 先将 `SaveSlotSelectionPanel` 自己的标题、槽位网格、复选框迁入 `DesignCanvas`。
-- 将存档槽位网格包进 `ScrollContainer`，为自动存档和后续更多存档槽位预留滚动选择能力。
-- 将本地手动存档槽数量从 4 扩展为 30。
-- 将存档卡片从场景预放改为运行时动态生成。
-- 保持 `SaveSlotSelectionPanel.cs` 存档、读档、删档逻辑不变。
-- 保持 `%TitleLabel`、`%SubtitleLabel`、`%SlotsGrid`、`%SkipConfirmationCheckBox` 唯一节点名不变。
-
-## 第四轮不做
-
-- 不迁地图点位坐标。
-- 不迁战斗棋盘和行动栏。
-- 不重做 `JyPanel` 基础节点。
-- 不迁 `system_panel.tscn` 左侧系统菜单。
-- 不调整 `SaveSlotSelectionPanel.cs` 的存档执行语义。
-- 不调整应用层服务、存档、剧情命令和战斗内核。
+- 第五轮：迁移 `SystemPanel` 主体内容到 `DesignCanvas`。
+  - 主要文件：`scenes/ui/system_panel/system_panel.tscn`、`src/Game.Godot/UI/System/SystemPanel.cs`。
+  - 用户已确认拉伸下视觉正常。
+- 第六轮：迁移 `JyPanel` 基础壳与第一批主面板。
+  - 主要文件：`scenes/ui/base/jy_panel.tscn`、`scenes/ui/inventory_panel/inventory_panel.tscn`、`scenes/ui/shop_panel/shop_panel.tscn`、`scenes/ui/chest_panel/chest_panel.tscn`、`scenes/ui/party_panel/party_panel.tscn`、`scenes/ui/journal/journal_panel.tscn`、`scenes/ui/hero_panel/hero_panel.tscn`。
+  - 等待用户运行时手动验证。
 
 ## 验证矩阵
 
@@ -47,6 +39,12 @@
 - `1366x768`
 - `1920x1200`
 - `3440x1440`
+
+验证方式：
+
+- Codex 做静态路径、节点唯一名和场景结构检查。
+- 用户在 Godot 运行时手动验证视觉和交互。
+- 当前阶段按用户要求不跑 `dotnet build` / `dotnet test`。
 
 ## 风险清单
 
@@ -59,86 +57,98 @@
 | P1 | ConfirmDialog | 弹窗背景虽已居中，但按钮和文本仍按根屏幕固定坐标摆放 | 已完成 |
 | P1 | SaveSlotSelectionPanel | 存档槽选择内容按根屏幕固定坐标摆放，且固定 4 个槽位 | 已完成 |
 | P1 | SystemPanel | 设置、命令行、返回与存读档入口直接按根屏幕固定坐标摆放 | 已完成 |
-| P1 | JyPanel | 背景和关闭按钮使用固定坐标，影响所有继承面板 | 已审计，待设计安全迁移 |
+| P1 | JyPanel | 背景和关闭按钮使用固定坐标，影响所有继承面板 | 基础壳已完成 |
+| P1 | InventoryPanel | 背包内容直接挂根节点固定坐标 | 已完成 |
+| P1 | ShopPanel | 商店内容直接挂根节点固定坐标 | 已完成 |
+| P1 | ChestPanel | 储物箱内容直接挂根节点固定坐标 | 已完成 |
+| P1 | PartyPanel | 队伍内容直接挂根节点固定坐标 | 已完成 |
+| P1 | JournalPanel | 日志内容直接挂根节点固定坐标 | 已完成 |
+| P1 | HeroPanel | 英雄面板内容直接挂根节点固定坐标 | 已完成 |
+| P1 | CharacterPanel | 角色主面板仍有根级固定坐标内容 | 待处理 |
+| P1 | ItemTargetSelectionPanel | 物品目标选择弹窗仍有根级固定坐标内容 | 待处理 |
+| P1 | CharacterEquipmentSelectionPanel | 装备选择弹窗仍有根级固定坐标内容 | 待处理 |
+| P1 | CombatantSelectPanel | 出战选择面板仍有根级固定坐标内容 | 待处理 |
+| P1 | BattleItemPanel / BattleSettlementPanel | 战斗弹窗仍有根级固定坐标内容 | 待处理 |
 
-## 第四轮改动记录
+## 第六轮改动记录
 
-- 审计 `JyPanel` 继承场景，确认多个继承场景仍直接覆盖 `BackGround` 或 `CloseButton`。
-  - 因此暂不移动 `JyPanel` 基础节点。
-- 修改 `scenes/ui/system_panel/save_slot_selection_panel.tscn`。
-  - 在 `SaveSlotSelectionPanel` 下新增 `DesignCanvas/DesignRoot`。
-  - 将 `TitleLabel`、`SubtitleLabel`、`SkipConfirmationCheckBox` 移入 `DesignRoot`。
-  - 新增 `SlotsScroll`，作为存档卡片滚动视口。
-  - 将 `SlotsGrid` 移入 `SlotsScroll`。
-  - 移除场景中预放的 `SlotCard1` 到 `SlotCard4`。
-  - 禁用横向滚动，只保留纵向滚动能力。
-  - 保留所有脚本依赖节点的 `unique_name_in_owner = true`。
-- 修改 `src/Game.Godot/Persistence/LocalSaveStore.cs`。
-  - `SlotCount` 从 4 扩展为 30。
-- 修改 `src/Game.Godot/UI/System/SaveSlotSelectionPanel.cs`。
-  - 根据 `LocalSaveStore.SlotCount` 动态生成存档卡片。
-  - 自动存档卡片仍只在读档模式出现，并插入到列表首位。
-- 修改 `src/Game.Godot/UI/System/SaveSlotCard.cs`。
-  - 重复实例内部节点获取从 `%TitleLabel` 等唯一节点名改为卡片内部相对路径。
-  - 避免 30 个重复卡片实例之间唯一节点名解析不稳定，导致标题都显示为场景默认的“存档1”。
-
-## 第四轮验证记录
-
-- 静态检查确认 `SaveSlotSelectionPanel.cs` 只依赖 `%TitleLabel`、`%SubtitleLabel`、`%SkipConfirmationCheckBox`、`%SlotsGrid`。
-- 静态检查确认迁移后这些节点仍保留 `unique_name_in_owner = true`。
-- 静态检查确认自动存档卡片仍会通过 `_slotsGrid.AddChild(card)` 加入滚动区域内部。
-- 静态检查确认已无 `%SlotCard1` 到 `%SlotCard4` 固定节点依赖。
-- 静态检查确认 `SaveSlotCard.Configure(...)` 仍按 `summary.SlotIndex` 设置标题：`存档{summary.SlotIndex}`。
-- 本轮改动限于 Godot 宿主层存档槽位数量、UI 生成与场景结构，未改核心游戏规则。
-
-后续验证方式改为：Codex 做静态检查，用户在 Godot 运行时手动验证视觉和交互。
-
-本轮仍需要在 Godot 编辑器或可用运行环境中做一次视觉验证：
-
-- `1920x1080`：存档槽选择内容位置应接近改前效果。
-- `1920x1200`：标题、槽位卡片、跳过确认复选框应保持在设计安全画布内，不随 expanded 画布漂移。
-- `3440x1440`：存档槽选择内容应保持在居中的 `16:9` 设计区域内。
-- 存档/读档/删档模式下应显示 30 个手动存档槽。
-- 读档模式下出现自动存档时，列表首位应是自动存档，后面是存档 1 到存档 30。
-- 手动槽位标题应按顺序显示为 `存档1`、`存档2`、`存档3`、`存档4`，继续向下滚动直到 `存档30`。
-- 列表应可通过纵向滚动查看全部槽位，不直接溢出到底部背景外。
-- 存档、读档、删档、自动存档卡片插入、跳过确认复选框行为应不变。
-
-## 第五轮目标
-
-- 将 `SystemPanel` 的设置区、命令行区、返回按钮和底部动作按钮组迁入 `DesignCanvas/DesignRoot`。
-- 保留 `SystemPanel` 自身全屏背景图与遮罩在根节点下，用于继续覆盖整个窗口。
-- 只调整 Godot 场景节点布局和节点查找路径，不修改设置、命令行、存档、读档、删档、返回主菜单等业务逻辑。
-- 继续让 `Save` / `Load` / `Delete` 按钮打开上一轮迁移后的 30 槽存档选择面板。
-
-## 第五轮改动记录
-
-- 修改 `scenes/ui/system_panel/system_panel.tscn`。
+- 修改 `scenes/ui/base/jy_panel.tscn`。
+  - 新增 `PanelBackdropCanvas/DesignRoot`，承载通用 `BackGround`。
+  - 新增 `PanelChromeCanvas/DesignRoot`，承载通用 `CloseButton`。
+  - `PanelChromeCanvas` 使用较高 `z_index`，确保关闭按钮压在子面板内容之上。
+  - 关闭按钮信号连接改为 `PanelChromeCanvas/DesignRoot/CloseButton`。
+- 修改继承 `JyPanel` 且覆盖基础节点的场景。
+  - `ChestPanel`、`CharacterPanel` 的 `BackGround` 覆盖路径改为 `PanelBackdropCanvas/DesignRoot`。
+  - `ShopPanel`、`ChestPanel`、`HeroPanel`、`CombatantSelectPanel`、`BattleSettlementPanel` 的 `CloseButton` 覆盖路径改为 `PanelChromeCanvas/DesignRoot`。
+  - 移除 `PartyPanel` 中指向旧根级 `CloseButton` 的残留连接。
+- 修改 `scenes/ui/inventory_panel/inventory_panel.tscn`。
   - 新增 `DesignCanvas/DesignRoot`。
-  - 将 `BackButton`、`SettingsVBox`、`ConsoleVBox`、`ActionRow` 移入 `DesignRoot`。
-  - 将主菜单、删档、存档、读档四个动作按钮及其图标/文字子节点统一挂到 `DesignCanvas/DesignRoot/ActionRow` 下。
-  - 保留 `Background` 与 `Backdrop` 为根节点全屏铺底，不纳入设计画布缩放。
-- 修改 `src/Game.Godot/UI/System/SystemPanel.cs`。
-  - `_consoleRoot` 从固定路径查找改为 `%ConsoleVBox` 唯一节点查找，适配场景层级移动。
+  - 将标题、分类按钮、列表头、滚动列表和空状态标签迁入设计画布。
+- 修改 `scenes/ui/shop_panel/shop_panel.tscn`。
+  - 保留 `BackgroundTexture` 与 `BackgroundDim` 为根节点全屏铺底。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将掌柜、标题、快速买入、买入/卖出/离开、分类按钮、商品列表、提示文本和货币栏迁入设计画布。
+- 修改 `scenes/ui/chest_panel/chest_panel.tscn`。
+  - 保留 `BackgroundTexture` 与 `BackgroundDim` 为根节点全屏铺底。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将掌柜、标题、存入/取出/离开、分类按钮、物品列表、提示文本和容量标签迁入设计画布。
+- 修改 `scenes/ui/party_panel/party_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将队伍滚动列表、拖拽提示和空状态标签迁入设计画布。
+- 修改 `scenes/ui/journal/journal_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将标题、日志滚动列表和空状态标签迁入设计画布。
+- 修改 `scenes/ui/hero_panel/hero_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将顶部 tab 按钮组和 `HeroTabContainer` 迁入设计画布。
 
-## 第五轮验证记录
+## 第六轮静态检查
 
-- 静态检查确认 `SystemPanel.cs` 中设置、命令行和动作按钮仍通过唯一节点名获取。
-- 静态检查确认 `ConsoleVBox` 已设置 `unique_name_in_owner = true`。
-- 静态检查确认 `ActionRow` 下面已无旧的 `parent="ActionRow..."` 残留路径。
-- 本轮只迁移系统面板 UI 层级，未改核心游戏规则、存档服务、设置保存逻辑或剧情命令逻辑。
+- `JyPanel` 基类信号连接已指向 `PanelChromeCanvas/DesignRoot/CloseButton`。
+- 本轮覆盖的 `BackGround`、`CloseButton` 不再使用根级父节点路径。
+- 背包、商店、储物箱、队伍、日志、英雄面板根级内容只保留预期的 `DesignCanvas`。
+- 商店与储物箱保留根级 `BackgroundTexture` 和 `BackgroundDim`，用于继续铺满整个窗口。
+- 背包、商店、储物箱、队伍、日志、英雄面板迁移后无旧的 `CategoryButtons`、`ModeButtons`、`GoodsPanel`、`Header`、`ScrollContainer`、`TabButtonRow`、`HeroTabContainer` 父路径残留。
+- 脚本依赖节点仍保留 `unique_name_in_owner = true`。
+- 按用户要求，本轮不做构建验证。
 
-本轮手动验证：
+## 第六轮手动验证清单
 
-- 打开系统面板。
-- 拉伸窗口到 `1920x1080`、`1920x1200`、`3440x1440` 或任意宽屏比例。
-- 确认命令行区、左侧设置项、右上返回游戏按钮、右下主菜单/删档/存档/读档按钮都保持在居中的 16:9 设计区域内。
-- 点击存档、读档、删档，确认仍能打开上一轮的 30 槽滚动存档选择面板。
-- 输入一条命令行无效指令，确认错误输出仍显示在命令行输出区。
+- 打开背包面板，确认标题、分类按钮、列表头、物品列表和空状态都保持在居中 16:9 设计区内。
+- 背包分类切换、物品 tooltip、使用物品打开目标选择入口应不变。
+- 打开商店，确认背景仍铺满窗口，掌柜、分类、商品列表、提示文本和货币栏保持在设计区内。
+- 商店买入、卖出、快速买入、离开行为应不变。
+- 打开储物箱，确认背景仍铺满窗口，分类、物品列表、提示文本和容量标签保持在设计区内。
+- 储物箱存入、取出、容量显示和离开行为应不变。
+- 打开队伍面板，确认队伍卡片列表、拖拽提示、空状态位于设计区内，拖拽排序仍正常。
+- 打开日志面板，确认标题、日志列表和空状态位于设计区内，长列表可滚动。
+- 打开英雄面板，确认 tab 按钮、江湖历练、成就、武学精通页位于设计区内，tab 切换仍正常。
+- 抽查继承 `JyPanel` 但内容尚未迁移的面板，确认关闭按钮仍可点击：角色面板、装备选择、目标选择、出战选择、战斗物品、战斗结算。
 
-## 下一阶段候选
+## 后续计划
 
-完成本轮后，优先从以下二选一继续：
+建议下一步继续补齐尚未迁完的 `JyPanel` 子面板，然后再进入剧情 UI：
 
-- 迁移 `JyPanel`，为背包、商店、储物箱等主面板打基础。
-- 迁移剧情对白框，继续处理底部锚点类 UI。
+1. 迁移角色相关面板。
+   - `scenes/ui/character_panel/character_panel.tscn`
+   - `scenes/ui/character_panel/equipment_selection_panel.tscn`
+   - 目标：角色主面板、装备选择弹窗与 `JyPanel` 背景保持同一设计坐标系。
+2. 迁移物品目标选择弹窗。
+   - `scenes/ui/inventory_panel/item_target_selection_panel.tscn`
+   - 目标：背包使用物品后的目标选择不再停留在根级固定坐标。
+3. 迁移战斗入口与战斗弹窗。
+   - `scenes/ui/battle/combatant_select_panel.tscn`
+   - `scenes/ui/battle/battle_item_panel.tscn`
+   - `scenes/ui/battle/battle_settlement_panel.tscn`
+   - 目标：先处理 `JyPanel` 弹窗类战斗 UI，不碰战斗棋盘坐标系统。
+4. 迁移剧情对白与选项。
+   - `scenes/ui/story/story_dialogue_panel.tscn`
+   - `scenes/ui/story/story_choice_panel.tscn`
+   - 目标：对白框贴底部安全区，选项框与对白框关系稳定。
+5. 迁移开局流程。
+   - 门派选择、输入名字、头像选择、随机属性。
+   - 目标：开局 UI 全部进入设计画布。
+6. 单独迁地图 UI。
+   - 地图背景显示 rect、点位、主角 pin、底部信息区共享坐标转换。
+7. 单独迁战斗棋盘和行动栏。
+   - 棋盘格、单位、hover、可达区、飘字、技能动画共享同一个 transform。

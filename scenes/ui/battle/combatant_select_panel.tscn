@@ -19,7 +19,7 @@ script = ExtResource("2_script")
 CharacterCardScene = ExtResource("3_card")
 PreviewBattleId = ""
 
-[node name="CloseButton" parent="." index="2" unique_id=962603895]
+[node name="CloseButton" parent="PanelChromeCanvas/DesignRoot" index="0" unique_id=962603895]
 visible = false
 PressOffset = Vector2(2, 2)
 PressColor = Color(0.8, 0.8, 0.8, 1)

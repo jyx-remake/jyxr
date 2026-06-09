@@ -3,29 +3,46 @@
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="2_base"]
 [ext_resource type="Script" uid="uid://c81noqnx8x52p" path="res://src/Game.Godot/UI/Party/PartyPanel.cs" id="2_dov0m"]
 [ext_resource type="PackedScene" uid="uid://b2mjgxqlxtul1" path="res://scenes/ui/party_panel/party_character_box.tscn" id="3_box"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="4_design_canvas"]
 
 [node name="PartyPanel" unique_id=410951020 instance=ExtResource("2_base")]
 script = ExtResource("2_dov0m")
 PartyCharacterBoxScene = ExtResource("3_box")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." index="3" unique_id=1113950281]
+[node name="DesignCanvas" type="Control" parent="." index="3" unique_id=436842554]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" index="0" unique_id=1508705481]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="DesignCanvas/DesignRoot" index="0" unique_id=1113950281]
 layout_mode = 1
 offset_left = 192.0
 offset_top = 144.0
 offset_right = 1677.0
 offset_bottom = 885.0
 
-[node name="GridContainer" type="GridContainer" parent="ScrollContainer" index="0" unique_id=199504820]
+[node name="GridContainer" type="GridContainer" parent="DesignCanvas/DesignRoot/ScrollContainer" index="0" unique_id=199504820]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 5
 
-[node name="PartyCharacterBox" parent="ScrollContainer/GridContainer" index="0" unique_id=527980720 instance=ExtResource("3_box")]
+[node name="PartyCharacterBox" parent="DesignCanvas/DesignRoot/ScrollContainer/GridContainer" index="0" unique_id=527980720 instance=ExtResource("3_box")]
 layout_mode = 2
 
-[node name="HintLabel" type="Label" parent="." index="4" unique_id=823510971]
+[node name="HintLabel" type="Label" parent="DesignCanvas/DesignRoot" index="1" unique_id=823510971]
 layout_mode = 0
 offset_left = 442.0
 offset_top = 998.0
@@ -37,7 +54,7 @@ theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 40
 text = "拖拽队友卡片可调整顺序，主角固定在队伍首位。"
 
-[node name="EmptyLabel" type="Label" parent="." index="5" unique_id=1930187884]
+[node name="EmptyLabel" type="Label" parent="DesignCanvas/DesignRoot" index="2" unique_id=1930187884]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -47,5 +64,3 @@ offset_right = 1200.0
 offset_bottom = 226.0
 theme_override_font_sizes/font_size = 26
 text = "当前没有队伍成员。"
-
-[connection signal="pressed" from="CloseButton" to="." method="_on_close_button_pressed"]

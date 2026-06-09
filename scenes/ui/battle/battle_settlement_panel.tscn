@@ -22,7 +22,7 @@ outline_color = Color(0, 0, 0, 1)
 script = ExtResource("2_script")
 InventoryItemBoxScene = ExtResource("3_item_box")
 
-[node name="CloseButton" parent="." index="2" unique_id=962603895]
+[node name="CloseButton" parent="PanelChromeCanvas/DesignRoot" index="0" unique_id=962603895]
 visible = false
 
 [node name="TitleLabel" type="Label" parent="." index="3" unique_id=1998335815]

@@ -26,7 +26,7 @@
 [node name="CharacterPanel" unique_id=104948523 instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
 
-[node name="BackGround" parent="." index="1" unique_id=2084013287]
+[node name="BackGround" parent="PanelBackdropCanvas/DesignRoot" index="0" unique_id=2084013287]
 texture = ExtResource("3_background")
 
 [node name="AvatarBox" type="Control" parent="." index="3" unique_id=1151911410]

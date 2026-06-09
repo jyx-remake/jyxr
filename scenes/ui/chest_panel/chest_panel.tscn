@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cguhj5812a2hr" path="res://assets/art/map/shop.jpg" id="4_shop_bg"]
 [ext_resource type="Texture2D" uid="uid://csplcrelb0rev" path="res://assets/art/ui/shopkeeper.png" id="5_keeper"]
 [ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="6_filter_button"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="7_design_canvas"]
 
 [sub_resource type="StyleBoxTexture" id="1_button_normal"]
 texture = ExtResource("6_filter_button")
@@ -14,10 +15,10 @@ texture = ExtResource("6_filter_button")
 script = ExtResource("2_script")
 ItemBoxScene = ExtResource("3_item_box")
 
-[node name="BackGround" parent="." index="1" unique_id=2084013287]
+[node name="BackGround" parent="PanelBackdropCanvas/DesignRoot" index="0" unique_id=2084013287]
 visible = false
 
-[node name="CloseButton" parent="." index="2" unique_id=962603895]
+[node name="CloseButton" parent="PanelChromeCanvas/DesignRoot" index="0" unique_id=962603895]
 visible = false
 PressOffset = Vector2(2, 2)
 PressColor = Color(0.8, 0.8, 0.8, 1)
@@ -44,7 +45,23 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.32)
 
-[node name="Shopkeeper" type="TextureRect" parent="." index="5" unique_id=100000103]
+[node name="DesignCanvas" type="Control" parent="." index="5" unique_id=100000127]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" index="0" unique_id=100000128]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Shopkeeper" type="TextureRect" parent="DesignCanvas/DesignRoot" index="0" unique_id=100000103]
 layout_mode = 0
 offset_left = 66.0
 offset_top = 180.0
@@ -55,7 +72,7 @@ texture = ExtResource("5_keeper")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TitleLabel" type="Label" parent="." index="6" unique_id=100000104]
+[node name="TitleLabel" type="Label" parent="DesignCanvas/DesignRoot" index="1" unique_id=100000104]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 480.0
@@ -68,7 +85,7 @@ theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 48
 text = "储物箱"
 
-[node name="ModeButtons" type="HBoxContainer" parent="." index="7" unique_id=100000105]
+[node name="ModeButtons" type="HBoxContainer" parent="DesignCanvas/DesignRoot" index="2" unique_id=100000105]
 layout_mode = 0
 offset_left = 834.0
 offset_top = 60.0
@@ -76,28 +93,28 @@ offset_right = 1606.0
 offset_bottom = 128.0
 theme_override_constants/separation = 36
 
-[node name="DepositModeButton" type="Button" parent="ModeButtons" index="0" unique_id=100000106]
+[node name="DepositModeButton" type="Button" parent="DesignCanvas/DesignRoot/ModeButtons" index="0" unique_id=100000106]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 66)
 layout_mode = 2
 theme_override_font_sizes/font_size = 38
 text = "存入"
 
-[node name="WithdrawModeButton" type="Button" parent="ModeButtons" index="1" unique_id=100000107]
+[node name="WithdrawModeButton" type="Button" parent="DesignCanvas/DesignRoot/ModeButtons" index="1" unique_id=100000107]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 66)
 layout_mode = 2
 theme_override_font_sizes/font_size = 38
 text = "取出"
 
-[node name="LeaveButton" type="Button" parent="ModeButtons" index="2" unique_id=100000108]
+[node name="LeaveButton" type="Button" parent="DesignCanvas/DesignRoot/ModeButtons" index="2" unique_id=100000108]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 66)
 layout_mode = 2
 theme_override_font_sizes/font_size = 38
 text = "离开"
 
-[node name="CategoryButtons" type="VBoxContainer" parent="." index="8" unique_id=100000109]
+[node name="CategoryButtons" type="VBoxContainer" parent="DesignCanvas/DesignRoot" index="3" unique_id=100000109]
 layout_mode = 0
 offset_left = 384.0
 offset_top = 204.0
@@ -105,7 +122,7 @@ offset_right = 584.0
 offset_bottom = 932.0
 theme_override_constants/separation = 8
 
-[node name="AllButton" type="Button" parent="CategoryButtons" index="0" unique_id=100000110]
+[node name="AllButton" type="Button" parent="DesignCanvas/DesignRoot/CategoryButtons" index="0" unique_id=100000110]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -116,7 +133,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "全部"
 
-[node name="EquipmentButton" type="Button" parent="CategoryButtons" index="1" unique_id=100000111]
+[node name="EquipmentButton" type="Button" parent="DesignCanvas/DesignRoot/CategoryButtons" index="1" unique_id=100000111]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -127,7 +144,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "装备"
 
-[node name="ConsumableButton" type="Button" parent="CategoryButtons" index="2" unique_id=100000112]
+[node name="ConsumableButton" type="Button" parent="DesignCanvas/DesignRoot/CategoryButtons" index="2" unique_id=100000112]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -138,7 +155,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "消耗品"
 
-[node name="SkillBookButton" type="Button" parent="CategoryButtons" index="3" unique_id=100000113]
+[node name="SkillBookButton" type="Button" parent="DesignCanvas/DesignRoot/CategoryButtons" index="3" unique_id=100000113]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -149,7 +166,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "武学书"
 
-[node name="SpecialSkillBookButton" type="Button" parent="CategoryButtons" index="4" unique_id=100000114]
+[node name="SpecialSkillBookButton" type="Button" parent="DesignCanvas/DesignRoot/CategoryButtons" index="4" unique_id=100000114]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -160,7 +177,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "绝技书"
 
-[node name="TalentBookButton" type="Button" parent="CategoryButtons" index="5" unique_id=100000115]
+[node name="TalentBookButton" type="Button" parent="DesignCanvas/DesignRoot/CategoryButtons" index="5" unique_id=100000115]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -171,7 +188,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "天赋书"
 
-[node name="BoosterButton" type="Button" parent="CategoryButtons" index="6" unique_id=100000116]
+[node name="BoosterButton" type="Button" parent="DesignCanvas/DesignRoot/CategoryButtons" index="6" unique_id=100000116]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -182,7 +199,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "强化道具"
 
-[node name="UtilityButton" type="Button" parent="CategoryButtons" index="7" unique_id=100000117]
+[node name="UtilityButton" type="Button" parent="DesignCanvas/DesignRoot/CategoryButtons" index="7" unique_id=100000117]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -193,7 +210,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "功能道具"
 
-[node name="GoodsPanel" type="Panel" parent="." index="9" unique_id=100000118]
+[node name="GoodsPanel" type="Panel" parent="DesignCanvas/DesignRoot" index="4" unique_id=100000118]
 layout_mode = 0
 offset_left = 610.0
 offset_top = 174.0
@@ -201,7 +218,7 @@ offset_right = 1742.0
 offset_bottom = 900.0
 mouse_filter = 2
 
-[node name="Header" type="HBoxContainer" parent="GoodsPanel" index="0" unique_id=100000119]
+[node name="Header" type="HBoxContainer" parent="DesignCanvas/DesignRoot/GoodsPanel" index="0" unique_id=100000119]
 layout_mode = 0
 offset_left = 33.0
 offset_top = 6.0
@@ -209,7 +226,7 @@ offset_right = 1089.0
 offset_bottom = 52.0
 theme_override_constants/separation = 20
 
-[node name="CategoryLabel" type="Label" parent="GoodsPanel/Header" index="0" unique_id=100000120]
+[node name="CategoryLabel" type="Label" parent="DesignCanvas/DesignRoot/GoodsPanel/Header" index="0" unique_id=100000120]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 46)
 layout_mode = 2
@@ -217,7 +234,7 @@ theme_override_colors/font_color = Color(0.92941177, 0.8784314, 0.7019608, 1)
 theme_override_font_sizes/font_size = 32
 text = "全部"
 
-[node name="CountLabel" type="Label" parent="GoodsPanel/Header" index="1" unique_id=100000121]
+[node name="CountLabel" type="Label" parent="DesignCanvas/DesignRoot/GoodsPanel/Header" index="1" unique_id=100000121]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 46)
 layout_mode = 2
@@ -226,21 +243,21 @@ theme_override_font_sizes/font_size = 26
 text = "0 项"
 vertical_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="GoodsPanel" index="1" unique_id=100000122]
+[node name="ScrollContainer" type="ScrollContainer" parent="DesignCanvas/DesignRoot/GoodsPanel" index="1" unique_id=100000122]
 layout_mode = 0
 offset_left = 34.0
 offset_top = 69.0
 offset_right = 1100.0
 offset_bottom = 685.0
 
-[node name="GridContainer" type="GridContainer" parent="GoodsPanel/ScrollContainer" index="0" unique_id=100000123]
+[node name="GridContainer" type="GridContainer" parent="DesignCanvas/DesignRoot/GoodsPanel/ScrollContainer" index="0" unique_id=100000123]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 24
 theme_override_constants/v_separation = 30
 columns = 5
 
-[node name="EmptyLabel" type="Label" parent="GoodsPanel" index="2" unique_id=100000124]
+[node name="EmptyLabel" type="Label" parent="DesignCanvas/DesignRoot/GoodsPanel" index="2" unique_id=100000124]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -253,7 +270,7 @@ theme_override_font_sizes/font_size = 32
 text = "当前分类下没有物品。"
 horizontal_alignment = 1
 
-[node name="PromptLabel" type="Label" parent="." index="10" unique_id=100000125]
+[node name="PromptLabel" type="Label" parent="DesignCanvas/DesignRoot" index="5" unique_id=100000125]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 462.0
@@ -266,7 +283,7 @@ theme_override_constants/outline_size = 7
 theme_override_font_sizes/font_size = 46
 text = "请问您存入什么物品？"
 
-[node name="CapacityLabel" type="Label" parent="." index="11" unique_id=100000126]
+[node name="CapacityLabel" type="Label" parent="DesignCanvas/DesignRoot" index="6" unique_id=100000126]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1300.0

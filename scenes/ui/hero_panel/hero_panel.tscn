@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="2_button_texture"]
 [ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="3_button_script"]
 [ext_resource type="Script" uid="uid://gajb5sg2ub38" path="res://src/Game.Godot/UI/Hero/HeroPanel.cs" id="4_script"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="5_design_canvas"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_tab_title"]
 font_size = 60
@@ -24,11 +25,27 @@ font_size = 40
 [node name="HeroPanel" unique_id=1789677815 instance=ExtResource("1_panel")]
 script = ExtResource("4_script")
 
-[node name="CloseButton" parent="." index="2" unique_id=962603895]
+[node name="CloseButton" parent="PanelChromeCanvas/DesignRoot" index="0" unique_id=962603895]
 PressOffset = Vector2(2, 2)
 PressColor = Color(0.8, 0.8, 0.8, 1)
 
-[node name="TabButtonRow" type="HBoxContainer" parent="." index="3" unique_id=1213870777]
+[node name="DesignCanvas" type="Control" parent="." index="3" unique_id=2070856707]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" index="0" unique_id=1955064540]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="TabButtonRow" type="HBoxContainer" parent="DesignCanvas/DesignRoot" index="0" unique_id=1213870777]
 layout_mode = 0
 offset_left = 210.0
 offset_top = 134.0
@@ -37,7 +54,7 @@ offset_bottom = 246.0
 theme_override_constants/separation = 80
 alignment = 1
 
-[node name="AdventureTabButton" type="TextureButton" parent="TabButtonRow" index="0" unique_id=880954121]
+[node name="AdventureTabButton" type="TextureButton" parent="DesignCanvas/DesignRoot/TabButtonRow" index="0" unique_id=880954121]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(342, 112)
 layout_mode = 2
@@ -48,7 +65,7 @@ stretch_mode = 5
 script = ExtResource("3_button_script")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="TabButtonRow/AdventureTabButton" index="0" unique_id=1588260131]
+[node name="Label" type="Label" parent="DesignCanvas/DesignRoot/TabButtonRow/AdventureTabButton" index="0" unique_id=1588260131]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -60,7 +77,7 @@ label_settings = SubResource("LabelSettings_tab_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AchievementTabButton" type="TextureButton" parent="TabButtonRow" index="1" unique_id=2026592363]
+[node name="AchievementTabButton" type="TextureButton" parent="DesignCanvas/DesignRoot/TabButtonRow" index="1" unique_id=2026592363]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(342, 112)
 layout_mode = 2
@@ -71,7 +88,7 @@ stretch_mode = 5
 script = ExtResource("3_button_script")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="TabButtonRow/AchievementTabButton" index="0" unique_id=386301227]
+[node name="Label" type="Label" parent="DesignCanvas/DesignRoot/TabButtonRow/AchievementTabButton" index="0" unique_id=386301227]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -83,7 +100,7 @@ label_settings = SubResource("LabelSettings_tab_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MasteryTabButton" type="TextureButton" parent="TabButtonRow" index="2" unique_id=1633701570]
+[node name="MasteryTabButton" type="TextureButton" parent="DesignCanvas/DesignRoot/TabButtonRow" index="2" unique_id=1633701570]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(342, 112)
 layout_mode = 2
@@ -94,7 +111,7 @@ stretch_mode = 5
 script = ExtResource("3_button_script")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="TabButtonRow/MasteryTabButton" index="0" unique_id=888277509]
+[node name="Label" type="Label" parent="DesignCanvas/DesignRoot/TabButtonRow/MasteryTabButton" index="0" unique_id=888277509]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -106,7 +123,7 @@ label_settings = SubResource("LabelSettings_tab_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HeroTabContainer" type="TabContainer" parent="." index="4" unique_id=1703835921]
+[node name="HeroTabContainer" type="TabContainer" parent="DesignCanvas/DesignRoot" index="1" unique_id=1703835921]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 217.0
@@ -117,12 +134,12 @@ theme = SubResource("Theme_dr12l")
 current_tab = 1
 tabs_visible = false
 
-[node name="AdventureTab" type="Control" parent="HeroTabContainer" index="1" unique_id=1308277667]
+[node name="AdventureTab" type="Control" parent="DesignCanvas/DesignRoot/HeroTabContainer" index="1" unique_id=1308277667]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="AdventurePageSubtitle" type="RichTextLabel" parent="HeroTabContainer/AdventureTab" index="0" unique_id=58969025]
+[node name="AdventurePageSubtitle" type="RichTextLabel" parent="DesignCanvas/DesignRoot/HeroTabContainer/AdventureTab" index="0" unique_id=58969025]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -141,11 +158,11 @@ text = "道德：[color=red]0[/color]
 女主角好感：[color=red]0[/color]"
 fit_content = true
 
-[node name="AchievementTab" type="Control" parent="HeroTabContainer" index="2" unique_id=728918971]
+[node name="AchievementTab" type="Control" parent="DesignCanvas/DesignRoot/HeroTabContainer" index="2" unique_id=728918971]
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="CompletionLabel" type="Label" parent="HeroTabContainer/AchievementTab" index="0" unique_id=1048106557]
+[node name="CompletionLabel" type="Label" parent="DesignCanvas/DesignRoot/HeroTabContainer/AchievementTab" index="0" unique_id=1048106557]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 33.0
@@ -157,7 +174,7 @@ theme_override_font_sizes/font_size = 50
 text = "完成度：0%"
 horizontal_alignment = 1
 
-[node name="Label" type="Label" parent="HeroTabContainer/AchievementTab" index="1" unique_id=1970319434]
+[node name="Label" type="Label" parent="DesignCanvas/DesignRoot/HeroTabContainer/AchievementTab" index="1" unique_id=1970319434]
 layout_mode = 0
 offset_left = 31.0
 offset_top = 214.0
@@ -166,7 +183,7 @@ offset_bottom = 494.0
 text = "成就代表你在金X世界中探索剧情程度。完成不同的分支剧情可能会解锁不同的成就噢！"
 autowrap_mode = 3
 
-[node name="AchievementLabel" type="RichTextLabel" parent="HeroTabContainer/AchievementTab" index="2" unique_id=1009544496]
+[node name="AchievementLabel" type="RichTextLabel" parent="DesignCanvas/DesignRoot/HeroTabContainer/AchievementTab" index="2" unique_id=1009544496]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 401.0
@@ -175,7 +192,7 @@ offset_right = 1450.0
 offset_bottom = 646.0
 bbcode_enabled = true
 
-[node name="PreviewCheckBox" type="CheckBox" parent="HeroTabContainer/AchievementTab" index="3" unique_id=1439308183]
+[node name="PreviewCheckBox" type="CheckBox" parent="DesignCanvas/DesignRoot/HeroTabContainer/AchievementTab" index="3" unique_id=1439308183]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 78)
 layout_mode = 0
@@ -185,12 +202,12 @@ offset_right = 264.0
 offset_bottom = 617.0
 text = "预览"
 
-[node name="MasteryTab" type="Control" parent="HeroTabContainer" index="3" unique_id=627145902]
+[node name="MasteryTab" type="Control" parent="DesignCanvas/DesignRoot/HeroTabContainer" index="3" unique_id=627145902]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="MasteryPageTitle" type="Label" parent="HeroTabContainer/MasteryTab" index="0" unique_id=450542089]
+[node name="MasteryPageTitle" type="Label" parent="DesignCanvas/DesignRoot/HeroTabContainer/MasteryTab" index="0" unique_id=450542089]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -206,7 +223,7 @@ text = "武学精通"
 label_settings = SubResource("LabelSettings_page_title")
 horizontal_alignment = 1
 
-[node name="MasteryPageSubtitle" type="Label" parent="HeroTabContainer/MasteryTab" index="1" unique_id=776178644]
+[node name="MasteryPageSubtitle" type="Label" parent="DesignCanvas/DesignRoot/HeroTabContainer/MasteryTab" index="1" unique_id=776178644]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
