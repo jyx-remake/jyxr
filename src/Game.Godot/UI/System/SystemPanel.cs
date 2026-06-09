@@ -36,7 +36,7 @@ public partial class SystemPanel : Control
 
 	public override void _Ready()
 	{
-		_consoleRoot = GetNode<Control>("ConsoleVBox");
+		_consoleRoot = GetNode<Control>("%ConsoleVBox");
 		_consoleInput = GetNode<LineEdit>("%ConsoleInput");
 		_consoleOutput = GetNode<RichTextLabel>("%ConsoleOutput");
 		_executeButton = GetNode<Button>("%ExecuteButton");
