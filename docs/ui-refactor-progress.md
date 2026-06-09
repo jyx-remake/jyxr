@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-第四轮：审计 `JyPanel` 继承风险，并迁移存档槽选择面板内容区与滚动区域。
+第四轮：审计 `JyPanel` 继承风险，并将存档槽选择面板扩展为 30 槽滚动列表。
 
 ## 已完成阶段
 
@@ -22,8 +22,10 @@
 - 不直接移动 `JyPanel` 的 `BackGround`、`CloseButton`，避免破坏继承场景覆盖。
 - 先将 `SaveSlotSelectionPanel` 自己的标题、槽位网格、复选框迁入 `DesignCanvas`。
 - 将存档槽位网格包进 `ScrollContainer`，为自动存档和后续更多存档槽位预留滚动选择能力。
+- 将本地手动存档槽数量从 4 扩展为 30。
+- 将存档卡片从场景预放改为运行时动态生成。
 - 保持 `SaveSlotSelectionPanel.cs` 存档、读档、删档逻辑不变。
-- 保持 `%TitleLabel`、`%SubtitleLabel`、`%SlotsGrid`、`%SlotCard1` 到 `%SlotCard4`、`%SkipConfirmationCheckBox` 唯一节点名不变。
+- 保持 `%TitleLabel`、`%SubtitleLabel`、`%SlotsGrid`、`%SkipConfirmationCheckBox` 唯一节点名不变。
 
 ## 本轮不做
 
@@ -31,7 +33,7 @@
 - 不迁战斗棋盘和行动栏。
 - 不重做 `JyPanel` 基础节点。
 - 不迁 `system_panel.tscn` 左侧系统菜单。
-- 不调整 `SaveSlotSelectionPanel.cs` 存档业务逻辑。
+- 不调整 `SaveSlotSelectionPanel.cs` 的存档执行语义。
 - 不调整应用层服务、存档、剧情命令和战斗内核。
 
 ## 验证矩阵
@@ -52,7 +54,7 @@
 | P0 | 战斗棋盘 | 棋盘、单位、飘字、技能动画必须共享坐标转换 | 待处理 |
 | P1 | Toast | 背景与文字固定全屏坐标，宽高比变化后可能不居中 | 已完成 |
 | P1 | ConfirmDialog | 弹窗背景虽已居中，但按钮和文本仍按根屏幕固定坐标摆放 | 已完成 |
-| P1 | SaveSlotSelectionPanel | 存档槽选择内容按根屏幕固定坐标摆放 | 本轮处理 |
+| P1 | SaveSlotSelectionPanel | 存档槽选择内容按根屏幕固定坐标摆放，且固定 4 个槽位 | 本轮处理 |
 | P1 | JyPanel | 背景和关闭按钮使用固定坐标，影响所有继承面板 | 已审计，待设计安全迁移 |
 
 ## 本轮改动记录
@@ -63,24 +65,39 @@
   - 在 `SaveSlotSelectionPanel` 下新增 `DesignCanvas/DesignRoot`。
   - 将 `TitleLabel`、`SubtitleLabel`、`SkipConfirmationCheckBox` 移入 `DesignRoot`。
   - 新增 `SlotsScroll`，作为存档卡片滚动视口。
-  - 将 `SlotsGrid`、`SlotCard1` 到 `SlotCard4` 移入 `SlotsScroll`。
+  - 将 `SlotsGrid` 移入 `SlotsScroll`。
+  - 移除场景中预放的 `SlotCard1` 到 `SlotCard4`。
   - 禁用横向滚动，只保留纵向滚动能力。
   - 保留所有脚本依赖节点的 `unique_name_in_owner = true`。
-  - `SaveSlotSelectionPanel.cs` 不需要修改。
+- 修改 `src/Game.Godot/Persistence/LocalSaveStore.cs`。
+  - `SlotCount` 从 4 扩展为 30。
+- 修改 `src/Game.Godot/UI/System/SaveSlotSelectionPanel.cs`。
+  - 根据 `LocalSaveStore.SlotCount` 动态生成存档卡片。
+  - 自动存档卡片仍只在读档模式出现，并插入到列表首位。
+- 修改 `src/Game.Godot/UI/System/SaveSlotCard.cs`。
+  - 重复实例内部节点获取从 `%TitleLabel` 等唯一节点名改为卡片内部相对路径。
+  - 避免 30 个重复卡片实例之间唯一节点名解析不稳定，导致标题都显示为场景默认的“存档1”。
 
 ## 本轮验证记录
 
-- 静态检查确认 `SaveSlotSelectionPanel.cs` 只依赖 `%TitleLabel`、`%SubtitleLabel`、`%SkipConfirmationCheckBox`、`%SlotsGrid`、`%SlotCard1` 到 `%SlotCard4`。
+- 静态检查确认 `SaveSlotSelectionPanel.cs` 只依赖 `%TitleLabel`、`%SubtitleLabel`、`%SkipConfirmationCheckBox`、`%SlotsGrid`。
 - 静态检查确认迁移后这些节点仍保留 `unique_name_in_owner = true`。
 - 静态检查确认自动存档卡片仍会通过 `_slotsGrid.AddChild(card)` 加入滚动区域内部。
-- 本轮只改场景节点结构，未改 C# 业务逻辑。
+- 静态检查确认已无 `%SlotCard1` 到 `%SlotCard4` 固定节点依赖。
+- 静态检查确认 `SaveSlotCard.Configure(...)` 仍按 `summary.SlotIndex` 设置标题：`存档{summary.SlotIndex}`。
+- 本轮改动限于 Godot 宿主层存档槽位数量、UI 生成与场景结构，未改核心游戏规则。
+
+后续验证方式改为：Codex 做静态检查，用户在 Godot 运行时手动验证视觉和交互。
 
 本轮仍需要在 Godot 编辑器或可用运行环境中做一次视觉验证：
 
 - `1920x1080`：存档槽选择内容位置应接近改前效果。
 - `1920x1200`：标题、槽位卡片、跳过确认复选框应保持在设计安全画布内，不随 expanded 画布漂移。
 - `3440x1440`：存档槽选择内容应保持在居中的 `16:9` 设计区域内。
-- 读档模式下出现自动存档时，第三行卡片应可通过纵向滚动查看，不再直接溢出到底部背景外。
+- 存档/读档/删档模式下应显示 30 个手动存档槽。
+- 读档模式下出现自动存档时，列表首位应是自动存档，后面是存档 1 到存档 30。
+- 手动槽位标题应按顺序显示为 `存档1`、`存档2`、`存档3`、`存档4`，继续向下滚动直到 `存档30`。
+- 列表应可通过纵向滚动查看全部槽位，不直接溢出到底部背景外。
 - 存档、读档、删档、自动存档卡片插入、跳过确认复选框行为应不变。
 
 ## 下一阶段候选

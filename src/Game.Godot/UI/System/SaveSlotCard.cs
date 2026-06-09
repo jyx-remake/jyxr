@@ -24,16 +24,16 @@ public partial class SaveSlotCard : Button
 
 	public override void _Ready()
 	{
-		_titleLabel = GetNode<Label>("%TitleLabel");
-		_nameLabel = GetNode<Label>("%NameLabel");
-		_partyCountLabel = GetNode<Label>("%PartyCountLabel");
-		_gameTimeLabel = GetNode<Label>("%GameTimeLabel");
-		_difficultyLabel = GetNode<Label>("%DifficultyLabel");
-		_roundLabel = GetNode<Label>("%RoundLabel");
-		_locationLabel = GetNode<Label>("%LocationLabel");
-		_savedAtLabel = GetNode<Label>("%SavedAtLabel");
-		_hintLabel = GetNode<Label>("%HintLabel");
-		_portrait = GetNode<TextureRect>("%Portrait");
+		_titleLabel = GetNode<Label>("Margin/VBox/TitleLabel");
+		_nameLabel = GetNode<Label>("Margin/VBox/ContentRow/InfoVBox/NameLabel");
+		_partyCountLabel = GetNode<Label>("Margin/VBox/ContentRow/InfoVBox/PartyCountLabel");
+		_gameTimeLabel = GetNode<Label>("Margin/VBox/ContentRow/InfoVBox/GameTimeLabel");
+		_difficultyLabel = GetNode<Label>("Margin/VBox/ContentRow/InfoVBox/RunInfoRow/DifficultyLabel");
+		_roundLabel = GetNode<Label>("Margin/VBox/ContentRow/InfoVBox/RunInfoRow/RoundLabel");
+		_locationLabel = GetNode<Label>("Margin/VBox/ContentRow/InfoVBox/LocationLabel");
+		_savedAtLabel = GetNode<Label>("Margin/VBox/ContentRow/InfoVBox/SavedAtLabel");
+		_hintLabel = GetNode<Label>("Margin/VBox/HintLabel");
+		_portrait = GetNode<TextureRect>("Margin/VBox/ContentRow/PortraitPanel/Portrait");
 	}
 
 	public void Configure(LocalSaveSlotSummary summary, SaveSlotPanelMode mode)

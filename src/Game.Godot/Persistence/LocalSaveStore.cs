@@ -19,7 +19,7 @@ public enum LocalSaveReadFailureReason
 
 public sealed class LocalSaveStore
 {
-	public const int SlotCount = 4;
+	public const int SlotCount = 30;
 	public const int AutoSaveSlotIndex = 0;
 	private const string SavePathFormat = "user://saves/save-slot-{0}.json";
 	private const string AutoSavePath = "user://saves/autosave.json";

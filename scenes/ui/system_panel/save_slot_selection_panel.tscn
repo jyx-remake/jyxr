@@ -2,7 +2,6 @@
 
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
 [ext_resource type="Script" uid="uid://b5rjwcm2fqdl6" path="res://src/Game.Godot/UI/System/SaveSlotSelectionPanel.cs" id="2_script"]
-[ext_resource type="PackedScene" uid="uid://dtr5c0pjawo7x" path="res://scenes/ui/system_panel/save_slot_card.tscn" id="3_card"]
 [ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="4_design_canvas"]
 
 [node name="SaveSlotSelectionPanel" unique_id=1893980029 instance=ExtResource("1_panel")]
@@ -63,22 +62,6 @@ size_flags_horizontal = 3
 theme_override_constants/h_separation = 28
 theme_override_constants/v_separation = 28
 columns = 2
-
-[node name="SlotCard1" parent="DesignCanvas/DesignRoot/SlotsScroll/SlotsGrid" index="0" unique_id=191581327 instance=ExtResource("3_card")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="SlotCard2" parent="DesignCanvas/DesignRoot/SlotsScroll/SlotsGrid" index="1" unique_id=445674418 instance=ExtResource("3_card")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="SlotCard3" parent="DesignCanvas/DesignRoot/SlotsScroll/SlotsGrid" index="2" unique_id=1725427486 instance=ExtResource("3_card")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="SlotCard4" parent="DesignCanvas/DesignRoot/SlotsScroll/SlotsGrid" index="3" unique_id=403031374 instance=ExtResource("3_card")]
-unique_name_in_owner = true
-layout_mode = 2
 
 [node name="SkipConfirmationCheckBox" type="CheckBox" parent="DesignCanvas/DesignRoot" index="4" unique_id=1033205733]
 unique_name_in_owner = true

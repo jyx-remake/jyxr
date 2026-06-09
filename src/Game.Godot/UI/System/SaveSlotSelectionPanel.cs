@@ -35,19 +35,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		_skipConfirmationCheckBox = GetNode<CheckBox>("%SkipConfirmationCheckBox");
 		_slotsGrid = GetNode<GridContainer>("%SlotsGrid");
 		_slotCardScene = GD.Load<PackedScene>("res://scenes/ui/system_panel/save_slot_card.tscn");
-		_slotCards =
-		[
-			GetNode<SaveSlotCard>("%SlotCard1"),
-			GetNode<SaveSlotCard>("%SlotCard2"),
-			GetNode<SaveSlotCard>("%SlotCard3"),
-			GetNode<SaveSlotCard>("%SlotCard4"),
-		];
-
-		for (var index = 0; index < _slotCards.Count; index++)
-		{
-			var slotIndex = index + 1;
-			_slotCards[index].Pressed += () => OnSlotPressed(slotIndex);
-		}
+		_slotCards = CreateSlotCards();
 		CreateAutoSaveCardIfNeeded();
 
 		ApplyModeText();
@@ -91,6 +79,21 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		}
 	}
 
+	private IReadOnlyList<SaveSlotCard> CreateSlotCards()
+	{
+		var cards = new List<SaveSlotCard>(LocalSaveStore.SlotCount);
+		for (var slotIndex = 1; slotIndex <= LocalSaveStore.SlotCount; slotIndex++)
+		{
+			var card = CreateSlotCard();
+			var capturedSlotIndex = slotIndex;
+			card.Pressed += () => OnSlotPressed(capturedSlotIndex);
+			_slotsGrid.AddChild(card);
+			cards.Add(card);
+		}
+
+		return cards;
+	}
+
 	private void CreateAutoSaveCardIfNeeded()
 	{
 		if (_mode != SaveSlotPanelMode.Load)
@@ -98,6 +101,14 @@ public partial class SaveSlotSelectionPanel : JyPanel
 			return;
 		}
 
+		_autoSaveCard = CreateSlotCard();
+		_autoSaveCard.Pressed += () => LoadFromAutoSave();
+		_slotsGrid.AddChild(_autoSaveCard);
+		_slotsGrid.MoveChild(_autoSaveCard, 0);
+	}
+
+	private SaveSlotCard CreateSlotCard()
+	{
 		var instance = _slotCardScene.Instantiate();
 		if (instance is not SaveSlotCard card)
 		{
@@ -105,10 +116,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 			throw new InvalidOperationException("Save slot card scene root must be SaveSlotCard.");
 		}
 
-		_autoSaveCard = card;
-		_autoSaveCard.Pressed += () => LoadFromAutoSave();
-		_slotsGrid.AddChild(card);
-		_slotsGrid.MoveChild(card, 0);
+		return card;
 	}
 
 	private async void OnSlotPressed(int slotIndex)
