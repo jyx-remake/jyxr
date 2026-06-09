@@ -50,6 +50,17 @@
 - 用户在 Godot 运行时手动验证视觉和交互。
 - 当前阶段按用户要求不跑 `dotnet build` / `dotnet test`。
 
+## 后续迁移执行规则
+
+从第八轮开始，剧情、开局流程、地图和战斗主界面都按小步迁移处理，不再把多个高风险区域合并到同一轮。
+
+- 每轮只迁一个明确目标，例如“剧情对白框”、“剧情选项框”、“门派选择界面”、“地图背景与点位 transform”。
+- 每轮完成后停止继续开发，先记录改动范围、静态检查结果和手动验证清单。
+- Codex 不自动 stage、不自动 commit；每轮结束时只提供一条建议的 Conventional Commit 提示词，由用户手动提交。
+- 用户手动验证通过并确认继续后，再进入下一轮迁移。
+- 高风险区域优先做结构性迁移，不做按分辨率堆叠的特殊偏移补丁。
+- 地图和战斗阶段必须先确认共享坐标模型，再迁移依赖该模型的点击、hover、飘字或动画。
+
 ## 风险清单
 
 | 等级 | 区域 | 风险 | 状态 |
@@ -73,6 +84,8 @@
 | P1 | CharacterEquipmentSelectionPanel | 装备选择弹窗仍有根级固定坐标内容 | 已完成 |
 | P1 | CombatantSelectPanel | 出战选择面板仍有根级固定坐标内容 | 已完成 |
 | P1 | BattleItemPanel / BattleSettlementPanel | 战斗弹窗仍有根级固定坐标内容 | 已完成 |
+| P1 | StoryDialoguePanel / StoryChoicePanel | 剧情对白和选项仍需进入底部安全布局，长文本与点击继续行为要保持 | 待处理 |
+| P1 | StartQuestion / SelectSect | 开局问卷流程场景仍需进入设计画布，不能改变剧情命令流程 | 待处理 |
 
 ## 第六轮改动记录
 
@@ -171,16 +184,41 @@
 
 ## 后续计划
 
-建议下一步进入剧情 UI 与开局流程：
+后续从低风险到高风险继续推进，每一步都需要用户手动验证通过后再继续。
 
-1. 迁移剧情对白与选项。
-   - `scenes/ui/story/story_dialogue_panel.tscn`
-   - `scenes/ui/story/story_choice_panel.tscn`
-   - 目标：对白框贴底部安全区，选项框与对白框关系稳定。
-2. 迁移开局流程。
-   - 门派选择、输入名字、头像选择、随机属性。
-   - 目标：开局 UI 全部进入设计画布。
-3. 单独迁地图 UI。
-   - 地图背景显示 rect、点位、主角 pin、底部信息区共享坐标转换。
-4. 单独迁战斗棋盘和行动栏。
-   - 棋盘格、单位、hover、可达区、飘字、技能动画共享同一个 transform。
+1. 第八轮：剧情对白框。
+   - 文件：`scenes/ui/story/story_dialogue_panel.tscn`。
+   - 目标：对白框进入底部安全区，长文本滚动和点击继续行为不变。
+   - 完成后建议 commit 提示词：`refactor(ui): migrate story dialogue layout to design canvas`。
+2. 第九轮：剧情选项框。
+   - 文件：`scenes/ui/story/story_choice_panel.tscn`、`scenes/ui/story/story_choice_button.tscn`。
+   - 目标：选项区域与对白框关系稳定，选项按钮不溢出。
+   - 完成后建议 commit 提示词：`refactor(ui): migrate story choice layout to design canvas`。
+3. 第十轮：开局流程第一批。
+   - 文件：`scenes/ui/select_sect/select_sect_screen.tscn`、`scenes/ui/start_question/input_name_panel.tscn`。
+   - 目标：门派选择和输入名字进入设计画布，剧情命令接线不变。
+   - 完成后建议 commit 提示词：`refactor(ui): migrate opening selection layouts`。
+4. 第十一轮：开局流程第二批。
+   - 文件：`scenes/ui/start_question/select_head_panel.tscn`、`scenes/ui/start_question/select_head_slot.tscn`、`scenes/ui/start_question/roll_stats_panel.tscn`。
+   - 目标：头像选择和随机属性界面进入设计画布，头像格与按钮区域稳定。
+   - 完成后建议 commit 提示词：`refactor(ui): migrate opening character setup layouts`。
+5. 第十二轮：地图 UI 坐标模型预备。
+   - 文件：`scenes/map/map_screen.tscn`、`src/Game.Godot` 中地图 UI 脚本。
+   - 目标：先明确地图背景显示 rect 与点位/pin/click 的统一 transform，不迁无关面板。
+   - 完成后建议 commit 提示词：`refactor(ui): define map display transform for adaptive layout`。
+6. 第十三轮：地图 UI 内容迁移。
+   - 文件：`scenes/map/map_entity_box.tscn`、`scenes/map/map_entity_slot.tscn` 及地图底部信息区。
+   - 目标：点位列表、底部信息区、主角 pin 与地图坐标模型一致。
+   - 完成后建议 commit 提示词：`refactor(ui): migrate map overlays to adaptive layout`。
+7. 第十四轮：战斗棋盘坐标模型预备。
+   - 文件：`scenes/ui/battle/battle_screen.tscn`、`scenes/ui/battle/battle_board_view.tscn`、战斗棋盘脚本。
+   - 目标：先统一棋盘格、单位、hover、可达区、飘字、技能动画使用的 transform。
+   - 完成后建议 commit 提示词：`refactor(ui): define battle board transform for adaptive layout`。
+8. 第十五轮：战斗行动 UI 迁移。
+   - 文件：`scenes/ui/battle/battle_skill_box.tscn`、`scenes/ui/battle/battle_skill_view.tscn`、`scenes/ui/battle/battle_legend_overlay.tscn`、`scenes/ui/battle/battle_float_text.tscn`。
+   - 目标：技能栏、行动按钮、飘字和 overlay 在共享坐标模型下稳定显示。
+   - 完成后建议 commit 提示词：`refactor(ui): migrate battle action layout to design canvas`。
+9. 收尾清理。
+   - 文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
+   - 目标：扫尾剩余固定根级坐标，固化新 UI 场景模板。
+   - 完成后建议 commit 提示词：`refactor(ui): clean up remaining fixed layout screens`。
