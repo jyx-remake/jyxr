@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="2_lapn3"]
 [ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="3_ephwk"]
 [ext_resource type="Script" path="res://src/Game.Godot/UI/ConfirmDialog.cs" id="4_confirm_dialog"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="5_design_canvas"]
 
 [node name="ConfirmDialog" type="Control" unique_id=1873262433]
 visible = false
@@ -16,7 +17,23 @@ grow_vertical = 2
 mouse_filter = 0
 script = ExtResource("4_confirm_dialog")
 
-[node name="Background" type="TextureRect" parent="." unique_id=265742394]
+[node name="DesignCanvas" type="Control" parent="." unique_id=597639835]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" unique_id=669922726]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Background" type="TextureRect" parent="DesignCanvas/DesignRoot" unique_id=265742394]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -33,7 +50,7 @@ texture = ExtResource("1_nu0yr")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ConfirmButton" type="TextureButton" parent="." unique_id=1517638290]
+[node name="ConfirmButton" type="TextureButton" parent="DesignCanvas/DesignRoot" unique_id=1517638290]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 536.0
@@ -46,7 +63,7 @@ stretch_mode = 5
 script = ExtResource("3_ephwk")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="ConfirmButton" unique_id=1942565471]
+[node name="Label" type="Label" parent="DesignCanvas/DesignRoot/ConfirmButton" unique_id=1942565471]
 layout_mode = 0
 offset_left = 136.0
 offset_top = 18.0
@@ -55,7 +72,7 @@ offset_bottom = 78.0
 theme_override_font_sizes/font_size = 50
 text = "确认"
 
-[node name="CancelButton" type="TextureButton" parent="." unique_id=867066366]
+[node name="CancelButton" type="TextureButton" parent="DesignCanvas/DesignRoot" unique_id=867066366]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1000.0
@@ -68,7 +85,7 @@ stretch_mode = 5
 script = ExtResource("3_ephwk")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="CancelButton" unique_id=852268700]
+[node name="Label" type="Label" parent="DesignCanvas/DesignRoot/CancelButton" unique_id=852268700]
 layout_mode = 0
 offset_left = 136.0
 offset_top = 18.0
@@ -77,7 +94,7 @@ offset_bottom = 78.0
 theme_override_font_sizes/font_size = 50
 text = "取消"
 
-[node name="ContentLabel" type="RichTextLabel" parent="." unique_id=854334387]
+[node name="ContentLabel" type="RichTextLabel" parent="DesignCanvas/DesignRoot" unique_id=854334387]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 559.0
