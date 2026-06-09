@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://co16la5kihi6o" path="res://assets/art/misc/story/daoju.png" id="10_backpack"]
 [ext_resource type="Texture2D" uid="uid://bpbr4s8fsji6r" path="res://assets/art/misc/story/rizhi.png" id="11_log"]
 [ext_resource type="Texture2D" uid="uid://cc7yi6jgcfwde" path="res://assets/art/misc/story/zhuangtai.png" id="12_team"]
+[ext_resource type="Script" uid="uid://b6ovs0k7in7v2" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="13_design_canvas"]
 
 [node name="Hud" type="Control" unique_id=1846363281]
 layout_mode = 3
@@ -24,6 +25,7 @@ mouse_filter = 2
 script = ExtResource("1_hud_script")
 
 [node name="TopBox" type="Control" parent="." unique_id=1135363019]
+layout_mode = 1
 anchors_preset = 0
 
 [node name="ShadowPanel" type="Panel" parent="TopBox" unique_id=35497544]
@@ -127,15 +129,38 @@ offset_bottom = 512.0
 scale = Vector2(0.3784722, 0.3784722)
 texture = ExtResource("6_difficulty")
 
-[node name="MenueButtonGroup" type="Control" parent="." unique_id=737845938]
+[node name="DesignCanvas" type="Control" parent="." unique_id=1538421821]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("13_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" unique_id=1442474549]
 anchors_preset = 0
-offset_left = 1730.0001
-offset_top = 885.0
-offset_right = 1730.0001
-offset_bottom = 885.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="MenueButtonGroup" type="Control" parent="DesignCanvas/DesignRoot" unique_id=737845938]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -190.0
+offset_top = -195.0
+offset_right = -190.0
+offset_bottom = -195.0
+grow_horizontal = 0
+grow_vertical = 0
 scale = Vector2(0.3684396, 0.36843964)
 
-[node name="Frame" type="TextureRect" parent="MenueButtonGroup" unique_id=1224916071]
+[node name="Frame" type="TextureRect" parent="DesignCanvas/DesignRoot/MenueButtonGroup" unique_id=1224916071]
 layout_mode = 0
 offset_left = -455.97705
 offset_top = -464.1194
@@ -143,7 +168,7 @@ offset_right = 456.02295
 offset_bottom = 467.8806
 texture = ExtResource("7_menu_frame")
 
-[node name="SystemButton" parent="MenueButtonGroup" unique_id=2079598957 instance=ExtResource("9_button")]
+[node name="SystemButton" parent="DesignCanvas/DesignRoot/MenueButtonGroup" unique_id=2079598957 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 3
@@ -160,7 +185,7 @@ grow_vertical = 0
 tooltip_text = "系统"
 texture_normal = ExtResource("8_system")
 
-[node name="BackpackButton" parent="MenueButtonGroup" unique_id=708079883 instance=ExtResource("9_button")]
+[node name="BackpackButton" parent="DesignCanvas/DesignRoot/MenueButtonGroup" unique_id=708079883 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = -428.83554
@@ -170,7 +195,7 @@ offset_bottom = 436.4235
 tooltip_text = "物品"
 texture_normal = ExtResource("10_backpack")
 
-[node name="LogButton" parent="MenueButtonGroup" unique_id=822725145 instance=ExtResource("9_button")]
+[node name="LogButton" parent="DesignCanvas/DesignRoot/MenueButtonGroup" unique_id=822725145 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = -317.55542
@@ -180,7 +205,7 @@ offset_bottom = 15.730438
 tooltip_text = "江湖日志"
 texture_normal = ExtResource("11_log")
 
-[node name="TeamButton" parent="MenueButtonGroup" unique_id=713409378 instance=ExtResource("9_button")]
+[node name="TeamButton" parent="DesignCanvas/DesignRoot/MenueButtonGroup" unique_id=713409378 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 86.85277
