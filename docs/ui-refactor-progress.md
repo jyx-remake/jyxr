@@ -2,13 +2,13 @@
 
 ## 当前阶段
 
-第十轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+第十一轮已完成代码侧迁移，等待 Godot 运行时手动验证。
 
 本轮范围：
 
-- 门派选择界面交互内容进入 `DesignCanvas/DesignRoot`，背景继续根级全屏铺底。
-- 输入名字面板主体内容进入 `DesignCanvas/DesignRoot`。
-- 不修改 `SelectSectScreen.cs` 和 `InputNamePanel.cs` 行为逻辑，保持门派切换、确认选择、输入提交和取消清理流程。
+- 头像选择界面主体内容进入 `DesignCanvas/DesignRoot`。
+- 随机属性界面的角色面板、重置按钮和确认按钮进入 `DesignCanvas/DesignRoot`。
+- 不修改 `SelectHeadPanel.cs`、`SelectHeadSlot.cs` 和 `RollStatsPanel.cs` 行为逻辑，保持头像动态生成、头像选择、随机属性重置和确认流程。
 - 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
 
 ## 已完成阶段
@@ -42,6 +42,10 @@
   - 等待用户运行时手动验证。
 - 第十轮：迁移开局流程第一批。
   - 主要文件：`scenes/ui/select_sect/select_sect_screen.tscn`、`scenes/ui/start_question/input_name_panel.tscn`。
+  - 等待用户运行时手动验证。
+- 第十一轮：迁移开局流程第二批。
+  - 主要文件：`scenes/ui/start_question/select_head_panel.tscn`、`scenes/ui/start_question/roll_stats_panel.tscn`。
+  - `scenes/ui/start_question/select_head_slot.tscn` 为动态列表项，本轮确认无需结构迁移。
   - 等待用户运行时手动验证。
 
 ## 验证矩阵
@@ -278,36 +282,65 @@
 - 输入框默认获得焦点，默认名正常显示。
 - 回车提交和点击确认按钮都能继续开局流程。
 
+## 第十一轮改动记录
+
+- 修改 `scenes/ui/start_question/select_head_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将 `Dikuang2`、标题、头像滚动列表、`HeadContainer` 示例项和确认按钮迁入设计画布。
+  - 保留 `HeadContainer` 和 `AckButton` 的唯一节点名，`SelectHeadPanel.cs` 的节点查找不变。
+- 修改 `scenes/ui/start_question/roll_stats_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将内嵌 `CharacterPanel`、`RollButton` 和 `AckButton` 迁入设计画布。
+  - 保留 `CharacterPanel`、`RollButton` 和 `AckButton` 的唯一节点名，`RollStatsPanel.cs` 的节点查找不变。
+- 未修改 `scenes/ui/start_question/select_head_slot.tscn`。
+  - 头像槽位是 `HeadContainer` 下动态生成的固定尺寸列表项。
+  - 本轮不改变头像格尺寸、选中标记和点击行为。
+
+## 第十一轮静态检查
+
+- `SelectHeadPanel` 根节点下只新增预期的 `DesignCanvas`。
+- 头像选择面板、头像滚动列表和确认按钮已迁入 `DesignCanvas/DesignRoot`。
+- `RollStatsPanel` 根节点下只新增预期的 `DesignCanvas`。
+- 随机属性界面的内嵌角色面板、重置按钮和确认按钮已迁入 `DesignCanvas/DesignRoot`。
+- 脚本依赖节点仍保留 `unique_name_in_owner = true`。
+- 按用户要求，本轮不做构建验证。
+
+## 第十一轮手动验证清单
+
+- 开局流程进入头像选择，确认头像选择面板位于居中的 16:9 设计区内。
+- 在 `1920x1080` 下确认标题、头像网格、滚动条和确认按钮位置与迁移前一致。
+- 在 `1366x768`、`1920x1200`、`3440x1440` 下确认头像选择整体随设计画布居中缩放。
+- 点击头像后选中标记正常出现，切换头像时旧选中标记正常消失。
+- 未选择头像时点击确认不会继续；选择头像后点击确认能进入下一步。
+- 进入随机属性界面，确认角色面板、重置按钮和确认按钮位于设计区内。
+- 点击重置按钮时角色属性刷新。
+- 点击确认按钮后开局流程继续。
+
 ## 后续计划
 
-后续从第十一轮开始继续推进，每一步都需要用户手动验证通过后再继续。
+后续从第十二轮开始继续推进，每一步都需要用户手动验证通过后再继续。
 
-1. 第十一轮：开局流程第二批。
-   - 文件：`scenes/ui/start_question/select_head_panel.tscn`、`scenes/ui/start_question/select_head_slot.tscn`、`scenes/ui/start_question/roll_stats_panel.tscn`。
-   - 目标：头像选择和随机属性界面进入设计画布，头像格与按钮区域稳定。
-   - 完成后建议提交标题：`重构UI：迁移开局角色设置布局`。
-   - 完成后建议提交描述：`将头像选择、头像格和随机属性界面迁入设计画布，保持头像选择和 roll stats 流程不变。`
-2. 第十二轮：地图 UI 坐标模型预备。
+1. 第十二轮：地图 UI 坐标模型预备。
    - 文件：`scenes/map/map_screen.tscn`、`src/Game.Godot` 中地图 UI 脚本。
    - 目标：先明确地图背景显示 rect 与点位/pin/click 的统一 transform，不迁无关面板。
    - 完成后建议提交标题：`重构UI：建立地图自适应坐标模型`。
    - 完成后建议提交描述：`明确地图背景显示区域与点位、主角标记、点击命中的统一坐标转换，为后续地图覆盖 UI 迁移做准备。`
-3. 第十三轮：地图 UI 内容迁移。
+2. 第十三轮：地图 UI 内容迁移。
    - 文件：`scenes/map/map_entity_box.tscn`、`scenes/map/map_entity_slot.tscn` 及地图底部信息区。
    - 目标：点位列表、底部信息区、主角 pin 与地图坐标模型一致。
    - 完成后建议提交标题：`重构UI：迁移地图覆盖层布局`。
    - 完成后建议提交描述：`将地图点位列表、底部信息区和主角标记接入统一地图坐标模型，保持地图交互和剧情隐藏行为不变。`
-4. 第十四轮：战斗棋盘坐标模型预备。
+3. 第十四轮：战斗棋盘坐标模型预备。
    - 文件：`scenes/ui/battle/battle_screen.tscn`、`scenes/ui/battle/battle_board_view.tscn`、战斗棋盘脚本。
    - 目标：先统一棋盘格、单位、hover、可达区、飘字、技能动画使用的 transform。
    - 完成后建议提交标题：`重构UI：建立战斗棋盘自适应坐标模型`。
    - 完成后建议提交描述：`统一战斗棋盘格、单位、hover、可达区域、飘字和技能动画的坐标转换，为战斗行动 UI 迁移做准备。`
-5. 第十五轮：战斗行动 UI 迁移。
+4. 第十五轮：战斗行动 UI 迁移。
    - 文件：`scenes/ui/battle/battle_skill_box.tscn`、`scenes/ui/battle/battle_skill_view.tscn`、`scenes/ui/battle/battle_legend_overlay.tscn`、`scenes/ui/battle/battle_float_text.tscn`。
    - 目标：技能栏、行动按钮、飘字和 overlay 在共享坐标模型下稳定显示。
    - 完成后建议提交标题：`重构UI：迁移战斗行动布局`。
    - 完成后建议提交描述：`将战斗技能栏、行动按钮、飘字和 overlay 接入设计画布与共享棋盘坐标模型，保持战斗操作行为不变。`
-6. 收尾清理。
+5. 收尾清理。
    - 文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
    - 目标：扫尾剩余固定根级坐标，固化新 UI 场景模板。
    - 完成后建议提交标题：`重构UI：清理剩余固定布局界面`。
