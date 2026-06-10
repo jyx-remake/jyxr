@@ -2,14 +2,13 @@
 
 ## 当前阶段
 
-第十二轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+第十三轮已完成代码侧迁移，等待 Godot 运行时手动验证。
 
 本轮范围：
 
-- 大地图坐标层从匿名 `Control` 明确为 `MapCoordinateRoot`。
-- 大地图点位和主角 pin 统一使用 `MapPositionToLargeMapPoint(...)` 换算。
-- 不迁小地图列表、底部信息区和地图覆盖 UI；这些留到第十三轮。
-- 不修改地图业务流程，保持地图点位点击、剧情/商店/储物箱/战斗入口处理逻辑。
+- 小地图覆盖 UI 进入 `DesignCanvas/DesignRoot`。
+- 相机按钮、小地图点位列表和底部描述区进入 16:9 设计画布。
+- 不修改 `MapScreen.cs` 行为逻辑，保持小地图点位生成、描述显示和剧情播放显隐规则。
 - 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
 
 ## 已完成阶段
@@ -50,6 +49,9 @@
   - 等待用户运行时手动验证。
 - 第十二轮：建立地图 UI 坐标模型预备结构。
   - 主要文件：`scenes/map/map_screen.tscn`、`src/Game.Godot/Map/MapScreen.cs`。
+  - 等待用户运行时手动验证。
+- 第十三轮：迁移地图覆盖 UI。
+  - 主要文件：`scenes/map/map_screen.tscn`。
   - 等待用户运行时手动验证。
 
 ## 验证矩阵
@@ -356,26 +358,56 @@
 - 从大地图进入小地图，确认小地图列表和底部描述区没有变化。
 - 在 `1920x1080`、`1366x768`、`1920x1200`、`3440x1440` 下抽查大地图点位和主角 pin 没有出现额外偏移。
 
+## 第十三轮改动记录
+
+- 修改 `scenes/map/map_screen.tscn`。
+  - 在 `MapSmallTab` 下新增 `DesignCanvas/DesignRoot`。
+  - 将小地图覆盖 UI 迁入设计画布。
+  - 更新节点路径：
+    - `MapSmallTab/CameraButton` -> `MapSmallTab/DesignCanvas/DesignRoot/CameraButton`
+    - `MapSmallTab/MapEntityList` -> `MapSmallTab/DesignCanvas/DesignRoot/MapEntityList`
+    - `MapSmallTab/BottomBox` -> `MapSmallTab/DesignCanvas/DesignRoot/BottomBox`
+    - `MapSmallTab/BottomBox/DialogueShadowPanel` -> `MapSmallTab/DesignCanvas/DesignRoot/BottomBox/DialogueShadowPanel`
+    - `MapSmallTab/BottomBox/Frame` -> `MapSmallTab/DesignCanvas/DesignRoot/BottomBox/Frame`
+    - `MapSmallTab/BottomBox/MapDescriptionLabel` -> `MapSmallTab/DesignCanvas/DesignRoot/BottomBox/MapDescriptionLabel`
+- 未修改 `src/Game.Godot/Map/MapScreen.cs`。
+  - `CameraButton`、`MapEntityList`、`BottomBox`、`MapDescriptionLabel` 均保留唯一节点名，脚本查找路径不变。
+  - 小地图点位动态生成仍写入 `%MapEntityList`。
+
+## 第十三轮静态检查
+
+- `MapSmallTab` 下新增预期的 `DesignCanvas/DesignRoot`。
+- 旧路径 `MapSmallTab/CameraButton`、`MapSmallTab/MapEntityList`、`MapSmallTab/BottomBox` 已无残留。
+- 小地图覆盖 UI 节点已迁入 `MapSmallTab/DesignCanvas/DesignRoot`。
+- 脚本依赖节点仍保留 `unique_name_in_owner = true`。
+- 大地图 `MapCoordinateRoot` 本轮未改。
+- 按用户要求，本轮不做构建验证。
+
+## 第十三轮手动验证清单
+
+- 从大地图进入任意小地图，确认小地图点位列表位于居中的 16:9 设计区内。
+- 在 `1920x1080` 下确认相机按钮、小地图点位列表、底部描述框位置与迁移前一致。
+- 在 `1366x768`、`1920x1200`、`3440x1440` 下确认小地图覆盖 UI 随设计画布居中缩放，不贴到扩展画布边缘。
+- 点击小地图点位，确认仍能触发事件、进入地点或打开商店/储物箱/战斗。
+- 底部地图描述文字仍正常显示。
+- 剧情播放模式下，小地图点位列表、底部描述区和相机按钮仍会隐藏，剧情结束后恢复。
+- 大地图点位和主角 pin 不应发生变化。
+
 ## 后续计划
 
-后续从第十三轮开始继续推进，每一步都需要用户手动验证通过后再继续。
+后续从第十四轮开始继续推进，每一步都需要用户手动验证通过后再继续。
 
-1. 第十三轮：地图 UI 内容迁移。
-   - 文件：`scenes/map/map_entity_box.tscn`、`scenes/map/map_entity_slot.tscn` 及地图底部信息区。
-   - 目标：点位列表、底部信息区、主角 pin 与地图坐标模型一致。
-   - 完成后建议提交标题：`重构UI：迁移地图覆盖层布局`。
-   - 完成后建议提交描述：`将地图点位列表、底部信息区和主角标记接入统一地图坐标模型，保持地图交互和剧情隐藏行为不变。`
-2. 第十四轮：战斗棋盘坐标模型预备。
+1. 第十四轮：战斗棋盘坐标模型预备。
    - 文件：`scenes/ui/battle/battle_screen.tscn`、`scenes/ui/battle/battle_board_view.tscn`、战斗棋盘脚本。
    - 目标：先统一棋盘格、单位、hover、可达区、飘字、技能动画使用的 transform。
    - 完成后建议提交标题：`重构UI：建立战斗棋盘自适应坐标模型`。
    - 完成后建议提交描述：`统一战斗棋盘格、单位、hover、可达区域、飘字和技能动画的坐标转换，为战斗行动 UI 迁移做准备。`
-3. 第十五轮：战斗行动 UI 迁移。
+2. 第十五轮：战斗行动 UI 迁移。
    - 文件：`scenes/ui/battle/battle_skill_box.tscn`、`scenes/ui/battle/battle_skill_view.tscn`、`scenes/ui/battle/battle_legend_overlay.tscn`、`scenes/ui/battle/battle_float_text.tscn`。
    - 目标：技能栏、行动按钮、飘字和 overlay 在共享坐标模型下稳定显示。
    - 完成后建议提交标题：`重构UI：迁移战斗行动布局`。
    - 完成后建议提交描述：`将战斗技能栏、行动按钮、飘字和 overlay 接入设计画布与共享棋盘坐标模型，保持战斗操作行为不变。`
-4. 收尾清理。
+3. 收尾清理。
    - 文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
    - 目标：扫尾剩余固定根级坐标，固化新 UI 场景模板。
    - 完成后建议提交标题：`重构UI：清理剩余固定布局界面`。

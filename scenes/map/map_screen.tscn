@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cc3wboaaf4svd" path="res://assets/art/misc/story/dibukuang.png" id="5_bottom_frame"]
 [ext_resource type="Texture2D" uid="uid://dlkp8qcmfkcfa" path="res://assets/art/misc/story/camera.png" id="6_camera"]
 [ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="7_pin_avatar"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="8_design_canvas"]
 
 [sub_resource type="Animation" id="Animation_pin_reset"]
 length = 0.001
@@ -124,7 +125,23 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CameraButton" type="TextureButton" parent="MapSmallTab" unique_id=1253279403]
+[node name="DesignCanvas" type="Control" parent="MapSmallTab" unique_id=1883220017]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("8_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="MapSmallTab/DesignCanvas" unique_id=210854581]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="CameraButton" type="TextureButton" parent="MapSmallTab/DesignCanvas/DesignRoot" unique_id=1253279403]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -136,7 +153,7 @@ rotation = 0.5235988
 scale = Vector2(0.4255765, 0.4255765)
 texture_normal = ExtResource("6_camera")
 
-[node name="MapEntityList" type="HBoxContainer" parent="MapSmallTab" unique_id=274914384]
+[node name="MapEntityList" type="HBoxContainer" parent="MapSmallTab/DesignCanvas/DesignRoot" unique_id=274914384]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 110.0
@@ -145,7 +162,7 @@ offset_right = 1810.0
 offset_bottom = 688.0
 theme_override_constants/separation = 80
 
-[node name="BottomBox" type="Control" parent="MapSmallTab" unique_id=294292032]
+[node name="BottomBox" type="Control" parent="MapSmallTab/DesignCanvas/DesignRoot" unique_id=294292032]
 unique_name_in_owner = true
 anchors_preset = 0
 offset_left = 35.0
@@ -154,7 +171,7 @@ offset_right = 1827.0
 offset_bottom = 1066.0
 mouse_filter = 2
 
-[node name="DialogueShadowPanel" type="Panel" parent="MapSmallTab/BottomBox" unique_id=627662737]
+[node name="DialogueShadowPanel" type="Panel" parent="MapSmallTab/DesignCanvas/DesignRoot/BottomBox" unique_id=627662737]
 layout_mode = 0
 offset_left = 170.0
 offset_top = 100.0
@@ -162,7 +179,7 @@ offset_right = 1774.0
 offset_bottom = 321.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_description_shadow")
 
-[node name="Frame" type="TextureRect" parent="MapSmallTab/BottomBox" unique_id=1253864497]
+[node name="Frame" type="TextureRect" parent="MapSmallTab/DesignCanvas/DesignRoot/BottomBox" unique_id=1253864497]
 layout_mode = 0
 offset_right = 4144.0
 offset_bottom = 880.0
@@ -170,7 +187,7 @@ scale = Vector2(0.43190765, 0.37521958)
 mouse_filter = 2
 texture = ExtResource("5_bottom_frame")
 
-[node name="MapDescriptionLabel" type="RichTextLabel" parent="MapSmallTab/BottomBox" unique_id=527718196]
+[node name="MapDescriptionLabel" type="RichTextLabel" parent="MapSmallTab/DesignCanvas/DesignRoot/BottomBox" unique_id=527718196]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
