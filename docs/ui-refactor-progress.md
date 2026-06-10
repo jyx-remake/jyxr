@@ -2,13 +2,14 @@
 
 ## 当前阶段
 
-第十一轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+第十二轮已完成代码侧迁移，等待 Godot 运行时手动验证。
 
 本轮范围：
 
-- 头像选择界面主体内容进入 `DesignCanvas/DesignRoot`。
-- 随机属性界面的角色面板、重置按钮和确认按钮进入 `DesignCanvas/DesignRoot`。
-- 不修改 `SelectHeadPanel.cs`、`SelectHeadSlot.cs` 和 `RollStatsPanel.cs` 行为逻辑，保持头像动态生成、头像选择、随机属性重置和确认流程。
+- 大地图坐标层从匿名 `Control` 明确为 `MapCoordinateRoot`。
+- 大地图点位和主角 pin 统一使用 `MapPositionToLargeMapPoint(...)` 换算。
+- 不迁小地图列表、底部信息区和地图覆盖 UI；这些留到第十三轮。
+- 不修改地图业务流程，保持地图点位点击、剧情/商店/储物箱/战斗入口处理逻辑。
 - 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
 
 ## 已完成阶段
@@ -46,6 +47,9 @@
 - 第十一轮：迁移开局流程第二批。
   - 主要文件：`scenes/ui/start_question/select_head_panel.tscn`、`scenes/ui/start_question/roll_stats_panel.tscn`。
   - `scenes/ui/start_question/select_head_slot.tscn` 为动态列表项，本轮确认无需结构迁移。
+  - 等待用户运行时手动验证。
+- 第十二轮：建立地图 UI 坐标模型预备结构。
+  - 主要文件：`scenes/map/map_screen.tscn`、`src/Game.Godot/Map/MapScreen.cs`。
   - 等待用户运行时手动验证。
 
 ## 验证矩阵
@@ -316,31 +320,62 @@
 - 点击重置按钮时角色属性刷新。
 - 点击确认按钮后开局流程继续。
 
+## 第十二轮改动记录
+
+- 修改 `scenes/map/map_screen.tscn`。
+  - 将原大地图坐标层 `MapBigTab/Control` 重命名为 `MapBigTab/MapCoordinateRoot`。
+  - 为 `MapCoordinateRoot` 设置 `unique_name_in_owner = true`。
+  - 将 `MapCoordinateRoot` 尺寸明确为 `1920x1080` 设计坐标区域，保持原有左上偏移 `(-15, -52)`。
+  - 更新子节点路径：
+    - `MapBigTab/Control/MapEntitySlots` -> `MapBigTab/MapCoordinateRoot/MapEntitySlots`
+    - `MapBigTab/Control/MapPin` -> `MapBigTab/MapCoordinateRoot/MapPin`
+    - `MapBigTab/Control/MapPin/PinAvatar` -> `MapBigTab/MapCoordinateRoot/MapPin/PinAvatar`
+    - `MapBigTab/Control/MapPin/AnimationPlayer` -> `MapBigTab/MapCoordinateRoot/MapPin/AnimationPlayer`
+- 修改 `src/Game.Godot/Map/MapScreen.cs`。
+  - 新增 `_mapCoordinateRoot = GetNode<Control>("%MapCoordinateRoot")`。
+  - 将原 `LargeMapXScale` / `LargeMapYScale` 收敛为 `LargeMapCoordinateScale`。
+  - 新增 `MapPositionToLargeMapPoint(...)` 作为大地图点位和主角 pin 的统一换算入口。
+  - 新增 `GetLargeMapDesignRect()`，后续可在第十三轮继续扩展为背景显示 rect / 覆盖 UI 坐标模型。
+  - `FillLargeMap(...)` 中点位按钮和 `_mapPin` 都改为调用 `MapPositionToLargeMapPoint(...)`。
+
+## 第十二轮静态检查
+
+- 旧路径 `MapBigTab/Control` 已无残留。
+- `MapEntitySlots`、`MapPin`、`PinAvatar` 和 `AnimationPlayer` 都已挂到 `MapBigTab/MapCoordinateRoot` 下。
+- `MapCoordinateRoot` 保留原左上偏移，不改变 `1920x1080` 下点位基准位置。
+- 大地图点位和主角 pin 坐标换算已共用同一个方法。
+- 小地图 `MapSmallTab`、`MapEntityList`、`BottomBox` 本轮未迁移。
+- 按用户要求，本轮不做构建验证。
+
+## 第十二轮手动验证清单
+
+- 进入大地图，确认地图点位整体位置与迁移前一致。
+- 进入大地图，确认主角 pin 位置与迁移前一致，并且跳动动画仍正常。
+- 点击大地图点位，确认仍能触发对应地图事件或进入地点。
+- 在大地图触发剧情播放时，云层、点位和主角 pin 仍会按剧情播放模式隐藏，剧情结束后恢复。
+- 从大地图进入小地图，确认小地图列表和底部描述区没有变化。
+- 在 `1920x1080`、`1366x768`、`1920x1200`、`3440x1440` 下抽查大地图点位和主角 pin 没有出现额外偏移。
+
 ## 后续计划
 
-后续从第十二轮开始继续推进，每一步都需要用户手动验证通过后再继续。
+后续从第十三轮开始继续推进，每一步都需要用户手动验证通过后再继续。
 
-1. 第十二轮：地图 UI 坐标模型预备。
-   - 文件：`scenes/map/map_screen.tscn`、`src/Game.Godot` 中地图 UI 脚本。
-   - 目标：先明确地图背景显示 rect 与点位/pin/click 的统一 transform，不迁无关面板。
-   - 完成后建议提交标题：`重构UI：建立地图自适应坐标模型`。
-   - 完成后建议提交描述：`明确地图背景显示区域与点位、主角标记、点击命中的统一坐标转换，为后续地图覆盖 UI 迁移做准备。`
-2. 第十三轮：地图 UI 内容迁移。
+1. 第十三轮：地图 UI 内容迁移。
    - 文件：`scenes/map/map_entity_box.tscn`、`scenes/map/map_entity_slot.tscn` 及地图底部信息区。
    - 目标：点位列表、底部信息区、主角 pin 与地图坐标模型一致。
    - 完成后建议提交标题：`重构UI：迁移地图覆盖层布局`。
    - 完成后建议提交描述：`将地图点位列表、底部信息区和主角标记接入统一地图坐标模型，保持地图交互和剧情隐藏行为不变。`
-3. 第十四轮：战斗棋盘坐标模型预备。
+2. 第十四轮：战斗棋盘坐标模型预备。
    - 文件：`scenes/ui/battle/battle_screen.tscn`、`scenes/ui/battle/battle_board_view.tscn`、战斗棋盘脚本。
    - 目标：先统一棋盘格、单位、hover、可达区、飘字、技能动画使用的 transform。
    - 完成后建议提交标题：`重构UI：建立战斗棋盘自适应坐标模型`。
    - 完成后建议提交描述：`统一战斗棋盘格、单位、hover、可达区域、飘字和技能动画的坐标转换，为战斗行动 UI 迁移做准备。`
-4. 第十五轮：战斗行动 UI 迁移。
+3. 第十五轮：战斗行动 UI 迁移。
    - 文件：`scenes/ui/battle/battle_skill_box.tscn`、`scenes/ui/battle/battle_skill_view.tscn`、`scenes/ui/battle/battle_legend_overlay.tscn`、`scenes/ui/battle/battle_float_text.tscn`。
    - 目标：技能栏、行动按钮、飘字和 overlay 在共享坐标模型下稳定显示。
    - 完成后建议提交标题：`重构UI：迁移战斗行动布局`。
    - 完成后建议提交描述：`将战斗技能栏、行动按钮、飘字和 overlay 接入设计画布与共享棋盘坐标模型，保持战斗操作行为不变。`
-5. 收尾清理。
+4. 收尾清理。
    - 文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
    - 目标：扫尾剩余固定根级坐标，固化新 UI 场景模板。
    - 完成后建议提交标题：`重构UI：清理剩余固定布局界面`。

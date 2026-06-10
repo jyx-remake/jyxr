@@ -82,25 +82,26 @@ texture = ExtResource("4_cloud")
 expand_mode = 1
 stretch_mode = 1
 
-[node name="Control" type="Control" parent="MapBigTab" unique_id=325343108]
+[node name="MapCoordinateRoot" type="Control" parent="MapBigTab" unique_id=325343108]
+unique_name_in_owner = true
 anchors_preset = 0
 offset_left = -15.0
 offset_top = -52.0
-offset_right = -15.0
-offset_bottom = -52.0
+offset_right = 1905.0
+offset_bottom = 1028.0
 
-[node name="MapEntitySlots" type="Control" parent="MapBigTab/Control" unique_id=356276484]
+[node name="MapEntitySlots" type="Control" parent="MapBigTab/MapCoordinateRoot" unique_id=356276484]
 unique_name_in_owner = true
 anchors_preset = 0
 
-[node name="MapPin" type="Control" parent="MapBigTab/Control" unique_id=1444961703]
+[node name="MapPin" type="Control" parent="MapBigTab/MapCoordinateRoot" unique_id=1444961703]
 unique_name_in_owner = true
 anchors_preset = 0
 offset_right = 76.0
 offset_bottom = 75.0
 mouse_filter = 2
 
-[node name="PinAvatar" type="TextureRect" parent="MapBigTab/Control/MapPin" unique_id=1626363249]
+[node name="PinAvatar" type="TextureRect" parent="MapBigTab/MapCoordinateRoot/MapPin" unique_id=1626363249]
 unique_name_in_owner = true
 layout_mode = 0
 offset_right = 76.0
@@ -110,7 +111,7 @@ texture = ExtResource("7_pin_avatar")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="MapBigTab/Control/MapPin" unique_id=1840084638]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MapBigTab/MapCoordinateRoot/MapPin" unique_id=1840084638]
 libraries/ = SubResource("AnimationLibrary_pin")
 autoplay = &"default"
 

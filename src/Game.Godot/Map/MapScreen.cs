@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Core.Definitions;
+using Game.Core.Model;
 using Game.Godot.Assets;
 using Game.Godot.Persistence;
 using Game.Godot.UI;
@@ -9,8 +10,7 @@ namespace Game.Godot.Map;
 
 public partial class MapScreen : Control
 {
-	private const float LargeMapXScale = 2.4f;
-	private const float LargeMapYScale = 1.8f;
+	private static readonly Vector2 LargeMapCoordinateScale = new(2.4f, 1.8f);
 	private readonly LocalSaveStore _saveStore = new();
 	private MapEnterResult? _pendingInitialResult;
 	private bool _isHandlingInteraction;
@@ -27,6 +27,7 @@ public partial class MapScreen : Control
 	private Control _mapBigTab = null!;
 	private Control _mapSmallTab = null!;
 	private Control _cloud = null!;
+	private Control _mapCoordinateRoot = null!;
 	private Control _mapEntitySlots = null!;
 	private Control _cameraButton = null!;
 	private HBoxContainer _mapEntityList = null!;
@@ -42,6 +43,7 @@ public partial class MapScreen : Control
 		_mapBigTab = GetNode<Control>("%MapBigTab");
 		_mapSmallTab = GetNode<Control>("%MapSmallTab");
 		_cloud = GetNode<Control>("%Cloud");
+		_mapCoordinateRoot = GetNode<Control>("%MapCoordinateRoot");
 		_mapEntitySlots = GetNode<Control>("%MapEntitySlots");
 		_cameraButton = GetNode<Control>("%CameraButton");
 		_mapEntityList = GetNode<HBoxContainer>("%MapEntityList");
@@ -135,7 +137,7 @@ public partial class MapScreen : Control
 			var button = CreateEntityButton(MapEntitySlotScene, location);
 			if (location.Location.Position is { } position)
 			{
-				button.Position = new Vector2(position.X * LargeMapXScale, position.Y * LargeMapYScale);
+				button.Position = MapPositionToLargeMapPoint(position);
 			}
 
 			_mapEntitySlots.AddChild(button);
@@ -143,9 +145,19 @@ public partial class MapScreen : Control
 
 		if (result.HeroPosition is { } heroPosition)
 		{
-			_mapPin.Position = new Vector2(heroPosition.X * LargeMapXScale, heroPosition.Y * LargeMapYScale);
+			_mapPin.Position = MapPositionToLargeMapPoint(heroPosition);
 		}
 	}
+
+	private Vector2 MapPositionToLargeMapPoint(MapPosition position)
+	{
+		var displayRect = GetLargeMapDesignRect();
+		return displayRect.Position + new Vector2(
+			position.X * LargeMapCoordinateScale.X,
+			position.Y * LargeMapCoordinateScale.Y);
+	}
+
+	private Rect2 GetLargeMapDesignRect() => new(Vector2.Zero, _mapCoordinateRoot.Size);
 
 	private void FillSmallMap(MapEnterResult result)
 	{
