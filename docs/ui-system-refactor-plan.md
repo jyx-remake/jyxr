@@ -400,13 +400,10 @@ UI 脚本可以逐步整理，但每一步都应先保证行为不变。
   - 棋盘放入设计画布中的稳定区域。
   - 棋盘格、单位、鼠标 hover、可达区域、飘字、技能动画共享棋盘坐标转换。
 - 第二步再迁战斗行动 UI。
-  - `scenes/ui/battle/battle_skill_box.tscn`
-  - `scenes/ui/battle/battle_skill_view.tscn`
-  - `scenes/ui/battle/battle_float_text.tscn`
-  - `scenes/ui/battle/battle_legend_overlay.tscn`
-  - 右上按钮组使用锚点。
-  - 底部行动栏使用安全画布底部区域。
-  - 复用或泛化 `BattleLegendOverlay` 的设计画布缩放思路。
+  - 已完成：在 `scenes/ui/battle/battle_screen.tscn` 中新增 `UiDesignCanvas/DesignRoot`。
+  - 已完成：右上按钮、顶部标题时钟、左侧日志、底部行动栏、技能列表滚动区迁入 UI 设计画布。
+  - 已保留：`BoardDesignCanvas/DesignRoot/BoardGrid` 继续承载棋盘、单位、飘字和技能动画坐标模型。
+  - 已保留：`OverlayRoot` 继续作为根级全屏覆盖层，避免和行动 UI 画布混用。
 
 验收：
 
@@ -436,10 +433,10 @@ UI 脚本可以逐步整理，但每一步都应先保证行为不变。
 
 ## 推荐优先级
 
-当前 `DesignCanvas`、HUD、toast、confirm、`JyPanel`、系统面板、存档槽选择、主要面板、剧情对白框、剧情选项框、开局流程、地图 UI 和战斗棋盘坐标模型预备结构已完成代码侧迁移。后续推荐优先级调整为：
+当前 `DesignCanvas`、HUD、toast、confirm、`JyPanel`、系统面板、存档槽选择、主要面板、剧情对白框、剧情选项框、开局流程、地图 UI、战斗棋盘坐标模型和战斗行动 UI 已完成代码侧迁移。后续推荐优先级调整为：
 
-1. 战斗行动 UI。
-2. 主菜单、失败/通关、角色摘要、hint 等扫尾。
+1. 主菜单、失败/通关、角色摘要、hint 等扫尾。
+2. UI 场景模板和固定坐标检查规则固化。
 
 地图和战斗属于高风险阶段，不允许把坐标模型、节点迁移和表现验证压进同一大步。
 

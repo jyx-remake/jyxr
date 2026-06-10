@@ -2,13 +2,14 @@
 
 ## 当前阶段
 
-第十四轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+第十五轮已完成代码侧迁移，等待 Godot 运行时手动验证。
 
 本轮范围：
 
-- 战斗棋盘进入独立 `BoardDesignCanvas/DesignRoot`。
-- 棋盘格、单位、hover 命中、技能动画和飘字继续共享 `BattleBoardView` 内部坐标转换。
-- 不迁战斗行动栏、技能栏、右上按钮、日志和底部 HUD；这些留到第十五轮。
+- 战斗行动 UI 进入独立 `UiDesignCanvas/DesignRoot`。
+- 右上战斗按钮、战斗日志、底部 HUD、行动按钮和技能列表滚动区随设计画布居中缩放。
+- 战斗棋盘继续保留在独立 `BoardDesignCanvas/DesignRoot`，不与行动 UI 混用坐标模型。
+- 不迁 `OverlayRoot`；战斗 overlay 仍作为全屏覆盖层承载模态表现和特效容器。
 - 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
 
 ## 已完成阶段
@@ -56,6 +57,9 @@
 - 第十四轮：建立战斗棋盘坐标模型预备结构。
   - 主要文件：`scenes/ui/battle/battle_screen.tscn`、`src/Game.Godot/UI/Battle/Widgets/BattleBoardView.cs`。
   - 等待用户运行时手动验证。
+- 第十五轮：迁移战斗行动 UI。
+  - 主要文件：`scenes/ui/battle/battle_screen.tscn`。
+  - 等待用户运行时手动验证。
 
 ## 验证矩阵
 
@@ -88,8 +92,8 @@
 | 等级 | 区域 | 风险 | 状态 |
 | --- | --- | --- | --- |
 | P0 | HUD 右下按钮组 | 固定 `offset_left = 1730`、`offset_top = 885`，非 16:9 下不是真正贴边 | 已完成 |
-| P0 | 地图点位 | 背景 stretch 与点位坐标换算不是同一模型 | 待处理 |
-| P0 | 战斗棋盘 | 棋盘、单位、飘字、技能动画必须共享坐标转换 | 待处理 |
+| P0 | 地图点位 | 背景 stretch 与点位坐标换算不是同一模型 | 坐标模型预备已完成 |
+| P0 | 战斗棋盘 | 棋盘、单位、飘字、技能动画必须共享坐标转换 | 棋盘模型已完成 |
 | P1 | Toast | 背景与文字固定全屏坐标，宽高比变化后可能不居中 | 已完成 |
 | P1 | ConfirmDialog | 弹窗背景虽已居中，但按钮和文本仍按根屏幕固定坐标摆放 | 已完成 |
 | P1 | SaveSlotSelectionPanel | 存档槽选择内容按根屏幕固定坐标摆放，且固定 4 个槽位 | 已完成 |
@@ -106,8 +110,8 @@
 | P1 | CharacterEquipmentSelectionPanel | 装备选择弹窗仍有根级固定坐标内容 | 已完成 |
 | P1 | CombatantSelectPanel | 出战选择面板仍有根级固定坐标内容 | 已完成 |
 | P1 | BattleItemPanel / BattleSettlementPanel | 战斗弹窗仍有根级固定坐标内容 | 已完成 |
-| P1 | StoryDialoguePanel / StoryChoicePanel | 剧情对白和选项仍需进入底部安全布局，长文本与点击继续行为要保持 | 待处理 |
-| P1 | StartQuestion / SelectSect | 开局问卷流程场景仍需进入设计画布，不能改变剧情命令流程 | 待处理 |
+| P1 | StoryDialoguePanel / StoryChoicePanel | 剧情对白和选项仍需进入底部安全布局，长文本与点击继续行为要保持 | 已完成 |
+| P1 | StartQuestion / SelectSect | 开局问卷流程场景仍需进入设计画布，不能改变剧情命令流程 | 已完成 |
 
 ## 第六轮改动记录
 
@@ -430,16 +434,51 @@
 - 伤害/治疗/状态飘字仍出现在对应单位头顶。
 - 行动栏、技能栏、右上按钮和日志不应因本轮迁移发生行为变化。
 
+## 第十五轮改动记录
+
+- 修改 `scenes/ui/battle/battle_screen.tscn`。
+  - 新增 `UiDesignCanvas/DesignRoot`。
+  - `UiDesignCanvas` 使用 `DesignCanvas.cs`，设计尺寸保持默认 `1920x1080`。
+  - `UiDesignCanvas` 设置 `z_index = 20`，确保行动 UI 显示在战斗棋盘之上。
+  - 将战斗行动 UI、右上按钮、标题时钟和日志迁入 UI 设计画布。
+  - 更新节点路径：
+    - `BattleScreen/TopClock` -> `BattleScreen/UiDesignCanvas/DesignRoot/TopClock`
+    - `BattleScreen/AutoBattleButton` -> `BattleScreen/UiDesignCanvas/DesignRoot/AutoBattleButton`
+    - `BattleScreen/SurrenderButton` -> `BattleScreen/UiDesignCanvas/DesignRoot/SurrenderButton`
+    - `BattleScreen/SpeedUpButton` -> `BattleScreen/UiDesignCanvas/DesignRoot/SpeedUpButton`
+    - `BattleScreen/BattleLogTag` -> `BattleScreen/UiDesignCanvas/DesignRoot/BattleLogTag`
+    - `BattleScreen/LogPanel` -> `BattleScreen/UiDesignCanvas/DesignRoot/LogPanel`
+    - `BattleScreen/BottomHud` -> `BattleScreen/UiDesignCanvas/DesignRoot/BottomHud`
+  - `BoardDesignCanvas/DesignRoot/BoardGrid` 保持不变，继续承载棋盘、单位、飘字和技能动画坐标模型。
+  - `OverlayRoot` 保持根级全屏覆盖层，不在本轮迁入设计画布。
+  - 脚本依赖的节点继续保留 `unique_name_in_owner = true`，`BattleScreen.cs` 无需修改。
+
+## 第十五轮静态检查
+
+- `TopClock`、`AutoBattleButton`、`SurrenderButton`、`SpeedUpButton`、`BattleLogTag`、`LogPanel`、`BottomHud` 已挂到 `BattleScreen/UiDesignCanvas/DesignRoot`。
+- `BattleScreen.cs` 仍通过唯一节点名获取标题、按钮、技能栏、头像、日志和 overlay。
+- `BoardGrid` 仍挂到 `BattleScreen/BoardDesignCanvas/DesignRoot`。
+- `OverlayRoot` 仍挂在 `BattleScreen` 根节点，用于继续覆盖全屏。
+- 本轮未修改 C# 行为代码。
+- 按用户要求，本轮不做构建验证。
+
+## 第十五轮手动验证清单
+
+- 进入战斗，确认右上投降、自动、加速按钮在 `1920x1080` 下位置与迁移前一致。
+- 在 `1366x768`、`1920x1200`、`3440x1440` 下确认右上按钮、左侧日志、顶部战场标题和底部行动栏随设计区居中缩放。
+- 选择可行动角色后，确认移动、技能、物品、休息、结束按钮仍可点击。
+- 点击技能按钮后，确认技能列表能正常显示和滚动，技能项点击仍能进入目标选择。
+- 选中技能后，确认左下选中技能图标、技能名和招式名正常刷新。
+- 自动战斗和加速按钮的红色激活状态仍正常显示和隐藏。
+- 战斗日志仍能追加文本，且不会被棋盘或底部 HUD 遮挡。
+- 棋盘 hover、点击移动、技能目标选择、飘字和技能动画不应因本轮迁移发生偏移。
+- 战斗中打开物品面板、战斗结束打开结算面板，确认 overlay 仍覆盖全屏。
+
 ## 后续计划
 
-后续从第十五轮开始继续推进，每一步都需要用户手动验证通过后再继续。
+后续从收尾清理开始继续推进，每一步都需要用户手动验证通过后再继续。
 
-1. 第十五轮：战斗行动 UI 迁移。
-   - 文件：`scenes/ui/battle/battle_skill_box.tscn`、`scenes/ui/battle/battle_skill_view.tscn`、`scenes/ui/battle/battle_legend_overlay.tscn`、`scenes/ui/battle/battle_float_text.tscn`。
-   - 目标：技能栏、行动按钮、飘字和 overlay 在共享坐标模型下稳定显示。
-   - 完成后建议提交标题：`重构UI：迁移战斗行动布局`。
-   - 完成后建议提交描述：`将战斗技能栏、行动按钮、飘字和 overlay 接入设计画布与共享棋盘坐标模型，保持战斗操作行为不变。`
-2. 收尾清理。
+1. 收尾清理。
    - 文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
    - 目标：扫尾剩余固定根级坐标，固化新 UI 场景模板。
    - 完成后建议提交标题：`重构UI：清理剩余固定布局界面`。

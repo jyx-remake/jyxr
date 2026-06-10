@@ -17,7 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://u5msb8uqcflv" path="res://assets/art/ui/battle/battle_zhuangtai-tubiao.png" id="15_skill_btn"]
 [ext_resource type="Texture2D" uid="uid://dm6cedvudfbhe" path="res://assets/art/ui/battle/battle_zhuangtai.png" id="16_skill_word"]
 [ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="17_font"]
-[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_skill_box.tscn" id="18_skill_box"]
+[ext_resource type="PackedScene" uid="uid://cstdi8n6cph7k" path="res://scenes/ui/battle/battle_skill_box.tscn" id="18_skill_box"]
 [ext_resource type="PackedScene" uid="uid://d1qdddofh12io" path="res://scenes/ui/battle/battle_board_view.tscn" id="19_board_view"]
 [ext_resource type="PackedScene" uid="uid://oei4u3648ovq" path="res://scenes/ui/battle/battle_item_panel.tscn" id="20_item_panel"]
 [ext_resource type="PackedScene" uid="uid://b77m8rj4t6o0x" path="res://scenes/ui/battle/battle_legend_overlay.tscn" id="21_legend_overlay"]
@@ -26,20 +26,8 @@
 [ext_resource type="Texture2D" uid="uid://ba8m81qumgdct" path="res://assets/art/ui/battle/battle_zidong.png" id="24_auto_button"]
 [ext_resource type="Texture2D" uid="uid://bc8dyte7msrvf" path="res://assets/art/ui/battle/battle_zidonghong.png" id="25_auto_active"]
 [ext_resource type="Texture2D" uid="uid://dukqh5gd77ixk" path="res://assets/art/ui/battle/touxiang.png" id="26_surrender_button"]
-[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
-[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="28_design_canvas"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
-bg_color = Color(0.18, 0.14, 0.1, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.9, 0.8, 0.55, 0.45)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+[ext_resource type="PackedScene" uid="uid://dtbij03bvh027" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
+[ext_resource type="Script" uid="uid://b6ovs0k7in7v2" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="28_design_canvas"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
 bg_color = Color(0, 0, 0, 0.72)
@@ -61,6 +49,18 @@ font = ExtResource("17_font")
 font_size = 40
 outline_size = 3
 outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
+bg_color = Color(0.18, 0.14, 0.1, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.8, 0.55, 0.45)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="BattleScreen" type="Control" unique_id=96008142]
 layout_mode = 3
@@ -98,7 +98,24 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.2)
 
-[node name="TopClock" type="TextureRect" parent="." unique_id=1545890483]
+[node name="UiDesignCanvas" type="Control" parent="." unique_id=1137548642]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("28_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="UiDesignCanvas" unique_id=1451124091]
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="TopClock" type="TextureRect" parent="UiDesignCanvas/DesignRoot" unique_id=1545890483]
 layout_mode = 0
 offset_left = 22.0
 offset_top = 16.0
@@ -109,7 +126,7 @@ texture = ExtResource("6_clock")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TitleLabel" type="Label" parent="TopClock" unique_id=1760768761]
+[node name="TitleLabel" type="Label" parent="UiDesignCanvas/DesignRoot/TopClock" unique_id=1760768761]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 178.0
@@ -122,7 +139,7 @@ theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 38
 text = "战场"
 
-[node name="SubtitleLabel" type="Label" parent="TopClock" unique_id=731501548]
+[node name="SubtitleLabel" type="Label" parent="UiDesignCanvas/DesignRoot/TopClock" unique_id=731501548]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 180.0
@@ -134,7 +151,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 24
 
-[node name="AutoBattleButton" type="TextureButton" parent="." unique_id=1003218841]
+[node name="AutoBattleButton" type="TextureButton" parent="UiDesignCanvas/DesignRoot" unique_id=1003218841]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1554.0
@@ -146,7 +163,7 @@ texture_normal = ExtResource("24_auto_button")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="AutoBattleActive" type="TextureRect" parent="AutoBattleButton" unique_id=743190248]
+[node name="AutoBattleActive" type="TextureRect" parent="UiDesignCanvas/DesignRoot/AutoBattleButton" unique_id=743190248]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -159,7 +176,7 @@ texture = ExtResource("25_auto_active")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SurrenderButton" type="TextureButton" parent="." unique_id=1078304102]
+[node name="SurrenderButton" type="TextureButton" parent="UiDesignCanvas/DesignRoot" unique_id=1078304102]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1363.0
@@ -171,7 +188,7 @@ texture_normal = ExtResource("26_surrender_button")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="SpeedUpButton" type="TextureButton" parent="." unique_id=1052298601]
+[node name="SpeedUpButton" type="TextureButton" parent="UiDesignCanvas/DesignRoot" unique_id=1052298601]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1748.0
@@ -183,7 +200,7 @@ texture_normal = ExtResource("22_speed_button")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="SpeedUpActive" type="TextureRect" parent="SpeedUpButton" unique_id=1743614407]
+[node name="SpeedUpActive" type="TextureRect" parent="UiDesignCanvas/DesignRoot/SpeedUpButton" unique_id=1743614407]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -196,7 +213,7 @@ texture = ExtResource("23_speed_active")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BattleLogTag" type="TextureRect" parent="." unique_id=1046574722]
+[node name="BattleLogTag" type="TextureRect" parent="UiDesignCanvas/DesignRoot" unique_id=1046574722]
 layout_mode = 0
 offset_left = -44.0
 offset_top = 200.0
@@ -207,56 +224,35 @@ texture = ExtResource("7_log_tag")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LogPanel" type="PanelContainer" parent="." unique_id=1677156711]
-layout_mode = 0
-offset_left = 28.0
-offset_top = 244.0
-offset_right = 268.0
-offset_bottom = 748.0
+[node name="LogPanel" type="PanelContainer" parent="UiDesignCanvas/DesignRoot" unique_id=1677156711]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -252.0
+offset_right = 240.0
+offset_bottom = 252.0
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_overlay")
 
-[node name="LogPadding" type="MarginContainer" parent="LogPanel" unique_id=1810979141]
+[node name="LogPadding" type="MarginContainer" parent="UiDesignCanvas/DesignRoot/LogPanel" unique_id=1810979141]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 14
 
-[node name="LogLabel" type="RichTextLabel" parent="LogPanel/LogPadding" unique_id=1613561611]
+[node name="LogLabel" type="RichTextLabel" parent="UiDesignCanvas/DesignRoot/LogPanel/LogPadding" unique_id=1613561611]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 470)
 layout_mode = 2
 theme_override_colors/default_color = Color(0.94, 0.93, 0.88, 1)
 theme_override_font_sizes/normal_font_size = 20
 
-[node name="BoardDesignCanvas" type="Control" parent="." unique_id=322072777]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("28_design_canvas")
-
-[node name="DesignRoot" type="Control" parent="BoardDesignCanvas" unique_id=546322942]
-layout_mode = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
-mouse_filter = 2
-
-[node name="BoardGrid" parent="BoardDesignCanvas/DesignRoot" unique_id=843775524 instance=ExtResource("19_board_view")]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 237.0
-offset_top = 242.0
-offset_right = 237.0
-offset_bottom = 242.0
-
-[node name="BottomHud" type="Control" parent="." unique_id=414540527]
+[node name="BottomHud" type="Control" parent="UiDesignCanvas/DesignRoot" unique_id=414540527]
 anchors_preset = 0
 
-[node name="BottomStrip" type="TextureRect" parent="BottomHud" unique_id=1312754331]
+[node name="BottomStrip" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=1312754331]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 901.0
@@ -267,7 +263,7 @@ texture = ExtResource("4_bottom_strip")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ActionBarBg" type="TextureRect" parent="BottomHud" unique_id=1125755907]
+[node name="ActionBarBg" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=1125755907]
 layout_mode = 0
 offset_left = 650.0
 offset_top = 533.0
@@ -278,7 +274,7 @@ texture = ExtResource("3_action_bg")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SelectedSkillBg" type="TextureRect" parent="BottomHud" unique_id=103111520]
+[node name="SelectedSkillBg" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=103111520]
 layout_mode = 0
 offset_left = 55.0
 offset_top = 767.0
@@ -289,7 +285,7 @@ texture = ExtResource("8_selected_skill")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SelectedSkillIconPanel" type="Panel" parent="BottomHud/SelectedSkillBg" unique_id=1569974441]
+[node name="SelectedSkillIconPanel" type="Panel" parent="UiDesignCanvas/DesignRoot/BottomHud/SelectedSkillBg" unique_id=1569974441]
 layout_mode = 0
 offset_left = 39.0
 offset_top = 66.0
@@ -298,7 +294,7 @@ offset_bottom = 205.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_skill_icon")
 
-[node name="SelectedSkillIconMargin" type="MarginContainer" parent="BottomHud/SelectedSkillBg/SelectedSkillIconPanel" unique_id=1240268755]
+[node name="SelectedSkillIconMargin" type="MarginContainer" parent="UiDesignCanvas/DesignRoot/BottomHud/SelectedSkillBg/SelectedSkillIconPanel" unique_id=1240268755]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -310,13 +306,13 @@ theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="SelectedSkillIcon" type="TextureRect" parent="BottomHud/SelectedSkillBg/SelectedSkillIconPanel/SelectedSkillIconMargin" unique_id=1889567405]
+[node name="SelectedSkillIcon" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud/SelectedSkillBg/SelectedSkillIconPanel/SelectedSkillIconMargin" unique_id=1889567405]
 unique_name_in_owner = true
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 4
 
-[node name="SelectedSkillNameLabel" type="Label" parent="BottomHud/SelectedSkillBg" unique_id=48809877]
+[node name="SelectedSkillNameLabel" type="Label" parent="UiDesignCanvas/DesignRoot/BottomHud/SelectedSkillBg" unique_id=48809877]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = -3.0
@@ -329,7 +325,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 1
 
-[node name="SelectedSkillFormNameLabel" type="Label" parent="BottomHud/SelectedSkillBg" unique_id=978270284]
+[node name="SelectedSkillFormNameLabel" type="Label" parent="UiDesignCanvas/DesignRoot/BottomHud/SelectedSkillBg" unique_id=978270284]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 40.0
@@ -341,7 +337,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 1
 
-[node name="ListScroll" type="ScrollContainer" parent="BottomHud" unique_id=60321938]
+[node name="ListScroll" type="ScrollContainer" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=60321938]
 layout_mode = 0
 offset_left = 267.0
 offset_top = 855.0
@@ -349,12 +345,12 @@ offset_right = 1425.0
 offset_bottom = 1074.0
 vertical_scroll_mode = 0
 
-[node name="ListContainer" type="HBoxContainer" parent="BottomHud/ListScroll" unique_id=2070798312]
+[node name="ListContainer" type="HBoxContainer" parent="UiDesignCanvas/DesignRoot/BottomHud/ListScroll" unique_id=2070798312]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Avatar" type="TextureRect" parent="BottomHud" unique_id=912225212]
+[node name="Avatar" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=912225212]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1598.0
@@ -365,7 +361,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AvatarFrame" type="TextureRect" parent="BottomHud" unique_id=55353986]
+[node name="AvatarFrame" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=55353986]
 layout_mode = 0
 offset_left = 1583.0
 offset_top = 839.0
@@ -376,7 +372,7 @@ texture = ExtResource("5_avatar_frame")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EndButton" type="Button" parent="BottomHud" unique_id=890715130]
+[node name="EndButton" type="Button" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=890715130]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(132, 56)
@@ -392,7 +388,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_action")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
 text = "结束"
 
-[node name="SkillButton" type="TextureButton" parent="BottomHud" unique_id=250363507]
+[node name="SkillButton" type="TextureButton" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=250363507]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1595.0
@@ -403,7 +399,7 @@ texture_normal = ExtResource("15_skill_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="SkillWord" type="TextureRect" parent="BottomHud/SkillButton" unique_id=1217349101]
+[node name="SkillWord" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud/SkillButton" unique_id=1217349101]
 layout_mode = 0
 offset_left = 33.0
 offset_top = 11.0
@@ -414,7 +410,7 @@ texture = ExtResource("16_skill_word")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ItemButton" type="TextureButton" parent="BottomHud" unique_id=984075596]
+[node name="ItemButton" type="TextureButton" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=984075596]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1724.0
@@ -425,7 +421,7 @@ texture_normal = ExtResource("11_item_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="ItemWord" type="TextureRect" parent="BottomHud/ItemButton" unique_id=1820730931]
+[node name="ItemWord" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud/ItemButton" unique_id=1820730931]
 layout_mode = 0
 offset_left = 37.0
 offset_top = 14.0
@@ -436,7 +432,7 @@ texture = ExtResource("12_item_word")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="RestButton" type="TextureButton" parent="BottomHud" unique_id=861883801]
+[node name="RestButton" type="TextureButton" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=861883801]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1729.0
@@ -447,7 +443,7 @@ texture_normal = ExtResource("13_rest_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="RestWord" type="TextureRect" parent="BottomHud/RestButton" unique_id=1311330508]
+[node name="RestWord" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud/RestButton" unique_id=1311330508]
 layout_mode = 0
 offset_left = 44.0
 offset_top = 22.0
@@ -458,7 +454,7 @@ texture = ExtResource("14_rest_word")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MoveButton" type="TextureButton" parent="BottomHud" unique_id=1408921671]
+[node name="MoveButton" type="TextureButton" parent="UiDesignCanvas/DesignRoot/BottomHud" unique_id=1408921671]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1462.0
@@ -469,7 +465,7 @@ texture_normal = ExtResource("9_move_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="MoveWord" type="TextureRect" parent="BottomHud/MoveButton" unique_id=336048975]
+[node name="MoveWord" type="TextureRect" parent="UiDesignCanvas/DesignRoot/BottomHud/MoveButton" unique_id=336048975]
 layout_mode = 0
 offset_left = 35.0
 offset_top = 16.0
@@ -480,6 +476,30 @@ texture = ExtResource("10_move_word")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="BoardDesignCanvas" type="Control" parent="." unique_id=322072777]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("28_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="BoardDesignCanvas" unique_id=546322942]
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="BoardGrid" parent="BoardDesignCanvas/DesignRoot" unique_id=843775524 instance=ExtResource("19_board_view")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 237.0
+offset_top = 242.0
+offset_right = 237.0
+offset_bottom = 242.0
+
 [node name="OverlayRoot" type="Control" parent="." unique_id=2009935606]
 unique_name_in_owner = true
 z_index = 100
@@ -487,6 +507,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -5.0
+offset_right = 2.0
+offset_bottom = -5.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
