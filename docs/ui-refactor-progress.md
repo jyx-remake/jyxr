@@ -2,14 +2,13 @@
 
 ## 当前阶段
 
-第十五轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+第十六轮已完成代码侧迁移，等待 Godot 运行时手动验证。
 
 本轮范围：
 
-- 战斗行动 UI 进入独立 `UiDesignCanvas/DesignRoot`。
-- 右上战斗按钮、战斗日志、底部 HUD、行动按钮和技能列表滚动区随设计画布居中缩放。
-- 战斗棋盘继续保留在独立 `BoardDesignCanvas/DesignRoot`，不与行动 UI 混用坐标模型。
-- 不迁 `OverlayRoot`；战斗 overlay 仍作为全屏覆盖层承载模态表现和特效容器。
+- 主菜单、失败界面、通关界面、角色摘要面板和 hint 提示框进入独立 `DesignCanvas/DesignRoot`。
+- 主菜单背景、失败/通关黑底和角色摘要遮罩继续保留根级全屏铺底。
+- 只迁场景结构，不修改 C# 行为代码。
 - 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
 
 ## 已完成阶段
@@ -59,6 +58,9 @@
   - 等待用户运行时手动验证。
 - 第十五轮：迁移战斗行动 UI。
   - 主要文件：`scenes/ui/battle/battle_screen.tscn`。
+  - 等待用户运行时手动验证。
+- 第十六轮：收尾清理剩余固定布局界面。
+  - 主要文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
   - 等待用户运行时手动验证。
 
 ## 验证矩阵
@@ -112,6 +114,7 @@
 | P1 | BattleItemPanel / BattleSettlementPanel | 战斗弹窗仍有根级固定坐标内容 | 已完成 |
 | P1 | StoryDialoguePanel / StoryChoicePanel | 剧情对白和选项仍需进入底部安全布局，长文本与点击继续行为要保持 | 已完成 |
 | P1 | StartQuestion / SelectSect | 开局问卷流程场景仍需进入设计画布，不能改变剧情命令流程 | 已完成 |
+| P1 | MainMenu / GameFlow / CharacterSummary / Hint | 剩余流程界面和轻量提示框仍有根级固定坐标内容 | 已完成 |
 
 ## 第六轮改动记录
 
@@ -476,10 +479,55 @@
 
 ## 后续计划
 
-后续从收尾清理开始继续推进，每一步都需要用户手动验证通过后再继续。
+后续从规则固化开始继续推进，每一步都需要用户手动验证通过后再继续。
 
-1. 收尾清理。
-   - 文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
-   - 目标：扫尾剩余固定根级坐标，固化新 UI 场景模板。
-   - 完成后建议提交标题：`重构UI：清理剩余固定布局界面`。
-   - 完成后建议提交描述：`迁移主菜单、失败通关界面、角色摘要和提示框等剩余固定坐标界面，并固化后续 UI 场景模板。`
+1. 固化 UI 场景模板与检查规则。
+   - 文件：`docs/ui-system-refactor-plan.md`、后续可新增 UI 模板文档或静态检查脚本。
+   - 目标：明确新 UI 必须进入 `DesignCanvas` 或说明例外，沉淀固定坐标扫描方式，降低后续回退风险。
+   - 完成后建议提交标题：`重构UI：固化自适应布局规则`。
+   - 完成后建议提交描述：`补充 UI 场景模板、固定坐标检查规则和新增界面约束，避免后续界面重新依赖根级固定坐标。`
+
+## 第十六轮改动记录
+
+- 修改 `scenes/main_menu/main_menu.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 保留 `Bg` 在根节点下继续全屏铺底。
+  - 将 `Cross`、`Title` 和主菜单按钮列表迁入设计画布。
+  - 将 `Cross` 从根级全屏锚点偏移换算为 `1920x1080` 设计坐标内的固定 rect，保持基准视觉尺寸不变。
+- 修改 `scenes/ui/game_flow/gameover_screen.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 保留 `BackgroundDim` 在根节点下继续全屏铺底。
+  - 将失败图、标题、日期、死亡统计和底部按钮组迁入设计画布。
+- 修改 `scenes/ui/game_flow/game_fin_screen.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 保留 `BackgroundDim` 在根节点下继续全屏铺底。
+  - 将通关文字和返回主菜单按钮迁入设计画布。
+- 修改 `scenes/ui/character_summary_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 保留 `Overlay` 在根节点下继续全屏遮罩。
+  - 将面板框、关闭按钮、头像、基础信息、装备信息和技能页迁入设计画布。
+- 修改 `scenes/ui/hint/hint_box.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将提示框背景、内容面板、确认按钮、标题和正文迁入设计画布。
+
+## 第十六轮静态检查
+
+- 本轮五个目标场景均已新增 `DesignCanvas/DesignRoot`。
+- 主菜单 `StartButton`、`LoadButton`、`MusicButton` 保留唯一节点名，`MainMenu.cs` 节点查找不变。
+- 失败界面 `DateLabel`、`DeathInfoLabel`、`RestartButton`、`LoadGameButton`、`ExitButton` 保留唯一节点名，`GameOverScreen.cs` 节点查找不变。
+- 通关界面 `MainMenuButton` 保留唯一节点名，`GameFinScreen.cs` 节点查找不变。
+- 角色摘要 `Avatar`、`NameLabel`、`LevelLabel`、`HpLabel`、`MpLabel`、`StatsLabel`、`EquipmentLabel`、`SkillTab`、`CloseButton` 保留唯一节点名，`CharacterSummaryPanel.cs` 节点查找不变。
+- hint `AckButton`、`ContentLabel` 保留唯一节点名，`HintBox.cs` 节点查找不变。
+- 根节点下保留的节点只用于全屏背景或遮罩：主菜单 `Bg`、失败/通关 `BackgroundDim`、角色摘要 `Overlay`。
+- 按用户要求，本轮不做构建验证。
+
+## 第十六轮手动验证清单
+
+- 打开主菜单，确认背景仍铺满整个窗口，标题、装饰和三个按钮在 `1920x1080` 下位置与迁移前一致。
+- 在 `1366x768`、`1920x1200`、`3440x1440` 下确认主菜单内容随设计区居中缩放，背景仍全屏。
+- 主菜单新游戏、读档、音乐欣赏按钮行为不变。
+- 进入失败界面，确认失败图、标题、日期、死亡统计和底部按钮位于居中的 16:9 设计区内。
+- 失败界面再战、读档、退出按钮行为不变。
+- 进入通关界面，确认“全剧终”和返回主菜单按钮位于设计区内，返回行为不变。
+- 打开角色摘要面板，确认遮罩仍铺满窗口，面板内容位于设计区内，关闭按钮可点击。
+- 打开 hint 提示框，确认提示框整体位于设计区内，确认按钮可关闭提示。

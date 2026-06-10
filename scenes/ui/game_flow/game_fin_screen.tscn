@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="1_8ryr2"]
 [ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="2_4v0n6"]
 [ext_resource type="Script" uid="uid://xrmyg6wulot" path="res://src/Game.Godot/UI/GameFinScreen.cs" id="3_10lbf"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="4_design_canvas"]
 
 [node name="GameFin" type="Control" unique_id=464009357]
 layout_mode = 3
@@ -23,7 +24,20 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
-[node name="Label" type="Label" parent="." unique_id=493274857]
+[node name="DesignCanvas" type="Control" parent="." unique_id=100000451]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" unique_id=100000452]
+layout_mode = 0
+
+[node name="Label" type="Label" parent="DesignCanvas/DesignRoot" unique_id=493274857]
 layout_mode = 0
 offset_left = 812.0
 offset_top = 401.0
@@ -34,7 +48,7 @@ theme_override_font_sizes/font_size = 100
 text = "全剧终"
 autowrap_mode = 3
 
-[node name="MainMenuButton" type="TextureButton" parent="." unique_id=1229064302]
+[node name="MainMenuButton" type="TextureButton" parent="DesignCanvas/DesignRoot" unique_id=1229064302]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(342, 112)
 layout_mode = 0
@@ -49,7 +63,7 @@ stretch_mode = 5
 script = ExtResource("2_4v0n6")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="MainMenuButton" unique_id=1414625951]
+[node name="Label" type="Label" parent="DesignCanvas/DesignRoot/MainMenuButton" unique_id=1414625951]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/Game.Godot/UI/CharacterSummaryPanel.cs" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/art/misc/dikuang2.png" id="2_background"]
 [ext_resource type="Texture2D" path="res://assets/art/misc/cross.png" id="3_close"]
 [ext_resource type="Texture2D" path="res://assets/art/head/zhujue2.png" id="4_avatar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/skill_tab/skill_tab.tscn" id="5_skill_tab"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="6_design_canvas"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
 bg_color = Color(0, 0, 0, 0.45)
@@ -27,7 +28,20 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_overlay")
 
-[node name="Frame" type="TextureRect" parent="."]
+[node name="DesignCanvas" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas"]
+layout_mode = 0
+
+[node name="Frame" type="TextureRect" parent="DesignCanvas/DesignRoot"]
 layout_mode = 0
 offset_left = 220.0
 offset_top = 94.0
@@ -37,7 +51,7 @@ texture = ExtResource("2_background")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="CloseButton" type="TextureButton" parent="."]
+[node name="CloseButton" type="TextureButton" parent="DesignCanvas/DesignRoot"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1560.0
@@ -48,7 +62,7 @@ ignore_texture_size = true
 stretch_mode = 4
 texture_normal = ExtResource("3_close")
 
-[node name="Avatar" type="TextureRect" parent="."]
+[node name="Avatar" type="TextureRect" parent="DesignCanvas/DesignRoot"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 318.0
@@ -59,7 +73,7 @@ texture = ExtResource("4_avatar")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="NameLabel" type="Label" parent="."]
+[node name="NameLabel" type="Label" parent="DesignCanvas/DesignRoot"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 700.0
@@ -69,7 +83,7 @@ offset_bottom = 234.0
 theme_override_font_sizes/font_size = 32
 text = "角色"
 
-[node name="LevelLabel" type="Label" parent="."]
+[node name="LevelLabel" type="Label" parent="DesignCanvas/DesignRoot"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 700.0
@@ -79,7 +93,7 @@ offset_bottom = 284.0
 theme_override_font_sizes/font_size = 24
 text = "等级 1"
 
-[node name="HpLabel" type="Label" parent="."]
+[node name="HpLabel" type="Label" parent="DesignCanvas/DesignRoot"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 700.0
@@ -89,7 +103,7 @@ offset_bottom = 342.0
 theme_override_font_sizes/font_size = 22
 text = "HP 0"
 
-[node name="MpLabel" type="Label" parent="."]
+[node name="MpLabel" type="Label" parent="DesignCanvas/DesignRoot"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 940.0
@@ -99,7 +113,7 @@ offset_bottom = 342.0
 theme_override_font_sizes/font_size = 22
 text = "MP 0"
 
-[node name="StatsLabel" type="Label" parent="."]
+[node name="StatsLabel" type="Label" parent="DesignCanvas/DesignRoot"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 318.0
@@ -110,7 +124,7 @@ theme_override_font_sizes/font_size = 22
 text = "攻击 0  防御 0  轻功 0  移动 0"
 autowrap_mode = 3
 
-[node name="EquipmentLabel" type="Label" parent="."]
+[node name="EquipmentLabel" type="Label" parent="DesignCanvas/DesignRoot"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 318.0
@@ -121,7 +135,7 @@ theme_override_font_sizes/font_size = 22
 text = "装备：无"
 autowrap_mode = 3
 
-[node name="SkillTab" parent="." instance=ExtResource("5_skill_tab")]
+[node name="SkillTab" parent="DesignCanvas/DesignRoot" instance=ExtResource("5_skill_tab")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 318.0
