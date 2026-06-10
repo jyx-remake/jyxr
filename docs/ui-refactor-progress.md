@@ -2,14 +2,15 @@
 
 ## 当前阶段
 
-第十六轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+UI 自适应迁移主线已完成，十六轮迁移均已通过 Godot 运行时手动验证。
 
-本轮范围：
+最终范围：
 
-- 主菜单、失败界面、通关界面、角色摘要面板和 hint 提示框进入独立 `DesignCanvas/DesignRoot`。
-- 主菜单背景、失败/通关黑底和角色摘要遮罩继续保留根级全屏铺底。
-- 只迁场景结构，不修改 C# 行为代码。
-- 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
+- `DesignCanvas` 已成为普通 UI 的默认设计安全画布。
+- HUD、toast、confirm、`JyPanel`、主要面板、剧情 UI、开局流程、地图 UI、战斗 UI、主菜单、失败/通关、角色摘要和 hint 已完成代码侧迁移。
+- 所有迁移轮次已完成用户运行时验证。
+- 后续进入具体视觉细节优化与规则维护，不再按迁移轮次推进。
+- 固化规则见 `docs/ui-layout-rules.md`。
 
 ## 已完成阶段
 
@@ -30,42 +31,42 @@
   - 用户已确认拉伸下视觉正常。
 - 第六轮：迁移 `JyPanel` 基础壳与第一批主面板。
   - 主要文件：`scenes/ui/base/jy_panel.tscn`、`scenes/ui/inventory_panel/inventory_panel.tscn`、`scenes/ui/shop_panel/shop_panel.tscn`、`scenes/ui/chest_panel/chest_panel.tscn`、`scenes/ui/party_panel/party_panel.tscn`、`scenes/ui/journal/journal_panel.tscn`、`scenes/ui/hero_panel/hero_panel.tscn`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第七轮：迁移剩余 `JyPanel` 子面板。
   - 主要文件：`scenes/ui/character_panel/character_panel.tscn`、`scenes/ui/character_panel/equipment_selection_panel.tscn`、`scenes/ui/inventory_panel/item_target_selection_panel.tscn`、`scenes/ui/battle/combatant_select_panel.tscn`、`scenes/ui/battle/battle_item_panel.tscn`、`scenes/ui/battle/battle_settlement_panel.tscn`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第八轮：迁移剧情对白框。
   - 主要文件：`scenes/ui/story/story_dialogue_panel.tscn`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第九轮：迁移剧情选项框。
   - 主要文件：`scenes/ui/story/story_choice_panel.tscn`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第十轮：迁移开局流程第一批。
   - 主要文件：`scenes/ui/select_sect/select_sect_screen.tscn`、`scenes/ui/start_question/input_name_panel.tscn`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第十一轮：迁移开局流程第二批。
   - 主要文件：`scenes/ui/start_question/select_head_panel.tscn`、`scenes/ui/start_question/roll_stats_panel.tscn`。
   - `scenes/ui/start_question/select_head_slot.tscn` 为动态列表项，本轮确认无需结构迁移。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第十二轮：建立地图 UI 坐标模型预备结构。
   - 主要文件：`scenes/map/map_screen.tscn`、`src/Game.Godot/Map/MapScreen.cs`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第十三轮：迁移地图覆盖 UI。
   - 主要文件：`scenes/map/map_screen.tscn`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第十四轮：建立战斗棋盘坐标模型预备结构。
   - 主要文件：`scenes/ui/battle/battle_screen.tscn`、`src/Game.Godot/UI/Battle/Widgets/BattleBoardView.cs`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第十五轮：迁移战斗行动 UI。
   - 主要文件：`scenes/ui/battle/battle_screen.tscn`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 - 第十六轮：收尾清理剩余固定布局界面。
   - 主要文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
-  - 等待用户运行时手动验证。
+  - 用户已完成运行时验证。
 
 ## 验证矩阵
 
-后续每轮 UI 迁移优先验证：
+后续具体细节优化优先验证：
 
 - `1920x1080`
 - `1366x768`
@@ -76,11 +77,11 @@
 
 - Codex 做静态路径、节点唯一名和场景结构检查。
 - 用户在 Godot 运行时手动验证视觉和交互。
-- 当前阶段按用户要求不跑 `dotnet build` / `dotnet test`。
+- UI 细节优化仍以 Godot 运行时视觉和交互验证为准；是否跑构建按当次改动风险决定。
 
-## 后续迁移执行规则
+## 历史迁移执行规则
 
-从第八轮开始，剧情、开局流程、地图和战斗主界面都按小步迁移处理，不再把多个高风险区域合并到同一轮。
+迁移主线执行期间，从第八轮开始，剧情、开局流程、地图和战斗主界面都按小步迁移处理，不再把多个高风险区域合并到同一轮。
 
 - 每轮只迁一个明确目标，例如“剧情对白框”、“剧情选项框”、“门派选择界面”、“地图背景与点位 transform”。
 - 每轮完成后停止继续开发，先记录改动范围、静态检查结果和手动验证清单。
@@ -477,15 +478,17 @@
 - 棋盘 hover、点击移动、技能目标选择、飘字和技能动画不应因本轮迁移发生偏移。
 - 战斗中打开物品面板、战斗结束打开结算面板，确认 overlay 仍覆盖全屏。
 
-## 后续计划
+## 规则固化
 
-后续从规则固化开始继续推进，每一步都需要用户手动验证通过后再继续。
+UI 自适应布局规则已固化到 `docs/ui-layout-rules.md`。
 
-1. 固化 UI 场景模板与检查规则。
-   - 文件：`docs/ui-system-refactor-plan.md`、后续可新增 UI 模板文档或静态检查脚本。
-   - 目标：明确新 UI 必须进入 `DesignCanvas` 或说明例外，沉淀固定坐标扫描方式，降低后续回退风险。
-   - 完成后建议提交标题：`重构UI：固化自适应布局规则`。
-   - 完成后建议提交描述：`补充 UI 场景模板、固定坐标检查规则和新增界面约束，避免后续界面重新依赖根级固定坐标。`
+后续具体界面细节优化应继续遵守：
+
+- 普通交互 UI 默认进入 `DesignCanvas/DesignRoot`。
+- 全屏背景、遮罩和战斗 overlay 可以留在根节点，但不承载普通内容。
+- 新增 UI 需要保留脚本依赖节点的唯一节点名。
+- 地图和战斗改动必须先确认坐标模型，再改点击、hover、飘字或动画位置。
+- 不做按分辨率堆叠的特殊偏移补丁。
 
 ## 第十六轮改动记录
 
