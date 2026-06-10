@@ -27,6 +27,7 @@
 [ext_resource type="Texture2D" uid="uid://bc8dyte7msrvf" path="res://assets/art/ui/battle/battle_zidonghong.png" id="25_auto_active"]
 [ext_resource type="Texture2D" uid="uid://dukqh5gd77ixk" path="res://assets/art/ui/battle/touxiang.png" id="26_surrender_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="28_design_canvas"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
 bg_color = Color(0.18, 0.14, 0.1, 0.92)
@@ -228,7 +229,23 @@ layout_mode = 2
 theme_override_colors/default_color = Color(0.94, 0.93, 0.88, 1)
 theme_override_font_sizes/normal_font_size = 20
 
-[node name="BoardGrid" parent="." unique_id=843775524 instance=ExtResource("19_board_view")]
+[node name="BoardDesignCanvas" type="Control" parent="." unique_id=322072777]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("28_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="BoardDesignCanvas" unique_id=546322942]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="BoardGrid" parent="BoardDesignCanvas/DesignRoot" unique_id=843775524 instance=ExtResource("19_board_view")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 237.0

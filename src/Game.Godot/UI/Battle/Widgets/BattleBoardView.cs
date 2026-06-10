@@ -94,7 +94,7 @@ public partial class BattleBoardView : Control
 			unitView ??= GetOrCreateUnitView(unit.UnitId);
 			unitView.Configure(unit);
 
-			var targetPosition = ResolveUnitAnchor(unit.Position);
+			var targetPosition = GridPositionToUnitAnchor(unit.Position);
 			if (!isExistingView)
 			{
 				unitView.Position = targetPosition;
@@ -140,7 +140,7 @@ public partial class BattleBoardView : Control
 		unitView.PlayMoveLoop();
 		foreach (var position in mode == BattleMovementPresentationMode.Instant ? [path[^1]] : path)
 		{
-			var targetPosition = ResolveUnitAnchor(position);
+			var targetPosition = GridPositionToUnitAnchor(position);
 			if (targetPosition.X < unitView.Position.X)
 			{
 				unitView.ApplyFacing(BattleFacing.Left);
@@ -205,7 +205,7 @@ public partial class BattleBoardView : Control
 		Task? firstImpactTask = null;
 		foreach (var impactPosition in impactPositions)
 		{
-			var impactTask = PlaySkillAnimationAtAsync(ResolveUnitAnchor(impactPosition), skillAnimationId);
+			var impactTask = PlaySkillAnimationAtAsync(GridPositionToUnitAnchor(impactPosition), skillAnimationId);
 			if (firstImpactTask is null)
 			{
 				firstImpactTask = impactTask;
@@ -307,7 +307,7 @@ public partial class BattleBoardView : Control
 					continue;
 				}
 
-				var rect = ResolveCellRect(position);
+				var rect = GridPositionToCellRect(position);
 				DrawRect(rect, cell.Color);
 				DrawRect(rect, BorderColor, false, 2f);
 				DrawCellText(font, rect, cell.Label);
@@ -325,7 +325,7 @@ public partial class BattleBoardView : Control
 				UpdateHoveredCell(motion.Position);
 				break;
 			case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } button:
-				if (TryGetCellAt(button.Position, out var position) &&
+				if (TryGetGridPositionAt(button.Position, out var position) &&
 					_cells.TryGetValue(position, out var cell) &&
 					cell.IsInteractive)
 				{
@@ -347,7 +347,7 @@ public partial class BattleBoardView : Control
 
 	private void UpdateHoveredCell(Vector2 mousePosition)
 	{
-		GridPosition? hovered = TryGetCellAt(mousePosition, out var position) &&
+		GridPosition? hovered = TryGetGridPositionAt(mousePosition, out var position) &&
 			_cells.TryGetValue(position, out var cell) &&
 			cell.IsInteractive
 			? position
@@ -361,7 +361,7 @@ public partial class BattleBoardView : Control
 		HoveredCellChanged?.Invoke(hovered);
 	}
 
-	private bool TryGetCellAt(Vector2 point, out GridPosition position)
+	private bool TryGetGridPositionAt(Vector2 point, out GridPosition position)
 	{
 		if (_cellWidth <= 0 || _cellHeight <= 0)
 		{
@@ -391,16 +391,16 @@ public partial class BattleBoardView : Control
 		return true;
 	}
 
-	private Rect2 ResolveCellRect(GridPosition position) =>
+	private Rect2 GridPositionToCellRect(GridPosition position) =>
 		new(
 			position.X * (_cellWidth + _cellGap),
 			position.Y * (_cellHeight + _cellGap),
 			_cellWidth,
 			_cellHeight);
 
-	private Vector2 ResolveUnitAnchor(GridPosition position)
+	private Vector2 GridPositionToUnitAnchor(GridPosition position)
 	{
-		var rect = ResolveCellRect(position);
+		var rect = GridPositionToCellRect(position);
 		return new Vector2(
 			rect.Position.X + rect.Size.X * 0.5f,
 			rect.Position.Y + rect.Size.Y * 0.5f);
