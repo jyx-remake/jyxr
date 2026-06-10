@@ -1,22 +1,38 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b5pkaboiwd6id"]
 
-[ext_resource type="Script" path="res://src/Game.Godot/UI/Story/StoryChoicePanel.cs" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/art/misc/dikuang2.png" id="2_background"]
-[ext_resource type="PackedScene" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="3_avatar"]
-[ext_resource type="PackedScene" path="res://scenes/ui/story/story_choice_button.tscn" id="4_choice_button"]
+[ext_resource type="Script" uid="uid://dwrn78qbdoypl" path="res://src/Game.Godot/UI/Story/StoryChoicePanel.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://jsmmfitkrv5x" path="res://assets/art/misc/dikuang2.png" id="2_background"]
+[ext_resource type="PackedScene" uid="uid://cveba3f8kxvxc" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="3_avatar"]
+[ext_resource type="PackedScene" uid="uid://brogwssf7afge" path="res://scenes/ui/story/story_choice_button.tscn" id="4_choice_button"]
+[ext_resource type="Script" uid="uid://b6ovs0k7in7v2" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="5_design_canvas"]
 
-[node name="StoryChoicePanel" type="Control"]
+[node name="StoryChoicePanel" type="Control" unique_id=507441085]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 script = ExtResource("1_script")
 ChoiceButtonScene = ExtResource("4_choice_button")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="DesignCanvas" type="Control" parent="." unique_id=626964433]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" unique_id=1439268953]
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Background" type="TextureRect" parent="DesignCanvas/DesignRoot" unique_id=1891060400]
 layout_mode = 0
 offset_left = 51.0
 offset_top = 35.0
@@ -26,7 +42,7 @@ mouse_filter = 2
 texture = ExtResource("2_background")
 expand_mode = 1
 
-[node name="AvatarBox" parent="." instance=ExtResource("3_avatar")]
+[node name="AvatarBox" parent="DesignCanvas/DesignRoot" unique_id=1164821191 instance=ExtResource("3_avatar")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 261.0
@@ -35,7 +51,7 @@ offset_right = 261.0
 offset_bottom = 213.0
 scale = Vector2(0.32, 0.32)
 
-[node name="QuestionLabel" type="RichTextLabel" parent="."]
+[node name="QuestionLabel" type="RichTextLabel" parent="DesignCanvas/DesignRoot" unique_id=1437127420]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 392.0
@@ -43,18 +59,16 @@ offset_top = 126.0
 offset_right = 1707.0
 offset_bottom = 305.0
 mouse_filter = 2
-bbcode_enabled = true
-fit_content = false
-scroll_active = false
-autowrap_mode = 3
 theme_override_colors/default_color = Color(0.8745098, 0.79607844, 0.654902, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/line_separation = 12
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/normal_font_size = 50
+bbcode_enabled = true
 text = "问题"
+scroll_active = false
 
-[node name="ChoiceScroll" type="ScrollContainer" parent="."]
+[node name="ChoiceScroll" type="ScrollContainer" parent="DesignCanvas/DesignRoot" unique_id=1907905783]
 layout_mode = 0
 offset_left = 316.0
 offset_top = 302.0
@@ -62,7 +76,7 @@ offset_right = 1645.0
 offset_bottom = 866.0
 horizontal_scroll_mode = 0
 
-[node name="ChoiceContainer" type="VBoxContainer" parent="ChoiceScroll"]
+[node name="ChoiceContainer" type="VBoxContainer" parent="DesignCanvas/DesignRoot/ChoiceScroll" unique_id=2120654038]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 0
