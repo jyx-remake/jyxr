@@ -2,13 +2,13 @@
 
 ## 当前阶段
 
-第九轮已完成代码侧迁移，等待 Godot 运行时手动验证。
+第十轮已完成代码侧迁移，等待 Godot 运行时手动验证。
 
 本轮范围：
 
-- 剧情选项框主体内容进入 `DesignCanvas/DesignRoot`。
-- 保留原有选项背景、头像、问题文本和选项列表的设计稿坐标与缩放。
-- 不修改 `StoryChoicePanel.cs` 和 `StoryChoiceButton.cs` 行为逻辑，保持选项生成、默认焦点和点击选择行为。
+- 门派选择界面交互内容进入 `DesignCanvas/DesignRoot`，背景继续根级全屏铺底。
+- 输入名字面板主体内容进入 `DesignCanvas/DesignRoot`。
+- 不修改 `SelectSectScreen.cs` 和 `InputNamePanel.cs` 行为逻辑，保持门派切换、确认选择、输入提交和取消清理流程。
 - 不做构建验证；本阶段以后由 Codex 做静态检查，用户在 Godot 运行时做视觉和交互验证。
 
 ## 已完成阶段
@@ -39,6 +39,9 @@
   - 等待用户运行时手动验证。
 - 第九轮：迁移剧情选项框。
   - 主要文件：`scenes/ui/story/story_choice_panel.tscn`。
+  - 等待用户运行时手动验证。
+- 第十轮：迁移开局流程第一批。
+  - 主要文件：`scenes/ui/select_sect/select_sect_screen.tscn`、`scenes/ui/start_question/input_name_panel.tscn`。
   - 等待用户运行时手动验证。
 
 ## 验证矩阵
@@ -244,41 +247,67 @@
 - 鼠标点击选项可以正常选择并关闭选项面板。
 - 键盘或手柄切换焦点、确认选择行为不变。
 
+## 第十轮改动记录
+
+- 修改 `scenes/ui/select_sect/select_sect_screen.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 保留 `Background` 在根节点下继续全屏铺底，避免门派背景受 16:9 设计画布裁切。
+  - 将 `PanelTextureRect`、`MasterAvatarBox`、`SectNameLabel`、`PrevButton`、`NextButton`、`AckButton`、门派信息 `VBoxContainer` 和描述 `ScrollContainer` 迁入设计画布。
+  - 保留 `Background`、师父头像、门派名、切换按钮、确认按钮、门派信息和描述文本的唯一节点名。
+- 修改 `scenes/ui/start_question/input_name_panel.tscn`。
+  - 新增 `DesignCanvas/DesignRoot`。
+  - 将 `Dikuang2` 面板迁入设计画布，输入框、提示文本、确认按钮继续作为面板子节点。
+  - 保留 `NameEdit`、`HintLabel`、`AckButton` 的唯一节点名。
+
+## 第十轮静态检查
+
+- `SelectSectScreen` 根节点下只保留预期的全屏 `Background` 和 `DesignCanvas`。
+- 门派选择交互节点已迁入 `DesignCanvas/DesignRoot`。
+- `InputNamePanel` 根节点下只新增预期的 `DesignCanvas`。
+- 输入名字面板内部的输入框、提示文本和确认按钮仍挂在 `Dikuang2` 下，脚本唯一节点查找不变。
+- 按用户要求，本轮不做构建验证。
+
+## 第十轮手动验证清单
+
+- 从新游戏开局进入门派选择，确认背景仍铺满整个窗口。
+- 在 `1920x1080` 下确认门派信息框、师父头像、门派名、左右切换按钮、确认按钮和描述区位置与迁移前一致。
+- 在 `1366x768`、`1920x1200`、`3440x1440` 下确认门派选择交互内容随设计画布居中缩放，背景仍全屏。
+- 左右切换门派时，门派名、师父头像、武学信息和描述正常刷新。
+- 点击确认后能进入下一步输入名字流程。
+- 输入名字面板在各验证分辨率下保持居中设计区位置。
+- 输入框默认获得焦点，默认名正常显示。
+- 回车提交和点击确认按钮都能继续开局流程。
+
 ## 后续计划
 
-后续从第十轮开始继续推进，每一步都需要用户手动验证通过后再继续。
+后续从第十一轮开始继续推进，每一步都需要用户手动验证通过后再继续。
 
-1. 第十轮：开局流程第一批。
-   - 文件：`scenes/ui/select_sect/select_sect_screen.tscn`、`scenes/ui/start_question/input_name_panel.tscn`。
-   - 目标：门派选择和输入名字进入设计画布，剧情命令接线不变。
-   - 完成后建议提交标题：`重构UI：迁移开局选择布局`。
-   - 完成后建议提交描述：`将门派选择和输入名字界面迁入设计画布，保持开局剧情命令流程和输入行为不变。`
-2. 第十一轮：开局流程第二批。
+1. 第十一轮：开局流程第二批。
    - 文件：`scenes/ui/start_question/select_head_panel.tscn`、`scenes/ui/start_question/select_head_slot.tscn`、`scenes/ui/start_question/roll_stats_panel.tscn`。
    - 目标：头像选择和随机属性界面进入设计画布，头像格与按钮区域稳定。
    - 完成后建议提交标题：`重构UI：迁移开局角色设置布局`。
    - 完成后建议提交描述：`将头像选择、头像格和随机属性界面迁入设计画布，保持头像选择和 roll stats 流程不变。`
-3. 第十二轮：地图 UI 坐标模型预备。
+2. 第十二轮：地图 UI 坐标模型预备。
    - 文件：`scenes/map/map_screen.tscn`、`src/Game.Godot` 中地图 UI 脚本。
    - 目标：先明确地图背景显示 rect 与点位/pin/click 的统一 transform，不迁无关面板。
    - 完成后建议提交标题：`重构UI：建立地图自适应坐标模型`。
    - 完成后建议提交描述：`明确地图背景显示区域与点位、主角标记、点击命中的统一坐标转换，为后续地图覆盖 UI 迁移做准备。`
-4. 第十三轮：地图 UI 内容迁移。
+3. 第十三轮：地图 UI 内容迁移。
    - 文件：`scenes/map/map_entity_box.tscn`、`scenes/map/map_entity_slot.tscn` 及地图底部信息区。
    - 目标：点位列表、底部信息区、主角 pin 与地图坐标模型一致。
    - 完成后建议提交标题：`重构UI：迁移地图覆盖层布局`。
    - 完成后建议提交描述：`将地图点位列表、底部信息区和主角标记接入统一地图坐标模型，保持地图交互和剧情隐藏行为不变。`
-5. 第十四轮：战斗棋盘坐标模型预备。
+4. 第十四轮：战斗棋盘坐标模型预备。
    - 文件：`scenes/ui/battle/battle_screen.tscn`、`scenes/ui/battle/battle_board_view.tscn`、战斗棋盘脚本。
    - 目标：先统一棋盘格、单位、hover、可达区、飘字、技能动画使用的 transform。
    - 完成后建议提交标题：`重构UI：建立战斗棋盘自适应坐标模型`。
    - 完成后建议提交描述：`统一战斗棋盘格、单位、hover、可达区域、飘字和技能动画的坐标转换，为战斗行动 UI 迁移做准备。`
-6. 第十五轮：战斗行动 UI 迁移。
+5. 第十五轮：战斗行动 UI 迁移。
    - 文件：`scenes/ui/battle/battle_skill_box.tscn`、`scenes/ui/battle/battle_skill_view.tscn`、`scenes/ui/battle/battle_legend_overlay.tscn`、`scenes/ui/battle/battle_float_text.tscn`。
    - 目标：技能栏、行动按钮、飘字和 overlay 在共享坐标模型下稳定显示。
    - 完成后建议提交标题：`重构UI：迁移战斗行动布局`。
    - 完成后建议提交描述：`将战斗技能栏、行动按钮、飘字和 overlay 接入设计画布与共享棋盘坐标模型，保持战斗操作行为不变。`
-7. 收尾清理。
+6. 收尾清理。
    - 文件：`scenes/main_menu/main_menu.tscn`、`scenes/ui/game_flow/gameover_screen.tscn`、`scenes/ui/game_flow/game_fin_screen.tscn`、`scenes/ui/character_summary_panel.tscn`、`scenes/ui/hint/hint_box.tscn`。
    - 目标：扫尾剩余固定根级坐标，固化新 UI 场景模板。
    - 完成后建议提交标题：`重构UI：清理剩余固定布局界面`。
