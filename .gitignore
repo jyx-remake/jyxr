@@ -21,3 +21,6 @@ coverage/
 .godot/
 .import/
 mono_crash.*.json
+.DS_Store
+android/.build_version
+android/build/
