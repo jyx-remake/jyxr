@@ -26,36 +26,48 @@ script = ExtResource("1_hud_script")
 
 [node name="TopBox" type="Control" parent="." unique_id=1135363019]
 layout_mode = 1
-anchors_preset = 0
+anchors_preset = -1
+anchor_right = 1.0
+offset_bottom = 88.0
 
 [node name="ShadowPanel" type="Panel" parent="TopBox" unique_id=35497544]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
 offset_left = 19.0
-offset_right = 1895.0
+offset_right = -25.0
 offset_bottom = 69.0
 
 [node name="Frame" type="TextureRect" parent="TopBox" unique_id=1230438179]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
 offset_left = 9.000061
-offset_right = 4569.0
-offset_bottom = 212.0
-scale = Vector2(0.41627344, 0.41627347)
+offset_right = -9.0
+offset_bottom = 88.0
 texture = ExtResource("2_top_frame")
+expand_mode = 1
 
 [node name="GoldIngot" type="TextureRect" parent="TopBox" unique_id=1207954560]
-layout_mode = 0
-offset_left = 1605.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -315.0
 offset_top = 24.0
-offset_right = 1685.0
+offset_right = -235.0
 offset_bottom = 72.0
 texture = ExtResource("3_gold")
 expand_mode = 1
 
 [node name="SilverIngot" type="TextureRect" parent="TopBox" unique_id=69149685]
-layout_mode = 0
-offset_left = 1275.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -645.0
 offset_top = 24.0
-offset_right = 1360.1852
+offset_right = -559.8148
 offset_bottom = 70.0
 texture = ExtResource("4_silver")
 expand_mode = 1
@@ -72,30 +84,39 @@ horizontal_alignment = 1
 
 [node name="DataTimeLabel" type="Label" parent="TopBox" unique_id=190790743]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 733.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -227.0
 offset_top = 29.0
-offset_right = 1207.0
+offset_right = 247.0
 offset_bottom = 60.0
 text = "1年1月1日 子时"
 horizontal_alignment = 1
 
 [node name="SilverIngotLabel" type="Label" parent="TopBox" unique_id=194327460]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 1383.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -537.0
 offset_top = 29.0
-offset_right = 1511.0
+offset_right = -409.0
 offset_bottom = 60.0
 text = "0"
 horizontal_alignment = 1
 
 [node name="GlodIngotLabel" type="Label" parent="TopBox" unique_id=822597299]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 1701.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -219.0
 offset_top = 29.0
-offset_right = 1856.0
+offset_right = -64.0
 offset_bottom = 60.0
 text = "0"
 horizontal_alignment = 1
@@ -138,6 +159,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("13_design_canvas")
+ScalingMode = 1
 
 [node name="DesignRoot" type="Control" parent="DesignCanvas" unique_id=1442474549]
 anchors_preset = 0

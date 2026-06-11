@@ -4,6 +4,15 @@ namespace Game.Godot.UI.Layout;
 
 public partial class DesignCanvas : Control
 {
+	public enum CanvasScalingMode
+	{
+		PreserveAspect,
+		FillParent,
+	}
+
+	[Export]
+	public CanvasScalingMode ScalingMode { get; set; } = CanvasScalingMode.PreserveAspect;
+
 	[Export]
 	public Vector2 DesignSize { get; set; } = new(1920f, 1080f);
 
@@ -30,7 +39,20 @@ public partial class DesignCanvas : Control
 
 	private void ApplyLayout()
 	{
-		if (_designRoot is null || DesignSize.X <= 0f || DesignSize.Y <= 0f || Size.X <= 0f || Size.Y <= 0f)
+		if (_designRoot is null || Size.X <= 0f || Size.Y <= 0f)
+		{
+			return;
+		}
+
+		if (ScalingMode == CanvasScalingMode.FillParent)
+		{
+			_designRoot.Position = Vector2.Zero;
+			_designRoot.Size = Size;
+			_designRoot.Scale = Vector2.One;
+			return;
+		}
+
+		if (DesignSize.X <= 0f || DesignSize.Y <= 0f)
 		{
 			return;
 		}
