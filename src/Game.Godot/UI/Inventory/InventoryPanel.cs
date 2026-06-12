@@ -116,12 +116,15 @@ public partial class InventoryPanel : JyPanel
 	private void OnEntrySelected(InventoryEntry entry)
 	{
 		var analysis = Game.ItemUseService.Analyze(entry);
-		if (!analysis.IsSupported)
-		{
-			UIRoot.Instance.ShowSuggestion(analysis.Message);
-			return;
-		}
+		UIRoot.Instance.ShowItemDetailPanel(
+			entry,
+			analysis.IsSupported ? "使用" : string.Empty,
+			analysis.IsSupported,
+			() => ShowTargetSelectionPanel(entry));
+	}
 
+	private void ShowTargetSelectionPanel(InventoryEntry entry)
+	{
 		if (ItemTargetSelectionPanelScene is null)
 		{
 			throw new InvalidOperationException("ItemTargetSelectionPanelScene is not assigned.");

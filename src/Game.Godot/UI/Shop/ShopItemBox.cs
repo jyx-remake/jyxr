@@ -25,6 +25,7 @@ public partial class ShopItemBox : TextureButton
 	private ShopProductView? _product;
 	private InventoryEntry? _entry;
 	private string _entryFooterText = string.Empty;
+	private bool _primaryActionEnabled = true;
 
 	public override void _Ready()
 	{
@@ -46,7 +47,8 @@ public partial class ShopItemBox : TextureButton
 		_item = product.Item;
 		_equipment = null;
 		_entryFooterText = string.Empty;
-		Disabled = !canBuy;
+		Disabled = false;
+		_primaryActionEnabled = canBuy;
 		TooltipText = product.DisplayName;
 		Refresh();
 	}
@@ -72,7 +74,8 @@ public partial class ShopItemBox : TextureButton
 			? equipmentEntry.Equipment
 			: null;
 		_entryFooterText = footerText;
-		Disabled = !canSelect;
+		Disabled = false;
+		_primaryActionEnabled = canSelect;
 		TooltipText = entry.Definition.Name;
 		Refresh();
 	}
@@ -130,6 +133,7 @@ public partial class ShopItemBox : TextureButton
 		_avatar.Texture = AssetResolver.LoadTextureResource(_product?.Picture ?? _item?.Picture);
 		_nameLabel.Text = _product?.DisplayName ?? _item!.Name;
 		_rarityBandStyle.BgColor = ResolveBandColor();
+		Modulate = _primaryActionEnabled ? Colors.White : new Color(0.62f, 0.62f, 0.62f, 0.86f);
 
 		if (_product is not null)
 		{

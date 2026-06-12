@@ -205,7 +205,16 @@ public partial class ShopPanel : JyPanel
 		return itemBox;
 	}
 
-	private async void OnProductSelected(ShopProductView product)
+	private void OnProductSelected(ShopProductView product)
+	{
+		UIRoot.Instance.ShowItemDetailPanel(
+			product,
+			"购买",
+			CanBuy(product),
+			() => TryBuyProduct(product));
+	}
+
+	private async void TryBuyProduct(ShopProductView product)
 	{
 		try
 		{
@@ -228,7 +237,17 @@ public partial class ShopPanel : JyPanel
 		}
 	}
 
-	private async void OnInventoryEntrySelected(InventoryEntry entry)
+	private void OnInventoryEntrySelected(InventoryEntry entry)
+	{
+		var sellPrice = Game.ShopService.GetSellPrice(entry.Definition);
+		UIRoot.Instance.ShowItemDetailPanel(
+			entry,
+			sellPrice > 0 ? $"卖出 {sellPrice}" : "卖出",
+			entry.Definition.CanDrop && sellPrice > 0,
+			() => TrySellInventoryEntry(entry));
+	}
+
+	private async void TrySellInventoryEntry(InventoryEntry entry)
 	{
 		try
 		{

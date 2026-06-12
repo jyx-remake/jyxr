@@ -160,6 +160,16 @@ public partial class ChestPanel : JyPanel
 
 	private void OnInventoryEntrySelected(InventoryEntry entry)
 	{
+		var chest = Game.ChestService.Open();
+		UIRoot.Instance.ShowItemDetailPanel(
+			entry,
+			_mode == ChestMode.Deposit ? "存入" : "取出",
+			CanSelectEntry(entry, chest),
+			() => TransferInventoryEntry(entry));
+	}
+
+	private void TransferInventoryEntry(InventoryEntry entry)
+	{
 		try
 		{
 			var result = _mode == ChestMode.Deposit

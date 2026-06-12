@@ -1,0 +1,204 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Items/ItemDetailPanel.cs" id="2_script"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="3_design_canvas"]
+[ext_resource type="Texture2D" uid="uid://b173d0wt20k3t" path="res://assets/art/misc/biankuang.png" id="4_frame"]
+[ext_resource type="Texture2D" uid="uid://hhslflvjkysr" path="res://assets/art/misc/dise.png" id="5_mask"]
+[ext_resource type="Texture2D" uid="uid://c6tnvcjup3en1" path="res://assets/art/item/baoguo.png" id="6_placeholder"]
+[ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="7_button"]
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="8_button_script"]
+
+[sub_resource type="StyleBoxFlat" id="1_text_panel"]
+bg_color = Color(0.075, 0.065, 0.048, 0.62)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="2_rarity_band"]
+bg_color = Color(0.08, 0.06, 0.02, 0.42)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="LabelSettings" id="3_name_settings"]
+font_size = 58
+outline_size = 6
+outline_color = Color(0, 0, 0, 1)
+
+[node name="ItemDetailPanel" instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+
+[node name="CloseButton" parent="PanelChromeCanvas/DesignRoot" index="0"]
+offset_left = 1546.0
+offset_top = 58.0
+offset_right = 1816.0
+offset_bottom = 317.0
+
+[node name="DesignCanvas" type="Control" parent="." index="3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_design_canvas")
+
+[node name="DesignRoot" type="Control" parent="DesignCanvas" index="0"]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="IconFrame" type="TextureRect" parent="DesignCanvas/DesignRoot" index="0"]
+layout_mode = 0
+offset_left = 450.0
+offset_top = 210.0
+offset_right = 770.0
+offset_bottom = 530.0
+mouse_filter = 2
+texture = ExtResource("4_frame")
+expand_mode = 1
+
+[node name="IconMask" type="TextureRect" parent="DesignCanvas/DesignRoot" index="1"]
+layout_mode = 0
+offset_left = 498.0
+offset_top = 258.0
+offset_right = 722.0
+offset_bottom = 482.0
+mouse_filter = 2
+texture = ExtResource("5_mask")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="ItemTexture" type="TextureRect" parent="DesignCanvas/DesignRoot" index="2"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 498.0
+offset_top = 258.0
+offset_right = 722.0
+offset_bottom = 482.0
+mouse_filter = 2
+texture = ExtResource("6_placeholder")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="IconBand" type="Panel" parent="DesignCanvas/DesignRoot" index="3"]
+layout_mode = 0
+offset_left = 462.0
+offset_top = 452.0
+offset_right = 758.0
+offset_bottom = 528.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("2_rarity_band")
+
+[node name="NameLabel" type="Label" parent="DesignCanvas/DesignRoot" index="4"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 376.0
+offset_top = 546.0
+offset_right = 844.0
+offset_bottom = 626.0
+theme_override_colors/font_color = Color(0.98, 0.96, 0.88, 1)
+text = "物品名"
+label_settings = SubResource("3_name_settings")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+justification_flags = 161
+
+[node name="TypeLabel" type="Label" parent="DesignCanvas/DesignRoot" index="5"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 424.0
+offset_top = 638.0
+offset_right = 796.0
+offset_bottom = 690.0
+theme_override_colors/font_color = Color(0.92, 0.86, 0.72, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 38
+text = "消耗品"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MetaLabel" type="Label" parent="DesignCanvas/DesignRoot" index="6"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 404.0
+offset_top = 696.0
+offset_right = 816.0
+offset_bottom = 746.0
+theme_override_colors/font_color = Color(0.85, 0.78, 0.58, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 28
+text = "数量 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DescriptionPanel" type="Panel" parent="DesignCanvas/DesignRoot" index="7"]
+layout_mode = 0
+offset_left = 860.0
+offset_top = 200.0
+offset_right = 1510.0
+offset_bottom = 766.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("1_text_panel")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="DesignCanvas/DesignRoot/DescriptionPanel" index="0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 22.0
+offset_right = -24.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentLabel" type="RichTextLabel" parent="DesignCanvas/DesignRoot/DescriptionPanel/ScrollContainer" index="0"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(590, 0)
+layout_mode = 2
+theme_override_constants/line_separation = 4
+theme_override_constants/paragraph_separation = 2
+theme_override_font_sizes/normal_font_size = 34
+bbcode_enabled = true
+text = "物品说明"
+fit_content = true
+scroll_active = false
+
+[node name="PrimaryActionButton" type="TextureButton" parent="DesignCanvas/DesignRoot" index="8"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 925.0
+offset_top = 792.0
+offset_right = 1289.0
+offset_bottom = 886.0
+texture_normal = ExtResource("7_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("8_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="PrimaryActionLabel" type="Label" parent="DesignCanvas/DesignRoot/PrimaryActionButton" index="0"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.08, 0.06, 0.02, 1)
+theme_override_colors/font_outline_color = Color(0.95, 0.83, 0.44, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 48
+text = "使用"
+horizontal_alignment = 1
+vertical_alignment = 1

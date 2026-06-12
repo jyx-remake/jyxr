@@ -26,6 +26,7 @@
 [ext_resource type="PackedScene" uid="uid://v4yc2ec3v1o8" path="res://scenes/ui/game_flow/game_fin_screen.tscn" id="19_gamefin"]
 [ext_resource type="PackedScene" uid="uid://di28xqh0osmwk" path="res://scenes/ui/battle/battle_screen.tscn" id="20_battle_screen"]
 [ext_resource type="Script" uid="uid://b6ovs0k7in7v2" path="res://src/Game.Godot/UI/Layout/DesignCanvas.cs" id="21_design_canvas"]
+[ext_resource type="PackedScene" path="res://scenes/ui/item_detail/item_detail_panel.tscn" id="22_item_detail"]
 
 [node name="UIRoot" type="Control" unique_id=684934628]
 layout_mode = 3
@@ -39,6 +40,7 @@ script = ExtResource("1_ui_root")
 PartyPanelScene = ExtResource("2_party_panel")
 CharacterPanelScene = ExtResource("3_i0hgf")
 InventoryPanelScene = ExtResource("12_inventory_panel")
+ItemDetailPanelScene = ExtResource("22_item_detail")
 GameLogPanelScene = ExtResource("7_journal")
 HeroPanelScene = ExtResource("8_hero_panel")
 SystemPanelScene = ExtResource("9_system_panel")

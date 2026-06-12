@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Core.Definitions;
+using Game.Core.Model;
 using Godot;
 using Game.Godot.Assets;
 using Game.Godot.Map;
@@ -23,6 +24,9 @@ public partial class UIRoot : Control
 
 	[Export]
 	public PackedScene InventoryPanelScene { get; set; } = null!;
+
+	[Export]
+	public PackedScene ItemDetailPanelScene { get; set; } = null!;
 
 	[Export]
 	public PackedScene GameLogPanelScene { get; set; } = null!;
@@ -198,6 +202,57 @@ public partial class UIRoot : Control
 		});
 
 	public Control ShowInventoryPanel() => ShowMainPanel(InventoryPanelScene, "inventory panel");
+
+	public ItemDetailPanel ShowItemDetailPanel(
+		InventoryEntry entry,
+		string primaryActionText = "",
+		bool primaryActionEnabled = false,
+		Action? primaryAction = null)
+	{
+		ArgumentNullException.ThrowIfNull(entry);
+		return ShowItemDetailPanelCore(panel =>
+		{
+			panel.Configure(entry, primaryActionText, primaryActionEnabled);
+			if (primaryAction is not null)
+			{
+				panel.PrimaryActionPressed += primaryAction;
+			}
+		});
+	}
+
+	public ItemDetailPanel ShowItemDetailPanel(
+		ShopProductView product,
+		string primaryActionText = "",
+		bool primaryActionEnabled = false,
+		Action? primaryAction = null)
+	{
+		ArgumentNullException.ThrowIfNull(product);
+		return ShowItemDetailPanelCore(panel =>
+		{
+			panel.Configure(product, primaryActionText, primaryActionEnabled);
+			if (primaryAction is not null)
+			{
+				panel.PrimaryActionPressed += primaryAction;
+			}
+		});
+	}
+
+	public ItemDetailPanel ShowItemDetailPanel(
+		EquipmentInstance equipment,
+		string primaryActionText = "",
+		bool primaryActionEnabled = false,
+		Action? primaryAction = null)
+	{
+		ArgumentNullException.ThrowIfNull(equipment);
+		return ShowItemDetailPanelCore(panel =>
+		{
+			panel.Configure(equipment, primaryActionText, primaryActionEnabled);
+			if (primaryAction is not null)
+			{
+				panel.PrimaryActionPressed += primaryAction;
+			}
+		});
+	}
 
 	public Control ShowGameLogPanel() => ShowMainPanel(GameLogPanelScene, "game log panel");
 
@@ -456,6 +511,35 @@ public partial class UIRoot : Control
 		PanelLayer.AddChild(panel);
 		_popupPanel = panel;
 		panel.TreeExited += () => ClearPanelReference(panel);
+		return panel;
+	}
+
+	private ItemDetailPanel ShowItemDetailPanelCore(Action<ItemDetailPanel> configure)
+	{
+		ArgumentNullException.ThrowIfNull(configure);
+		if (ItemDetailPanelScene is null)
+		{
+			throw new InvalidOperationException("UIRoot panel scene is not assigned: item detail panel.");
+		}
+
+		var instance = ItemDetailPanelScene.Instantiate();
+		if (instance is not ItemDetailPanel panel)
+		{
+			instance.QueueFree();
+			throw new InvalidOperationException("Item detail panel scene root must be ItemDetailPanel.");
+		}
+
+		try
+		{
+			configure(panel);
+		}
+		catch
+		{
+			panel.QueueFree();
+			throw;
+		}
+
+		ModalLayer.AddChild(panel);
 		return panel;
 	}
 
