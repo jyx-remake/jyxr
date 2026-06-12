@@ -1,6 +1,7 @@
 using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Core.Model.Skills;
 using Godot;
 using Game.Godot.Assets;
 using Game.Godot.Map;
@@ -27,6 +28,9 @@ public partial class UIRoot : Control
 
 	[Export]
 	public PackedScene ItemDetailPanelScene { get; set; } = null!;
+
+	[Export]
+	public PackedScene SkillDetailPanelScene { get; set; } = null!;
 
 	[Export]
 	public PackedScene GameLogPanelScene { get; set; } = null!;
@@ -247,6 +251,23 @@ public partial class UIRoot : Control
 		return ShowItemDetailPanelCore(panel =>
 		{
 			panel.Configure(equipment, primaryActionText, primaryActionEnabled);
+			if (primaryAction is not null)
+			{
+				panel.PrimaryActionPressed += primaryAction;
+			}
+		});
+	}
+
+	public SkillDetailPanel ShowSkillDetailPanel(
+		SkillInstance skill,
+		string primaryActionText = "",
+		bool primaryActionEnabled = false,
+		Action? primaryAction = null)
+	{
+		ArgumentNullException.ThrowIfNull(skill);
+		return ShowSkillDetailPanelCore(panel =>
+		{
+			panel.Configure(skill, primaryActionText, primaryActionEnabled);
 			if (primaryAction is not null)
 			{
 				panel.PrimaryActionPressed += primaryAction;
@@ -527,6 +548,35 @@ public partial class UIRoot : Control
 		{
 			instance.QueueFree();
 			throw new InvalidOperationException("Item detail panel scene root must be ItemDetailPanel.");
+		}
+
+		try
+		{
+			configure(panel);
+		}
+		catch
+		{
+			panel.QueueFree();
+			throw;
+		}
+
+		ModalLayer.AddChild(panel);
+		return panel;
+	}
+
+	private SkillDetailPanel ShowSkillDetailPanelCore(Action<SkillDetailPanel> configure)
+	{
+		ArgumentNullException.ThrowIfNull(configure);
+		if (SkillDetailPanelScene is null)
+		{
+			throw new InvalidOperationException("UIRoot panel scene is not assigned: skill detail panel.");
+		}
+
+		var instance = SkillDetailPanelScene.Instantiate();
+		if (instance is not SkillDetailPanel panel)
+		{
+			instance.QueueFree();
+			throw new InvalidOperationException("Skill detail panel scene root must be SkillDetailPanel.");
 		}
 
 		try

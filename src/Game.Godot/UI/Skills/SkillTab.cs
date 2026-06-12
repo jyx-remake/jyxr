@@ -7,6 +7,7 @@ namespace Game.Godot.UI;
 public partial class SkillTab : Control
 {
 	public event Action<SkillInstance>? SkillToggleRequested;
+	public event Action<SkillInstance>? SkillDetailRequested;
 
 	[Export]
 	public PackedScene SkillBoxScene { get; set; } = null!;
@@ -70,12 +71,18 @@ public partial class SkillTab : Control
 
 		skillBox.Setup(skill, IsInteractive);
 		skillBox.ToggleRequested += OnSkillBoxToggleRequested;
+		skillBox.DetailRequested += OnSkillBoxDetailRequested;
 		return skillBox;
 	}
 
 	private void OnSkillBoxToggleRequested(SkillInstance skill)
 	{
 		SkillToggleRequested?.Invoke(skill);
+	}
+
+	private void OnSkillBoxDetailRequested(SkillInstance skill)
+	{
+		SkillDetailRequested?.Invoke(skill);
 	}
 
 	private void ClearGrid()

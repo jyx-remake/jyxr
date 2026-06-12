@@ -8,6 +8,7 @@ namespace Game.Godot.UI;
 public partial class SkillBox : Control
 {
 	public event Action<SkillInstance>? ToggleRequested;
+	public event Action<SkillInstance>? DetailRequested;
 
 	[Export]
 	public PackedScene TooltipScene { get; set; } = null!;
@@ -31,6 +32,7 @@ public partial class SkillBox : Control
 		_activeButton = GetNode<TextureButton>("%ActiveButton");
 		_checkMark = GetNode<TextureRect>("%CheckMark");
 		_activeButton.Pressed += OnActiveButtonPressed;
+		GuiInput += OnGuiInput;
 		Refresh();
 	}
 
@@ -107,6 +109,28 @@ public partial class SkillBox : Control
 
 		ToggleRequested?.Invoke(_skill);
 	}
+
+	private void OnGuiInput(InputEvent inputEvent)
+	{
+		if (inputEvent is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } mouseButton)
+		{
+			return;
+		}
+
+		if (IsInsideActiveButton(mouseButton.Position))
+		{
+			return;
+		}
+
+		if (_skill is not null)
+		{
+			DetailRequested?.Invoke(_skill);
+			GetViewport().SetInputAsHandled();
+		}
+	}
+
+	private bool IsInsideActiveButton(Vector2 localPosition) =>
+		_activeButton.Visible && new Rect2(_activeButton.Position, _activeButton.Size).HasPoint(localPosition);
 
 	private static void ApplyLabelColor(Label label, Color color)
 	{

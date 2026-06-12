@@ -81,7 +81,7 @@ public partial class CharacterEquipmentTab : Control
 	{
 		slotButton.Pressed += () => ShowEquipmentSelection(slotType);
 		slotButton.GuiInput += inputEvent => OnSlotGuiInput(inputEvent, slotType);
-		equipmentBox.EquipmentPrimaryClicked += () => ShowEquipmentSelection(slotType);
+		equipmentBox.EquipmentPrimaryClicked += () => ShowEquipmentDetail(slotType);
 		equipmentBox.EquipmentSecondaryClicked += () => Unequip(slotType);
 	}
 
@@ -117,6 +117,27 @@ public partial class CharacterEquipmentTab : Control
 
 		panel.Configure(_character.Id, slotType);
 		UIRoot.Instance.ModalLayer.AddChild(panel);
+	}
+
+	private void ShowEquipmentDetail(EquipmentSlotType slotType)
+	{
+		if (_character is null)
+		{
+			return;
+		}
+
+		var equipment = _character.GetEquipment(slotType);
+		if (equipment is null)
+		{
+			ShowEquipmentSelection(slotType);
+			return;
+		}
+
+		UIRoot.Instance.ShowItemDetailPanel(
+			equipment,
+			"卸下",
+			true,
+			() => Unequip(slotType));
 	}
 
 	private void Unequip(EquipmentSlotType slotType)

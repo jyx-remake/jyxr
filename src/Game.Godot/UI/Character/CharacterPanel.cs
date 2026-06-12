@@ -80,6 +80,7 @@ public partial class CharacterPanel : JyPanel
 		_prevCharacterButton.Pressed += () => SwitchCharacter(-1);
 		_nextCharacterButton.Pressed += () => SwitchCharacter(1);
 		_skillTab.SkillToggleRequested += OnSkillToggleRequested;
+		_skillTab.SkillDetailRequested += OnSkillDetailRequested;
 		_subscriptions.Add(Game.Session.Events.Subscribe<CharacterChangedEvent>(OnCharacterChanged));
 
 		if (!string.IsNullOrWhiteSpace(CharacterId))
@@ -152,6 +153,26 @@ public partial class CharacterPanel : JyPanel
 				break;
 		}
 	}
+
+	private void OnSkillDetailRequested(SkillInstance skill)
+	{
+		var (actionText, actionEnabled) = ResolveSkillDetailAction(skill);
+		UIRoot.Instance.ShowSkillDetailPanel(
+			skill,
+			actionText,
+			actionEnabled,
+			() => OnSkillToggleRequested(skill));
+	}
+
+	private static (string Text, bool Enabled) ResolveSkillDetailAction(SkillInstance skill) =>
+		skill switch
+		{
+			ExternalSkillInstance externalSkill => (externalSkill.IsActive ? "停用" : "启用", true),
+			SpecialSkillInstance specialSkill => (specialSkill.IsActive ? "停用" : "启用", true),
+			InternalSkillInstance internalSkill when internalSkill.IsEquipped => (string.Empty, false),
+			InternalSkillInstance => ("装备", true),
+			_ => (string.Empty, false),
+		};
 
 	private void OnCharacterChanged(CharacterChangedEvent sessionEvent)
 	{
