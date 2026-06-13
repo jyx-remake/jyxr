@@ -88,6 +88,7 @@ corner_radius_bottom_left = 14
 custom_minimum_size = Vector2(650, 295)
 offset_right = 650.0
 offset_bottom = 295.0
+mouse_filter = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_card_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_card_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_card_hover")

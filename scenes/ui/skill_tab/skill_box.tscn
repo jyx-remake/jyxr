@@ -108,6 +108,7 @@ offset_left = -1.0
 offset_top = -3.0
 offset_right = 79.0
 offset_bottom = 79.0
+mouse_filter = 2
 texture_normal = ExtResource("5_badge")
 ignore_texture_size = true
 stretch_mode = 5

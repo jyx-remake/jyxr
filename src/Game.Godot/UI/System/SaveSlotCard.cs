@@ -9,6 +9,10 @@ namespace Game.Godot.UI;
 
 public partial class SaveSlotCard : Button
 {
+	private const float TapDragThreshold = 18f;
+
+	public event Action? Tapped;
+
 	private Label _titleLabel = null!;
 	private Label _nameLabel = null!;
 	private Label _partyCountLabel = null!;
@@ -19,6 +23,8 @@ public partial class SaveSlotCard : Button
 	private Label _savedAtLabel = null!;
 	private Label _hintLabel = null!;
 	private TextureRect _portrait = null!;
+	private bool _pendingTap;
+	private Vector2 _tapStartPosition;
 
 	public int SlotIndex { get; private set; }
 
@@ -34,6 +40,24 @@ public partial class SaveSlotCard : Button
 		_savedAtLabel = GetNode<Label>("Margin/VBox/ContentRow/InfoVBox/SavedAtLabel");
 		_hintLabel = GetNode<Label>("Margin/VBox/HintLabel");
 		_portrait = GetNode<TextureRect>("Margin/VBox/ContentRow/PortraitPanel/Portrait");
+	}
+
+	public override void _GuiInput(InputEvent @event)
+	{
+		if (Disabled)
+		{
+			return;
+		}
+
+		switch (@event)
+		{
+			case InputEventMouseButton { ButtonIndex: MouseButton.Left } mouseButton:
+				HandleMouseButton(mouseButton);
+				break;
+			case InputEventMouseMotion mouseMotion:
+				CancelTapIfDragged(mouseMotion.Position);
+				break;
+		}
 	}
 
 	public void Configure(LocalSaveSlotSummary summary, SaveSlotPanelMode mode)
@@ -153,4 +177,33 @@ public partial class SaveSlotCard : Button
 		LocalSaveReadFailureReason.MissingFile => "该槽位暂无存档",
 		_ => "该存档无法读取",
 	};
+
+	private void HandleMouseButton(InputEventMouseButton mouseButton)
+	{
+		if (mouseButton.Pressed)
+		{
+			_pendingTap = true;
+			_tapStartPosition = mouseButton.Position;
+			return;
+		}
+
+		var shouldTap = _pendingTap &&
+			_tapStartPosition.DistanceTo(mouseButton.Position) <= TapDragThreshold;
+		_pendingTap = false;
+		if (!shouldTap)
+		{
+			return;
+		}
+
+		Tapped?.Invoke();
+		GetViewport().SetInputAsHandled();
+	}
+
+	private void CancelTapIfDragged(Vector2 localPosition)
+	{
+		if (_pendingTap && _tapStartPosition.DistanceTo(localPosition) > TapDragThreshold)
+		{
+			_pendingTap = false;
+		}
+	}
 }

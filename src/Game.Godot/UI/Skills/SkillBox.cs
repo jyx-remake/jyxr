@@ -7,6 +7,8 @@ namespace Game.Godot.UI;
 
 public partial class SkillBox : Control
 {
+	private const float TapDragThreshold = 18f;
+
 	public event Action<SkillInstance>? ToggleRequested;
 	public event Action<SkillInstance>? DetailRequested;
 
@@ -22,6 +24,8 @@ public partial class SkillBox : Control
 
 	private SkillInstance? _skill;
 	private bool _isInteractive;
+	private PendingTapTarget _pendingTapTarget = PendingTapTarget.None;
+	private Vector2 _tapStartPosition;
 
 	public override void _Ready()
 	{
@@ -31,7 +35,6 @@ public partial class SkillBox : Control
 		_avatar = GetNode<TextureRect>("%Avatar");
 		_activeButton = GetNode<TextureButton>("%ActiveButton");
 		_checkMark = GetNode<TextureRect>("%CheckMark");
-		_activeButton.Pressed += OnActiveButtonPressed;
 		GuiInput += OnGuiInput;
 		Refresh();
 	}
@@ -112,20 +115,63 @@ public partial class SkillBox : Control
 
 	private void OnGuiInput(InputEvent inputEvent)
 	{
-		if (inputEvent is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } mouseButton)
+		switch (inputEvent)
+		{
+			case InputEventMouseButton { ButtonIndex: MouseButton.Left } mouseButton:
+				HandleMouseButton(mouseButton);
+				break;
+			case InputEventMouseMotion mouseMotion:
+				CancelTapIfDragged(mouseMotion.Position);
+				break;
+		}
+	}
+
+	private void HandleMouseButton(InputEventMouseButton mouseButton)
+	{
+		if (mouseButton.Pressed)
+		{
+			_pendingTapTarget = ResolveTapTarget(mouseButton.Position);
+			_tapStartPosition = mouseButton.Position;
+			return;
+		}
+
+		var pendingTapTarget = _pendingTapTarget;
+		_pendingTapTarget = PendingTapTarget.None;
+		if (pendingTapTarget == PendingTapTarget.None ||
+			_tapStartPosition.DistanceTo(mouseButton.Position) > TapDragThreshold)
 		{
 			return;
 		}
 
-		if (IsInsideActiveButton(mouseButton.Position))
+		switch (pendingTapTarget)
 		{
-			return;
+			case PendingTapTarget.Toggle:
+				OnActiveButtonPressed();
+				GetViewport().SetInputAsHandled();
+				break;
+			case PendingTapTarget.Detail when _skill is not null:
+				DetailRequested?.Invoke(_skill);
+				GetViewport().SetInputAsHandled();
+				break;
+		}
+	}
+
+	private PendingTapTarget ResolveTapTarget(Vector2 localPosition)
+	{
+		if (IsInsideActiveButton(localPosition) && _skill is not null && _isInteractive && CanToggle(_skill))
+		{
+			return PendingTapTarget.Toggle;
 		}
 
-		if (_skill is not null)
+		return _skill is null ? PendingTapTarget.None : PendingTapTarget.Detail;
+	}
+
+	private void CancelTapIfDragged(Vector2 localPosition)
+	{
+		if (_pendingTapTarget != PendingTapTarget.None &&
+			_tapStartPosition.DistanceTo(localPosition) > TapDragThreshold)
 		{
-			DetailRequested?.Invoke(_skill);
-			GetViewport().SetInputAsHandled();
+			_pendingTapTarget = PendingTapTarget.None;
 		}
 	}
 
@@ -174,5 +220,12 @@ public partial class SkillBox : Control
 		}
 
 		return null;
+	}
+
+	private enum PendingTapTarget
+	{
+		None,
+		Detail,
+		Toggle,
 	}
 }

@@ -86,7 +86,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		{
 			var card = CreateSlotCard();
 			var capturedSlotIndex = slotIndex;
-			card.Pressed += () => OnSlotPressed(capturedSlotIndex);
+			card.Tapped += () => OnSlotPressed(capturedSlotIndex);
 			_slotsGrid.AddChild(card);
 			cards.Add(card);
 		}
@@ -102,7 +102,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		}
 
 		_autoSaveCard = CreateSlotCard();
-		_autoSaveCard.Pressed += () => LoadFromAutoSave();
+		_autoSaveCard.Tapped += () => LoadFromAutoSave();
 		_slotsGrid.AddChild(_autoSaveCard);
 		_slotsGrid.MoveChild(_autoSaveCard, 0);
 	}
