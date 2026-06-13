@@ -7,6 +7,7 @@ namespace Game.Godot.UI.Battle;
 
 public partial class BattleBoardView : Control
 {
+	private const float DesignCellSize = 144f;
 	private const int CellTextFontSize = 13;
 	private const double StepMoveDurationSeconds = 0.3d;
 	private const double FloatTextQueueInitialDelaySeconds = 0.1d;
@@ -31,12 +32,16 @@ public partial class BattleBoardView : Control
 
 	private int _gridWidth;
 	private int _gridHeight;
-	private int _cellWidth;
-	private int _cellHeight;
-	private int _cellGap;
+	private int _baseCellGap;
+	private float _cellSize = DesignCellSize;
+	private float _cellGap;
+	private float _unitVisualScale = 1f;
+	private Vector2 _contentOrigin;
+	private Vector2 _contentSize;
 	private GridPosition? _hoveredCell;
 	private Node2D _combatantLayer = null!;
 	private Node2D _effectLayer = null!;
+	private readonly Dictionary<string, GridPosition> _unitPositions = new(StringComparer.Ordinal);
 
 	private sealed record QueuedFloatText(string Text, Color Color);
 
@@ -53,22 +58,16 @@ public partial class BattleBoardView : Control
 	public void RenderGrid(
 		int gridWidth,
 		int gridHeight,
-		int cellWidth,
-		int cellHeight,
 		int cellGap,
 		IReadOnlyList<BattleBoardCellVisual> cells)
 	{
 		ArgumentOutOfRangeException.ThrowIfLessThan(gridWidth, 1);
 		ArgumentOutOfRangeException.ThrowIfLessThan(gridHeight, 1);
-		ArgumentOutOfRangeException.ThrowIfLessThan(cellWidth, 1);
-		ArgumentOutOfRangeException.ThrowIfLessThan(cellHeight, 1);
 		ArgumentNullException.ThrowIfNull(cells);
 
 		_gridWidth = gridWidth;
 		_gridHeight = gridHeight;
-		_cellWidth = cellWidth;
-		_cellHeight = cellHeight;
-		_cellGap = Math.Max(0, cellGap);
+		_baseCellGap = Math.Max(0, cellGap);
 
 		_cells.Clear();
 		foreach (var cell in cells)
@@ -76,9 +75,9 @@ public partial class BattleBoardView : Control
 			_cells[cell.Position] = cell;
 		}
 
-		CustomMinimumSize = new Vector2(
-			_gridWidth * _cellWidth + Math.Max(0, _gridWidth - 1) * _cellGap,
-			_gridHeight * _cellHeight + Math.Max(0, _gridHeight - 1) * _cellGap);
+		CustomMinimumSize = Vector2.Zero;
+		UpdateLayoutMetrics();
+		RelayoutUnitViews();
 		QueueRedraw();
 	}
 
@@ -90,9 +89,11 @@ public partial class BattleBoardView : Control
 		foreach (var unit in units)
 		{
 			activeUnitIds.Add(unit.UnitId);
+			_unitPositions[unit.UnitId] = unit.Position;
 			var isExistingView = _unitViews.TryGetValue(unit.UnitId, out var unitView);
 			unitView ??= GetOrCreateUnitView(unit.UnitId);
 			unitView.Configure(unit);
+			unitView.Scale = Vector2.One * _unitVisualScale;
 
 			var targetPosition = GridPositionToUnitAnchor(unit.Position);
 			if (!isExistingView)
@@ -124,6 +125,7 @@ public partial class BattleBoardView : Control
 
 			_queuedFloatTexts.Remove(staleUnitId);
 			_processingFloatTextUnits.Remove(staleUnitId);
+			_unitPositions.Remove(staleUnitId);
 		}
 	}
 
@@ -243,6 +245,7 @@ public partial class BattleBoardView : Control
 		}
 
 		effectView.Position = position;
+		effectView.Scale = Vector2.One * _unitVisualScale;
 		_effectLayer.AddChild(effectView);
 		return effectView.PlayAsync(skillAnimation);
 	}
@@ -274,7 +277,7 @@ public partial class BattleBoardView : Control
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(text);
 
-		PlayFloatTextAt(CustomMinimumSize * 0.5f, text, color, popup: true);
+		PlayFloatTextAt(_contentOrigin + _contentSize * 0.5f, text, color, popup: true);
 	}
 
 	public void PlaySpeech(string unitId, string text)
@@ -338,11 +341,25 @@ public partial class BattleBoardView : Control
 	public override void _Notification(int what)
 	{
 		base._Notification(what);
+		if (what == NotificationResized)
+		{
+			UpdateLayoutMetrics();
+			RelayoutUnitViews();
+			QueueRedraw();
+		}
+
 		if (what == NotificationMouseExit && _hoveredCell is not null)
 		{
 			_hoveredCell = null;
 			HoveredCellChanged?.Invoke(null);
 		}
+	}
+
+	public void RefreshLayout()
+	{
+		UpdateLayoutMetrics();
+		RelayoutUnitViews();
+		QueueRedraw();
 	}
 
 	private void UpdateHoveredCell(Vector2 mousePosition)
@@ -363,25 +380,31 @@ public partial class BattleBoardView : Control
 
 	private bool TryGetGridPositionAt(Vector2 point, out GridPosition position)
 	{
-		if (_cellWidth <= 0 || _cellHeight <= 0)
+		if (_cellSize <= 0f)
 		{
 			position = default;
 			return false;
 		}
 
-		var strideX = _cellWidth + _cellGap;
-		var strideY = _cellHeight + _cellGap;
-		var x = Mathf.FloorToInt(point.X / strideX);
-		var y = Mathf.FloorToInt(point.Y / strideY);
+		var localPoint = point - _contentOrigin;
+		if (localPoint.X < 0f || localPoint.Y < 0f || localPoint.X > _contentSize.X || localPoint.Y > _contentSize.Y)
+		{
+			position = default;
+			return false;
+		}
+
+		var stride = _cellSize + _cellGap;
+		var x = Mathf.FloorToInt(localPoint.X / stride);
+		var y = Mathf.FloorToInt(localPoint.Y / stride);
 		if (x < 0 || x >= _gridWidth || y < 0 || y >= _gridHeight)
 		{
 			position = default;
 			return false;
 		}
 
-		var localX = point.X - x * strideX;
-		var localY = point.Y - y * strideY;
-		if (localX > _cellWidth || localY > _cellHeight)
+		var localX = localPoint.X - x * stride;
+		var localY = localPoint.Y - y * stride;
+		if (localX > _cellSize || localY > _cellSize)
 		{
 			position = default;
 			return false;
@@ -393,10 +416,10 @@ public partial class BattleBoardView : Control
 
 	private Rect2 GridPositionToCellRect(GridPosition position) =>
 		new(
-			position.X * (_cellWidth + _cellGap),
-			position.Y * (_cellHeight + _cellGap),
-			_cellWidth,
-			_cellHeight);
+			_contentOrigin.X + position.X * (_cellSize + _cellGap),
+			_contentOrigin.Y + position.Y * (_cellSize + _cellGap),
+			_cellSize,
+			_cellSize);
 
 	private Vector2 GridPositionToUnitAnchor(GridPosition position)
 	{
@@ -426,9 +449,49 @@ public partial class BattleBoardView : Control
 		}
 
 		unitView.Name = $"Unit_{unitId}";
+		unitView.Scale = Vector2.One * _unitVisualScale;
 		_combatantLayer.AddChild(unitView);
 		_unitViews[unitId] = unitView;
 		return unitView;
+	}
+
+	private void UpdateLayoutMetrics()
+	{
+		if (_gridWidth <= 0 || _gridHeight <= 0 || Size.X <= 0f || Size.Y <= 0f)
+		{
+			_cellSize = DesignCellSize;
+			_cellGap = _baseCellGap;
+			_unitVisualScale = 1f;
+			_contentOrigin = Vector2.Zero;
+			_contentSize = Vector2.Zero;
+			return;
+		}
+
+		var gapRatio = _baseCellGap / DesignCellSize;
+		var widthUnits = _gridWidth + Math.Max(0, _gridWidth - 1) * gapRatio;
+		var heightUnits = _gridHeight + Math.Max(0, _gridHeight - 1) * gapRatio;
+		var nextCellSize = MathF.Floor(MathF.Min(Size.X / widthUnits, Size.Y / heightUnits));
+		_cellSize = MathF.Max(1f, nextCellSize);
+		_cellGap = MathF.Max(0f, MathF.Round(_baseCellGap * _cellSize / DesignCellSize));
+		_contentSize = new Vector2(
+			_gridWidth * _cellSize + Math.Max(0, _gridWidth - 1) * _cellGap,
+			_gridHeight * _cellSize + Math.Max(0, _gridHeight - 1) * _cellGap);
+		_contentOrigin = (Size - _contentSize) * 0.5f;
+		_unitVisualScale = Math.Clamp(_cellSize / DesignCellSize, 0.55f, 1.1f);
+	}
+
+	private void RelayoutUnitViews()
+	{
+		foreach (var (unitId, unitView) in _unitViews)
+		{
+			if (!_unitPositions.TryGetValue(unitId, out var position))
+			{
+				continue;
+			}
+
+			unitView.Position = GridPositionToUnitAnchor(position);
+			unitView.Scale = Vector2.One * _unitVisualScale;
+		}
 	}
 
 	private void PlayFloatTextAt(Vector2 position, string text, Color color, bool popup = false)
@@ -446,6 +509,7 @@ public partial class BattleBoardView : Control
 		}
 
 		floatText.Position = position;
+		floatText.PresentationScale = _unitVisualScale;
 		_effectLayer.AddChild(floatText);
 		if (popup)
 		{

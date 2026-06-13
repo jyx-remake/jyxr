@@ -12,6 +12,8 @@ public partial class BattleFloatText : Node2D
 
 	private Label _label = null!;
 
+	public float PresentationScale { get; set; } = 1f;
+
 	public override void _Ready()
 	{
 		_label = GetNode<Label>("%TextLabel");
@@ -21,18 +23,19 @@ public partial class BattleFloatText : Node2D
 	{
 		_label.Text = text;
 		_label.Modulate = color;
-		Scale = Vector2.One;
+		var scale = Math.Max(0.6f, PresentationScale);
+		Scale = Vector2.One * scale;
 
 		var endPosition = Position + new Vector2(
-			(float)GD.RandRange(-RandomOffsetX, RandomOffsetX),
-			-(FloatRiseDistance + (float)GD.RandRange(0.0, RandomRiseDistance)));
+			(float)GD.RandRange(-RandomOffsetX, RandomOffsetX) * scale,
+			-(FloatRiseDistance + (float)GD.RandRange(0.0, RandomRiseDistance)) * scale);
 
 		var tween = CreateTween();
 		tween.TweenProperty(this, "position", endPosition, 1.5d)
 			.SetTrans(Tween.TransitionType.Elastic)
 			.SetEase(Tween.EaseType.Out);
 		tween.Parallel()
-			.TweenProperty(this, "scale", new Vector2(1.3f, 1.3f), 1.5d)
+			.TweenProperty(this, "scale", new Vector2(1.3f, 1.3f) * scale, 1.5d)
 			.SetTrans(Tween.TransitionType.Expo)
 			.SetEase(Tween.EaseType.Out);
 		tween.Finished += QueueFree;
@@ -42,11 +45,12 @@ public partial class BattleFloatText : Node2D
 	{
 		_label.Text = text;
 		_label.Modulate = color;
-		Scale = Vector2.One;
+		var scale = Math.Max(0.6f, PresentationScale);
+		Scale = Vector2.One * scale;
 		_label.AddThemeFontSizeOverride("font_size", PopupFontSize);
 
 		var tween = CreateTween();
-		tween.TweenProperty(this, "position:y", Position.Y - PopupRiseDistance, 2d);
+		tween.TweenProperty(this, "position:y", Position.Y - PopupRiseDistance * scale, 2d);
 		tween.Finished += QueueFree;
 	}
 }

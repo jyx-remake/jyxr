@@ -16,8 +16,23 @@ public partial class BattleScreen : Control
 {
 	private const int MinBattleSpeedMultiplier = 1;
 	private const int MaxBattleSpeedMultiplier = 5;
-	private const int GridCellWidth = 144;
-	private const int GridCellHeight = 144;
+	private const float DesignWidth = 1920f;
+	private const float DesignHeight = 1080f;
+	private const float BoardLeftDesign = 285f;
+	private const float BoardTopDesign = 245f;
+	private const float BoardRightReserveDesign = 110f;
+	private const float BoardBottomReserveDesign = 205f;
+	private const float BoardMinWidth = 560f;
+	private const float BoardMinHeight = 300f;
+	private const float ActionMenuDesignWidth = 520f;
+	private const float ActionMenuDesignHeight = 560f;
+	private const float ActionMenuMinScale = 0.6f;
+	private const float ActionMenuMaxScale = 1.02f;
+	private const float ActionMenuRightMarginDesign = 15f;
+	private const float ActionMenuBottomMarginDesign = 0f;
+	private const float BottomHudDesignHeight = 260f;
+	private const float BottomHudMinHeight = 150f;
+	private const float BottomHudMaxHeight = 260f;
 	private const BattleMovementPresentationMode MovementPresentationMode = BattleMovementPresentationMode.Step;
 	private static readonly Color DefaultCellColor = new(0.2f, 0.2f, 0.2f, 0.2f);
 	private static readonly Color MoveHighlightColor = new(0.2f, 0.6f, 1f, 0.35f);
@@ -71,6 +86,7 @@ public partial class BattleScreen : Control
 	private GridPosition? _hoveredCellPosition;
 
 	private TextureRect _background = null!;
+	private TextureRect _topClock = null!;
 	private Label _titleLabel = null!;
 	private Label _subtitleLabel = null!;
 	private BaseButton _surrenderButton = null!;
@@ -88,7 +104,19 @@ public partial class BattleScreen : Control
 	private BaseButton _restButton = null!;
 	private BaseButton _endButton = null!;
 	private TextureRect _avatar = null!;
+	private TextureRect _avatarFrame = null!;
 	private HBoxContainer _listContainer = null!;
+	private Control _bottomHud = null!;
+	private TextureRect _bottomStrip = null!;
+	private TextureRect _actionBarBg = null!;
+	private TextureRect _selectedSkillBg = null!;
+	private ScrollContainer _listScroll = null!;
+	private Control _uiDesignCanvas = null!;
+	private Control _uiDesignRoot = null!;
+	private Control _boardDesignCanvas = null!;
+	private Control _boardDesignRoot = null!;
+	private TextureRect _battleLogTag = null!;
+	private PanelContainer _logPanel = null!;
 	private RichTextLabel _logLabel = null!;
 	private Control _overlayRoot = null!;
 	private int PlayerTeam => GameRoot.Config.BattlePlayerTeam;
@@ -98,6 +126,7 @@ public partial class BattleScreen : Control
 		_initialTimeScale = Engine.TimeScale;
 		_presenter = new BattlePresenter(PlayerTeam);
 		_background = GetNode<TextureRect>("%Background");
+		_topClock = GetNode<TextureRect>("UiDesignCanvas/DesignRoot/TopClock");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
 		_surrenderButton = GetNode<BaseButton>("%SurrenderButton");
@@ -115,6 +144,18 @@ public partial class BattleScreen : Control
 		_restButton = GetNode<BaseButton>("%RestButton");
 		_endButton = GetNode<BaseButton>("%EndButton");
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_avatarFrame = GetNode<TextureRect>("UiDesignCanvas/DesignRoot/BottomHud/AvatarFrame");
+		_bottomHud = GetNode<Control>("UiDesignCanvas/DesignRoot/BottomHud");
+		_bottomStrip = GetNode<TextureRect>("UiDesignCanvas/DesignRoot/BottomHud/BottomStrip");
+		_actionBarBg = GetNode<TextureRect>("UiDesignCanvas/DesignRoot/BottomHud/ActionBarBg");
+		_selectedSkillBg = GetNode<TextureRect>("UiDesignCanvas/DesignRoot/BottomHud/SelectedSkillBg");
+		_listScroll = GetNode<ScrollContainer>("UiDesignCanvas/DesignRoot/BottomHud/ListScroll");
+		_uiDesignCanvas = GetNode<Control>("UiDesignCanvas");
+		_uiDesignRoot = GetNode<Control>("UiDesignCanvas/DesignRoot");
+		_boardDesignCanvas = GetNode<Control>("BoardDesignCanvas");
+		_boardDesignRoot = GetNode<Control>("BoardDesignCanvas/DesignRoot");
+		_battleLogTag = GetNode<TextureRect>("UiDesignCanvas/DesignRoot/BattleLogTag");
+		_logPanel = GetNode<PanelContainer>("UiDesignCanvas/DesignRoot/LogPanel");
 		_listContainer = GetNode<HBoxContainer>("%ListContainer");
 		_logLabel = GetNode<RichTextLabel>("%LogLabel");
 		_overlayRoot = GetNode<Control>("%OverlayRoot");
@@ -166,10 +207,20 @@ public partial class BattleScreen : Control
 				await _orchestrator.TryEndActionAsync();
 		};
 		RefreshToggleButtons();
+		ApplyResponsiveLayout();
 
 		if (_isConfigured)
 		{
 			StartBattle();
+		}
+	}
+
+	public override void _Notification(int what)
+	{
+		base._Notification(what);
+		if (what == NotificationResized)
+		{
+			ApplyResponsiveLayout();
 		}
 	}
 
@@ -237,6 +288,120 @@ public partial class BattleScreen : Control
 		GameRoot.Audio.PlayBgm(GameRoot.Config.RandomBattleMusics);
 	}
 
+	private void ApplyResponsiveLayout()
+	{
+		if (!IsNodeReady() || Size.X <= 0f || Size.Y <= 0f)
+		{
+			return;
+		}
+
+		FillRoot(_uiDesignCanvas);
+		FillRoot(_uiDesignRoot);
+		FillRoot(_boardDesignCanvas);
+		FillRoot(_boardDesignRoot);
+
+		var scale = ResolveViewportScale();
+		var bottomHudHeight = Mathf.Clamp(BottomHudDesignHeight * scale, BottomHudMinHeight, BottomHudMaxHeight);
+		var actionMenuScale = ResolveActionMenuScale(scale, bottomHudHeight);
+		var topScale = Mathf.Clamp(scale, 0.62f, 1f);
+		var actionMenuSize = new Vector2(ActionMenuDesignWidth, ActionMenuDesignHeight) * actionMenuScale;
+		var rightMargin = ActionMenuRightMarginDesign * scale;
+		var bottomMargin = ActionMenuBottomMarginDesign * scale;
+
+		ApplyScaledRect(_topClock, Vector2.Zero, topScale, new Rect2(22f, 16f, 814f, 183f));
+		var topButtonOrigin = new Vector2(MathF.Max(820f * topScale, Size.X - 558f * topScale - 14f * scale), 0f);
+		ApplyScaledRect(_surrenderButton, topButtonOrigin, topScale, new Rect2(0f, 29f, 187f, 175f));
+		ApplyScaledRect(_autoBattleButton, topButtonOrigin, topScale, new Rect2(191f, 23f, 185f, 158f));
+		ApplyScaledRect(_speedUpButton, topButtonOrigin, topScale, new Rect2(385f, 30f, 158f, 136f));
+		ApplyScaledRect(_battleLogTag, Vector2.Zero, topScale, new Rect2(-44f, 200f, 166f, 459f));
+		ApplyAbsoluteScaledRect(_logPanel, new Vector2(0f, (Size.Y - 504f * topScale) * 0.5f), topScale, new Vector2(240f, 504f));
+
+		var boardLeft = Mathf.Min(BoardLeftDesign * scale, Size.X * 0.22f);
+		var boardTop = Mathf.Min(BoardTopDesign * scale, Size.Y * 0.26f);
+		var boardRight = MathF.Max(rightMargin + actionMenuSize.X + BoardRightReserveDesign * scale, Size.X * 0.08f);
+		var boardBottom = MathF.Max(bottomHudHeight + BoardBottomReserveDesign * scale, Size.Y * 0.22f);
+		var boardWidth = MathF.Max(BoardMinWidth * scale, Size.X - boardLeft - boardRight);
+		var boardHeight = MathF.Max(BoardMinHeight * scale, Size.Y - boardTop - boardBottom);
+		_boardGrid.Position = new Vector2(boardLeft, boardTop);
+		_boardGrid.Size = new Vector2(boardWidth, boardHeight);
+		_boardGrid.RefreshLayout();
+
+		_bottomHud.Position = Vector2.Zero;
+		_bottomHud.Size = Size;
+
+		_actionBarBg.Position = new Vector2(Size.X - actionMenuSize.X - 70f * scale, Size.Y - actionMenuSize.Y - 8f * scale);
+		_actionBarBg.Size = new Vector2(actionMenuSize.X + 70f * scale, actionMenuSize.Y + 14f * scale);
+
+		var menuOrigin = new Vector2(Size.X - actionMenuSize.X - rightMargin, Size.Y - actionMenuSize.Y - bottomMargin);
+		ApplyScaledRect(_skillButton, menuOrigin, actionMenuScale, new Rect2(133f, 152f, 177f, 160f));
+		ApplyScaledRect(_itemButton, menuOrigin, actionMenuScale, new Rect2(262f, 230f, 177f, 160f));
+		ApplyScaledRect(_restButton, menuOrigin, actionMenuScale, new Rect2(267f, 385f, 177f, 160f));
+		ApplyScaledRect(_moveButton, menuOrigin, actionMenuScale, new Rect2(0f, 386f, 177f, 160f));
+		ApplyScaledRect(_avatar, menuOrigin, actionMenuScale, new Rect2(136f, 294f, 157f, 167f));
+		ApplyScaledRect(_avatarFrame, menuOrigin, actionMenuScale, new Rect2(121f, 306f, 198f, 164f));
+		ApplyScaledRect(_endButton, menuOrigin, actionMenuScale, new Rect2(245f, 0f, 202f, 62f));
+
+		var selectedSkillY = MathF.Min(
+			Size.Y - 282f * actionMenuScale - 12f * scale,
+			Size.Y - bottomHudHeight - 10f * scale);
+		ApplyScaledRect(
+			_selectedSkillBg,
+			Vector2.Zero,
+			actionMenuScale,
+			new Rect2(55f * scale / actionMenuScale, selectedSkillY / actionMenuScale, 257f, 282f));
+
+		var selectedSkillRight = _selectedSkillBg.Position.X + _selectedSkillBg.Size.X * _selectedSkillBg.Scale.X;
+		var listLeft = selectedSkillRight - 45f * scale;
+		var listRight = MathF.Max(listLeft + 220f * scale, menuOrigin.X - 34f * scale);
+		var listTop = selectedSkillY + 88f * actionMenuScale;
+		var listHeight = MathF.Max(96f, Size.Y - listTop - 12f * scale);
+		_listScroll.Position = new Vector2(listLeft, listTop);
+		_listScroll.Size = new Vector2(
+			MathF.Max(220f * scale, listRight - listLeft),
+			listHeight);
+
+		_bottomStrip.Position = new Vector2(20f * scale, Size.Y - bottomHudHeight + 46f * scale);
+		_bottomStrip.Size = new Vector2(MathF.Max(0f, menuOrigin.X - 36f * scale), 163f * scale);
+	}
+
+	private float ResolveViewportScale() =>
+		MathF.Min(Size.X / DesignWidth, Size.Y / DesignHeight);
+
+	private float ResolveActionMenuScale(float viewportScale, float bottomHudHeight)
+	{
+		var widthScale = Size.X / DesignWidth;
+		var heightScale = Size.Y / DesignHeight;
+		var availableHeightScale = MathF.Max(ActionMenuMinScale, (Size.Y - 12f) / ActionMenuDesignHeight);
+		var scale = MathF.Min(MathF.Max(viewportScale, MathF.Min(widthScale, heightScale)), availableHeightScale);
+		if (bottomHudHeight < BottomHudDesignHeight)
+		{
+			scale = MathF.Min(scale, bottomHudHeight / BottomHudDesignHeight);
+		}
+
+		return Mathf.Clamp(scale, ActionMenuMinScale, ActionMenuMaxScale);
+	}
+
+	private static void FillRoot(Control control)
+	{
+		control.Position = Vector2.Zero;
+		control.Size = control.GetParent<Control>()?.Size ?? control.Size;
+		control.Scale = Vector2.One;
+	}
+
+	private static void ApplyScaledRect(Control control, Vector2 origin, float scale, Rect2 designRect)
+	{
+		control.Position = origin + designRect.Position * scale;
+		control.Size = designRect.Size;
+		control.Scale = Vector2.One * scale;
+	}
+
+	private static void ApplyAbsoluteScaledRect(Control control, Vector2 position, float scale, Vector2 designSize)
+	{
+		control.Position = position;
+		control.Size = designSize;
+		control.Scale = Vector2.One * scale;
+	}
+
 	internal void RefreshAll()
 	{
 		if (_state is null || !IsInsideTree())
@@ -301,7 +466,7 @@ public partial class BattleScreen : Control
 				ResolveCellColor(cell, highlights),
 				CanClickCell(cell.Position, highlights)))
 			.ToArray();
-		_boardGrid.RenderGrid(_state.Grid.Width, _state.Grid.Height, GridCellWidth, GridCellHeight, 6, cells);
+		_boardGrid.RenderGrid(_state.Grid.Width, _state.Grid.Height, 6, cells);
 		var actingUnitId = _state.CurrentAction?.ActingUnitId;
 		_boardGrid.RenderUnits(_state.Units
 			.Select(unit => new BattleBoardUnitVisual(

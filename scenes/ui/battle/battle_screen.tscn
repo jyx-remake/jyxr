@@ -108,6 +108,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("28_design_canvas")
+ScalingMode = 1
 
 [node name="DesignRoot" type="Control" parent="UiDesignCanvas" unique_id=1451124091]
 anchors_preset = 0
@@ -485,6 +486,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("28_design_canvas")
+ScalingMode = 1
 
 [node name="DesignRoot" type="Control" parent="BoardDesignCanvas" unique_id=546322942]
 anchors_preset = 0
