@@ -56,6 +56,14 @@ public partial class BattleScreen : Control
 	private const float BottomStripDesignLeft = 20f;
 	private const float BottomStripDesignHeight = 163f;
 	private const float BottomStripTopInsetDesign = 46f;
+	private const float SkillListItemMinScale = 0.45f;
+	private const float SkillListItemMaxScale = 1f;
+	private const float ListButtonDesignWidth = 180f;
+	private const float ListButtonDesignHeight = 60f;
+	private const int ListHeaderDesignFontSize = 22;
+	private const int ListLabelDesignFontSize = 18;
+	private const int ListButtonDesignFontSize = 18;
+	private const int ListSeparationDesign = 12;
 	private const float LogPanelDesignWidth = 240f;
 	private const float LogPanelDesignHeight = 504f;
 	private const float LogPanelMinWidth = 176f;
@@ -117,6 +125,7 @@ public partial class BattleScreen : Control
 	private bool _isSpeedUpEnabled;
 	private double _initialTimeScale = 1d;
 	private int _battleSpeedMultiplier = 2;
+	private float _skillListItemScale = 1f;
 	private SkillPresentationContext? _activeSkillPresentation;
 	private GridPosition? _hoveredCellPosition;
 
@@ -512,6 +521,8 @@ public partial class BattleScreen : Control
 		_selectedSkillBg.Scale = Vector2.One * layout.SelectedSkillScale;
 		_listScroll.Position = layout.SkillListBounds.Position;
 		_listScroll.Size = layout.SkillListBounds.Size;
+		_skillListItemScale = ResolveSkillListItemScale(layout.SkillListBounds.Size.Y);
+		ApplySkillListItemScale();
 		_bottomStrip.Position = layout.BottomStripBounds.Position;
 		_bottomStrip.Size = layout.BottomStripBounds.Size;
 	}
@@ -609,6 +620,61 @@ public partial class BattleScreen : Control
 		control.Position = Vector2.Zero;
 		control.Size = control.GetParent<Control>()?.Size ?? control.Size;
 		control.Scale = Vector2.One;
+	}
+
+	private float ResolveSkillListItemScale(float listHeight)
+	{
+		var availableHeight = MathF.Max(1f, listHeight - 8f);
+		var heightScale = availableHeight / BattleSkillBox.DesignHeight;
+		return Mathf.Clamp(heightScale, SkillListItemMinScale, SkillListItemMaxScale);
+	}
+
+	private void ApplySkillListItemScale()
+	{
+		if (_listContainer is null)
+		{
+			return;
+		}
+
+		var separation = Math.Max(6, (int)MathF.Round(ListSeparationDesign * _skillListItemScale));
+		_listContainer.AddThemeConstantOverride("separation", separation);
+		foreach (var child in _listContainer.GetChildren())
+		{
+			if (child is Control control)
+			{
+				ApplyListItemScale(control);
+			}
+		}
+	}
+
+	private void ApplyListItemScale(Control control)
+	{
+		if (control is BattleSkillBox skillBox)
+		{
+			skillBox.SetPresentationScale(_skillListItemScale);
+			return;
+		}
+
+		if (control is Button button)
+		{
+			button.CustomMinimumSize = new Vector2(ListButtonDesignWidth, ListButtonDesignHeight) * _skillListItemScale;
+			button.AddThemeFontSizeOverride(
+				"font_size",
+				Math.Max(12, (int)MathF.Round(ListButtonDesignFontSize * _skillListItemScale)));
+			return;
+		}
+
+		if (control is Label label)
+		{
+			ApplyListLabelScale(label, ListLabelDesignFontSize);
+		}
+	}
+
+	private void ApplyListLabelScale(Label label, int designFontSize)
+	{
+		label.AddThemeFontSizeOverride(
+			"font_size",
+			Math.Max(12, (int)MathF.Round(designFontSize * _skillListItemScale)));
 	}
 
 	private static Rect2 ScaleDesignRect(Vector2 origin, float scale, Rect2 designRect) =>
@@ -947,8 +1013,8 @@ public partial class BattleScreen : Control
 	private void AddListHeader(string text)
 	{
 		var label = new Label { Text = text };
-		label.AddThemeFontSizeOverride("font_size", 22);
 		label.AddThemeColorOverride("font_color", new Color(0.95f, 0.92f, 0.8f));
+		ApplyListLabelScale(label, ListHeaderDesignFontSize);
 		_listContainer.AddChild(label);
 	}
 
@@ -959,8 +1025,8 @@ public partial class BattleScreen : Control
 			Text = text,
 			AutowrapMode = TextServer.AutowrapMode.WordSmart,
 		};
-		label.AddThemeFontSizeOverride("font_size", 18);
 		label.AddThemeColorOverride("font_color", Colors.White);
+		ApplyListLabelScale(label, ListLabelDesignFontSize);
 		_listContainer.AddChild(label);
 	}
 
@@ -969,10 +1035,11 @@ public partial class BattleScreen : Control
 		var button = new Button
 		{
 			Text = text,
-			CustomMinimumSize = new Vector2(180, 60),
+			CustomMinimumSize = new Vector2(ListButtonDesignWidth, ListButtonDesignHeight),
 		};
 		button.AddThemeFontSizeOverride("font_size", 18);
 		button.Pressed += pressed;
+		ApplyListItemScale(button);
 		_listContainer.AddChild(button);
 	}
 
@@ -985,6 +1052,7 @@ public partial class BattleScreen : Control
 
 		button.Setup(skillView.Skill, ReferenceEquals(_uiState.SelectedSkill, skillView.Skill), skillView.IsAvailable);
 		button.TooltipText = BuildSkillTooltip(skillView);
+		button.SetPresentationScale(_skillListItemScale);
 		if (skillView.IsAvailable)
 		{
 			button.Pressed += () =>
