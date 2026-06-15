@@ -35,6 +35,18 @@ public partial class BattleScreen : Control
 	private const float BottomHudDesignHeight = 260f;
 	private const float BottomHudMinHeight = 150f;
 	private const float BottomHudMaxHeight = 260f;
+	private const float SelectedSkillDesignLeft = 55f;
+	private const float SelectedSkillDesignWidth = 257f;
+	private const float SelectedSkillDesignHeight = 282f;
+	private const float SkillListMinWidth = 220f;
+	private const float SkillListMinScreenWidth = 180f;
+	private const float SkillListMinHeight = 96f;
+	private const float SkillListSelectedOverlapDesign = 45f;
+	private const float SkillListTopInsetDesign = 88f;
+	private const float SkillListRightGapDesign = 34f;
+	private const float BottomStripDesignLeft = 20f;
+	private const float BottomStripDesignHeight = 163f;
+	private const float BottomStripTopInsetDesign = 46f;
 	private const BattleMovementPresentationMode MovementPresentationMode = BattleMovementPresentationMode.Step;
 	private static readonly Color DefaultCellColor = new(0.2f, 0.2f, 0.2f, 0.2f);
 	private static readonly Color MoveHighlightColor = new(0.2f, 0.6f, 1f, 0.35f);
@@ -128,6 +140,12 @@ public partial class BattleScreen : Control
 		Vector2 Origin,
 		Rect2 Bounds,
 		Rect2 BackgroundBounds);
+
+	private readonly record struct BottomSkillLayout(
+		float SelectedSkillScale,
+		Rect2 SelectedSkillBounds,
+		Rect2 SkillListBounds,
+		Rect2 BottomStripBounds);
 
 	public override void _Ready()
 	{
@@ -311,7 +329,6 @@ public partial class BattleScreen : Control
 		var scale = ResolveViewportScale();
 		var bottomHudHeight = Mathf.Clamp(BottomHudDesignHeight * scale, BottomHudMinHeight, BottomHudMaxHeight);
 		var actionMenuLayout = ResolveActionMenuLayout(scale, bottomHudHeight);
-		var actionMenuScale = actionMenuLayout.Scale;
 		var topScale = Mathf.Clamp(scale, 0.62f, 1f);
 		var safeMargin = MathF.Max(12f, BoardSafeMarginDesign * scale);
 
@@ -331,31 +348,70 @@ public partial class BattleScreen : Control
 		_bottomHud.Size = Size;
 
 		var actionMenuRect = ApplyActionMenuLayout(actionMenuLayout);
+		var bottomSkillLayout = ResolveBottomSkillLayout(scale, bottomHudHeight, actionMenuLayout);
+		ApplyBottomSkillLayout(bottomSkillLayout);
 
-		var selectedSkillY = MathF.Min(
-			Size.Y - 282f * actionMenuScale - 12f * scale,
-			Size.Y - bottomHudHeight - 10f * scale);
-		var selectedSkillRect = ApplyScaledRect(
-			_selectedSkillBg,
-			Vector2.Zero,
-			actionMenuScale,
-			new Rect2(55f * scale / actionMenuScale, selectedSkillY / actionMenuScale, 257f, 282f));
+		ApplyBoardLayout(
+			topClockRect,
+			logPanelRect,
+			actionMenuRect,
+			bottomSkillLayout.SelectedSkillBounds,
+			bottomSkillLayout.SkillListBounds,
+			safeMargin,
+			scale);
+	}
 
-		var selectedSkillRight = _selectedSkillBg.Position.X + _selectedSkillBg.Size.X * _selectedSkillBg.Scale.X;
-		var listLeft = selectedSkillRight - 45f * scale;
-		var listRight = MathF.Max(listLeft + 220f * scale, actionMenuLayout.Origin.X - 34f * scale);
-		var listTop = selectedSkillY + 88f * actionMenuScale;
-		var listHeight = MathF.Max(96f, Size.Y - listTop - 12f * scale);
-		_listScroll.Position = new Vector2(listLeft, listTop);
-		_listScroll.Size = new Vector2(
-			MathF.Max(220f * scale, listRight - listLeft),
-			listHeight);
-		var listScrollRect = new Rect2(_listScroll.Position, _listScroll.Size);
+	private BottomSkillLayout ResolveBottomSkillLayout(
+		float viewportScale,
+		float bottomHudHeight,
+		ActionMenuLayout actionMenuLayout)
+	{
+		var screenMargin = MathF.Max(ActionMenuScreenMarginMin, BoardSafeMarginDesign * viewportScale * 0.5f);
+		var selectedScale = actionMenuLayout.Scale;
+		var selectedSize = new Vector2(SelectedSkillDesignWidth, SelectedSkillDesignHeight) * selectedScale;
+		var selectedLeft = MathF.Max(screenMargin, SelectedSkillDesignLeft * viewportScale);
+		var selectedTop = MathF.Min(
+			Size.Y - selectedSize.Y - screenMargin,
+			Size.Y - bottomHudHeight - 10f * viewportScale);
+		selectedTop = MathF.Max(screenMargin, selectedTop);
+		var selectedBounds = new Rect2(new Vector2(selectedLeft, selectedTop), selectedSize);
 
-		_bottomStrip.Position = new Vector2(20f * scale, Size.Y - bottomHudHeight + 46f * scale);
-		_bottomStrip.Size = new Vector2(MathF.Max(0f, actionMenuLayout.Origin.X - 36f * scale), 163f * scale);
+		var listLeft = selectedBounds.Position.X + selectedBounds.Size.X - SkillListSelectedOverlapDesign * viewportScale;
+		var listRight = actionMenuLayout.Origin.X - SkillListRightGapDesign * viewportScale;
+		var listTop = selectedBounds.Position.Y + SkillListTopInsetDesign * selectedScale;
+		var listBottom = Size.Y - screenMargin;
+		var minListWidth = MathF.Max(SkillListMinScreenWidth, SkillListMinWidth * viewportScale);
+		var minListHeight = SkillListMinHeight;
+		if (listRight - listLeft < minListWidth)
+		{
+			var rightLimit = MathF.Max(screenMargin, actionMenuLayout.Origin.X - screenMargin);
+			listLeft = MathF.Max(screenMargin, MathF.Min(listLeft, rightLimit - minListWidth));
+			listRight = rightLimit;
+		}
 
-		ApplyBoardLayout(topClockRect, logPanelRect, actionMenuRect, selectedSkillRect, listScrollRect, safeMargin, scale);
+		var listBounds = new Rect2(
+			new Vector2(listLeft, listTop),
+			new Vector2(MathF.Max(1f, listRight - listLeft), MathF.Max(minListHeight, listBottom - listTop)));
+
+		var stripLeft = BottomStripDesignLeft * viewportScale;
+		var stripTop = Size.Y - bottomHudHeight + BottomStripTopInsetDesign * viewportScale;
+		var stripRight = MathF.Max(stripLeft, actionMenuLayout.Origin.X - SkillListRightGapDesign * viewportScale);
+		var stripBounds = new Rect2(
+			new Vector2(stripLeft, stripTop),
+			new Vector2(stripRight - stripLeft, BottomStripDesignHeight * viewportScale));
+
+		return new BottomSkillLayout(selectedScale, selectedBounds, listBounds, stripBounds);
+	}
+
+	private void ApplyBottomSkillLayout(BottomSkillLayout layout)
+	{
+		_selectedSkillBg.Position = layout.SelectedSkillBounds.Position;
+		_selectedSkillBg.Size = new Vector2(SelectedSkillDesignWidth, SelectedSkillDesignHeight);
+		_selectedSkillBg.Scale = Vector2.One * layout.SelectedSkillScale;
+		_listScroll.Position = layout.SkillListBounds.Position;
+		_listScroll.Size = layout.SkillListBounds.Size;
+		_bottomStrip.Position = layout.BottomStripBounds.Position;
+		_bottomStrip.Size = layout.BottomStripBounds.Size;
 	}
 
 	private ActionMenuLayout ResolveActionMenuLayout(float viewportScale, float bottomHudHeight)
