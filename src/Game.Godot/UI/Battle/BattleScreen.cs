@@ -25,10 +25,13 @@ public partial class BattleScreen : Control
 	private const float BoardSafeMarginDesign = 24f;
 	private const float ActionMenuDesignWidth = 520f;
 	private const float ActionMenuDesignHeight = 560f;
-	private const float ActionMenuMinScale = 0.6f;
+	private const float ActionButtonDesignWidth = 177f;
+	private const float ActionButtonDesignHeight = 160f;
+	private const float ActionButtonMinHitSize = 44f;
 	private const float ActionMenuMaxScale = 1.02f;
 	private const float ActionMenuRightMarginDesign = 15f;
 	private const float ActionMenuBottomMarginDesign = 0f;
+	private const float ActionMenuScreenMarginMin = 8f;
 	private const float BottomHudDesignHeight = 260f;
 	private const float BottomHudMinHeight = 150f;
 	private const float BottomHudMaxHeight = 260f;
@@ -119,6 +122,12 @@ public partial class BattleScreen : Control
 	private RichTextLabel _logLabel = null!;
 	private Control _overlayRoot = null!;
 	private int PlayerTeam => GameRoot.Config.BattlePlayerTeam;
+
+	private readonly record struct ActionMenuLayout(
+		float Scale,
+		Vector2 Origin,
+		Rect2 Bounds,
+		Rect2 BackgroundBounds);
 
 	public override void _Ready()
 	{
@@ -301,11 +310,9 @@ public partial class BattleScreen : Control
 
 		var scale = ResolveViewportScale();
 		var bottomHudHeight = Mathf.Clamp(BottomHudDesignHeight * scale, BottomHudMinHeight, BottomHudMaxHeight);
-		var actionMenuScale = ResolveActionMenuScale(scale, bottomHudHeight);
+		var actionMenuLayout = ResolveActionMenuLayout(scale, bottomHudHeight);
+		var actionMenuScale = actionMenuLayout.Scale;
 		var topScale = Mathf.Clamp(scale, 0.62f, 1f);
-		var actionMenuSize = new Vector2(ActionMenuDesignWidth, ActionMenuDesignHeight) * actionMenuScale;
-		var rightMargin = ActionMenuRightMarginDesign * scale;
-		var bottomMargin = ActionMenuBottomMarginDesign * scale;
 		var safeMargin = MathF.Max(12f, BoardSafeMarginDesign * scale);
 
 		var topClockRect = ApplyScaledRect(_topClock, Vector2.Zero, topScale, new Rect2(22f, 16f, 814f, 183f));
@@ -323,18 +330,7 @@ public partial class BattleScreen : Control
 		_bottomHud.Position = Vector2.Zero;
 		_bottomHud.Size = Size;
 
-		_actionBarBg.Position = new Vector2(Size.X - actionMenuSize.X - 70f * scale, Size.Y - actionMenuSize.Y - 8f * scale);
-		_actionBarBg.Size = new Vector2(actionMenuSize.X + 70f * scale, actionMenuSize.Y + 14f * scale);
-
-		var menuOrigin = new Vector2(Size.X - actionMenuSize.X - rightMargin, Size.Y - actionMenuSize.Y - bottomMargin);
-		var actionMenuRect = new Rect2(menuOrigin, actionMenuSize);
-		ApplyScaledRect(_skillButton, menuOrigin, actionMenuScale, new Rect2(133f, 152f, 177f, 160f));
-		ApplyScaledRect(_itemButton, menuOrigin, actionMenuScale, new Rect2(262f, 230f, 177f, 160f));
-		ApplyScaledRect(_restButton, menuOrigin, actionMenuScale, new Rect2(267f, 385f, 177f, 160f));
-		ApplyScaledRect(_moveButton, menuOrigin, actionMenuScale, new Rect2(0f, 386f, 177f, 160f));
-		ApplyScaledRect(_avatar, menuOrigin, actionMenuScale, new Rect2(136f, 294f, 157f, 167f));
-		ApplyScaledRect(_avatarFrame, menuOrigin, actionMenuScale, new Rect2(121f, 306f, 198f, 164f));
-		ApplyScaledRect(_endButton, menuOrigin, actionMenuScale, new Rect2(245f, 0f, 202f, 62f));
+		var actionMenuRect = ApplyActionMenuLayout(actionMenuLayout);
 
 		var selectedSkillY = MathF.Min(
 			Size.Y - 282f * actionMenuScale - 12f * scale,
@@ -347,7 +343,7 @@ public partial class BattleScreen : Control
 
 		var selectedSkillRight = _selectedSkillBg.Position.X + _selectedSkillBg.Size.X * _selectedSkillBg.Scale.X;
 		var listLeft = selectedSkillRight - 45f * scale;
-		var listRight = MathF.Max(listLeft + 220f * scale, menuOrigin.X - 34f * scale);
+		var listRight = MathF.Max(listLeft + 220f * scale, actionMenuLayout.Origin.X - 34f * scale);
 		var listTop = selectedSkillY + 88f * actionMenuScale;
 		var listHeight = MathF.Max(96f, Size.Y - listTop - 12f * scale);
 		_listScroll.Position = new Vector2(listLeft, listTop);
@@ -357,9 +353,58 @@ public partial class BattleScreen : Control
 		var listScrollRect = new Rect2(_listScroll.Position, _listScroll.Size);
 
 		_bottomStrip.Position = new Vector2(20f * scale, Size.Y - bottomHudHeight + 46f * scale);
-		_bottomStrip.Size = new Vector2(MathF.Max(0f, menuOrigin.X - 36f * scale), 163f * scale);
+		_bottomStrip.Size = new Vector2(MathF.Max(0f, actionMenuLayout.Origin.X - 36f * scale), 163f * scale);
 
 		ApplyBoardLayout(topClockRect, logPanelRect, actionMenuRect, selectedSkillRect, listScrollRect, safeMargin, scale);
+	}
+
+	private ActionMenuLayout ResolveActionMenuLayout(float viewportScale, float bottomHudHeight)
+	{
+		var minHitScale = MathF.Max(
+			ActionButtonMinHitSize / ActionButtonDesignWidth,
+			ActionButtonMinHitSize / ActionButtonDesignHeight);
+		var rightMargin = MathF.Max(ActionMenuScreenMarginMin, ActionMenuRightMarginDesign * viewportScale);
+		var bottomMargin = MathF.Max(0f, ActionMenuBottomMarginDesign * viewportScale);
+		var widthScale = Size.X / DesignWidth;
+		var heightScale = Size.Y / DesignHeight;
+		var availableWidthScale = MathF.Max(minHitScale, (Size.X - rightMargin - ActionMenuScreenMarginMin) / ActionMenuDesignWidth);
+		var availableHeightScale = MathF.Max(minHitScale, (Size.Y - bottomMargin - ActionMenuScreenMarginMin) / ActionMenuDesignHeight);
+		var maxFitScale = MathF.Min(availableWidthScale, availableHeightScale);
+		var targetScale = MathF.Min(MathF.Max(viewportScale, MathF.Min(widthScale, heightScale)), maxFitScale);
+		if (bottomHudHeight < BottomHudDesignHeight)
+		{
+			targetScale = MathF.Min(targetScale, bottomHudHeight / BottomHudDesignHeight);
+		}
+
+		var scale = Mathf.Clamp(targetScale, minHitScale, MathF.Min(ActionMenuMaxScale, maxFitScale));
+		var size = new Vector2(ActionMenuDesignWidth, ActionMenuDesignHeight) * scale;
+		var origin = new Vector2(
+			MathF.Max(ActionMenuScreenMarginMin, Size.X - size.X - rightMargin),
+			MathF.Max(ActionMenuScreenMarginMin, Size.Y - size.Y - bottomMargin));
+		var backgroundOrigin = new Vector2(
+			MathF.Max(0f, origin.X - 70f * viewportScale),
+			MathF.Max(0f, origin.Y - 8f * viewportScale));
+		var backgroundSize = new Vector2(size.X + 70f * viewportScale, size.Y + 14f * viewportScale);
+
+		return new ActionMenuLayout(
+			scale,
+			origin,
+			new Rect2(origin, size),
+			new Rect2(backgroundOrigin, backgroundSize));
+	}
+
+	private Rect2 ApplyActionMenuLayout(ActionMenuLayout layout)
+	{
+		_actionBarBg.Position = layout.BackgroundBounds.Position;
+		_actionBarBg.Size = layout.BackgroundBounds.Size;
+		ApplyScaledRect(_skillButton, layout.Origin, layout.Scale, new Rect2(133f, 152f, 177f, 160f));
+		ApplyScaledRect(_itemButton, layout.Origin, layout.Scale, new Rect2(262f, 230f, 177f, 160f));
+		ApplyScaledRect(_restButton, layout.Origin, layout.Scale, new Rect2(267f, 385f, 177f, 160f));
+		ApplyScaledRect(_moveButton, layout.Origin, layout.Scale, new Rect2(0f, 386f, 177f, 160f));
+		ApplyScaledRect(_avatar, layout.Origin, layout.Scale, new Rect2(136f, 294f, 157f, 167f));
+		ApplyScaledRect(_avatarFrame, layout.Origin, layout.Scale, new Rect2(121f, 306f, 198f, 164f));
+		ApplyScaledRect(_endButton, layout.Origin, layout.Scale, new Rect2(245f, 0f, 202f, 62f));
+		return layout.Bounds;
 	}
 
 	private void ApplyBoardLayout(
@@ -400,20 +445,6 @@ public partial class BattleScreen : Control
 
 	private float ResolveViewportScale() =>
 		MathF.Min(Size.X / DesignWidth, Size.Y / DesignHeight);
-
-	private float ResolveActionMenuScale(float viewportScale, float bottomHudHeight)
-	{
-		var widthScale = Size.X / DesignWidth;
-		var heightScale = Size.Y / DesignHeight;
-		var availableHeightScale = MathF.Max(ActionMenuMinScale, (Size.Y - 12f) / ActionMenuDesignHeight);
-		var scale = MathF.Min(MathF.Max(viewportScale, MathF.Min(widthScale, heightScale)), availableHeightScale);
-		if (bottomHudHeight < BottomHudDesignHeight)
-		{
-			scale = MathF.Min(scale, bottomHudHeight / BottomHudDesignHeight);
-		}
-
-		return Mathf.Clamp(scale, ActionMenuMinScale, ActionMenuMaxScale);
-	}
 
 	private static void FillRoot(Control control)
 	{
