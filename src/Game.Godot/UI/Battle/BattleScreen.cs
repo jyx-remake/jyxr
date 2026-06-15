@@ -23,6 +23,15 @@ public partial class BattleScreen : Control
 	private const float BoardMinWidth = 560f;
 	private const float BoardMinHeight = 300f;
 	private const float BoardSafeMarginDesign = 24f;
+	private const float TopClockDesignLeft = 22f;
+	private const float TopClockDesignTop = 16f;
+	private const float TopClockDesignWidth = 814f;
+	private const float TopClockDesignHeight = 183f;
+	private const float TopButtonGroupDesignWidth = 543f;
+	private const float TopButtonRightMarginDesign = 14f;
+	private const float TopHudGapDesign = 24f;
+	private const float TopHudMinScale = 0.33f;
+	private const float TopHudMaxScale = 1f;
 	private const float ActionMenuDesignWidth = 520f;
 	private const float ActionMenuDesignHeight = 560f;
 	private const float ActionButtonDesignWidth = 177f;
@@ -163,6 +172,14 @@ public partial class BattleScreen : Control
 		Rect2 PanelBounds,
 		Rect2 TagBounds,
 		float LabelMinHeight);
+
+	private readonly record struct TopHudLayout(
+		float Scale,
+		Rect2 Bounds,
+		Rect2 ClockBounds,
+		Rect2 SurrenderBounds,
+		Rect2 AutoBattleBounds,
+		Rect2 SpeedUpBounds);
 
 	public override void _Ready()
 	{
@@ -346,15 +363,11 @@ public partial class BattleScreen : Control
 		var scale = ResolveViewportScale();
 		var bottomHudHeight = Mathf.Clamp(BottomHudDesignHeight * scale, BottomHudMinHeight, BottomHudMaxHeight);
 		var actionMenuLayout = ResolveActionMenuLayout(scale, bottomHudHeight);
-		var topScale = Mathf.Clamp(scale, 0.62f, 1f);
 		var safeMargin = MathF.Max(12f, BoardSafeMarginDesign * scale);
 
-		var topClockRect = ApplyScaledRect(_topClock, Vector2.Zero, topScale, new Rect2(22f, 16f, 814f, 183f));
-		var topButtonOrigin = new Vector2(MathF.Max(820f * topScale, Size.X - 558f * topScale - 14f * scale), 0f);
-		ApplyScaledRect(_surrenderButton, topButtonOrigin, topScale, new Rect2(0f, 29f, 187f, 175f));
-		ApplyScaledRect(_autoBattleButton, topButtonOrigin, topScale, new Rect2(191f, 23f, 185f, 158f));
-		ApplyScaledRect(_speedUpButton, topButtonOrigin, topScale, new Rect2(385f, 30f, 158f, 136f));
-		var logLayout = ResolveLogPanelLayout(topScale, safeMargin);
+		var topHudLayout = ResolveTopHudLayout(scale);
+		ApplyTopHudLayout(topHudLayout);
+		var logLayout = ResolveLogPanelLayout(topHudLayout.Scale, safeMargin);
 		ApplyLogPanelLayout(logLayout);
 		var logPanelRect = logLayout.PanelBounds;
 
@@ -366,13 +379,55 @@ public partial class BattleScreen : Control
 		ApplyBottomSkillLayout(bottomSkillLayout);
 
 		ApplyBoardLayout(
-			topClockRect,
+			topHudLayout.Bounds,
 			logPanelRect,
 			actionMenuRect,
 			bottomSkillLayout.SelectedSkillBounds,
 			bottomSkillLayout.SkillListBounds,
 			safeMargin,
 			scale);
+	}
+
+	private TopHudLayout ResolveTopHudLayout(float viewportScale)
+	{
+		var fitDesignWidth =
+			TopClockDesignLeft +
+			TopClockDesignWidth +
+			TopHudGapDesign +
+			TopButtonGroupDesignWidth +
+			TopButtonRightMarginDesign;
+		var fitScale = MathF.Min(TopHudMaxScale, Size.X / fitDesignWidth);
+		var minScale = MathF.Min(TopHudMinScale, fitScale);
+		var scale = Mathf.Clamp(viewportScale, minScale, MathF.Min(TopHudMaxScale, fitScale));
+		var clockBounds = ScaleDesignRect(
+			Vector2.Zero,
+			scale,
+			new Rect2(
+				TopClockDesignLeft,
+				TopClockDesignTop,
+				TopClockDesignWidth,
+				TopClockDesignHeight));
+		var topButtonOrigin = new Vector2(
+			MathF.Max(
+				clockBounds.Position.X + clockBounds.Size.X + TopHudGapDesign * scale,
+				Size.X - TopButtonGroupDesignWidth * scale - TopButtonRightMarginDesign * scale),
+			0f);
+		var surrenderBounds = ScaleDesignRect(topButtonOrigin, scale, new Rect2(0f, 29f, 187f, 175f));
+		var autoBattleBounds = ScaleDesignRect(topButtonOrigin, scale, new Rect2(191f, 23f, 185f, 158f));
+		var speedUpBounds = ScaleDesignRect(topButtonOrigin, scale, new Rect2(385f, 30f, 158f, 136f));
+		var bounds = UnionRects(
+			UnionRects(clockBounds, surrenderBounds),
+			UnionRects(autoBattleBounds, speedUpBounds));
+
+		return new TopHudLayout(scale, bounds, clockBounds, surrenderBounds, autoBattleBounds, speedUpBounds);
+	}
+
+	private void ApplyTopHudLayout(TopHudLayout layout)
+	{
+		ApplyResolvedRect(_topClock, layout.ClockBounds, layout.Scale);
+		ApplyResolvedRect(_surrenderButton, layout.SurrenderBounds, layout.Scale);
+		ApplyResolvedRect(_autoBattleButton, layout.AutoBattleBounds, layout.Scale);
+		ApplyResolvedRect(_speedUpButton, layout.SpeedUpBounds, layout.Scale);
 	}
 
 	private LogPanelLayout ResolveLogPanelLayout(float topScale, float safeMargin)
@@ -511,7 +566,7 @@ public partial class BattleScreen : Control
 	}
 
 	private void ApplyBoardLayout(
-		Rect2 topClockRect,
+		Rect2 topHudRect,
 		Rect2 logPanelRect,
 		Rect2 actionMenuRect,
 		Rect2 selectedSkillRect,
@@ -524,7 +579,7 @@ public partial class BattleScreen : Control
 		var preferredLeft = Mathf.Min(BoardLeftDesign * scale, Size.X * 0.22f);
 		var preferredTop = Mathf.Min(BoardTopDesign * scale, Size.Y * 0.26f);
 		var leftEdge = MathF.Max(preferredLeft, logPanelRect.Position.X + logPanelRect.Size.X + safeMargin);
-		var topEdge = MathF.Max(preferredTop, topClockRect.Position.Y + topClockRect.Size.Y + safeMargin);
+		var topEdge = MathF.Max(preferredTop, topHudRect.Position.Y + topHudRect.Size.Y + safeMargin);
 		var bottomHudTop = MathF.Min(selectedSkillRect.Position.Y, listScrollRect.Position.Y);
 		var rightEdge = actionMenuRect.Position.X - safeMargin;
 		var bottomEdge = bottomHudTop - safeMargin;
@@ -556,12 +611,31 @@ public partial class BattleScreen : Control
 		control.Scale = Vector2.One;
 	}
 
+	private static Rect2 ScaleDesignRect(Vector2 origin, float scale, Rect2 designRect) =>
+		new(origin + designRect.Position * scale, designRect.Size * scale);
+
+	private static void ApplyResolvedRect(Control control, Rect2 bounds, float scale)
+	{
+		control.Position = bounds.Position;
+		control.Size = bounds.Size / scale;
+		control.Scale = Vector2.One * scale;
+	}
+
 	private static Rect2 ApplyScaledRect(Control control, Vector2 origin, float scale, Rect2 designRect)
 	{
 		control.Position = origin + designRect.Position * scale;
 		control.Size = designRect.Size;
 		control.Scale = Vector2.One * scale;
 		return new Rect2(control.Position, designRect.Size * scale);
+	}
+
+	private static Rect2 UnionRects(Rect2 first, Rect2 second)
+	{
+		var left = MathF.Min(first.Position.X, second.Position.X);
+		var top = MathF.Min(first.Position.Y, second.Position.Y);
+		var right = MathF.Max(first.Position.X + first.Size.X, second.Position.X + second.Size.X);
+		var bottom = MathF.Max(first.Position.Y + first.Size.Y, second.Position.Y + second.Size.Y);
+		return new Rect2(left, top, right - left, bottom - top);
 	}
 
 	internal void RefreshAll()
