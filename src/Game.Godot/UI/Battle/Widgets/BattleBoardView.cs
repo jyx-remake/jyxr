@@ -530,7 +530,7 @@ public partial class BattleBoardView : Control
 				var item = queue.Dequeue();
 				if (_unitViews.TryGetValue(unitId, out var unitView))
 				{
-					PlayFloatTextAt(unitView.Position + new Vector2(0f, -FloatTextHeadOffsetY), item.Text, item.Color);
+					PlayFloatTextAt(unitView.Position + new Vector2(0f, -FloatTextHeadOffsetY * _unitVisualScale), item.Text, item.Color);
 				}
 
 				await ToSignal(GetTree().CreateTimer(FloatTextQueueSpacingSeconds), SceneTreeTimer.SignalName.Timeout);
