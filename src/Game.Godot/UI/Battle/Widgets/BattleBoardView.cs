@@ -8,6 +8,8 @@ namespace Game.Godot.UI.Battle;
 public partial class BattleBoardView : Control
 {
 	private const float DesignCellSize = 144f;
+	private const float MinUnitVisualScale = 0.35f;
+	private const float MaxUnitVisualScale = 1.1f;
 	private const int CellTextFontSize = 13;
 	private const double StepMoveDurationSeconds = 0.3d;
 	private const double FloatTextQueueInitialDelaySeconds = 0.1d;
@@ -477,7 +479,7 @@ public partial class BattleBoardView : Control
 			_gridWidth * _cellSize + Math.Max(0, _gridWidth - 1) * _cellGap,
 			_gridHeight * _cellSize + Math.Max(0, _gridHeight - 1) * _cellGap);
 		_contentOrigin = (Size - _contentSize) * 0.5f;
-		_unitVisualScale = Math.Clamp(_cellSize / DesignCellSize, 0.55f, 1.1f);
+		_unitVisualScale = Math.Clamp(_cellSize / DesignCellSize, MinUnitVisualScale, MaxUnitVisualScale);
 	}
 
 	private void RelayoutUnitViews()

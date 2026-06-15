@@ -4,6 +4,7 @@ namespace Game.Godot.UI.Battle;
 
 public partial class BattleFloatText : Node2D
 {
+	private const float MinPresentationScale = 0.45f;
 	private const float RandomOffsetX = 50f;
 	private const float FloatRiseDistance = 150f;
 	private const float RandomRiseDistance = 50f;
@@ -23,7 +24,7 @@ public partial class BattleFloatText : Node2D
 	{
 		_label.Text = text;
 		_label.Modulate = color;
-		var scale = Math.Max(0.6f, PresentationScale);
+		var scale = Math.Max(MinPresentationScale, PresentationScale);
 		Scale = Vector2.One * scale;
 
 		var endPosition = Position + new Vector2(
@@ -45,7 +46,7 @@ public partial class BattleFloatText : Node2D
 	{
 		_label.Text = text;
 		_label.Modulate = color;
-		var scale = Math.Max(0.6f, PresentationScale);
+		var scale = Math.Max(MinPresentationScale, PresentationScale);
 		Scale = Vector2.One * scale;
 		_label.AddThemeFontSizeOverride("font_size", PopupFontSize);
 
