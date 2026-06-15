@@ -18,11 +18,11 @@ public partial class BattleScreen : Control
 	private const int MaxBattleSpeedMultiplier = 5;
 	private const float DesignWidth = 1920f;
 	private const float DesignHeight = 1080f;
-	private const float BoardLeftDesign = 285f;
-	private const float BoardTopDesign = 245f;
+	private const float BoardLeftDesign = 215f;
+	private const float BoardTopDesign = 190f;
 	private const float BoardMinWidth = 560f;
 	private const float BoardMinHeight = 300f;
-	private const float BoardSafeMarginDesign = 24f;
+	private const float BoardSafeMarginDesign = 6f;
 	private const float TopClockDesignLeft = 22f;
 	private const float TopClockDesignTop = 16f;
 	private const float TopClockDesignWidth = 814f;
@@ -609,8 +609,8 @@ public partial class BattleScreen : Control
 		var leftEdge = MathF.Max(preferredLeft, logPanelRect.Position.X + logPanelRect.Size.X + safeMargin);
 		var topEdge = MathF.Max(preferredTop, topHudRect.Position.Y + topHudRect.Size.Y + safeMargin);
 		var bottomHudTop = MathF.Min(selectedSkillRect.Position.Y, listScrollRect.Position.Y);
-		var rightEdge = actionMenuRect.Position.X - safeMargin;
-		var bottomEdge = bottomHudTop - safeMargin;
+		var rightEdge = Size.X - safeMargin;
+		var bottomEdge = MathF.Min(Size.Y - safeMargin, bottomHudTop + BottomStripTopInsetDesign * scale);
 
 		if (rightEdge - leftEdge < minBoardWidth)
 		{
