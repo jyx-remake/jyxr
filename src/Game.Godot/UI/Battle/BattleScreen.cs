@@ -233,6 +233,7 @@ public partial class BattleScreen : Control
 		_surrenderButton.Pressed += SurrenderBattle;
 		_speedUpButton.Pressed += ToggleSpeedUp;
 		_autoBattleButton.Pressed += async () => await ToggleAutoBattleAsync();
+		ConfigureTopActionButtonInput();
 
 		_moveButton.Pressed += async () =>
 		{
@@ -437,6 +438,22 @@ public partial class BattleScreen : Control
 		ApplyResolvedRect(_surrenderButton, layout.SurrenderBounds, layout.Scale);
 		ApplyResolvedRect(_autoBattleButton, layout.AutoBattleBounds, layout.Scale);
 		ApplyResolvedRect(_speedUpButton, layout.SpeedUpBounds, layout.Scale);
+		_surrenderButton.MoveToFront();
+		_autoBattleButton.MoveToFront();
+		_speedUpButton.MoveToFront();
+	}
+
+	private void ConfigureTopActionButtonInput()
+	{
+		ConfigureTopActionButtonInput(_surrenderButton);
+		ConfigureTopActionButtonInput(_autoBattleButton);
+		ConfigureTopActionButtonInput(_speedUpButton);
+	}
+
+	private static void ConfigureTopActionButtonInput(Control button)
+	{
+		button.MouseFilter = MouseFilterEnum.Stop;
+		button.ZIndex = 80;
 	}
 
 	private LogPanelLayout ResolveLogPanelLayout(float topScale, float safeMargin)
