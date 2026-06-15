@@ -47,6 +47,18 @@ public partial class BattleScreen : Control
 	private const float BottomStripDesignLeft = 20f;
 	private const float BottomStripDesignHeight = 163f;
 	private const float BottomStripTopInsetDesign = 46f;
+	private const float LogPanelDesignWidth = 240f;
+	private const float LogPanelDesignHeight = 504f;
+	private const float LogPanelMinWidth = 176f;
+	private const float LogPanelMaxWidth = 260f;
+	private const float LogPanelMinHeight = 240f;
+	private const float LogPanelViewportWidthRatio = 0.14f;
+	private const float LogPanelViewportHeightRatio = 0.52f;
+	private const float LogPanelVerticalPadding = 28f;
+	private const float LogTagDesignWidth = 166f;
+	private const float LogTagDesignHeight = 459f;
+	private const float LogTagDesignLeft = -44f;
+	private const float LogTagDesignTopOffset = -88f;
 	private const BattleMovementPresentationMode MovementPresentationMode = BattleMovementPresentationMode.Step;
 	private static readonly Color DefaultCellColor = new(0.2f, 0.2f, 0.2f, 0.2f);
 	private static readonly Color MoveHighlightColor = new(0.2f, 0.6f, 1f, 0.35f);
@@ -146,6 +158,11 @@ public partial class BattleScreen : Control
 		Rect2 SelectedSkillBounds,
 		Rect2 SkillListBounds,
 		Rect2 BottomStripBounds);
+
+	private readonly record struct LogPanelLayout(
+		Rect2 PanelBounds,
+		Rect2 TagBounds,
+		float LabelMinHeight);
 
 	public override void _Ready()
 	{
@@ -337,12 +354,9 @@ public partial class BattleScreen : Control
 		ApplyScaledRect(_surrenderButton, topButtonOrigin, topScale, new Rect2(0f, 29f, 187f, 175f));
 		ApplyScaledRect(_autoBattleButton, topButtonOrigin, topScale, new Rect2(191f, 23f, 185f, 158f));
 		ApplyScaledRect(_speedUpButton, topButtonOrigin, topScale, new Rect2(385f, 30f, 158f, 136f));
-		ApplyScaledRect(_battleLogTag, Vector2.Zero, topScale, new Rect2(-44f, 200f, 166f, 459f));
-		var logPanelRect = ApplyAbsoluteScaledRect(
-			_logPanel,
-			new Vector2(0f, (Size.Y - 504f * topScale) * 0.5f),
-			topScale,
-			new Vector2(240f, 504f));
+		var logLayout = ResolveLogPanelLayout(topScale, safeMargin);
+		ApplyLogPanelLayout(logLayout);
+		var logPanelRect = logLayout.PanelBounds;
 
 		_bottomHud.Position = Vector2.Zero;
 		_bottomHud.Size = Size;
@@ -359,6 +373,39 @@ public partial class BattleScreen : Control
 			bottomSkillLayout.SkillListBounds,
 			safeMargin,
 			scale);
+	}
+
+	private LogPanelLayout ResolveLogPanelLayout(float topScale, float safeMargin)
+	{
+		var panelWidth = Mathf.Clamp(
+			MathF.Max(LogPanelDesignWidth * topScale, Size.X * LogPanelViewportWidthRatio),
+			LogPanelMinWidth,
+			LogPanelMaxWidth);
+		var maxPanelHeight = MathF.Max(LogPanelMinHeight, Size.Y - safeMargin * 2f);
+		var panelHeight = Mathf.Clamp(
+			MathF.Min(LogPanelDesignHeight * topScale, Size.Y * LogPanelViewportHeightRatio),
+			LogPanelMinHeight,
+			maxPanelHeight);
+		var panelTop = MathF.Max(safeMargin, (Size.Y - panelHeight) * 0.5f);
+		var panelBounds = new Rect2(new Vector2(0f, panelTop), new Vector2(panelWidth, panelHeight));
+		var tagScale = panelHeight / LogPanelDesignHeight;
+		var tagBounds = new Rect2(
+			new Vector2(LogTagDesignLeft * tagScale, panelTop + LogTagDesignTopOffset * tagScale),
+			new Vector2(LogTagDesignWidth, LogTagDesignHeight) * tagScale);
+		var labelMinHeight = MathF.Max(0f, panelHeight - LogPanelVerticalPadding);
+
+		return new LogPanelLayout(panelBounds, tagBounds, labelMinHeight);
+	}
+
+	private void ApplyLogPanelLayout(LogPanelLayout layout)
+	{
+		_logPanel.Position = layout.PanelBounds.Position;
+		_logPanel.Size = layout.PanelBounds.Size;
+		_logPanel.Scale = Vector2.One;
+		_battleLogTag.Position = layout.TagBounds.Position;
+		_battleLogTag.Size = layout.TagBounds.Size;
+		_battleLogTag.Scale = Vector2.One;
+		_logLabel.CustomMinimumSize = new Vector2(0f, layout.LabelMinHeight);
 	}
 
 	private BottomSkillLayout ResolveBottomSkillLayout(
@@ -515,14 +562,6 @@ public partial class BattleScreen : Control
 		control.Size = designRect.Size;
 		control.Scale = Vector2.One * scale;
 		return new Rect2(control.Position, designRect.Size * scale);
-	}
-
-	private static Rect2 ApplyAbsoluteScaledRect(Control control, Vector2 position, float scale, Vector2 designSize)
-	{
-		control.Position = position;
-		control.Size = designSize;
-		control.Scale = Vector2.One * scale;
-		return new Rect2(position, designSize * scale);
 	}
 
 	internal void RefreshAll()
