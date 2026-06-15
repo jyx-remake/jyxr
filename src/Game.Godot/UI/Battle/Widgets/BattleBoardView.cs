@@ -10,7 +10,12 @@ public partial class BattleBoardView : Control
 	private const float DesignCellSize = 144f;
 	private const float MinUnitVisualScale = 0.35f;
 	private const float MaxUnitVisualScale = 1.1f;
-	private const int CellTextFontSize = 13;
+	private const float DesignCellTextFontSize = 13f;
+	private const int MinCellTextFontSize = 9;
+	private const int MaxCellTextFontSize = 16;
+	private const float DesignCellBorderWidth = 2f;
+	private const float MinCellBorderWidth = 1f;
+	private const float MaxCellBorderWidth = 3f;
 	private const double StepMoveDurationSeconds = 0.3d;
 	private const double FloatTextQueueInitialDelaySeconds = 0.1d;
 	private const double FloatTextQueueSpacingSeconds = 0.4d;
@@ -314,7 +319,7 @@ public partial class BattleBoardView : Control
 
 				var rect = GridPositionToCellRect(position);
 				DrawRect(rect, cell.Color);
-				DrawRect(rect, BorderColor, false, 2f);
+				DrawRect(rect, BorderColor, false, ResolveCellBorderWidth());
 				DrawCellText(font, rect, cell.Label);
 			}
 		}
@@ -568,17 +573,30 @@ public partial class BattleBoardView : Control
 			return;
 		}
 
-		var lineHeight = CellTextFontSize + 6f;
+		var fontSize = ResolveCellTextFontSize();
+		var lineHeight = fontSize + MathF.Max(3f, 6f * _cellSize / DesignCellSize);
 		var totalHeight = lines.Length * lineHeight;
-		var startY = rect.Position.Y + (rect.Size.Y - totalHeight) * 0.5f + CellTextFontSize;
+		var startY = rect.Position.Y + (rect.Size.Y - totalHeight) * 0.5f + fontSize;
 		for (var index = 0; index < lines.Length; index++)
 		{
 			var line = lines[index];
-			var size = font.GetStringSize(line, HorizontalAlignment.Left, -1, CellTextFontSize);
+			var size = font.GetStringSize(line, HorizontalAlignment.Left, -1, fontSize);
 			var x = rect.Position.X + (rect.Size.X - size.X) * 0.5f;
 			var y = startY + index * lineHeight;
-			DrawString(font, new Vector2(x, y), line, HorizontalAlignment.Left, -1, CellTextFontSize, TextColor);
+			DrawString(font, new Vector2(x, y), line, HorizontalAlignment.Left, -1, fontSize, TextColor);
 		}
+	}
+
+	private int ResolveCellTextFontSize()
+	{
+		var scaledSize = DesignCellTextFontSize * _cellSize / DesignCellSize;
+		return Mathf.RoundToInt(Math.Clamp(scaledSize, MinCellTextFontSize, MaxCellTextFontSize));
+	}
+
+	private float ResolveCellBorderWidth()
+	{
+		var scaledWidth = DesignCellBorderWidth * _cellSize / DesignCellSize;
+		return Math.Clamp(scaledWidth, MinCellBorderWidth, MaxCellBorderWidth);
 	}
 }
 
