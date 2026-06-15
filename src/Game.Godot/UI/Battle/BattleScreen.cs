@@ -20,10 +20,9 @@ public partial class BattleScreen : Control
 	private const float DesignHeight = 1080f;
 	private const float BoardLeftDesign = 285f;
 	private const float BoardTopDesign = 245f;
-	private const float BoardRightReserveDesign = 110f;
-	private const float BoardBottomReserveDesign = 205f;
 	private const float BoardMinWidth = 560f;
 	private const float BoardMinHeight = 300f;
+	private const float BoardSafeMarginDesign = 24f;
 	private const float ActionMenuDesignWidth = 520f;
 	private const float ActionMenuDesignHeight = 560f;
 	private const float ActionMenuMinScale = 0.6f;
@@ -307,24 +306,19 @@ public partial class BattleScreen : Control
 		var actionMenuSize = new Vector2(ActionMenuDesignWidth, ActionMenuDesignHeight) * actionMenuScale;
 		var rightMargin = ActionMenuRightMarginDesign * scale;
 		var bottomMargin = ActionMenuBottomMarginDesign * scale;
+		var safeMargin = MathF.Max(12f, BoardSafeMarginDesign * scale);
 
-		ApplyScaledRect(_topClock, Vector2.Zero, topScale, new Rect2(22f, 16f, 814f, 183f));
+		var topClockRect = ApplyScaledRect(_topClock, Vector2.Zero, topScale, new Rect2(22f, 16f, 814f, 183f));
 		var topButtonOrigin = new Vector2(MathF.Max(820f * topScale, Size.X - 558f * topScale - 14f * scale), 0f);
 		ApplyScaledRect(_surrenderButton, topButtonOrigin, topScale, new Rect2(0f, 29f, 187f, 175f));
 		ApplyScaledRect(_autoBattleButton, topButtonOrigin, topScale, new Rect2(191f, 23f, 185f, 158f));
 		ApplyScaledRect(_speedUpButton, topButtonOrigin, topScale, new Rect2(385f, 30f, 158f, 136f));
 		ApplyScaledRect(_battleLogTag, Vector2.Zero, topScale, new Rect2(-44f, 200f, 166f, 459f));
-		ApplyAbsoluteScaledRect(_logPanel, new Vector2(0f, (Size.Y - 504f * topScale) * 0.5f), topScale, new Vector2(240f, 504f));
-
-		var boardLeft = Mathf.Min(BoardLeftDesign * scale, Size.X * 0.22f);
-		var boardTop = Mathf.Min(BoardTopDesign * scale, Size.Y * 0.26f);
-		var boardRight = MathF.Max(rightMargin + actionMenuSize.X + BoardRightReserveDesign * scale, Size.X * 0.08f);
-		var boardBottom = MathF.Max(bottomHudHeight + BoardBottomReserveDesign * scale, Size.Y * 0.22f);
-		var boardWidth = MathF.Max(BoardMinWidth * scale, Size.X - boardLeft - boardRight);
-		var boardHeight = MathF.Max(BoardMinHeight * scale, Size.Y - boardTop - boardBottom);
-		_boardGrid.Position = new Vector2(boardLeft, boardTop);
-		_boardGrid.Size = new Vector2(boardWidth, boardHeight);
-		_boardGrid.RefreshLayout();
+		var logPanelRect = ApplyAbsoluteScaledRect(
+			_logPanel,
+			new Vector2(0f, (Size.Y - 504f * topScale) * 0.5f),
+			topScale,
+			new Vector2(240f, 504f));
 
 		_bottomHud.Position = Vector2.Zero;
 		_bottomHud.Size = Size;
@@ -333,6 +327,7 @@ public partial class BattleScreen : Control
 		_actionBarBg.Size = new Vector2(actionMenuSize.X + 70f * scale, actionMenuSize.Y + 14f * scale);
 
 		var menuOrigin = new Vector2(Size.X - actionMenuSize.X - rightMargin, Size.Y - actionMenuSize.Y - bottomMargin);
+		var actionMenuRect = new Rect2(menuOrigin, actionMenuSize);
 		ApplyScaledRect(_skillButton, menuOrigin, actionMenuScale, new Rect2(133f, 152f, 177f, 160f));
 		ApplyScaledRect(_itemButton, menuOrigin, actionMenuScale, new Rect2(262f, 230f, 177f, 160f));
 		ApplyScaledRect(_restButton, menuOrigin, actionMenuScale, new Rect2(267f, 385f, 177f, 160f));
@@ -344,7 +339,7 @@ public partial class BattleScreen : Control
 		var selectedSkillY = MathF.Min(
 			Size.Y - 282f * actionMenuScale - 12f * scale,
 			Size.Y - bottomHudHeight - 10f * scale);
-		ApplyScaledRect(
+		var selectedSkillRect = ApplyScaledRect(
 			_selectedSkillBg,
 			Vector2.Zero,
 			actionMenuScale,
@@ -359,9 +354,48 @@ public partial class BattleScreen : Control
 		_listScroll.Size = new Vector2(
 			MathF.Max(220f * scale, listRight - listLeft),
 			listHeight);
+		var listScrollRect = new Rect2(_listScroll.Position, _listScroll.Size);
 
 		_bottomStrip.Position = new Vector2(20f * scale, Size.Y - bottomHudHeight + 46f * scale);
 		_bottomStrip.Size = new Vector2(MathF.Max(0f, menuOrigin.X - 36f * scale), 163f * scale);
+
+		ApplyBoardLayout(topClockRect, logPanelRect, actionMenuRect, selectedSkillRect, listScrollRect, safeMargin, scale);
+	}
+
+	private void ApplyBoardLayout(
+		Rect2 topClockRect,
+		Rect2 logPanelRect,
+		Rect2 actionMenuRect,
+		Rect2 selectedSkillRect,
+		Rect2 listScrollRect,
+		float safeMargin,
+		float scale)
+	{
+		var minBoardWidth = BoardMinWidth * scale;
+		var minBoardHeight = BoardMinHeight * scale;
+		var preferredLeft = Mathf.Min(BoardLeftDesign * scale, Size.X * 0.22f);
+		var preferredTop = Mathf.Min(BoardTopDesign * scale, Size.Y * 0.26f);
+		var leftEdge = MathF.Max(preferredLeft, logPanelRect.Position.X + logPanelRect.Size.X + safeMargin);
+		var topEdge = MathF.Max(preferredTop, topClockRect.Position.Y + topClockRect.Size.Y + safeMargin);
+		var bottomHudTop = MathF.Min(selectedSkillRect.Position.Y, listScrollRect.Position.Y);
+		var rightEdge = actionMenuRect.Position.X - safeMargin;
+		var bottomEdge = bottomHudTop - safeMargin;
+
+		if (rightEdge - leftEdge < minBoardWidth)
+		{
+			rightEdge = MathF.Min(Size.X - safeMargin, leftEdge + minBoardWidth);
+		}
+
+		if (bottomEdge - topEdge < minBoardHeight)
+		{
+			bottomEdge = MathF.Min(Size.Y - safeMargin, topEdge + minBoardHeight);
+		}
+
+		_boardGrid.Position = new Vector2(leftEdge, topEdge);
+		_boardGrid.Size = new Vector2(
+			MathF.Max(1f, rightEdge - leftEdge),
+			MathF.Max(1f, bottomEdge - topEdge));
+		_boardGrid.RefreshLayout();
 	}
 
 	private float ResolveViewportScale() =>
@@ -388,18 +422,20 @@ public partial class BattleScreen : Control
 		control.Scale = Vector2.One;
 	}
 
-	private static void ApplyScaledRect(Control control, Vector2 origin, float scale, Rect2 designRect)
+	private static Rect2 ApplyScaledRect(Control control, Vector2 origin, float scale, Rect2 designRect)
 	{
 		control.Position = origin + designRect.Position * scale;
 		control.Size = designRect.Size;
 		control.Scale = Vector2.One * scale;
+		return new Rect2(control.Position, designRect.Size * scale);
 	}
 
-	private static void ApplyAbsoluteScaledRect(Control control, Vector2 position, float scale, Vector2 designSize)
+	private static Rect2 ApplyAbsoluteScaledRect(Control control, Vector2 position, float scale, Vector2 designSize)
 	{
 		control.Position = position;
 		control.Size = designSize;
 		control.Scale = Vector2.One * scale;
+		return new Rect2(position, designSize * scale);
 	}
 
 	internal void RefreshAll()
