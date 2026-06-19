@@ -64,18 +64,6 @@ public partial class BattleScreen : Control
 	private const int ListLabelDesignFontSize = 18;
 	private const int ListButtonDesignFontSize = 18;
 	private const int ListSeparationDesign = 12;
-	private const float LogPanelDesignWidth = 240f;
-	private const float LogPanelDesignHeight = 504f;
-	private const float LogPanelMinWidth = 176f;
-	private const float LogPanelMaxWidth = 260f;
-	private const float LogPanelMinHeight = 240f;
-	private const float LogPanelViewportWidthRatio = 0.14f;
-	private const float LogPanelViewportHeightRatio = 0.52f;
-	private const float LogPanelVerticalPadding = 28f;
-	private const float LogTagDesignWidth = 166f;
-	private const float LogTagDesignHeight = 459f;
-	private const float LogTagDesignLeft = -44f;
-	private const float LogTagDesignTopOffset = -88f;
 	private const BattleMovementPresentationMode MovementPresentationMode = BattleMovementPresentationMode.Step;
 	private static readonly Color DefaultCellColor = new(0.2f, 0.2f, 0.2f, 0.2f);
 	private static readonly Color MoveHighlightColor = new(0.2f, 0.6f, 1f, 0.35f);
@@ -123,6 +111,7 @@ public partial class BattleScreen : Control
 	private bool _isResolvingSkillPresentation;
 	private bool _isEndingBattle;
 	private bool _isSpeedUpEnabled;
+	private bool _isBattleInfoCollapsed;
 	private double _initialTimeScale = 1d;
 	private int _battleSpeedMultiplier = 2;
 	private float _skillListItemScale = 1f;
@@ -177,11 +166,6 @@ public partial class BattleScreen : Control
 		Rect2 SkillListBounds,
 		Rect2 BottomStripBounds);
 
-	private readonly record struct LogPanelLayout(
-		Rect2 PanelBounds,
-		Rect2 TagBounds,
-		float LabelMinHeight);
-
 	private readonly record struct TopHudLayout(
 		float Scale,
 		Rect2 Bounds,
@@ -224,7 +208,7 @@ public partial class BattleScreen : Control
 		_boardDesignCanvas = GetNode<Control>("BoardDesignCanvas");
 		_boardDesignRoot = GetNode<Control>("BoardDesignCanvas/DesignRoot");
 		_battleLogTag = GetNode<TextureRect>("UiDesignCanvas/DesignRoot/BattleLogTag");
-		_logPanel = GetNode<PanelContainer>("UiDesignCanvas/DesignRoot/LogPanel");
+		_logPanel = GetNode<PanelContainer>("UiDesignCanvas/DesignRoot/BattleLogTag/LogPanel");
 		_listContainer = GetNode<HBoxContainer>("%ListContainer");
 		_logLabel = GetNode<RichTextLabel>("%LogLabel");
 		_overlayRoot = GetNode<Control>("%OverlayRoot");
@@ -233,6 +217,10 @@ public partial class BattleScreen : Control
 		_surrenderButton.Pressed += SurrenderBattle;
 		_speedUpButton.Pressed += ToggleSpeedUp;
 		_autoBattleButton.Pressed += async () => await ToggleAutoBattleAsync();
+		_battleLogTag.GuiInput += OnBattleLogTagGuiInput;
+		_battleLogTag.MouseFilter = MouseFilterEnum.Stop;
+		_logPanel.MouseFilter = MouseFilterEnum.Pass;
+		ApplyBattleInfoVisibility();
 		ConfigureTopActionButtonInput();
 
 		_moveButton.Pressed += async () =>
@@ -377,9 +365,7 @@ public partial class BattleScreen : Control
 
 		var topHudLayout = ResolveTopHudLayout(scale);
 		ApplyTopHudLayout(topHudLayout);
-		var logLayout = ResolveLogPanelLayout(topHudLayout.Scale, safeMargin);
-		ApplyLogPanelLayout(logLayout);
-		var logPanelRect = logLayout.PanelBounds;
+		var logPanelRect = new Rect2(Vector2.Zero, Vector2.Zero);
 
 		_bottomHud.Position = Vector2.Zero;
 		_bottomHud.Size = Size;
@@ -456,37 +442,25 @@ public partial class BattleScreen : Control
 		button.ZIndex = 80;
 	}
 
-	private LogPanelLayout ResolveLogPanelLayout(float topScale, float safeMargin)
+	private void ApplyBattleInfoVisibility()
 	{
-		var panelWidth = Mathf.Clamp(
-			MathF.Max(LogPanelDesignWidth * topScale, Size.X * LogPanelViewportWidthRatio),
-			LogPanelMinWidth,
-			LogPanelMaxWidth);
-		var maxPanelHeight = MathF.Max(LogPanelMinHeight, Size.Y - safeMargin * 2f);
-		var panelHeight = Mathf.Clamp(
-			MathF.Min(LogPanelDesignHeight * topScale, Size.Y * LogPanelViewportHeightRatio),
-			LogPanelMinHeight,
-			maxPanelHeight);
-		var panelTop = MathF.Max(safeMargin, (Size.Y - panelHeight) * 0.5f);
-		var panelBounds = new Rect2(new Vector2(0f, panelTop), new Vector2(panelWidth, panelHeight));
-		var tagScale = panelHeight / LogPanelDesignHeight;
-		var tagBounds = new Rect2(
-			new Vector2(LogTagDesignLeft * tagScale, panelTop + LogTagDesignTopOffset * tagScale),
-			new Vector2(LogTagDesignWidth, LogTagDesignHeight) * tagScale);
-		var labelMinHeight = MathF.Max(0f, panelHeight - LogPanelVerticalPadding);
-
-		return new LogPanelLayout(panelBounds, tagBounds, labelMinHeight);
+		_logPanel.Visible = !_isBattleInfoCollapsed;
+		_battleLogTag.Visible = true;
+		_battleLogTag.TooltipText = _isBattleInfoCollapsed ? "展开战斗详情" : "收起战斗详情";
 	}
 
-	private void ApplyLogPanelLayout(LogPanelLayout layout)
+	private void OnBattleLogTagGuiInput(InputEvent inputEvent)
 	{
-		_logPanel.Position = layout.PanelBounds.Position;
-		_logPanel.Size = layout.PanelBounds.Size;
-		_logPanel.Scale = Vector2.One;
-		_battleLogTag.Position = layout.TagBounds.Position;
-		_battleLogTag.Size = layout.TagBounds.Size;
-		_battleLogTag.Scale = Vector2.One;
-		_logLabel.CustomMinimumSize = new Vector2(0f, layout.LabelMinHeight);
+		if (inputEvent is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
+		{
+			ToggleBattleInfoPanel();
+		}
+	}
+
+	private void ToggleBattleInfoPanel()
+	{
+		_isBattleInfoCollapsed = !_isBattleInfoCollapsed;
+		ApplyBattleInfoVisibility();
 	}
 
 	private BottomSkillLayout ResolveBottomSkillLayout(

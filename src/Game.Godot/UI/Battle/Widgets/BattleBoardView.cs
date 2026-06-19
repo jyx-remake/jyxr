@@ -16,6 +16,7 @@ public partial class BattleBoardView : Control
 	private const float DesignCellBorderWidth = 2f;
 	private const float MinCellBorderWidth = 1f;
 	private const float MaxCellBorderWidth = 3f;
+	private const float ContentLeftBias = 0.14f;
 	private const double StepMoveDurationSeconds = 0.3d;
 	private const double FloatTextQueueInitialDelaySeconds = 0.1d;
 	private const double FloatTextQueueSpacingSeconds = 0.4d;
@@ -483,7 +484,9 @@ public partial class BattleBoardView : Control
 		_contentSize = new Vector2(
 			_gridWidth * _cellSize + Math.Max(0, _gridWidth - 1) * _cellGap,
 			_gridHeight * _cellSize + Math.Max(0, _gridHeight - 1) * _cellGap);
-		_contentOrigin = (Size - _contentSize) * 0.5f;
+		_contentOrigin = new Vector2(
+			MathF.Max(0f, (Size.X - _contentSize.X) * ContentLeftBias),
+			MathF.Max(0f, (Size.Y - _contentSize.Y) * 0.5f));
 		_unitVisualScale = Math.Clamp(_cellSize / DesignCellSize, MinUnitVisualScale, MaxUnitVisualScale);
 	}
 

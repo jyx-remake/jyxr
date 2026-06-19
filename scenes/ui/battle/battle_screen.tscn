@@ -215,35 +215,38 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="BattleLogTag" type="TextureRect" parent="UiDesignCanvas/DesignRoot" unique_id=1046574722]
-layout_mode = 0
-offset_left = -44.0
-offset_top = 200.0
-offset_right = 122.0
-offset_bottom = 659.0
+layout_mode = 1
+anchors_preset = -1
+offset_left = 191.0
+offset_top = 299.0
+offset_right = 372.0
+offset_bottom = 488.0
+pivot_offset = Vector2(67, 20)
 mouse_filter = 2
 texture = ExtResource("7_log_tag")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LogPanel" type="PanelContainer" parent="UiDesignCanvas/DesignRoot" unique_id=1677156711]
+[node name="LogPanel" type="PanelContainer" parent="UiDesignCanvas/DesignRoot/BattleLogTag" unique_id=1677156711]
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -252.0
-offset_right = 240.0
-offset_bottom = 252.0
+offset_left = -190.0
+offset_top = -89.5
+offset_right = 81.0
+offset_bottom = 408.5
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_overlay")
 
-[node name="LogPadding" type="MarginContainer" parent="UiDesignCanvas/DesignRoot/LogPanel" unique_id=1810979141]
+[node name="LogPadding" type="MarginContainer" parent="UiDesignCanvas/DesignRoot/BattleLogTag/LogPanel" unique_id=1810979141]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 14
 
-[node name="LogLabel" type="RichTextLabel" parent="UiDesignCanvas/DesignRoot/LogPanel/LogPadding" unique_id=1613561611]
+[node name="LogLabel" type="RichTextLabel" parent="UiDesignCanvas/DesignRoot/BattleLogTag/LogPanel/LogPadding" unique_id=1613561611]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 470)
 layout_mode = 2
@@ -509,10 +512,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 2.0
-offset_top = -5.0
-offset_right = 2.0
-offset_bottom = -5.0
+offset_left = 1.0
+offset_top = -1.0
+offset_right = 1.0
+offset_bottom = -1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
