@@ -49,6 +49,7 @@ public partial class DetailPanelHost : Control
 
 		panel.Configure(content);
 		AddChild(panel);
+		MoveToFront();
 		_currentPanel = panel;
 		panel.TreeExited += () => ClearPanelReference(panel);
 		return panel;

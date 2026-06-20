@@ -88,6 +88,23 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 
 	private void OnEntrySelected(InventoryEntry entry)
 	{
+		var character = Game.State.Party.GetMember(_characterId);
+		var candidate = Game.ItemUseService.AnalyzeTarget(entry, character);
+		Control? detailPanel = null;
+		var action = new DetailPanelAction(
+			candidate.CanUse ? "装备" : "不可装备",
+			candidate.CanUse,
+			() =>
+			{
+				EquipEntry(entry, detailPanel);
+				return Task.CompletedTask;
+			},
+			CloseAfterExecute: false);
+		detailPanel = UIRoot.Instance.ShowInventoryEntryDetailPanel(entry, action);
+	}
+
+	private void EquipEntry(InventoryEntry entry, Control? detailPanel)
+	{
 		try
 		{
 			var result = Game.ItemUseService.Use(entry, _characterId);
@@ -98,6 +115,11 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 			}
 
 			UIRoot.Instance.ShowToast(result.Message);
+			if (detailPanel is not null && GodotObject.IsInstanceValid(detailPanel))
+			{
+				detailPanel.QueueFree();
+			}
+
 			QueueFree();
 		}
 		catch (Exception exception)
