@@ -10,6 +10,9 @@ public partial class HeroPanel : JyPanel
 {
 	private const string AchievementGroup = "nick";
 
+	[Export]
+	public PackedScene SkillBoxScene { get; set; } = null!;
+
 	private TabContainer _heroTabContainer = null!;
 	private JyButton _adventureTabButton = null!;
 	private JyButton _achievementTabButton = null!;
@@ -18,6 +21,8 @@ public partial class HeroPanel : JyPanel
 	private CheckBox _previewCheckBox = null!;
 	private Label _completionLabel = null!;
 	private RichTextLabel _achievementLabel = null!;
+	private HeroSkillMasteryView _masteryView = null!;
+	private bool _isMasteryViewInitialized;
 	private readonly List<IDisposable> _subscriptions = [];
 
 	public override void _Ready()
@@ -32,6 +37,7 @@ public partial class HeroPanel : JyPanel
 		_previewCheckBox = GetNode<CheckBox>("%PreviewCheckBox");
 		_completionLabel = GetNode<Label>("%CompletionLabel");
 		_achievementLabel = GetNode<RichTextLabel>("%AchievementLabel");
+		_masteryView = CreateMasteryView();
 
 		_adventureTabButton.Pressed += () => ShowTab(0);
 		_achievementTabButton.Pressed += () => ShowTab(1);
@@ -60,6 +66,12 @@ public partial class HeroPanel : JyPanel
 
 	private void ShowTab(int index)
 	{
+		if (index == 2 && !_isMasteryViewInitialized)
+		{
+			_masteryView.Initialize();
+			_isMasteryViewInitialized = true;
+		}
+
 		_heroTabContainer.CurrentTab = index;
 	}
 
@@ -92,6 +104,18 @@ public partial class HeroPanel : JyPanel
 		_completionLabel.Text = BuildCompletionText(achievements);
 		_achievementLabel.Text = BuildAchievementsText(achievements, _previewCheckBox.ButtonPressed);
 	}
+
+	private HeroSkillMasteryView CreateMasteryView() =>
+		new(
+			GetNode<GridContainer>("%GridContainer"),
+			SkillBoxScene,
+			new HeroSkillMasteryPresenter(Game.ContentRepository),
+			GetNode<JyButton>("%AllButton"),
+			GetNode<JyButton>("%QuanzhangButton"),
+			GetNode<JyButton>("%JianfaButton"),
+			GetNode<JyButton>("%DaofaButton"),
+			GetNode<JyButton>("%QimenButton"),
+			GetNode<JyButton>("%NeigongButton"));
 
 	private void OnPreviewToggled(bool _) =>
 		RenderAchievements();

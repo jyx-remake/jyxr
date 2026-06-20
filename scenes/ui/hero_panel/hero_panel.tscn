@@ -4,6 +4,13 @@
 [ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="2_button_texture"]
 [ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="3_button_script"]
 [ext_resource type="Script" uid="uid://gajb5sg2ub38" path="res://src/Game.Godot/UI/Hero/HeroPanel.cs" id="4_script"]
+[ext_resource type="Texture2D" uid="uid://beveqit6i4mqk" path="res://assets/art/ui/character_stat/iconquanbu.png" id="5_3htau"]
+[ext_resource type="Texture2D" uid="uid://broc3ykivhb6d" path="res://assets/art/ui/character_stat/iconquanzhang.png" id="6_hf86k"]
+[ext_resource type="Texture2D" uid="uid://ucxhityfcr5k" path="res://assets/art/ui/character_stat/iconjianfa.png" id="7_cd78k"]
+[ext_resource type="Texture2D" uid="uid://dcdftdynmhiyq" path="res://assets/art/ui/character_stat/icondaofa.png" id="8_543kb"]
+[ext_resource type="Texture2D" uid="uid://og4o54kuyhm2" path="res://assets/art/ui/character_stat/iconqimen.png" id="9_muhdb"]
+[ext_resource type="Texture2D" uid="uid://d2hjb1d5p507" path="res://assets/art/ui/character_stat/icongengu.png" id="10_ptgvi"]
+[ext_resource type="PackedScene" uid="uid://cn1marksgcufq" path="res://scenes/ui/skill_tab/skill_box.tscn" id="11_skill_box"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_tab_title"]
 font_size = 60
@@ -15,14 +22,9 @@ RichTextLabel/constants/line_separation = 10
 RichTextLabel/font_sizes/mono_font_size = 40
 RichTextLabel/font_sizes/normal_font_size = 40
 
-[sub_resource type="LabelSettings" id="LabelSettings_page_title"]
-font_size = 48
-
-[sub_resource type="LabelSettings" id="LabelSettings_page_subtitle"]
-font_size = 40
-
 [node name="HeroPanel" unique_id=1789677815 instance=ExtResource("1_panel")]
 script = ExtResource("4_script")
+SkillBoxScene = ExtResource("11_skill_box")
 
 [node name="TabButtonRow" type="HBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1213870777]
 layout_mode = 0
@@ -110,11 +112,10 @@ offset_top = 264.0
 offset_right = 1691.0
 offset_bottom = 924.0
 theme = SubResource("Theme_dr12l")
-current_tab = 1
+current_tab = 0
 tabs_visible = false
 
 [node name="AdventureTab" type="Control" parent="ContentRoot/HeroTabContainer" index="1" unique_id=1308277667]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -138,6 +139,7 @@ text = "道德：[color=red]0[/color]
 fit_content = true
 
 [node name="AchievementTab" type="Control" parent="ContentRoot/HeroTabContainer" index="2" unique_id=728918971]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
@@ -186,38 +188,144 @@ visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="MasteryPageTitle" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab" index="0" unique_id=450542089]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = -60.0
-offset_right = 150.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "武学精通"
-label_settings = SubResource("LabelSettings_page_title")
-horizontal_alignment = 1
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab" index="0" unique_id=810616775]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 17.0
+offset_right = 207.0
+offset_bottom = 646.0
+text = "武学精通代表当前各个技能的等级上限。你可以通过提高周目、完成解锁剧情:获得残章来提升。"
+autowrap_mode = 3
 
-[node name="MasteryPageSubtitle" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab" index="1" unique_id=776178644]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -220.0
-offset_top = 12.0
-offset_right = 220.0
-offset_bottom = 50.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "这里放武学精通与养成数据。"
-label_settings = SubResource("LabelSettings_page_subtitle")
-horizontal_alignment = 1
+[node name="HBoxContainer" type="HBoxContainer" parent="ContentRoot/HeroTabContainer/MasteryTab" index="1" unique_id=4709377]
+layout_mode = 0
+offset_left = 434.0
+offset_top = 476.0
+offset_right = 1264.0
+offset_bottom = 671.0
+theme_override_constants/separation = 20
+
+[node name="AllButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="0" unique_id=1846521811]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("5_3htau")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/AllButton" index="0" unique_id=1339409515]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "全部"
+
+[node name="QuanzhangButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="1" unique_id=392235821]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("6_hf86k")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/QuanzhangButton" index="0" unique_id=1687443556]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "拳掌"
+
+[node name="JianfaButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="2" unique_id=938617151]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("7_cd78k")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/JianfaButton" index="0" unique_id=1067145244]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "剑法"
+
+[node name="DaofaButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="3" unique_id=1034674272]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("8_543kb")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/DaofaButton" index="0" unique_id=809465393]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "刀法"
+
+[node name="QimenButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="4" unique_id=23883254]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("9_muhdb")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/QimenButton" index="0" unique_id=1460782374]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "奇门"
+
+[node name="NeigongButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="5" unique_id=83270784]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("10_ptgvi")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/NeigongButton" index="0" unique_id=1395066687]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "内功"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot/HeroTabContainer/MasteryTab" index="2" unique_id=200335630]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 23.0
+offset_right = 1475.0
+offset_bottom = 493.0
+mouse_filter = 0
+
+[node name="GridContainer" type="GridContainer" parent="ContentRoot/HeroTabContainer/MasteryTab/ScrollContainer" index="0" unique_id=476130249]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 0
+columns = 6
 
 [node name="CloseButton" parent="." index="3" unique_id=962603895]
 PressOffset = Vector2(2, 2)

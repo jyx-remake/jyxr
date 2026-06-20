@@ -264,7 +264,7 @@ public partial class MapScreen
 
 		if (mouseButton.ButtonIndex is MouseButton.WheelUp or MouseButton.WheelDown)
 		{
-			if (!isInsideLargeMap)
+			if (!isInsideLargeMap || IsPointerBlockedByForegroundControl())
 			{
 				return;
 			}
@@ -284,7 +284,10 @@ public partial class MapScreen
 
 		if (mouseButton.Pressed)
 		{
-			_isDraggingLargeMap = isInsideLargeMap && !IsPointerOverLargeMapInteractive(mouseButton.Position);
+			_isDraggingLargeMap =
+				isInsideLargeMap &&
+				!IsPointerBlockedByForegroundControl() &&
+				!IsPointerOverLargeMapInteractive(mouseButton.Position);
 			if (_isDraggingLargeMap)
 			{
 				GetViewport().SetInputAsHandled();
@@ -305,6 +308,12 @@ public partial class MapScreen
 	{
 		if (!_isDraggingLargeMap)
 		{
+			return;
+		}
+
+		if (IsPointerBlockedByForegroundControl())
+		{
+			ResetLargeMapInputState();
 			return;
 		}
 
@@ -349,6 +358,17 @@ public partial class MapScreen
 		}
 
 		return _mapPin.Visible && new Rect2(_mapPin.Position, _mapPin.Size).HasPoint(worldPosition);
+	}
+
+	private bool IsPointerBlockedByForegroundControl()
+	{
+		var hoveredControl = GetViewport().GuiGetHoveredControl();
+		if (hoveredControl is null)
+		{
+			return false;
+		}
+
+		return hoveredControl != this && !IsAncestorOf(hoveredControl);
 	}
 
 	private Vector2 ScreenToLargeMapWorldPosition(Vector2 screenPosition)
