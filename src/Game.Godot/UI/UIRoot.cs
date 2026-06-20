@@ -115,7 +115,14 @@ public partial class UIRoot : Control
 
 	public void HideHud() => _hud?.Hide();
 
-	public void SetToastSuppressed(bool suppressed) => _isToastSuppressed = suppressed;
+	public void SetToastSuppressed(bool suppressed)
+	{
+		_isToastSuppressed = suppressed;
+		if (suppressed)
+		{
+			_toastPanel.Clear();
+		}
+	}
 
 	public void SetHudSuppressed(bool suppressed)
 	{
