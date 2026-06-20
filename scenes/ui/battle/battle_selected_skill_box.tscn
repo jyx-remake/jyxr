@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://cnfci8vqthgqc"]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Battle/Widgets/BattleSelectedSkillBox.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cwew33n5mbgj3" path="res://assets/art/ui/battle/xuandingjineng-dise.png" id="2_bg"]
+[ext_resource type="PackedScene" uid="uid://cao7kwtub078m" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="3_tooltip"]
+[ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="4_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skill_icon"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_legacy_skill"]
+line_spacing = -18.0
+font = ExtResource("4_font")
+font_size = 40
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="BattleSelectedSkillBox" type="TextureButton"]
+offset_right = 257.0
+offset_bottom = 282.0
+texture_normal = ExtResource("2_bg")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("1_script")
+TooltipScene = ExtResource("3_tooltip")
+
+[node name="SelectedSkillIconPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 39.0
+offset_top = 66.0
+offset_right = 179.0
+offset_bottom = 205.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_skill_icon")
+
+[node name="SelectedSkillIconMargin" type="MarginContainer" parent="SelectedSkillIconPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="SelectedSkillIcon" type="TextureRect" parent="SelectedSkillIconPanel/SelectedSkillIconMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 4
+
+[node name="SelectedSkillNameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -3.0
+offset_top = -1.0
+offset_right = 36.0
+offset_bottom = 268.0
+text = "未选中技能"
+label_settings = SubResource("LabelSettings_legacy_skill")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="SelectedSkillFormNameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 40.0
+offset_top = 14.0
+offset_right = 79.0
+offset_bottom = 283.0
+label_settings = SubResource("LabelSettings_legacy_skill")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1

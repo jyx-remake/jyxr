@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://hiaeyvyjcwwv" path="res://src/Game.Godot/UI/Skills/SkillTooltip.cs" id="1_script"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0, 0, 0, 0.39215687)
+bg_color = Color(0, 0, 0, 0.5882353)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10

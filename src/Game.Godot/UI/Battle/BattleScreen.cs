@@ -79,9 +79,7 @@ public partial class BattleScreen : Control
 	private BaseButton _autoBattleButton = null!;
 	private CanvasItem _autoBattleActive = null!;
 	private BattleBoardView _boardGrid = null!;
-	private TextureRect _selectedSkillIcon = null!;
-	private Label _selectedSkillNameLabel = null!;
-	private Label _selectedSkillFormNameLabel = null!;
+	private BattleSelectedSkillBox _selectedSkillBox = null!;
 	private BaseButton _moveButton = null!;
 	private BaseButton _skillButton = null!;
 	private BaseButton _itemButton = null!;
@@ -106,9 +104,7 @@ public partial class BattleScreen : Control
 		_autoBattleButton = GetNode<BaseButton>("%AutoBattleButton");
 		_autoBattleActive = GetNode<CanvasItem>("%AutoBattleActive");
 		_boardGrid = GetNode<BattleBoardView>("%BoardGrid");
-		_selectedSkillIcon = GetNode<TextureRect>("%SelectedSkillIcon");
-		_selectedSkillNameLabel = GetNode<Label>("%SelectedSkillNameLabel");
-		_selectedSkillFormNameLabel = GetNode<Label>("%SelectedSkillFormNameLabel");
+		_selectedSkillBox = GetNode<BattleSelectedSkillBox>("%BattleSelectedSkillBox");
 		_moveButton = GetNode<BaseButton>("%MoveButton");
 		_skillButton = GetNode<BaseButton>("%SkillButton");
 		_itemButton = GetNode<BaseButton>("%ItemButton");
@@ -266,24 +262,13 @@ public partial class BattleScreen : Control
 	{
 		if (_state is null)
 		{
-			_selectedSkillIcon.Texture = null;
-			_selectedSkillNameLabel.Text = "未选中技能";
-			_selectedSkillFormNameLabel.Text = string.Empty;
+			_selectedSkillBox.Setup(null);
 			return;
 		}
 
 		var actingUnit = BattlePresenter.TryGetActingUnit(_state);
 		var previewSkill = ResolvePreviewSkill(actingUnit);
-		if (previewSkill is null)
-		{
-			_selectedSkillIcon.Texture = null;
-			_selectedSkillNameLabel.Text = "无可用技能";
-			_selectedSkillFormNameLabel.Text = string.Empty;
-			return;
-		}
-
-		_selectedSkillIcon.Texture = AssetResolver.LoadSkillIconResource(previewSkill.Icon);
-		ApplyLegacySkillName(_selectedSkillNameLabel, _selectedSkillFormNameLabel, previewSkill.Name);
+		_selectedSkillBox.Setup(previewSkill);
 	}
 
 	private void RefreshBoard()
@@ -1113,23 +1098,6 @@ public partial class BattleScreen : Control
 		}
 
 		_uiState.SelectSkillTarget(defaultSkill);
-	}
-
-	private static void ApplyLegacySkillName(Label nameLabel, Label formNameLabel, string skillName)
-	{
-		var segments = skillName.Split('.', 2, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-		if (segments.Length == 2)
-		{
-			nameLabel.Text = segments[0];
-			formNameLabel.Text = segments[1];
-			formNameLabel.Visible = true;
-			return;
-		}
-
-		nameLabel.Text = skillName;
-		formNameLabel.Text = string.Empty;
-		formNameLabel.Visible = false;
 	}
 
 	private static void ClearChildren(Node node)
