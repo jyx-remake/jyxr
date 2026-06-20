@@ -15,7 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://b3h356h4xfurf" path="res://assets/art/ui/battle/battle_xiuxi.png" id="14_rest_word"]
 [ext_resource type="Texture2D" uid="uid://u5msb8uqcflv" path="res://assets/art/ui/battle/battle_zhuangtai-tubiao.png" id="15_skill_btn"]
 [ext_resource type="Texture2D" uid="uid://dm6cedvudfbhe" path="res://assets/art/ui/battle/battle_zhuangtai.png" id="16_skill_word"]
-[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_skill_box.tscn" id="18_skill_box"]
+[ext_resource type="PackedScene" uid="uid://cstdi8n6cph7k" path="res://scenes/ui/battle/battle_skill_box.tscn" id="18_skill_box"]
 [ext_resource type="PackedScene" uid="uid://d1qdddofh12io" path="res://scenes/ui/battle/battle_board_view.tscn" id="19_board_view"]
 [ext_resource type="PackedScene" uid="uid://oei4u3648ovq" path="res://scenes/ui/battle/battle_item_panel.tscn" id="20_item_panel"]
 [ext_resource type="PackedScene" uid="uid://b77m8rj4t6o0x" path="res://scenes/ui/battle/battle_legend_overlay.tscn" id="21_legend_overlay"]
@@ -24,8 +24,15 @@
 [ext_resource type="Texture2D" uid="uid://ba8m81qumgdct" path="res://assets/art/ui/battle/battle_zidong.png" id="24_auto_button"]
 [ext_resource type="Texture2D" uid="uid://bc8dyte7msrvf" path="res://assets/art/ui/battle/battle_zidonghong.png" id="25_auto_active"]
 [ext_resource type="Texture2D" uid="uid://dukqh5gd77ixk" path="res://assets/art/ui/battle/touxiang.png" id="26_surrender_button"]
-[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
+[ext_resource type="PackedScene" uid="uid://dtbij03bvh027" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
 [ext_resource type="PackedScene" uid="uid://cnfci8vqthgqc" path="res://scenes/ui/battle/battle_selected_skill_box.tscn" id="28_selected_skill_box"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
+bg_color = Color(0, 0, 0, 0.72)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
 bg_color = Color(0.18, 0.14, 0.1, 0.92)
@@ -34,13 +41,6 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.9, 0.8, 0.55, 0.45)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
-bg_color = Color(0, 0, 0, 0.72)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
@@ -83,15 +83,14 @@ mouse_filter = 2
 color = Color(0, 0, 0, 0.2)
 
 [node name="TopClock" type="TextureRect" parent="." unique_id=1545890483]
-layout_mode = 0
-offset_left = 22.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.5
 offset_top = 16.0
-offset_right = 836.0
 offset_bottom = 199.0
 mouse_filter = 2
 texture = ExtResource("6_clock")
 expand_mode = 1
-stretch_mode = 5
 
 [node name="TitleLabel" type="Label" parent="TopClock" unique_id=1760768761]
 unique_name_in_owner = true
@@ -118,13 +117,33 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 24
 
+[node name="SurrenderButton" type="TextureButton" parent="." unique_id=1078304102]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -583.0
+offset_top = 11.0
+offset_right = -396.0
+offset_bottom = 186.0
+grow_horizontal = 0
+tooltip_text = "投降"
+texture_normal = ExtResource("26_surrender_button")
+ignore_texture_size = true
+stretch_mode = 5
+
 [node name="AutoBattleButton" type="TextureButton" parent="." unique_id=1003218841]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 1554.0
-offset_top = 23.0
-offset_right = 1739.0
-offset_bottom = 181.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -375.0
+offset_top = 20.0
+offset_right = -190.0
+offset_bottom = 178.0
+grow_horizontal = 0
 tooltip_text = "自动战斗"
 texture_normal = ExtResource("24_auto_button")
 ignore_texture_size = true
@@ -143,25 +162,17 @@ texture = ExtResource("25_auto_active")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SurrenderButton" type="TextureButton" parent="." unique_id=1078304102]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 1363.0
-offset_top = 29.0
-offset_right = 1550.0
-offset_bottom = 204.0
-tooltip_text = "投降"
-texture_normal = ExtResource("26_surrender_button")
-ignore_texture_size = true
-stretch_mode = 5
-
 [node name="SpeedUpButton" type="TextureButton" parent="." unique_id=1052298601]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 1748.0
-offset_top = 30.0
-offset_right = 1906.0
-offset_bottom = 166.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -172.0
+offset_top = 20.0
+offset_right = -14.0
+offset_bottom = 156.0
+grow_horizontal = 0
 tooltip_text = "战斗加速"
 texture_normal = ExtResource("22_speed_button")
 ignore_texture_size = true
@@ -181,6 +192,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="BattleLogTag" type="TextureRect" parent="." unique_id=1046574722]
+visible = false
 layout_mode = 0
 offset_left = -44.0
 offset_top = 200.0
@@ -192,10 +204,11 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="LogPanel" type="PanelContainer" parent="." unique_id=1677156711]
-layout_mode = 0
-offset_left = 28.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.01
+anchor_right = 0.12
 offset_top = 244.0
-offset_right = 268.0
 offset_bottom = 748.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_overlay")
 
@@ -213,7 +226,18 @@ layout_mode = 2
 theme_override_colors/default_color = Color(0.94, 0.93, 0.88, 1)
 theme_override_font_sizes/normal_font_size = 20
 
-[node name="BoardGrid" parent="." unique_id=843775524 instance=ExtResource("19_board_view")]
+[node name="ContentRoot" type="Control" parent="." unique_id=1435293204]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -960.0
+offset_right = 960.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="BoardGrid" parent="ContentRoot" unique_id=843775524 instance=ExtResource("19_board_view")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 237.0
@@ -221,45 +245,45 @@ offset_top = 242.0
 offset_right = 237.0
 offset_bottom = 242.0
 
-[node name="BottomHud" type="Control" parent="." unique_id=414540527]
-anchors_preset = 0
-
-[node name="BottomStrip" type="TextureRect" parent="BottomHud" unique_id=1312754331]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 901.0
-offset_right = 1387.0
-offset_bottom = 1064.0
+[node name="BottomHud" type="Control" parent="." unique_id=2050466151]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -507.0
+grow_horizontal = 2
+grow_vertical = 0
 mouse_filter = 2
-texture = ExtResource("4_bottom_strip")
-expand_mode = 1
-stretch_mode = 5
 
 [node name="ActionBarBg" type="TextureRect" parent="BottomHud" unique_id=1125755907]
-layout_mode = 0
-offset_left = 650.0
-offset_top = 533.0
-offset_right = 1908.0865
-offset_bottom = 1072.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
 mouse_filter = 2
 texture = ExtResource("3_action_bg")
 expand_mode = 1
-stretch_mode = 5
 
-[node name="BattleSelectedSkillBox" parent="BottomHud" unique_id=1885387874 instance=ExtResource("28_selected_skill_box")]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 55.0
-offset_top = 767.0
-offset_right = 312.0
-offset_bottom = 1049.0
+[node name="BottomStrip" type="TextureRect" parent="BottomHud" unique_id=1312754331]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.72
+offset_top = 328.0
+offset_bottom = 491.0
+mouse_filter = 2
+texture = ExtResource("4_bottom_strip")
+expand_mode = 1
 
 [node name="ListScroll" type="ScrollContainer" parent="BottomHud" unique_id=60321938]
-layout_mode = 0
-offset_left = 267.0
-offset_top = 855.0
-offset_right = 1425.0
-offset_bottom = 1074.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_right = 0.75
+offset_top = 282.0
+offset_bottom = 501.0
 vertical_scroll_mode = 0
 
 [node name="ListContainer" type="HBoxContainer" parent="BottomHud/ListScroll" unique_id=2070798312]
@@ -267,37 +291,55 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Avatar" type="TextureRect" parent="BottomHud" unique_id=912225212]
+[node name="BattleSelectedSkillBox" parent="BottomHud" unique_id=1885387874 instance=ExtResource("28_selected_skill_box")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 1598.0
-offset_top = 827.0
-offset_right = 1755.0
-offset_bottom = 993.9545
+offset_left = 55.0
+offset_top = 194.0
+offset_right = 312.0
+offset_bottom = 476.0
+
+[node name="BottomRightHud" type="Control" parent="." unique_id=66707520]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Avatar" type="TextureRect" parent="BottomRightHud" unique_id=912225212]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -322.0
+offset_top = -253.0
+offset_right = -165.0
+offset_bottom = -86.04547
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AvatarFrame" type="TextureRect" parent="BottomHud" unique_id=55353986]
+[node name="AvatarFrame" type="TextureRect" parent="BottomRightHud" unique_id=55353986]
 layout_mode = 0
-offset_left = 1583.0
-offset_top = 839.0
-offset_right = 1781.2417
-offset_bottom = 1003.0
+offset_left = -337.0
+offset_top = -241.0
+offset_right = -138.7583
+offset_bottom = -77.0
 mouse_filter = 2
 texture = ExtResource("5_avatar_frame")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EndButton" type="Button" parent="BottomHud" unique_id=890715130]
+[node name="EndButton" type="Button" parent="BottomRightHud" unique_id=890715130]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(132, 56)
 layout_mode = 0
-offset_left = 1707.0
-offset_top = 519.0
-offset_right = 1909.0
-offset_bottom = 581.0
+offset_left = -213.0
+offset_top = -561.0
+offset_right = -11.0
+offset_bottom = -499.0
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_action")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
@@ -305,18 +347,18 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_action")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
 text = "结束"
 
-[node name="SkillButton" type="TextureButton" parent="BottomHud" unique_id=250363507]
+[node name="SkillButton" type="TextureButton" parent="BottomRightHud" unique_id=250363507]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 1595.0
-offset_top = 685.0
-offset_right = 1772.0
-offset_bottom = 845.0
+offset_left = -325.0
+offset_top = -395.0
+offset_right = -148.0
+offset_bottom = -235.0
 texture_normal = ExtResource("15_skill_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="SkillWord" type="TextureRect" parent="BottomHud/SkillButton" unique_id=1217349101]
+[node name="SkillWord" type="TextureRect" parent="BottomRightHud/SkillButton" unique_id=1217349101]
 layout_mode = 0
 offset_left = 33.0
 offset_top = 11.0
@@ -327,18 +369,18 @@ texture = ExtResource("16_skill_word")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ItemButton" type="TextureButton" parent="BottomHud" unique_id=984075596]
+[node name="ItemButton" type="TextureButton" parent="BottomRightHud" unique_id=984075596]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 1724.0
-offset_top = 763.0
-offset_right = 1901.0
-offset_bottom = 923.0
+offset_left = -196.0
+offset_top = -317.0
+offset_right = -19.0
+offset_bottom = -157.0
 texture_normal = ExtResource("11_item_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="ItemWord" type="TextureRect" parent="BottomHud/ItemButton" unique_id=1820730931]
+[node name="ItemWord" type="TextureRect" parent="BottomRightHud/ItemButton" unique_id=1820730931]
 layout_mode = 0
 offset_left = 37.0
 offset_top = 14.0
@@ -349,18 +391,18 @@ texture = ExtResource("12_item_word")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="RestButton" type="TextureButton" parent="BottomHud" unique_id=861883801]
+[node name="RestButton" type="TextureButton" parent="BottomRightHud" unique_id=861883801]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 1729.0
-offset_top = 918.0
-offset_right = 1906.0
-offset_bottom = 1078.0
+offset_left = -191.0
+offset_top = -162.0
+offset_right = -14.0
+offset_bottom = -2.0
 texture_normal = ExtResource("13_rest_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="RestWord" type="TextureRect" parent="BottomHud/RestButton" unique_id=1311330508]
+[node name="RestWord" type="TextureRect" parent="BottomRightHud/RestButton" unique_id=1311330508]
 layout_mode = 0
 offset_left = 44.0
 offset_top = 22.0
@@ -371,18 +413,18 @@ texture = ExtResource("14_rest_word")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MoveButton" type="TextureButton" parent="BottomHud" unique_id=1408921671]
+[node name="MoveButton" type="TextureButton" parent="BottomRightHud" unique_id=1408921671]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 1462.0
-offset_top = 919.0
-offset_right = 1639.0
-offset_bottom = 1079.0
+offset_left = -458.0
+offset_top = -161.0
+offset_right = -281.0
+offset_bottom = -1.0
 texture_normal = ExtResource("9_move_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="MoveWord" type="TextureRect" parent="BottomHud/MoveButton" unique_id=336048975]
+[node name="MoveWord" type="TextureRect" parent="BottomRightHud/MoveButton" unique_id=336048975]
 layout_mode = 0
 offset_left = 35.0
 offset_top = 16.0

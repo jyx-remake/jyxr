@@ -24,7 +24,18 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
-[node name="Gameover" type="TextureRect" parent="." unique_id=1158655853]
+[node name="ContentRoot" type="Control" parent="." unique_id=1688399359]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -960.0
+offset_right = 960.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Gameover" type="TextureRect" parent="ContentRoot" unique_id=1158655853]
 layout_mode = 0
 offset_left = 98.0
 offset_top = 123.0
@@ -33,7 +44,7 @@ offset_bottom = 851.0
 texture = ExtResource("3_esgjf")
 stretch_mode = 5
 
-[node name="TitileLabel" type="Label" parent="." unique_id=1814276788]
+[node name="TitileLabel" type="Label" parent="ContentRoot" unique_id=1814276788]
 layout_mode = 0
 offset_left = 300.0
 offset_top = 33.0
@@ -43,7 +54,7 @@ theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_font_sizes/font_size = 80
 text = "胜败乃兵家常事，大侠请重新来过！"
 
-[node name="DateLabel" type="Label" parent="." unique_id=429813897]
+[node name="DateLabel" type="Label" parent="ContentRoot" unique_id=429813897]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1052.0
@@ -56,7 +67,7 @@ text = "2026/5/2
 "
 autowrap_mode = 3
 
-[node name="PromptLabel" type="Label" parent="." unique_id=163295065]
+[node name="PromptLabel" type="Label" parent="ContentRoot" unique_id=163295065]
 layout_mode = 0
 offset_left = 1052.0
 offset_top = 261.0
@@ -67,7 +78,7 @@ theme_override_font_sizes/font_size = 60
 text = "在地球的某处，当地的失踪人口又多了一笔..."
 autowrap_mode = 3
 
-[node name="DeathInfoLabel" type="Label" parent="." unique_id=995307596]
+[node name="DeathInfoLabel" type="Label" parent="ContentRoot" unique_id=995307596]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1059.0
@@ -79,7 +90,7 @@ theme_override_font_sizes/font_size = 60
 text = "您在这个世界已经累计死亡了1次"
 autowrap_mode = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=2133816440]
+[node name="HBoxContainer" type="HBoxContainer" parent="ContentRoot" unique_id=2133816440]
 layout_mode = 0
 offset_left = 420.0
 offset_top = 888.0
@@ -87,7 +98,7 @@ offset_right = 1546.0
 offset_bottom = 1000.0
 theme_override_constants/separation = 50
 
-[node name="RestartButton" type="TextureButton" parent="HBoxContainer" unique_id=205531626]
+[node name="RestartButton" type="TextureButton" parent="ContentRoot/HBoxContainer" unique_id=205531626]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(342, 112)
 layout_mode = 2
@@ -98,7 +109,7 @@ stretch_mode = 5
 script = ExtResource("2_esgjf")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="HBoxContainer/RestartButton" unique_id=2012652437]
+[node name="Label" type="Label" parent="ContentRoot/HBoxContainer/RestartButton" unique_id=2012652437]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -110,7 +121,7 @@ text = "再战"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LoadGameButton" type="TextureButton" parent="HBoxContainer" unique_id=144171521]
+[node name="LoadGameButton" type="TextureButton" parent="ContentRoot/HBoxContainer" unique_id=144171521]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(342, 112)
 layout_mode = 2
@@ -121,7 +132,7 @@ stretch_mode = 5
 script = ExtResource("2_esgjf")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="HBoxContainer/LoadGameButton" unique_id=1074994963]
+[node name="Label" type="Label" parent="ContentRoot/HBoxContainer/LoadGameButton" unique_id=1074994963]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -133,7 +144,7 @@ text = "读档"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ExitButton" type="TextureButton" parent="HBoxContainer" unique_id=250612706]
+[node name="ExitButton" type="TextureButton" parent="ContentRoot/HBoxContainer" unique_id=250612706]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(342, 112)
 layout_mode = 2
@@ -144,7 +155,7 @@ stretch_mode = 5
 script = ExtResource("2_esgjf")
 metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
-[node name="Label" type="Label" parent="HBoxContainer/ExitButton" unique_id=724144499]
+[node name="Label" type="Label" parent="ContentRoot/HBoxContainer/ExitButton" unique_id=724144499]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

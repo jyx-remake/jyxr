@@ -5,9 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://jon61teprdc7" path="res://scenes/ui/party_panel/party_panel.tscn" id="2_party_panel"]
 [ext_resource type="PackedScene" uid="uid://c7xwca038g3px" path="res://scenes/ui/character_panel/character_panel.tscn" id="3_i0hgf"]
 [ext_resource type="PackedScene" uid="uid://beqsxw0hmqwm" path="res://scenes/ui/story/story_dialogue_panel.tscn" id="4_story_dialogue"]
-[ext_resource type="PackedScene" path="res://scenes/ui/story/story_choice_panel.tscn" id="5_story_choice"]
+[ext_resource type="PackedScene" uid="uid://0gybacdn8xd4" path="res://scenes/ui/story/story_choice_panel.tscn" id="5_story_choice"]
 [ext_resource type="PackedScene" uid="uid://bnk146v0yfw02" path="res://scenes/ui/hud/hud.tscn" id="6_hud"]
-[ext_resource type="PackedScene" path="res://scenes/ui/journal/journal_panel.tscn" id="7_journal"]
+[ext_resource type="PackedScene" uid="uid://cup3ph7k7eg4o" path="res://scenes/ui/journal/journal_panel.tscn" id="7_journal"]
 [ext_resource type="PackedScene" uid="uid://bdvws2ugdkk6a" path="res://scenes/ui/hero_panel/hero_panel.tscn" id="8_hero_panel"]
 [ext_resource type="PackedScene" uid="uid://sdtyoj35nitl" path="res://scenes/ui/system_panel/system_panel.tscn" id="9_system_panel"]
 [ext_resource type="Script" uid="uid://d0fqg0iuf06b" path="res://src/Game.Godot/UI/ToastPanel.cs" id="9_toast_panel"]
@@ -16,15 +16,15 @@
 [ext_resource type="PackedScene" uid="uid://brltgo8b2opqk" path="res://scenes/ui/system_panel/save_slot_selection_panel.tscn" id="10_save_slots"]
 [ext_resource type="PackedScene" uid="uid://b4kveik4eci2d" path="res://scenes/ui/base/confirm_dialog.tscn" id="11_confirm_dialog"]
 [ext_resource type="PackedScene" uid="uid://bs35w4y4foane" path="res://scenes/ui/inventory_panel/inventory_panel.tscn" id="12_inventory_panel"]
-[ext_resource type="PackedScene" uid="uid://bhe7ohx87bpf8" path="res://scenes/ui/shop_panel/shop_panel.tscn" id="13_shop_panel"]
 [ext_resource type="PackedScene" uid="uid://cpw5uh28ivr5j" path="res://scenes/ui/chest_panel/chest_panel.tscn" id="13_chest_panel"]
+[ext_resource type="PackedScene" uid="uid://bhe7ohx87bpf8" path="res://scenes/ui/shop_panel/shop_panel.tscn" id="13_shop_panel"]
 [ext_resource type="PackedScene" uid="uid://cqj0ggeob6p6r" path="res://scenes/ui/select_sect/select_sect_screen.tscn" id="14_select_sect"]
-[ext_resource type="PackedScene" path="res://scenes/ui/start_question/input_name_panel.tscn" id="15_input_name"]
-[ext_resource type="PackedScene" path="res://scenes/ui/start_question/select_head_panel.tscn" id="16_select_head"]
-[ext_resource type="PackedScene" path="res://scenes/ui/start_question/roll_stats_panel.tscn" id="17_roll_stats"]
+[ext_resource type="PackedScene" uid="uid://c7aloysecbkuf" path="res://scenes/ui/start_question/input_name_panel.tscn" id="15_input_name"]
+[ext_resource type="PackedScene" uid="uid://bccaqwan1bkp8" path="res://scenes/ui/start_question/select_head_panel.tscn" id="16_select_head"]
+[ext_resource type="PackedScene" uid="uid://bm0g7oxqn8qdr" path="res://scenes/ui/start_question/roll_stats_panel.tscn" id="17_roll_stats"]
 [ext_resource type="PackedScene" uid="uid://bln8qsr5mtxvm" path="res://scenes/ui/game_flow/gameover_screen.tscn" id="18_gameover"]
-[ext_resource type="PackedScene" uid="uid://v4yc2ec3v1o8" path="res://scenes/ui/game_flow/game_fin.tscn" id="19_gamefin"]
 [ext_resource type="PackedScene" uid="uid://brnaq54kgocs" path="res://scenes/ui/battle/combatant_select_panel.tscn" id="19_combatant_select"]
+[ext_resource type="PackedScene" uid="uid://v4yc2ec3v1o8" path="res://scenes/ui/game_flow/game_fin_screen.tscn" id="19_gamefin"]
 [ext_resource type="PackedScene" uid="uid://di28xqh0osmwk" path="res://scenes/ui/battle/battle_screen.tscn" id="20_battle_screen"]
 [ext_resource type="PackedScene" uid="uid://52n8a1s5b8e0" path="res://scenes/ui/base/detail_panel.tscn" id="21_detail_panel"]
 
@@ -61,7 +61,6 @@ layer = 10
 
 [node name="Hud" parent="HudLayer" unique_id=978258501 instance=ExtResource("6_hud")]
 unique_name_in_owner = true
-layout_mode = 1
 
 [node name="PanelLayer" type="CanvasLayer" parent="." unique_id=261397122]
 unique_name_in_owner = true
@@ -74,19 +73,15 @@ layer = 30
 [node name="StoryDialoguePanel" parent="ModalLayer" unique_id=2120644622 instance=ExtResource("4_story_dialogue")]
 unique_name_in_owner = true
 visible = false
-layout_mode = 1
 
 [node name="StoryChoicePanel" parent="ModalLayer" unique_id=353291670 instance=ExtResource("5_story_choice")]
 unique_name_in_owner = true
 visible = false
-layout_mode = 1
 
 [node name="HintBox" parent="ModalLayer" unique_id=463491151 instance=ExtResource("10_hint_box")]
-layout_mode = 1
 
 [node name="ConfirmDialog" parent="ModalLayer" unique_id=1760846137 instance=ExtResource("11_confirm_dialog")]
 unique_name_in_owner = true
-layout_mode = 1
 
 [node name="DetailPanelHost" type="Control" parent="ModalLayer" unique_id=100000211]
 unique_name_in_owner = true
@@ -108,7 +103,7 @@ layer = 40
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(360, 44)
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -118,22 +113,26 @@ mouse_filter = 2
 script = ExtResource("9_toast_panel")
 
 [node name="TextureRect" type="TextureRect" parent="OverlayLayer/ToastPanel" unique_id=1470423910]
-layout_mode = 0
-offset_left = 649.0
-offset_top = 14.0
-offset_right = 1374.0
-offset_bottom = 224.0
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -362.5
+offset_top = 76.0
+offset_right = 362.5
+offset_bottom = 286.0
+grow_horizontal = 2
 texture = ExtResource("10_1766m")
 stretch_mode = 5
 
-[node name="MessageLabel" type="Label" parent="OverlayLayer/ToastPanel" unique_id=1346246878]
+[node name="MessageLabel" type="Label" parent="OverlayLayer/ToastPanel/TextureRect" unique_id=1346246878]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(324, 24)
 layout_mode = 0
-offset_left = 675.0
-offset_top = 59.0
-offset_right = 1312.0
-offset_bottom = 177.0
+offset_left = 26.0
+offset_top = 45.0
+offset_right = 663.0
+offset_bottom = 163.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 40
 text = "获得称号【草头百姓】"

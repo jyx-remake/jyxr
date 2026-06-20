@@ -1,14 +1,14 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cup3ph7k7eg4o"]
 
-[ext_resource type="PackedScene" path="res://scenes/ui/base/jy_panel.tscn" id="1_base"]
-[ext_resource type="Script" path="res://src/Game.Godot/UI/Journal/JournalPanel.cs" id="2_script"]
-[ext_resource type="PackedScene" path="res://scenes/ui/journal/journal_entry.tscn" id="3_entry"]
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://r13aulsyfgvg" path="res://src/Game.Godot/UI/Journal/JournalPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://bbbfr2yrgntxf" path="res://scenes/ui/journal/journal_entry.tscn" id="3_entry"]
 
-[node name="JournalPanel" instance=ExtResource("1_base")]
+[node name="JournalPanel" unique_id=1645991545 instance=ExtResource("1_base")]
 script = ExtResource("2_script")
 JournalEntryScene = ExtResource("3_entry")
 
-[node name="TitleLabel" type="Label" parent="." index="3"]
+[node name="TitleLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1411292994]
 layout_mode = 0
 offset_left = 790.0
 offset_top = 109.0
@@ -19,20 +19,20 @@ theme_override_font_sizes/font_size = 100
 text = "江湖日志"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." index="4"]
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=1294498475]
 layout_mode = 0
 offset_left = 263.0
 offset_top = 224.0
 offset_right = 1660.0
 offset_bottom = 905.0
 
-[node name="EntryContainer" type="VBoxContainer" parent="ScrollContainer" index="0"]
+[node name="EntryContainer" type="VBoxContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=718284816]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
-[node name="EmptyLabel" type="Label" parent="." index="5"]
+[node name="EmptyLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=1561126765]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0

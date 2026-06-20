@@ -14,7 +14,18 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Dikuang2" type="TextureRect" parent="." unique_id=670724643]
+[node name="ContentRoot" type="Control" parent="." unique_id=1281992720]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -960.0
+offset_right = 960.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Dikuang2" type="TextureRect" parent="ContentRoot" unique_id=670724643]
 layout_mode = 0
 offset_left = 241.0
 offset_top = 240.0
@@ -23,38 +34,38 @@ offset_bottom = 664.0
 texture = ExtResource("2_dikuang")
 expand_mode = 1
 
-[node name="NameEdit" type="LineEdit" parent="Dikuang2" unique_id=240888859]
+[node name="NameEdit" type="LineEdit" parent="ContentRoot" unique_id=240888859]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = 369.0
-offset_top = 206.0
-offset_right = 745.0
-offset_bottom = 291.0
+offset_left = 610.0
+offset_top = 446.0
+offset_right = 986.0
+offset_bottom = 531.0
 theme_override_font_sizes/font_size = 60
 text = "小虾米"
 
-[node name="HintLabel" type="Label" parent="Dikuang2" unique_id=1353645064]
+[node name="HintLabel" type="Label" parent="ContentRoot" unique_id=1353645064]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 347.0
-offset_top = 39.0
-offset_right = 1047.0
-offset_bottom = 157.0
+offset_left = 588.0
+offset_top = 279.0
+offset_right = 1288.0
+offset_bottom = 397.0
 theme_override_colors/font_color = Color(1, 1, 0, 1)
 theme_override_font_sizes/font_size = 100
 text = "请输入主角名称"
 
-[node name="AckButton" parent="Dikuang2" unique_id=1460814934 instance=ExtResource("4_jy_button")]
+[node name="AckButton" parent="ContentRoot" unique_id=1460814934 instance=ExtResource("4_jy_button")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 793.0
-offset_top = 208.0
-offset_right = 1071.0
-offset_bottom = 295.0
+offset_left = 1034.0
+offset_top = 448.0
+offset_right = 1312.0
+offset_bottom = 535.0
 texture_normal = ExtResource("3_button")
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Dikuang2/AckButton" unique_id=424344837]
+[node name="Label" type="Label" parent="ContentRoot/AckButton" unique_id=424344837]
 layout_mode = 0
 offset_left = 78.0
 offset_top = 6.0

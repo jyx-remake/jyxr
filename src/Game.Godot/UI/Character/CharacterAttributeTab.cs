@@ -39,16 +39,16 @@ public partial class CharacterAttributeTab : Control
 	public override void _Ready()
 	{
 		_addPointButton = GetNode<JyButton>("%AddPointButton");
-		_pointLabel = _addPointButton.GetNode<Label>("PointLabel");
-		_assignStatWidget = GetNode<Control>("AssignStatWidget");
-		_assignStatCloseButton = _assignStatWidget.GetNode<JyButton>("CloseButton");
+		_pointLabel = GetNode<Label>("%PointLabel");
+		_assignStatWidget = GetNode<Control>("%AssignStatWidget");
+		_assignStatCloseButton = GetNode<JyButton>("%CloseButton");
 
 		_addPointButton.Pressed += OnAddPointButtonPressed;
 		_assignStatCloseButton.Pressed += HideAssignStatWidget;
 
 		foreach (var (buttonName, statType) in AssignableStats)
 		{
-			var button = _assignStatWidget.GetNode<JyButton>($"HBoxContainer/{buttonName}");
+			var button = GetNode<JyButton>($"%{buttonName}");
 			button.Pressed += () => OnAssignStatButtonPressed(statType);
 		}
 

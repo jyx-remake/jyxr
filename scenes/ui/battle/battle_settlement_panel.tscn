@@ -22,10 +22,7 @@ outline_color = Color(0, 0, 0, 1)
 script = ExtResource("2_script")
 InventoryItemBoxScene = ExtResource("3_item_box")
 
-[node name="CloseButton" parent="." index="2" unique_id=962603895]
-visible = false
-
-[node name="TitleLabel" type="Label" parent="." index="3" unique_id=1998335815]
+[node name="TitleLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1998335815]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 760.0
@@ -37,7 +34,7 @@ text = "战斗胜利"
 label_settings = SubResource("1_title")
 horizontal_alignment = 1
 
-[node name="DetailLabel" type="Label" parent="." index="4" unique_id=1366637210]
+[node name="DetailLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=1366637210]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 360.0
@@ -50,7 +47,7 @@ text = "获得金钱：0           获得经验：0/每人"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="RewardHeaderLabel" type="Label" parent="." index="5" unique_id=1962746852]
+[node name="RewardHeaderLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=1962746852]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 372.0
@@ -61,7 +58,7 @@ theme_override_colors/font_color = Color(0.12, 0.08, 0.04, 1)
 theme_override_font_sizes/font_size = 34
 text = "获得物品"
 
-[node name="CountLabel" type="Label" parent="." index="6" unique_id=195187860]
+[node name="CountLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=195187860]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1390.0
@@ -73,14 +70,14 @@ theme_override_font_sizes/font_size = 28
 text = "0 项"
 horizontal_alignment = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." index="7" unique_id=295024919]
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="4" unique_id=295024919]
 layout_mode = 0
 offset_left = 368.0
 offset_top = 304.0
 offset_right = 1664.0
 offset_bottom = 856.0
 
-[node name="GridContainer" type="GridContainer" parent="ScrollContainer" index="0" unique_id=1977328070]
+[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=1977328070]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -88,7 +85,7 @@ theme_override_constants/h_separation = 18
 theme_override_constants/v_separation = 34
 columns = 6
 
-[node name="EmptyLabel" type="Label" parent="." index="8" unique_id=1807244912]
+[node name="EmptyLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="5" unique_id=1807244912]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -101,7 +98,7 @@ theme_override_font_sizes/font_size = 32
 text = "未获得额外物品。"
 horizontal_alignment = 1
 
-[node name="ConfirmButton" parent="." index="9" unique_id=1858360694 instance=ExtResource("4_button")]
+[node name="ConfirmButton" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="6" unique_id=1858360694 instance=ExtResource("4_button")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 104)
 layout_mode = 0
@@ -111,7 +108,7 @@ offset_right = 1126.0
 offset_bottom = 957.0
 texture_normal = ExtResource("5_button_texture")
 
-[node name="ConfirmButtonLabel" type="Label" parent="ConfirmButton" index="0" unique_id=920890203]
+[node name="ConfirmButtonLabel" type="Label" parent="ContentRoot/ConfirmButton" index="0" unique_id=920890203]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -123,3 +120,6 @@ text = "确定"
 label_settings = SubResource("2_confirm")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="CloseButton" parent="." index="3" unique_id=962603895]
+visible = false

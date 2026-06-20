@@ -130,8 +130,10 @@ autoplay = &"default"
 unique_name_in_owner = true
 position = Vector2(960, 540)
 enabled = true
+
 [node name="MapSmallTab" type="Control" parent="." unique_id=1873506715]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -153,45 +155,56 @@ texture_normal = ExtResource("6_camera")
 
 [node name="MapEntityList" type="HBoxContainer" parent="MapSmallTab" unique_id=274914384]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 110.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_right = 0.95
 offset_top = 362.0
-offset_right = 1810.0
 offset_bottom = 688.0
 theme_override_constants/separation = 80
 
 [node name="BottomBox" type="Control" parent="MapSmallTab" unique_id=294292032]
 unique_name_in_owner = true
-anchors_preset = 0
-offset_left = 35.0
-offset_top = 733.0
-offset_right = 1827.0
-offset_bottom = 1066.0
+layout_mode = 1
+anchor_left = 0.018
+anchor_top = 0.694
+anchor_right = 0.95
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
 mouse_filter = 2
 
 [node name="DialogueShadowPanel" type="Panel" parent="MapSmallTab/BottomBox" unique_id=627662737]
-layout_mode = 0
-offset_left = 170.0
-offset_top = 100.0
-offset_right = 1774.0
-offset_bottom = 321.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.095
+anchor_top = 0.3
+anchor_right = 0.99
+anchor_bottom = 0.96
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_description_shadow")
 
 [node name="Frame" type="TextureRect" parent="MapSmallTab/BottomBox" unique_id=1253864497]
-layout_mode = 0
-offset_right = 4144.0
-offset_bottom = 880.0
-scale = Vector2(0.43190765, 0.37521958)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("5_bottom_frame")
+expand_mode = 1
 
 [node name="MapDescriptionLabel" type="RichTextLabel" parent="MapSmallTab/BottomBox" unique_id=527718196]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
-offset_left = 227.0
-offset_top = 135.0
-offset_right = 1453.0
-offset_bottom = 317.0
+anchor_left = 0.13
+anchor_top = 0.41
+anchor_right = 0.82
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 bbcode_enabled = true

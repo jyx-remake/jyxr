@@ -363,6 +363,7 @@ label_settings = ExtResource("14_label_settings")
 vertical_alignment = 1
 
 [node name="AssignStatWidget" type="Control" parent="." unique_id=161896769]
+unique_name_in_owner = true
 visible = false
 anchors_preset = 0
 offset_left = 3.0

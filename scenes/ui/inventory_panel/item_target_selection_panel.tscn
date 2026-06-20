@@ -1,14 +1,14 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://dnacvsxreo2hx"]
 
-[ext_resource type="PackedScene" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
-[ext_resource type="Script" path="res://src/Game.Godot/UI/Inventory/ItemTargetSelectionPanel.cs" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" uid="uid://bmuvi6e6ogspp" path="res://src/Game.Godot/UI/Inventory/ItemTargetSelectionPanel.cs" id="2_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/item_target_character_box.tscn" id="3_character_box"]
 
-[node name="ItemTargetSelectionPanel" instance=ExtResource("1_panel")]
+[node name="ItemTargetSelectionPanel" unique_id=1475795774 instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
 TargetCharacterBoxScene = ExtResource("3_character_box")
 
-[node name="TitleLabel" type="Label" parent="." index="3"]
+[node name="TitleLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1046855802]
 layout_mode = 0
 offset_left = 760.0
 offset_top = 90.0
@@ -21,7 +21,7 @@ theme_override_font_sizes/font_size = 58
 text = "选择人物"
 horizontal_alignment = 1
 
-[node name="ItemLabel" type="Label" parent="." index="4"]
+[node name="ItemLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=146252365]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 360.0
@@ -33,21 +33,21 @@ theme_override_font_sizes/font_size = 30
 text = "选择目标：物品"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." index="5"]
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=941231250]
 layout_mode = 0
 offset_left = 330.0
 offset_top = 238.0
 offset_right = 1660.0
 offset_bottom = 850.0
 
-[node name="GridContainer" type="GridContainer" parent="ScrollContainer"]
+[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=1064672287]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 32
 theme_override_constants/v_separation = 38
 columns = 5
 
-[node name="HintLabel" type="Label" parent="." index="6"]
+[node name="HintLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=158857563]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 330.0

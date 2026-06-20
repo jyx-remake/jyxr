@@ -96,21 +96,14 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_card_hover")
 alignment = 0
 script = ExtResource("1_script")
 
-[node name="Margin" type="MarginContainer" parent="." unique_id=828750394]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1138809716]
-layout_mode = 2
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1138809716]
+layout_mode = 0
+offset_right = 658.0
+offset_bottom = 327.0
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="TitleLabel" type="Label" parent="Margin/VBox" unique_id=78954124]
+[node name="TitleLabel" type="Label" parent="VBox" unique_id=78954124]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.27, 0.91, 0.93, 1)
@@ -119,18 +112,18 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 42
 text = "存档1"
 
-[node name="ContentRow" type="HBoxContainer" parent="Margin/VBox" unique_id=970388627]
+[node name="ContentRow" type="HBoxContainer" parent="VBox" unique_id=970388627]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 24
 
-[node name="PortraitPanel" type="PanelContainer" parent="Margin/VBox/ContentRow" unique_id=15342250]
+[node name="PortraitPanel" type="PanelContainer" parent="VBox/ContentRow" unique_id=15342250]
 custom_minimum_size = Vector2(118, 156)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_portrait")
 
-[node name="Portrait" type="TextureRect" parent="Margin/VBox/ContentRow/PortraitPanel" unique_id=457092067]
+[node name="Portrait" type="TextureRect" parent="VBox/ContentRow/PortraitPanel" unique_id=457092067]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(118, 156)
 layout_mode = 2
@@ -138,13 +131,13 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="InfoVBox" type="VBoxContainer" parent="Margin/VBox/ContentRow" unique_id=517824296]
+[node name="InfoVBox" type="VBoxContainer" parent="VBox/ContentRow" unique_id=517824296]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=395789326]
+[node name="NameLabel" type="Label" parent="VBox/ContentRow/InfoVBox" unique_id=395789326]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.98, 0.91, 1)
@@ -153,24 +146,24 @@ theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 36
 text = "空档"
 
-[node name="PartyCountLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=1410164908]
+[node name="PartyCountLabel" type="Label" parent="VBox/ContentRow/InfoVBox" unique_id=1410164908]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.91, 0.8, 1)
 theme_override_font_sizes/font_size = 26
 
-[node name="GameTimeLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=1735996101]
+[node name="GameTimeLabel" type="Label" parent="VBox/ContentRow/InfoVBox" unique_id=1735996101]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.91, 0.8, 1)
 theme_override_font_sizes/font_size = 26
 
-[node name="RunInfoRow" type="HBoxContainer" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=1940620639]
+[node name="RunInfoRow" type="HBoxContainer" parent="VBox/ContentRow/InfoVBox" unique_id=1940620639]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 26
 
-[node name="DifficultyLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=2015163800]
+[node name="DifficultyLabel" type="Label" parent="VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=2015163800]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.15, 0.1, 1)
@@ -179,26 +172,26 @@ theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 26
 text = "难度：简单"
 
-[node name="RoundLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=694259001]
+[node name="RoundLabel" type="Label" parent="VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=694259001]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.91, 0.8, 1)
 theme_override_font_sizes/font_size = 26
 text = "周目：1"
 
-[node name="LocationLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=335058721]
+[node name="LocationLabel" type="Label" parent="VBox/ContentRow/InfoVBox" unique_id=335058721]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.91, 0.8, 1)
 theme_override_font_sizes/font_size = 26
 
-[node name="SavedAtLabel" type="Label" parent="Margin/VBox/ContentRow/InfoVBox" unique_id=1985571942]
+[node name="SavedAtLabel" type="Label" parent="VBox/ContentRow/InfoVBox" unique_id=1985571942]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.76, 0.63, 1)
 theme_override_font_sizes/font_size = 22
 
-[node name="HintLabel" type="Label" parent="Margin/VBox" unique_id=1537577179]
+[node name="HintLabel" type="Label" parent="VBox" unique_id=1537577179]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.82, 0.42, 1)

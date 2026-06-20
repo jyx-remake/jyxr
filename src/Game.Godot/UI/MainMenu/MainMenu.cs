@@ -15,7 +15,7 @@ public partial class MainMenu : Control
 
 	public override void _Ready()
 	{
-		_background = GetNode<TextureRect>("Bg");
+		_background = GetNode<TextureRect>("%Bg");
 		_startButton = GetNode<TextureButton>("%StartButton");
 		_loadButton = GetNode<TextureButton>("%LoadButton");
 		_musicButton = GetNode<TextureButton>("%MusicButton");

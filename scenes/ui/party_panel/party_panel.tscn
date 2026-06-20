@@ -8,24 +8,24 @@
 script = ExtResource("2_dov0m")
 PartyCharacterBoxScene = ExtResource("3_box")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." index="3" unique_id=1113950281]
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1113950281]
 layout_mode = 1
 offset_left = 192.0
 offset_top = 144.0
 offset_right = 1677.0
 offset_bottom = 885.0
 
-[node name="GridContainer" type="GridContainer" parent="ScrollContainer" index="0" unique_id=199504820]
+[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=199504820]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 5
 
-[node name="PartyCharacterBox" parent="ScrollContainer/GridContainer" index="0" unique_id=527980720 instance=ExtResource("3_box")]
+[node name="PartyCharacterBox" parent="ContentRoot/ScrollContainer/GridContainer" index="0" unique_id=527980720 instance=ExtResource("3_box")]
 layout_mode = 2
 
-[node name="HintLabel" type="Label" parent="." index="4" unique_id=823510971]
+[node name="HintLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=823510971]
 layout_mode = 0
 offset_left = 442.0
 offset_top = 998.0
@@ -37,7 +37,7 @@ theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 40
 text = "拖拽队友卡片可调整顺序，主角固定在队伍首位。"
 
-[node name="EmptyLabel" type="Label" parent="." index="5" unique_id=1930187884]
+[node name="EmptyLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=1930187884]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
