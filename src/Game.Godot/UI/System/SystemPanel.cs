@@ -91,7 +91,10 @@ public partial class SystemPanel : Control
 
 		AppendConsoleLine("系统", "命令行执行剧本指令，当前不支持 jump。");
 		AppendConsoleLine("系统", "示例：item 道口烧鸡 / log \"踏入江湖\"");
-		_consoleInput.CallDeferred(Control.MethodName.GrabFocus);
+		if (!Game.IsMobilePlatform)
+		{
+			_consoleInput.CallDeferred(Control.MethodName.GrabFocus);
+		}
 	}
 
 	private void LoadSettings()
@@ -263,7 +266,6 @@ public partial class SystemPanel : Control
 			return;
 		}
 
-		_consoleInput.Clear();
 		try
 		{
 			var invocation = await Game.StoryService.CommandLine.ExecuteAsync(commandLine);
