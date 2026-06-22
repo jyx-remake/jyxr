@@ -12,6 +12,7 @@ public partial class BattleUnitView : Node2D
 	private static readonly Color ManaBarColor = new(0.2f, 0.48f, 0.9f, 1f);
 	private static readonly Color GaugeBarColor = new(0.95f, 0.95f, 0.95f, 1f);
 	private static readonly Color RagePipColor = new(1f, 0.78f, 0.1f, 1f);
+	private static readonly Color EnemyNameColor = Colors.Red;
 
 	private Sprite2D _sprite = null!;
 	private Sprite2D _activeArrow = null!;
@@ -64,6 +65,7 @@ public partial class BattleUnitView : Node2D
 		_portraitTexture = unit.PortraitTexture;
 
 		_nameLabel.Text = unit.Name;
+		_nameLabel.SelfModulate = unit.IsPlayerUnit ? Colors.White : EnemyNameColor;
 		UpdateBar(_hpBar, unit.Hp, unit.MaxHp, unit.IsPlayerUnit ? PlayerBarColor : EnemyBarColor);
 		UpdateBar(_mpBar, unit.Mp, unit.MaxMp, ManaBarColor);
 		UpdateBar(_gaugeBar, unit.ActionGauge, 100, GaugeBarColor);
