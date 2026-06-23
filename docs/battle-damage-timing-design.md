@@ -98,13 +98,13 @@
 - `modify_damage_context`
   - 这是这一层的主力原语
   - 常见字段：
-    - `source_attack`
-    - `source_attack_low`
-    - `source_attack_high`
-    - `target_defence`
-    - `critical_chance`
-    - `critical_multiplier`
-    - `final_damage`
+	- `source_attack`
+	- `source_attack_low`
+	- `source_attack_high`
+	- `target_defence`
+	- `critical_chance`
+	- `critical_multiplier`
+	- `final_damage`
 - 不建议在这一层挂：
   - `cancel_hit`
   - `add_rage`

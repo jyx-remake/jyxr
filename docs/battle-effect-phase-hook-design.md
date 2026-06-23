@@ -368,10 +368,10 @@
 {
   "phase": "BeforeDamageApply",
   "conditions": [
-    { "type": "SelfHealthBelowPercent", "value": 20 }
+	{ "type": "SelfHealthBelowPercent", "value": 20 }
   ],
   "operations": [
-    { "type": "ClampFinalDamageMax", "value": 200 }
+	{ "type": "ClampFinalDamageMax", "value": 200 }
   ]
 }
 ```
@@ -405,7 +405,7 @@
 {
   "phase": "AfterAction",
   "custom": {
-    "type": "ChainKillRecast"
+	"type": "ChainKillRecast"
   }
 }
 ```
@@ -421,9 +421,9 @@
 ```csharp
 public interface IAttachmentSource
 {
-    IReadOnlyList<IActivationCondition> ActivationConditions { get; }
-    IReadOnlyList<IModifierDefinition> Modifiers { get; }
-    IReadOnlyList<BattleHookDefinition> Hooks { get; }
+	IReadOnlyList<IActivationCondition> ActivationConditions { get; }
+	IReadOnlyList<IModifierDefinition> Modifiers { get; }
+	IReadOnlyList<BattleHookDefinition> Hooks { get; }
 }
 ```
 
@@ -443,10 +443,10 @@ public sealed record GrantTalentModifierDefinition(string TalentId) : IModifierD
 
 ```csharp
 public sealed record BattleHookDefinition(
-    BattleHookPhase Phase,
-    IReadOnlyList<HookConditionDefinition> Conditions,
-    IReadOnlyList<HookOperationDefinition> Operations,
-    CustomHookExecutionDefinition? Custom = null);
+	BattleHookPhase Phase,
+	IReadOnlyList<HookConditionDefinition> Conditions,
+	IReadOnlyList<HookOperationDefinition> Operations,
+	CustomHookExecutionDefinition? Custom = null);
 ```
 
 ### 9.4 固定阶段
@@ -454,17 +454,17 @@ public sealed record BattleHookDefinition(
 ```csharp
 public enum BattleHookPhase
 {
-    TurnStart,
-    BeforeAction,
-    AfterAction,
-    TurnEnd,
-    BeforeHit,
-    BeforeDamageResolve,
-    BeforeDamageApply,
-    BeforeDeath,
-    AfterDamageApplied,
-    BeforeHealResolve,
-    AfterHealApplied
+	TurnStart,
+	BeforeAction,
+	AfterAction,
+	TurnEnd,
+	BeforeHit,
+	BeforeDamageResolve,
+	BeforeDamageApply,
+	BeforeDeath,
+	AfterDamageApplied,
+	BeforeHealResolve,
+	AfterHealApplied
 }
 ```
 
@@ -571,10 +571,10 @@ public abstract record CustomHookExecutionDefinition;
 {
   "phase": "BeforeDamageResolve",
   "conditions": [
-    { "type": "RandomChance", "value": 0.1 }
+	{ "type": "RandomChance", "value": 0.1 }
   ],
   "operations": [
-    { "type": "AddFinalDamagePercent", "value": 0.5 }
+	{ "type": "AddFinalDamagePercent", "value": 0.5 }
   ]
 }
 ```
@@ -597,10 +597,10 @@ public abstract record CustomHookExecutionDefinition;
 {
   "phase": "BeforeDamageApply",
   "conditions": [
-    { "type": "SelfHealthBelowPercent", "value": 20 }
+	{ "type": "SelfHealthBelowPercent", "value": 20 }
   ],
   "operations": [
-    { "type": "ClampFinalDamageMax", "value": 200 }
+	{ "type": "ClampFinalDamageMax", "value": 200 }
   ]
 }
 ```
@@ -623,10 +623,10 @@ public abstract record CustomHookExecutionDefinition;
 {
   "phase": "AfterAction",
   "conditions": [
-    { "type": "KilledAnyTargetThisAction" }
+	{ "type": "KilledAnyTargetThisAction" }
   ],
   "operations": [
-    { "type": "GrantExtraAction", "count": 1 }
+	{ "type": "GrantExtraAction", "count": 1 }
   ]
 }
 ```
@@ -649,21 +649,21 @@ public abstract record CustomHookExecutionDefinition;
 {
   "phase": "BeforeDeath",
   "conditions": [
-    {
-      "type": "UsageRemaining",
-      "scope": "Battle",
-      "key": "first_death_revive",
-      "max": 1
-    }
+	{
+	  "type": "UsageRemaining",
+	  "scope": "Battle",
+	  "key": "first_death_revive",
+	  "max": 1
+	}
   ],
   "operations": [
-    {
-      "type": "ConsumeUsage",
-      "scope": "Battle",
-      "key": "first_death_revive"
-    },
-    { "type": "CancelDeath" },
-    { "type": "RestoreHealthFull" }
+	{
+	  "type": "ConsumeUsage",
+	  "scope": "Battle",
+	  "key": "first_death_revive"
+	},
+	{ "type": "CancelDeath" },
+	{ "type": "RestoreHealthFull" }
   ]
 }
 ```
@@ -683,35 +683,35 @@ public abstract record CustomHookExecutionDefinition;
   "name": "Unyielding Will",
   "modifiers": [],
   "hooks": [
-    {
-      "phase": "BeforeDamageApply",
-      "conditions": [
-        { "type": "SelfHealthBelowPercent", "value": 20 }
-      ],
-      "operations": [
-        { "type": "ClampFinalDamageMax", "value": 200 }
-      ]
-    },
-    {
-      "phase": "BeforeDeath",
-      "conditions": [
-        {
-          "type": "UsageRemaining",
-          "scope": "Battle",
-          "key": "first_death_revive",
-          "max": 1
-        }
-      ],
-      "operations": [
-        {
-          "type": "ConsumeUsage",
-          "scope": "Battle",
-          "key": "first_death_revive"
-        },
-        { "type": "CancelDeath" },
-        { "type": "RestoreHealthFull" }
-      ]
-    }
+	{
+	  "phase": "BeforeDamageApply",
+	  "conditions": [
+		{ "type": "SelfHealthBelowPercent", "value": 20 }
+	  ],
+	  "operations": [
+		{ "type": "ClampFinalDamageMax", "value": 200 }
+	  ]
+	},
+	{
+	  "phase": "BeforeDeath",
+	  "conditions": [
+		{
+		  "type": "UsageRemaining",
+		  "scope": "Battle",
+		  "key": "first_death_revive",
+		  "max": 1
+		}
+	  ],
+	  "operations": [
+		{
+		  "type": "ConsumeUsage",
+		  "scope": "Battle",
+		  "key": "first_death_revive"
+		},
+		{ "type": "CancelDeath" },
+		{ "type": "RestoreHealthFull" }
+	  ]
+	}
   ]
 }
 ```
@@ -770,22 +770,22 @@ public abstract record CustomHookExecutionDefinition;
 
 ```csharp
 public sealed record BattleHookTrace(
-    BattleHookPhase Phase,
-    string SourceId,
-    string RuleId,
-    IReadOnlyList<ConditionTrace> Conditions,
-    IReadOnlyList<OperationTrace> Operations);
+	BattleHookPhase Phase,
+	string SourceId,
+	string RuleId,
+	IReadOnlyList<ConditionTrace> Conditions,
+	IReadOnlyList<OperationTrace> Operations);
 
 public sealed record ConditionTrace(
-    string ConditionType,
-    bool Result,
-    string? Detail = null);
+	string ConditionType,
+	bool Result,
+	string? Detail = null);
 
 public sealed record OperationTrace(
-    string OperationType,
-    string? Before = null,
-    string? After = null,
-    string? Detail = null);
+	string OperationType,
+	string? Before = null,
+	string? After = null,
+	string? Detail = null);
 ```
 
 ### 14.4 示例

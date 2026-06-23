@@ -223,7 +223,10 @@ public sealed class SpecialBattleService
             new ZhenlongqijuBattleRequest(
                 ZhenlongqijuBattleId,
                 selected,
-                level),
+                level)
+            {
+                StageLabel = BuildZhenlongqijuStageLabel(level),
+            },
             cancellationToken);
         if (!isWin)
         {
@@ -232,6 +235,36 @@ public sealed class SpecialBattleService
 
         _session.ProfileService.AdvanceZhenlongqijuLevel();
         return StoryCommandResult.Jump(ZhenlongqijuWinStoryId);
+    }
+
+    public async ValueTask<StoryCommandResult> RunZhenlongqijuAutoAsync(
+        IRuntimeHost host,
+        CancellationToken cancellationToken = default)
+    {
+        var selected = await SelectCombatantsAsync(host, ZhenlongqijuBattleId, EmptyForbiddenSet, cancellationToken);
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var level = _session.Profile.ZhenlongqijuLevel;
+            var isWin = await RunBattleAsync(
+                host,
+                new ZhenlongqijuBattleRequest(
+                    ZhenlongqijuBattleId,
+                    selected,
+                    level)
+                {
+                    StartWithAutoBattle = true,
+                    AutoConfirmVictorySettlementDelaySeconds = 2d,
+                    StageLabel = BuildZhenlongqijuStageLabel(level),
+                },
+                cancellationToken);
+            if (!isWin)
+            {
+                return StoryCommandResult.Jump(ZhenlongqijuLoseStoryId);
+            }
+
+            _session.ProfileService.AdvanceZhenlongqijuLevel();
+        }
     }
 
     private async ValueTask<TowerDefinition?> ChooseTowerAsync(
@@ -424,6 +457,8 @@ public sealed class SpecialBattleService
         string.IsNullOrWhiteSpace(callbackStoryId)
             ? StoryCommandResult.None
             : StoryCommandResult.Jump(callbackStoryId);
+
+    private static string BuildZhenlongqijuStageLabel(int level) => $"珍珑棋局 第 {level + 1} 关";
 
     private static IReadOnlySet<string> EmptyForbiddenSet { get; } = new HashSet<string>(StringComparer.Ordinal);
 

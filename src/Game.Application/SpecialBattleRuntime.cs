@@ -7,7 +7,14 @@ public sealed record CombatantSelectionRequest(
 
 public abstract record SpecialBattleRequest(
     string BattleId,
-    IReadOnlyList<string> SelectedCharacterIds);
+    IReadOnlyList<string> SelectedCharacterIds)
+{
+    public bool StartWithAutoBattle { get; init; }
+
+    public double AutoConfirmVictorySettlementDelaySeconds { get; init; }
+
+    public string? StageLabel { get; init; }
+}
 
 public sealed record OrdinaryBattleRequest(
     string BattleId,

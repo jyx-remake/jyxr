@@ -21,6 +21,7 @@ public partial class BattleSettlementPanel : JyPanel
 	private TextureButton _confirmButton = null!;
 	private Label _confirmButtonLabel = null!;
 	private BattleSettlementView? _view;
+	private Control? _rewardDetailPanel;
 
 	public override void _Ready()
 	{
@@ -46,7 +47,9 @@ public partial class BattleSettlementPanel : JyPanel
 		Refresh();
 	}
 
-	public async Task AwaitConfirmationAsync(CancellationToken cancellationToken = default)
+	public async Task AwaitConfirmationAsync(
+		double autoConfirmDelaySeconds = 0d,
+		CancellationToken cancellationToken = default)
 	{
 		using var registration = cancellationToken.CanBeCanceled
 			? cancellationToken.Register(() =>
@@ -58,12 +61,18 @@ public partial class BattleSettlementPanel : JyPanel
 			})
 			: default;
 
+		if (autoConfirmDelaySeconds > 0d)
+		{
+			_ = ConfirmAfterDelayAsync(autoConfirmDelaySeconds, cancellationToken);
+		}
+
 		await _confirmationCompletion.Task;
 	}
 
 	public override void _ExitTree()
 	{
 		base._ExitTree();
+		CloseRewardDetailPanel();
 		if (!_confirmationCompletion.Task.IsCompleted)
 		{
 			_confirmationCompletion.TrySetResult();
@@ -84,6 +93,16 @@ public partial class BattleSettlementPanel : JyPanel
 		if (_confirmationCompletion.TrySetResult())
 		{
 			QueueFree();
+		}
+	}
+
+	private async Task ConfirmAfterDelayAsync(double seconds, CancellationToken cancellationToken)
+	{
+		var timer = GetTree().CreateTimer(seconds);
+		await ToSignal(timer, SceneTreeTimer.SignalName.Timeout);
+		if (!cancellationToken.IsCancellationRequested && GodotObject.IsInstanceValid(this))
+		{
+			Confirm();
 		}
 	}
 
@@ -132,7 +151,35 @@ public partial class BattleSettlementPanel : JyPanel
 		}
 
 		itemBox.Setup(entry);
+		itemBox.EntrySelected += ShowRewardDetail;
 		return itemBox;
+	}
+
+	private void ShowRewardDetail(InventoryEntry entry)
+	{
+		var detailPanel = UIRoot.Instance.ShowInventoryEntryDetailPanel(entry);
+		detailPanel.ZIndex = 1000;
+		detailPanel.ZAsRelative = false;
+		_rewardDetailPanel = detailPanel;
+		detailPanel.TreeExited += () => ClearRewardDetailPanelReference(detailPanel);
+	}
+
+	private void CloseRewardDetailPanel()
+	{
+		if (_rewardDetailPanel is not null && GodotObject.IsInstanceValid(_rewardDetailPanel))
+		{
+			_rewardDetailPanel.QueueFree();
+		}
+
+		_rewardDetailPanel = null;
+	}
+
+	private void ClearRewardDetailPanelReference(Control panel)
+	{
+		if (ReferenceEquals(_rewardDetailPanel, panel))
+		{
+			_rewardDetailPanel = null;
+		}
 	}
 
 	private void ClearGrid()
