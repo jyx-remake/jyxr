@@ -65,6 +65,7 @@ public partial class BattleScreen : Control
 	private bool _isResolvingSkillPresentation;
 	private bool _isEndingBattle;
 	private bool _isSpeedUpEnabled;
+	private bool _isTimeScaleRestored;
 	private bool? _battleResult;
 	private double _initialTimeScale = 1d;
 	private int _battleSpeedMultiplier = 2;
@@ -74,6 +75,7 @@ public partial class BattleScreen : Control
 	private TextureRect _background = null!;
 	private Label _titleLabel = null!;
 	private Label _subtitleLabel = null!;
+	private Label _stageLabel = null!;
 	private BaseButton _surrenderButton = null!;
 	private BaseButton _speedUpButton = null!;
 	private CanvasItem _speedUpActive = null!;
@@ -100,6 +102,7 @@ public partial class BattleScreen : Control
 		_background = GetNode<TextureRect>("%Background");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
+		_stageLabel = GetNode<Label>("%StageLabel");
 		_surrenderButton = GetNode<BaseButton>("%SurrenderButton");
 		_speedUpButton = GetNode<BaseButton>("%SpeedUpButton");
 		_speedUpActive = GetNode<CanvasItem>("%SpeedUpActive");
@@ -215,6 +218,7 @@ public partial class BattleScreen : Control
 		_state = GameRoot.BattleService.BuildBattleState(_battleRequest);
 		_orchestrator = new BattleFlowOrchestrator(this, _state);
 		ApplyBattleSettings(_settingsStore.LoadOrDefault());
+		ApplyBattleRequestOptions(_battleRequest);
 		_logLines.Clear();
 		_isEndingBattle = false;
 		_battleResult = null;
@@ -251,6 +255,8 @@ public partial class BattleScreen : Control
 		var header = _presenter.CreateHeader(_state, _uiState.Mode);
 		_titleLabel.Text = _battleDefinition?.Name ?? header.Title;
 		_subtitleLabel.Text = header.Subtitle;
+		_stageLabel.Text = _battleRequest?.StageLabel ?? string.Empty;
+		_stageLabel.Visible = !string.IsNullOrWhiteSpace(_stageLabel.Text);
 
 		RefreshBoard();
 		RefreshSelectedSkill();
@@ -1153,6 +1159,7 @@ public partial class BattleScreen : Control
 
 	private void ApplyTimeScale()
 	{
+		_isTimeScaleRestored = false;
 		Engine.TimeScale = _isSpeedUpEnabled
 			? _initialTimeScale * _battleSpeedMultiplier
 			: _initialTimeScale;
@@ -1164,6 +1171,14 @@ public partial class BattleScreen : Control
 		_battleSpeedMultiplier = ClampBattleSpeedMultiplier(settings.BattleSpeedMultiplier);
 		_orchestrator?.SetAutoBattleEnabled(settings.AutoBattle);
 		ApplyTimeScale();
+	}
+
+	private void ApplyBattleRequestOptions(SpecialBattleRequest request)
+	{
+		if (request.StartWithAutoBattle)
+		{
+			_orchestrator?.SetAutoBattleEnabled(true);
+		}
 	}
 
 	private void SaveBattleSettings()
@@ -1182,7 +1197,13 @@ public partial class BattleScreen : Control
 
 	private void RestoreTimeScale()
 	{
+		if (_isTimeScaleRestored)
+		{
+			return;
+		}
+
 		Engine.TimeScale = _initialTimeScale;
+		_isTimeScaleRestored = true;
 	}
 
 	private void SurrenderBattle()
@@ -1265,6 +1286,7 @@ public partial class BattleScreen : Control
 			throw new InvalidOperationException("Battle result has not been resolved.");
 		}
 
+		RestoreTimeScale();
 		if (_battleCompletion.TrySetResult(battleResult))
 		{
 			QueueFree();
@@ -1287,7 +1309,10 @@ public partial class BattleScreen : Control
 
 		panel.Configure(_presenter.CreateSettlementView(isWin, settlement));
 		_overlayRoot.AddChild(panel);
-		await panel.AwaitConfirmationAsync();
+		var autoConfirmDelay = isWin
+			? _battleRequest?.AutoConfirmVictorySettlementDelaySeconds ?? 0d
+			: 0d;
+		await panel.AwaitConfirmationAsync(autoConfirmDelay);
 	}
 
 	private static Color ResolveCellColor(BattleCellView cell, BoardHighlights highlights)

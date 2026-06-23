@@ -426,6 +426,12 @@ public sealed class StoryCommandDispatcher
         params ExprValue[] _) =>
         _session.SpecialBattleService.RunZhenlongqijuAsync(_host, cancellationToken);
 
+    [StoryCommand("zhenlongqiju_auto")]
+    private ValueTask<StoryCommandResult> ExecuteZhenlongqijuAutoAsync(
+        CancellationToken cancellationToken,
+        params ExprValue[] _) =>
+        _session.SpecialBattleService.RunZhenlongqijuAutoAsync(_host, cancellationToken);
+
     [StoryCommand("arena")]
     private ValueTask<StoryCommandResult> ExecuteArenaAsync(
         string? callbackStoryId = null,

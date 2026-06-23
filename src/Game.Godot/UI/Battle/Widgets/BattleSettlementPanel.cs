@@ -46,7 +46,9 @@ public partial class BattleSettlementPanel : JyPanel
 		Refresh();
 	}
 
-	public async Task AwaitConfirmationAsync(CancellationToken cancellationToken = default)
+	public async Task AwaitConfirmationAsync(
+		double autoConfirmDelaySeconds = 0d,
+		CancellationToken cancellationToken = default)
 	{
 		using var registration = cancellationToken.CanBeCanceled
 			? cancellationToken.Register(() =>
@@ -57,6 +59,11 @@ public partial class BattleSettlementPanel : JyPanel
 				}
 			})
 			: default;
+
+		if (autoConfirmDelaySeconds > 0d)
+		{
+			_ = ConfirmAfterDelayAsync(autoConfirmDelaySeconds, cancellationToken);
+		}
 
 		await _confirmationCompletion.Task;
 	}
@@ -84,6 +91,16 @@ public partial class BattleSettlementPanel : JyPanel
 		if (_confirmationCompletion.TrySetResult())
 		{
 			QueueFree();
+		}
+	}
+
+	private async Task ConfirmAfterDelayAsync(double seconds, CancellationToken cancellationToken)
+	{
+		var timer = GetTree().CreateTimer(seconds);
+		await ToSignal(timer, SceneTreeTimer.SignalName.Timeout);
+		if (!cancellationToken.IsCancellationRequested && GodotObject.IsInstanceValid(this))
+		{
+			Confirm();
 		}
 	}
 
