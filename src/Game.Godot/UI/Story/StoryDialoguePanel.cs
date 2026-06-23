@@ -5,6 +5,7 @@ namespace Game.Godot.UI.Story;
 
 public partial class StoryDialoguePanel : Control
 {
+	private const double TypewriterCharactersPerSecond = 36d;
 	private static bool _skipMode;
 	private static bool _isHighMode;
 	private TaskCompletionSource<bool>? _completionSource;
@@ -15,6 +16,9 @@ public partial class StoryDialoguePanel : Control
 	private Label _speakerLabel = null!;
 	private RichTextLabel _contentLabel = null!;
 	private Button _skipButton = null!;
+	private bool _isTyping;
+	private double _typewriterProgress;
+	private int _typewriterTargetCharacters;
 
 	public int PresentationVersion { get; private set; }
 
@@ -30,7 +34,27 @@ public partial class StoryDialoguePanel : Control
 		_shadowPanel.GuiInput += OnShadowPanelGuiInput;
 		_skipButton.ButtonDown += OnSkipButtonDown;
 		_skipButton.ButtonUp += OnSkipButtonUp;
+		SetProcess(false);
 		Apply();
+	}
+
+	public override void _Process(double delta)
+	{
+		if (!_isTyping)
+		{
+			return;
+		}
+
+		_typewriterProgress += delta * TypewriterCharactersPerSecond;
+		var visibleCharacters = Math.Min(
+			_typewriterTargetCharacters,
+			Math.Max(1, (int)Math.Floor(_typewriterProgress)));
+		_contentLabel.VisibleCharacters = visibleCharacters;
+
+		if (visibleCharacters >= _typewriterTargetCharacters)
+		{
+			RevealFullText();
+		}
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -59,7 +83,7 @@ public partial class StoryDialoguePanel : Control
 			@event.IsActionPressed("ui_select") ||
 			@event.IsActionPressed("ui_text_submit"))
 		{
-			Complete();
+			Advance();
 			AcceptEvent();
 		}
 	}
@@ -117,6 +141,14 @@ public partial class StoryDialoguePanel : Control
 		_speakerLabel.Text = displayName;
 		_contentLabel.Text = _text;
 		_skipButton.Text = "跳过";
+
+		if (_completionSource is null || _text.Length == 0)
+		{
+			RevealFullText();
+			return;
+		}
+
+		StartTypewriter();
 	}
 
 	private void OnShadowPanelGuiInput(InputEvent @event)
@@ -126,7 +158,7 @@ public partial class StoryDialoguePanel : Control
 			return;
 		}
 
-		Complete();
+		Advance();
 		AcceptEvent();
 	}
 
@@ -147,7 +179,7 @@ public partial class StoryDialoguePanel : Control
 			return;
 		}
 
-		Complete();
+		Advance();
 		AcceptEvent();
 	}
 
@@ -160,8 +192,36 @@ public partial class StoryDialoguePanel : Control
 		};
 	}
 
+	private void StartTypewriter()
+	{
+		_typewriterProgress = 0d;
+		_typewriterTargetCharacters = Math.Max(1, _text.Length);
+		_contentLabel.VisibleCharacters = 0;
+		_isTyping = true;
+		SetProcess(true);
+	}
+
+	private void RevealFullText()
+	{
+		_isTyping = false;
+		SetProcess(false);
+		_contentLabel.VisibleCharacters = -1;
+	}
+
+	private void Advance()
+	{
+		if (_isTyping)
+		{
+			RevealFullText();
+			return;
+		}
+
+		Complete();
+	}
+
 	private void Complete()
 	{
+		RevealFullText();
 		_completionSource?.TrySetResult(true);
 	}
 
@@ -176,5 +236,9 @@ public partial class StoryDialoguePanel : Control
 		_skipMode = false;
 	}
 
-	public void HidePanel() => Hide();
+	public void HidePanel()
+	{
+		RevealFullText();
+		Hide();
+	}
 }
