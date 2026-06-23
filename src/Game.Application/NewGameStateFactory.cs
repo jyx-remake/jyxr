@@ -1,19 +1,18 @@
 using Game.Core.Abstractions;
 using Game.Core.Model;
-using Game.Core.Model.Character;
 
 namespace Game.Application;
 
 public sealed class NewGameStateFactory
 {
-    private readonly IContentRepository _contentRepository;
+    private readonly InitialCharacterFactory _initialCharacterFactory;
     private readonly GameConfig _config;
 
     public NewGameStateFactory(IContentRepository contentRepository, GameConfig? config = null)
     {
         ArgumentNullException.ThrowIfNull(contentRepository);
-        _contentRepository = contentRepository;
         _config = config ?? new GameConfig();
+        _initialCharacterFactory = new InitialCharacterFactory(contentRepository, _config);
     }
 
     public GameState Create(
@@ -34,15 +33,7 @@ public sealed class NewGameStateFactory
         var party = new Party();
         foreach (var characterId in initialPartyCharacterIds)
         {
-            if (string.IsNullOrWhiteSpace(characterId))
-            {
-                throw new InvalidOperationException("Initial party character id cannot be empty.");
-            }
-
-            var definition = _contentRepository.GetCharacter(characterId);
-            var member = CharacterMapper.CreateInitial(characterId, definition, equipmentInstanceFactory, _config);
-            member.LevelUpAllSkillsMaxLevel();
-            party.AddMember(member);
+            party.AddMember(_initialCharacterFactory.Create(characterId, equipmentInstanceFactory));
         }
 
         var adventure = new AdventureState();

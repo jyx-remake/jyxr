@@ -1,4 +1,3 @@
-using Game.Core.Abstractions;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 
@@ -7,15 +6,16 @@ namespace Game.Application;
 public sealed class PartyService
 {
     private readonly GameSession _session;
+    private readonly InitialCharacterFactory _initialCharacterFactory;
 
     public PartyService(GameSession session)
     {
         ArgumentNullException.ThrowIfNull(session);
         _session = session;
+        _initialCharacterFactory = new InitialCharacterFactory(session.ContentRepository, session.Config);
     }
 
     private GameState State => _session.State;
-    private IContentRepository ContentRepository => _session.ContentRepository;
 
     public void MoveMember(string characterId, int targetIndex)
     {
@@ -177,10 +177,7 @@ public sealed class PartyService
 
     private CharacterInstance CreateInitialCharacter(string characterId)
     {
-        var definition = ContentRepository.GetCharacter(characterId);
-        var character = CharacterMapper.CreateInitial(characterId, definition, State.EquipmentInstanceFactory, _session.Config);
-        character.LevelUpAllSkillsMaxLevel();
-        return character;
+        return _initialCharacterFactory.Create(characterId, State.EquipmentInstanceFactory);
     }
 
     private bool TryFindPartyMember(string idOrName, out CharacterInstance character) =>

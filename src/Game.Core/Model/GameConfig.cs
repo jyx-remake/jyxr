@@ -18,6 +18,7 @@ public sealed class GameConfig
 	public int MaxInternalSkillCount { get; init; } = 8;
 	public int MaxAttribute { get; init; } = 300;
 	public ItemRequirementStatSource ItemRequirementStatSource { get; init; } = ItemRequirementStatSource.Final;
+	public bool MaximizeNewPartyCharacterSkills { get; init; } = true;
 	public int MaxExternalSkillLevel { get; init; } = 20;
 	public int MaxInternalSkillLevel { get; init; } = 20;
 	public int MaxHpMp { get; init; } = 10000;
