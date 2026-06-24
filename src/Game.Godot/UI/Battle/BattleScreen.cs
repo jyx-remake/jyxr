@@ -291,7 +291,8 @@ public partial class BattleScreen : Control
 				cell.Position,
 				cell.Label,
 				ResolveCellColor(cell, highlights),
-				CanClickCell(cell.Position, highlights)))
+				CanClickCell(cell.Position, highlights),
+				HasCellOverlay(cell, highlights)))
 			.ToArray();
 		_boardGrid.RenderGrid(_state.Grid.Width, _state.Grid.Height, GridCellWidth, GridCellHeight, 6, cells);
 		var actingUnitId = _state.CurrentAction?.ActingUnitId;
@@ -1162,6 +1163,7 @@ public partial class BattleScreen : Control
 	{
 		_isSpeedUpEnabled = settings.BattleSpeedUp;
 		_battleSpeedMultiplier = ClampBattleSpeedMultiplier(settings.BattleSpeedMultiplier);
+		_boardGrid.ShowBaseBoard = settings.ShowBattleBoard;
 		_orchestrator?.SetAutoBattleEnabled(settings.AutoBattle);
 		ApplyTimeScale();
 	}
@@ -1331,6 +1333,15 @@ public partial class BattleScreen : Control
 
 		return DefaultCellColor;
 	}
+
+	private static bool HasCellOverlay(BattleCellView cell, BoardHighlights highlights) =>
+		cell.HasUnit ||
+		cell.IsActing ||
+		highlights.MoveTargets.Contains(cell.Position) ||
+		highlights.ItemTargets.Contains(cell.Position) ||
+		highlights.SkillTargets.Contains(cell.Position) ||
+		highlights.SkillPossibleImpacts.Contains(cell.Position) ||
+		highlights.SkillActualImpacts.Contains(cell.Position);
 
 	private bool IsAutoBattleEnabled() => _orchestrator?.IsAutoBattleEnabled ?? false;
 

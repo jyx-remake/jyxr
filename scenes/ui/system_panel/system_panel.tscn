@@ -2,7 +2,9 @@
 
 [ext_resource type="Script" uid="uid://dfeiaxmn5awtk" path="res://src/Game.Godot/UI/System/SystemPanel.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://5n52fg3sl8bk" path="res://assets/art/battle_bg/zhulin.jpg" id="2_background"]
+[ext_resource type="Texture2D" uid="uid://rp0frp5p0jig" path="res://assets/art/misc/cross.png" id="3_ndm7c"]
 [ext_resource type="Texture2D" uid="uid://b1n3vntrjjyry" path="res://assets/art/ui/icon_main_menu.svg" id="3_quit_icon"]
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://src/Game.Godot/UI/Base/JyButton.cs" id="4_7j340"]
 [ext_resource type="Texture2D" uid="uid://bbc8vj3vn1kxx" path="res://assets/art/ui/icon_load.svg" id="4_load_icon"]
 [ext_resource type="Texture2D" uid="uid://yw4d3sy6ibqr" path="res://assets/art/ui/icon_save.svg" id="5_save_icon"]
 [ext_resource type="Texture2D" uid="uid://bk4oxdt3ugto2" path="res://assets/art/ui/icon_delete.svg" id="6_delete_icon"]
@@ -146,155 +148,25 @@ offset_bottom = 1080.0
 grow_horizontal = 2
 mouse_filter = 2
 
-[node name="BackButton" type="Button" parent="ContentRoot" unique_id=1680764813]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 90)
-layout_mode = 0
-offset_left = 1537.0
-offset_top = 114.0
-offset_right = 1817.0
-offset_bottom = 204.0
-text = "返回游戏"
-
-[node name="SettingsVBox" type="VBoxContainer" parent="ContentRoot" unique_id=1628029161]
-layout_mode = 0
-offset_left = 94.0
-offset_top = 404.0
-offset_right = 716.0
-offset_bottom = 1068.0
-size_flags_vertical = 3
-theme_override_constants/separation = 12
-
-[node name="ShowBattleHpCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=241839893]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 68)
-layout_mode = 2
-text = "战斗血条显示"
-
-[node name="AutoSaveCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=1547401015]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 68)
-layout_mode = 2
-button_pressed = true
-text = "自动存档"
-
-[node name="AutoBattleCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=1797562101]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 68)
-layout_mode = 2
-text = "自动战斗"
-
-[node name="BattleSpeedUpCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=602575964]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 68)
-layout_mode = 2
-text = "战斗加速"
-
-[node name="BattleSpeedMultiplierRow" type="HBoxContainer" parent="ContentRoot/SettingsVBox" unique_id=1372084744]
-custom_minimum_size = Vector2(0, 68)
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="BattleSpeedMultiplierTitle" type="Label" parent="ContentRoot/SettingsVBox/BattleSpeedMultiplierRow" unique_id=1850405269]
-custom_minimum_size = Vector2(150, 0)
-layout_mode = 2
-text = "加速倍率"
-
-[node name="BattleSpeedMultiplierSlider" type="HSlider" parent="ContentRoot/SettingsVBox/BattleSpeedMultiplierRow" unique_id=6818955]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-min_value = 1.0
-max_value = 5.0
-value = 2.0
-
-[node name="BattleSpeedMultiplierValueLabel" type="Label" parent="ContentRoot/SettingsVBox/BattleSpeedMultiplierRow" unique_id=1441750479]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "2倍"
-
-[node name="ScreenAspectRow" type="HBoxContainer" parent="ContentRoot/SettingsVBox" unique_id=902061134]
-custom_minimum_size = Vector2(0, 68)
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="ScreenAspectTitle" type="Label" parent="ContentRoot/SettingsVBox/ScreenAspectRow" unique_id=759503675]
-custom_minimum_size = Vector2(150, 0)
-layout_mode = 2
-text = "画面尺寸"
-
-[node name="ScreenAspectOptionButton" type="OptionButton" parent="ContentRoot/SettingsVBox/ScreenAspectRow" unique_id=1056856894]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MusicCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=485689480]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 68)
-layout_mode = 2
-button_pressed = true
-text = "音乐"
-
-[node name="SfxCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=2144269868]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 68)
-layout_mode = 2
-button_pressed = true
-text = "音效"
-
-[node name="SettingsSpacer" type="Control" parent="ContentRoot/SettingsVBox" unique_id=86344426]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="ConsoleVBox" type="VBoxContainer" parent="ContentRoot" unique_id=1398615551]
+[node name="BackButton" type="TextureButton" parent="ContentRoot" unique_id=57524310]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 78.0
-offset_top = 45.0
-offset_right = 1543.0
-offset_bottom = 415.0
-theme_override_constants/separation = 18
-
-[node name="ConsoleTitle" type="Label" parent="ContentRoot/ConsoleVBox" unique_id=1313749824]
-layout_mode = 2
-theme_override_font_sizes/font_size = 42
-text = "命令行"
-
-[node name="InputRow" type="HBoxContainer" parent="ContentRoot/ConsoleVBox" unique_id=1760579999]
-layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="ConsoleInput" type="LineEdit" parent="ContentRoot/ConsoleVBox/InputRow" unique_id=1705413527]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 84)
-layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "输入指令..."
-keep_editing_on_text_submit = true
-
-[node name="ExecuteButton" type="Button" parent="ContentRoot/ConsoleVBox/InputRow" unique_id=681298942]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(190, 84)
-layout_mode = 2
-text = "执行"
-
-[node name="ConsoleOutput" type="RichTextLabel" parent="ContentRoot/ConsoleVBox" unique_id=1236216528]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 200)
-layout_mode = 2
-size_flags_horizontal = 3
-bbcode_enabled = true
+offset_left = 1688.0
+offset_top = 3.0
+offset_right = 1879.0
+offset_bottom = 178.0
+texture_normal = ExtResource("3_ndm7c")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("4_7j340")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
 
 [node name="ActionRow" type="Control" parent="ContentRoot" unique_id=1158134751]
 anchors_preset = 0
-offset_left = 922.0
-offset_top = 646.0
-offset_right = 1813.0
-offset_bottom = 1016.0
+offset_left = 1023.0
+offset_top = 708.0
+offset_right = 1914.0
+offset_bottom = 1078.0
 
 [node name="MainMenuButton" type="Button" parent="ContentRoot/ActionRow" unique_id=858266893]
 unique_name_in_owner = true
@@ -547,3 +419,171 @@ theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 44
 text = "存档"
 horizontal_alignment = 1
+
+[node name="ConsoleVBox" type="VBoxContainer" parent="ContentRoot" unique_id=1398615551]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 78.0
+offset_top = 45.0
+offset_right = 1549.0
+offset_bottom = 415.0
+theme_override_constants/separation = 18
+
+[node name="ConsoleTitle" type="Label" parent="ContentRoot/ConsoleVBox" unique_id=1313749824]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "命令行"
+
+[node name="InputRow" type="HBoxContainer" parent="ContentRoot/ConsoleVBox" unique_id=1760579999]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ConsoleInput" type="LineEdit" parent="ContentRoot/ConsoleVBox/InputRow" unique_id=1705413527]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "输入指令..."
+keep_editing_on_text_submit = true
+
+[node name="ExecuteButton" type="Button" parent="ContentRoot/ConsoleVBox/InputRow" unique_id=681298942]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 84)
+layout_mode = 2
+text = "执行"
+
+[node name="ConsoleOutput" type="RichTextLabel" parent="ContentRoot/ConsoleVBox" unique_id=1236216528]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+
+[node name="SettingsVBox" type="VBoxContainer" parent="ContentRoot" unique_id=1628029161]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 342.0
+offset_right = 490.0
+offset_bottom = 1072.0
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="ShowBattleBoardCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=178949392]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+button_pressed = true
+text = "战斗棋盘显示"
+
+[node name="ShowBattleHpCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=241839893]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+text = "战斗血条显示"
+
+[node name="AutoBattleCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=1797562101]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+text = "自动战斗"
+
+[node name="BattleSpeedUpCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=602575964]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+text = "战斗加速"
+
+[node name="MusicCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=485689480]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+button_pressed = true
+text = "音乐"
+
+[node name="SfxCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=2144269868]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+button_pressed = true
+text = "音效"
+
+[node name="AutoSaveCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=1547401015]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+button_pressed = true
+text = "自动存档"
+
+[node name="LargeMapMovementAnimationCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=100000213]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+button_pressed = true
+text = "大地图移动动画"
+
+[node name="TypewriterDialogCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=1858744057]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+button_pressed = true
+text = "对话逐字显示"
+
+[node name="SettingsVBox2" type="VBoxContainer" parent="ContentRoot" unique_id=513766603]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SettingsVBoxExtra" type="VBoxContainer" parent="ContentRoot" unique_id=761857004]
+layout_mode = 0
+offset_left = 784.0
+offset_top = 352.0
+offset_right = 1456.0
+offset_bottom = 830.0
+
+[node name="BattleSpeedMultiplierRow" type="HBoxContainer" parent="ContentRoot/SettingsVBoxExtra" unique_id=1372084744]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BattleSpeedMultiplierTitle" type="Label" parent="ContentRoot/SettingsVBoxExtra/BattleSpeedMultiplierRow" unique_id=1850405269]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "加速倍率"
+
+[node name="BattleSpeedMultiplierSlider" type="HSlider" parent="ContentRoot/SettingsVBoxExtra/BattleSpeedMultiplierRow" unique_id=6818955]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 1.0
+max_value = 5.0
+value = 2.0
+
+[node name="BattleSpeedMultiplierValueLabel" type="Label" parent="ContentRoot/SettingsVBoxExtra/BattleSpeedMultiplierRow" unique_id=1441750479]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "2倍"
+
+[node name="ScreenAspectRow" type="HBoxContainer" parent="ContentRoot/SettingsVBoxExtra" unique_id=902061134]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ScreenAspectTitle" type="Label" parent="ContentRoot/SettingsVBoxExtra/ScreenAspectRow" unique_id=759503675]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "画面尺寸"
+
+[node name="ScreenAspectOptionButton" type="OptionButton" parent="ContentRoot/SettingsVBoxExtra/ScreenAspectRow" unique_id=1056856894]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 50

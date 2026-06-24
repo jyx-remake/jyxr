@@ -11,9 +11,12 @@ public sealed record UserSettingsRecord(
 	int BattleSpeedMultiplier,
 	bool MusicEnabled,
 	bool SfxEnabled,
+	bool DialogueTypewriterEnabled,
+	bool ShowBattleBoard,
+	bool LargeMapMovementAnimationEnabled,
 	ScreenAspectMode ScreenAspectMode)
 {
-	public const int CurrentVersion = 3;
+	public const int CurrentVersion = 6;
 
 	public static UserSettingsRecord Default { get; } = new(
 		CurrentVersion,
@@ -24,5 +27,8 @@ public sealed record UserSettingsRecord(
 		BattleSpeedMultiplier: 2,
 		MusicEnabled: true,
 		SfxEnabled: true,
+		DialogueTypewriterEnabled: true,
+		ShowBattleBoard: true,
+		LargeMapMovementAnimationEnabled: true,
 		ScreenAspectMode: ScreenAspectMode.Unlimited);
 }

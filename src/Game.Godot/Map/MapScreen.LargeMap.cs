@@ -543,6 +543,14 @@ public partial class MapScreen
 			return;
 		}
 
+		if (!Game.Settings.LargeMapMovementAnimationEnabled)
+		{
+			ResetLargeMapInputState();
+			_mapPin.Position = to;
+			_currentLargeMapResult = _currentLargeMapResult with { HeroPosition = movement.To };
+			return;
+		}
+
 		ResetLargeMapInputState();
 		_isPlayingLargeMapMovement = true;
 		_mapPin.Position = from;

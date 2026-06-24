@@ -37,12 +37,28 @@ public partial class BattleBoardView : Control
 	private GridPosition? _hoveredCell;
 	private Node2D _combatantLayer = null!;
 	private Node2D _effectLayer = null!;
+	private bool _showBaseBoard = true;
 
 	private sealed record QueuedFloatText(string Text, Color Color);
 
 	public event Action<GridPosition>? CellPressed;
 
 	public event Action<GridPosition?>? HoveredCellChanged;
+
+	public bool ShowBaseBoard
+	{
+		get => _showBaseBoard;
+		set
+		{
+			if (_showBaseBoard == value)
+			{
+				return;
+			}
+
+			_showBaseBoard = value;
+			QueueRedraw();
+		}
+	}
 
 	public override void _Ready()
 	{
@@ -308,9 +324,16 @@ public partial class BattleBoardView : Control
 				}
 
 				var rect = ResolveCellRect(position);
-				DrawRect(rect, cell.Color);
-				DrawRect(rect, BorderColor, false, 2f);
-				DrawCellText(font, rect, cell.Label);
+				if (_showBaseBoard || cell.HasOverlay)
+				{
+					DrawRect(rect, cell.Color);
+				}
+
+				if (_showBaseBoard)
+				{
+					DrawRect(rect, BorderColor, false, 2f);
+					DrawCellText(font, rect, cell.Label);
+				}
 			}
 		}
 	}
@@ -520,7 +543,8 @@ public sealed record BattleBoardCellVisual(
 	GridPosition Position,
 	string Label,
 	Color Color,
-	bool IsInteractive);
+	bool IsInteractive,
+	bool HasOverlay);
 
 public sealed record BattleBoardUnitVisual(
 	string UnitId,

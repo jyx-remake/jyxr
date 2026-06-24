@@ -148,7 +148,13 @@ public partial class StoryDialoguePanel : Control
 			return;
 		}
 
-		StartTypewriter();
+		if (global::Game.Godot.Game.Settings.DialogueTypewriterEnabled)
+		{
+			StartTypewriter();
+			return;
+		}
+
+		RevealFullText();
 	}
 
 	private void OnShadowPanelGuiInput(InputEvent @event)

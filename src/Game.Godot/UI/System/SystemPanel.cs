@@ -16,10 +16,13 @@ public partial class SystemPanel : Control
 	private readonly List<string> _consoleLines = [];
 
 	private UserSettingsRecord _settings = UserSettingsRecord.Default;
+	private CheckBox _showBattleBoardCheckBox = null!;
 	private CheckBox _showBattleHpCheckBox = null!;
 	private CheckBox _autoSaveCheckBox = null!;
+	private CheckBox _largeMapMovementAnimationCheckBox = null!;
 	private CheckBox _autoBattleCheckBox = null!;
 	private CheckBox _battleSpeedUpCheckBox = null!;
+	private CheckBox _typewriterDialogCheckBox = null!;
 	private HSlider _battleSpeedMultiplierSlider = null!;
 	private Label _battleSpeedMultiplierValueLabel = null!;
 	private OptionButton _screenAspectOptionButton = null!;
@@ -29,7 +32,7 @@ public partial class SystemPanel : Control
 	private LineEdit _consoleInput = null!;
 	private RichTextLabel _consoleOutput = null!;
 	private Button _executeButton = null!;
-	private Button _backButton = null!;
+	private BaseButton _backButton = null!;
 	private Button _mainMenuButton = null!;
 	private Button _loadButton = null!;
 	private Button _saveButton = null!;
@@ -41,16 +44,19 @@ public partial class SystemPanel : Control
 		_consoleInput = GetNode<LineEdit>("%ConsoleInput");
 		_consoleOutput = GetNode<RichTextLabel>("%ConsoleOutput");
 		_executeButton = GetNode<Button>("%ExecuteButton");
-		_backButton = GetNode<Button>("%BackButton");
+		_backButton = GetNode<BaseButton>("%BackButton");
 		_mainMenuButton = GetNode<Button>("%MainMenuButton");
 		_loadButton = GetNode<Button>("%LoadButton");
 		_saveButton = GetNode<Button>("%SaveButton");
 		_deleteSaveButton = GetNode<Button>("%DeleteSaveButton");
 
+		_showBattleBoardCheckBox = GetNode<CheckBox>("%ShowBattleBoardCheckBox");
 		_showBattleHpCheckBox = GetNode<CheckBox>("%ShowBattleHpCheckBox");
 		_autoSaveCheckBox = GetNode<CheckBox>("%AutoSaveCheckBox");
+		_largeMapMovementAnimationCheckBox = GetNode<CheckBox>("%LargeMapMovementAnimationCheckBox");
 		_autoBattleCheckBox = GetNode<CheckBox>("%AutoBattleCheckBox");
 		_battleSpeedUpCheckBox = GetNode<CheckBox>("%BattleSpeedUpCheckBox");
+		_typewriterDialogCheckBox = GetNode<CheckBox>("%TypewriterDialogCheckBox");
 		_battleSpeedMultiplierSlider = GetNode<HSlider>("%BattleSpeedMultiplierSlider");
 		_battleSpeedMultiplierValueLabel = GetNode<Label>("%BattleSpeedMultiplierValueLabel");
 		_screenAspectOptionButton = GetNode<OptionButton>("%ScreenAspectOptionButton");
@@ -65,10 +71,13 @@ public partial class SystemPanel : Control
 		_saveButton.Pressed += OnSavePressed;
 		_deleteSaveButton.Pressed += OnDeleteSavePressed;
 
+		_showBattleBoardCheckBox.Toggled += enabled => OnSettingToggled("战斗棋盘显示", enabled);
 		_showBattleHpCheckBox.Toggled += enabled => OnSettingToggled("战斗血条显示", enabled);
 		_autoSaveCheckBox.Toggled += enabled => OnSettingToggled("自动存档", enabled);
+		_largeMapMovementAnimationCheckBox.Toggled += enabled => OnSettingToggled("大地图移动动画", enabled);
 		_autoBattleCheckBox.Toggled += enabled => OnSettingToggled("自动战斗", enabled);
 		_battleSpeedUpCheckBox.Toggled += enabled => OnSettingToggled("战斗加速", enabled);
+		_typewriterDialogCheckBox.Toggled += enabled => OnSettingToggled("对话逐字显示", enabled);
 		_battleSpeedMultiplierSlider.ValueChanged += OnBattleSpeedMultiplierChanged;
 		_screenAspectOptionButton.ItemSelected += OnScreenAspectSelected;
 		_musicCheckBox.Toggled += enabled => OnSettingToggled("音乐", enabled);
@@ -127,10 +136,13 @@ public partial class SystemPanel : Control
 
 	private void ApplySettingsToControls(UserSettingsRecord settings)
 	{
+		_showBattleBoardCheckBox.SetPressedNoSignal(settings.ShowBattleBoard);
 		_showBattleHpCheckBox.SetPressedNoSignal(settings.ShowBattleHp);
 		_autoSaveCheckBox.SetPressedNoSignal(settings.AutoSave);
+		_largeMapMovementAnimationCheckBox.SetPressedNoSignal(settings.LargeMapMovementAnimationEnabled);
 		_autoBattleCheckBox.SetPressedNoSignal(settings.AutoBattle);
 		_battleSpeedUpCheckBox.SetPressedNoSignal(settings.BattleSpeedUp);
+		_typewriterDialogCheckBox.SetPressedNoSignal(settings.DialogueTypewriterEnabled);
 		_battleSpeedMultiplierSlider.SetValueNoSignal(ClampBattleSpeedMultiplier(settings.BattleSpeedMultiplier));
 		UpdateBattleSpeedMultiplierLabel((int)_battleSpeedMultiplierSlider.Value);
 		SelectScreenAspectNoSignal(settings.ScreenAspectMode);
@@ -183,6 +195,9 @@ public partial class SystemPanel : Control
 		ClampBattleSpeedMultiplier((int)Math.Round(_battleSpeedMultiplierSlider.Value)),
 		_musicCheckBox.ButtonPressed,
 		_sfxCheckBox.ButtonPressed,
+		_typewriterDialogCheckBox.ButtonPressed,
+		_showBattleBoardCheckBox.ButtonPressed,
+		_largeMapMovementAnimationCheckBox.ButtonPressed,
 		ReadSelectedScreenAspect());
 
 	private void UpdateBattleSpeedMultiplierLabel(int multiplier)

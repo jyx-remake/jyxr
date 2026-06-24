@@ -3,6 +3,9 @@
 public sealed class GameSettings
 {
     public bool AutoSave { get; set; } = true;
+    public bool DialogueTypewriterEnabled { get; set; } = true;
+    public bool ShowBattleBoard { get; set; } = true;
+    public bool LargeMapMovementAnimationEnabled { get; set; } = true;
     public int TimeScale { get; set; } = 1;
     public float MasterVolume { get; set; } = 1.0f;
     public float MusicVolume { get; set; } = 0.8f;

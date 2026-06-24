@@ -17,6 +17,9 @@ public static class UserSettingsApplier
 		if (Game.IsInitialized)
 		{
 			Game.Settings.AutoSave = settings.AutoSave;
+			Game.Settings.DialogueTypewriterEnabled = settings.DialogueTypewriterEnabled;
+			Game.Settings.ShowBattleBoard = settings.ShowBattleBoard;
+			Game.Settings.LargeMapMovementAnimationEnabled = settings.LargeMapMovementAnimationEnabled;
 		}
 
 		ApplyBusEnabled(BgmBusName, settings.MusicEnabled);
