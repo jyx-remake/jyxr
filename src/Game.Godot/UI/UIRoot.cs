@@ -72,6 +72,7 @@ public partial class UIRoot : Control
 
 	public CanvasLayer HudLayer { get; private set; } = null!;
 	public CanvasLayer PanelLayer { get; private set; } = null!;
+	public CanvasLayer BattleLayer { get; private set; } = null!;
 	public CanvasLayer ModalLayer { get; private set; } = null!;
 	public CanvasLayer OverlayLayer { get; private set; } = null!;
 	private HudPanel? _hud;
@@ -94,6 +95,7 @@ public partial class UIRoot : Control
 	{
 		HudLayer = GetNode<CanvasLayer>("%HudLayer");
 		PanelLayer = GetNode<CanvasLayer>("%PanelLayer");
+		BattleLayer = GetNode<CanvasLayer>("%BattleLayer");
 		ModalLayer = GetNode<CanvasLayer>("%ModalLayer");
 		OverlayLayer = GetNode<CanvasLayer>("%OverlayLayer");
 		_hud = GetNodeOrNull<HudPanel>("%Hud");
@@ -492,7 +494,7 @@ public partial class UIRoot : Control
 			throw new InvalidOperationException("Battle screen scene root must be BattleScreen.");
 		}
 
-		ModalLayer.AddChild(screen);
+		BattleLayer.AddChild(screen);
 		configure(screen);
 		return await screen.AwaitBattleAsync(cancellationToken);
 	}

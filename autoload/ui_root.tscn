@@ -68,6 +68,10 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 layer = 20
 
+[node name="BattleLayer" type="CanvasLayer" parent="." unique_id=100000212]
+unique_name_in_owner = true
+layer = 25
+
 [node name="ModalLayer" type="CanvasLayer" parent="." unique_id=697258805]
 unique_name_in_owner = true
 layer = 30
