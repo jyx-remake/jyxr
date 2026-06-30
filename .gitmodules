@@ -4,6 +4,3 @@
 [submodule "jyx-legacy-dll"]
 	path = jyx-legacy-dll
 	url = https://github.com/jyx-remake/jyx-legacy-dll
-[submodule "data"]
-	path = data
-	url = https://github.com/jyx-remake/jyxr-data

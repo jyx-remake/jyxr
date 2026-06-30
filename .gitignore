@@ -8,6 +8,7 @@ TestResults/
 *.userosscache
 *.rsuser
 *.ncrunch*
+.agent
 .idea/
 .vscode/
 .codex-temp
@@ -19,6 +20,7 @@ coverage/
 /assets/art
 /assets/audio
 /assets/font
+/mods
 .godot/
 .import/
 mono_crash.*.json
