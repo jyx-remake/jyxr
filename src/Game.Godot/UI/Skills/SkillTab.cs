@@ -12,7 +12,7 @@ public partial class SkillTab : Control
 	[Export]
 	public PackedScene SkillBoxScene { get; set; } = null!;
 
-	public bool IsInteractive { get; set; }
+	public bool IsReadOnly { get; set; } = true;
 
 	private GridContainer _gridContainer = null!;
 	private Label _emptyLabel = null!;
@@ -69,7 +69,7 @@ public partial class SkillTab : Control
 			throw new InvalidOperationException("SkillBox scene root must be SkillBox.");
 		}
 
-		skillBox.Setup(skill, IsInteractive);
+		skillBox.Setup(skill, isInteractive: !IsReadOnly);
 		skillBox.ToggleRequested += OnSkillBoxToggleRequested;
 		skillBox.DetailRequested += OnSkillBoxDetailRequested;
 		return skillBox;

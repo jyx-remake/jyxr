@@ -12,10 +12,10 @@ public partial class DetailPanelHost : Control
 
 	private Control? _currentPanel;
 
-	public Control ShowSkill(SkillInstance skill)
+	public Control ShowSkill(SkillInstance skill, DetailPanelAction? action = null)
 	{
 		ArgumentNullException.ThrowIfNull(skill);
-		return Show(DetailPanelContentFactory.CreateSkill(skill));
+		return Show(DetailPanelContentFactory.CreateSkill(skill, action));
 	}
 
 	public Control ShowInventoryEntry(InventoryEntry entry, DetailPanelAction? action = null)

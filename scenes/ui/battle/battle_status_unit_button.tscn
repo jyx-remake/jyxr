@@ -1,0 +1,108 @@
+[gd_scene format=3 uid="uid://cw2lo46cxge44"]
+
+[ext_resource type="Script" uid="uid://cv5x3kottdm0n" path="res://src/Game.Godot/UI/Battle/Widgets/BattleStatusUnitButton.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="2_avatar"]
+
+[sub_resource type="StyleBoxFlat" id="1_normal"]
+bg_color = Color(0.08, 0.06, 0.04, 0.72)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.48, 0.24, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="2_hover"]
+bg_color = Color(0.23, 0.18, 0.1, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.48, 0.24, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxEmpty" id="3_focus"]
+
+[sub_resource type="StyleBoxFlat" id="4_selected"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.85, 0.34, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="BattleStatusUnitButton" type="Button"]
+custom_minimum_size = Vector2(124, 150)
+offset_right = 124.0
+offset_bottom = 150.0
+focus_mode = 0
+mouse_filter = 1
+theme_override_styles/normal = SubResource("1_normal")
+theme_override_styles/pressed = SubResource("2_hover")
+theme_override_styles/hover = SubResource("2_hover")
+theme_override_styles/focus = SubResource("3_focus")
+script = ExtResource("1_script")
+
+[node name="Avatar" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 8.0
+offset_right = 102.0
+offset_bottom = 88.0
+mouse_filter = 2
+texture = ExtResource("2_avatar")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 88.0
+offset_right = 118.0
+offset_bottom = 116.0
+theme_override_colors/font_color = Color(0.94, 0.88, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "角色"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="HpLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 116.0
+offset_right = 118.0
+offset_bottom = 142.0
+theme_override_colors/font_color = Color(0.72, 1, 0.72, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
+text = "0/0"
+horizontal_alignment = 1
+
+[node name="SelectedFrame" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("4_selected")

@@ -224,7 +224,8 @@ public partial class UIRoot : Control
 
 	public Control ShowGameFinScreen() => ShowMainPanel(GameFinScreenScene, "game fin screen");
 
-	public Control ShowSkillDetailPanel(SkillInstance skill) => _detailPanelHost.ShowSkill(skill);
+	public Control ShowSkillDetailPanel(SkillInstance skill, DetailPanelAction? action = null) =>
+		_detailPanelHost.ShowSkill(skill, action);
 
 	public Control ShowInventoryEntryDetailPanel(
 		InventoryEntry entry,

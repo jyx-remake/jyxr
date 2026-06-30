@@ -26,6 +26,7 @@
 [ext_resource type="Texture2D" uid="uid://dukqh5gd77ixk" path="res://assets/art/ui/battle/touxiang.png" id="26_surrender_button"]
 [ext_resource type="PackedScene" uid="uid://dtbij03bvh027" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
 [ext_resource type="PackedScene" uid="uid://cnfci8vqthgqc" path="res://scenes/ui/battle/battle_selected_skill_box.tscn" id="28_selected_skill_box"]
+[ext_resource type="PackedScene" uid="uid://bucx4fp6bcml8" path="res://scenes/ui/battle/battle_status_panel.tscn" id="29_status_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
 bg_color = Color(0, 0, 0, 0.72)
@@ -58,6 +59,7 @@ BattleSkillBoxScene = ExtResource("18_skill_box")
 BattleItemPanelScene = ExtResource("20_item_panel")
 BattleLegendOverlayScene = ExtResource("21_legend_overlay")
 BattleSettlementPanelScene = ExtResource("27_settlement_panel")
+BattleStatusPanelScene = ExtResource("29_status_panel")
 
 [node name="Background" type="TextureRect" parent="." unique_id=372176778]
 unique_name_in_owner = true
@@ -347,7 +349,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_action")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
 text = "结束"
 
-[node name="SkillButton" type="TextureButton" parent="BottomRightHud" unique_id=250363507]
+[node name="StatusButton" type="TextureButton" parent="BottomRightHud" unique_id=250363507]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = -325.0
@@ -358,7 +360,7 @@ texture_normal = ExtResource("15_skill_btn")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="SkillWord" type="TextureRect" parent="BottomRightHud/SkillButton" unique_id=1217349101]
+[node name="StatusWord" type="TextureRect" parent="BottomRightHud/StatusButton" unique_id=1217349101]
 layout_mode = 0
 offset_left = 33.0
 offset_top = 11.0

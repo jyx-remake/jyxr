@@ -4,6 +4,7 @@
 - 技能等级上限目前已接入 `GameConfig.MaxExternalSkillLevel` / `GameConfig.MaxInternalSkillLevel` 作为普通技能实例默认上限。legacy `maxlevel` 剧情命令当前只做技能存在性校验并发 toast，不写入技能实例；后续如要支持动态突破上限，需要重新建模“技能精通/上限提升”的持久化归属。
 - 武学书授予等级与配置上限的关系仍待明确：如果物品效果显式授予等级高于 `GameConfig` 技能等级上限，当前应决定是把授予等级 clamp 到配置上限，还是允许该物品抬高单个技能实例上限。
 - 随机战斗临时敌人的技能上限不按玩家技能实例上限配置单独设置。legacy 行为是按 `NPC_SKILL_LEVEL_ADD_BY_ZHOUMU` 增加 NPC 实际技能等级，并 clamp 到 `MAX_SKILL_LEVEL` / `MAX_INTERNALSKILL_LEVEL`；后续如复刻高周目 NPC 强化，应接入等级加成规则，而不是简单给临时敌人写入配置化 `MaxLevel`。
+- 玩家主动“遗忘技能”当前复用 `CharacterService.RemoveExternalSkill` / `RemoveInternalSkill` / `RemoveSpecialSkill`，并在 Godot UI 层限制派生技能和当前装备内功。后续如玩家交互规则与剧情强制 `remove` 明确分叉，再补应用层专门语义。
 - 内容加载目前只是“DTO 校验 + 按顺序构建 runtime definitions”，还不是真正的二阶段加载。后续如需支持定义间循环依赖，应改成“先注册 runtime definition 空壳，再统一 resolve 引用”的两阶段装配流程。
 - 当前 affix 引用解析集中在 `JsonContentLoader.ResolveAffixes(...)`，而不是各 definition 自己的 `Resolve(...)` 方法。后续如继续扩展 affix 来源，应把 affix 引用解析入口收敛成更明确的专门服务或 definition 统一协议，避免新增来源时漏掉 `GrantTalentAffix` 等需要 resolve 的条目。
 - `博览群书` 当前先用现有无参数 trait 表达，并在奥义触发率计算中写死触发倍率 `+0.5`；后续如果类似规则增多，可考虑把 trait 升级为带参数规则 trait，避免规则数值长期散落在代码里。
