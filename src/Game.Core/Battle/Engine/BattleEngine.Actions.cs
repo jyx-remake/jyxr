@@ -118,6 +118,7 @@ public sealed partial class BattleEngine
             context.Source = unit;
             context.Skill = resolvedSkill;
         });
+        unit.RecordUsedSkill(skill.Id);
         EndActionCore(state, unit, committedMainAction: true);
         return BattleActionResult.Succeeded(
             string.Empty,
