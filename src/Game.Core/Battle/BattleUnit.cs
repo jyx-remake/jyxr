@@ -7,7 +7,7 @@ namespace Game.Core.Battle;
 
 public sealed class BattleUnit
 {
-    public const int MaxRage = 6;
+    public const int MaxRage = CharacterInstance.MaxBattleRage;
 
     private readonly List<BattleBuffInstance> _buffs = [];
     private readonly HashSet<string> _disabledSkillIds = new(StringComparer.Ordinal);

@@ -35,6 +35,8 @@ public sealed class MapService
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(mapId);
 
+        _session.BattleService.RestorePartyBattleResources();
+
         var map = ContentRepository.GetMap(mapId);
         State.Location.ChangeMap(map.Id);
         _session.Events.Publish(new MapChangedEvent(map.Id));

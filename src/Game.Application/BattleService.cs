@@ -237,6 +237,27 @@ public sealed class BattleService
         _session.Events.Publish(new InventoryChangedEvent());
     }
 
+    public void ApplyPlayerBattleCarryover(BattleState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+
+        foreach (var playerUnit in GetRewardEligiblePlayerUnits(state))
+        {
+            playerUnit.Character.ApplyBattleCarryover(
+                playerUnit.Hp,
+                playerUnit.Mp,
+                playerUnit.Rage);
+        }
+    }
+
+    public void RestorePartyBattleResources()
+    {
+        foreach (var member in State.Party.Members)
+        {
+            member.RestoreBattleResources();
+        }
+    }
+
     public OrdinaryBattleVictorySettlement PreviewZhenlongqijuVictorySettlement(
         BattleState state,
         int level)
@@ -732,5 +753,8 @@ public sealed class BattleService
             character,
             team,
             position,
-            facing <= 0 ? BattleFacing.Left : BattleFacing.Right);
+            facing <= 0 ? BattleFacing.Left : BattleFacing.Right,
+            hp: character.CurrentHp,
+            mp: character.CurrentMp,
+            rage: character.CurrentRage);
 }

@@ -7,6 +7,8 @@ namespace Game.Core.Model.Character;
 
 public sealed class CharacterInstance
 {
+    public const int MaxBattleRage = 6;
+
     public required string Id { get; init; }
     public required CharacterDefinition Definition { get; init; }
     public required string Name { get; set; }
@@ -17,6 +19,9 @@ public sealed class CharacterInstance
     public int Level { get; private set; } = 1;
     public int Experience { get; private set; }
     public int UnspentStatPoints { get; private set; }
+    public int? CurrentHp { get; private set; }
+    public int? CurrentMp { get; private set; }
+    public int CurrentRage { get; private set; }
 
     public CharacterAffixSnapshot Snapshot { get; private set; } = CharacterAffixSnapshot.Empty;
     public IReadOnlySet<TalentDefinition> EffectiveTalents => Snapshot.EffectiveTalents;
@@ -309,6 +314,25 @@ public sealed class CharacterInstance
         return SkillListMutation.Remove(SpecialSkills, skillId, beforeRemove: null);
     }
 
+    public void ApplyBattleCarryover(int hp, int mp, int rage)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(hp);
+        ArgumentOutOfRangeException.ThrowIfNegative(mp);
+        ArgumentOutOfRangeException.ThrowIfNegative(rage);
+
+        CurrentHp = Math.Clamp(hp, 0, ResolveMaxHp());
+        CurrentMp = Math.Clamp(mp, 0, ResolveMaxMp());
+        CurrentRage = Math.Clamp(rage, 0, MaxBattleRage);
+    }
+
+    public void RestoreBattleResources()
+    {
+        CurrentHp = ResolveMaxHp();
+        CurrentMp = ResolveMaxMp();
+        CurrentRage = 0;
+        ResetSkillCooldowns();
+    }
+
     public void AddEquipmentInstance(EquipmentInstance equipmentInstance)
     {
         if (EquippedItems.Values.Any(instance => string.Equals(instance.Id, equipmentInstance.Id, StringComparison.Ordinal)))
@@ -348,6 +372,7 @@ public sealed class CharacterInstance
     {
         var resolvedAffixSet = AffixResolver.Resolve(CollectActiveAffixes(), UnlockedTalents);
         Snapshot = SnapshotBuilder.Build(resolvedAffixSet);
+        ClampBattleResources();
     }
 
     private IReadOnlyList<AffixDefinition> CollectActiveAffixes()
@@ -406,6 +431,43 @@ public sealed class CharacterInstance
     private static ModifierBucket GetBucket<TKey>(IReadOnlyDictionary<TKey, ModifierBucket> buckets, TKey key)
         where TKey : notnull =>
         buckets.TryGetValue(key, out var bucket) ? bucket : ModifierBucket.Empty;
+
+    private void ResetSkillCooldowns()
+    {
+        foreach (var skill in ExternalSkills)
+        {
+            skill.ResetBattleCooldown();
+        }
+
+        foreach (var skill in InternalSkills)
+        {
+            skill.ResetBattleCooldown();
+        }
+
+        foreach (var skill in SpecialSkills)
+        {
+            skill.ResetBattleCooldown();
+        }
+    }
+
+    private void ClampBattleResources()
+    {
+        if (CurrentHp is not null)
+        {
+            CurrentHp = Math.Clamp(CurrentHp.Value, 0, ResolveMaxHp());
+        }
+
+        if (CurrentMp is not null)
+        {
+            CurrentMp = Math.Clamp(CurrentMp.Value, 0, ResolveMaxMp());
+        }
+
+        CurrentRage = Math.Clamp(CurrentRage, 0, MaxBattleRage);
+    }
+
+    private int ResolveMaxHp() => Math.Max(1, (int)Math.Round(GetStat(StatType.MaxHp)));
+
+    private int ResolveMaxMp() => Math.Max(0, (int)Math.Round(GetStat(StatType.MaxMp)));
 
     private ExternalSkillInstance CreateExternalSkill(ExternalSkillDefinition definition, int level, int exp, bool canUseInBattle, int? maxLevel = null) =>
         new(definition, this, canUseInBattle)
