@@ -10,7 +10,7 @@ namespace Game.Godot.UI;
 
 public static class DetailPanelContentFactory
 {
-	public static DetailPanelContent CreateSkill(SkillInstance skill)
+	public static DetailPanelContent CreateSkill(SkillInstance skill, DetailPanelAction? action = null)
 	{
 		ArgumentNullException.ThrowIfNull(skill);
 
@@ -19,7 +19,8 @@ public static class DetailPanelContentFactory
 			ResolveSkillCategory(skill),
 			ResolveSkillIcon(skill),
 			SkillDescriptionFormatter.FormatBbCodeCn(skill, Game.ContentRepository),
-			ResolveSkillTitleColor(skill));
+			ResolveSkillTitleColor(skill),
+			action);
 	}
 
 	public static DetailPanelContent CreateInventoryEntry(

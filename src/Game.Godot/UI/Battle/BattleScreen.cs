@@ -50,6 +50,9 @@ public partial class BattleScreen : Control
 	[Export]
 	public PackedScene BattleSettlementPanelScene { get; set; } = null!;
 
+	[Export]
+	public PackedScene BattleStatusPanelScene { get; set; } = null!;
+
 	private BattlePresenter _presenter = null!;
 	private readonly BattleUiStateMachine _uiState = new();
 	private readonly LocalUserSettingsStore _settingsStore = new();
@@ -82,7 +85,7 @@ public partial class BattleScreen : Control
 	private BattleBoardView _boardGrid = null!;
 	private BattleSelectedSkillBox _selectedSkillBox = null!;
 	private BaseButton _moveButton = null!;
-	private BaseButton _skillButton = null!;
+	private BaseButton _statusButton = null!;
 	private BaseButton _itemButton = null!;
 	private BaseButton _restButton = null!;
 	private BaseButton _endButton = null!;
@@ -108,7 +111,7 @@ public partial class BattleScreen : Control
 		_boardGrid = GetNode<BattleBoardView>("%BoardGrid");
 		_selectedSkillBox = GetNode<BattleSelectedSkillBox>("%BattleSelectedSkillBox");
 		_moveButton = GetNode<BaseButton>("%MoveButton");
-		_skillButton = GetNode<BaseButton>("%SkillButton");
+		_statusButton = GetNode<BaseButton>("%StatusButton");
 		_itemButton = GetNode<BaseButton>("%ItemButton");
 		_restButton = GetNode<BaseButton>("%RestButton");
 		_endButton = GetNode<BaseButton>("%EndButton");
@@ -139,11 +142,7 @@ public partial class BattleScreen : Control
 			_uiState.SelectMove();
 			RefreshAll();
 		};
-		_skillButton.Pressed += () =>
-		{
-			_uiState.SelectSkillList();
-			RefreshAll();
-		};
+		_statusButton.Pressed += OpenStatusPanel;
 		_itemButton.Pressed += async () => await OpenItemPanelAsync();
 		_restButton.Pressed += async () =>
 		{
@@ -489,7 +488,9 @@ public partial class BattleScreen : Control
 			!_isResolvingSkillPresentation &&
 			!IsAutoBattleEnabled();
 		_moveButton.Disabled = !isActing;
-		_skillButton.Disabled = !isActing;
+		_statusButton.Disabled = _state is null ||
+			_uiState.Mode == BattleUiMode.BattleEnded ||
+			_isResolvingSkillPresentation;
 		_itemButton.Disabled = !isActing;
 		_restButton.Disabled = !isActing;
 		_endButton.Disabled = !isActing;
@@ -634,6 +635,29 @@ public partial class BattleScreen : Control
 
 		_uiState.SelectItemTarget(selectedEntry);
 		RefreshAll();
+	}
+
+	private void OpenStatusPanel()
+	{
+		if (_state is null || _uiState.Mode == BattleUiMode.BattleEnded)
+		{
+			return;
+		}
+
+		if (BattleStatusPanelScene is null)
+		{
+			throw new InvalidOperationException("BattleStatusPanelScene is not assigned.");
+		}
+
+		var instance = BattleStatusPanelScene.Instantiate();
+		if (instance is not BattleStatusPanel panel)
+		{
+			instance.QueueFree();
+			throw new InvalidOperationException("Battle status panel scene root must be BattleStatusPanel.");
+		}
+
+		panel.Configure(_state, PlayerTeam);
+		_overlayRoot.AddChild(panel);
 	}
 
 	private void RefreshAvatar()

@@ -35,6 +35,20 @@ public partial class CharacterAttributeTab : Control
 	private Control _assignStatWidget = null!;
 	private JyButton _assignStatCloseButton = null!;
 	private string _characterId = string.Empty;
+	private bool _isReadOnly;
+
+	public bool IsReadOnly
+	{
+		get => _isReadOnly;
+		set
+		{
+			_isReadOnly = value;
+			if (_isReadOnly && IsInsideTree())
+			{
+				HideAssignStatWidget();
+			}
+		}
+	}
 
 	public override void _Ready()
 	{
@@ -61,9 +75,9 @@ public partial class CharacterAttributeTab : Control
 		ArgumentNullException.ThrowIfNull(character);
 		_characterId = character.Id;
 		_pointLabel.Text = character.UnspentStatPoints.ToString();
-		_addPointButton.Disabled = character.UnspentStatPoints <= 0;
+		_addPointButton.Disabled = IsReadOnly || character.UnspentStatPoints <= 0;
 
-		if (character.UnspentStatPoints <= 0)
+		if (IsReadOnly || character.UnspentStatPoints <= 0)
 		{
 			HideAssignStatWidget();
 		}
@@ -79,7 +93,7 @@ public partial class CharacterAttributeTab : Control
 
 	private void OnAddPointButtonPressed()
 	{
-		if (_addPointButton.Disabled)
+		if (IsReadOnly || _addPointButton.Disabled)
 		{
 			return;
 		}
@@ -89,6 +103,11 @@ public partial class CharacterAttributeTab : Control
 
 	private void OnAssignStatButtonPressed(StatType statType)
 	{
+		if (IsReadOnly)
+		{
+			return;
+		}
+
 		if (string.IsNullOrWhiteSpace(_characterId))
 		{
 			throw new InvalidOperationException("CharacterAttributeTab is not initialized with a character.");

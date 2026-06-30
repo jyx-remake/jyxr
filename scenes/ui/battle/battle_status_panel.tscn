@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://bucx4fp6bcml8"]
+
+[ext_resource type="Script" uid="uid://bc4kq4qgd1ek2" path="res://src/Game.Godot/UI/Battle/BattleStatusPanel.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://c7xwca038g3px" path="res://scenes/ui/character_panel/character_panel.tscn" id="2_character_panel"]
+[ext_resource type="PackedScene" uid="uid://cw2lo46cxge44" path="res://scenes/ui/battle/battle_status_unit_button.tscn" id="3_unit_button"]
+
+[node name="BattleStatusPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+UnitButtonScene = ExtResource("3_unit_button")
+
+[node name="CharacterPanel" parent="." instance=ExtResource("2_character_panel")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="ContentRoot" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -960.0
+offset_right = 960.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot"]
+layout_mode = 0
+offset_left = 1776.0
+offset_top = 111.0
+offset_right = 1916.0
+offset_bottom = 957.0
+horizontal_scroll_mode = 0
+
+[node name="UnitList" type="VBoxContainer" parent="ContentRoot/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8

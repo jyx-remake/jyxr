@@ -21,6 +21,7 @@ public partial class CharacterEquipmentTab : Control
 	private Label _accessoryEmptyLabel = null!;
 
 	private CharacterInstance? _character;
+	public bool IsReadOnly { get; set; }
 
 	public override void _Ready()
 	{
@@ -87,6 +88,11 @@ public partial class CharacterEquipmentTab : Control
 
 	private void OnSlotGuiInput(InputEvent inputEvent, EquipmentSlotType slotType)
 	{
+		if (IsReadOnly)
+		{
+			return;
+		}
+
 		if (inputEvent is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right })
 		{
 			return;
@@ -106,6 +112,11 @@ public partial class CharacterEquipmentTab : Control
 		var equipment = _character.GetEquipment(slotType);
 		if (equipment is null)
 		{
+			if (IsReadOnly)
+			{
+				return;
+			}
+
 			ShowEquipmentSelection(slotType);
 			return;
 		}
@@ -115,6 +126,12 @@ public partial class CharacterEquipmentTab : Control
 
 	private void ShowEquipmentDetail(EquipmentSlotType slotType, EquipmentInstance equipment)
 	{
+		if (IsReadOnly)
+		{
+			UIRoot.Instance.ShowEquipmentDetailPanel(equipment);
+			return;
+		}
+
 		var action = new DetailPanelAction(
 			"卸下",
 			true,
@@ -128,7 +145,7 @@ public partial class CharacterEquipmentTab : Control
 
 	private void ShowEquipmentSelection(EquipmentSlotType slotType)
 	{
-		if (_character is null)
+		if (_character is null || IsReadOnly)
 		{
 			return;
 		}
@@ -151,6 +168,11 @@ public partial class CharacterEquipmentTab : Control
 
 	private void Unequip(EquipmentSlotType slotType)
 	{
+		if (IsReadOnly)
+		{
+			return;
+		}
+
 		if (_character is null || _character.GetEquipment(slotType) is null)
 		{
 			UIRoot.Instance.ShowSuggestion("该装备槽为空。");

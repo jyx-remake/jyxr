@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Application.Formatters;
+using Game.Core.Battle;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
@@ -10,18 +11,26 @@ namespace Game.Godot.UI;
 
 public partial class CharacterPanel : JyPanel
 {
+	private string _characterId = string.Empty;
+	private CharacterPanelMode _mode = CharacterPanelMode.Editable;
+	private CharacterInstance? _character;
+	private BattleUnit? _battleUnit;
+
 	public string CharacterId
 	{
-		get;
+		get => _characterId;
 		set
 		{
-			field = value;
+			_characterId = value;
+			_character = null;
+			_battleUnit = null;
+			_mode = CharacterPanelMode.Editable;
 			if (IsInsideTree())
 			{
 				Render();
 			}
 		}
-	} = string.Empty;
+	}
 
 	private TextureRect _avatar = null!;
 	private Label _nameLabel = null!;
@@ -66,8 +75,6 @@ public partial class CharacterPanel : JyPanel
 		_talentButton = GetNode<JyButton>("%TalentButton");
 		_skillButton = GetNode<JyButton>("%SkillButton");
 		_biographyButton = GetNode<JyButton>("%BiographyButton");
-		_skillTab.IsInteractive = true;
-
 		_attrButton.Pressed += () => ShowTab(0);
 		_equipButton.Pressed += () => ShowTab(1);
 		_skillButton.Pressed += () => ShowTab(2);
@@ -78,6 +85,22 @@ public partial class CharacterPanel : JyPanel
 		_subscriptions.Add(Game.Session.Events.Subscribe<CharacterChangedEvent>(OnCharacterChanged));
 
 		if (!string.IsNullOrWhiteSpace(CharacterId))
+		{
+			Render();
+		}
+	}
+
+	public void Configure(
+		CharacterInstance character,
+		CharacterPanelMode mode = CharacterPanelMode.Editable,
+		BattleUnit? battleUnit = null)
+	{
+		ArgumentNullException.ThrowIfNull(character);
+		_character = character;
+		_characterId = character.Id;
+		_mode = mode;
+		_battleUnit = battleUnit;
+		if (IsInsideTree())
 		{
 			Render();
 		}
@@ -95,12 +118,12 @@ public partial class CharacterPanel : JyPanel
 
 	private void Render()
 	{
-		if (string.IsNullOrWhiteSpace(CharacterId))
+		var character = ResolveCharacter();
+		if (character is null)
 		{
 			throw new InvalidOperationException("CharacterPanel.CharacterId is required.");
 		}
 
-		var character = Game.State.Party.GetMember(CharacterId);
 		var portrait = AssetResolver.LoadCharacterPortrait(character);
 		if (portrait is not null)
 		{
@@ -109,8 +132,12 @@ public partial class CharacterPanel : JyPanel
 
 		_nameLabel.Text = character.Name;
 		_levelValueLabel.Text = character.Level.ToString();
-		_hpValueLabel.Text = ToDisplayStat(character.GetStat(StatType.MaxHp)).ToString();
-		_mpValueLabel.Text = ToDisplayStat(character.GetStat(StatType.MaxMp)).ToString();
+		_hpValueLabel.Text = _battleUnit is null
+			? ToDisplayStat(character.GetStat(StatType.MaxHp)).ToString()
+			: $"{_battleUnit.Hp}/{_battleUnit.MaxHp}";
+		_mpValueLabel.Text = _battleUnit is null
+			? ToDisplayStat(character.GetStat(StatType.MaxMp)).ToString()
+			: $"{_battleUnit.Mp}/{_battleUnit.MaxMp}";
 		_xpValueLabel.Text = character.Level >= Game.Config.MaxLevel
 			? "-/-"
 			: FormatExperienceProgress(character);
@@ -118,6 +145,10 @@ public partial class CharacterPanel : JyPanel
 		_attackValueLabel.Text = combatStats.Attack.ToString();
 		_defenceValueLabel.Text = combatStats.Defence.ToString();
 
+		var isReadOnly = _mode == CharacterPanelMode.ReadOnly;
+		_attributeTab.IsReadOnly = isReadOnly;
+		_equipmentTab.IsReadOnly = isReadOnly;
+		_skillTab.IsReadOnly = isReadOnly;
 		_attributeTab.Setup(character);
 		_equipmentTab.Setup(character);
 		_skillTab.Setup(character);
@@ -133,6 +164,11 @@ public partial class CharacterPanel : JyPanel
 
 	private void OnSkillToggleRequested(SkillInstance skill)
 	{
+		if (_mode == CharacterPanelMode.ReadOnly)
+		{
+			return;
+		}
+
 		switch (skill)
 		{
 			case ExternalSkillInstance externalSkill:
@@ -147,9 +183,12 @@ public partial class CharacterPanel : JyPanel
 		}
 	}
 
-	private static void OnSkillDetailRequested(SkillInstance skill)
+	private void OnSkillDetailRequested(SkillInstance skill)
 	{
-		UIRoot.Instance.ShowSkillDetailPanel(skill);
+		var action = _mode == CharacterPanelMode.ReadOnly
+			? null
+			: CharacterSkillDetailActionFactory.CreateForgetAction(skill);
+		UIRoot.Instance.ShowSkillDetailPanel(skill, action);
 	}
 
 	private void OnCharacterChanged(CharacterChangedEvent sessionEvent)
@@ -160,6 +199,18 @@ public partial class CharacterPanel : JyPanel
 		}
 
 		Render();
+	}
+
+	private CharacterInstance? ResolveCharacter()
+	{
+		if (_character is not null)
+		{
+			return _character;
+		}
+
+		return string.IsNullOrWhiteSpace(CharacterId)
+			? null
+			: Game.State.Party.GetMember(CharacterId);
 	}
 
 	private static string FormatExperienceProgress(CharacterInstance character)
