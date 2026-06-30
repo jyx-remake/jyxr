@@ -23,15 +23,21 @@
 
 ## 当前目录与数据位置
 
-- `data`
-  - 正式 JSON 内容包。Godot 侧通过 `res://data` 加载。
-  - 不要再把正式内容放回 `src/Game.Content/Data`。
+- `mods`
+  - 当前未提交的 MOD 化改造已把正式 JSON 内容从仓库根 `data` 迁到 `mods/jyxr-base/data`。
+  - `mods/jyxr-base/mod.json` 是基础内容包清单；内容目录固定约定为 MOD 根目录下的 `data`。
+  - `mods/jyxr-mod-test` 是当前本地测试 MOD，不应当按正式内容路径假设。
+- `launcher`
+  - 当前保存 launcher 级配置文件；`userdata/<modId>` 保存各 MOD 自己的存档、档案与设置。
 - `assets`
-  - Godot 资源目录，当前主要是 `art`、`audio`、战斗动画库与图集纹理。
+  - Godot 内置资源目录，当前主要是 `art`、`audio`、战斗动画库与图集纹理。
+  - MOD 资源覆盖走 PCK；不支持 loose assets 目录覆盖。
 - `autoload`
-  - Godot autoload 场景，包括 `World`、`UIRoot`、`AudioManager`。
+  - 目录名仍叫 `autoload`，但当前 `project.godot` 没有 `[autoload]` 注册。
+  - `World`、`UIRoot`、`AudioManager` 目前由 `GameRuntimeBootstrap` 手动实例化到 `/root/__GameRuntime` 下，实质是 bootstrap 托管的运行时单例节点，不是 Godot 项目设置里的 autoload。
 - `scenes`
-  - 当前 Godot 主场景、地图场景、HUD、剧情 UI、队伍 UI 等。
+  - 当前 Godot 主场景已切到 MOD launcher：`scenes/ui/mod_launcher/mod_launcher_panel.tscn`。
+  - 还包含地图场景、HUD、剧情 UI、队伍 UI 等。
 - `src/Game.Core`
   - 领域模型、定义模型、角色状态、技能实例、背包/装备实例、affix 投影、轻量战斗状态/引擎、剧情运行时、存档记录。
 - `src/Game.Content`
@@ -39,9 +45,11 @@
   - `SampleData` 只保留测试样例内容。
 - `src/Game.Application`
   - 应用态会话、全局档案、存读档、角色服务、背包服务、物品使用服务、商店服务、地图服务、剧情服务、剧情命令行、诊断日志抽象、会话事件。
+  - 当前未提交的 MOD 改造新增 `src/Game.Application/Mods`，包含 `ProjectDataRoot`、`ModManifest`、`ModContext`、`ModRegistry`、`ModStoragePaths`、`LauncherSettingsRecord`。
 - `src/Game.Godot`
   - Godot 宿主适配层源码，由根目录 `engine-free-rpg.csproj` 编译。
-  - 当前还包含 Godot 内容包加载、本地存档/档案持久化适配 `src/Game.Godot/Persistence`、主菜单、失败界面、储物箱 UI 和战斗 UI。
+  - 当前还包含 MOD runtime bootstrap、本地存档/档案持久化适配 `src/Game.Godot/Persistence`、主菜单、失败界面、储物箱 UI 和战斗 UI。
+  - 当前未提交的 MOD launcher UI 位于 `src/Game.Godot/UI/ModLauncher` 与 `scenes/ui/mod_launcher`。
 - `legacy_scenes`
   - 原 Godot/GDScript 参考场景，不是当前主运行路径。
 - `jyx-legacy-data` / `jyx-legacy-dll`
@@ -149,25 +157,38 @@
   - `StoryService`
   - `Audio`
   - `Logger`
-- `Game.Initialize(...)` 只接收已构造的 `GameSession` 和 logger；`GameConfig` 从 `GameSession.Config` 读取。它属于宿主启动装配，不属于业务流程调用点。
-- `GameConfig` 当前从 `data/game-config.json` 读取，并挂在 `GameSession` 上，承载开局剧情、初始队伍、储物箱容量、角色/技能上限和随机战斗音乐池等预览运行参数。
+- `Game.Initialize(...)` 当前接收已构造的 `GameSession`、当前 `ModContext` 和 logger；`GameConfig` 从 `GameSession.Config` 读取。它属于宿主启动装配，不属于业务流程调用点。
+- `Game.ActiveMod` 当前保存正在运行的 MOD 上下文；本地存档、档案和设置会通过它落到该 MOD 独立的 `userdata/<modId>` 目录。
+- `GameConfig` 当前从当前 MOD 的 `data/game-config.json` 读取，并挂在 `GameSession` 上，承载开局剧情、初始队伍、储物箱容量、角色/技能上限和随机战斗音乐池等预览运行参数。
 - `SessionFlowService` 当前负责新游戏与下一周目状态切换；下一周目保留银两和储物箱内容，周目数加 1，再按 `GameConfig.InitialPartyCharacterIds` 重建初始队伍。
 - `NewGameStateFactory` 当前集中创建新 `GameState`；初始化角色会调用 `LevelUpAllSkillsMaxLevel()` 把已有技能提到各自 `MaxLevel`。
-- `PreviewGameBootstrap` 当前通过 `GodotContentPackageLoader` 从 `res://data` 加载内容，读取 `game-config.json`，创建初始 `GameSession`，把 `UIRoot` 与 `TimedStoryCoordinator` 绑定到 session events，并尝试加载本地全局档案。
+- `PreviewGameBootstrap` 已被当前未提交的 MOD 改造移除。
+- `GameRuntimeBootstrap.Initialize(ModContext, SceneTree)` 当前负责：
+  - 确保 `/root/__GameRuntime` 下的 `World`、`UIRoot`、`AudioManager` 三个运行时节点存在。
+  - 在 runtime 节点实例化前按 manifest 顺序加载当前 MOD 的 PCK。
+  - 从 `ModContext.DataDirectoryPath` 读取 `game-config.json` 和 JSON 内容目录。
+  - 从 `ModContext.StoragePaths` 读取该 MOD 独立的设置与全局档案。
+  - 构造新的 `GameSession`，调用 `Game.Initialize(...)`，再把 `UIRoot` 与 `TimedStoryCoordinator` 绑定到 session events。
+- 当前重复调用 `GameRuntimeBootstrap.Initialize(...)` 会替换 `Game.Session` 和资源上下文，但不会销毁并重建 `World`、`UIRoot`、`AudioManager` 节点；因此它还不是完整的“热切换 MOD / reload runtime”流程。
 
 ## 当前内容加载设计
 
 - 正式内容默认按目录中的多个 JSON 文件加载，不再依赖单个大内容包文件。
-- 正式内容目录位于仓库根 `data`，Godot 侧通过 `res://data` 加载。
+- 当前未提交的 MOD 改造后，基础内容目录位于 `mods/jyxr-base/data`，Godot 侧不再通过 `res://data` 作为正式内容入口。
+- launcher 会按平台解析固定的 `ProjectDataRoot`，再从 `<ProjectDataRoot>/mods/*/mod.json` 发现可用 MOD。
+  - 编辑器调试：Godot 项目根。
+  - PC 导出：可执行文件所在目录。
+  - Android：`/storage/emulated/0/JYXR`。
+- 启动某个 MOD 后，`JsonContentLoader.LoadFromDirectory(ModContext.DataDirectoryPath)` 直接从该 MOD 的 loose `data` 目录加载内容。
 - `src/Game.Content/SampleData` 只保留测试样例内容。
-- `Game.Content.csproj` 通过链接根目录 `data/**/*.json` 把正式内容拷贝到输出目录。
+- `Game.Content.csproj` 当前不再链接根目录 `data/**/*.json`。
 - `JsonContentLoader` 入口包括：
   - `LoadFromDirectory(...)`
   - `LoadFromFile(...)`
   - `LoadFromPackage(...)`
 - 当前会加载 `story/*.story.json`，并把 segment id 建入内容仓储。
-- `ContentPackage` 当前是公开类型，允许 Godot 宿主先用自身文件 API 组装内容包，再交给 `JsonContentLoader.LoadFromPackage(...)` 构建仓储。
-- Godot 运行时通过 `GodotContentPackageLoader` 从 `res://data` 读取正式内容，避免导出后依赖 `ProjectSettings.GlobalizePath(...)` 和普通文件系统路径。
+- `ContentPackage` 当前仍是公开类型，保留给后续 pck/包式内容加载使用。
+- `GodotContentPackageLoader` 已不再是当前 MOD launcher 主运行路径；当前主路径是普通文件系统 loose MOD 目录。
 - 顶层 JSON 使用 `System.Text.Json` 直接反序列化到 runtime definition；当前不维护整套 `XxxDto -> XxxDefinition`。
 - `FormSkillDefinition.Icon` 当前允许为空；legacy 转换脚本不再为招式输出空 icon 字段。
 - 商店 JSON 当前支持 `price` 与 `premiumPrice`；旧 `contentId == "元宝"` 与 `*残章` 商品仍会被校验和运行时商店视图忽略。
@@ -455,14 +476,51 @@
   - 纹理走 `LoadTextureResource(...)`
   - 音频走 `LoadAudioResource(...)`
   - 角色头像、说话人展示等可以保留为语义包装，但不要重新实现资源 id 解析、路径拼接、扩展名回退和 `ResourceLoader` 检查。
+  - MOD 资源覆盖只通过 PCK；`AssetResolver` 不读取 MOD loose assets 目录。
   - 说话人展示优先查整个 `Party` 名册，因此 `Reserves` 中的角色改名和头像也会用于剧情对白。
   - 战斗动画库当前走 `LoadCombatantAnimation(...)` 与 `LoadSkillAnimation(...)`，底层从 `assets/animation` 解析 Godot `AnimationLibrary`。
 - `AudioManager.PlayBgm(IReadOnlyList<string>)` 是多 BGM 播放池入口；播放完一首后会从池子中随机挑下一首，并避免连续重复同一首。
 - 单首 BGM 播放完后循环当前曲目。
 - `TimedStoryCoordinator`
-  - 当前挂在 `World` 下，并由 `PreviewGameBootstrap` 绑定当前 session。
+  - 当前挂在 `World` 下，并由 `GameRuntimeBootstrap` 绑定当前 session。
   - 监听 `ClockChangedEvent` 与 `SaveLoadedEvent`，检查到期 story time key，等待当前剧情表现结束后排队运行目标剧情。
   - 限时剧情结束后，如果当前场景是地图，会刷新当前地图。
+
+## 当前 MOD 启动器改造状态（未提交）
+
+- 当前 `project.godot` 的 `run/main_scene` 已切到 `res://scenes/ui/mod_launcher/mod_launcher_panel.tscn`。
+- `ModLauncherPanel` 按平台解析固定 `ProjectDataRoot`，并从 `<ProjectDataRoot>/mods` 发现 MOD；不再提供目录选择器。
+  - 编辑器调试使用工程根。
+  - PC 导出使用可执行文件所在目录。
+  - Android 使用 `/storage/emulated/0/JYXR`。
+- `ModRegistry` 只识别带 `mod.json` 且拥有有效 `data` 目录的 MOD；`ModManifest` 当前包含：
+  - `id`
+  - `name`
+  - `version`
+  - `date`
+  - `description`
+  - `author`
+  - `packs`
+  - `assemblies`
+  - `minClientVersion`
+- 当前实现 loose data 与 PCK 资源包加载；`packs` 字段会按 manifest 顺序通过 `ProjectSettings.LoadResourcePack(..., replaceFiles: true)` 加载，`assemblies` 字段尚未加载外部程序集。
+- 当前基础内容包是 `mods/jyxr-base`；原仓库根 `data` 已迁移为 `mods/jyxr-base/data`。
+- 启动 MOD 后会进入主菜单；主菜单的新游戏、读档、音乐欣赏继续走原 `GameFlow`。
+- 各 MOD 的本地状态隔离在 `<ProjectDataRoot>/userdata/<modId>`：
+  - `saves/autosave.json`
+  - `saves/save-slot-{n}.json`
+  - `profile.json`
+  - `settings.json`
+- launcher 自身设置保存在 `<ProjectDataRoot>/launcher/settings.json`，当前只记录最后启动的 MOD id。
+- 当前 runtime 节点不是 Godot autoload：
+  - `autoload/world.tscn`
+  - `autoload/ui_root.tscn`
+  - `autoload/audio_manager.tscn`
+  只是被 `GameRuntimeBootstrap` 手动实例化到 `/root/__GameRuntime` 下。
+- 这三个节点内部通过 `World.Instance`、`UIRoot.Instance`、`AudioManager.Instance` 暴露运行时单例；调用前必须确保 `GameRuntimeBootstrap` 已执行并且节点 `_Ready()` 已完成。
+- Godot 运行期代码不应再通过 `/root/World` 这类路径查找 runtime 节点，避免把 bootstrap 托管节点误当 Godot autoload。
+- 当前重复启动不同 MOD 只会替换 `Game.Session`、`Game.ActiveMod` 并重绑 `UIRoot` / `TimedStoryCoordinator` 的 session events；不会自动销毁 `World`、`UIRoot`、`AudioManager`，也不会清空旧地图、旧面板、旧 toast 或正在播放的音乐。
+- 因此当前 MOD launcher 适合“进程内选择一个 MOD 后启动”；如果要支持不重启进程切换 MOD，需要补正式 runtime reset / reload 流程。
 
 ## 当前会话事件
 
@@ -593,7 +651,7 @@
   - 战斗飘字
   - 地图与剧情 battle 入口
 - 英雄面板、系统面板、存档槽选择面板、toast、hint 当前都已迁到 C# 运行路径。
-- `PreviewGameBootstrap` 当前默认初始队伍为：
+- 当前基础 MOD `mods/jyxr-base/data/game-config.json` 默认初始队伍为：
   - `主角`
   - `阿青`
   - `华山郭襄`
