@@ -11,6 +11,8 @@ public partial class SystemPanel : Control
 	private const int MaxConsoleLineCount = 8;
 	private const int MinBattleSpeedMultiplier = 1;
 	private const int MaxBattleSpeedMultiplier = 5;
+	private const int MinAudioVolume = 0;
+	private const int MaxAudioVolume = 100;
 
 	private readonly LocalUserSettingsStore _settingsStore = new();
 	private readonly List<string> _consoleLines = [];
@@ -25,6 +27,8 @@ public partial class SystemPanel : Control
 	private OptionButton _screenAspectOptionButton = null!;
 	private CheckBox _musicCheckBox = null!;
 	private CheckBox _sfxCheckBox = null!;
+	private HSlider _musicVolumeSlider = null!;
+	private HSlider _sfxVolumeSlider = null!;
 	private Control _consoleRoot = null!;
 	private LineEdit _consoleInput = null!;
 	private RichTextLabel _consoleOutput = null!;
@@ -56,6 +60,8 @@ public partial class SystemPanel : Control
 		_screenAspectOptionButton = GetNode<OptionButton>("%ScreenAspectOptionButton");
 		_musicCheckBox = GetNode<CheckBox>("%MusicCheckBox");
 		_sfxCheckBox = GetNode<CheckBox>("%SfxCheckBox");
+		_musicVolumeSlider = GetNode<HSlider>("%MusicVolumeSlider");
+		_sfxVolumeSlider = GetNode<HSlider>("%SfxVolumeSlider");
 
 		_executeButton.Pressed += OnExecutePressed;
 		_consoleInput.TextSubmitted += OnConsoleTextSubmitted;
@@ -73,6 +79,8 @@ public partial class SystemPanel : Control
 		_screenAspectOptionButton.ItemSelected += OnScreenAspectSelected;
 		_musicCheckBox.Toggled += enabled => OnSettingToggled("音乐", enabled);
 		_sfxCheckBox.Toggled += enabled => OnSettingToggled("音效", enabled);
+		_musicVolumeSlider.ValueChanged += _ => OnAudioVolumeChanged();
+		_sfxVolumeSlider.ValueChanged += _ => OnAudioVolumeChanged();
 
 		PopulateScreenAspectOptions();
 		LoadSettings();
@@ -136,6 +144,8 @@ public partial class SystemPanel : Control
 		SelectScreenAspectNoSignal(settings.ScreenAspectMode);
 		_musicCheckBox.SetPressedNoSignal(settings.MusicEnabled);
 		_sfxCheckBox.SetPressedNoSignal(settings.SfxEnabled);
+		_musicVolumeSlider.SetValueNoSignal(ClampAudioVolume(settings.MusicVolume));
+		_sfxVolumeSlider.SetValueNoSignal(ClampAudioVolume(settings.SfxVolume));
 	}
 
 	private void OnBattleSpeedMultiplierChanged(double value)
@@ -174,6 +184,22 @@ public partial class SystemPanel : Control
 		}
 	}
 
+	private void OnAudioVolumeChanged()
+	{
+		var musicVolume = ClampAudioVolume((int)Math.Round(_musicVolumeSlider.Value));
+		var sfxVolume = ClampAudioVolume((int)Math.Round(_sfxVolumeSlider.Value));
+		_musicVolumeSlider.SetValueNoSignal(musicVolume);
+		_sfxVolumeSlider.SetValueNoSignal(sfxVolume);
+		if (_settings.MusicVolume == musicVolume && _settings.SfxVolume == sfxVolume)
+		{
+			return;
+		}
+
+		_settings = ReadSettingsFromControls();
+		UserSettingsApplier.Apply(_settings);
+		SaveSettings(_settings);
+	}
+
 	private UserSettingsRecord ReadSettingsFromControls() => new(
 		UserSettingsRecord.CurrentVersion,
 		_showBattleHpCheckBox.ButtonPressed,
@@ -183,6 +209,8 @@ public partial class SystemPanel : Control
 		ClampBattleSpeedMultiplier((int)Math.Round(_battleSpeedMultiplierSlider.Value)),
 		_musicCheckBox.ButtonPressed,
 		_sfxCheckBox.ButtonPressed,
+		ClampAudioVolume((int)Math.Round(_musicVolumeSlider.Value)),
+		ClampAudioVolume((int)Math.Round(_sfxVolumeSlider.Value)),
 		ReadSelectedScreenAspect());
 
 	private void UpdateBattleSpeedMultiplierLabel(int multiplier)
@@ -192,6 +220,9 @@ public partial class SystemPanel : Control
 
 	private static int ClampBattleSpeedMultiplier(int multiplier) =>
 		Math.Clamp(multiplier, MinBattleSpeedMultiplier, MaxBattleSpeedMultiplier);
+
+	private static int ClampAudioVolume(int volume) =>
+		Math.Clamp(volume, MinAudioVolume, MaxAudioVolume);
 
 	private void PopulateScreenAspectOptions()
 	{

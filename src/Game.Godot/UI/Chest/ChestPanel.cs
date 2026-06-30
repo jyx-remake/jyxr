@@ -80,12 +80,14 @@ public partial class ChestPanel : JyPanel
 
 	private void SelectMode(ChestMode mode)
 	{
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		_mode = mode;
 		Refresh();
 	}
 
 	private void SelectCategory(ChestCategory category)
 	{
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		_selectedCategory = category;
 		Refresh();
 	}

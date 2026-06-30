@@ -123,6 +123,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 	{
 		try
 		{
+			global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 			if (_mode == SaveSlotPanelMode.Save)
 			{
 				await SaveToSlotAsync(slotIndex);
@@ -146,6 +147,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private void LoadFromAutoSave()
 	{
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		if (!_saveStore.TryLoadAutoSave(out var envelope, out var failureReason) || envelope is null)
 		{
 			UIRoot.Instance.ShowSuggestion(BuildLoadFailureText(LocalSaveStore.AutoSaveSlotIndex, failureReason));

@@ -11,6 +11,9 @@ public partial class JyButton : TextureButton
 	[Export]
 	public Color PressColor { get; set; } = new(0.8f, 0.8f, 0.8f);
 
+	[Export]
+	public string PressSfxId { get; set; } = "音效.UI.点击";
+
 	private Vector2 _originPosition;
 	private bool _signalsConnected;
 
@@ -31,6 +34,7 @@ public partial class JyButton : TextureButton
 		_originPosition = Position;
 		Position = _originPosition + PressOffset;
 		Modulate = PressColor;
+		global::Game.Godot.Game.Audio.PlaySfx(PressSfxId);
 		OnPressedDown();
 	}
 

@@ -73,5 +73,6 @@ pivot_offset_ratio = Vector2(0.5, 0.5)
 texture_normal = ExtResource("3_close")
 PressOffset = null
 PressColor = null
+PressSfxId = "音效.UI.关闭"
 
 [connection signal="pressed" from="CloseButton" to="." method="OnCloseButtonPressed"]

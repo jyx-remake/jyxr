@@ -74,6 +74,7 @@ public partial class ItemTargetCharacterBox : Button
 			return;
 		}
 
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		if (!_candidate.CanUse)
 		{
 			UIRoot.Instance.ShowSuggestion(_candidate.Reason);
