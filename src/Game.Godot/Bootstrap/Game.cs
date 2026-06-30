@@ -1,4 +1,5 @@
 using Game.Application;
+using Game.Application.Mods;
 using Game.Core.Abstractions;
 using Game.Core.Model;
 using Game.Core.Persistence;
@@ -17,6 +18,7 @@ public static class Game
 {
 	private static GameSession _currentSession = null!;
 	private static IDiagnosticLogger _diagnosticLogger = null!;
+	private static ModContext _activeMod = null!;
 
 	public static bool IsInitialized =>
 		_currentSession is not null &&
@@ -84,23 +86,35 @@ public static class Game
 	public static MapService MapService => Session.MapService;
 	public static StoryService StoryService => Session.StoryService;
 	public static AudioManager Audio => AudioManager.Instance;
+	public static ModContext ActiveMod
+	{
+		get
+		{
+			EnsureInitialized();
+			return _activeMod;
+		}
+	}
+
 	public static GameClientPlatformKind ClientPlatform => ResolveClientPlatform();
 	public static bool IsDesktopPlatform => ClientPlatform == GameClientPlatformKind.Desktop;
 	public static bool IsMobilePlatform => ClientPlatform == GameClientPlatformKind.Mobile;
 
 	public static void Initialize(
 		GameSession initialSession,
+		ModContext activeMod,
 		IDiagnosticLogger? diagnosticLogger = null)
 	{
 		ArgumentNullException.ThrowIfNull(initialSession);
+		ArgumentNullException.ThrowIfNull(activeMod);
 		if (initialSession.Config.InitialPartyCharacterIds.Count == 0)
 		{
 			throw new InvalidOperationException("Game initialization requires at least one initial party character.");
 		}
 
 		_currentSession = initialSession;
+		_activeMod = activeMod;
 		_diagnosticLogger = diagnosticLogger ?? NullDiagnosticLogger.Instance;
-		_diagnosticLogger.Info("Game initialized.");
+		_diagnosticLogger.Info($"Game initialized with mod '{activeMod.ModId}'.");
 	}
 
 	public static void LoadSave(SaveGame saveGame)

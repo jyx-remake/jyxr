@@ -15,6 +15,11 @@ public partial class MainMenu : Control
 
 	public override void _Ready()
 	{
+		if (!Game.IsInitialized)
+		{
+			throw new InvalidOperationException("Game runtime must be initialized by the mod launcher before opening main menu.");
+		}
+
 		_background = GetNode<TextureRect>("%Bg");
 		_startButton = GetNode<TextureButton>("%StartButton");
 		_loadButton = GetNode<TextureButton>("%LoadButton");
@@ -24,7 +29,6 @@ public partial class MainMenu : Control
 		_loadButton.Pressed += OnLoadPressed;
 		_musicButton.Pressed += OnMusicPressed;
 
-		PreviewGameBootstrap.Initialize();
 		_background.Texture = AssetResolver.LoadTextureResource(Game.Config.MainMenuBackground);
 		UIRoot.Instance.SetHudSuppressed(true);
 		Game.Audio.PlayBgm(Game.Config.MainMenuMusic);

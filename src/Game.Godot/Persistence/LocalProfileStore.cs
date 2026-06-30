@@ -3,21 +3,18 @@ using Game.Application;
 using Game.Core.Model;
 using Game.Core.Persistence;
 using Game.Core.Serialization;
-using Godot;
 
 namespace Game.Godot.Persistence;
 
 public sealed class LocalProfileStore
 {
-	public const string DefaultProfilePath = "user://saves/profile.json";
+	private readonly string? _profilePath;
+	private readonly IDiagnosticLogger? _logger;
 
-	private readonly string _profilePath;
-
-	public LocalProfileStore(string? profilePath = null)
+	public LocalProfileStore(string? profilePath = null, IDiagnosticLogger? logger = null)
 	{
-		_profilePath = string.IsNullOrWhiteSpace(profilePath)
-			? DefaultProfilePath
-			: profilePath.Trim();
+		_profilePath = string.IsNullOrWhiteSpace(profilePath) ? null : Path.GetFullPath(profilePath.Trim());
+		_logger = logger;
 	}
 
 	public string SaveCurrentProfile()
@@ -32,7 +29,7 @@ public sealed class LocalProfileStore
 		Directory.CreateDirectory(directoryPath);
 		var json = JsonSerializer.Serialize(Game.ProfileService.CreateProfileRecord(), GameJson.Default);
 		File.WriteAllText(absolutePath, json);
-		Game.Logger.Info($"Saved global profile to '{absolutePath}'.");
+		Logger.Info($"Saved global profile to '{absolutePath}'.");
 		return absolutePath;
 	}
 
@@ -51,26 +48,26 @@ public sealed class LocalProfileStore
 			var loadedProfile = JsonSerializer.Deserialize<GameProfileRecord>(json, GameJson.Default);
 			if (loadedProfile is null)
 			{
-				Game.Logger.Warning($"Global profile could not be deserialized: {absolutePath}");
+				Logger.Warning($"Global profile could not be deserialized: {absolutePath}");
 				profile = null;
 				return false;
 			}
 
 			if (loadedProfile.Version != GameProfileRecord.CurrentVersion)
 			{
-				Game.Logger.Warning(
+				Logger.Warning(
 					$"Global profile version mismatch: {loadedProfile.Version}, supported {GameProfileRecord.CurrentVersion}. Falling back to empty profile.");
 				profile = null;
 				return false;
 			}
 
-			Game.Logger.Info($"Loaded global profile from '{absolutePath}'.");
+			Logger.Info($"Loaded global profile from '{absolutePath}'.");
 			profile = loadedProfile;
 			return true;
 		}
 		catch (Exception exception)
 		{
-			Game.Logger.Warning($"Global profile read failed: {absolutePath}. {exception.Message}");
+			Logger.Warning($"Global profile read failed: {absolutePath}. {exception.Message}");
 			profile = null;
 			return false;
 		}
@@ -83,5 +80,7 @@ public sealed class LocalProfileStore
 			? profile
 			: GameProfileRecord.Create(new GameProfile());
 
-	private string ResolveAbsolutePath() => ProjectSettings.GlobalizePath(_profilePath);
+	private string ResolveAbsolutePath() => _profilePath ?? Game.ActiveMod.StoragePaths.ProfilePath;
+
+	private IDiagnosticLogger Logger => _logger ?? Game.Logger;
 }

@@ -254,21 +254,5 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeH
 		};
 	}
 
-	private static World GetWorld() => GetRequiredNode<World>("/root/World");
-
-	private static T GetRequiredNode<T>(string path) where T : Node
-	{
-		if (Engine.GetMainLoop() is not SceneTree tree)
-		{
-			throw new InvalidOperationException("Godot scene tree is not available.");
-		}
-
-		var node = tree.Root.GetNodeOrNull<T>(path);
-		if (node is null)
-		{
-			throw new InvalidOperationException($"Required Godot node is missing: {path}.");
-		}
-
-		return node;
-	}
+	private static World GetWorld() => World.Instance;
 }

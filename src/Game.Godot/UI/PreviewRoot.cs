@@ -1,4 +1,5 @@
 using Godot;
+using Game.Application.Mods;
 
 namespace Game.Godot.UI;
 
@@ -14,7 +15,9 @@ public partial class PreviewRoot : Control
 	{
 		try
 		{
-			PreviewGameBootstrap.Initialize();
+			var root = ProjectDataRoot.FromPath(ProjectSettings.GlobalizePath("res://"));
+			var mod = new ModRegistry(root).LoadRequired("jyxr-base");
+			GameRuntimeBootstrap.Initialize(mod, GetTree());
 			OpenMap();
 		}
 		catch (Exception exception)
@@ -27,8 +30,7 @@ public partial class PreviewRoot : Control
 	{
 		try
 		{
-			var world = GetNode<World>("/root/World");
-			world.ShowMap("南贤屋内");
+			World.Instance.ShowMap("南贤屋内");
 		}
 		catch (Exception exception)
 		{

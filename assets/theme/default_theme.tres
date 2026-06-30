@@ -1,8 +1,8 @@
 [gd_resource type="Theme" format=3 uid="uid://dlcvf85pnfgve"]
 
 [ext_resource type="FontFile" uid="uid://cdfrmippp180d" path="res://assets/font/LXGWWenKaiMonoGBLite-Medium.ttf" id="1_ag65a"]
-[ext_resource type="Texture2D" uid="uid://dm0vjpb2ne3ac" path="res://assets/art/ui/checkbox_checked.svg" id="1_xul1n"]
-[ext_resource type="Texture2D" uid="uid://caaqngs56a3px" path="res://assets/art/ui/checkbox_empty.svg" id="2_ehq15"]
+[ext_resource type="Texture2D" uid="uid://dm0vjpb2ne3ac" path="res://assets/theme/art/checkbox_checked.svg" id="1_xul1n"]
+[ext_resource type="Texture2D" uid="uid://caaqngs56a3px" path="res://assets/theme/art/checkbox_empty.svg" id="2_ehq15"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ehq15"]
 bg_color = Color(0, 0, 0, 0.627451)
