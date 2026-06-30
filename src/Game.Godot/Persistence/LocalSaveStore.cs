@@ -1,10 +1,10 @@
 using System.Linq;
 using System.Text.Json;
 using Game.Application;
+using Game.Application.Mods;
 using Game.Core.Model;
 using Game.Core.Persistence;
 using Game.Core.Serialization;
-using Godot;
 
 namespace Game.Godot.Persistence;
 
@@ -21,8 +21,12 @@ public sealed class LocalSaveStore
 {
 	public const int SlotCount = 8;
 	public const int AutoSaveSlotIndex = 0;
-	private const string SavePathFormat = "user://saves/save-slot-{0}.json";
-	private const string AutoSavePath = "user://saves/autosave.json";
+	private readonly ModStoragePaths? _storagePaths;
+
+	public LocalSaveStore(ModStoragePaths? storagePaths = null)
+	{
+		_storagePaths = storagePaths;
+	}
 
 	public string SaveCurrentSession(int slotIndex)
 	{
@@ -31,7 +35,7 @@ public sealed class LocalSaveStore
 	}
 
 	public string SaveCurrentSessionToAutoSave() =>
-		SaveCurrentSession(AutoSavePath, "autosave");
+		SaveCurrentSession(ResolveAutoSavePath(), "autosave");
 
 	private static string SaveCurrentSession(string savePath, string logName)
 	{
@@ -40,7 +44,7 @@ public sealed class LocalSaveStore
 			Game.SaveGameService.CreateSave(),
 			DateTimeOffset.UtcNow);
 
-		var absolutePath = ResolveAbsolutePath(savePath);
+		var absolutePath = savePath;
 		var directoryPath = Path.GetDirectoryName(absolutePath);
 		if (string.IsNullOrWhiteSpace(directoryPath))
 		{
@@ -68,8 +72,8 @@ public sealed class LocalSaveStore
 
 	public bool TryLoadAutoSave(out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
 	{
-		var absolutePath = ResolveAbsolutePath(AutoSavePath);
-		if (!TryReadEnvelope(AutoSavePath, out envelope, out failureReason))
+		var absolutePath = ResolveAutoSavePath();
+		if (!TryReadEnvelope(absolutePath, out envelope, out failureReason))
 		{
 			return false;
 		}
@@ -121,12 +125,12 @@ public sealed class LocalSaveStore
 
 	public LocalSaveSlotSummary GetAutoSaveSummary()
 	{
-		if (!File.Exists(ResolveAbsolutePath(AutoSavePath)))
+		if (!File.Exists(ResolveAutoSavePath()))
 		{
 			return new LocalSaveSlotSummary(AutoSaveSlotIndex, Title: "自动存档");
 		}
 
-		if (!TryReadEnvelope(AutoSavePath, out var envelope, out var failureReason) || envelope is null)
+		if (!TryReadEnvelope(ResolveAutoSavePath(), out var envelope, out var failureReason) || envelope is null)
 		{
 			return new LocalSaveSlotSummary(AutoSaveSlotIndex, HasSave: true, Title: "自动存档", FailureReason: failureReason);
 		}
@@ -167,14 +171,16 @@ public sealed class LocalSaveStore
 		}
 	}
 
-	private static string ResolveSavePath(int slotIndex) =>
-		string.Format(SavePathFormat, slotIndex);
+	private string ResolveSavePath(int slotIndex) =>
+		StoragePaths.GetSaveSlotPath(slotIndex);
 
-	private static string ResolveAbsolutePath(int slotIndex) => ResolveAbsolutePath(ResolveSavePath(slotIndex));
+	private string ResolveAbsolutePath(int slotIndex) => ResolveSavePath(slotIndex);
 
-	private static string ResolveAbsolutePath(string savePath) => ProjectSettings.GlobalizePath(savePath);
+	private string ResolveAutoSavePath() => StoragePaths.AutoSavePath;
 
-	private static bool TryReadEnvelope(int slotIndex, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
+	private ModStoragePaths StoragePaths => _storagePaths ?? Game.ActiveMod.StoragePaths;
+
+	private bool TryReadEnvelope(int slotIndex, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
 	{
 		ValidateSlotIndex(slotIndex);
 		return TryReadEnvelope(ResolveSavePath(slotIndex), out envelope, out failureReason);
@@ -182,7 +188,7 @@ public sealed class LocalSaveStore
 
 	private static bool TryReadEnvelope(string savePath, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
 	{
-		var absolutePath = ResolveAbsolutePath(savePath);
+		var absolutePath = savePath;
 		if (!File.Exists(absolutePath))
 		{
 			return Fail(out envelope, out failureReason, LocalSaveReadFailureReason.MissingFile);

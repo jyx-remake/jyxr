@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://cedgv7xkofuwx"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/mod_launcher/mod_item_card.tscn" id="1_card"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/ModLauncher/ModShowcasePage.cs" id="2_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_empty"]
+bg_color = Color(0.08, 0.065, 0.05, 0.28)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.9, 0.7, 0.18)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="ModShowcasePage" type="Control" unique_id=385496908]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_script")
+ModItemCardScene = ExtResource("1_card")
+
+[node name="RootMargin" type="MarginContainer" parent="." unique_id=1477861873]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
+
+[node name="Root" type="VBoxContainer" parent="RootMargin" unique_id=729452248]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ScrollContainer" type="ScrollContainer" parent="RootMargin/Root" unique_id=1501630196]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CardList" type="VBoxContainer" parent="RootMargin/Root/ScrollContainer" unique_id=105208366]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="ModItemCard" parent="RootMargin/Root/ScrollContainer/CardList" unique_id=1090499943 instance=ExtResource("1_card")]
+layout_mode = 2
+
+[node name="EmptyState" type="PanelContainer" parent="RootMargin/Root/ScrollContainer/CardList" unique_id=2132123763]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(1040, 96)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_empty")
+
+[node name="Label" type="Label" parent="RootMargin/Root/ScrollContainer/CardList/EmptyState" unique_id=721677642]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.76)
+theme_override_font_sizes/font_size = 24
+text = "暂无 MOD"
+horizontal_alignment = 1
+vertical_alignment = 1

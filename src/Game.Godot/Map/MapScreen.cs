@@ -363,7 +363,7 @@ public partial class MapScreen : Control
 			throw new InvalidOperationException("Map story event is missing target story id.");
 		}
 
-		var world = GetNode<World>("/root/World");
+		var world = World.Instance;
 		UIRoot.Instance.SetStoryPresentationActive(true);
 
 		try

@@ -1,21 +1,18 @@
 using System.Text.Json;
 using Game.Application;
 using Game.Core.Serialization;
-using Godot;
 
 namespace Game.Godot.Persistence;
 
 public sealed class LocalUserSettingsStore
 {
-	public const string DefaultSettingsPath = "user://settings.json";
+	private readonly string? _settingsPath;
+	private readonly IDiagnosticLogger? _logger;
 
-	private readonly string _settingsPath;
-
-	public LocalUserSettingsStore(string? settingsPath = null)
+	public LocalUserSettingsStore(string? settingsPath = null, IDiagnosticLogger? logger = null)
 	{
-		_settingsPath = string.IsNullOrWhiteSpace(settingsPath)
-			? DefaultSettingsPath
-			: settingsPath.Trim();
+		_settingsPath = string.IsNullOrWhiteSpace(settingsPath) ? null : Path.GetFullPath(settingsPath.Trim());
+		_logger = logger;
 	}
 
 	public string Save(UserSettingsRecord settings)
@@ -32,7 +29,7 @@ public sealed class LocalUserSettingsStore
 		Directory.CreateDirectory(directoryPath);
 		var json = JsonSerializer.Serialize(settings, GameJson.Default);
 		File.WriteAllText(absolutePath, json);
-		Game.Logger.Info($"Saved user settings to '{absolutePath}'.");
+		Logger.Info($"Saved user settings to '{absolutePath}'.");
 		return absolutePath;
 	}
 
@@ -51,26 +48,26 @@ public sealed class LocalUserSettingsStore
 			var loadedSettings = JsonSerializer.Deserialize<UserSettingsRecord>(json, GameJson.Default);
 			if (loadedSettings is null)
 			{
-				Game.Logger.Warning($"User settings could not be deserialized: {absolutePath}");
+				Logger.Warning($"User settings could not be deserialized: {absolutePath}");
 				settings = null;
 				return false;
 			}
 
 			if (loadedSettings.Version != UserSettingsRecord.CurrentVersion)
 			{
-				Game.Logger.Warning(
+				Logger.Warning(
 					$"User settings version mismatch: {loadedSettings.Version}, supported {UserSettingsRecord.CurrentVersion}. Falling back to defaults.");
 				settings = null;
 				return false;
 			}
 
 			settings = loadedSettings;
-			Game.Logger.Info($"Loaded user settings from '{absolutePath}'.");
+			Logger.Info($"Loaded user settings from '{absolutePath}'.");
 			return true;
 		}
 		catch (Exception exception)
 		{
-			Game.Logger.Warning($"User settings read failed: {absolutePath}. {exception.Message}");
+			Logger.Warning($"User settings read failed: {absolutePath}. {exception.Message}");
 			settings = null;
 			return false;
 		}
@@ -81,5 +78,7 @@ public sealed class LocalUserSettingsStore
 			? settings
 			: UserSettingsRecord.Default;
 
-	private string ResolveAbsolutePath() => ProjectSettings.GlobalizePath(_settingsPath);
+	private string ResolveAbsolutePath() => _settingsPath ?? Game.ActiveMod.StoragePaths.SettingsPath;
+
+	private IDiagnosticLogger Logger => _logger ?? Game.Logger;
 }

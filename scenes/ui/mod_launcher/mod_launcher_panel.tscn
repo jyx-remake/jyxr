@@ -1,0 +1,195 @@
+[gd_scene format=3 uid="uid://b7mjhun0ww0f6"]
+
+[ext_resource type="Texture2D" uid="uid://dfioecvq005w8" path="res://assets/launcher_art/laucher_background.jpg" id="2_cge5m"]
+[ext_resource type="Texture2D" uid="uid://b3oseyuugmxbw" path="res://assets/launcher_art/laucher_dikuang2.png" id="3_kn506"]
+[ext_resource type="Texture2D" uid="uid://dqilfyhu5o6a7" path="res://assets/launcher_art/laucher_title.png" id="4_dm8n4"]
+[ext_resource type="Texture2D" uid="uid://ou3bahommq7a" path="res://assets/launcher_art/laucher_cross.png" id="5_3ylpc"]
+[ext_resource type="Texture2D" uid="uid://dcn6ok0liv8ql" path="res://assets/launcher_art/laucher_btn_heng.png" id="6_cge5m"]
+[ext_resource type="PackedScene" uid="uid://cedgv7xkofuwx" path="res://scenes/ui/mod_launcher/mod_showcase_page.tscn" id="6_showcase_page"]
+[ext_resource type="Script" uid="uid://byvsv71r5v85n" path="res://src/Game.Godot/UI/ModLauncher/ModLauncherPanel.cs" id="7_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dim"]
+bg_color = Color(0, 0, 0, 0.2)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 62
+font_color = Color(0.12, 0.095, 0.075, 1)
+outline_size = 8
+outline_color = Color(0.86, 0.76, 0.56, 0.58)
+shadow_size = 4
+shadow_color = Color(0, 0, 0, 0.42)
+
+[sub_resource type="LabelSettings" id="LabelSettings_white"]
+font_size = 38
+font_color = Color(0, 0, 0, 1)
+shadow_size = 3
+shadow_color = Color(0.5064698, 0.5064697, 0.5064697, 0.4509804)
+
+[sub_resource type="LabelSettings" id="LabelSettings_button"]
+font_size = 39
+font_color = Color(1, 1, 1, 0.95)
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_content"]
+bg_color = Color(0.16, 0.13, 0.09, 0.52)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="ModLauncherPanel" type="Control" unique_id=1994056591]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=303183031]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_cge5m")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dim" type="Panel" parent="." unique_id=1742029544]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dim")
+
+[node name="ContentRoot" type="Control" parent="." unique_id=176365953]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -960.0
+offset_right = 960.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Paper" type="TextureRect" parent="ContentRoot" unique_id=287057127]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.042
+anchor_top = 0.035
+anchor_right = 0.958
+anchor_bottom = 0.962
+mouse_filter = 2
+texture = ExtResource("3_kn506")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLogo" type="TextureRect" parent="ContentRoot" unique_id=131918305]
+layout_mode = 0
+offset_left = 514.0
+offset_top = 78.0
+offset_right = 965.19995
+offset_bottom = 218.40001
+mouse_filter = 2
+texture = ExtResource("4_dm8n4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleCross" type="TextureRect" parent="ContentRoot" unique_id=1193314320]
+layout_mode = 0
+offset_left = 954.0
+offset_top = 92.0
+offset_right = 1082.0
+offset_bottom = 209.0
+mouse_filter = 2
+texture = ExtResource("5_3ylpc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LauncherTitle" type="Label" parent="ContentRoot" unique_id=745204655]
+layout_mode = 0
+offset_left = 1086.0
+offset_top = 112.0
+offset_right = 1304.0
+offset_bottom = 211.0
+text = "启动器"
+label_settings = SubResource("LabelSettings_title")
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="ContentRoot" unique_id=49318989]
+layout_mode = 0
+offset_left = 334.0
+offset_top = 213.0
+offset_right = 1565.0
+offset_bottom = 312.0
+text = "说明：该Godot重置版启动器由金x爱好者自行制作，并免费、开源分享。
+江湖路远，侠心如初！"
+label_settings = SubResource("LabelSettings_white")
+autowrap_mode = 3
+
+[node name="SideButtons" type="VBoxContainer" parent="ContentRoot" unique_id=256536755]
+visible = false
+layout_mode = 0
+offset_left = 161.0
+offset_top = 312.0
+offset_right = 401.16003
+offset_bottom = 722.4
+theme_override_constants/separation = 32
+
+[node name="LocalModButton" type="TextureButton" parent="ContentRoot/SideButtons" unique_id=62498828]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 110)
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("6_cge5m")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="ContentRoot/SideButtons/LocalModButton" unique_id=198125098]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "刷新"
+label_settings = SubResource("LabelSettings_button")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContentPanel" type="Panel" parent="ContentRoot" unique_id=171887560]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+offset_left = 266.0
+offset_top = 320.0
+offset_right = 1629.0
+offset_bottom = 882.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_content")
+
+[node name="ModShowcasePage" parent="ContentRoot/ContentPanel" unique_id=1477710215 instance=ExtResource("6_showcase_page")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="ClientVersionLabel" type="Label" parent="ContentRoot" unique_id=1801328943]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1444.0
+offset_top = 962.0
+offset_right = 1764.0
+offset_bottom = 1000.0
+theme_override_colors/font_color = Color(1, 0.92, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.55)
+theme_override_font_sizes/font_size = 32
+text = "XR客户端版本: V0.1.0"
+horizontal_alignment = 2
+vertical_alignment = 1
