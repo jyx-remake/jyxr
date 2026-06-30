@@ -77,6 +77,11 @@ public abstract class SkillInstance(CharacterInstance owner)
     public abstract double Affinity { get; }
     public abstract bool IsActive { get; }
 
+    public virtual void ResetBattleCooldown()
+    {
+        CurrentCooldown = 0;
+    }
+
     protected static void ValidateLevel(int level) => ArgumentOutOfRangeException.ThrowIfLessThan(level, 1);
 
     protected static void ValidateExperience(int exp) => ArgumentOutOfRangeException.ThrowIfNegative(exp);

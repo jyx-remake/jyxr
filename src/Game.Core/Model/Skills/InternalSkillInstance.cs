@@ -57,6 +57,20 @@ public sealed class InternalSkillInstance(
     public IReadOnlyList<FormSkillInstance> GetFormSkills() =>
         _formSkills ??= Definition.FormSkills.Select(definition => new FormSkillInstance(definition, this)).ToList();
 
+    public override void ResetBattleCooldown()
+    {
+        base.ResetBattleCooldown();
+        if (_formSkills is null)
+        {
+            return;
+        }
+
+        foreach (var formSkill in _formSkills)
+        {
+            formSkill.ResetBattleCooldown();
+        }
+    }
+
     public int GetLevelUpExp(int currentLevel)
     {
         if (currentLevel < 1)

@@ -1277,10 +1277,14 @@ public partial class BattleScreen : Control
 		_uiState.EndBattle();
 		AppendLog(isWin ? "战斗胜利。" : "战斗失败。");
 		OrdinaryBattleVictorySettlement? settlement = null;
-		if (isWin && _state is not null && _battleRequest is not null)
+		if (_state is not null && _battleRequest is not null)
 		{
-			settlement = GameRoot.BattleService.PreviewVictorySettlement(_state, _battleRequest);
-			GameRoot.BattleService.ApplyOrdinaryVictorySettlement(_state, settlement);
+			GameRoot.BattleService.ApplyPlayerBattleCarryover(_state);
+			if (isWin)
+			{
+				settlement = GameRoot.BattleService.PreviewVictorySettlement(_state, _battleRequest);
+				GameRoot.BattleService.ApplyOrdinaryVictorySettlement(_state, settlement);
+			}
 		}
 
 		RefreshAll();
