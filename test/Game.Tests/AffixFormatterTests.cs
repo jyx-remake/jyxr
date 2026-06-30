@@ -11,7 +11,7 @@ namespace Game.Tests;
 public sealed class AffixFormatterTests
 {
     private static string RealContentDirectoryPath =>
-        Path.Combine(AppContext.BaseDirectory, "data");
+        Path.Combine(AppContext.BaseDirectory, "mods", "jyxr-base", "data");
 
     [Fact]
     public void AffixFormatter_FormatsSingleAffixesInChinese()

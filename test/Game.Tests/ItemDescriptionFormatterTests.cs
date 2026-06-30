@@ -10,7 +10,7 @@ namespace Game.Tests;
 public sealed class ItemDescriptionFormatterTests
 {
     private static string RealContentDirectoryPath =>
-        Path.Combine(AppContext.BaseDirectory, "data");
+        Path.Combine(AppContext.BaseDirectory, "mods", "jyxr-base", "data");
 
     [Fact]
     public void ItemDescriptionFormatter_FormatsConsumableItemBbCode()
