@@ -232,19 +232,49 @@ custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MusicCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=485689480]
-unique_name_in_owner = true
+[node name="MusicRow" type="HBoxContainer" parent="ContentRoot/SettingsVBox" unique_id=100000200]
 custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="MusicCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox/MusicRow" unique_id=485689480]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 68)
 layout_mode = 2
 button_pressed = true
 text = "音乐"
 
-[node name="SfxCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox" unique_id=2144269868]
+[node name="MusicVolumeSlider" type="HSlider" parent="ContentRoot/SettingsVBox/MusicRow" unique_id=100000201]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+step = 1.0
+value = 100.0
+
+[node name="SfxRow" type="HBoxContainer" parent="ContentRoot/SettingsVBox" unique_id=100000202]
 custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SfxCheckBox" type="CheckBox" parent="ContentRoot/SettingsVBox/SfxRow" unique_id=2144269868]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 68)
 layout_mode = 2
 button_pressed = true
 text = "音效"
+
+[node name="SfxVolumeSlider" type="HSlider" parent="ContentRoot/SettingsVBox/SfxRow" unique_id=100000203]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+step = 1.0
+value = 100.0
 
 [node name="SettingsSpacer" type="Control" parent="ContentRoot/SettingsVBox" unique_id=86344426]
 layout_mode = 2

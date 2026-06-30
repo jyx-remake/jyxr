@@ -118,12 +118,14 @@ public partial class ShopPanel : JyPanel
 
 	private void SelectMode(ShopMode mode)
 	{
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		_mode = mode;
 		Refresh();
 	}
 
 	private void SelectCategory(ShopCategory category)
 	{
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		_selectedCategory = category;
 		Refresh();
 	}

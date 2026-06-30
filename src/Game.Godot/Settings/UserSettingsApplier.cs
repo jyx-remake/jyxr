@@ -21,6 +21,8 @@ public static class UserSettingsApplier
 
 		ApplyBusEnabled(BgmBusName, settings.MusicEnabled);
 		ApplyBusEnabled(SfxBusName, settings.SfxEnabled);
+		ApplyBusVolume(BgmBusName, settings.MusicVolume);
+		ApplyBusVolume(SfxBusName, settings.SfxVolume);
 		ApplyScreenAspect(settings.ScreenAspectMode);
 	}
 
@@ -33,6 +35,23 @@ public static class UserSettingsApplier
 		}
 
 		AudioServer.SetBusMute(busIndex, !enabled);
+	}
+
+	private static void ApplyBusVolume(string busName, int volume)
+	{
+		var busIndex = AudioServer.GetBusIndex(busName);
+		if (busIndex < 0)
+		{
+			throw new InvalidOperationException($"音频总线不存在：{busName}");
+		}
+
+		AudioServer.SetBusVolumeDb(busIndex, VolumePercentToDb(volume));
+	}
+
+	private static float VolumePercentToDb(int volume)
+	{
+		var normalized = Math.Clamp(volume, 0, 100) / 100f;
+		return normalized <= 0f ? -80f : Mathf.LinearToDb(normalized);
 	}
 
 	private static void ApplyScreenAspect(ScreenAspectMode mode)

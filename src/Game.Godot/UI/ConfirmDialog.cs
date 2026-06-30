@@ -46,11 +46,13 @@ public partial class ConfirmDialog : Control
 
 	private void OnConfirmPressed()
 	{
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		_completion?.TrySetResult(true);
 	}
 
 	private void OnCancelPressed()
 	{
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.关闭");
 		_completion?.TrySetResult(false);
 	}
 }

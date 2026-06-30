@@ -64,6 +64,7 @@ public partial class InventoryItemBox : TextureButton
 	{
 		if (_entry is not null)
 		{
+			global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 			EntrySelected?.Invoke(_entry);
 		}
 	}

@@ -11,9 +11,11 @@ public sealed record UserSettingsRecord(
 	int BattleSpeedMultiplier,
 	bool MusicEnabled,
 	bool SfxEnabled,
+	int MusicVolume,
+	int SfxVolume,
 	ScreenAspectMode ScreenAspectMode)
 {
-	public const int CurrentVersion = 3;
+	public const int CurrentVersion = 4;
 
 	public static UserSettingsRecord Default { get; } = new(
 		CurrentVersion,
@@ -24,5 +26,7 @@ public sealed record UserSettingsRecord(
 		BattleSpeedMultiplier: 2,
 		MusicEnabled: true,
 		SfxEnabled: true,
+		MusicVolume: 100,
+		SfxVolume: 100,
 		ScreenAspectMode: ScreenAspectMode.Unlimited);
 }

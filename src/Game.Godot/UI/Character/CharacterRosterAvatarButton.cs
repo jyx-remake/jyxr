@@ -57,6 +57,7 @@ public partial class CharacterRosterAvatarButton : Button
 			return;
 		}
 
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		EmitSignal(SignalName.CharacterSelected, _character.Id);
 	}
 }

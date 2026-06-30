@@ -80,6 +80,7 @@ public partial class DetailPanel : JyPanel
 			return;
 		}
 
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		await action.ExecuteAsync();
 		if (action.CloseAfterExecute && GodotObject.IsInstanceValid(this))
 		{

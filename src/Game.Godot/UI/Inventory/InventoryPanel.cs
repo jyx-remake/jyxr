@@ -66,6 +66,7 @@ public partial class InventoryPanel : JyPanel
 
 	private void SelectCategory(InventoryCategory category)
 	{
+		global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 		_selectedCategory = category;
 		Refresh();
 	}

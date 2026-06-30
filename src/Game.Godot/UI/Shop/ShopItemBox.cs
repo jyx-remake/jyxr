@@ -113,12 +113,14 @@ public partial class ShopItemBox : TextureButton
 	{
 		if (_product is not null)
 		{
+			global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 			ProductSelected?.Invoke(_product);
 			return;
 		}
 
 		if (_entry is not null)
 		{
+			global::Game.Godot.Game.Audio.PlaySfx("音效.UI.点击");
 			InventoryEntrySelected?.Invoke(_entry);
 		}
 	}
