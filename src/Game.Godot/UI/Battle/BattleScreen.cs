@@ -861,7 +861,9 @@ public partial class BattleScreen : Control
 			return selectedSkill;
 		}
 
-		return skillOptions.FirstOrDefault(static skill => skill.IsAvailable)?.Skill;
+		return actingUnit is null
+			? null
+			: ResolveDefaultSkill(actingUnit, skillOptions);
 	}
 
 	private IReadOnlyList<BattleSkillOptionView> GetSkillOptions(BattleUnit actingUnit)
@@ -872,6 +874,24 @@ public partial class BattleScreen : Control
 		}
 
 		return _presenter.CreateSkillList(_state, _orchestrator.Engine, actingUnit);
+	}
+
+	private static SkillInstance? ResolveDefaultSkill(
+		BattleUnit actingUnit,
+		IReadOnlyList<BattleSkillOptionView> skillOptions)
+	{
+		if (!string.IsNullOrWhiteSpace(actingUnit.LastUsedSkillId))
+		{
+			var lastUsedSkill = skillOptions.FirstOrDefault(skill =>
+				skill.IsAvailable &&
+				string.Equals(skill.Skill.Id, actingUnit.LastUsedSkillId, StringComparison.Ordinal));
+			if (lastUsedSkill is not null)
+			{
+				return lastUsedSkill.Skill;
+			}
+		}
+
+		return skillOptions.FirstOrDefault(static skill => skill.IsAvailable)?.Skill;
 	}
 
 	private static string BuildSkillTooltip(BattleSkillOptionView skillView)
@@ -1111,9 +1131,7 @@ public partial class BattleScreen : Control
 
 	private void SelectDefaultPostMoveMode(BattleUnit actingUnit)
 	{
-		var defaultSkill = GetSkillOptions(actingUnit)
-			.FirstOrDefault(static skill => skill.IsAvailable)
-			?.Skill;
+		var defaultSkill = ResolveDefaultSkill(actingUnit, GetSkillOptions(actingUnit));
 		if (defaultSkill is null)
 		{
 			_uiState.ActUnit();

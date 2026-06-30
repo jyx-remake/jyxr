@@ -69,6 +69,8 @@ public sealed class BattleUnit
 
     public int ItemCooldown { get; private set; }
 
+    public string? LastUsedSkillId { get; private set; }
+
     public bool IsAlive => Hp > 0;
 
     public IReadOnlyList<BattleBuffInstance> Buffs => _buffs;
@@ -169,6 +171,12 @@ public sealed class BattleUnit
         {
             ItemCooldown--;
         }
+    }
+
+    public void RecordUsedSkill(string skillId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
+        LastUsedSkillId = skillId;
     }
 
     public int TakeDamage(int amount)
