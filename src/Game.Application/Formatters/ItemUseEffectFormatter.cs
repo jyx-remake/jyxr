@@ -31,8 +31,7 @@ public static class ItemUseEffectFormatter
                 internalSkill.Level),
             GrantSpecialSkillItemUseEffectDefinition specialSkill =>
                 $"学会特殊技能「{FormatterTextCn.ResolveSpecialSkillName(specialSkill.SkillId, contentRepository)}」",
-            GrantTalentItemUseEffectDefinition talent =>
-                $"获得天赋「{FormatterTextCn.ResolveTalentName(talent.TalentId, contentRepository)}」",
+            GrantTalentItemUseEffectDefinition talent => FormatGrantTalentCn(talent, contentRepository),
             _ => throw new NotSupportedException($"Unsupported item use effect type '{useEffect.GetType().Name}'.")
         };
     }
@@ -66,6 +65,21 @@ public static class ItemUseEffectFormatter
         }
 
         return $"解毒：等级 {detoxify.Values[0]}，持续 {detoxify.Values[1]}";
+    }
+
+    private static string FormatGrantTalentCn(
+        GrantTalentItemUseEffectDefinition grantTalent,
+        IContentRepository contentRepository)
+    {
+        if (!contentRepository.TryGetTalent(grantTalent.TalentId, out var talent))
+        {
+            return $"获得天赋「{grantTalent.TalentId}」";
+        }
+
+        var line = $"获得天赋「{talent.Name}」";
+        return string.IsNullOrWhiteSpace(talent.Description)
+            ? line
+            : $"{line}\n{talent.Description.Trim()}";
     }
 
     private static string FormatGrantSkillCn(string kind, string skillName, int? level) =>

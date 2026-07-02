@@ -58,6 +58,7 @@ public sealed class ItemDescriptionFormatterTests
         {
             Id = "battle_focus",
             Name = "战意高昂",
+            Description = "越战越勇，攻击力提高。",
         };
         var item = new NormalItemDefinition
         {
@@ -87,7 +88,7 @@ public sealed class ItemDescriptionFormatterTests
         Assert.Contains("[color=red]剑法 >= 30[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=red]需要天赋「战意高昂」[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=yellow]学会外功「松风剑法」（10级）[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]获得天赋「战意高昂」[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]获得天赋「战意高昂」\n越战越勇，攻击力提高。[/color]", text, StringComparison.Ordinal);
     }
 
     [Fact]
