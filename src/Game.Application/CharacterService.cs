@@ -178,10 +178,10 @@ public sealed class CharacterService
                 LearnSkill(character, targetId, level);
                 return;
             case "external":
-                LearnExternalSkill(character, targetId, level);
+                GrantExternalSkill(character, targetId, level);
                 return;
             case "internal":
-                LearnInternalSkill(character, targetId, level);
+                GrantInternalSkill(character, targetId, level);
                 return;
             case "talent":
                 LearnTalent(character, targetId);
@@ -198,13 +198,13 @@ public sealed class CharacterService
     {
         if (ContentRepository.TryGetExternalSkill(skillId, out _))
         {
-            LearnExternalSkill(character, skillId, level);
+            GrantExternalSkill(character, skillId, level);
             return;
         }
 
         if (ContentRepository.TryGetInternalSkill(skillId, out _))
         {
-            LearnInternalSkill(character, skillId, level);
+            GrantInternalSkill(character, skillId, level);
             return;
         }
 
@@ -217,20 +217,44 @@ public sealed class CharacterService
         throw new InvalidOperationException($"Command 'learn skill' references unknown skill '{skillId}'.");
     }
 
-    public void LearnExternalSkill(CharacterInstance character, string skillId, int level = 1)
+    public void GrantExternalSkill(CharacterInstance character, string skillId, int level = 1)
     {
         ArgumentNullException.ThrowIfNull(character);
         var externalSkill = ContentRepository.GetExternalSkill(skillId);
-        character.SetExternalSkillState(externalSkill, level, 0, true, Config.MaxExternalSkillLevel);
-        PublishToastAndCharacterChanged(character, $"{character.Name} 习得外功【{externalSkill.Name}】 {level}级");
+        ApplyGrantedExternalSkill(character, externalSkill, level);
     }
 
-    public void LearnInternalSkill(CharacterInstance character, string skillId, int level = 1)
+    public void StudyExternalSkillFromBook(CharacterInstance character, string skillId, int level = 1)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+        var externalSkill = ContentRepository.GetExternalSkill(skillId);
+        if (character.GetExternalSkillLevel(externalSkill.Id) is null &&
+            character.GetExternalSkills().Count >= Config.MaxExternalSkillCount)
+        {
+            throw new InvalidOperationException("External skill count limit reached.");
+        }
+
+        ApplyGrantedExternalSkill(character, externalSkill, level);
+    }
+
+    public void GrantInternalSkill(CharacterInstance character, string skillId, int level = 1)
     {
         ArgumentNullException.ThrowIfNull(character);
         var internalSkill = ContentRepository.GetInternalSkill(skillId);
-        character.SetInternalSkillState(internalSkill, level, 0, Config.MaxInternalSkillLevel);
-        PublishToastAndCharacterChanged(character, $"{character.Name} 习得内功【{internalSkill.Name}】 {level}级");
+        ApplyGrantedInternalSkill(character, internalSkill, level);
+    }
+
+    public void StudyInternalSkillFromBook(CharacterInstance character, string skillId, int level = 1)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+        var internalSkill = ContentRepository.GetInternalSkill(skillId);
+        if (character.GetInternalSkillLevel(internalSkill.Id) is null &&
+            character.GetInternalSkills().Count >= Config.MaxInternalSkillCount)
+        {
+            throw new InvalidOperationException("Internal skill count limit reached.");
+        }
+
+        ApplyGrantedInternalSkill(character, internalSkill, level);
     }
 
     public void UpgradeExternalSkillLevel(string characterId, string skillId, int levels)
@@ -405,6 +429,18 @@ public sealed class CharacterService
             ? $"{character.Name} 习得{skillKind}【{change.Skill.Name}】 {change.NewLevel}级"
             : $"{character.Name} {skillKind}【{change.Skill.Name}】 +{change.NewLevel - change.OldLevel}";
         PublishToastAndCharacterChanged(character, message);
+    }
+
+    private void ApplyGrantedExternalSkill(CharacterInstance character, ExternalSkillDefinition externalSkill, int level)
+    {
+        character.SetExternalSkillState(externalSkill, level, 0, true, Config.MaxExternalSkillLevel);
+        PublishToastAndCharacterChanged(character, $"{character.Name} 习得外功【{externalSkill.Name}】 {level}级");
+    }
+
+    private void ApplyGrantedInternalSkill(CharacterInstance character, InternalSkillDefinition internalSkill, int level)
+    {
+        character.SetInternalSkillState(internalSkill, level, 0, Config.MaxInternalSkillLevel);
+        PublishToastAndCharacterChanged(character, $"{character.Name} 习得内功【{internalSkill.Name}】 {level}级");
     }
 
     private void PublishToastAndCharacterChanged(CharacterInstance character, string message)

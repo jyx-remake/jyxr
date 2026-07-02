@@ -60,6 +60,71 @@ public sealed class ItemUseServiceTests
     }
 
     [Fact]
+    public void Use_ExternalSkillBook_UpgradesKnownSkillWhenExternalSkillCountAtLimit()
+    {
+        var skill = TestContentFactory.CreateExternalSkill("dragon_palm");
+        var book = CreateItem(
+            "dragon_book",
+            ItemType.SkillBook,
+            [new GrantExternalSkillItemUseEffectDefinition(skill.Id)]);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition(
+            "hero",
+            externalSkills: [new InitialExternalSkillEntryDefinition(skill, Level: 10)]);
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(book);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            externalSkills: [skill],
+            items: [book]);
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig { MaxExternalSkillCount = 1 });
+        var entry = state.Inventory.GetStack(book);
+
+        var result = session.ItemUseService.Use(entry, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(20, hero.GetExternalSkillLevel(skill.Id));
+        Assert.Equal(1, entry.Quantity);
+    }
+
+    [Fact]
+    public void AnalyzeTarget_DisablesNewExternalSkillWhenExternalSkillCountAtLimit()
+    {
+        var knownSkill = TestContentFactory.CreateExternalSkill("known_palm");
+        var newSkill = TestContentFactory.CreateExternalSkill("dragon_palm");
+        var book = CreateItem(
+            "dragon_book",
+            ItemType.SkillBook,
+            [new GrantExternalSkillItemUseEffectDefinition(newSkill.Id)]);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition(
+            "hero",
+            externalSkills: [new InitialExternalSkillEntryDefinition(knownSkill)]);
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(book);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            externalSkills: [knownSkill, newSkill],
+            items: [book]);
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig { MaxExternalSkillCount = 1 });
+        var entry = state.Inventory.GetStack(book);
+
+        var candidate = session.ItemUseService.AnalyzeTarget(entry, hero);
+        var result = session.ItemUseService.Use(entry, hero.Id);
+
+        Assert.False(candidate.CanUse);
+        Assert.Equal("外功数量已达上限", candidate.Reason);
+        Assert.False(result.Success);
+        Assert.Equal("外功数量已达上限", result.Message);
+        Assert.Null(hero.GetExternalSkillLevel(newSkill.Id));
+        Assert.Equal(1, entry.Quantity);
+    }
+
+    [Fact]
     public void AnalyzeTarget_DisablesKnownExternalSkillAtMaxLevel()
     {
         var skill = TestContentFactory.CreateExternalSkill("dragon_palm");
@@ -107,6 +172,38 @@ public sealed class ItemUseServiceTests
 
         Assert.True(result.Success);
         Assert.Equal(20, hero.GetInternalSkillLevel(skill.Id));
+        Assert.Equal(1, entry.Quantity);
+    }
+
+    [Fact]
+    public void AnalyzeTarget_DisablesNewInternalSkillWhenInternalSkillCountAtLimit()
+    {
+        var knownSkill = TestContentFactory.CreateInternalSkill("known_internal");
+        var newSkill = TestContentFactory.CreateInternalSkill("yijinjing");
+        var book = CreateItem(
+            "internal_book",
+            ItemType.SkillBook,
+            [new GrantInternalSkillItemUseEffectDefinition(newSkill.Id)]);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition(
+            "hero",
+            internalSkills: [new InitialInternalSkillEntryDefinition(knownSkill)]);
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(book);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            internalSkills: [knownSkill, newSkill],
+            items: [book]);
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig { MaxInternalSkillCount = 1 });
+        var entry = state.Inventory.GetStack(book);
+
+        var candidate = session.ItemUseService.AnalyzeTarget(entry, hero);
+
+        Assert.False(candidate.CanUse);
+        Assert.Equal("内功数量已达上限", candidate.Reason);
+        Assert.Null(hero.GetInternalSkillLevel(newSkill.Id));
         Assert.Equal(1, entry.Quantity);
     }
 

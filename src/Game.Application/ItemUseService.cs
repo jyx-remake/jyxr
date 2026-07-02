@@ -125,7 +125,7 @@ public sealed class ItemUseService
                         target.GetExternalSkillLevel(externalSkill.SkillId),
                         externalSkill.Level,
                         Config.MaxExternalSkillLevel);
-                    _session.CharacterService.LearnExternalSkill(
+                    _session.CharacterService.StudyExternalSkillFromBook(
                         target,
                         externalSkill.SkillId,
                         level);
@@ -137,7 +137,7 @@ public sealed class ItemUseService
                         target.GetInternalSkillLevel(internalSkill.SkillId),
                         internalSkill.Level,
                         Config.MaxInternalSkillLevel);
-                    _session.CharacterService.LearnInternalSkill(
+                    _session.CharacterService.StudyInternalSkillFromBook(
                         target,
                         internalSkill.SkillId,
                         level);
@@ -309,6 +309,12 @@ public sealed class ItemUseService
                     {
                         return "该外功已达上限";
                     }
+
+                    if (currentLevel is null &&
+                        target.GetExternalSkills().Count >= Config.MaxExternalSkillCount)
+                    {
+                        return "外功数量已达上限";
+                    }
                     break;
                 }
                 case GrantInternalSkillItemUseEffectDefinition internalSkill:
@@ -320,6 +326,12 @@ public sealed class ItemUseService
                             Config.MaxInternalSkillLevel))
                     {
                         return "该内功已达上限";
+                    }
+
+                    if (currentLevel is null &&
+                        target.GetInternalSkills().Count >= Config.MaxInternalSkillCount)
+                    {
+                        return "内功数量已达上限";
                     }
                     break;
                 }
