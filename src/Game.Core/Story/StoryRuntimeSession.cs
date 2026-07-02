@@ -40,6 +40,11 @@ internal sealed class StoryRuntimeSession(
                     yield return stepResult.Event;
                 }
 
+                if (stepResult.IsTerminated)
+                {
+                    yield break;
+                }
+
                 if (stepResult.JumpTarget is not null)
                 {
                     jumpTarget = stepResult.JumpTarget;
@@ -79,7 +84,7 @@ internal sealed class StoryRuntimeSession(
             await foreach (var result in ExecuteStepAsync(step, ct))
             {
                 yield return result;
-                if (result.JumpTarget is not null)
+                if (result.IsTerminated || result.JumpTarget is not null)
                 {
                     yield break;
                 }
@@ -164,7 +169,7 @@ internal sealed class StoryRuntimeSession(
         await foreach (var result in ExecuteStepsAsync(choice.Options[selectedIndex].Steps, ct))
         {
             yield return result;
-            if (result.JumpTarget is not null)
+            if (result.IsTerminated || result.JumpTarget is not null)
             {
                 yield break;
             }
@@ -187,6 +192,7 @@ internal sealed class StoryRuntimeSession(
                 await host.ExecuteCommandAsync(GameOverCommand, args, ct);
                 yield return StepResult.FromEvent(new BattleResolvedEvent(context, selectedOutcome));
                 yield return StepResult.FromEvent(new CommandExecutedEvent(GameOverCommand, args));
+                yield return StepResult.Terminate();
                 yield break;
             }
 
@@ -199,7 +205,7 @@ internal sealed class StoryRuntimeSession(
         await foreach (var result in ExecuteStepsAsync(steps, ct))
         {
             yield return result;
-            if (result.JumpTarget is not null)
+            if (result.IsTerminated || result.JumpTarget is not null)
             {
                 yield break;
             }
@@ -221,7 +227,7 @@ internal sealed class StoryRuntimeSession(
             await foreach (var stepResult in ExecuteStepsAsync(branchCase.Steps, ct))
             {
                 yield return stepResult;
-                if (stepResult.JumpTarget is not null)
+                if (stepResult.IsTerminated || stepResult.JumpTarget is not null)
                 {
                     yield break;
                 }
@@ -238,7 +244,7 @@ internal sealed class StoryRuntimeSession(
         await foreach (var stepResult in ExecuteStepsAsync(branch.Fallback, ct))
         {
             yield return stepResult;
-            if (stepResult.JumpTarget is not null)
+            if (stepResult.IsTerminated || stepResult.JumpTarget is not null)
             {
                 yield break;
             }
@@ -258,10 +264,12 @@ internal sealed class StoryRuntimeSession(
         return values;
     }
 
-    private sealed record StepResult(StoryEvent? Event, string? JumpTarget)
+    private sealed record StepResult(StoryEvent? Event, string? JumpTarget, bool IsTerminated)
     {
-        public static StepResult FromEvent(StoryEvent storyEvent) => new(storyEvent, null);
+        public static StepResult FromEvent(StoryEvent storyEvent) => new(storyEvent, null, false);
 
-        public static StepResult FromJump(string jumpTarget) => new(null, jumpTarget);
+        public static StepResult FromJump(string jumpTarget) => new(null, jumpTarget, false);
+
+        public static StepResult Terminate() => new(null, null, true);
     }
 }

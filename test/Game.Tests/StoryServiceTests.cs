@@ -167,6 +167,57 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
+    public async Task RunAsync_BattleLoseWithoutLoseOutcomeTerminatesSegmentWithoutCompletingIt()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "battle_story",
+                            [
+                                new BattleStep(
+                                    "battle_lose",
+                                    new Dictionary<BattleOutcome, IReadOnlyList<Step>>
+                                    {
+                                        [BattleOutcome.Win] =
+                                        [
+                                            new CommandStep(
+                                                "custom_cmd",
+                                                [new LiteralExprNode(ExprValue.FromString("won"))]),
+                                        ],
+                                    }),
+                                new CommandStep(
+                                    "custom_cmd",
+                                    [new LiteralExprNode(ExprValue.FromString("after_battle"))]),
+                            ]),
+                    ]),
+            ]);
+
+        var host = new RecordingRuntimeHost
+        {
+            BattleOutcome = BattleOutcome.Lose,
+        };
+        var session = new GameSession(new GameState(), repository, host);
+
+        var events = new List<StoryEvent>();
+        await foreach (var storyEvent in session.StoryService.RunAsync("battle_story"))
+        {
+            events.Add(storyEvent);
+        }
+
+        var battleResolved = Assert.Single(events.OfType<BattleResolvedEvent>());
+        Assert.Equal(BattleOutcome.Lose, battleResolved.Outcome);
+        Assert.DoesNotContain(events, static storyEvent => storyEvent is SegmentCompletedEvent);
+        var command = Assert.Single(host.CustomCommands);
+        Assert.Equal("gameover", command.Name);
+        Assert.False(session.State.Story.IsStoryCompleted("battle_story"));
+        Assert.Null(session.State.Story.LastStoryId);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ExecutesBuiltInStoryFlowAndUpdatesStoryState()
     {
         var repository = TestContentFactory.CreateRepository(
@@ -872,6 +923,8 @@ public sealed class StoryServiceTests
 
         public Dictionary<string, string> CommandJumps { get; } = new(StringComparer.Ordinal);
 
+        public BattleOutcome BattleOutcome { get; init; } = BattleOutcome.Win;
+
         public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken)
         {
             Dialogues.Add(dialogue);
@@ -909,6 +962,6 @@ public sealed class StoryServiceTests
         }
 
         public ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken) =>
-            ValueTask.FromResult(BattleOutcome.Win);
+            ValueTask.FromResult(BattleOutcome);
     }
 }
