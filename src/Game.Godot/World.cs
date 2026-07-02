@@ -74,7 +74,6 @@ public partial class World : Control
 			throw new InvalidOperationException("Map screen scene root must be MapScreen.");
 		}
 
-		mapScreen.InitialMapId = result.Map.Id;
 		mapScreen.Initialize(result);
 		ReplaceCurrentScene(mapScreen);
 		return mapScreen;

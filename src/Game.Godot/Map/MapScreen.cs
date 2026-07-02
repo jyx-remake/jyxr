@@ -14,9 +14,6 @@ public partial class MapScreen : Control
 	private bool _isHandlingInteraction;
 
 	[Export]
-	public string InitialMapId { get; set; } = string.Empty;
-
-	[Export]
 	public PackedScene MapEntitySlotScene { get; set; } = null!;
 
 	[Export]
@@ -56,8 +53,6 @@ public partial class MapScreen : Control
 			_pendingInitialResult = null;
 			return;
 		}
-
-		ShowMap(InitialMapId);
 	}
 
 	public override void _ExitTree()
@@ -378,15 +373,12 @@ public partial class MapScreen : Control
 			}
 		}
 
-		if (!GodotObject.IsInstanceValid(world) || !GodotObject.IsInstanceValid(this))
+		if (!GodotObject.IsInstanceValid(world))
 		{
 			return;
 		}
 
-		if (world.CurrentScene == this)
-		{
-			world.RefreshCurrentMap();
-		}
+		world.RefreshCurrentMap();
 	}
 
 	private static void ClearChildren(Node node)

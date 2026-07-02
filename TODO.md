@@ -17,6 +17,7 @@
 - 演出系统待建模：`CutsceneDefinition`、`CutsceneStepDefinition`、`DialogueDefinition`、`DialogueLineDefinition`、`SpeakerDefinition`，用于承载对话、镜头、角色入场退场、立绘/动画/音效触发。
 - 地图会话层待建模：`MapSession` 或 `WorldSession`，用于承载当前地图、当前交互状态、场景内事件进度，并与 `GameSession` / 战斗入口衔接。
 - 当前“进入地图后的自动触发事件”消费编排暂放在 `MapScreen`。后续应上移到 `World` 或专门的宿主 flow coordinator，保持 `MapService` 只负责返回结果、`MapScreen` 只负责展示和点击交互，避免 Godot screen 承担场景流转编排职责。
+- 地图剧情结束后的刷新目前由 `MapScreen` 直接调用 `World.RefreshCurrentMap()`，不再用 `world.CurrentScene == this` 判定当前 screen 实例；后续上移地图 flow 编排时，应把“是否仍需刷新地图”的判断改成显式流程状态，而不是依赖 Godot 节点实例身份。
 - 战斗外触发入口待建模：`InteractionCommand`、`StoryCommand`、`MapTransitionCommand`，用于统一地图交互、剧情推进、场景切换等外部输入。
 - 地图与战斗的衔接对象待建模：`BattleEncounterDefinition`、`EncounterTriggerDefinition`、`BattleResultProjection`，用于表达地图遭遇战入口、触发条件，以及战斗结果如何回写世界状态。
 - 剧情对白/选项中的 `$MALE$` / `$FEMALE$` 当前先在 `Game.Application` 做临时文本插值，只覆盖主角名与女主名，不属于正式统一变量系统。后续应与剧情变量读取/写入模型统一设计，避免模板文本占位与表达式变量长期分裂。
