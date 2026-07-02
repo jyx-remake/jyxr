@@ -17,6 +17,10 @@ public sealed class GameProfileTests
         profile.AddDeaths(2);
         profile.AddKills(5);
         profile.SetZhenlongqijuLevel(7);
+        profile.AddSkillMaxLevelBonus("dragon_palm", 3);
+        profile.AddSkillMaxLevelBonus("dragon_palm", 2);
+        Assert.True(profile.TryAddSkillMaxLevelBonusOnce("yijinjing", 1, "reward.yijinjing.mastery"));
+        Assert.False(profile.TryAddSkillMaxLevelBonusOnce("yijinjing", 1, "reward.yijinjing.mastery"));
 
         var record = GameProfileRecord.Create(profile);
         var json = JsonSerializer.Serialize(record, GameJson.Default);
@@ -28,6 +32,8 @@ public sealed class GameProfileTests
         Assert.Contains("\"DeathCount\":2", json, StringComparison.Ordinal);
         Assert.Contains("\"KillCount\":5", json, StringComparison.Ordinal);
         Assert.Contains("\"ZhenlongqijuLevel\":7", json, StringComparison.Ordinal);
+        Assert.Contains("\"dragon_palm\":5", json, StringComparison.Ordinal);
+        Assert.Contains("reward.yijinjing.mastery", json, StringComparison.Ordinal);
 
         var restored = roundTripped!.Restore();
         Assert.True(restored.IsAchievementUnlocked("first_blood"));
@@ -35,6 +41,9 @@ public sealed class GameProfileTests
         Assert.Equal(2, restored.DeathCount);
         Assert.Equal(5, restored.KillCount);
         Assert.Equal(7, restored.ZhenlongqijuLevel);
+        Assert.Equal(5, restored.GetSkillMaxLevelBonus("dragon_palm"));
+        Assert.Equal(1, restored.GetSkillMaxLevelBonus("yijinjing"));
+        Assert.Contains("reward.yijinjing.mastery", restored.ConsumedSkillMaxLevelKeys);
     }
 
     [Fact]
@@ -76,6 +85,46 @@ public sealed class GameProfileTests
         Assert.Equal(9, session.Profile.KillCount);
         Assert.Equal(3, session.Profile.ZhenlongqijuLevel);
         Assert.Single(publishedEvents.OfType<ProfileLoadedEvent>());
+        Assert.Empty(publishedEvents.OfType<ProfileChangedEvent>());
+    }
+
+    [Fact]
+    public void ProfileService_AddSkillMaxLevelBonus_DoesNotPublishProfileChangedEvent()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var publishedEvents = CollectPublishedEvents(session);
+
+        session.ProfileService.AddSkillMaxLevelBonus("dragon_palm", 3);
+        session.ProfileService.AddSkillMaxLevelBonus("dragon_palm", 2);
+
+        Assert.Equal(5, session.Profile.GetSkillMaxLevelBonus("dragon_palm"));
+        Assert.Empty(publishedEvents.OfType<ProfileChangedEvent>());
+    }
+
+    [Fact]
+    public void ProfileService_TryAddSkillMaxLevelBonusOnce_ConsumesKeyWithoutPublishingProfileChangedEvent()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var publishedEvents = CollectPublishedEvents(session);
+
+        var first = session.ProfileService.TryAddSkillMaxLevelBonusOnce(
+            "dragon_palm",
+            3,
+            "reward.dragon_palm.mastery");
+        var second = session.ProfileService.TryAddSkillMaxLevelBonusOnce(
+            "dragon_palm",
+            3,
+            "reward.dragon_palm.mastery");
+        var repeated = session.ProfileService.TryAddSkillMaxLevelBonusOnce(
+            "dragon_palm",
+            2,
+            null);
+
+        Assert.True(first);
+        Assert.False(second);
+        Assert.True(repeated);
+        Assert.Equal(5, session.Profile.GetSkillMaxLevelBonus("dragon_palm"));
+        Assert.Contains("reward.dragon_palm.mastery", session.Profile.ConsumedSkillMaxLevelKeys);
         Assert.Empty(publishedEvents.OfType<ProfileChangedEvent>());
     }
 

@@ -1,3 +1,4 @@
+using Game.Application;
 using Game.Application.Formatters;
 using Game.Core.Affix;
 using Game.Core.Definitions;
@@ -56,11 +57,11 @@ public sealed class SkillDescriptionFormatterTests
         {
             Level = 4,
             Exp = 18,
-            MaxLevel = 8,
             CurrentCooldown = 1,
         };
+        var policy = new SkillMaxLevelPolicy(new GameConfig { BaseExternalSkillMaxLevel = 8 });
 
-        var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository);
+        var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository, policy);
 
         Assert.Contains("入门剑法", text, StringComparison.Ordinal);
         Assert.Contains("[color=red]威力 4.5[/color]", text, StringComparison.Ordinal);
@@ -90,10 +91,10 @@ public sealed class SkillDescriptionFormatterTests
         var instance = new InternalSkillInstance(skill, CreateOwner())
         {
             Level = 10,
-            MaxLevel = 20,
         };
+        var policy = new SkillMaxLevelPolicy(new GameConfig { BaseInternalSkillMaxLevel = 20 });
 
-        var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository);
+        var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository, policy);
 
         Assert.Contains("[color=green](√)(10级解锁)装备生效：防御力 +20，抗暴击率 +5%[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=red](×)(12级解锁)攻击力 +12[/color]", text, StringComparison.Ordinal);
@@ -131,10 +132,10 @@ public sealed class SkillDescriptionFormatterTests
         {
             Level = 12,
             Exp = 90,
-            MaxLevel = 15,
         };
+        var policy = new SkillMaxLevelPolicy(new GameConfig { BaseInternalSkillMaxLevel = 15 });
 
-        var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository);
+        var text = SkillDescriptionFormatter.FormatBbCodeCn(instance, repository, policy);
 
         Assert.Contains("逍遥派心法宝典", text, StringComparison.Ordinal);
         Assert.Contains("[color=red]+攻击 60%[/color]", text, StringComparison.Ordinal);
@@ -213,7 +214,6 @@ public sealed class SkillDescriptionFormatterTests
         {
             Level = 4,
             Exp = 0,
-            MaxLevel = 8,
         };
         var instance = new LegendSkillInstance(legend, parent);
 
@@ -263,7 +263,6 @@ public sealed class SkillDescriptionFormatterTests
         {
             Level = 6,
             Exp = 18,
-            MaxLevel = 10,
         };
         var instance = Assert.Single(parent.GetFormSkills());
 

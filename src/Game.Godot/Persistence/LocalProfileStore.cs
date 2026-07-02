@@ -53,10 +53,10 @@ public sealed class LocalProfileStore
 				return false;
 			}
 
-			if (loadedProfile.Version != GameProfileRecord.CurrentVersion)
+			if (loadedProfile.Version is < 1 or > GameProfileRecord.CurrentVersion)
 			{
 				Logger.Warning(
-					$"Global profile version mismatch: {loadedProfile.Version}, supported {GameProfileRecord.CurrentVersion}. Falling back to empty profile.");
+					$"Global profile version mismatch: {loadedProfile.Version}, supported 1..{GameProfileRecord.CurrentVersion}. Falling back to empty profile.");
 				profile = null;
 				return false;
 			}

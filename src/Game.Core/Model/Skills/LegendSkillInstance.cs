@@ -24,12 +24,6 @@ public sealed class LegendSkillInstance(
         set => throw new NotSupportedException($"{nameof(LegendSkillInstance)} does not support level changes.");
     }
 
-    public override int MaxLevel
-    {
-        get => 0;
-        set => throw new NotSupportedException($"{nameof(LegendSkillInstance)} does not support max level changes.");
-    }
-
     public override int Exp
     {
         get => 0;

@@ -1,3 +1,4 @@
+using Game.Application;
 using Game.Core.Abstractions;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
@@ -19,7 +20,6 @@ internal enum MasterySkillFilter
 
 internal sealed class HeroSkillMasteryPresenter
 {
-	private const int PreviewSkillLevel = 20;
 	private const string PreviewOwnerId = "__skill_mastery_preview__";
 
 	private static readonly CharacterDefinition PreviewOwnerDefinition = new(
@@ -32,6 +32,8 @@ internal sealed class HeroSkillMasteryPresenter
 		[]);
 
 	private readonly IContentRepository _contentRepository;
+	private readonly SkillMaxLevelPolicy _skillMaxLevelPolicy;
+	private readonly int _absoluteSkillMaxLevel;
 	private readonly CharacterInstance _previewOwner = new()
 	{
 		Id = PreviewOwnerId,
@@ -39,12 +41,18 @@ internal sealed class HeroSkillMasteryPresenter
 		Definition = PreviewOwnerDefinition,
 	};
 
-	public HeroSkillMasteryPresenter(IContentRepository contentRepository)
+	public HeroSkillMasteryPresenter(
+		IContentRepository contentRepository,
+		SkillMaxLevelPolicy skillMaxLevelPolicy,
+		int absoluteSkillMaxLevel)
 	{
 		_contentRepository = contentRepository ?? throw new ArgumentNullException(nameof(contentRepository));
+		_skillMaxLevelPolicy = skillMaxLevelPolicy ?? throw new ArgumentNullException(nameof(skillMaxLevelPolicy));
+		ArgumentOutOfRangeException.ThrowIfLessThan(absoluteSkillMaxLevel, 1);
+		_absoluteSkillMaxLevel = absoluteSkillMaxLevel;
 	}
 
-	public IReadOnlyList<SkillInstance> GetSkills(MasterySkillFilter filter)
+	public IReadOnlyList<SkillInstance> GetSkills(MasterySkillFilter filter, bool previewHardMaxLevel)
 	{
 		var skills = new List<SkillInstance>();
 
@@ -57,7 +65,7 @@ internal sealed class HeroSkillMasteryPresenter
 					continue;
 				}
 
-				skills.Add(CreatePreviewSkill(definition));
+				skills.Add(CreatePreviewSkill(definition, previewHardMaxLevel));
 			}
 		}
 
@@ -65,28 +73,32 @@ internal sealed class HeroSkillMasteryPresenter
 		{
 			foreach (var definition in _contentRepository.GetInternalSkills())
 			{
-				skills.Add(CreatePreviewSkill(definition));
+				skills.Add(CreatePreviewSkill(definition, previewHardMaxLevel));
 			}
 		}
 
 		return skills;
 	}
 
-	private ExternalSkillInstance CreatePreviewSkill(ExternalSkillDefinition definition) =>
+	private ExternalSkillInstance CreatePreviewSkill(ExternalSkillDefinition definition, bool previewHardMaxLevel) =>
 		new(definition, _previewOwner, active: false)
 		{
-			Level = PreviewSkillLevel,
-			MaxLevel = PreviewSkillLevel,
+			Level = ResolvePreviewLevel(definition, previewHardMaxLevel),
 			Exp = 0,
 		};
 
-	private InternalSkillInstance CreatePreviewSkill(InternalSkillDefinition definition) =>
+	private InternalSkillInstance CreatePreviewSkill(InternalSkillDefinition definition, bool previewHardMaxLevel) =>
 		new(definition, _previewOwner)
 		{
-			Level = PreviewSkillLevel,
-			MaxLevel = PreviewSkillLevel,
+			Level = ResolvePreviewLevel(definition, previewHardMaxLevel),
 			Exp = 0,
 		};
+
+	private int ResolvePreviewLevel(ExternalSkillDefinition definition, bool previewHardMaxLevel) =>
+		previewHardMaxLevel ? _absoluteSkillMaxLevel : _skillMaxLevelPolicy.GetMaxLevel(definition);
+
+	private int ResolvePreviewLevel(InternalSkillDefinition definition, bool previewHardMaxLevel) =>
+		previewHardMaxLevel ? _absoluteSkillMaxLevel : _skillMaxLevelPolicy.GetMaxLevel(definition);
 
 	private static bool MatchesFilter(ExternalSkillDefinition definition, MasterySkillFilter filter) =>
 		filter switch

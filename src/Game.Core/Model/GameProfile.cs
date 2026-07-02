@@ -3,8 +3,12 @@ namespace Game.Core.Model;
 public sealed class GameProfile
 {
     private readonly HashSet<string> _unlockedAchievementIds = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, int> _skillMaxLevelBonuses = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _consumedSkillMaxLevelKeys = new(StringComparer.Ordinal);
 
     public IReadOnlyCollection<string> UnlockedAchievementIds => _unlockedAchievementIds;
+    public IReadOnlyDictionary<string, int> SkillMaxLevelBonuses => _skillMaxLevelBonuses;
+    public IReadOnlyCollection<string> ConsumedSkillMaxLevelKeys => _consumedSkillMaxLevelKeys;
 
     public int DeathCount { get; private set; }
 
@@ -22,6 +26,39 @@ public sealed class GameProfile
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(achievementId);
         return _unlockedAchievementIds.Add(achievementId);
+    }
+
+    public int GetSkillMaxLevelBonus(string skillId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
+        return _skillMaxLevelBonuses.GetValueOrDefault(skillId);
+    }
+
+    public void AddSkillMaxLevelBonus(string skillId, int levels)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
+        _skillMaxLevelBonuses[skillId] = checked(GetSkillMaxLevelBonus(skillId) + levels);
+    }
+
+    public bool TryAddSkillMaxLevelBonusOnce(string skillId, int levels, string? onceKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
+        if (string.IsNullOrWhiteSpace(onceKey))
+        {
+            AddSkillMaxLevelBonus(skillId, levels);
+            return true;
+        }
+
+        if (_consumedSkillMaxLevelKeys.Contains(onceKey))
+        {
+            return false;
+        }
+
+        AddSkillMaxLevelBonus(skillId, levels);
+        _consumedSkillMaxLevelKeys.Add(onceKey);
+        return true;
     }
 
     public void AddDeaths(int count = 1)
@@ -53,6 +90,34 @@ public sealed class GameProfile
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(achievementId);
             _unlockedAchievementIds.Add(achievementId);
+        }
+    }
+
+    public void SetSkillMaxLevelBonuses(IReadOnlyDictionary<string, int> bonuses)
+    {
+        ArgumentNullException.ThrowIfNull(bonuses);
+
+        _skillMaxLevelBonuses.Clear();
+        foreach (var (skillId, bonus) in bonuses)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
+            ArgumentOutOfRangeException.ThrowIfNegative(bonus);
+            if (bonus > 0)
+            {
+                _skillMaxLevelBonuses[skillId] = bonus;
+            }
+        }
+    }
+
+    public void SetConsumedSkillMaxLevelKeys(IEnumerable<string> keys)
+    {
+        ArgumentNullException.ThrowIfNull(keys);
+
+        _consumedSkillMaxLevelKeys.Clear();
+        foreach (var key in keys)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(key);
+            _consumedSkillMaxLevelKeys.Add(key);
         }
     }
 

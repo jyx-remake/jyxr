@@ -1,5 +1,4 @@
 using Game.Core.Definitions.Skills;
-using Game.Core.Model;
 using Game.Core.Model.Character;
 
 namespace Game.Core.Model.Skills;
@@ -15,10 +14,7 @@ public enum SkillKind
 
 public abstract class SkillInstance(CharacterInstance owner)
 {
-    public static int DefaultMaxLevel => new GameConfig().MaxExternalSkillLevel;
-
     private int _level = 1;
-    private int _maxLevel = DefaultMaxLevel;
     private int _exp;
 
     public CharacterInstance Owner { get; } = owner ?? throw new ArgumentNullException(nameof(owner));
@@ -37,16 +33,6 @@ public abstract class SkillInstance(CharacterInstance owner)
         {
             ValidateLevel(value);
             _level = value;
-        }
-    }
-
-    public virtual int MaxLevel
-    {
-        get => _maxLevel;
-        set
-        {
-            ValidateMaxLevel(value);
-            _maxLevel = value;
         }
     }
 

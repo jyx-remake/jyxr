@@ -91,17 +91,17 @@ public sealed class CharacterInstance
         BaseStats[statType] = value;
     }
 
-    public void SetExternalSkillState(ExternalSkillDefinition definition, int level, int exp, bool active, int? maxLevel = null)
+    public void SetExternalSkillState(ExternalSkillDefinition definition, int level, int exp, bool active)
     {
         ArgumentNullException.ThrowIfNull(definition);
         var skill = SkillListMutation.Find(ExternalSkills, definition.Id);
         if (skill is null)
         {
-            ExternalSkills.Add(CreateExternalSkill(definition, level, exp, active, maxLevel));
+            ExternalSkills.Add(CreateExternalSkill(definition, level, exp, active));
         }
         else
         {
-            skill.SetState(level, exp, active, maxLevel);
+            skill.SetState(level, exp, active);
         }
 
         RebuildSnapshot();
@@ -110,22 +110,21 @@ public sealed class CharacterInstance
     public SkillLevelChange<ExternalSkillInstance> UpgradeExternalSkillLevel(
         ExternalSkillDefinition definition,
         int levels,
-        int? maxLevel = null)
+        int maxLevel)
     {
         ArgumentNullException.ThrowIfNull(definition);
         var skill = SkillListMutation.Find(ExternalSkills, definition.Id);
         if (skill is null)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
-            var effectiveMaxLevel = maxLevel ?? SkillInstance.DefaultMaxLevel;
-            var createdLevel = Math.Min(levels, effectiveMaxLevel);
-            skill = CreateExternalSkill(definition, createdLevel, 0, true, effectiveMaxLevel);
+            var createdLevel = Math.Min(levels, maxLevel);
+            skill = CreateExternalSkill(definition, createdLevel, 0, true);
             ExternalSkills.Add(skill);
             RebuildSnapshot();
             return new SkillLevelChange<ExternalSkillInstance>(skill, 0, createdLevel, true);
         }
 
-        var change = skill.UpgradeLevel(levels);
+        var change = skill.UpgradeLevel(levels, maxLevel);
         if (change.NewLevel != change.OldLevel)
         {
             RebuildSnapshot();
@@ -141,15 +140,20 @@ public sealed class CharacterInstance
         return SkillListMutation.GetRequired(ExternalSkills, skillId, "External skill").SetActive(isActive);
     }
 
-    public void LevelUpAllSkillsMaxLevel()
+    public void LevelUpAllSkillsMaxLevel(
+        Func<ExternalSkillInstance, int> externalSkillMaxLevelResolver,
+        Func<InternalSkillInstance, int> internalSkillMaxLevelResolver)
     {
+        ArgumentNullException.ThrowIfNull(externalSkillMaxLevelResolver);
+        ArgumentNullException.ThrowIfNull(internalSkillMaxLevelResolver);
+
         foreach (var externalSkill in ExternalSkills)
         {
-            externalSkill.Level = externalSkill.MaxLevel;
+            externalSkill.Level = Math.Max(externalSkill.Level, externalSkillMaxLevelResolver(externalSkill));
         }
         foreach (var internalSkill in InternalSkills)
         {
-            internalSkill.Level = internalSkill.MaxLevel;
+            internalSkill.Level = Math.Max(internalSkill.Level, internalSkillMaxLevelResolver(internalSkill));
         }
         RebuildSnapshot();
     }
@@ -159,17 +163,17 @@ public sealed class CharacterInstance
         return SkillListMutation.Remove(ExternalSkills, skillId, beforeRemove: null, onChanged: RebuildSnapshot);
     }
 
-    public void SetInternalSkillState(InternalSkillDefinition definition, int level, int exp, int? maxLevel = null)
+    public void SetInternalSkillState(InternalSkillDefinition definition, int level, int exp)
     {
         ArgumentNullException.ThrowIfNull(definition);
         var skill = SkillListMutation.Find(InternalSkills, definition.Id);
         if (skill is null)
         {
-            InternalSkills.Add(CreateInternalSkill(definition, level, exp, maxLevel));
+            InternalSkills.Add(CreateInternalSkill(definition, level, exp));
         }
         else
         {
-            skill.SetState(level, exp, maxLevel);
+            skill.SetState(level, exp);
         }
 
         RebuildSnapshot();
@@ -178,22 +182,21 @@ public sealed class CharacterInstance
     public SkillLevelChange<InternalSkillInstance> UpgradeInternalSkillLevel(
         InternalSkillDefinition definition,
         int levels,
-        int? maxLevel = null)
+        int maxLevel)
     {
         ArgumentNullException.ThrowIfNull(definition);
         var skill = SkillListMutation.Find(InternalSkills, definition.Id);
         if (skill is null)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
-            var effectiveMaxLevel = maxLevel ?? SkillInstance.DefaultMaxLevel;
-            var createdLevel = Math.Min(levels, effectiveMaxLevel);
-            skill = CreateInternalSkill(definition, createdLevel, 0, effectiveMaxLevel);
+            var createdLevel = Math.Min(levels, maxLevel);
+            skill = CreateInternalSkill(definition, createdLevel, 0);
             InternalSkills.Add(skill);
             RebuildSnapshot();
             return new SkillLevelChange<InternalSkillInstance>(skill, 0, createdLevel, true);
         }
 
-        var change = skill.UpgradeLevel(levels);
+        var change = skill.UpgradeLevel(levels, maxLevel);
         if (change.NewLevel != change.OldLevel)
         {
             RebuildSnapshot();
@@ -469,19 +472,17 @@ public sealed class CharacterInstance
 
     private int ResolveMaxMp() => Math.Max(0, (int)Math.Round(GetStat(StatType.MaxMp)));
 
-    private ExternalSkillInstance CreateExternalSkill(ExternalSkillDefinition definition, int level, int exp, bool canUseInBattle, int? maxLevel = null) =>
+    private ExternalSkillInstance CreateExternalSkill(ExternalSkillDefinition definition, int level, int exp, bool canUseInBattle) =>
         new(definition, this, canUseInBattle)
         {
             Level = level,
             Exp = exp,
-            MaxLevel = maxLevel ?? SkillInstance.DefaultMaxLevel,
         };
 
-    private InternalSkillInstance CreateInternalSkill(InternalSkillDefinition definition, int level, int exp, int? maxLevel = null) =>
+    private InternalSkillInstance CreateInternalSkill(InternalSkillDefinition definition, int level, int exp) =>
         new(definition, this)
         {
             Level = level,
             Exp = exp,
-            MaxLevel = maxLevel ?? SkillInstance.DefaultMaxLevel,
         };
 }

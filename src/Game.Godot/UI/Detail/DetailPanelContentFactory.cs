@@ -18,7 +18,7 @@ public static class DetailPanelContentFactory
 			skill.Name,
 			ResolveSkillCategory(skill),
 			ResolveSkillIcon(skill),
-			SkillDescriptionFormatter.FormatBbCodeCn(skill, Game.ContentRepository),
+			SkillDescriptionFormatter.FormatBbCodeCn(skill, Game.ContentRepository, Game.SkillMaxLevelPolicy),
 			ResolveSkillTitleColor(skill),
 			action);
 	}

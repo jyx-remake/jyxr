@@ -112,10 +112,11 @@ offset_top = 264.0
 offset_right = 1691.0
 offset_bottom = 924.0
 theme = SubResource("Theme_dr12l")
-current_tab = 0
+current_tab = 2
 tabs_visible = false
 
 [node name="AdventureTab" type="Control" parent="ContentRoot/HeroTabContainer" index="1" unique_id=1308277667]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -154,7 +155,7 @@ offset_top = 84.0
 offset_right = 341.0
 offset_bottom = 144.0
 theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_font_sizes/font_size = 50
+theme_override_font_sizes/font_size = 30
 text = "完成度：0%"
 horizontal_alignment = 1
 
@@ -187,7 +188,6 @@ offset_bottom = 617.0
 text = "预览"
 
 [node name="MasteryTab" type="Control" parent="ContentRoot/HeroTabContainer" index="3" unique_id=627145902]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
@@ -200,7 +200,17 @@ offset_bottom = 646.0
 text = "武学精通代表当前各个技能的等级上限。你可以通过提高周目、完成解锁剧情:获得残章来提升。"
 autowrap_mode = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ContentRoot/HeroTabContainer/MasteryTab" index="1" unique_id=4709377]
+[node name="MasteryPreviewHardMaxCheckBox" type="CheckBox" parent="ContentRoot/HeroTabContainer/MasteryTab" index="1" unique_id=1519027442]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 543.0
+offset_right = 228.0
+offset_bottom = 621.0
+theme_override_font_sizes/font_size = 50
+text = "预览"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ContentRoot/HeroTabContainer/MasteryTab" index="2" unique_id=4709377]
 layout_mode = 0
 offset_left = 434.0
 offset_top = 476.0
@@ -316,7 +326,7 @@ offset_right = 98.0
 offset_bottom = 155.0
 text = "内功"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot/HeroTabContainer/MasteryTab" index="2" unique_id=200335630]
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot/HeroTabContainer/MasteryTab" index="3" unique_id=200335630]
 layout_mode = 0
 offset_left = 210.0
 offset_top = 23.0

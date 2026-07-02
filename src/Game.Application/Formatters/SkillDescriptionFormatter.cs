@@ -11,15 +11,25 @@ namespace Game.Application.Formatters;
 
 public static class SkillDescriptionFormatter
 {
-    public static string FormatBbCodeCn(SkillInstance skill, IContentRepository contentRepository)
+    public static string FormatBbCodeCn(
+        SkillInstance skill,
+        IContentRepository contentRepository,
+        SkillMaxLevelPolicy? skillMaxLevelPolicy = null)
     {
         ArgumentNullException.ThrowIfNull(skill);
         ArgumentNullException.ThrowIfNull(contentRepository);
+        skillMaxLevelPolicy ??= new SkillMaxLevelPolicy();
 
         return skill switch
         {
-            ExternalSkillInstance externalSkill => FormatExternalSkillBbCodeCn(externalSkill, contentRepository),
-            InternalSkillInstance internalSkill => FormatInternalSkillBbCodeCn(internalSkill, contentRepository),
+            ExternalSkillInstance externalSkill => FormatExternalSkillBbCodeCn(
+                externalSkill,
+                contentRepository,
+                skillMaxLevelPolicy.GetMaxLevel(externalSkill)),
+            InternalSkillInstance internalSkill => FormatInternalSkillBbCodeCn(
+                internalSkill,
+                contentRepository,
+                skillMaxLevelPolicy.GetMaxLevel(internalSkill)),
             FormSkillInstance formSkill => FormatFormSkillBbCodeCn(formSkill),
             LegendSkillInstance legendSkill => FormatLegendSkillBbCodeCn(legendSkill, contentRepository),
             SpecialSkillInstance specialSkill => FormatSpecialSkillBbCodeCn(specialSkill),
@@ -29,33 +39,35 @@ public static class SkillDescriptionFormatter
 
     private static string FormatExternalSkillBbCodeCn(
         ExternalSkillInstance skill,
-        IContentRepository contentRepository)
+        IContentRepository contentRepository,
+        int maxLevel)
     {
         var builder = new StringBuilder();
         AppendDescription(builder, skill.Description);
-        AppendLine(builder, $"等级 {skill.Level}{FormatMaxLevel(skill.MaxLevel)}");
+        AppendLine(builder, $"等级 {skill.Level}{FormatMaxLevel(maxLevel)}");
         AppendLine(builder, $"经验 {skill.Exp}/{skill.LevelUpExp}");
         AppendBaseCombatLines(builder, skill);
         AppendLine(builder, FormatAffinityBbCodeCn(skill.IsHarmony, skill.Affinity));
         AppendBuffLines(builder, skill.Buffs);
-        AppendPassiveAffixLines(builder, skill.Definition.Affixes, skill.Level, skill.MaxLevel, contentRepository);
+        AppendPassiveAffixLines(builder, skill.Definition.Affixes, skill.Level, maxLevel, contentRepository);
         return builder.ToString().TrimEnd('\n');
     }
 
     private static string FormatInternalSkillBbCodeCn(
         InternalSkillInstance skill,
-        IContentRepository contentRepository)
+        IContentRepository contentRepository,
+        int maxLevel)
     {
         var builder = new StringBuilder();
         AppendDescription(builder, skill.Description);
-        AppendLine(builder, $"等级 {skill.Level}{FormatMaxLevel(skill.MaxLevel)}");
+        AppendLine(builder, $"等级 {skill.Level}{FormatMaxLevel(maxLevel)}");
         AppendLine(builder, $"经验 {skill.Exp}/{skill.LevelUpExp}");
         AppendRedLine(builder, $"+攻击 {FormatPercent(skill.AttackRatio)}");
         AppendGreenLine(builder, $"+防御 {FormatPercent(skill.DefenceRatio)}");
         AppendYellowLine(builder, $"+爆发 {FormatPercent(skill.CriticalRatio)}");
         AppendCyanLine(builder, $"阴适性 {skill.Yin}");
         AppendYellowLine(builder, $"阳适性 {skill.Yang}");
-        AppendPassiveAffixLines(builder, skill.Definition.Affixes, skill.Level, skill.MaxLevel, contentRepository);
+        AppendPassiveAffixLines(builder, skill.Definition.Affixes, skill.Level, maxLevel, contentRepository);
         return builder.ToString().TrimEnd('\n');
     }
 

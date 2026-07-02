@@ -12,7 +12,10 @@ public sealed class PartyService
     {
         ArgumentNullException.ThrowIfNull(session);
         _session = session;
-        _initialCharacterFactory = new InitialCharacterFactory(session.ContentRepository, session.Config);
+        _initialCharacterFactory = new InitialCharacterFactory(
+            session.ContentRepository,
+            session.Config,
+            session.SkillMaxLevelPolicy);
     }
 
     private GameState State => _session.State;

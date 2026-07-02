@@ -14,6 +14,7 @@ internal sealed class HeroSkillMasteryView
 	private readonly JyButton _daofaButton;
 	private readonly JyButton _qimenButton;
 	private readonly JyButton _neigongButton;
+	private readonly CheckBox _previewHardMaxCheckBox;
 
 	private MasterySkillFilter _filter = MasterySkillFilter.All;
 
@@ -26,7 +27,8 @@ internal sealed class HeroSkillMasteryView
 		JyButton jianfaButton,
 		JyButton daofaButton,
 		JyButton qimenButton,
-		JyButton neigongButton)
+		JyButton neigongButton,
+		CheckBox previewHardMaxCheckBox)
 	{
 		_gridContainer = gridContainer ?? throw new ArgumentNullException(nameof(gridContainer));
 		_skillBoxScene = skillBoxScene ?? throw new ArgumentNullException(nameof(skillBoxScene));
@@ -37,6 +39,7 @@ internal sealed class HeroSkillMasteryView
 		_daofaButton = daofaButton ?? throw new ArgumentNullException(nameof(daofaButton));
 		_qimenButton = qimenButton ?? throw new ArgumentNullException(nameof(qimenButton));
 		_neigongButton = neigongButton ?? throw new ArgumentNullException(nameof(neigongButton));
+		_previewHardMaxCheckBox = previewHardMaxCheckBox ?? throw new ArgumentNullException(nameof(previewHardMaxCheckBox));
 	}
 
 	public void Initialize()
@@ -47,6 +50,7 @@ internal sealed class HeroSkillMasteryView
 		_daofaButton.Pressed += () => SetFilter(MasterySkillFilter.Daofa);
 		_qimenButton.Pressed += () => SetFilter(MasterySkillFilter.Qimen);
 		_neigongButton.Pressed += () => SetFilter(MasterySkillFilter.Internal);
+		_previewHardMaxCheckBox.Toggled += _ => Render();
 		Render();
 	}
 
@@ -64,7 +68,7 @@ internal sealed class HeroSkillMasteryView
 	private void Render()
 	{
 		ClearGrid();
-		foreach (var skill in _presenter.GetSkills(_filter))
+		foreach (var skill in _presenter.GetSkills(_filter, _previewHardMaxCheckBox.ButtonPressed))
 		{
 			_gridContainer.AddChild(CreateSkillBox(skill));
 		}

@@ -173,6 +173,141 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
     }
 
     [Fact]
+    public void BattleServicePreviewOrdinaryVictorySettlement_NormalDifficultyDoesNotDropFragments()
+    {
+        var externalSkill = TestContentFactory.CreateExternalSkill("dragon_palm", hard: 1d);
+        var internalSkill = TestContentFactory.CreateInternalSkill("yijinjing", hard: 1d);
+        var repository = TestContentFactory.CreateRepository(
+            externalSkills: [externalSkill],
+            internalSkills: [internalSkill]);
+        var state = new GameState();
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig
+            {
+                OrdinaryBattleDropChance = 0d,
+                HardModeCanzhangDropRate = 1d,
+                CrazyModeCanzhangDropRate = 1d,
+            });
+        var battleState = new BattleState(
+            new BattleGrid(4, 4),
+            [
+                CreateUnit("hero", team: 1, level: 1, new GridPosition(0, 0)),
+                CreateUnit("enemy", team: 2, level: 10, new GridPosition(3, 0)),
+            ]);
+
+        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+
+        Assert.Empty(settlement.Drops.OfType<OrdinaryBattleSkillFragmentRewardDrop>());
+    }
+
+    [Fact]
+    public void BattleServicePreviewOrdinaryVictorySettlement_HardDifficultyDropsFilteredExternalFragments()
+    {
+        var low = TestContentFactory.CreateExternalSkill("too_low", hard: 2d);
+        var eligible = TestContentFactory.CreateExternalSkill("eligible", hard: 5d);
+        var tooHard = TestContentFactory.CreateExternalSkill("too_hard", hard: 8d);
+        var internalSkill = TestContentFactory.CreateInternalSkill("internal", hard: 1d);
+        var repository = TestContentFactory.CreateRepository(
+            externalSkills: [low, eligible, tooHard],
+            internalSkills: [internalSkill]);
+        var state = new GameState();
+        state.Adventure.SetDifficulty(GameDifficulty.Hard);
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig
+            {
+                OrdinaryBattleDropChance = 0d,
+                HardModeCanzhangDropRate = 1d,
+                CanzhangDropRateInternalRate = double.PositiveInfinity,
+                CanzhangMaxHardSkill = 8d,
+                MaxLevel = 30,
+            });
+        var battleState = new BattleState(
+            new BattleGrid(4, 4),
+            [
+                CreateUnit("hero", team: 1, level: 1, new GridPosition(0, 0)),
+                CreateUnit("enemy", team: 2, level: 30, new GridPosition(3, 0)),
+            ]);
+
+        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+
+        var fragment = Assert.Single(settlement.Drops.OfType<OrdinaryBattleSkillFragmentRewardDrop>());
+        Assert.Equal(SkillFragmentKind.External, fragment.Kind);
+        Assert.Equal("eligible", fragment.SkillId);
+        Assert.Equal("eligible残章", fragment.DisplayName);
+    }
+
+    [Fact]
+    public void BattleServicePreviewOrdinaryVictorySettlement_CrazyDifficultyDropsInternalFragmentsWithRoundScaling()
+    {
+        var lowExternal = TestContentFactory.CreateExternalSkill("too_hard_external", hard: 9d);
+        var internalSkill = TestContentFactory.CreateInternalSkill("eligible_internal", hard: 2d);
+        var repository = TestContentFactory.CreateRepository(
+            externalSkills: [lowExternal],
+            internalSkills: [internalSkill]);
+        var state = new GameState();
+        state.Adventure.SetDifficulty(GameDifficulty.Crazy);
+        state.Adventure.SetRound(3);
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig
+            {
+                OrdinaryBattleDropChance = 0d,
+                CrazyModeCanzhangDropRate = 0d,
+                CrazyModeCanzhangDropRatePerRound = 0.5d,
+                CanzhangDropRateInternalRate = 1d,
+                CanzhangMaxHardInternalSkill = 8d,
+            });
+        var battleState = new BattleState(
+            new BattleGrid(4, 4),
+            [
+                CreateUnit("hero", team: 1, level: 1, new GridPosition(0, 0)),
+                CreateUnit("enemy", team: 2, level: 10, new GridPosition(3, 0)),
+            ]);
+
+        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+
+        var fragment = Assert.Single(settlement.Drops.OfType<OrdinaryBattleSkillFragmentRewardDrop>());
+        Assert.Equal(SkillFragmentKind.Internal, fragment.Kind);
+        Assert.Equal("eligible_internal", fragment.SkillId);
+    }
+
+    [Fact]
+    public void BattleServicePreviewOrdinaryVictorySettlement_NoFragmentCandidatesDoesNotThrow()
+    {
+        var externalSkill = TestContentFactory.CreateExternalSkill("too_hard", hard: 9d);
+        var internalSkill = TestContentFactory.CreateInternalSkill("also_too_hard", hard: 9d);
+        var repository = TestContentFactory.CreateRepository(
+            externalSkills: [externalSkill],
+            internalSkills: [internalSkill]);
+        var state = new GameState();
+        state.Adventure.SetDifficulty(GameDifficulty.Hard);
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig
+            {
+                OrdinaryBattleDropChance = 0d,
+                HardModeCanzhangDropRate = 1d,
+                CanzhangDropRateInternalRate = 1d,
+            });
+        var battleState = new BattleState(
+            new BattleGrid(4, 4),
+            [
+                CreateUnit("hero", team: 1, level: 1, new GridPosition(0, 0)),
+                CreateUnit("enemy", team: 2, level: 10, new GridPosition(3, 0)),
+            ]);
+
+        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+
+        Assert.Empty(settlement.Drops.OfType<OrdinaryBattleSkillFragmentRewardDrop>());
+    }
+
+    [Fact]
     public void BattleServiceApplyOrdinaryVictorySettlement_IgnoresFixedPlayerTeamNpcExperience()
     {
         var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero", level: 1);
@@ -199,6 +334,53 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
 
         Assert.Equal(5, hero.Experience);
         Assert.Equal(0, fixedAlly.Experience);
+    }
+
+    [Fact]
+    public void BattleServiceApplyOrdinaryVictorySettlement_AppliesFragmentsToProfileOnlyAndPublishesOnce()
+    {
+        var externalSkill = TestContentFactory.CreateExternalSkill("dragon_palm");
+        var internalSkill = TestContentFactory.CreateInternalSkill("yijinjing");
+        var repository = TestContentFactory.CreateRepository(
+            externalSkills: [externalSkill],
+            internalSkills: [internalSkill]);
+        var state = new GameState();
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero", level: 1);
+        var hero = TestContentFactory.CreateCharacterInstance("hero", heroDefinition, state.EquipmentInstanceFactory);
+        state.Party.AddMember(hero);
+        var session = new GameSession(state, repository);
+        var profileChangedCount = 0;
+        var inventoryChangedCount = 0;
+        using var profileSubscription = session.Events.Subscribe<ProfileChangedEvent>(_ => profileChangedCount++);
+        using var inventorySubscription = session.Events.Subscribe<InventoryChangedEvent>(_ => inventoryChangedCount++);
+        var battleState = new BattleState(
+            new BattleGrid(4, 4),
+            [
+                new BattleUnit("hero", hero, 1, new GridPosition(0, 0)),
+                CreateUnit("enemy", team: 2, level: 10, new GridPosition(3, 0)),
+            ]);
+        var settlement = new OrdinaryBattleVictorySettlement(
+            5,
+            0,
+            0,
+            [
+                new OrdinaryBattleSkillFragmentRewardDrop(
+                    SkillFragmentKind.External,
+                    externalSkill.Id,
+                    $"{externalSkill.Name}残章"),
+                new OrdinaryBattleSkillFragmentRewardDrop(
+                    SkillFragmentKind.Internal,
+                    internalSkill.Id,
+                    $"{internalSkill.Name}残章"),
+            ]);
+
+        session.BattleService.ApplyOrdinaryVictorySettlement(battleState, settlement);
+
+        Assert.Equal(1, session.Profile.GetSkillMaxLevelBonus(externalSkill.Id));
+        Assert.Equal(1, session.Profile.GetSkillMaxLevelBonus(internalSkill.Id));
+        Assert.Empty(state.Inventory.Entries);
+        Assert.Equal(1, profileChangedCount);
+        Assert.Equal(0, inventoryChangedCount);
     }
 
     [Fact]

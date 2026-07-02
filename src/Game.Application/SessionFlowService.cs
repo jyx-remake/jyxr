@@ -12,7 +12,10 @@ public sealed class SessionFlowService
     {
         ArgumentNullException.ThrowIfNull(session);
         _session = session;
-        _newGameStateFactory = new NewGameStateFactory(session.ContentRepository, session.Config);
+        _newGameStateFactory = new NewGameStateFactory(
+            session.ContentRepository,
+            session.Config,
+            profileProvider: () => session.Profile);
     }
 
     private GameConfig Config => _session.Config;

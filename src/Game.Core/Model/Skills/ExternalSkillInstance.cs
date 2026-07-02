@@ -83,20 +83,20 @@ public sealed class ExternalSkillInstance(
         return true;
     }
 
-    public void SetState(int level, int exp, bool isActive, int? maxLevel = null)
+    public void SetState(int level, int exp, bool isActive)
     {
-        MaxLevel = maxLevel ?? DefaultMaxLevel;
         Level = level;
         Exp = exp;
         _isActive = isActive;
     }
 
-    public SkillLevelChange<ExternalSkillInstance> UpgradeLevel(int levels)
+    public SkillLevelChange<ExternalSkillInstance> UpgradeLevel(int levels, int maxLevel)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
+        ValidateMaxLevel(maxLevel);
 
         var oldLevel = Level;
-        var targetLevel = Math.Min(checked(oldLevel + levels), MaxLevel);
+        var targetLevel = Math.Max(oldLevel, Math.Min(checked(oldLevel + levels), maxLevel));
         if (targetLevel == oldLevel)
         {
             return new SkillLevelChange<ExternalSkillInstance>(this, oldLevel, targetLevel, false);

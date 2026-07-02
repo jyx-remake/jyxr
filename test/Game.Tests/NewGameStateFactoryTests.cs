@@ -22,8 +22,8 @@ public sealed class NewGameStateFactoryTests
             internalSkills: [breath]);
         var config = new GameConfig
         {
-            MaxExternalSkillLevel = 7,
-            MaxInternalSkillLevel = 9,
+            BaseExternalSkillMaxLevel = 7,
+            BaseInternalSkillMaxLevel = 9,
         };
 
         var state = new NewGameStateFactory(repository, config).Create(["hero", "ally"]);
@@ -32,9 +32,7 @@ public sealed class NewGameStateFactoryTests
         var hero = state.Party.GetMember("hero");
         var externalSkill = Assert.Single(hero.ExternalSkills);
         var internalSkill = Assert.Single(hero.InternalSkills);
-        Assert.Equal(7, externalSkill.MaxLevel);
         Assert.Equal(7, externalSkill.Level);
-        Assert.Equal(9, internalSkill.MaxLevel);
         Assert.Equal(9, internalSkill.Level);
     }
 
@@ -54,8 +52,8 @@ public sealed class NewGameStateFactoryTests
         var config = new GameConfig
         {
             MaximizeNewPartyCharacterSkills = false,
-            MaxExternalSkillLevel = 7,
-            MaxInternalSkillLevel = 9,
+            BaseExternalSkillMaxLevel = 7,
+            BaseInternalSkillMaxLevel = 9,
         };
 
         var state = new NewGameStateFactory(repository, config).Create(["hero"]);
@@ -63,9 +61,7 @@ public sealed class NewGameStateFactoryTests
         var hero = state.Party.GetMember("hero");
         var externalSkill = Assert.Single(hero.ExternalSkills);
         var internalSkill = Assert.Single(hero.InternalSkills);
-        Assert.Equal(7, externalSkill.MaxLevel);
         Assert.Equal(3, externalSkill.Level);
-        Assert.Equal(9, internalSkill.MaxLevel);
         Assert.Equal(4, internalSkill.Level);
     }
 
@@ -84,8 +80,8 @@ public sealed class NewGameStateFactoryTests
             internalSkills: [breath]);
         var config = new GameConfig
         {
-            MaxExternalSkillLevel = 7,
-            MaxInternalSkillLevel = 9,
+            BaseExternalSkillMaxLevel = 7,
+            BaseInternalSkillMaxLevel = 9,
         };
         var session = new GameSession(new GameState(), repository, config: config);
 
@@ -95,6 +91,49 @@ public sealed class NewGameStateFactoryTests
         Assert.Equal("ally", ally.Id);
         Assert.Equal(7, Assert.Single(ally.ExternalSkills).Level);
         Assert.Equal(9, Assert.Single(ally.InternalSkills).Level);
+    }
+
+    [Fact]
+    public void Create_MaxesSkillsUsingProfileBonus()
+    {
+        var slash = TestContentFactory.CreateExternalSkill("slash");
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition(
+            "hero",
+            externalSkills: [new InitialExternalSkillEntryDefinition(slash, Level: 1)]);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            externalSkills: [slash]);
+        var profile = new GameProfile();
+        profile.AddSkillMaxLevelBonus("slash", 3);
+        var policy = new SkillMaxLevelPolicy(profile: profile);
+
+        var state = new NewGameStateFactory(repository, skillMaxLevelPolicy: policy).Create(["hero"]);
+
+        var skill = Assert.Single(state.Party.GetMember("hero").ExternalSkills);
+        Assert.Equal(13, skill.Level);
+    }
+
+    [Fact]
+    public void Create_MaxesSkillsUsingTargetRoundBonus()
+    {
+        var slash = TestContentFactory.CreateExternalSkill("slash");
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition(
+            "hero",
+            externalSkills: [new InitialExternalSkillEntryDefinition(slash, Level: 1)]);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            externalSkills: [slash]);
+        var config = new GameConfig
+        {
+            BaseExternalSkillMaxLevel = 10,
+            RoundsPerMaxSkillLevelIncrease = 2,
+            AbsoluteSkillMaxLevel = 20,
+        };
+
+        var state = new NewGameStateFactory(repository, config).Create(["hero"], round: 4);
+
+        var skill = Assert.Single(state.Party.GetMember("hero").ExternalSkills);
+        Assert.Equal(12, skill.Level);
     }
 
     [Fact]
@@ -113,8 +152,8 @@ public sealed class NewGameStateFactoryTests
         var config = new GameConfig
         {
             MaximizeNewPartyCharacterSkills = false,
-            MaxExternalSkillLevel = 7,
-            MaxInternalSkillLevel = 9,
+            BaseExternalSkillMaxLevel = 7,
+            BaseInternalSkillMaxLevel = 9,
         };
         var session = new GameSession(new GameState(), repository, config: config);
 

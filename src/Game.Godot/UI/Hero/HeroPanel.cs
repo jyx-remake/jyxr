@@ -112,13 +112,17 @@ public partial class HeroPanel : JyPanel
 		new(
 			GetNode<GridContainer>("%GridContainer"),
 			SkillBoxScene,
-			new HeroSkillMasteryPresenter(Game.ContentRepository),
+			new HeroSkillMasteryPresenter(
+				Game.ContentRepository,
+				Game.SkillMaxLevelPolicy,
+				Game.Config.AbsoluteSkillMaxLevel),
 			GetNode<JyButton>("%AllButton"),
 			GetNode<JyButton>("%QuanzhangButton"),
 			GetNode<JyButton>("%JianfaButton"),
 			GetNode<JyButton>("%DaofaButton"),
 			GetNode<JyButton>("%QimenButton"),
-			GetNode<JyButton>("%NeigongButton"));
+			GetNode<JyButton>("%NeigongButton"),
+			GetNode<CheckBox>("%MasteryPreviewHardMaxCheckBox"));
 
 	private void OnPreviewToggled(bool _) =>
 		RenderAchievements();

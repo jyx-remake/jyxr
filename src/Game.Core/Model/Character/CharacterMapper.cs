@@ -14,8 +14,6 @@ public static class CharacterMapper
         GameConfig? config = null)
     {
         ArgumentNullException.ThrowIfNull(equipmentInstanceFactory);
-        var externalSkillMaxLevel = config?.MaxExternalSkillLevel ?? SkillInstance.DefaultMaxLevel;
-        var internalSkillMaxLevel = config?.MaxInternalSkillLevel ?? SkillInstance.DefaultMaxLevel;
         var character = new CharacterInstance
         {
             Id = id,
@@ -35,14 +33,12 @@ public static class CharacterMapper
             {
                 Level = skill.Level,
                 Exp = 0,
-                MaxLevel = externalSkillMaxLevel,
             }));
         character.InternalSkills.AddRange(definition.InternalSkills.Select(skill =>
             new InternalSkillInstance(skill.Skill, character)
             {
                 Level = skill.Level,
                 Exp = 0,
-                MaxLevel = internalSkillMaxLevel,
             }));
 
         var equippedInternalSkill = definition.InternalSkills.FirstOrDefault(skill => skill.Equipped);
@@ -67,8 +63,6 @@ public static class CharacterMapper
         IContentRepository contentRepository,
         GameConfig? config = null)
     {
-        var externalSkillMaxLevel = config?.MaxExternalSkillLevel ?? SkillInstance.DefaultMaxLevel;
-        var internalSkillMaxLevel = config?.MaxInternalSkillLevel ?? SkillInstance.DefaultMaxLevel;
         var character = new CharacterInstance
         {
             Id = record.Id,
@@ -99,7 +93,6 @@ public static class CharacterMapper
             {
                 Level = skill.Level,
                 Exp = skill.Exp,
-                MaxLevel = externalSkillMaxLevel,
             }));
         character.InternalSkills.AddRange(record.InternalSkills.Select(skill =>
             new InternalSkillInstance(
@@ -108,7 +101,6 @@ public static class CharacterMapper
             {
                 Level = skill.Level,
                 Exp = skill.Exp,
-                MaxLevel = internalSkillMaxLevel,
             }));
 
         var equippedInternalSkill = record.InternalSkills.FirstOrDefault(skill => skill.Equipped);

@@ -9,6 +9,7 @@ public sealed class GameConfig
 	public double RoundEnemyHpAddRatio { get; init; } = 0.15d;
 	public double RoundEnemyMpAddRatio { get; init; } = 0.15d;
 	public int RoundsPerMaxSkillLevelIncrease { get; init; } = 2;
+	public int RoundsPerMaxLevelCommandIncrease { get; init; } = 2;
 	public int RoundsPerNpcSkillLevelIncrease { get; init; } = 2;
 	public int DefaultMaxBattleSpTime { get; init; } = 3000;
 	public bool ConsoleEnabled { get; init; } = true;
@@ -19,14 +20,21 @@ public sealed class GameConfig
 	public int MaxAttribute { get; init; } = 300;
 	public ItemRequirementStatSource ItemRequirementStatSource { get; init; } = ItemRequirementStatSource.Final;
 	public bool MaximizeNewPartyCharacterSkills { get; init; } = true;
-	public int MaxExternalSkillLevel { get; init; } = 20;
-	public int MaxInternalSkillLevel { get; init; } = 20;
+	public int BaseExternalSkillMaxLevel { get; init; } = 10;
+	public int BaseInternalSkillMaxLevel { get; init; } = 10;
+	public int AbsoluteSkillMaxLevel { get; init; } = 20;
 	public int MaxHpMp { get; init; } = 10000;
 	public int MaxHpMpPerRound { get; init; } = 1000;
 	public int MaxLevel { get; init; } = 30;
 	public int BattlePlayerTeam { get; init; } = 1;
 	public double BattleGoldDropChance { get; init; } = 0.005d;
 	public double OrdinaryBattleDropChance { get; init; } = 0.1d;
+	public double HardModeCanzhangDropRate { get; init; } = 0.015d;
+	public double CrazyModeCanzhangDropRate { get; init; } = 0.03d;
+	public double CrazyModeCanzhangDropRatePerRound { get; init; } = 0.005d;
+	public double CanzhangMaxHardSkill { get; init; } = 8d;
+	public double CanzhangMaxHardInternalSkill { get; init; } = 8d;
+	public double CanzhangDropRateInternalRate { get; init; } = 2d;
 	public MapPosition DefaultLargeMapPosition { get; init; } = new(447, 383);
 	public string InitialStorySegmentId { get; init; } = "开局答题";
 

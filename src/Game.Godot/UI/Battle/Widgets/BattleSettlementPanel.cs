@@ -1,3 +1,4 @@
+using Game.Application;
 using Game.Core.Model;
 using Game.Godot.UI;
 using Godot;
@@ -8,6 +9,9 @@ public partial class BattleSettlementPanel : JyPanel
 {
 	[Export]
 	public PackedScene InventoryItemBoxScene { get; set; } = null!;
+
+	[Export]
+	public PackedScene SkillFragmentRewardBoxScene { get; set; } = null!;
 
 	private readonly TaskCompletionSource _confirmationCompletion =
 		new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -105,7 +109,7 @@ public partial class BattleSettlementPanel : JyPanel
 		FillRewardList(_view.RewardEntries);
 	}
 
-	private void FillRewardList(IReadOnlyList<InventoryEntry> rewardEntries)
+	private void FillRewardList(IReadOnlyList<BattleSettlementRewardView> rewardEntries)
 	{
 		ClearGrid();
 		_emptyLabel.Visible = rewardEntries.Count == 0
@@ -113,8 +117,18 @@ public partial class BattleSettlementPanel : JyPanel
 
 		foreach (var rewardEntry in rewardEntries)
 		{
-			_gridContainer.AddChild(CreateItemBox(rewardEntry));
+			_gridContainer.AddChild(CreateRewardControl(rewardEntry));
 		}
+	}
+
+	private Control CreateRewardControl(BattleSettlementRewardView reward)
+	{
+		return reward switch
+		{
+			BattleSettlementInventoryRewardView inventoryReward => CreateItemBox(inventoryReward.Entry),
+			BattleSettlementSkillFragmentRewardView fragmentReward => CreateSkillFragmentBox(fragmentReward),
+			_ => throw new NotSupportedException($"Unsupported settlement reward view '{reward.GetType().Name}'."),
+		};
 	}
 
 	private InventoryItemBox CreateItemBox(InventoryEntry entry)
@@ -134,6 +148,24 @@ public partial class BattleSettlementPanel : JyPanel
 		itemBox.Setup(entry);
 		itemBox.EntrySelected += OnRewardEntrySelected;
 		return itemBox;
+	}
+
+	private BattleSkillFragmentRewardBox CreateSkillFragmentBox(BattleSettlementSkillFragmentRewardView reward)
+	{
+		if (SkillFragmentRewardBoxScene is null)
+		{
+			throw new InvalidOperationException("SkillFragmentRewardBoxScene is not assigned.");
+		}
+
+		var instance = SkillFragmentRewardBoxScene.Instantiate();
+		if (instance is not BattleSkillFragmentRewardBox rewardBox)
+		{
+			instance.QueueFree();
+			throw new InvalidOperationException("Skill fragment reward box scene root must be BattleSkillFragmentRewardBox.");
+		}
+
+		rewardBox.Setup(reward);
+		return rewardBox;
 	}
 
 	private static void OnRewardEntrySelected(InventoryEntry entry)

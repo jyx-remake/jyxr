@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
@@ -151,8 +152,9 @@ public sealed class SaveGameTests
 
         var restored = saveGame.RestoreCharacters(repository)["hero"];
 
-        Assert.Equal(20, restored.GetExternalSkills().Single().MaxLevel);
-        Assert.Equal(20, restored.GetInternalSkills().Single().MaxLevel);
+        var policy = new SkillMaxLevelPolicy();
+        Assert.Equal(10, policy.GetMaxLevel(restored.GetExternalSkills().Single()));
+        Assert.Equal(10, policy.GetMaxLevel(restored.GetInternalSkills().Single()));
     }
 
     [Fact]

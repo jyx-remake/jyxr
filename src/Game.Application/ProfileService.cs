@@ -46,6 +46,27 @@ public sealed class ProfileService
         return true;
     }
 
+    public void AddSkillMaxLevelBonus(string skillId, int levels)
+    {
+        Profile.AddSkillMaxLevelBonus(skillId, levels);
+        _logger.Info($"Added {levels} skill max level bonus to '{skillId}'.");
+    }
+
+    public bool TryAddSkillMaxLevelBonusOnce(string skillId, int levels, string? onceKey)
+    {
+        var applied = Profile.TryAddSkillMaxLevelBonusOnce(skillId, levels, onceKey);
+        if (applied)
+        {
+            _logger.Info($"Added {levels} skill max level bonus to '{skillId}'.");
+        }
+        else
+        {
+            _logger.Info($"Skipped consumed skill max level bonus key '{onceKey}' for '{skillId}'.");
+        }
+
+        return applied;
+    }
+
     public void AddDeaths(int count = 1)
     {
         Profile.AddDeaths(count);

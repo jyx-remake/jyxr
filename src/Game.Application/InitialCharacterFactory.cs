@@ -8,12 +8,17 @@ public sealed class InitialCharacterFactory
 {
     private readonly IContentRepository _contentRepository;
     private readonly GameConfig _config;
+    private readonly SkillMaxLevelPolicy _skillMaxLevelPolicy;
 
-    public InitialCharacterFactory(IContentRepository contentRepository, GameConfig? config = null)
+    public InitialCharacterFactory(
+        IContentRepository contentRepository,
+        GameConfig? config = null,
+        SkillMaxLevelPolicy? skillMaxLevelPolicy = null)
     {
         ArgumentNullException.ThrowIfNull(contentRepository);
         _contentRepository = contentRepository;
         _config = config ?? new GameConfig();
+        _skillMaxLevelPolicy = skillMaxLevelPolicy ?? new SkillMaxLevelPolicy(_config);
     }
 
     public CharacterInstance Create(string characterId, EquipmentInstanceFactory equipmentInstanceFactory)
@@ -25,7 +30,9 @@ public sealed class InitialCharacterFactory
         var character = CharacterMapper.CreateInitial(characterId, definition, equipmentInstanceFactory, _config);
         if (_config.MaximizeNewPartyCharacterSkills)
         {
-            character.LevelUpAllSkillsMaxLevel();
+            character.LevelUpAllSkillsMaxLevel(
+                _skillMaxLevelPolicy.GetMaxLevel,
+                _skillMaxLevelPolicy.GetMaxLevel);
         }
 
         return character;

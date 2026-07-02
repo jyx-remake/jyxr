@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="4_button"]
 [ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="5_button_texture"]
 [ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="6_font"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_skill_fragment_reward_box.tscn" id="7_fragment_box"]
 
 [sub_resource type="LabelSettings" id="1_title"]
 font = ExtResource("6_font")
@@ -21,6 +22,7 @@ outline_color = Color(0, 0, 0, 1)
 [node name="BattleSettlementPanel" unique_id=2072633636 instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
 InventoryItemBoxScene = ExtResource("3_item_box")
+SkillFragmentRewardBoxScene = ExtResource("7_fragment_box")
 
 [node name="TitleLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1998335815]
 unique_name_in_owner = true

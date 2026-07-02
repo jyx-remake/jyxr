@@ -268,8 +268,67 @@ public sealed class SessionEventsTests
 
         var toast = Assert.Single(publishedEvents.OfType<ToastRequestedEvent>());
         Assert.Equal("武学精通【starter_sword】+ 2", toast.Message);
+        Assert.Equal(2, session.Profile.GetSkillMaxLevelBonus("starter_sword"));
+        Assert.Single(publishedEvents.OfType<ProfileChangedEvent>());
         Assert.DoesNotContain(publishedEvents, static sessionEvent => sessionEvent is CharacterChangedEvent);
         Assert.Null(hero.GetExternalSkillLevel("starter_sword"));
+    }
+
+    [Fact]
+    public async Task StoryCommandDispatcher_MaxLevel_AddsConfiguredRoundCommandBonus()
+    {
+        var skill = TestContentFactory.CreateExternalSkill("starter_sword");
+        var repository = TestContentFactory.CreateRepository(externalSkills: [skill]);
+        var state = new GameState();
+        state.Adventure.SetRound(5);
+        var config = new GameConfig
+        {
+            RoundsPerMaxSkillLevelIncrease = 2,
+            RoundsPerMaxLevelCommandIncrease = 3,
+        };
+        var session = new GameSession(state, repository, config: config);
+        var dispatcher = new StoryCommandDispatcher(session, new RecordingRuntimeHost());
+        var publishedEvents = CollectPublishedEvents(session);
+
+        await dispatcher.ExecuteCommandAsync("maxlevel", [ExprValue.FromString("starter_sword")], default);
+
+        var toast = Assert.Single(publishedEvents.OfType<ToastRequestedEvent>());
+        Assert.Equal("武学精通【starter_sword】+ 2", toast.Message);
+        Assert.Equal(2, session.Profile.GetSkillMaxLevelBonus("starter_sword"));
+        Assert.Single(publishedEvents.OfType<ProfileChangedEvent>());
+    }
+
+    [Fact]
+    public async Task StoryCommandDispatcher_MaxLevel_SkipsConsumedOnceKey()
+    {
+        var skill = TestContentFactory.CreateExternalSkill("starter_sword");
+        var repository = TestContentFactory.CreateRepository(externalSkills: [skill]);
+        var session = new GameSession(new GameState(), repository);
+        var dispatcher = new StoryCommandDispatcher(session, new RecordingRuntimeHost());
+        var publishedEvents = CollectPublishedEvents(session);
+
+        await dispatcher.ExecuteCommandAsync(
+            "maxlevel",
+            [
+                ExprValue.FromString("starter_sword"),
+                ExprValue.FromNumber(2),
+                ExprValue.FromString("reward.starter_sword.mastery"),
+            ],
+            default);
+        await dispatcher.ExecuteCommandAsync(
+            "maxlevel",
+            [
+                ExprValue.FromString("starter_sword"),
+                ExprValue.FromNumber(2),
+                ExprValue.FromString("reward.starter_sword.mastery"),
+            ],
+            default);
+
+        var toast = Assert.Single(publishedEvents.OfType<ToastRequestedEvent>());
+        Assert.Equal("武学精通【starter_sword】+ 2", toast.Message);
+        Assert.Equal(2, session.Profile.GetSkillMaxLevelBonus("starter_sword"));
+        Assert.Contains("reward.starter_sword.mastery", session.Profile.ConsumedSkillMaxLevelKeys);
+        Assert.Single(publishedEvents.OfType<ProfileChangedEvent>());
     }
 
     [Fact]

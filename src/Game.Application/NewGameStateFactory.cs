@@ -5,14 +5,22 @@ namespace Game.Application;
 
 public sealed class NewGameStateFactory
 {
-    private readonly InitialCharacterFactory _initialCharacterFactory;
+    private readonly IContentRepository _contentRepository;
     private readonly GameConfig _config;
+    private readonly SkillMaxLevelPolicy? _skillMaxLevelPolicy;
+    private readonly Func<GameProfile> _profileProvider;
 
-    public NewGameStateFactory(IContentRepository contentRepository, GameConfig? config = null)
+    public NewGameStateFactory(
+        IContentRepository contentRepository,
+        GameConfig? config = null,
+        SkillMaxLevelPolicy? skillMaxLevelPolicy = null,
+        Func<GameProfile>? profileProvider = null)
     {
         ArgumentNullException.ThrowIfNull(contentRepository);
+        _contentRepository = contentRepository;
         _config = config ?? new GameConfig();
-        _initialCharacterFactory = new InitialCharacterFactory(contentRepository, _config);
+        _skillMaxLevelPolicy = skillMaxLevelPolicy;
+        _profileProvider = profileProvider ?? (() => new GameProfile());
     }
 
     public GameState Create(
@@ -31,9 +39,10 @@ public sealed class NewGameStateFactory
 
         var equipmentInstanceFactory = new EquipmentInstanceFactory();
         var party = new Party();
+        var initialCharacterFactory = CreateInitialCharacterFactory(round);
         foreach (var characterId in initialPartyCharacterIds)
         {
-            party.AddMember(_initialCharacterFactory.Create(characterId, equipmentInstanceFactory));
+            party.AddMember(initialCharacterFactory.Create(characterId, equipmentInstanceFactory));
         }
 
         var adventure = new AdventureState();
@@ -50,5 +59,12 @@ public sealed class NewGameStateFactory
         state.SetEquipmentInstanceFactory(equipmentInstanceFactory);
         state.SetCurrency(currency);
         return state;
+    }
+
+    private InitialCharacterFactory CreateInitialCharacterFactory(int round)
+    {
+        var skillMaxLevelPolicy = _skillMaxLevelPolicy ??
+            new SkillMaxLevelPolicy(_config, _profileProvider(), round);
+        return new InitialCharacterFactory(_contentRepository, _config, skillMaxLevelPolicy);
     }
 }

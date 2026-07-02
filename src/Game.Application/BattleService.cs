@@ -42,6 +42,7 @@ public sealed class BattleService
     private GameState State => _session.State;
     private IContentRepository ContentRepository => _session.ContentRepository;
     private CharacterService CharacterService => _session.CharacterService;
+    private ProfileService ProfileService => _session.ProfileService;
     private int PlayerTeam => _session.Config.BattlePlayerTeam;
     private GameConfig Config => _session.Config;
 
@@ -198,6 +199,8 @@ public sealed class BattleService
         var drops = OrdinaryBattleLootGenerator.Generate(
             state,
             ContentRepository,
+            _session.Config,
+            State.Adventure.Difficulty,
             State.Adventure.Round,
             PlayerTeam,
             _session.Config.OrdinaryBattleDropChance);
@@ -229,12 +232,24 @@ public sealed class BattleService
             return;
         }
 
+        var inventoryChanged = false;
+        var profileChanged = false;
         foreach (var drop in settlement.Drops)
         {
-            ApplyRewardDrop(drop);
+            var result = ApplyRewardDrop(drop);
+            inventoryChanged |= result.InventoryChanged;
+            profileChanged |= result.ProfileChanged;
         }
 
-        _session.Events.Publish(new InventoryChangedEvent());
+        if (inventoryChanged)
+        {
+            _session.Events.Publish(new InventoryChangedEvent());
+        }
+
+        if (profileChanged)
+        {
+            _session.Events.Publish(new ProfileChangedEvent());
+        }
     }
 
     public void ApplyPlayerBattleCarryover(BattleState state)
@@ -601,16 +616,17 @@ public sealed class BattleService
     {
         var candidates = ContentRepository.GetExternalSkills()
             .Where(predicate)
-            .Select(skill => $"{skill.Id}残章")
-            .Where(fragmentId => ContentRepository.TryGetItem(fragmentId, out _))
-            .Select(ContentRepository.GetItem)
             .ToArray();
         if (candidates.Length == 0)
         {
             return;
         }
 
-        drops.Add(new OrdinaryBattleStackRewardDrop(PickRandom(candidates), 1));
+        var skill = PickRandom(candidates);
+        drops.Add(new OrdinaryBattleSkillFragmentRewardDrop(
+            SkillFragmentKind.External,
+            skill.Id,
+            $"{skill.Name}残章"));
     }
 
     private EquipmentDefinition PickConfiguredZhenlongqijuEquipment()
@@ -721,13 +737,13 @@ public sealed class BattleService
             unit.Team == PlayerTeam &&
             State.Party.ContainsMember(unit.Character.Id));
 
-    private void ApplyRewardDrop(OrdinaryBattleRewardDrop drop)
+    private RewardDropApplyResult ApplyRewardDrop(OrdinaryBattleRewardDrop drop)
     {
         switch (drop)
         {
             case OrdinaryBattleStackRewardDrop stack:
                 State.Inventory.AddItem(stack.Item, stack.Quantity);
-                return;
+                return RewardDropApplyResult.Inventory;
 
             case OrdinaryBattleEquipmentRewardDrop equipment:
                 var extraAffixes = equipment.Rolls
@@ -735,11 +751,21 @@ public sealed class BattleService
                     .ToArray();
                 var equipmentInstance = State.EquipmentInstanceFactory.Create(equipment.Equipment, extraAffixes);
                 State.Inventory.AddEquipmentInstance(equipmentInstance);
-                return;
+                return RewardDropApplyResult.Inventory;
+
+            case OrdinaryBattleSkillFragmentRewardDrop fragment:
+                ProfileService.AddSkillMaxLevelBonus(fragment.SkillId, fragment.Levels);
+                return RewardDropApplyResult.Profile;
 
             default:
                 throw new InvalidOperationException($"Unsupported ordinary battle reward drop type '{drop.GetType().Name}'.");
         }
+    }
+
+    private readonly record struct RewardDropApplyResult(bool InventoryChanged, bool ProfileChanged)
+    {
+        public static RewardDropApplyResult Inventory { get; } = new(true, false);
+        public static RewardDropApplyResult Profile { get; } = new(false, true);
     }
 
     private static BattleUnit CreateUnit(

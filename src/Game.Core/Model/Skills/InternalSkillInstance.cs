@@ -81,19 +81,19 @@ public sealed class InternalSkillInstance(
         return (int)(((currentLevel + 4d) / 4d) * ((Definition.Hard + 4d) / 4d) * 40d);
     }
 
-    public void SetState(int level, int exp, int? maxLevel = null)
+    public void SetState(int level, int exp)
     {
-        MaxLevel = maxLevel ?? DefaultMaxLevel;
         Level = level;
         Exp = exp;
     }
 
-    public SkillLevelChange<InternalSkillInstance> UpgradeLevel(int levels)
+    public SkillLevelChange<InternalSkillInstance> UpgradeLevel(int levels, int maxLevel)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
+        ValidateMaxLevel(maxLevel);
 
         var oldLevel = Level;
-        var targetLevel = Math.Min(checked(oldLevel + levels), MaxLevel);
+        var targetLevel = Math.Max(oldLevel, Math.Min(checked(oldLevel + levels), maxLevel));
         if (targetLevel == oldLevel)
         {
             return new SkillLevelChange<InternalSkillInstance>(this, oldLevel, targetLevel, false);

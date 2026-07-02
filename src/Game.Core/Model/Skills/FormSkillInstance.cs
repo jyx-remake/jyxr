@@ -37,12 +37,6 @@ public sealed class FormSkillInstance(
 		set => Parent.Level = value;
 	}
 
-	public override int MaxLevel
-	{
-		get => Parent.MaxLevel;
-		set => Parent.MaxLevel = value;
-	}
-
 	public override int Exp
 	{
 		get => Parent.Exp;

@@ -34,7 +34,7 @@ public partial class SkillTooltip : PanelContainer
 
 		_nameLabel.Text = _skill.Name;
 		ApplyLabelColor(_nameLabel, ResolveTitleColor(_skill));
-		_contentLabel.Text = SkillDescriptionFormatter.FormatBbCodeCn(_skill, Game.ContentRepository);
+		_contentLabel.Text = SkillDescriptionFormatter.FormatBbCodeCn(_skill, Game.ContentRepository, Game.SkillMaxLevelPolicy);
 	}
 
 	private static void ApplyLabelColor(Label label, Color color)

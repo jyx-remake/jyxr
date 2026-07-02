@@ -56,7 +56,6 @@ public sealed class CharacterTests
         Assert.Single(character.ExternalSkills);
         Assert.Equal("basic_attack", character.ExternalSkills[0].Definition.Id);
         Assert.Equal(1, character.ExternalSkills[0].Level);
-        Assert.Equal(20, character.ExternalSkills[0].MaxLevel);
         Assert.True(character.ExternalSkills[0].IsActive);
         Assert.Same(character, character.ExternalSkills[0].Owner);
         Assert.Equal(["battle_focus"], character.UnlockedTalents.Select(talent => talent.Id).ToArray());
@@ -169,6 +168,45 @@ public sealed class CharacterTests
         character.SetExternalSkillState(skill, 3, 0, true);
 
         Assert.Equal(15, character.GetStat(StatType.Bili));
+    }
+
+    [Fact]
+    public void UpgradeSkillLevel_DoesNotDowngradeWhenCurrentLevelExceedsResolvedMaxLevel()
+    {
+        var externalSkill = TestContentFactory.CreateExternalSkill("blade");
+        var internalSkill = TestContentFactory.CreateInternalSkill("breath");
+        var character = TestContentFactory.CreateCharacterInstance(
+            "char_001",
+            TestContentFactory.CreateCharacterDefinition(
+                "hero_knight",
+                externalSkills: [new InitialExternalSkillEntryDefinition(externalSkill, Level: 12)],
+                internalSkills: [new InitialInternalSkillEntryDefinition(internalSkill, Level: 15)]));
+
+        var externalChange = character.UpgradeExternalSkillLevel(externalSkill, levels: 1, maxLevel: 10);
+        var internalChange = character.UpgradeInternalSkillLevel(internalSkill, levels: 1, maxLevel: 10);
+
+        Assert.Equal(12, externalChange.NewLevel);
+        Assert.Equal(12, character.GetExternalSkillLevel(externalSkill.Id));
+        Assert.Equal(15, internalChange.NewLevel);
+        Assert.Equal(15, character.GetInternalSkillLevel(internalSkill.Id));
+    }
+
+    [Fact]
+    public void LevelUpAllSkillsMaxLevel_DoesNotDowngradeExistingHighLevelSkills()
+    {
+        var externalSkill = TestContentFactory.CreateExternalSkill("blade");
+        var internalSkill = TestContentFactory.CreateInternalSkill("breath");
+        var character = TestContentFactory.CreateCharacterInstance(
+            "char_001",
+            TestContentFactory.CreateCharacterDefinition(
+                "hero_knight",
+                externalSkills: [new InitialExternalSkillEntryDefinition(externalSkill, Level: 12)],
+                internalSkills: [new InitialInternalSkillEntryDefinition(internalSkill, Level: 15)]));
+
+        character.LevelUpAllSkillsMaxLevel(_ => 10, _ => 10);
+
+        Assert.Equal(12, character.GetExternalSkillLevel(externalSkill.Id));
+        Assert.Equal(15, character.GetInternalSkillLevel(internalSkill.Id));
     }
 
     [Fact]

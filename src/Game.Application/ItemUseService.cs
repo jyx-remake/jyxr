@@ -16,6 +16,7 @@ public sealed class ItemUseService
 
     private GameState State => _session.State;
     private GameConfig Config => _session.Config;
+    private SkillMaxLevelPolicy SkillMaxLevelPolicy => _session.SkillMaxLevelPolicy;
 
     public ItemUseAnalysis Analyze(InventoryEntry entry)
     {
@@ -121,26 +122,18 @@ public sealed class ItemUseService
             {
                 case GrantExternalSkillItemUseEffectDefinition externalSkill:
                 {
-                    var level = ResolveTargetSkillLevel(
-                        target.GetExternalSkillLevel(externalSkill.SkillId),
-                        externalSkill.Level,
-                        Config.MaxExternalSkillLevel);
                     _session.CharacterService.StudyExternalSkillFromBook(
                         target,
                         externalSkill.SkillId,
-                        level);
+                        SkillMaxLevelPolicy.GetExternalSkillMaxLevel(externalSkill.SkillId));
                     break;
                 }
                 case GrantInternalSkillItemUseEffectDefinition internalSkill:
                 {
-                    var level = ResolveTargetSkillLevel(
-                        target.GetInternalSkillLevel(internalSkill.SkillId),
-                        internalSkill.Level,
-                        Config.MaxInternalSkillLevel);
                     _session.CharacterService.StudyInternalSkillFromBook(
                         target,
                         internalSkill.SkillId,
-                        level);
+                        SkillMaxLevelPolicy.GetInternalSkillMaxLevel(internalSkill.SkillId));
                     break;
                 }
             }
@@ -303,9 +296,7 @@ public sealed class ItemUseService
                 {
                     var currentLevel = target.GetExternalSkillLevel(externalSkill.SkillId);
                     if (currentLevel is not null &&
-                        currentLevel.Value >= ResolveEffectiveMaxLevel(
-                            externalSkill.Level,
-                            Config.MaxExternalSkillLevel))
+                        currentLevel.Value >= SkillMaxLevelPolicy.GetExternalSkillMaxLevel(externalSkill.SkillId))
                     {
                         return "该外功已达上限";
                     }
@@ -321,9 +312,7 @@ public sealed class ItemUseService
                 {
                     var currentLevel = target.GetInternalSkillLevel(internalSkill.SkillId);
                     if (currentLevel is not null &&
-                        currentLevel.Value >= ResolveEffectiveMaxLevel(
-                            internalSkill.Level,
-                            Config.MaxInternalSkillLevel))
+                        currentLevel.Value >= SkillMaxLevelPolicy.GetInternalSkillMaxLevel(internalSkill.SkillId))
                     {
                         return "该内功已达上限";
                     }
@@ -372,17 +361,6 @@ public sealed class ItemUseService
     }
 
     private static string FormatStatName(StatType statType) => StatCatalog.GetDisplayNameCn(statType);
-
-    private static int ResolveTargetSkillLevel(int? currentLevel, int? effectLevel, int configuredMaxLevel)
-    {
-        var targetLevel = ResolveEffectiveMaxLevel(effectLevel, configuredMaxLevel);
-        return currentLevel is null
-            ? targetLevel
-            : Math.Max(currentLevel.Value, targetLevel);
-    }
-
-    private static int ResolveEffectiveMaxLevel(int? effectLevel, int configuredMaxLevel) =>
-        effectLevel ?? configuredMaxLevel;
 
     private enum ItemUseKind
     {

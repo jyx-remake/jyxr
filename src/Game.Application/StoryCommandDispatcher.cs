@@ -378,12 +378,19 @@ public sealed class StoryCommandDispatcher
     }
 
     [StoryCommand("maxlevel")]
-    private ValueTask ExecuteMaxLevelAsync(string skillId, int level)
+    private ValueTask ExecuteMaxLevelAsync(string skillId, int level = 1, string? onceKey = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(level);
 
         var skillName = ResolveMaxLevelSkillName(skillId);
-        _session.Events.Publish(new ToastRequestedEvent($"武学精通【{skillName}】+ {level}"));
+        var bonus = checked(level + _session.SkillMaxLevelPolicy.GetMaxLevelCommandRoundBonus());
+        if (!_session.ProfileService.TryAddSkillMaxLevelBonusOnce(skillId, bonus, onceKey))
+        {
+            return ValueTask.CompletedTask;
+        }
+
+        _session.Events.Publish(new ProfileChangedEvent());
+        _session.Events.Publish(new ToastRequestedEvent($"武学精通【{skillName}】+ {bonus}"));
         return ValueTask.CompletedTask;
     }
 

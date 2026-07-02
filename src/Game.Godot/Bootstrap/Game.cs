@@ -73,6 +73,7 @@ public static class Game
 
 	public static SaveGameService SaveGameService => Session.SaveGameService;
 	public static ProfileService ProfileService => Session.ProfileService;
+	public static SkillMaxLevelPolicy SkillMaxLevelPolicy => Session.SkillMaxLevelPolicy;
 	public static SessionFlowService SessionFlowService => Session.SessionFlowService;
 	public static PartyService PartyService => Session.PartyService;
 	public static InventoryService InventoryService => Session.InventoryService;

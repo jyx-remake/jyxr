@@ -128,7 +128,7 @@ public sealed class BattlePresenter
 			"战斗胜利",
 			detail,
 			"获得物品",
-			CreateRewardEntries(settlement.Drops),
+			CreateRewardItems(settlement.Drops),
 			"确定");
 	}
 
@@ -145,18 +145,19 @@ public sealed class BattlePresenter
 			_ => entry.Definition.Name,
 		};
 
-	private static IReadOnlyList<InventoryEntry> CreateRewardEntries(IReadOnlyList<OrdinaryBattleRewardDrop> drops)
+	private static IReadOnlyList<BattleSettlementRewardView> CreateRewardItems(IReadOnlyList<OrdinaryBattleRewardDrop> drops)
 	{
 		ArgumentNullException.ThrowIfNull(drops);
 
-		var entries = new List<InventoryEntry>(drops.Count);
+		var entries = new List<BattleSettlementRewardView>(drops.Count);
 		long entryNumber = 1;
 		foreach (var drop in drops)
 		{
 			switch (drop)
 			{
 				case OrdinaryBattleStackRewardDrop stack:
-					entries.Add(new StackInventoryEntry(entryNumber++, stack.Item, stack.Quantity));
+					entries.Add(new BattleSettlementInventoryRewardView(
+						new StackInventoryEntry(entryNumber++, stack.Item, stack.Quantity)));
 					break;
 				case OrdinaryBattleEquipmentRewardDrop equipment:
 					var extraAffixes = equipment.Rolls.SelectMany(static roll => roll.Affixes).ToArray();
@@ -164,7 +165,15 @@ public sealed class BattlePresenter
 						$"settlement_reward_{entryNumber:D8}",
 						equipment.Equipment,
 						extraAffixes);
-					entries.Add(new EquipmentInstanceInventoryEntry(entryNumber++, equipmentInstance));
+					entries.Add(new BattleSettlementInventoryRewardView(
+						new EquipmentInstanceInventoryEntry(entryNumber++, equipmentInstance)));
+					break;
+				case OrdinaryBattleSkillFragmentRewardDrop fragment:
+					entries.Add(new BattleSettlementSkillFragmentRewardView(
+						fragment.DisplayName,
+						fragment.Kind,
+						fragment.SkillId,
+						fragment.Levels));
 					break;
 				default:
 					throw new NotSupportedException($"Unsupported reward drop type '{drop.GetType().Name}'.");
@@ -200,5 +209,16 @@ public sealed record BattleSettlementView(
 	string Title,
 	string Detail,
 	string RewardHeader,
-	IReadOnlyList<InventoryEntry> RewardEntries,
+	IReadOnlyList<BattleSettlementRewardView> RewardEntries,
 	string ConfirmText);
+
+public abstract record BattleSettlementRewardView(string DisplayName);
+
+public sealed record BattleSettlementInventoryRewardView(InventoryEntry Entry)
+	: BattleSettlementRewardView(Entry.Definition.Name);
+
+public sealed record BattleSettlementSkillFragmentRewardView(
+	string DisplayName,
+	SkillFragmentKind Kind,
+	string SkillId,
+	int Levels) : BattleSettlementRewardView(DisplayName);

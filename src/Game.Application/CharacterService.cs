@@ -22,6 +22,7 @@ public sealed class CharacterService
     private GameState State => _session.State;
     private IContentRepository ContentRepository => _session.ContentRepository;
     private GameConfig Config => _session.Config;
+    private SkillMaxLevelPolicy SkillMaxLevelPolicy => _session.SkillMaxLevelPolicy;
 
     public void RenameCharacter(string characterId, string name)
     {
@@ -263,7 +264,7 @@ public sealed class CharacterService
         var definition = ContentRepository.GetExternalSkill(skillId);
         PublishSkillUpgradeResult(
             character,
-            character.UpgradeExternalSkillLevel(definition, levels, Config.MaxExternalSkillLevel),
+            character.UpgradeExternalSkillLevel(definition, levels, SkillMaxLevelPolicy.GetMaxLevel(definition)),
             "外功");
     }
 
@@ -273,7 +274,7 @@ public sealed class CharacterService
         var definition = ContentRepository.GetInternalSkill(skillId);
         PublishSkillUpgradeResult(
             character,
-            character.UpgradeInternalSkillLevel(definition, levels, Config.MaxInternalSkillLevel),
+            character.UpgradeInternalSkillLevel(definition, levels, SkillMaxLevelPolicy.GetMaxLevel(definition)),
             "内功");
     }
 
@@ -433,14 +434,16 @@ public sealed class CharacterService
 
     private void ApplyGrantedExternalSkill(CharacterInstance character, ExternalSkillDefinition externalSkill, int level)
     {
-        character.SetExternalSkillState(externalSkill, level, 0, true, Config.MaxExternalSkillLevel);
-        PublishToastAndCharacterChanged(character, $"{character.Name} 习得外功【{externalSkill.Name}】 {level}级");
+        var resolvedLevel = Math.Min(level, SkillMaxLevelPolicy.GetMaxLevel(externalSkill));
+        character.SetExternalSkillState(externalSkill, resolvedLevel, 0, true);
+        PublishToastAndCharacterChanged(character, $"{character.Name} 习得外功【{externalSkill.Name}】 {resolvedLevel}级");
     }
 
     private void ApplyGrantedInternalSkill(CharacterInstance character, InternalSkillDefinition internalSkill, int level)
     {
-        character.SetInternalSkillState(internalSkill, level, 0, Config.MaxInternalSkillLevel);
-        PublishToastAndCharacterChanged(character, $"{character.Name} 习得内功【{internalSkill.Name}】 {level}级");
+        var resolvedLevel = Math.Min(level, SkillMaxLevelPolicy.GetMaxLevel(internalSkill));
+        character.SetInternalSkillState(internalSkill, resolvedLevel, 0);
+        PublishToastAndCharacterChanged(character, $"{character.Name} 习得内功【{internalSkill.Name}】 {resolvedLevel}级");
     }
 
     private void PublishToastAndCharacterChanged(CharacterInstance character, string message)
