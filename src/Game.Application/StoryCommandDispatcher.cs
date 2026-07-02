@@ -46,7 +46,16 @@ public sealed class StoryCommandDispatcher
     [StoryCommand("item")]
     private ValueTask ExecuteItemAsync(string itemId, int quantity = 1)
     {
-        _session.InventoryService.AddItem(itemId, quantity);
+        if (quantity > 0)
+        {
+            _session.InventoryService.AddItem(itemId, quantity);
+        }
+        else if (quantity < 0)
+        {
+            ArgumentOutOfRangeException.ThrowIfEqual(quantity, int.MinValue);
+            _session.InventoryService.RemoveItem(itemId, -quantity);
+        }
+
         return ValueTask.CompletedTask;
     }
 
@@ -61,7 +70,11 @@ public sealed class StoryCommandDispatcher
     private ValueTask ExecuteGetMoneyAsync(int amount) => ExecuteChangeSilverAsync(amount);
 
     [StoryCommand("cost_money")]
-    private ValueTask ExecuteCostMoneyAsync(int amount) => ExecuteChangeSilverAsync(-amount);
+    private ValueTask ExecuteCostMoneyAsync(int amount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(amount);
+        return ExecuteChangeSilverAsync(-amount);
+    }
 
     private ValueTask ExecuteChangeSilverAsync(int delta)
     {

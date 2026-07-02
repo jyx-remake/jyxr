@@ -267,6 +267,48 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_ItemCommandTreatsNegativeQuantityAsRemoval()
+    {
+        var token = new NormalItemDefinition
+        {
+            Id = "quest_token",
+            Name = "quest_token",
+            Type = ItemType.QuestItem,
+        };
+        var repository = TestContentFactory.CreateRepository(
+            items: [token],
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "item_delta",
+                            [
+                                new CommandStep(
+                                    "item",
+                                    [
+                                        new LiteralExprNode(ExprValue.FromString("quest_token")),
+                                        new LiteralExprNode(ExprValue.FromNumber(3)),
+                                    ]),
+                                new CommandStep(
+                                    "item",
+                                    [
+                                        new LiteralExprNode(ExprValue.FromString("quest_token")),
+                                        new LiteralExprNode(ExprValue.FromNumber(-1)),
+                                    ]),
+                            ]),
+                    ]),
+            ]);
+        var session = new GameSession(new GameState(), repository, new RecordingRuntimeHost());
+
+        await session.StoryService.ExecuteAsync("item_delta");
+
+        Assert.True(session.State.Inventory.ContainsStack(token, 2));
+        Assert.Equal(2, session.State.Inventory.GetStack(token).Quantity);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ResolvesCurrencyProjectionVariablesFromGameState()
     {
         var repository = TestContentFactory.CreateRepository(

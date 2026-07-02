@@ -39,6 +39,16 @@ public sealed class StoryCommandLineServiceTests
 		Assert.Equal("town", command.Args[0].AsString("map"));
 	}
 
+	[Fact]
+	public async Task ExecuteAsync_CostMoneyRejectsNegativeAmount()
+	{
+		var service = CreateService(out var session);
+
+		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await service.ExecuteAsync("cost_money -100"));
+
+		Assert.Equal(0, session.State.Currency.Silver);
+	}
+
 	private static StoryCommandLineService CreateService(out GameSession session)
 	{
 		var repository = TestContentFactory.CreateRepository(
