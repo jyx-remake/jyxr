@@ -126,6 +126,8 @@ public sealed record ItemAcquiredEvent(
 
 public sealed record ToastRequestedEvent(string Message) : ISessionEvent;
 
+public sealed record AutoSaveRequestedEvent(string Reason) : ISessionEvent;
+
 public sealed record PartyChangedEvent : ISessionEvent;
 
 public sealed record CharacterChangedEvent(string CharacterId) : ISessionEvent;

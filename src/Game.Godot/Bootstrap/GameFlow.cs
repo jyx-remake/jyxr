@@ -1,3 +1,5 @@
+using Game.Application;
+using Game.Godot.Story;
 using Game.Godot.UI;
 using Godot;
 
@@ -53,7 +55,11 @@ public static class GameFlow
 		var storyId = Game.Config.InitialStorySegmentId;
 		try
 		{
-			await Game.StoryService.ExecuteAsync(storyId, cancellationToken);
+			var completed = await StoryRunHelper.RunAsync(storyId, cancellationToken);
+			if (completed)
+			{
+				Game.Session.Events.Publish(new AutoSaveRequestedEvent($"story '{storyId}' completed"));
+			}
 		}
 		finally
 		{

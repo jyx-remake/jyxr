@@ -122,7 +122,13 @@ public partial class TimedStoryCoordinator : Node
 
 		try
 		{
-			await Game.StoryService.ExecuteAsync(storyId);
+			var completed = await StoryRunHelper.RunAsync(storyId);
+			if (!completed)
+			{
+				return;
+			}
+
+			Game.Session.Events.Publish(new AutoSaveRequestedEvent($"story '{storyId}' completed"));
 		}
 		finally
 		{

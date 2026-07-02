@@ -1,7 +1,7 @@
 using Game.Application;
 using Game.Core.Definitions;
 using Game.Godot.Assets;
-using Game.Godot.Persistence;
+using Game.Godot.Story;
 using Game.Godot.UI;
 using Godot;
 
@@ -9,7 +9,6 @@ namespace Game.Godot.Map;
 
 public partial class MapScreen : Control
 {
-	private readonly LocalSaveStore _saveStore = new();
 	private MapEnterResult? _pendingInitialResult;
 	private bool _isHandlingInteraction;
 
@@ -81,23 +80,6 @@ public partial class MapScreen : Control
 		ApplyStoryPresentationVisibility();
 	}
 
-	private void AutoSaveIfEnabled()
-	{
-		if (!Game.Settings.AutoSave)
-		{
-			return;
-		}
-
-		try
-		{
-			_saveStore.SaveCurrentSessionToAutoSave();
-		}
-		catch (Exception exception)
-		{
-			Game.Logger.Error("Auto save failed.", exception);
-		}
-	}
-
 	public void Initialize(MapEnterResult result)
 	{
 		ArgumentNullException.ThrowIfNull(result);
@@ -138,7 +120,6 @@ public partial class MapScreen : Control
 		}
 
 		ApplyStoryPresentationVisibility();
-		AutoSaveIfEnabled();
 	}
 
 	private void FillSmallMap(MapEnterResult result)
@@ -210,33 +191,36 @@ public partial class MapScreen : Control
 		}
 
 		await PlayLargeMapInteractionMovementAsync(result.Movement);
-		await HandleMapInteractionResultAsync(result);
+		var completed = await HandleMapInteractionResultAsync(result);
+		if (completed && result.Outcome == MapService.MapInteractionOutcome.MapChanged)
+		{
+			Game.Session.Events.Publish(new AutoSaveRequestedEvent($"player map change to '{result.TargetId}'"));
+		}
 	}
 
-	private async Task HandleMapInteractionResultAsync(MapInteractionResult result)
+	private async Task<bool> HandleMapInteractionResultAsync(MapInteractionResult result)
 	{
 		if (result.EnterResult is not null)
 		{
 			Apply(result.EnterResult);
 			if (result.EnterResult.PendingInteraction is not null)
 			{
-				await HandleMapInteractionResultAsync(result.EnterResult.PendingInteraction);
+				return await HandleMapInteractionResultAsync(result.EnterResult.PendingInteraction);
 			}
 
-			return;
+			return true;
 		}
 
 		switch (result.Outcome)
 		{
 			case MapService.MapInteractionOutcome.StoryRequested:
-				await RunStoryAsync(result.TargetId);
-				return;
+				return await RunStoryAsync(result.TargetId);
 			case MapService.MapInteractionOutcome.ShopRequested:
 				OpenShop(result.TargetId);
-				return;
+				return true;
 			case MapService.MapInteractionOutcome.ChestRequested:
 				OpenChest();
-				return;
+				return true;
 			case MapService.MapInteractionOutcome.BattleRequested:
 				var isWin = await OpenBattleAsync(result.TargetId);
 				if (isWin && GodotObject.IsInstanceValid(this))
@@ -244,11 +228,11 @@ public partial class MapScreen : Control
 					World.Instance.RefreshCurrentMap();
 				}
 
-				return;
+				return isWin;
 			case MapService.MapInteractionOutcome.PlaceholderInteraction:
 			case MapService.MapInteractionOutcome.Blocked:
 				Game.Logger.Info($"Map event requested: {result.Outcome}, target={result.TargetId}");
-				return;
+				return true;
 			default:
 				throw new InvalidOperationException($"Unsupported map interaction outcome '{result.Outcome}'.");
 		}
@@ -351,7 +335,7 @@ public partial class MapScreen : Control
 		_smallMapTimeDim.Visible = dimAlpha > 0f;
 	}
 
-	private async Task RunStoryAsync(string? storyId)
+	private async Task<bool> RunStoryAsync(string? storyId)
 	{
 		if (string.IsNullOrWhiteSpace(storyId))
 		{
@@ -363,7 +347,13 @@ public partial class MapScreen : Control
 
 		try
 		{
-			await Game.StoryService.ExecuteAsync(storyId);
+			var completed = await StoryRunHelper.RunAsync(storyId);
+			if (!completed)
+			{
+				return false;
+			}
+
+			Game.Session.Events.Publish(new AutoSaveRequestedEvent($"story '{storyId}' completed"));
 		}
 		finally
 		{
@@ -375,10 +365,11 @@ public partial class MapScreen : Control
 
 		if (!GodotObject.IsInstanceValid(world))
 		{
-			return;
+			return false;
 		}
 
 		world.RefreshCurrentMap();
+		return true;
 	}
 
 	private static void ClearChildren(Node node)

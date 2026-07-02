@@ -1,6 +1,7 @@
 using Game.Application;
 using Game.Godot.Assets;
 using Game.Godot.Map;
+using Game.Godot.Persistence;
 using Game.Godot.UI;
 using Godot;
 
@@ -18,10 +19,13 @@ public partial class World : Control
 
 	public Control? CurrentScene { get; private set; }
 
+	public AutoSaveCoordinator AutoSave { get; private set; } = null!;
+
 	public override void _Ready()
 	{
 		_basePosition = Position;
 		_background = GetNode<TextureRect>("%Background");
+		AutoSave = GetNode<AutoSaveCoordinator>("%AutoSaveCoordinator");
 		Instance = this;
 	}
 
