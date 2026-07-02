@@ -99,13 +99,5 @@ public partial class HudPanel : Control
 	}
 
 	private static string BuildAdventureInfoTooltip(AdventureState adventure) =>
-		$"当前难度：{FormatDifficulty(adventure.Difficulty)}\n当前周目：{adventure.Round}";
-
-	private static string FormatDifficulty(GameDifficulty difficulty) => difficulty switch
-	{
-		GameDifficulty.Normal => "简单",
-		GameDifficulty.Hard => "进阶",
-		GameDifficulty.Crazy => "炼狱",
-		_ => throw new InvalidOperationException($"Unsupported difficulty: {difficulty}"),
-	};
+		$"当前难度：{GameDifficultyFormatter.FormatNameCn(adventure.Difficulty)}\n当前周目：{adventure.Round}";
 }

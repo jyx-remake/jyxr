@@ -93,7 +93,7 @@ public partial class SaveSlotCard : Button
 		_nameLabel.Text = summary.LeaderName ?? "无名侠客";
 		_partyCountLabel.Text = $"队伍人数：{summary.PartyMemberCount}";
 		_gameTimeLabel.Text = BuildGameTimeText(summary.Clock);
-		_difficultyLabel.Text = $"难度：{FormatDifficulty(summary.Difficulty)}";
+		_difficultyLabel.Text = $"难度：{GameDifficultyFormatter.FormatNameCn(summary.Difficulty)}";
 		_roundLabel.Text = $"周目：{summary.Round}";
 		_locationLabel.Text = $"当前位置：{ResolveMapName(summary.CurrentMapId)}";
 		_savedAtLabel.Text = summary.SavedAtUtc is null
@@ -136,14 +136,6 @@ public partial class SaveSlotCard : Button
 		Game.Logger.Warning($"Save slot map definition is missing: {mapId}");
 		return mapId;
 	}
-
-	private static string FormatDifficulty(GameDifficulty difficulty) => difficulty switch
-	{
-		GameDifficulty.Normal => "简单",
-		GameDifficulty.Hard => "进阶",
-		GameDifficulty.Crazy => "炼狱",
-		_ => throw new InvalidOperationException($"Unsupported difficulty: {difficulty}"),
-	};
 
 	private static string BuildInvalidSlotHint(LocalSaveReadFailureReason failureReason) => failureReason switch
 	{

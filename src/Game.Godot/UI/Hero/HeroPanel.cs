@@ -91,11 +91,14 @@ public partial class HeroPanel : JyPanel
 
 	private void RenderAdventure()
 	{
+		var adventure = Game.State.Adventure;
 		var sectName = ResolveSectName();
-		var morality = Game.State.Adventure.Morality;
-		var favorability = Game.State.Adventure.Favorability;
 		_adventurePageSubtitle.Text =
-			$"门派：[color=red]{sectName}[/color]\n道德：[color=red]{morality}[/color]\n女主角好感：[color=red]{favorability}[/color]";
+			$"门派：[color=red]{sectName}[/color]\n" +
+			$"道德：[color=red]{adventure.Morality}[/color]\n" +
+			$"女主角好感：[color=red]{adventure.Favorability}[/color]\n" +
+			$"难度：[color=red]{GameDifficultyFormatter.FormatNameCn(adventure.Difficulty)}[/color]\n" +
+			$"周目：[color=red]{adventure.Round}[/color]";
 	}
 
 	private void RenderAchievements()
