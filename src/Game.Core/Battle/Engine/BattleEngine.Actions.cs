@@ -118,14 +118,72 @@ public sealed partial class BattleEngine
             context.Source = unit;
             context.Skill = resolvedSkill;
         });
+        var skillExperienceEvents = TryGainSkillExperience(state, unit, skill);
         unit.RecordUsedSkill(skill.Id);
         EndActionCore(state, unit, committedMainAction: true);
         return BattleActionResult.Succeeded(
             string.Empty,
             targets.Select(static targetUnit => targetUnit.Id).ToList(),
-            [battleEvent],
+            [battleEvent, .. skillExperienceEvents],
             impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList(),
             skillCastInfo);
+    }
+
+    private IReadOnlyList<BattleEvent> TryGainSkillExperience(
+        BattleState state,
+        BattleUnit unit,
+        SkillInstance usedSkill)
+    {
+        var experience = SkillExperienceProgression.CalculateBattleUseExperience(unit.Character);
+        var events = new List<BattleEvent>();
+        var progressedSkills = new HashSet<SkillInstance>(ReferenceEqualityComparer.Instance);
+        TryGainSkillExperience(state, unit, usedSkill, experience, progressedSkills, events);
+
+        var equippedInternalSkill = unit.Character.GetInternalSkills()
+            .FirstOrDefault(static skill => skill.IsEquipped);
+        if (equippedInternalSkill is not null)
+        {
+            TryGainSkillExperience(state, unit, equippedInternalSkill, experience, progressedSkills, events);
+        }
+
+        return events;
+    }
+
+    private void TryGainSkillExperience(
+        BattleState state,
+        BattleUnit unit,
+        SkillInstance skill,
+        int experience,
+        HashSet<SkillInstance> progressedSkills,
+        List<BattleEvent> events)
+    {
+        if (SkillExperienceProgression.NormalizeProgressionSkill(skill) is not { } progressSkill ||
+            !progressedSkills.Add(progressSkill))
+        {
+            return;
+        }
+
+        var change = SkillExperienceProgression.TryAddExperience(
+            progressSkill,
+            experience,
+            _skillMaxLevelResolver(progressSkill));
+        if (change is not { LeveledUp: true })
+        {
+            return;
+        }
+
+        var battleEvent = new BattleEvent(
+            BattleEventKind.SkillLeveledUp,
+            unit.Id,
+            SkillExperience: new BattleSkillExperienceEvent(
+                progressSkill.Id,
+                progressSkill.Name,
+                progressSkill.SkillKind,
+                change.AddedExperience,
+                change.OldLevel,
+                change.NewLevel));
+        AddEvent(state, battleEvent);
+        events.Add(battleEvent);
     }
 
     private void TryRequestSpecialSkillSpeech(

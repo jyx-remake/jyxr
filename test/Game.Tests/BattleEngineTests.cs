@@ -261,6 +261,169 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_AddsSkillExperience_WhenNoUnitIsHit()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            hard: 1d,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(skillMaxLevelResolver: _ => 20);
+        engine.BeginAction(state, hero.Id);
+
+        var skill = hero.Character.GetExternalSkills().Single();
+        var result = engine.CastSkill(state, hero.Id, skill, new GridPosition(1, 0));
+
+        Assert.True(result.Success);
+        Assert.Equal(2, skill.Level);
+        Assert.Equal(15, skill.Exp);
+        var levelEvent = Assert.Single(state.Events.Where(static battleEvent =>
+            battleEvent.Kind == BattleEventKind.SkillLeveledUp));
+        Assert.Equal(hero.Id, levelEvent.UnitId);
+        Assert.Equal(new BattleSkillExperienceEvent("strike", "strike", SkillKind.External, 30, 1, 2), levelEvent.SkillExperience);
+    }
+
+    [Fact]
+    public void CastSkill_AddsExperienceToEquippedInternalSkill()
+    {
+        var externalDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            hard: 10d,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var internalDefinition = TestContentFactory.CreateInternalSkill("inner", hard: 10d);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(externalDefinition, 1)],
+            internalSkills: [new InitialInternalSkillEntryDefinition(internalDefinition, 1, Equipped: true)]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(skillMaxLevelResolver: _ => 20);
+        engine.BeginAction(state, hero.Id);
+
+        var externalSkill = hero.Character.GetExternalSkills().Single();
+        var internalSkill = hero.Character.GetInternalSkills().Single();
+        var result = engine.CastSkill(state, hero.Id, externalSkill, new GridPosition(1, 0));
+
+        Assert.True(result.Success);
+        Assert.Equal(30, externalSkill.Exp);
+        Assert.Equal(30, internalSkill.Exp);
+        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.SkillLeveledUp);
+    }
+
+    [Fact]
+    public void CastSkill_DoesNotDoubleAddExperience_WhenUsingEquippedInternalFormSkill()
+    {
+        var form = new FormSkillDefinition(
+            "inner_form",
+            "inner_form",
+            "",
+            null,
+            UnlockLevel: 1,
+            Cooldown: 0,
+            Cost: new SkillCostDefinition(0, 0),
+            Targeting: new SkillTargetingDefinition(CastSize: 3, ImpactType: SkillImpactType.Single, ImpactSize: 0),
+            PowerExtra: 0d,
+            Animation: "",
+            Audio: "",
+            Buffs: []);
+        var internalDefinition = TestContentFactory.CreateInternalSkill(
+            "inner",
+            hard: 10d,
+            formSkills: [form]);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            internalSkills: [new InitialInternalSkillEntryDefinition(internalDefinition, 1, Equipped: true)]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(skillMaxLevelResolver: _ => 20);
+        engine.BeginAction(state, hero.Id);
+
+        var internalSkill = hero.Character.GetInternalSkills().Single();
+        var result = engine.CastSkill(state, hero.Id, internalSkill.GetFormSkills().Single(), new GridPosition(1, 0));
+
+        Assert.True(result.Success);
+        Assert.Equal(1, internalSkill.Level);
+        Assert.Equal(30, internalSkill.Exp);
+    }
+
+    [Fact]
+    public void CastSkill_ClampsSkillExperience_WhenAtMaxLevel()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            hard: 1d,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Wuxing] = 100,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(skillMaxLevelResolver: _ => 1);
+        engine.BeginAction(state, hero.Id);
+
+        var skill = hero.Character.GetExternalSkills().Single();
+        var result = engine.CastSkill(state, hero.Id, skill, new GridPosition(1, 0));
+
+        Assert.True(result.Success);
+        Assert.Equal(1, skill.Level);
+        Assert.Equal(skill.LevelUpExp, skill.Exp);
+        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.SkillLeveledUp);
+    }
+
+    [Fact]
+    public void CastSkill_DoesNotAddSkillExperience_WhenCastFails()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            mpCost: 10,
+            hard: 1d,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxMp: 5,
+            mp: 5,
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(skillMaxLevelResolver: _ => 20);
+        engine.BeginAction(state, hero.Id);
+
+        var skill = hero.Character.GetExternalSkills().Single();
+        var result = engine.CastSkill(state, hero.Id, skill, new GridPosition(1, 0));
+
+        Assert.False(result.Success);
+        Assert.Equal(1, skill.Level);
+        Assert.Equal(0, skill.Exp);
+        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.SkillLeveledUp);
+    }
+
+    [Fact]
     public void CastSkill_DoesNotApplyBuff_WhenChanceRollFails()
     {
         var buff = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };

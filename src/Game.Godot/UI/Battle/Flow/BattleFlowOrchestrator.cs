@@ -20,7 +20,8 @@ internal sealed class BattleFlowOrchestrator
         State = state ?? throw new ArgumentNullException(nameof(state));
         _engine = new BattleEngine(
             buffResolver: buffId => GameRoot.ContentRepository.GetBuff(buffId),
-            legendSkillsProvider: () => GameRoot.ContentRepository.GetLegendSkills());
+            legendSkillsProvider: () => GameRoot.ContentRepository.GetLegendSkills(),
+            skillMaxLevelResolver: GameRoot.SkillMaxLevelPolicy.GetMaxLevel);
         _battleAgent = new BasicEnemyBattleAgent(new BattleTurnCandidateGenerator(_engine));
         _screen.BindState(State);
     }

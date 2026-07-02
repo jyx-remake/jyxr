@@ -1,4 +1,5 @@
 using Game.Core.Affix;
+using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
 
@@ -11,7 +12,8 @@ public sealed record BattleEvent(
     BattleSpeechCue? Speech = null,
     BattleSkillCastInfo? SkillCast = null,
     BattleDamageEvent? Damage = null,
-    BattleRestRecovery? Rest = null);
+    BattleRestRecovery? Rest = null,
+    BattleSkillExperienceEvent? SkillExperience = null);
 
 public sealed record BattleSpeechCue(string Text);
 
@@ -19,6 +21,14 @@ public sealed record BattleDamageEvent(
     int Amount,
     bool IsCritical = false,
     string? SourceUnitId = null);
+
+public sealed record BattleSkillExperienceEvent(
+    string SkillId,
+    string SkillName,
+    SkillKind SkillKind,
+    int AddedExperience,
+    int OldLevel,
+    int NewLevel);
 
 public enum BattleEventKind
 {
@@ -37,4 +47,5 @@ public enum BattleEventKind
     MpDamaged,
     RageChanged,
     SpeechRequested,
+    SkillLeveledUp,
 }

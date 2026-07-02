@@ -3,6 +3,7 @@ using Game.Core.Affix;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
+using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
 
@@ -17,6 +18,7 @@ public sealed partial class BattleEngine
     private readonly Func<IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
     private readonly IRandomService _random;
     private readonly Func<string, BuffDefinition> _buffResolver;
+    private readonly Func<SkillInstance, int> _skillMaxLevelResolver;
 
     public BattleEngine(
         BattleDamageCalculator? damageCalculator = null,
@@ -24,7 +26,8 @@ public sealed partial class BattleEngine
         IRandomService? random = null,
         Func<string, BuffDefinition>? buffResolver = null,
         LegendSkillResolver? legendSkillResolver = null,
-        Func<IReadOnlyList<LegendSkillDefinition>>? legendSkillsProvider = null)
+        Func<IReadOnlyList<LegendSkillDefinition>>? legendSkillsProvider = null,
+        Func<SkillInstance, int>? skillMaxLevelResolver = null)
     {
         _damageCalculator = damageCalculator ?? new BattleDamageCalculator();
         _hookExecutor = hookExecutor ?? new BattleHookExecutor();
@@ -32,6 +35,7 @@ public sealed partial class BattleEngine
         _legendSkillsProvider = legendSkillsProvider ?? EmptyLegendSkillProvider;
         _random = random ?? SharedRandomService.Instance;
         _buffResolver = buffResolver ?? MissingBuffResolver;
+        _skillMaxLevelResolver = skillMaxLevelResolver ?? DefaultSkillMaxLevelResolver;
     }
 
     private static BattleActionResult ValidateActingUnit(
@@ -112,4 +116,13 @@ public sealed partial class BattleEngine
         throw new InvalidOperationException($"Battle engine cannot resolve buff '{buffId}'.");
 
     private static IReadOnlyList<LegendSkillDefinition> EmptyLegendSkillProvider() => [];
+
+    private static int DefaultSkillMaxLevelResolver(SkillInstance skill) =>
+        skill switch
+        {
+            FormSkillInstance formSkill => DefaultSkillMaxLevelResolver(formSkill.Parent),
+            LegendSkillInstance legendSkill => DefaultSkillMaxLevelResolver(legendSkill.Parent),
+            ExternalSkillInstance or InternalSkillInstance => SkillExperienceProgression.DefaultMaxLevel,
+            _ => skill.Level,
+        };
 }

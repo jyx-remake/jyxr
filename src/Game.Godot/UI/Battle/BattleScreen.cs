@@ -737,6 +737,7 @@ public partial class BattleScreen : Control
 			case BattleEventKind.MpDamaged:
 			case BattleEventKind.Rested:
 			case BattleEventKind.ItemUsed:
+			case BattleEventKind.SkillLeveledUp:
 				presentation.EnqueueImpactFloat(() => AppendEventImmediate(battleEvent));
 				return true;
 			default:
@@ -803,6 +804,15 @@ public partial class BattleScreen : Control
 				if (!string.IsNullOrWhiteSpace(battleEvent.Speech?.Text))
 				{
 					_boardGrid.PlaySpeech(battleEvent.UnitId, battleEvent.Speech.Text);
+				}
+				break;
+			case BattleEventKind.SkillLeveledUp:
+				if (battleEvent.SkillExperience is { } skillExperience)
+				{
+					_boardGrid.PlayFloatText(
+						battleEvent.UnitId,
+						ResolveSkillLevelUpFloatText(skillExperience),
+						FloatHealColor);
 				}
 				break;
 		}
@@ -923,6 +933,11 @@ public partial class BattleScreen : Control
 				SkillKind.Internal => FloatManaColor,
 				_ => FloatInfoColor,
 			};
+
+	private static string ResolveSkillLevelUpFloatText(BattleSkillExperienceEvent skillExperience) =>
+		skillExperience.SkillKind == SkillKind.Internal
+			? $"{skillExperience.SkillName}等级提升"
+			: $"{skillExperience.SkillName}等级升级";
 
 	private static string ResolveDamageFloatText(int damage, bool isCritical) =>
 		damage <= 0
