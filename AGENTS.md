@@ -26,7 +26,6 @@
 - `mods`
   - 当前未提交的 MOD 化改造已把正式 JSON 内容从仓库根 `data` 迁到 `mods/jyxr-base/data`。
   - `mods/jyxr-base/mod.json` 是基础内容包清单；内容目录固定约定为 MOD 根目录下的 `data`。
-  - `mods/jyxr-mod-test` 是当前本地测试 MOD，不应当按正式内容路径假设。
 - `launcher`
   - 当前保存 launcher 级配置文件；`userdata/<modId>` 保存各 MOD 自己的存档、档案与设置。
 - `assets`

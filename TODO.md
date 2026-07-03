@@ -1,8 +1,8 @@
 # TODO
 
 - 重新审视 `CharacterDefinition` 中初始技能/装备的表达方式：继续使用纯 `SkillIds` / `EquipmentIds`，还是引入定义侧条目对象来承载默认等级、开关、锻造等初始配置。
-- 技能等级上限目前已接入 `GameConfig.MaxExternalSkillLevel` / `GameConfig.MaxInternalSkillLevel` 作为普通技能实例默认上限。legacy `maxlevel` 剧情命令当前只做技能存在性校验并发 toast，不写入技能实例；后续如要支持动态突破上限，需要重新建模“技能精通/上限提升”的持久化归属。
-- 武学书授予等级与配置上限的关系仍待明确：如果物品效果显式授予等级高于 `GameConfig` 技能等级上限，当前应决定是把授予等级 clamp 到配置上限，还是允许该物品抬高单个技能实例上限。
+- 技能等级上限目前已接入 `SkillMaxLevelPolicy`，由基础上限、全局档案技能精通加成、周目加成和硬上限共同计算。`maxlevel` 剧情命令当前为了复刻 legacy 行为保留了独立的高周目指令增强；后续应去掉这层 `maxlevel` 增强，只保留普通精通加成和人物技能上限的周目规则。
+- 武学书学习当前忽略 `GrantExternalSkillItemUseEffectDefinition.Level` / `GrantInternalSkillItemUseEffectDefinition.Level`，统一学到 `SkillMaxLevelPolicy` 计算出的当前上限。后续需要重新明确物品效果里的 `Level` 字段用途，例如作为最低授予等级、学习门槛、残章进度或特殊书籍覆盖规则。
 - 随机战斗临时敌人的技能上限不按玩家技能实例上限配置单独设置。legacy 行为是按 `NPC_SKILL_LEVEL_ADD_BY_ZHOUMU` 增加 NPC 实际技能等级，并 clamp 到 `MAX_SKILL_LEVEL` / `MAX_INTERNALSKILL_LEVEL`；后续如复刻高周目 NPC 强化，应接入等级加成规则，而不是简单给临时敌人写入配置化 `MaxLevel`。
 - 玩家主动“遗忘技能”当前复用 `CharacterService.RemoveExternalSkill` / `RemoveInternalSkill` / `RemoveSpecialSkill`，并在 Godot UI 层限制派生技能和当前装备内功。后续如玩家交互规则与剧情强制 `remove` 明确分叉，再补应用层专门语义。
 - 内容加载目前只是“DTO 校验 + 按顺序构建 runtime definitions”，还不是真正的二阶段加载。后续如需支持定义间循环依赖，应改成“先注册 runtime definition 空壳，再统一 resolve 引用”的两阶段装配流程。
@@ -25,6 +25,8 @@
 - 物品使用后续待建模：普通消耗品、功能道具、剧情物品、战斗内使用上下文、目标选择规则与效果执行器。目前只接入装备、武学书、绝技书、天赋书和基础强化道具。
 - 装备选择 UI 当前直接复用背包物品格与 tooltip，后续如装备比较、替换确认、套装/词条高亮变复杂，应抽专门 presenter，而不是把规则继续堆在 Godot 控件脚本里。
 - 战场系统后续按 `docs/battlefield-system-design.md` 重建，不保留旧 `BattleEngine` / `CombatantState` / battle hook 运行实现的兼容层。
+- 当前轻量战斗内核的技能使用经验与角色使用经验由宿主通过队伍判定限制为我方单位。后续如果支持网络对战，需要重新建模“哪一方可获得持久化成长”和服务端权威校验，避免客户端队伍归属或自动战斗流程导致成长写入错误。
+- 当前战斗内角色升级直接修改 `CharacterInstance` 并通过 `BattleEventKind.CharacterLeveledUp` 做战斗内表现，没有发布应用层 `CharacterChangedEvent` / `CharacterLeveledUpEvent`。后续如果战斗中角色升级需要驱动 HUD、档案、成就或其他 session 订阅者，应把这条成长路径收敛回应用层服务或补明确的战斗结算事件桥接。
 - 普通战斗装备掉落的随机词条抽样当前按 legacy `ItemInstance.GenerateRandomTrigger()` 复刻：合并匹配等级表后，按配置顺序逐项执行 `weight / totalWeight` 试投，未命中则整轮重试，重复词条再重抽。该行为不是标准权重轮盘抽样；后续如改成一次随机数累计权重命中，应作为明确设计变更评估掉落分布差异。
 - 当前轻量战斗内核的命中结算暂按 legacy 顺序处理：目标侧 `BeforeHitResolved` 闪避/反制先落地，来源侧破闪避/失手后处理。因此可能出现“最终命中但目标闪避反制副作用已生效”的结果；后续正式战场系统重建时需明确这是保留为原版结算顺序，还是拆成命中状态解析与最终结果副作用两阶段。
 - `BeforeHitResolved` 应只承载命中结果确定前的闪避、破闪避、失手等逻辑。后续内容校验应禁止来源侧 `context_hit_state == hit` 的 hook，命中确认后的追加效果应使用 `OnHitConfirmed`，避免数据写法被运行时静默跳过。
