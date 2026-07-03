@@ -15,4 +15,5 @@ bus = &"Bgm"
 [node name="SfxPlayer" type="AudioStreamPlayer" parent="." unique_id=189789563]
 unique_name_in_owner = true
 stream = SubResource("AudioStreamPolyphonic_sfx")
+max_polyphony = 6
 bus = &"SFX"
