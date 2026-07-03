@@ -87,6 +87,39 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void GetImpactPositions_ReturnsLegacyFanFromTarget()
+    {
+        var positions = BattleEngine.GetImpactPositions(
+            new GridPosition(5, 5),
+            new GridPosition(6, 5),
+            SkillImpactType.Fan,
+            impactSize: 2);
+
+        var expected = new HashSet<GridPosition>
+        {
+            new(6, 5),
+            new(7, 4),
+            new(7, 5),
+            new(7, 6),
+            new(8, 3),
+            new(8, 4),
+            new(8, 5),
+            new(8, 6),
+            new(8, 7),
+        };
+
+        Assert.Equal(expected.Count, positions.Count);
+        foreach (var position in expected)
+        {
+            Assert.Contains(position, positions);
+        }
+
+        Assert.DoesNotContain(new GridPosition(5, 5), positions);
+        Assert.DoesNotContain(new GridPosition(6, 4), positions);
+        Assert.DoesNotContain(new GridPosition(6, 6), positions);
+    }
+
+    [Fact]
     public void AdvanceUntilNextAction_SelectsHighestReadyGauge()
     {
         var slow = CreateUnit("slow", team: 1, new GridPosition(0, 0), actionSpeed: 10);

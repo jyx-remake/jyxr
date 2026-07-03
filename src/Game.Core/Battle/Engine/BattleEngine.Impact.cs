@@ -40,7 +40,7 @@ public sealed partial class BattleEngine
                 .Where(position => position == target || Math.Abs(position.X - target.X) == Math.Abs(position.Y - target.Y))
                 .ToHashSet(),
             SkillImpactType.Line => ResolveLinePositions(source, target, Math.Max(1, size)).ToHashSet(),
-            SkillImpactType.Fan => ResolveFanPositions(source, target, Math.Max(1, size)).ToHashSet(),
+            SkillImpactType.Fan => ResolveFanPositions(source, target, size).ToHashSet(),
             SkillImpactType.Cleave => ResolveCleavePositions(source, target).ToHashSet(),
             _ => new HashSet<GridPosition> { target },
         };
@@ -68,14 +68,25 @@ public sealed partial class BattleEngine
 
     private static IEnumerable<GridPosition> ResolveFanPositions(GridPosition source, GridPosition target, int size)
     {
-        var (dx, dy) = ResolvePrimaryDirection(source, target);
+        yield return target;
+
+        var forwardX = Math.Sign(target.X - source.X);
+        var forwardY = Math.Sign(target.Y - source.Y);
+        if (forwardX == 0 && forwardY == 0)
+        {
+            yield break;
+        }
+
+        var sideX = forwardX == 0 ? 1 : 0;
+        var sideY = forwardX == 0 ? 0 : 1;
         for (var distance = 1; distance <= size; distance++)
         {
-            for (var offset = -distance + 1; offset <= distance - 1; offset++)
+            var center = new GridPosition(target.X + forwardX * distance, target.Y + forwardY * distance);
+            yield return center;
+            for (var offset = 1; offset <= distance; offset++)
             {
-                yield return dx != 0
-                    ? new GridPosition(source.X + dx * distance, source.Y + offset)
-                    : new GridPosition(source.X + offset, source.Y + dy * distance);
+                yield return new GridPosition(center.X + sideX * offset, center.Y + sideY * offset);
+                yield return new GridPosition(center.X - sideX * offset, center.Y - sideY * offset);
             }
         }
     }
