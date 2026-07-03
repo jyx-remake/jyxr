@@ -22,9 +22,9 @@ PreviewBattleId = ""
 [node name="TitleLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1117418853]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 640.0
+offset_left = 175.0
 offset_top = 78.0
-offset_right = 1280.0
+offset_right = 1720.0
 offset_bottom = 146.0
 theme_override_colors/font_color = Color(0.07, 0.045, 0.025, 1)
 theme_override_font_sizes/font_size = 44
