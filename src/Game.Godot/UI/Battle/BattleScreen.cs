@@ -787,8 +787,9 @@ public partial class BattleScreen : Control
 				break;
 			case BattleEventKind.BuffApplied:
 				var buffName = ResolveBuffName(battleEvent.Detail);
+				var buffTargetName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 				_boardGrid.PlayFloatText(battleEvent.UnitId, buffName, FloatStateColor);
-				AppendLog($"{battleEvent.UnitId} 获得状态 {buffName}。");
+				AppendLog($"{buffTargetName} 获得状态【{buffName}】。");
 				break;
 			case BattleEventKind.BuffRemoved:
 				var expiredBuffName = ResolveBuffName(battleEvent.Detail);
