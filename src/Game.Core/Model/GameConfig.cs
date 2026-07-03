@@ -20,6 +20,7 @@ public sealed class GameConfig
 	public int MaxAttribute { get; init; } = 300;
 	public ItemRequirementStatSource ItemRequirementStatSource { get; init; } = ItemRequirementStatSource.Final;
 	public bool MaximizeNewPartyCharacterSkills { get; init; } = true;
+	public bool IgnoreSkillBookLevelLimit { get; init; }
 	public int BaseExternalSkillMaxLevel { get; init; } = 10;
 	public int BaseInternalSkillMaxLevel { get; init; } = 10;
 	public int AbsoluteSkillMaxLevel { get; init; } = 20;

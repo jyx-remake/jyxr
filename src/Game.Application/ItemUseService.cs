@@ -125,7 +125,7 @@ public sealed class ItemUseService
                     _session.CharacterService.StudyExternalSkillFromBook(
                         target,
                         externalSkill.SkillId,
-                        SkillMaxLevelPolicy.GetExternalSkillMaxLevel(externalSkill.SkillId));
+                        ResolveExternalSkillBookMaxLevel(externalSkill));
                     break;
                 }
                 case GrantInternalSkillItemUseEffectDefinition internalSkill:
@@ -133,7 +133,7 @@ public sealed class ItemUseService
                     _session.CharacterService.StudyInternalSkillFromBook(
                         target,
                         internalSkill.SkillId,
-                        SkillMaxLevelPolicy.GetInternalSkillMaxLevel(internalSkill.SkillId));
+                        ResolveInternalSkillBookMaxLevel(internalSkill));
                     break;
                 }
             }
@@ -296,7 +296,7 @@ public sealed class ItemUseService
                 {
                     var currentLevel = target.GetExternalSkillLevel(externalSkill.SkillId);
                     if (currentLevel is not null &&
-                        currentLevel.Value >= SkillMaxLevelPolicy.GetExternalSkillMaxLevel(externalSkill.SkillId))
+                        currentLevel.Value >= ResolveExternalSkillBookMaxLevel(externalSkill))
                     {
                         return "该外功已达上限";
                     }
@@ -312,7 +312,7 @@ public sealed class ItemUseService
                 {
                     var currentLevel = target.GetInternalSkillLevel(internalSkill.SkillId);
                     if (currentLevel is not null &&
-                        currentLevel.Value >= SkillMaxLevelPolicy.GetInternalSkillMaxLevel(internalSkill.SkillId))
+                        currentLevel.Value >= ResolveInternalSkillBookMaxLevel(internalSkill))
                     {
                         return "该内功已达上限";
                     }
@@ -328,6 +328,22 @@ public sealed class ItemUseService
         }
 
         return null;
+    }
+
+    private int ResolveExternalSkillBookMaxLevel(GrantExternalSkillItemUseEffectDefinition effect) =>
+        ResolveSkillBookMaxLevel(effect.Level, SkillMaxLevelPolicy.GetExternalSkillMaxLevel(effect.SkillId));
+
+    private int ResolveInternalSkillBookMaxLevel(GrantInternalSkillItemUseEffectDefinition effect) =>
+        ResolveSkillBookMaxLevel(effect.Level, SkillMaxLevelPolicy.GetInternalSkillMaxLevel(effect.SkillId));
+
+    private int ResolveSkillBookMaxLevel(int? bookLevel, int currentMaxLevel)
+    {
+        if (Config.IgnoreSkillBookLevelLimit || bookLevel is null)
+        {
+            return currentMaxLevel;
+        }
+
+        return Math.Min(bookLevel.Value, currentMaxLevel);
     }
 
     private static string? ValidateSpecialSkillTarget(

@@ -579,11 +579,13 @@ public sealed partial class JsonContentLoader
                     case GrantExternalSkillItemUseEffectDefinition externalSkill:
                         Ensure(!string.IsNullOrWhiteSpace(externalSkill.SkillId), $"Item '{item.Id}' external_skill effect is missing skillId.");
                         Ensure(externalSkillIds.Contains(externalSkill.SkillId), $"Item '{item.Id}' references missing external skill '{externalSkill.SkillId}'.");
+                        Ensure(externalSkill.Level is null or >= 1, $"Item '{item.Id}' external_skill effect has invalid level '{externalSkill.Level}'.");
                         break;
 
                     case GrantInternalSkillItemUseEffectDefinition internalSkill:
                         Ensure(!string.IsNullOrWhiteSpace(internalSkill.SkillId), $"Item '{item.Id}' internal_skill effect is missing skillId.");
                         Ensure(internalSkillIds.Contains(internalSkill.SkillId), $"Item '{item.Id}' references missing internal skill '{internalSkill.SkillId}'.");
+                        Ensure(internalSkill.Level is null or >= 1, $"Item '{item.Id}' internal_skill effect has invalid level '{internalSkill.Level}'.");
                         break;
 
                     case GrantSpecialSkillItemUseEffectDefinition specialSkill:

@@ -90,13 +90,64 @@ public sealed class ItemUseServiceTests
     }
 
     [Fact]
-    public void Use_ExternalSkillBook_IgnoresBookEffectLevelAndLearnsCurrentMaxLevel()
+    public void Use_ExternalSkillBook_RespectsBookEffectLevelByDefault()
     {
         var skill = TestContentFactory.CreateExternalSkill("dragon_palm");
         var book = CreateItem(
             "dragon_book",
             ItemType.SkillBook,
             [new GrantExternalSkillItemUseEffectDefinition(skill.Id, Level: 5)]);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(book);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            externalSkills: [skill],
+            items: [book]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(book);
+
+        var result = session.ItemUseService.Use(entry, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(5, hero.GetExternalSkillLevel(skill.Id));
+    }
+
+    [Fact]
+    public void Use_ExternalSkillBook_IgnoresBookEffectLevelWhenConfigured()
+    {
+        var skill = TestContentFactory.CreateExternalSkill("dragon_palm");
+        var book = CreateItem(
+            "dragon_book",
+            ItemType.SkillBook,
+            [new GrantExternalSkillItemUseEffectDefinition(skill.Id, Level: 5)]);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(book);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            externalSkills: [skill],
+            items: [book]);
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig { IgnoreSkillBookLevelLimit = true });
+        var entry = state.Inventory.GetStack(book);
+
+        var result = session.ItemUseService.Use(entry, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(10, hero.GetExternalSkillLevel(skill.Id));
+    }
+
+    [Fact]
+    public void Use_ExternalSkillBook_ClampsBookEffectLevelToCurrentMaxLevel()
+    {
+        var skill = TestContentFactory.CreateExternalSkill("dragon_palm");
+        var book = CreateItem(
+            "dragon_book",
+            ItemType.SkillBook,
+            [new GrantExternalSkillItemUseEffectDefinition(skill.Id, Level: 15)]);
         var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
         var state = CreateStateWithHero(heroDefinition, out var hero);
         state.Inventory.AddItem(book);
@@ -175,6 +226,32 @@ public sealed class ItemUseServiceTests
     }
 
     [Fact]
+    public void AnalyzeTarget_DisablesKnownExternalSkillAtBookEffectLevel()
+    {
+        var skill = TestContentFactory.CreateExternalSkill("dragon_palm");
+        var book = CreateItem(
+            "dragon_book",
+            ItemType.SkillBook,
+            [new GrantExternalSkillItemUseEffectDefinition(skill.Id, Level: 5)]);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition(
+            "hero",
+            externalSkills: [new InitialExternalSkillEntryDefinition(skill, Level: 5)]);
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(book);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            externalSkills: [skill],
+            items: [book]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(book);
+
+        var candidate = session.ItemUseService.AnalyzeTarget(entry, hero);
+
+        Assert.False(candidate.CanUse);
+        Assert.Equal("该外功已达上限", candidate.Reason);
+    }
+
+    [Fact]
     public void Use_InternalSkillBook_LearnsDefaultLevel10AndDoesNotConsume()
     {
         var skill = TestContentFactory.CreateInternalSkill("yijinjing");
@@ -196,6 +273,31 @@ public sealed class ItemUseServiceTests
 
         Assert.True(result.Success);
         Assert.Equal(10, hero.GetInternalSkillLevel(skill.Id));
+        Assert.Equal(1, entry.Quantity);
+    }
+
+    [Fact]
+    public void Use_InternalSkillBook_RespectsBookEffectLevelByDefault()
+    {
+        var skill = TestContentFactory.CreateInternalSkill("yijinjing");
+        var book = CreateItem(
+            "internal_book",
+            ItemType.SkillBook,
+            [new GrantInternalSkillItemUseEffectDefinition(skill.Id, Level: 5)]);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(book);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            internalSkills: [skill],
+            items: [book]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(book);
+
+        var result = session.ItemUseService.Use(entry, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(5, hero.GetInternalSkillLevel(skill.Id));
         Assert.Equal(1, entry.Quantity);
     }
 

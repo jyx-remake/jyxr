@@ -2,7 +2,7 @@
 
 - 重新审视 `CharacterDefinition` 中初始技能/装备的表达方式：继续使用纯 `SkillIds` / `EquipmentIds`，还是引入定义侧条目对象来承载默认等级、开关、锻造等初始配置。
 - 技能等级上限目前已接入 `SkillMaxLevelPolicy`，由基础上限、全局档案技能精通加成、周目加成和硬上限共同计算。`maxlevel` 剧情命令当前为了复刻 legacy 行为保留了独立的高周目指令增强；后续应去掉这层 `maxlevel` 增强，只保留普通精通加成和人物技能上限的周目规则。
-- 武学书学习当前忽略 `GrantExternalSkillItemUseEffectDefinition.Level` / `GrantInternalSkillItemUseEffectDefinition.Level`，统一学到 `SkillMaxLevelPolicy` 计算出的当前上限。后续需要重新明确物品效果里的 `Level` 字段用途，例如作为最低授予等级、学习门槛、残章进度或特殊书籍覆盖规则。
+- 武学书学习默认会把 `GrantExternalSkillItemUseEffectDefinition.Level` / `GrantInternalSkillItemUseEffectDefinition.Level` 作为书本上限，并与 `SkillMaxLevelPolicy` 当前上限取较小值；`GameConfig.IgnoreSkillBookLevelLimit` 可切回旧的忽略书本上限行为。后续如要支持残章进度或特殊书籍覆盖规则，需要继续细化物品效果语义。
 - 随机战斗临时敌人的技能上限不按玩家技能实例上限配置单独设置。legacy 行为是按 `NPC_SKILL_LEVEL_ADD_BY_ZHOUMU` 增加 NPC 实际技能等级，并 clamp 到 `MAX_SKILL_LEVEL` / `MAX_INTERNALSKILL_LEVEL`；后续如复刻高周目 NPC 强化，应接入等级加成规则，而不是简单给临时敌人写入配置化 `MaxLevel`。
 - 玩家主动“遗忘技能”当前复用 `CharacterService.RemoveExternalSkill` / `RemoveInternalSkill` / `RemoveSpecialSkill`，并在 Godot UI 层限制派生技能和当前装备内功。后续如玩家交互规则与剧情强制 `remove` 明确分叉，再补应用层专门语义。
 - 内容加载目前只是“DTO 校验 + 按顺序构建 runtime definitions”，还不是真正的二阶段加载。后续如需支持定义间循环依赖，应改成“先注册 runtime definition 空壳，再统一 resolve 引用”的两阶段装配流程。
