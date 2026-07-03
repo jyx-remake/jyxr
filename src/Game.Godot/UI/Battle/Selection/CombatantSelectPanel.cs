@@ -27,6 +27,7 @@ public partial class CombatantSelectPanel : JyPanel
 	private readonly HashSet<string> _selectedIds = new(StringComparer.Ordinal);
 	private readonly Dictionary<string, CombatantSelectCard> _cards = new(StringComparer.Ordinal);
 	private string _battleId = string.Empty;
+	private string _battleName = string.Empty;
 	private int _deploySlotCount;
 	private bool _isConfigured;
 	private readonly TaskCompletionSource<IReadOnlyList<string>> _deploymentCompletion =
@@ -71,6 +72,7 @@ public partial class CombatantSelectPanel : JyPanel
 		ArgumentNullException.ThrowIfNull(forbiddenCharacterIds);
 
 		_battleId = battle.Id;
+		_battleName = string.IsNullOrWhiteSpace(battle.Name) ? battle.Id : battle.Name;
 		_deploySlotCount = CountPlayerDeploySlots(battle);
 		_requiredIds.Clear();
 		_forbiddenIds.Clear();
@@ -137,9 +139,9 @@ public partial class CombatantSelectPanel : JyPanel
 		ClearGrid();
 		_cards.Clear();
 
-		_titleLabel.Text = string.IsNullOrWhiteSpace(_battleId)
+		_titleLabel.Text = string.IsNullOrWhiteSpace(_battleName)
 			? "出战人物选择"
-			: $"出战人物选择 - {_battleId}";
+			: $"出战人物选择 - {_battleName}";
 
 		var members = Game.State.Party.Members;
 		foreach (var member in members)
