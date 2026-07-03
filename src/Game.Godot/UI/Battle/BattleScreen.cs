@@ -738,6 +738,7 @@ public partial class BattleScreen : Control
 			case BattleEventKind.Rested:
 			case BattleEventKind.ItemUsed:
 			case BattleEventKind.SkillLeveledUp:
+			case BattleEventKind.CharacterLeveledUp:
 				presentation.EnqueueImpactFloat(() => AppendEventImmediate(battleEvent));
 				return true;
 			default:
@@ -813,6 +814,15 @@ public partial class BattleScreen : Control
 					_boardGrid.PlayFloatText(
 						battleEvent.UnitId,
 						ResolveSkillLevelUpFloatText(skillExperience),
+						FloatHealColor);
+				}
+				break;
+			case BattleEventKind.CharacterLeveledUp:
+				if (battleEvent.CharacterExperience is not null)
+				{
+					_boardGrid.PlayFloatText(
+						battleEvent.UnitId,
+						"角色等级提升",
 						FloatHealColor);
 				}
 				break;

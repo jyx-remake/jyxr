@@ -13,7 +13,8 @@ public sealed record BattleEvent(
     BattleSkillCastInfo? SkillCast = null,
     BattleDamageEvent? Damage = null,
     BattleRestRecovery? Rest = null,
-    BattleSkillExperienceEvent? SkillExperience = null);
+    BattleSkillExperienceEvent? SkillExperience = null,
+    BattleCharacterExperienceEvent? CharacterExperience = null);
 
 public sealed record BattleSpeechCue(string Text);
 
@@ -26,6 +27,13 @@ public sealed record BattleSkillExperienceEvent(
     string SkillId,
     string SkillName,
     SkillKind SkillKind,
+    int AddedExperience,
+    int OldLevel,
+    int NewLevel);
+
+public sealed record BattleCharacterExperienceEvent(
+    string CharacterId,
+    string CharacterName,
     int AddedExperience,
     int OldLevel,
     int NewLevel);
@@ -48,4 +56,5 @@ public enum BattleEventKind
     RageChanged,
     SpeechRequested,
     SkillLeveledUp,
+    CharacterLeveledUp,
 }

@@ -9,8 +9,6 @@ namespace Game.Application;
 
 public sealed class CharacterService
 {
-    private const string DefaultGrowTemplateId = "default";
-    private const int LevelUpGrantedStatPoints = 2;
     private readonly GameSession _session;
 
     public CharacterService(GameSession session)
@@ -136,14 +134,14 @@ public sealed class CharacterService
         }
 
         var character = GetPartyMember(characterId);
-        var oldLevel = character.Level;
-        character.GrantExperience(experience);
-
-        var resolvedLevel = Math.Max(oldLevel, CharacterLevelProgression.ResolveLevel(character.Experience, Config.MaxLevel));
-        if (resolvedLevel > oldLevel)
+        var change = CharacterExperienceProgression.TryAddExperience(
+            character,
+            experience,
+            Config.MaxLevel,
+            () => ResolveGrowTemplate(character));
+        if (change.LeveledUp)
         {
-            ApplyLevelUps(character, oldLevel, resolvedLevel);
-            _session.Events.Publish(new CharacterLeveledUpEvent(character.Id, oldLevel, resolvedLevel));
+            _session.Events.Publish(new CharacterLeveledUpEvent(character.Id, change.OldLevel, change.NewLevel));
         }
 
         PublishCharacterChanged(character);
@@ -480,38 +478,11 @@ public sealed class CharacterService
         return false;
     }
 
-    private void ApplyLevelUps(CharacterInstance character, int oldLevel, int newLevel)
-    {
-        var growTemplate = ResolveGrowTemplate(character);
-        for (var currentLevel = oldLevel + 1; currentLevel <= newLevel; currentLevel += 1)
-        {
-            character.SetLevel(currentLevel);
-            ApplyStatGrowth(character, growTemplate);
-            character.GrantStatPoints(LevelUpGrantedStatPoints);
-        }
-    }
-
     private GrowTemplateDefinition ResolveGrowTemplate(CharacterInstance character)
     {
         ArgumentNullException.ThrowIfNull(character);
-        var growTemplateId = character.GrowTemplateId ?? DefaultGrowTemplateId;
+        var growTemplateId = character.GrowTemplateId ?? CharacterExperienceProgression.DefaultGrowTemplateId;
         return ContentRepository.GetGrowTemplate(growTemplateId);
-    }
-
-    private static void ApplyStatGrowth(CharacterInstance character, GrowTemplateDefinition growTemplate)
-    {
-        ArgumentNullException.ThrowIfNull(character);
-        ArgumentNullException.ThrowIfNull(growTemplate);
-
-        foreach (var (statType, delta) in growTemplate.StatGrowth)
-        {
-            if (delta == 0)
-            {
-                continue;
-            }
-
-            character.AddBaseStat(statType, delta);
-        }
     }
 }
 

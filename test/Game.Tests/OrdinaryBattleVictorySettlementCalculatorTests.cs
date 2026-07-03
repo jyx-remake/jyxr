@@ -537,8 +537,6 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
             character,
             team,
             position,
-            maxHp: maxHp,
-            maxMp: maxMp,
             hp: hp);
     }
 }

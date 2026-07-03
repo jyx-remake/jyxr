@@ -4,6 +4,7 @@ using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 
 namespace Game.Tests;
@@ -322,6 +323,220 @@ public sealed class BattleEngineTests
             battleEvent.Kind == BattleEventKind.SkillLeveledUp));
         Assert.Equal(hero.Id, levelEvent.UnitId);
         Assert.Equal(new BattleSkillExperienceEvent("strike", "strike", SkillKind.External, 30, 1, 2), levelEvent.SkillExperience);
+    }
+
+    [Fact]
+    public void CastSkill_RefreshesBattleResourceLimit_WhenSkillLevelUpChangesMaxHp()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            hard: 1d,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3,
+            affixes:
+            [
+                new SkillAffixDefinition(
+                    new StatModifierAffix(StatType.MaxHp, ModifierValue.Add(50)),
+                    MinimumLevel: 2),
+            ]);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxHp: 100,
+            hp: 40,
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(skillMaxLevelResolver: _ => 20);
+        engine.BeginAction(state, hero.Id);
+
+        var skill = hero.Character.GetExternalSkills().Single();
+        var result = engine.CastSkill(state, hero.Id, skill, new GridPosition(1, 0));
+
+        Assert.True(result.Success);
+        Assert.Equal(2, skill.Level);
+        Assert.Equal(150, hero.MaxHp);
+        Assert.Equal(40, hero.Hp);
+    }
+
+    [Fact]
+    public void CastSkill_RefreshesBattleResourceLimits_WhenCharacterLevelsUp()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            hard: 10d,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var growTemplate = TestContentFactory.CreateGrowTemplate(
+            "fighter",
+            new Dictionary<StatType, int>
+            {
+                [StatType.MaxHp] = 25,
+                [StatType.MaxMp] = 12,
+            });
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxHp: 100,
+            maxMp: 30,
+            hp: 40,
+            mp: 10,
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        hero.Character.GrantExperience(CharacterLevelProgression.GetTotalExperienceRequiredForLevel(2) - 3);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(
+            skillMaxLevelResolver: _ => 20,
+            characterGrowTemplateResolver: _ => growTemplate,
+            characterMaxLevelResolver: _ => 20);
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(
+            state,
+            hero.Id,
+            hero.Character.GetExternalSkills().Single(),
+            new GridPosition(1, 0));
+
+        Assert.True(result.Success);
+        Assert.Equal(2, hero.Character.Level);
+        Assert.Equal(125, hero.MaxHp);
+        Assert.Equal(40, hero.Hp);
+        Assert.Equal(42, hero.MaxMp);
+        Assert.Equal(10, hero.Mp);
+        Assert.Contains(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.CharacterLeveledUp);
+    }
+
+    [Fact]
+    public void CastSkill_DoesNotGainBattleExperience_WhenUnitIsNotEligible()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            hard: 1d,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var growTemplate = TestContentFactory.CreateGrowTemplate(
+            "fighter",
+            new Dictionary<StatType, int>
+            {
+                [StatType.MaxHp] = 25,
+            });
+        var hero = CreateUnit(
+            "hero",
+            team: 2,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        hero.Character.GrantExperience(CharacterLevelProgression.GetTotalExperienceRequiredForLevel(2) - 3);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(
+            skillMaxLevelResolver: _ => 20,
+            characterGrowTemplateResolver: _ => growTemplate,
+            characterMaxLevelResolver: _ => 20,
+            battleExperienceEligibilityResolver: unit => unit.Team == 1);
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(
+            state,
+            hero.Id,
+            hero.Character.GetExternalSkills().Single(),
+            new GridPosition(1, 0));
+
+        Assert.True(result.Success);
+        Assert.Equal(1, hero.Character.Level);
+        Assert.Equal(CharacterLevelProgression.GetTotalExperienceRequiredForLevel(2) - 3, hero.Character.Experience);
+        Assert.Equal(1, hero.Character.GetExternalSkills().Single().Level);
+        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.SkillLeveledUp);
+        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.CharacterLeveledUp);
+    }
+
+    [Fact]
+    public void CastSkill_ClampsBattleResources_WhenRefreshedLimitDrops()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            hard: 1d,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3,
+            affixes:
+            [
+                new SkillAffixDefinition(
+                    new StatModifierAffix(StatType.MaxHp, ModifierValue.Add(-60)),
+                    MinimumLevel: 2),
+                new SkillAffixDefinition(
+                    new StatModifierAffix(StatType.MaxMp, ModifierValue.Add(-20)),
+                    MinimumLevel: 2),
+            ]);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxHp: 100,
+            maxMp: 30,
+            hp: 80,
+            mp: 25,
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(skillMaxLevelResolver: _ => 20);
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(
+            state,
+            hero.Id,
+            hero.Character.GetExternalSkills().Single(),
+            new GridPosition(1, 0));
+
+        Assert.True(result.Success);
+        Assert.Equal(40, hero.MaxHp);
+        Assert.Equal(40, hero.Hp);
+        Assert.Equal(10, hero.MaxMp);
+        Assert.Equal(10, hero.Mp);
+    }
+
+    [Fact]
+    public void BattleUnit_ComputesResourceLimitsFromActiveBuffs()
+    {
+        var buff = new BuffDefinition
+        {
+            Id = "resource_boost",
+            Name = "resource_boost",
+            IsDebuff = false,
+            Affixes =
+            [
+                new StatModifierAffix(StatType.MaxHp, ModifierValue.Add(50)),
+                new StatModifierAffix(StatType.MaxMp, ModifierValue.Add(20)),
+            ],
+        };
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxHp: 100,
+            maxMp: 30,
+            hp: 80,
+            mp: 25);
+
+        hero.ApplyBuff(new BattleBuffInstance(buff, level: 1, remainingTurns: 3, sourceUnitId: hero.Id, appliedAtActionSerial: 1));
+        hero.RestoreHp(100);
+        hero.RestoreMp(100);
+
+        Assert.Equal(150, hero.MaxHp);
+        Assert.Equal(150, hero.Hp);
+        Assert.Equal(50, hero.MaxMp);
+        Assert.Equal(50, hero.Mp);
+
+        hero.RemoveBuffsById(buff.Id);
+
+        Assert.Equal(100, hero.MaxHp);
+        Assert.Equal(100, hero.Hp);
+        Assert.Equal(30, hero.MaxMp);
+        Assert.Equal(30, hero.Mp);
     }
 
     [Fact]
@@ -2928,8 +3143,6 @@ public sealed class BattleEngineTests
             character,
             team,
             position,
-            maxHp: maxHp,
-            maxMp: maxMp,
             hp: hp,
             mp: mp,
             rage: rage);

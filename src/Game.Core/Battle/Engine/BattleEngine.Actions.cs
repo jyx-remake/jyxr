@@ -1,6 +1,7 @@
 using Game.Core.Affix;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -119,12 +120,13 @@ public sealed partial class BattleEngine
             context.Skill = resolvedSkill;
         });
         var skillExperienceEvents = TryGainSkillExperience(state, unit, skill);
+        var characterExperienceEvents = TryGainCharacterExperience(state, unit);
         unit.RecordUsedSkill(skill.Id);
         EndActionCore(state, unit, committedMainAction: true);
         return BattleActionResult.Succeeded(
             string.Empty,
             targets.Select(static targetUnit => targetUnit.Id).ToList(),
-            [battleEvent, .. skillExperienceEvents],
+            [battleEvent, .. skillExperienceEvents, .. characterExperienceEvents],
             impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList(),
             skillCastInfo);
     }
@@ -134,6 +136,11 @@ public sealed partial class BattleEngine
         BattleUnit unit,
         SkillInstance usedSkill)
     {
+        if (!_battleExperienceEligibilityResolver(unit))
+        {
+            return [];
+        }
+
         var experience = SkillExperienceProgression.CalculateBattleUseExperience(unit.Character);
         var events = new List<BattleEvent>();
         var progressedSkills = new HashSet<SkillInstance>(ReferenceEqualityComparer.Instance);
@@ -172,6 +179,7 @@ public sealed partial class BattleEngine
             return;
         }
 
+        unit.ClampResourcesToLimits();
         var battleEvent = new BattleEvent(
             BattleEventKind.SkillLeveledUp,
             unit.Id,
@@ -184,6 +192,37 @@ public sealed partial class BattleEngine
                 change.NewLevel));
         AddEvent(state, battleEvent);
         events.Add(battleEvent);
+    }
+
+    private IReadOnlyList<BattleEvent> TryGainCharacterExperience(BattleState state, BattleUnit unit)
+    {
+        if (!_battleExperienceEligibilityResolver(unit))
+        {
+            return [];
+        }
+
+        var change = CharacterExperienceProgression.TryAddExperience(
+            unit.Character,
+            SkillCastCharacterExperience,
+            _characterMaxLevelResolver(unit.Character),
+            () => _characterGrowTemplateResolver(unit.Character));
+        if (!change.LeveledUp)
+        {
+            return [];
+        }
+
+        unit.ClampResourcesToLimits();
+        var battleEvent = new BattleEvent(
+            BattleEventKind.CharacterLeveledUp,
+            unit.Id,
+            CharacterExperience: new BattleCharacterExperienceEvent(
+                unit.Character.Id,
+                unit.Character.Name,
+                change.AddedExperience,
+                change.OldLevel,
+                change.NewLevel));
+        AddEvent(state, battleEvent);
+        return [battleEvent];
     }
 
     private void TryRequestSpecialSkillSpeech(

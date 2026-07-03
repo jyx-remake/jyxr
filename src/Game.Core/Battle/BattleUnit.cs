@@ -18,8 +18,6 @@ public sealed class BattleUnit
         int team,
         GridPosition position,
         BattleFacing facing = BattleFacing.Right,
-        int? maxHp = null,
-        int? maxMp = null,
         int? hp = null,
         int? mp = null,
         int rage = 0)
@@ -34,10 +32,10 @@ public sealed class BattleUnit
         Position = position;
         Facing = facing;
 
-        MaxHp = Math.Max(1, maxHp ?? ResolvePositiveStat(character, StatType.MaxHp, 1));
-        MaxMp = Math.Max(0, maxMp ?? ResolvePositiveStat(character, StatType.MaxMp, 0));
-        Hp = Math.Clamp(hp ?? MaxHp, 0, MaxHp);
-        Mp = Math.Clamp(mp ?? MaxMp, 0, MaxMp);
+        var initialMaxHp = MaxHp;
+        var initialMaxMp = MaxMp;
+        Hp = Math.Clamp(hp ?? initialMaxHp, 0, initialMaxHp);
+        Mp = Math.Clamp(mp ?? initialMaxMp, 0, initialMaxMp);
         Rage = Math.Clamp(rage, 0, MaxRage);
     }
 
@@ -51,11 +49,11 @@ public sealed class BattleUnit
 
     public BattleFacing Facing { get; internal set; }
 
-    public int MaxHp { get; }
+    public int MaxHp => ResolveMaxHp();
 
     public int Hp { get; private set; }
 
-    public int MaxMp { get; }
+    public int MaxMp => ResolveMaxMp();
 
     public int Mp { get; private set; }
 
@@ -93,6 +91,12 @@ public sealed class BattleUnit
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
         return _disabledSkillIds.Remove(skillId);
+    }
+
+    internal void ClampResourcesToLimits()
+    {
+        Hp = Math.Clamp(Hp, 0, MaxHp);
+        Mp = Math.Clamp(Mp, 0, MaxMp);
     }
 
     public void SpendMp(int amount)
@@ -191,6 +195,7 @@ public sealed class BattleUnit
     {
         ArgumentNullException.ThrowIfNull(buff);
         _buffs.Add(buff);
+        ClampResourcesToLimits();
     }
 
     public IReadOnlyList<BattleBuffInstance> RemoveBuffs(Func<BattleBuffInstance, bool> predicate)
@@ -201,6 +206,7 @@ public sealed class BattleUnit
             .Where(predicate)
             .ToList();
         _buffs.RemoveAll(buff => removed.Contains(buff));
+        ClampResourcesToLimits();
         return removed
             .Where(static buff => !buff.IsExpired)
             .ToList();
@@ -312,6 +318,7 @@ public sealed class BattleUnit
     {
         var expired = _buffs.Where(static buff => buff.IsExpired).ToList();
         _buffs.RemoveAll(static buff => buff.IsExpired);
+        ClampResourcesToLimits();
         return expired;
     }
 
@@ -363,9 +370,15 @@ public sealed class BattleUnit
         return bucket;
     }
 
-    private static int ResolvePositiveStat(CharacterInstance character, StatType statType, int fallback)
+    private int ResolveMaxHp() =>
+        ResolvePositiveStat(StatType.MaxHp, 1);
+
+    private int ResolveMaxMp() =>
+        ResolvePositiveStat(StatType.MaxMp, 0);
+
+    private int ResolvePositiveStat(StatType statType, int fallback)
     {
-        var value = (int)Math.Round(character.GetStat(statType));
+        var value = (int)Math.Round(GetStat(statType));
         return value > 0 ? value : fallback;
     }
 }

@@ -136,6 +136,6 @@ public sealed class BattleAiTests
 
         var definition = TestContentFactory.CreateCharacterDefinition(id, stats: mergedStats, externalSkills: externalSkills);
         var character = TestContentFactory.CreateCharacterInstance(id, definition);
-        return new BattleUnit(id, character, team, position, maxHp: maxHp, maxMp: maxMp, mp: mp);
+        return new BattleUnit(id, character, team, position, mp: mp);
     }
 }

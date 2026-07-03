@@ -1,5 +1,6 @@
 using Game.Core.Battle;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 using GameRoot = Game.Godot.Game;
 
@@ -21,7 +22,12 @@ internal sealed class BattleFlowOrchestrator
         _engine = new BattleEngine(
             buffResolver: buffId => GameRoot.ContentRepository.GetBuff(buffId),
             legendSkillsProvider: () => GameRoot.ContentRepository.GetLegendSkills(),
-            skillMaxLevelResolver: GameRoot.SkillMaxLevelPolicy.GetMaxLevel);
+            skillMaxLevelResolver: GameRoot.SkillMaxLevelPolicy.GetMaxLevel,
+            characterGrowTemplateResolver: character =>
+                GameRoot.ContentRepository.GetGrowTemplate(
+                    character.GrowTemplateId ?? CharacterExperienceProgression.DefaultGrowTemplateId),
+            characterMaxLevelResolver: _ => GameRoot.Config.MaxLevel,
+            battleExperienceEligibilityResolver: unit => unit.Team == PlayerTeam);
         _battleAgent = new BasicEnemyBattleAgent(new BattleTurnCandidateGenerator(_engine));
         _screen.BindState(State);
     }

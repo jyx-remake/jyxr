@@ -3,6 +3,7 @@ using Game.Core.Affix;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -11,6 +12,13 @@ public sealed partial class BattleEngine
 {
     internal const int TimelineTicksPerRound = BattleBuffInstance.TimelineTicksPerRound;
     private const double ActionGaugeThreshold = 100d;
+    private const int DefaultBattleExperienceTeam = 1;
+    private const int SkillCastCharacterExperience = 3;
+    private static readonly GrowTemplateDefinition EmptyGrowTemplate = new()
+    {
+        Id = CharacterExperienceProgression.DefaultGrowTemplateId,
+        Name = CharacterExperienceProgression.DefaultGrowTemplateId,
+    };
 
     private readonly BattleDamageCalculator _damageCalculator;
     private readonly BattleHookExecutor _hookExecutor;
@@ -19,6 +27,9 @@ public sealed partial class BattleEngine
     private readonly IRandomService _random;
     private readonly Func<string, BuffDefinition> _buffResolver;
     private readonly Func<SkillInstance, int> _skillMaxLevelResolver;
+    private readonly Func<CharacterInstance, GrowTemplateDefinition> _characterGrowTemplateResolver;
+    private readonly Func<CharacterInstance, int> _characterMaxLevelResolver;
+    private readonly Func<BattleUnit, bool> _battleExperienceEligibilityResolver;
 
     public BattleEngine(
         BattleDamageCalculator? damageCalculator = null,
@@ -27,7 +38,10 @@ public sealed partial class BattleEngine
         Func<string, BuffDefinition>? buffResolver = null,
         LegendSkillResolver? legendSkillResolver = null,
         Func<IReadOnlyList<LegendSkillDefinition>>? legendSkillsProvider = null,
-        Func<SkillInstance, int>? skillMaxLevelResolver = null)
+        Func<SkillInstance, int>? skillMaxLevelResolver = null,
+        Func<CharacterInstance, GrowTemplateDefinition>? characterGrowTemplateResolver = null,
+        Func<CharacterInstance, int>? characterMaxLevelResolver = null,
+        Func<BattleUnit, bool>? battleExperienceEligibilityResolver = null)
     {
         _damageCalculator = damageCalculator ?? new BattleDamageCalculator();
         _hookExecutor = hookExecutor ?? new BattleHookExecutor();
@@ -36,6 +50,9 @@ public sealed partial class BattleEngine
         _random = random ?? SharedRandomService.Instance;
         _buffResolver = buffResolver ?? MissingBuffResolver;
         _skillMaxLevelResolver = skillMaxLevelResolver ?? DefaultSkillMaxLevelResolver;
+        _characterGrowTemplateResolver = characterGrowTemplateResolver ?? DefaultCharacterGrowTemplateResolver;
+        _characterMaxLevelResolver = characterMaxLevelResolver ?? DefaultCharacterMaxLevelResolver;
+        _battleExperienceEligibilityResolver = battleExperienceEligibilityResolver ?? DefaultBattleExperienceEligibilityResolver;
     }
 
     private static BattleActionResult ValidateActingUnit(
@@ -116,6 +133,12 @@ public sealed partial class BattleEngine
         throw new InvalidOperationException($"Battle engine cannot resolve buff '{buffId}'.");
 
     private static IReadOnlyList<LegendSkillDefinition> EmptyLegendSkillProvider() => [];
+
+    private static GrowTemplateDefinition DefaultCharacterGrowTemplateResolver(CharacterInstance _) => EmptyGrowTemplate;
+
+    private static int DefaultCharacterMaxLevelResolver(CharacterInstance _) => CharacterLevelProgression.DefaultMaxLevel;
+
+    private static bool DefaultBattleExperienceEligibilityResolver(BattleUnit unit) => unit.Team == DefaultBattleExperienceTeam;
 
     private static int DefaultSkillMaxLevelResolver(SkillInstance skill) =>
         skill switch
