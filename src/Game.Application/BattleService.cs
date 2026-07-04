@@ -91,7 +91,7 @@ public sealed class BattleService
                     : CreateArenaOpponentCharacter(hardLevel, index, tempFactory),
             (_, index, tempFactory) =>
                 CreateArenaOpponentCharacter(hardLevel, index + battle.Participants.Count, tempFactory),
-            ApplyNpcRoundPowerUp,
+            (character, _) => ApplyNpcRoundPowerUp(character),
             CreateBattleRuleSettings(battleDifficulty, enableRoundEnemyAttackDefenceScaling: true));
     }
 
@@ -110,7 +110,7 @@ public sealed class BattleService
                 ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory, battleDifficulty),
             (participant, index, tempFactory) =>
                 CreateRandomParticipantCharacter(participant, index, tempFactory, battleDifficulty),
-            character => PowerUpZhenlongqijuEnemy(character, level),
+            (character, tempFactory) => PowerUpZhenlongqijuEnemy(character, level, tempFactory),
             CreateBattleRuleSettings(battleDifficulty, enableRoundEnemyAttackDefenceScaling: false));
     }
 
@@ -127,7 +127,7 @@ public sealed class BattleService
                 ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory, battleDifficulty),
             (participant, index, tempFactory) =>
                 CreateRandomParticipantCharacter(participant, index, tempFactory, battleDifficulty),
-            ApplyNpcRoundPowerUp,
+            (character, _) => ApplyNpcRoundPowerUp(character),
             CreateBattleRuleSettings(battleDifficulty, enableRoundEnemyAttackDefenceScaling: true));
     }
 
@@ -151,7 +151,7 @@ public sealed class BattleService
         IReadOnlyList<string> selectedCharacterIds,
         Func<BattleParticipantDefinition, int, IReadOnlyList<CharacterInstance?>, EquipmentInstanceFactory, CharacterInstance?> participantResolver,
         Func<BattleRandomParticipantDefinition, int, EquipmentInstanceFactory, CharacterInstance> randomParticipantResolver,
-        Action<CharacterInstance> npcCharacterProcessor,
+        Action<CharacterInstance, EquipmentInstanceFactory> npcCharacterProcessor,
         BattleRuleSettings ruleSettings)
     {
         ArgumentNullException.ThrowIfNull(battle);
@@ -176,7 +176,7 @@ public sealed class BattleService
 
             if (!IsPartyCharacterInstance(character))
             {
-                npcCharacterProcessor(character);
+                npcCharacterProcessor(character, tempFactory);
             }
 
             units.Add(CreateUnit(
@@ -190,7 +190,7 @@ public sealed class BattleService
         foreach (var (participant, index) in battle.RandomParticipants.Select(static (participant, index) => (participant, index)))
         {
             var character = randomParticipantResolver(participant, index, tempFactory);
-            npcCharacterProcessor(character);
+            npcCharacterProcessor(character, tempFactory);
             units.Add(CreateUnit(
                 $"random_{index}_{character.Id}",
                 character,
@@ -786,6 +786,28 @@ public sealed class BattleService
         return PickRandom(candidates);
     }
 
+    private EquipmentDefinition PickConfiguredZhenlongqijuEquipment(EquipmentSlotType slotType)
+    {
+        var equipmentIds = slotType switch
+        {
+            EquipmentSlotType.Weapon => Config.ZhenlongWeaponRewardIds,
+            EquipmentSlotType.Armor => Config.ZhenlongArmorRewardIds,
+            EquipmentSlotType.Accessory => Config.ZhenlongAccessoryRewardIds,
+            _ => throw new InvalidOperationException($"Unsupported zhenlongqiju equipment slot '{slotType}'."),
+        };
+        var candidates = equipmentIds
+            .Distinct(StringComparer.Ordinal)
+            .Select(equipmentId => ResolveConfiguredZhenlongEquipment(equipmentId, slotType))
+            .ToArray();
+        if (candidates.Length == 0)
+        {
+            throw new InvalidOperationException(
+                $"Zhenlongqiju enemy equipment requires at least one configured {slotType} equipment definition.");
+        }
+
+        return PickRandom(candidates);
+    }
+
     private EquipmentDefinition ResolveConfiguredZhenlongEquipment(string equipmentId)
     {
         if (string.IsNullOrWhiteSpace(equipmentId))
@@ -796,6 +818,27 @@ public sealed class BattleService
         return ContentRepository.GetItem(equipmentId.Trim()) as EquipmentDefinition
             ?? throw new InvalidOperationException(
                 $"Zhenlongqiju equipment reward '{equipmentId}' is not an equipment definition.");
+    }
+
+    private EquipmentDefinition ResolveConfiguredZhenlongEquipment(
+        string equipmentId,
+        EquipmentSlotType expectedSlotType)
+    {
+        if (string.IsNullOrWhiteSpace(equipmentId))
+        {
+            throw new InvalidOperationException("Zhenlongqiju enemy equipment id cannot be empty.");
+        }
+
+        var equipment = ContentRepository.GetItem(equipmentId.Trim()) as EquipmentDefinition
+            ?? throw new InvalidOperationException(
+                $"Zhenlongqiju enemy equipment '{equipmentId}' is not an equipment definition.");
+        if (equipment.SlotType != expectedSlotType)
+        {
+            throw new InvalidOperationException(
+                $"Zhenlongqiju enemy equipment '{equipment.Id}' must be a {expectedSlotType} equipment definition.");
+        }
+
+        return equipment;
     }
 
     private IReadOnlyList<GeneratedEquipmentAffixRoll> GenerateFixedEquipmentRolls(
@@ -823,8 +866,13 @@ public sealed class BattleService
         return rolls;
     }
 
-    private void PowerUpZhenlongqijuEnemy(CharacterInstance character, int level)
+    private void PowerUpZhenlongqijuEnemy(
+        CharacterInstance character,
+        int level,
+        EquipmentInstanceFactory tempFactory)
     {
+        ArgumentNullException.ThrowIfNull(tempFactory);
+
         if (level <= 0)
         {
             return;
@@ -864,7 +912,24 @@ public sealed class BattleService
             skill.Level += Random.Shared.Next(level / 5, level / 3 + 1);
         }
 
+        EquipZhenlongqijuEnemy(character, tempFactory);
         character.RebuildSnapshot();
+    }
+
+    private void EquipZhenlongqijuEnemy(
+        CharacterInstance character,
+        EquipmentInstanceFactory tempFactory)
+    {
+        character.EquippedItems.Clear();
+
+        foreach (var slotType in new[] { EquipmentSlotType.Weapon, EquipmentSlotType.Armor, EquipmentSlotType.Accessory })
+        {
+            var equipment = PickConfiguredZhenlongqijuEquipment(slotType);
+            var extraAffixes = GenerateFixedEquipmentRolls(equipment, 4)
+                .SelectMany(static roll => roll.Affixes)
+                .ToArray();
+            character.AddEquipmentInstance(tempFactory.Create(equipment, extraAffixes));
+        }
     }
 
     private CharacterInstance? ResolvePartyCharacter(string characterId) =>
