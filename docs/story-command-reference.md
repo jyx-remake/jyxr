@@ -111,7 +111,6 @@ command arg1 arg2 ...
 
 | 指令 | 参数 | 效果 | 示例 |
 | --- | --- | --- | --- |
-| `change_female_name` | `name [characterId=女主]` | 改名；目标不存在时创建到后备池。 | `change_female_name "阿九"` |
 | `join` | `characterId` | 角色加入当前队伍；已有实例会从其他池移动。 | `join 阿青` |
 | `follow` | `characterId` | 角色加入随队池。 | `follow 女主` |
 | `leave` | `characterIdOrName` | 当前队伍角色离队并进入后备池。 | `leave 阿青` |
@@ -155,7 +154,7 @@ command arg1 arg2 ...
 | --- | --- | --- | --- |
 | `toast` | `on/off` | 开启或抑制 toast 显示。 | `toast off` |
 | `select_menpai` / `select_sect` | 无 | 打开门派选择 UI，并运行所选门派入口剧情。 | `select_menpai` |
-| `input_name` | `characterId [defaultName=""]` | 打开改名 UI，并写回角色名。 | `input_name 主角 "小虾米"` |
+| `input_name` | `characterId [defaultName=""]` | 打开改名 UI，并写回角色名；目标不存在时创建到后备池。 | `input_name 主角 "小虾米"` |
 | `select_head` | `characterId` | 打开头像选择 UI，并写回角色头像。 | `select_head 主角` |
 | `roll_stats` | 无 | 打开主角随机属性 UI。 | `roll_stats` |
 | `mainmenu` | 无 | 返回主菜单。 | `mainmenu` |

@@ -173,7 +173,7 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeH
 		CancellationToken cancellationToken = default)
 	{
 		var name = await UIRoot.Instance.ShowInputNamePanelAsync(characterId, defaultName, cancellationToken);
-		Game.CharacterService.RenameCharacter(characterId, name);
+		Game.PartyService.RenameOrCreateReserve(characterId, name);
 	}
 
 	[StoryCommand("select_head")]

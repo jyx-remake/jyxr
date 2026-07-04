@@ -225,31 +225,6 @@ public sealed class SessionEventsTests
     }
 
     [Fact]
-    public async Task StoryCommandDispatcher_ChangeFemaleName_CreatesReserveCharacterWhenInactive()
-    {
-        var femaleDefinition = TestContentFactory.CreateCharacterDefinition("女主");
-        var repository = TestContentFactory.CreateRepository(characters: [femaleDefinition]);
-        var session = new GameSession(new GameState(), repository);
-        var dispatcher = new StoryCommandDispatcher(session, new RecordingRuntimeHost());
-        var publishedEvents = CollectPublishedEvents(session);
-
-        await dispatcher.ExecuteCommandAsync("change_female_name", [ExprValue.FromString("玲兰")], default);
-
-        var female = Assert.Single(session.State.Party.Reserves);
-        Assert.Equal("女主", female.Id);
-        Assert.Equal("玲兰", female.Name);
-        Assert.Empty(session.State.Party.Members);
-        Assert.Empty(session.State.Party.Followers);
-        Assert.Contains(publishedEvents, static sessionEvent => sessionEvent is PartyChangedEvent);
-        Assert.Contains(publishedEvents, static sessionEvent => sessionEvent is CharacterChangedEvent { CharacterId: "女主" });
-
-        await dispatcher.ExecuteCommandAsync("change_female_name", [ExprValue.FromString("阿兰")], default);
-
-        Assert.Same(female, Assert.Single(session.State.Party.Reserves));
-        Assert.Equal("阿兰", female.Name);
-    }
-
-    [Fact]
     public async Task StoryCommandDispatcher_MaxLevel_PublishesSingleToastWithoutChangingCharacters()
     {
         var skill = TestContentFactory.CreateExternalSkill("starter_sword");
@@ -1087,6 +1062,30 @@ public sealed class SessionEventsTests
 
         Assert.Single(publishedEvents.OfType<PartyChangedEvent>());
         Assert.Equal([Party.HeroCharacterId, "ally_2", "ally"], session.State.Party.Members.Select(member => member.Id).ToArray());
+    }
+
+    [Fact]
+    public void PartyService_RenameOrCreateReserve_CreatesReserveCharacterWhenInactive()
+    {
+        var femaleDefinition = TestContentFactory.CreateCharacterDefinition("女主");
+        var repository = TestContentFactory.CreateRepository(characters: [femaleDefinition]);
+        var session = new GameSession(new GameState(), repository);
+        var publishedEvents = CollectPublishedEvents(session);
+
+        session.PartyService.RenameOrCreateReserve("女主", "玲兰");
+
+        var female = Assert.Single(session.State.Party.Reserves);
+        Assert.Equal("女主", female.Id);
+        Assert.Equal("玲兰", female.Name);
+        Assert.Empty(session.State.Party.Members);
+        Assert.Empty(session.State.Party.Followers);
+        Assert.Contains(publishedEvents, static sessionEvent => sessionEvent is PartyChangedEvent);
+        Assert.Contains(publishedEvents, static sessionEvent => sessionEvent is CharacterChangedEvent { CharacterId: "女主" });
+
+        session.PartyService.RenameOrCreateReserve("女主", "阿兰");
+
+        Assert.Same(female, Assert.Single(session.State.Party.Reserves));
+        Assert.Equal("阿兰", female.Name);
     }
 
     [Fact]

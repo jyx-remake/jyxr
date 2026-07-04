@@ -236,7 +236,7 @@
   - 当前内建处理物品、货币、日志、剧情变量、冒险状态、人物成长、入队/跟随/离队、学习、移除技能、称号解锁等剧情命令。
   - `log` 会把日志条目追加到 `GameState.Journal`。
   - `set_time_key key limitDays [targetStoryId]` 会登记限时剧情 key；严格超过天数后移除，存在目标剧情时才触发跳转；`clear_time_key key` 会取消登记。
-  - `change_female_name` 默认操作角色 id `女主`；如果该角色不在 `Party` 名册中，会创建角色实例并放入 `Reserves` 后再改名。
+  - `input_name` 打开宿主改名 UI；如果目标角色不在 `Party` 名册中，会创建角色实例并放入 `Reserves` 后再改名。
 - `StoryTextInterpolator`
   - 当前在应用层对白/选项进入宿主前处理 `$MALE$` 与 `$FEMALE$`。
   - 只解析主角和女主显示名，优先查 `Party` 全名册，其次查角色 definition；未知占位符保持原文本。

@@ -369,7 +369,6 @@
   - `grant_point` / `get_point`
   - `grant_exp` / `get_exp`
   - `levelup`
-  - `change_female_name`
   - `join`
   - `follow`
   - `leave`
@@ -393,9 +392,9 @@
   - 按 key 移除尚未触发或已登记的限时剧情 key。
 - `nick`
   - 当前按资源组 `nick` 校验称号资源，并通过 `ProfileService` 解锁全局称号。
-- `change_female_name`
-  - 默认角色 id 为 `女主`。
-  - 如果 `女主` 不在 `Party.Members`、`Party.Followers` 或 `Party.Reserves` 中，会创建角色实例并放入 `Party.Reserves` 后再改名。
+- `input_name`
+  - 打开宿主改名 UI，并把输入结果写回指定角色。
+  - 如果目标角色不在 `Party.Members`、`Party.Followers` 或 `Party.Reserves` 中，会创建角色实例并放入 `Party.Reserves` 后再改名。
   - 已存在时只改名，不改变其当前池子。
 - `Game.Core/Story`
   - 当前已有轻量剧本解释器、表达式求值、JSON parser 与 runtime session。

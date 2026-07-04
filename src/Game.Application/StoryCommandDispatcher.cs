@@ -10,7 +10,6 @@ public sealed class StoryCommandDispatcher
 {
     private const string AchievementResourceGroup = "nick";
     private const string AchievementResourcePrefix = AchievementResourceGroup + ".";
-    private const string FemaleLeadCharacterId = "女主";
     private readonly GameSession _session;
     private readonly IRuntimeHost _host;
     private readonly StoryCommandBinder _binder;
@@ -317,13 +316,6 @@ public sealed class StoryCommandDispatcher
     private ValueTask ExecuteLevelUpAsync(string characterId, int levels = 1)
     {
         _session.CharacterService.LevelUp(characterId, levels);
-        return ValueTask.CompletedTask;
-    }
-
-    [StoryCommand("change_female_name")]
-    private ValueTask ExecuteChangeFemaleNameAsync(string name, string characterId = FemaleLeadCharacterId)
-    {
-        _session.PartyService.RenameOrCreateReserve(characterId, name);
         return ValueTask.CompletedTask;
     }
 
