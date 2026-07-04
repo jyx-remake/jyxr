@@ -154,6 +154,56 @@ public sealed class SessionEventsTests
     }
 
     [Fact]
+    public async Task StoryCommandDispatcher_RandomItem_AddsOneCandidate()
+    {
+        var potion = new NormalItemDefinition
+        {
+            Id = "potion",
+            Name = "potion",
+            Type = ItemType.Consumable,
+        };
+        var repository = TestContentFactory.CreateRepository(items: [potion]);
+        var session = new GameSession(new GameState(), repository);
+        var dispatcher = new StoryCommandDispatcher(session, new RecordingRuntimeHost());
+
+        await dispatcher.ExecuteCommandAsync(
+            "random_item",
+            [ExprValue.FromList([ExprValue.FromString("potion")]), ExprValue.FromNumber(2)],
+            default);
+
+        Assert.True(session.State.Inventory.ContainsStack(potion, 2));
+    }
+
+    [Fact]
+    public async Task StoryCommandDispatcher_RandomJoin_JoinsOneCandidate()
+    {
+        var allyDefinition = TestContentFactory.CreateCharacterDefinition("ally");
+        var repository = TestContentFactory.CreateRepository(characters: [allyDefinition]);
+        var session = new GameSession(new GameState(), repository);
+        var dispatcher = new StoryCommandDispatcher(session, new RecordingRuntimeHost());
+
+        await dispatcher.ExecuteCommandAsync(
+            "random_join",
+            [ExprValue.FromList([ExprValue.FromString("ally")])],
+            default);
+
+        Assert.True(session.State.Party.ContainsMember("ally"));
+    }
+
+    [Fact]
+    public async Task StoryCommandDispatcher_RandomCommands_RejectEmptyCandidateLists()
+    {
+        var repository = TestContentFactory.CreateRepository();
+        var session = new GameSession(new GameState(), repository);
+        var dispatcher = new StoryCommandDispatcher(session, new RecordingRuntimeHost());
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await dispatcher.ExecuteCommandAsync("random_item", [ExprValue.FromList([])], default));
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await dispatcher.ExecuteCommandAsync("random_join", [ExprValue.FromList([])], default));
+    }
+
+    [Fact]
     public async Task StoryCommandDispatcher_GrowTemplate_UpdatesCharacterInstanceState()
     {
         var defaultGrowth = TestContentFactory.CreateGrowTemplate("default", new Dictionary<StatType, int>());

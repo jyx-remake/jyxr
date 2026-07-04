@@ -364,6 +364,7 @@ public sealed class SaveGameTests
         story.SetVariable("hero_name", ExprValue.FromString("张无忌"));
         story.SetVariable("met_nanxian", ExprValue.FromBoolean(true));
         story.SetVariable("boss_level", ExprValue.FromNumber(12));
+        story.SetVariable("reward_pool", ExprValue.FromList([ExprValue.FromString("小还丹"), ExprValue.FromString("大还丹")]));
         story.MarkCompleted("新手村_南贤开场");
         story.MarkCompleted("新手村_南贤");
         story.SetLastStory("新手村_南贤");
@@ -399,6 +400,9 @@ public sealed class SaveGameTests
         Assert.True(metNanxian.Boolean);
         Assert.True(restoredStory.TryGetVariable("boss_level", out var bossLevel));
         Assert.Equal(12d, bossLevel.Number);
+        Assert.True(restoredStory.TryGetVariable("reward_pool", out var rewardPool));
+        Assert.Equal(ExprValueKind.List, rewardPool.Kind);
+        Assert.Equal(["小还丹", "大还丹"], rewardPool.List?.Select(static item => item.Text));
         var timeKey = Assert.Single(restoredStory.TimeKeys.Values);
         Assert.Equal("襄阳急报", timeKey.Key);
         Assert.Equal(5, timeKey.LimitDays);

@@ -8,6 +8,8 @@ public sealed record LiteralExprNode(ExprValue Value) : ExprNode;
 
 public sealed record VariableExprNode(string Name) : ExprNode;
 
+public sealed record ListExprNode(IReadOnlyList<ExprNode> Items) : ExprNode;
+
 public sealed record PredicateExprNode(
     string Name,
     IReadOnlyList<ExprNode> Arguments) : ExprNode;
@@ -36,16 +38,18 @@ public enum ExprValueKind
     Boolean,
     Number,
     String,
+    List,
 }
 
 public readonly record struct ExprValue
 {
-    private ExprValue(ExprValueKind kind, bool boolean, double number, string? text)
+    private ExprValue(ExprValueKind kind, bool boolean, double number, string? text, IReadOnlyList<ExprValue>? list)
     {
         Kind = kind;
         Boolean = boolean;
         Number = number;
         Text = text;
+        List = list;
     }
 
     public ExprValueKind Kind { get; }
@@ -56,11 +60,19 @@ public readonly record struct ExprValue
 
     public string? Text { get; }
 
-    public static ExprValue FromBoolean(bool value) => new(ExprValueKind.Boolean, value, default, null);
+    public IReadOnlyList<ExprValue>? List { get; }
 
-    public static ExprValue FromNumber(double value) => new(ExprValueKind.Number, default, value, null);
+    public static ExprValue FromBoolean(bool value) => new(ExprValueKind.Boolean, value, default, null, null);
 
-    public static ExprValue FromString(string value) => new(ExprValueKind.String, default, default, value);
+    public static ExprValue FromNumber(double value) => new(ExprValueKind.Number, default, value, null, null);
+
+    public static ExprValue FromString(string value) => new(ExprValueKind.String, default, default, value, null);
+
+    public static ExprValue FromList(IReadOnlyList<ExprValue> value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return new ExprValue(ExprValueKind.List, default, default, null, value.ToArray());
+    }
 
     public bool AsBoolean(string context)
     {
@@ -103,11 +115,22 @@ public readonly record struct ExprValue
         return Text;
     }
 
+    public IReadOnlyList<ExprValue> AsList(string context)
+    {
+        if (Kind != ExprValueKind.List || List is null)
+        {
+            throw new StoryRuntimeException($"{context} requires a list value, got {DescribeKind()}.");
+        }
+
+        return List;
+    }
+
     public string DescribeKind() => Kind switch
     {
         ExprValueKind.Boolean => "boolean",
         ExprValueKind.Number => "number",
         ExprValueKind.String => "string",
+        ExprValueKind.List => "list",
         _ => "unknown",
     };
 
@@ -116,6 +139,7 @@ public readonly record struct ExprValue
         ExprValueKind.Boolean => Boolean ? "true" : "false",
         ExprValueKind.Number => Number.ToString(CultureInfo.InvariantCulture),
         ExprValueKind.String => Text ?? string.Empty,
+        ExprValueKind.List => List is null ? string.Empty : $"[{string.Join(", ", List)}]",
         _ => string.Empty,
     };
 }

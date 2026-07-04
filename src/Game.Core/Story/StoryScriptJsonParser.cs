@@ -240,8 +240,8 @@ internal sealed class StoryScriptJsonParser(JsonElement root)
         return element.ValueKind switch
         {
             JsonValueKind.String or JsonValueKind.Number => ParseLiteralExpression(element),
-            JsonValueKind.Array => ParseVariableValueArg(element, path),
-            _ => throw new StoryRuntimeException($"{path} must contain only strings, numbers, or ['var', name]."),
+            JsonValueKind.Array => ParseArrayValueArg(element, path),
+            _ => throw new StoryRuntimeException($"{path} must contain only strings, numbers, ['var', name], or ['list', ...]."),
         };
     }
 
@@ -257,15 +257,31 @@ internal sealed class StoryScriptJsonParser(JsonElement root)
         };
     }
 
-    private ExprNode ParseVariableValueArg(JsonElement element, string path)
+    private ExprNode ParseArrayValueArg(JsonElement element, string path)
     {
-        var value = ParseArrayExpression(element);
-        if (value is VariableExprNode)
+        var items = element.EnumerateArray().ToArray();
+        if (items.Length == 0 || items[0].ValueKind != JsonValueKind.String)
         {
-            return value;
+            throw new StoryRuntimeException($"{path} array value arguments must start with an operator string.");
         }
 
-        throw new StoryRuntimeException($"{path} must contain only variable references in array form.");
+        return items[0].GetString() switch
+        {
+            "var" => ParseVariableExpression(items),
+            "list" => ParseListValueArg(items, path),
+            _ => throw new StoryRuntimeException($"{path} must contain only variable or list array values."),
+        };
+    }
+
+    private ExprNode ParseListValueArg(IReadOnlyList<JsonElement> items, string path)
+    {
+        var values = new List<ExprNode>(Math.Max(0, items.Count - 1));
+        for (var index = 1; index < items.Count; index += 1)
+        {
+            values.Add(ParseValueArg(items[index], $"{path}.list"));
+        }
+
+        return new ListExprNode(values);
     }
 
     private static JsonElement GetRequiredProperty(JsonElement element, string name)

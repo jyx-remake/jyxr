@@ -65,6 +65,20 @@ public sealed class StoryCommandDispatcher
         return ValueTask.CompletedTask;
     }
 
+    [StoryCommand("random_item")]
+    private ValueTask ExecuteRandomItemAsync(IReadOnlyList<string> itemIds, int quantity = 1)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        EnsureNonEmptyCandidates(itemIds, "random_item");
+        foreach (var itemId in itemIds)
+        {
+            ContentRepository.GetItem(itemId);
+        }
+
+        _session.InventoryService.AddItem(PickRandom(itemIds), quantity);
+        return ValueTask.CompletedTask;
+    }
+
     [StoryCommand("get_money")]
     private ValueTask ExecuteGetMoneyAsync(int amount) => ExecuteChangeSilverAsync(amount);
 
@@ -326,6 +340,19 @@ public sealed class StoryCommandDispatcher
         return ValueTask.CompletedTask;
     }
 
+    [StoryCommand("random_join")]
+    private ValueTask ExecuteRandomJoinAsync(IReadOnlyList<string> characterIds)
+    {
+        EnsureNonEmptyCandidates(characterIds, "random_join");
+        foreach (var characterId in characterIds)
+        {
+            ContentRepository.GetCharacter(characterId);
+        }
+
+        _session.PartyService.Join(PickRandom(characterIds));
+        return ValueTask.CompletedTask;
+    }
+
     [StoryCommand("follow")]
     private ValueTask ExecuteFollowAsync(string characterId)
     {
@@ -479,5 +506,16 @@ public sealed class StoryCommandDispatcher
 
         throw new InvalidOperationException($"Command 'maxlevel' references unknown skill '{skillId}'.");
     }
+
+    private static void EnsureNonEmptyCandidates(IReadOnlyCollection<string> candidates, string commandName)
+    {
+        if (candidates.Count == 0)
+        {
+            throw new InvalidOperationException($"Command '{commandName}' requires at least one candidate.");
+        }
+    }
+
+    private static string PickRandom(IReadOnlyList<string> candidates) =>
+        candidates[Random.Shared.Next(0, candidates.Count)];
 
 }

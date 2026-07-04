@@ -21,6 +21,8 @@ coverage/
 /assets/audio
 /assets/font
 /mods
+/launcher
+/userdata
 .godot/
 .import/
 mono_crash.*.json

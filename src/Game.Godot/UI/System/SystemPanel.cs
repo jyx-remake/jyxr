@@ -375,7 +375,10 @@ public partial class SystemPanel : Control
 	}
 
 	private static string FormatArgument(ExprValue value) =>
-		value.Kind == ExprValueKind.String
-			? $"\"{value.AsString("console")}\""
-			: value.ToString();
+		value.Kind switch
+		{
+			ExprValueKind.String => $"\"{value.AsString("console")}\"",
+			ExprValueKind.List => $"[{string.Join(", ", value.AsList("console").Select(FormatArgument))}]",
+			_ => value.ToString(),
+		};
 }

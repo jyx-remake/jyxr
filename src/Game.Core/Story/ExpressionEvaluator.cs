@@ -16,6 +16,7 @@ internal static class ExpressionEvaluator
 
         return expr switch
         {
+            ListExprNode list => await EvaluateListAsync(list, host, cancellationToken),
             PredicateExprNode predicate => ExprValue.FromBoolean(await EvaluatePredicateAsync(predicate, host, cancellationToken)),
             NotExprNode notExpr => ExprValue.FromBoolean(!((await EvaluateAsync(notExpr.Operand, host, cancellationToken)).AsBoolean("not"))),
             BinaryExprNode binary => await EvaluateBinaryAsync(binary, host, cancellationToken),
@@ -49,7 +50,26 @@ internal static class ExpressionEvaluator
             return await valueTask;
         }
 
-        throw new StoryRuntimeException("Value arguments must be literals or variables.");
+        if (arg is ListExprNode list)
+        {
+            return await EvaluateListAsync(list, host, cancellationToken);
+        }
+
+        throw new StoryRuntimeException("Value arguments must be literals, variables, or lists.");
+    }
+
+    private static async ValueTask<ExprValue> EvaluateListAsync(
+        ListExprNode list,
+        IRuntimeHost host,
+        CancellationToken cancellationToken)
+    {
+        var values = new List<ExprValue>(list.Items.Count);
+        foreach (var item in list.Items)
+        {
+            values.Add(await EvaluateValueArgAsync(item, host, cancellationToken));
+        }
+
+        return ExprValue.FromList(values);
     }
 
     private static bool TryEvaluateLiteralOrVariable(

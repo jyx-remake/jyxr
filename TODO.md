@@ -21,6 +21,7 @@
 - 战斗外触发入口待建模：`InteractionCommand`、`StoryCommand`、`MapTransitionCommand`，用于统一地图交互、剧情推进、场景切换等外部输入。
 - 地图与战斗的衔接对象待建模：`BattleEncounterDefinition`、`EncounterTriggerDefinition`、`BattleResultProjection`，用于表达地图遭遇战入口、触发条件，以及战斗结果如何回写世界状态。
 - 剧情对白/选项中的 `$MALE$` / `$FEMALE$` 当前先在 `Game.Application` 做临时文本插值，只覆盖主角名与女主名，不属于正式统一变量系统。后续应与剧情变量读取/写入模型统一设计，避免模板文本占位与表达式变量长期分裂。
+- 剧情命令行调试入口 `StoryCommandLineService` 当前只把参数解析成 bool/number/string，不支持 list 参数；`random_item` / `random_join` 这类命令只能通过 JSON 剧情的 `["list", ...]` 调用。后续如需要在系统面板调试这些命令，应补明确的 list 命令行语法，例如 `random_item ["potion","elixir"] 2`，并覆盖带引号字符串与执行路径测试。
 - 商店系统后续待建模：商品刷新、回购、动态库存、商店关闭回调、剧情锁定商品、元宝商品展示分组，以及旧 `contentId == "元宝"` / `*残章` 兼容条目的清理策略。
 - 物品使用后续待建模：普通消耗品、功能道具、剧情物品、战斗内使用上下文、目标选择规则与效果执行器。目前只接入装备、武学书、绝技书、天赋书和基础强化道具。
 - 装备选择 UI 当前直接复用背包物品格与 tooltip，后续如装备比较、替换确认、套装/词条高亮变复杂，应抽专门 presenter，而不是把规则继续堆在 Godot 控件脚本里。

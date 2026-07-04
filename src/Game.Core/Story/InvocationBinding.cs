@@ -117,6 +117,12 @@ internal static class InvocationBinding
             return value.AsBoolean(context);
         }
 
+        if (targetType == typeof(IReadOnlyList<string>) || targetType == typeof(IReadOnlyCollection<string>) ||
+            targetType == typeof(IEnumerable<string>) || targetType == typeof(string[]))
+        {
+            return ConvertStringListArgument(value, context, targetType);
+        }
+
         if (targetType == typeof(ExprValue))
         {
             return value;
@@ -124,5 +130,17 @@ internal static class InvocationBinding
 
         throw new InvalidOperationException(
             $"Invocation '{invocationName}' parameter '{parameterName}' has unsupported type '{targetType.Name}'.");
+    }
+
+    private static object ConvertStringListArgument(ExprValue value, string context, Type targetType)
+    {
+        var items = value.AsList(context);
+        var strings = new string[items.Count];
+        for (var index = 0; index < items.Count; index += 1)
+        {
+            strings[index] = items[index].AsString($"{context}[{index}]");
+        }
+
+        return targetType == typeof(string[]) ? strings : Array.AsReadOnly(strings);
     }
 }

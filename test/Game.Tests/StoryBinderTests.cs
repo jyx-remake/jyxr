@@ -22,6 +22,54 @@ public sealed class StoryBinderTests
     }
 
     [Fact]
+    public async Task StoryCommandBinder_BindsStringListArgument()
+    {
+        var target = new RecordingTarget();
+        var binder = new StoryCommandBinder(target);
+
+        var executed = binder.TryExecute(
+            "playlist",
+            [ExprValue.FromList([ExprValue.FromString("a"), ExprValue.FromString("b")])],
+            CancellationToken.None,
+            out var result);
+
+        Assert.True(executed);
+        await result;
+        Assert.Equal(["a", "b"], target.TrackIds);
+    }
+
+    [Fact]
+    public void StoryScriptJson_ParsesListValueArguments()
+    {
+        const string json = """
+        {
+          "version": 1,
+          "segments": [
+            {
+              "name": "start",
+              "steps": [
+                {
+                  "kind": "command",
+                  "name": "random_join",
+                  "args": [["list", "胡斐", ["var", "candidateId"]]]
+                }
+              ]
+            }
+          ]
+        }
+        """;
+
+        var script = StoryScriptJson.Parse(json);
+        var command = Assert.IsType<CommandStep>(Assert.Single(script.Segments[0].Steps));
+        var list = Assert.IsType<ListExprNode>(Assert.Single(command.Args));
+
+        Assert.Collection(
+            list.Items,
+            item => Assert.Equal("胡斐", Assert.IsType<LiteralExprNode>(item).Value.Text),
+            item => Assert.Equal("candidateId", Assert.IsType<VariableExprNode>(item).Name));
+    }
+
+    [Fact]
     public async Task StoryCommandBinder_AllowsCommandsToReturnJumpResults()
     {
         var target = new RecordingTarget();
@@ -43,6 +91,13 @@ public sealed class StoryBinderTests
 
         [StoryCommand("music")]
         private ValueTask ExecuteMusicAsync(params string[] trackIds)
+        {
+            TrackIds = trackIds;
+            return ValueTask.CompletedTask;
+        }
+
+        [StoryCommand("playlist")]
+        private ValueTask ExecutePlaylistAsync(IReadOnlyList<string> trackIds)
         {
             TrackIds = trackIds;
             return ValueTask.CompletedTask;
