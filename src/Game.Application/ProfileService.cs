@@ -87,4 +87,27 @@ public sealed class ProfileService
         _session.Events.Publish(new ProfileChangedEvent());
         _logger.Info($"Advanced zhenlongqiju level to {Profile.ZhenlongqijuLevel}.");
     }
+
+    public void ChangeYuanbao(int delta)
+    {
+        Profile.ChangeYuanbao(delta);
+        _session.Events.Publish(new ProfileChangedEvent());
+        _logger.Info($"Changed yuanbao by {delta}. Current yuanbao: {Profile.Yuanbao}.");
+    }
+
+    public void AddYuanbao(int amount)
+    {
+        Profile.AddYuanbao(amount);
+        _session.Events.Publish(new ProfileChangedEvent());
+        _logger.Info($"Added {amount} yuanbao. Current yuanbao: {Profile.Yuanbao}.");
+    }
+
+    public void SpendYuanbao(int amount)
+    {
+        Profile.SpendYuanbao(amount);
+        _session.Events.Publish(new ProfileChangedEvent());
+        _logger.Info($"Spent {amount} yuanbao. Current yuanbao: {Profile.Yuanbao}.");
+    }
+
+    public bool CanSpendYuanbao(int amount) => Profile.CanSpendYuanbao(amount);
 }

@@ -350,8 +350,7 @@ public sealed class SpecialBattleService
         {
             if (string.Equals(reward.ContentId, "元宝", StringComparison.Ordinal))
             {
-                State.Currency.AddGold(1);
-                _session.Events.Publish(new CurrencyChangedEvent());
+                _session.ProfileService.AddYuanbao(1);
                 AddTowerRewardClaimIfNeeded(reward);
                 continue;
             }

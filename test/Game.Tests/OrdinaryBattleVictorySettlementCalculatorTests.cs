@@ -505,7 +505,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
 
         Assert.Equal(5, hero.Experience);
         Assert.Equal(23, state.Currency.Silver);
-        Assert.Equal(1, state.Currency.Gold);
+        Assert.Equal(1, session.Profile.Yuanbao);
         Assert.True(state.Inventory.ContainsStack(potion, 2));
         var equipmentEntry = Assert.Single(state.Inventory.Entries.OfType<EquipmentInstanceInventoryEntry>());
         Assert.Equal("青锋剑", equipmentEntry.Equipment.Definition.Name);

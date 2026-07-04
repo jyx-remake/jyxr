@@ -26,12 +26,10 @@ public sealed class NewGameStateFactory
     public GameState Create(
         IReadOnlyList<string> initialPartyCharacterIds,
         int round = 1,
-        int gold = 0,
         ChestState? chest = null)
     {
         ArgumentNullException.ThrowIfNull(initialPartyCharacterIds);
         ArgumentOutOfRangeException.ThrowIfLessThan(round, 1);
-        ArgumentOutOfRangeException.ThrowIfNegative(gold);
         if (initialPartyCharacterIds.Count == 0)
         {
             throw new InvalidOperationException("Session flow requires at least one initial party character.");
@@ -49,7 +47,6 @@ public sealed class NewGameStateFactory
         adventure.SetRound(round);
 
         var currency = new CurrencyState();
-        currency.AddGold(gold);
 
         var state = new GameState();
         state.SetAdventure(adventure);

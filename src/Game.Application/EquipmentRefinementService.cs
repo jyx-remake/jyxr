@@ -65,8 +65,7 @@ public sealed class EquipmentRefinementService
             text => string.Equals(text, affixTexts[selectedAffixIndex], StringComparison.Ordinal));
 
         var candidates = GenerateCandidates(equipment, affixTexts);
-        State.Currency.SpendGold(1);
-        _session.Events.Publish(new CurrencyChangedEvent());
+        _session.ProfileService.SpendYuanbao(1);
 
         var candidateTexts = candidates
             .Select(candidate => FormatAffixGroup(candidate.Affixes))

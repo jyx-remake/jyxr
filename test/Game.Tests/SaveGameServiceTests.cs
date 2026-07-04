@@ -40,7 +40,6 @@ public sealed class SaveGameServiceTests
         var state = new GameState();
         state.SetParty(party);
         state.Currency.AddSilver(140);
-        state.Currency.AddGold(6);
         state.Clock.AdvanceTimeSlots(9);
         state.Clock.AdvanceDays(31);
         state.Location.ChangeMap("sample_map");
@@ -60,7 +59,6 @@ public sealed class SaveGameServiceTests
         Assert.Equal(["char_003"], session.State.Party.Followers.Select(member => member.Id).ToArray());
         Assert.Equal(["char_004"], session.State.Party.Reserves.Select(member => member.Id).ToArray());
         Assert.Equal(140, session.State.Currency.Silver);
-        Assert.Equal(6, session.State.Currency.Gold);
         Assert.Equal(1, session.State.Clock.Year);
         Assert.Equal(2, session.State.Clock.Month);
         Assert.Equal(3, session.State.Clock.Day);

@@ -75,6 +75,8 @@ public partial class ShopPanel : JyPanel
 		_leaveButton.Pressed += QueueFree;
 		_subscriptions.Add(Game.Session.Events.Subscribe<InventoryChangedEvent>(OnInventoryChanged));
 		_subscriptions.Add(Game.Session.Events.Subscribe<CurrencyChangedEvent>(OnCurrencyChanged));
+		_subscriptions.Add(Game.Session.Events.Subscribe<ProfileChangedEvent>(OnProfileChanged));
+		_subscriptions.Add(Game.Session.Events.Subscribe<ProfileLoadedEvent>(OnProfileLoaded));
 		_subscriptions.Add(Game.Session.Events.Subscribe<SaveLoadedEvent>(OnSaveLoaded));
 
 		if (!string.IsNullOrWhiteSpace(_shopId))
@@ -309,7 +311,7 @@ public partial class ShopPanel : JyPanel
 		return price is not null && product.DefaultCurrencyKind switch
 		{
 			ShopCurrencyKind.Silver => Game.State.Currency.CanSpendSilver(price.Value),
-			ShopCurrencyKind.Gold => Game.State.Currency.CanSpendGold(price.Value),
+			ShopCurrencyKind.Gold => Game.ProfileService.CanSpendYuanbao(price.Value),
 			_ => false,
 		};
 	}
@@ -341,12 +343,16 @@ public partial class ShopPanel : JyPanel
 	private void UpdateCurrencyLabels()
 	{
 		_silverLabel.Text = Game.State.Currency.Silver.ToString();
-		_goldLabel.Text = Game.State.Currency.Gold.ToString();
+		_goldLabel.Text = Game.Profile.Yuanbao.ToString();
 	}
 
 	private void OnInventoryChanged(InventoryChangedEvent _) => Refresh();
 
 	private void OnCurrencyChanged(CurrencyChangedEvent _) => Refresh();
+
+	private void OnProfileChanged(ProfileChangedEvent _) => Refresh();
+
+	private void OnProfileLoaded(ProfileLoadedEvent _) => Refresh();
 
 	private void OnSaveLoaded(SaveLoadedEvent _) => Refresh();
 

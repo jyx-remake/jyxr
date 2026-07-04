@@ -28,7 +28,7 @@ public sealed class StoryVariableResolver
                 return true;
             case "yuanbao":
             case "gold":
-                value = ExprValue.FromNumber(State.Currency.Gold);
+                value = ExprValue.FromNumber(_session.Profile.Yuanbao);
                 return true;
             case "round":
                 value = ExprValue.FromNumber(Adventure.Round);

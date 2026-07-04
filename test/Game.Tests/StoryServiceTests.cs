@@ -381,13 +381,14 @@ public sealed class StoryServiceTests
                                     ]),
                             ]),
                     ]),
-            ]);
+        ]);
         var state = new GameState();
         state.Currency.AddSilver(120);
-        state.Currency.AddGold(3);
         state.Story.SetVariable("money", ExprValue.FromNumber(999));
+        var profile = new GameProfile();
+        profile.SetYuanbao(3);
         var host = new RecordingRuntimeHost();
-        var session = new GameSession(state, repository, host);
+        var session = new GameSession(state, repository, host, initialProfile: profile);
 
         await session.StoryService.ExecuteAsync("currency_projection");
 
@@ -778,7 +779,8 @@ public sealed class StoryServiceTests
             ]);
 
         var state = new GameState();
-        state.Currency.AddGold(1);
+        var profile = new GameProfile();
+        profile.SetYuanbao(1);
         var hero = TestContentFactory.CreateCharacterInstance("hero", repository.GetCharacter("hero"), state.EquipmentInstanceFactory);
         hero.AddBaseStat(StatType.Jianfa, 79);
         hero.AddBaseStat(StatType.Quanzhang, 80);
@@ -788,7 +790,7 @@ public sealed class StoryServiceTests
         party.AddMember(hero);
         state.SetParty(party);
         var host = new RecordingRuntimeHost();
-        var session = new GameSession(state, repository, host);
+        var session = new GameSession(state, repository, host, initialProfile: profile);
 
         await session.StoryService.ExecuteAsync("legacy_predicates");
 

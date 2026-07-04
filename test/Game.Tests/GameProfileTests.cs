@@ -17,6 +17,7 @@ public sealed class GameProfileTests
         profile.AddDeaths(2);
         profile.AddKills(5);
         profile.SetZhenlongqijuLevel(7);
+        profile.SetYuanbao(11);
         profile.AddSkillMaxLevelBonus("dragon_palm", 3);
         profile.AddSkillMaxLevelBonus("dragon_palm", 2);
         Assert.True(profile.TryAddSkillMaxLevelBonusOnce("yijinjing", 1, "reward.yijinjing.mastery"));
@@ -32,6 +33,7 @@ public sealed class GameProfileTests
         Assert.Contains("\"DeathCount\":2", json, StringComparison.Ordinal);
         Assert.Contains("\"KillCount\":5", json, StringComparison.Ordinal);
         Assert.Contains("\"ZhenlongqijuLevel\":7", json, StringComparison.Ordinal);
+        Assert.Contains("\"Yuanbao\":11", json, StringComparison.Ordinal);
         Assert.Contains("\"dragon_palm\":5", json, StringComparison.Ordinal);
         Assert.Contains("reward.yijinjing.mastery", json, StringComparison.Ordinal);
 
@@ -41,9 +43,29 @@ public sealed class GameProfileTests
         Assert.Equal(2, restored.DeathCount);
         Assert.Equal(5, restored.KillCount);
         Assert.Equal(7, restored.ZhenlongqijuLevel);
+        Assert.Equal(11, restored.Yuanbao);
         Assert.Equal(5, restored.GetSkillMaxLevelBonus("dragon_palm"));
         Assert.Equal(1, restored.GetSkillMaxLevelBonus("yijinjing"));
         Assert.Contains("reward.yijinjing.mastery", restored.ConsumedSkillMaxLevelKeys);
+    }
+
+    [Fact]
+    public void GameProfileRecord_RestoresMissingYuanbaoAsZero()
+    {
+        const string json = """
+        {
+            "Version": 4,
+            "UnlockedAchievementIds": [],
+            "DeathCount": 0,
+            "KillCount": 0,
+            "ZhenlongqijuLevel": 0
+        }
+        """;
+
+        var record = JsonSerializer.Deserialize<GameProfileRecord>(json, GameJson.Default);
+
+        Assert.NotNull(record);
+        Assert.Equal(0, record!.Restore().Yuanbao);
     }
 
     [Fact]
@@ -64,6 +86,35 @@ public sealed class GameProfileTests
         Assert.Equal(3, session.Profile.KillCount);
         Assert.Single(publishedEvents.OfType<AchievementUnlockedEvent>());
         Assert.Equal(3, publishedEvents.OfType<ProfileChangedEvent>().Count());
+    }
+
+    [Fact]
+    public void ProfileService_ChangesYuanbao_PublishesOnlyProfileChangedEvent()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var publishedEvents = CollectPublishedEvents(session);
+
+        session.ProfileService.AddYuanbao(7);
+        session.ProfileService.SpendYuanbao(2);
+        session.ProfileService.ChangeYuanbao(0);
+
+        Assert.Equal(5, session.Profile.Yuanbao);
+        Assert.True(session.ProfileService.CanSpendYuanbao(5));
+        Assert.False(session.ProfileService.CanSpendYuanbao(6));
+        Assert.Equal(3, publishedEvents.OfType<ProfileChangedEvent>().Count());
+        Assert.Empty(publishedEvents.OfType<CurrencyChangedEvent>());
+    }
+
+    [Fact]
+    public void ProfileService_RejectsInvalidYuanbaoChanges()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => session.ProfileService.AddYuanbao(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => session.ProfileService.SpendYuanbao(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => session.ProfileService.ChangeYuanbao(int.MinValue));
+        Assert.Throws<InvalidOperationException>(() => session.ProfileService.SpendYuanbao(1));
+        Assert.Throws<InvalidOperationException>(() => session.ProfileService.ChangeYuanbao(-1));
     }
 
     [Fact]

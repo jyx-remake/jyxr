@@ -109,6 +109,7 @@
   - 已解锁称号
   - 累计死亡数
   - 累计击杀数
+  - 跨存档共享元宝
 - `SaveGame` 是单个存档槽数据。
 - `SaveGame` 不保存 `GameProfile`；全局档案单独持久化为 `GameProfileRecord`。
 - 读档由 `SaveGameService.LoadSave(...)` 恢复各子状态，创建新的 `GameState`，然后调用 `GameSession.ReplaceState(...)`。
@@ -159,7 +160,7 @@
 - `Game.Initialize(...)` 当前接收已构造的 `GameSession`、当前 `ModContext` 和 logger；`GameConfig` 从 `GameSession.Config` 读取。它属于宿主启动装配，不属于业务流程调用点。
 - `Game.ActiveMod` 当前保存正在运行的 MOD 上下文；本地存档、档案和设置会通过它落到该 MOD 独立的 `userdata/<modId>` 目录。
 - `GameConfig` 当前从当前 MOD 的 `data/game-config.json` 读取，并挂在 `GameSession` 上，承载开局剧情、初始队伍、储物箱容量、角色/技能上限和随机战斗音乐池等预览运行参数。
-- `SessionFlowService` 当前负责新游戏与下一周目状态切换；下一周目保留银两和储物箱内容，周目数加 1，再按 `GameConfig.InitialPartyCharacterIds` 重建初始队伍。
+- `SessionFlowService` 当前负责新游戏与下一周目状态切换；下一周目保留储物箱内容，元宝由 `GameProfile` 跨周目保留，周目数加 1，再按 `GameConfig.InitialPartyCharacterIds` 重建初始队伍。
 - `NewGameStateFactory` 当前集中创建新 `GameState`；初始化角色会调用 `LevelUpAllSkillsMaxLevel()` 把已有技能提到各自 `MaxLevel`。
 - `PreviewGameBootstrap` 已被当前未提交的 MOD 改造移除。
 - `GameRuntimeBootstrap.Initialize(ModContext, SceneTree)` 当前负责：
@@ -169,6 +170,7 @@
   - 从 `ModContext.StoragePaths` 读取该 MOD 独立的设置与全局档案。
   - 构造新的 `GameSession`，调用 `Game.Initialize(...)`，再把 `UIRoot` 与 `TimedStoryCoordinator` 绑定到 session events。
 - 当前重复调用 `GameRuntimeBootstrap.Initialize(...)` 会替换 `Game.Session` 和资源上下文，但不会销毁并重建 `World`、`UIRoot`、`AudioManager` 节点；因此它还不是完整的“热切换 MOD / reload runtime”流程。
+- 如果后续支持大 MOD 级别的进程内切换或完整 runtime reload，应在替换旧 MOD/runtime 前 flush Godot 宿主侧 pending 的全局档案保存。
 
 ## 当前内容加载设计
 
@@ -407,7 +409,8 @@
     - `ApplicationStoryRuntimeHost`
     - `NullRuntimeHost`
 - `StoryVariableResolver`
-  - 当前把 `money` / `silver` / `gold` / `yuanbao` 投影到 `GameState.Currency`。
+  - 当前把 `money` / `silver` 投影到 `GameState.Currency`。
+  - 当前把 `gold` / `yuanbao` 投影到 `GameProfile.Yuanbao`。
   - 当前还把 `round` / `game_mode` 投影到 `GameState.Adventure`。
 - `StoryTextInterpolator`
   - 当前在应用层对白/选项进入宿主前处理 `$MALE$` 与 `$FEMALE$`。

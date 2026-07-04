@@ -209,40 +209,27 @@ public sealed class SaveGameTests
         var currency = new CurrencyState();
 
         currency.AddSilver(120);
-        currency.AddGold(7);
         currency.SpendSilver(45);
-        currency.SpendGold(2);
 
         Assert.Equal(75, currency.Silver);
-        Assert.Equal(5, currency.Gold);
         Assert.True(currency.CanSpendSilver(75));
-        Assert.True(currency.CanSpendGold(5));
         Assert.False(currency.CanSpendSilver(76));
-        Assert.False(currency.CanSpendGold(6));
         Assert.Throws<InvalidOperationException>(() => currency.SpendSilver(76));
-        Assert.Throws<InvalidOperationException>(() => currency.SpendGold(6));
         Assert.Throws<ArgumentOutOfRangeException>(() => currency.AddSilver(-1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => currency.AddGold(-1));
     }
 
     [Fact]
-    public void CurrencyState_ChangesCurrencyBySignedDelta()
+    public void CurrencyState_ChangesSilverBySignedDelta()
     {
         var currency = new CurrencyState();
 
         currency.ChangeSilver(100);
-        currency.ChangeGold(8);
         currency.ChangeSilver(-35);
-        currency.ChangeGold(-3);
         currency.ChangeSilver(0);
-        currency.ChangeGold(0);
 
         Assert.Equal(65, currency.Silver);
-        Assert.Equal(5, currency.Gold);
         Assert.Throws<InvalidOperationException>(() => currency.ChangeSilver(-66));
-        Assert.Throws<InvalidOperationException>(() => currency.ChangeGold(-6));
         Assert.Throws<ArgumentOutOfRangeException>(() => currency.ChangeSilver(int.MinValue));
-        Assert.Throws<ArgumentOutOfRangeException>(() => currency.ChangeGold(int.MinValue));
     }
 
     [Fact]
@@ -253,7 +240,6 @@ public sealed class SaveGameTests
         var repository = TestContentFactory.CreateRepository(characters: [definition]);
         var currency = new CurrencyState();
         currency.AddSilver(320);
-        currency.AddGold(12);
 
         var saveGame = SaveGame.Create(new AdventureState(), CreateReserveParty(character), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), currency, new ClockState(), new LocationState(), new MapEventProgressState(), new WorldTriggerState());
         var json = JsonSerializer.Serialize(saveGame, GameJson.Default);
@@ -261,11 +247,25 @@ public sealed class SaveGameTests
 
         Assert.NotNull(roundTripped);
         Assert.Contains("\"Silver\":320", json, StringComparison.Ordinal);
-        Assert.Contains("\"Gold\":12", json, StringComparison.Ordinal);
+        Assert.DoesNotContain("\"Gold\"", json, StringComparison.Ordinal);
         Assert.Empty(roundTripped!.RestoreCharacters(repository).Values.Single().EquippedItems);
         var restoredCurrency = roundTripped.RestoreCurrency();
         Assert.Equal(320, restoredCurrency.Silver);
-        Assert.Equal(12, restoredCurrency.Gold);
+    }
+
+    [Fact]
+    public void SaveGame_IgnoresLegacyCurrencyGoldField()
+    {
+        var currency = new CurrencyState();
+        currency.AddSilver(320);
+        var saveGame = SaveGame.Create(new AdventureState(), new Party(), new Inventory(), new ChestState(), new EquipmentInstanceFactory(), currency, new ClockState(), new LocationState(), new MapEventProgressState(), new WorldTriggerState());
+        var json = JsonSerializer.Serialize(saveGame, GameJson.Default)
+            .Replace("\"Currency\":{\"Silver\":320}", "\"Currency\":{\"Silver\":320,\"Gold\":12}", StringComparison.Ordinal);
+
+        var roundTripped = JsonSerializer.Deserialize<SaveGame>(json, GameJson.Default);
+
+        Assert.NotNull(roundTripped);
+        Assert.Equal(320, roundTripped!.RestoreCurrency().Silver);
     }
 
     [Fact]

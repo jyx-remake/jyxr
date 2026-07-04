@@ -79,7 +79,7 @@
   - `Members` 是当前队伍；`Followers` 是随队但不在当前编队的角色；`Reserves` 保存入过队或跟随过但当前离队的角色。
 - `GameProfile`
   - 全局档案状态，不属于单个 `SaveGame` 槽位。
-  - 当前保存已解锁称号、累计死亡数、累计击杀数。
+  - 当前保存已解锁称号、累计死亡数、累计击杀数和跨存档共享元宝。
 - `GameSession`
   - 普通应用态对象，不是单例类。
   - 持有当前 `GameState`、`GameProfile`、`GameConfig`、`IContentRepository`、应用服务和 `SessionEvents`。
@@ -94,7 +94,7 @@
   - 当前配置开局剧情、初始队伍、储物箱容量、角色/技能上限和随机战斗音乐池等预览运行参数。
 - `SessionFlowService`
   - 负责新游戏与下一周目状态切换。
-  - 新状态由 `NewGameStateFactory` 创建；下一周目保留银两和储物箱内容，周目数加 1。
+  - 新状态由 `NewGameStateFactory` 创建；下一周目保留储物箱内容，元宝由 `GameProfile` 跨周目保留，周目数加 1。
 - `SaveGame`
   - 单个存档槽数据。
   - 保存稳定 ID 和实例状态，不保存 runtime definition 引用。
@@ -244,7 +244,8 @@
   - 根据当前 `ClockState` 检查已严格超过期限的 story time key。
   - 到期后移除 key、发布 `StoryStateChangedEvent`，并仅为非空目标返回要执行的 story id。
 - `StoryVariableResolver`
-  - 当前把 `money` / `silver` / `gold` / `yuanbao` 直接投影到 `GameState.Currency`。
+  - 当前把 `money` / `silver` 投影到 `GameState.Currency`。
+  - 当前把 `gold` / `yuanbao` 投影到 `GameProfile.Yuanbao`。
   - 当前把 `round` / `game_mode` 投影到 `GameState.Adventure`。
 - `GodotStoryRuntimeHost`
   - 负责剧情等待式 UI 和宿主表现命令。
@@ -262,6 +263,7 @@
   - 在 runtime 节点实例化前加载 MOD PCK，然后读取该 MOD 的 loose data、设置和全局档案。
   - 初始化 `Game` 并把 `UIRoot`、`TimedStoryCoordinator` 绑定到 session events。
   - 当前重复调用会替换业务 session 和 MOD 上下文，但不会销毁并重建 runtime 节点；进程内热切换 MOD 还需要正式 reset/reload 流程。
+  - 后续如果支持大 MOD 级别的进程内切换或完整 runtime reload，应在替换旧 MOD/runtime 前 flush Godot 宿主侧 pending 的全局档案保存。
 - `GameFlow`
   - 负责主菜单、新游戏、下一周目和回主菜单的宿主级流程。
   - 新游戏/下一周目会运行 `Game.Config.InitialStorySegmentId` 指向的开局剧情。

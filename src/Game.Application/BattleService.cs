@@ -222,11 +222,15 @@ public sealed class BattleService
             CharacterService.GainExperience(playerUnit.Character.Id, settlement.ExperiencePerMember);
         }
 
-        if (settlement.Silver > 0 || settlement.Gold > 0)
+        if (settlement.Silver > 0)
         {
             State.Currency.AddSilver(settlement.Silver);
-            State.Currency.AddGold(settlement.Gold);
             _session.Events.Publish(new CurrencyChangedEvent());
+        }
+
+        if (settlement.Gold > 0)
+        {
+            _session.ProfileService.AddYuanbao(settlement.Gold);
         }
 
         if (settlement.Drops.Count == 0)

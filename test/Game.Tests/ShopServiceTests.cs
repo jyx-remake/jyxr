@@ -57,6 +57,28 @@ public sealed class ShopServiceTests
     }
 
     [Fact]
+    public void Buy_PremiumProductSpendsYuanbaoAndDoesNotPublishCurrencyChangedEvent()
+    {
+        var herb = CreateItem("herb", price: 30);
+        var shop = CreateShop("premium_shop", new ShopProductDefinition
+        {
+            ContentId = herb.Id,
+            PremiumPrice = 2,
+        });
+        var session = CreateSession([herb], [shop], silver: 100, yuanbao: 5);
+        var publishedEvents = CollectPublishedEvents(session);
+
+        var result = session.ShopService.Buy(shop.Id, productIndex: 0);
+
+        Assert.True(result.Success);
+        Assert.Equal(3, session.Profile.Yuanbao);
+        Assert.Equal(100, session.State.Currency.Silver);
+        Assert.True(session.State.Inventory.ContainsStack(herb));
+        Assert.Contains(publishedEvents, static sessionEvent => sessionEvent is ProfileChangedEvent);
+        Assert.DoesNotContain(publishedEvents, static sessionEvent => sessionEvent is CurrencyChangedEvent);
+    }
+
+    [Fact]
     public void Buy_RejectsSoldOutLimitedProduct()
     {
         var herb = CreateItem("herb", price: 30);
@@ -175,12 +197,15 @@ public sealed class ShopServiceTests
     private static GameSession CreateSession(
         IReadOnlyList<ItemDefinition> items,
         IReadOnlyList<ShopDefinition> shops,
-        int silver)
+        int silver,
+        int yuanbao = 0)
     {
         var repository = TestContentFactory.CreateRepository(items: items, shops: shops);
         var state = new GameState();
         state.Currency.AddSilver(silver);
-        return new GameSession(state, repository);
+        var profile = new GameProfile();
+        profile.SetYuanbao(yuanbao);
+        return new GameSession(state, repository, initialProfile: profile);
     }
 
     private static NormalItemDefinition CreateItem(string id, int price) =>

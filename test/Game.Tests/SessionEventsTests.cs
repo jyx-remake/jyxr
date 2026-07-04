@@ -438,15 +438,16 @@ public sealed class SessionEventsTests
     public async Task StoryCommandDispatcher_xilian_NoEligibleEquipment_JumpsNoEquipment_NoCharge_NoChoice()
     {
         var state = new GameState();
-        state.Currency.AddGold(1);
-        var session = new GameSession(state, TestContentFactory.CreateRepository());
+        var profile = new GameProfile();
+        profile.SetYuanbao(1);
+        var session = new GameSession(state, TestContentFactory.CreateRepository(), initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, new ThrowingRuntimeHost());
         var publishedEvents = CollectPublishedEvents(session);
 
         var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
 
         Assert.Equal("洗练_没有装备", result.JumpTarget);
-        Assert.Equal(1, state.Currency.Gold);
+        Assert.Equal(1, session.Profile.Yuanbao);
         Assert.Empty(publishedEvents);
     }
 
@@ -459,20 +460,22 @@ public sealed class SessionEventsTests
             equipment: [equipment],
             equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
         var state = new GameState();
-        state.Currency.AddGold(1);
+        var profile = new GameProfile();
+        profile.SetYuanbao(1);
         var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix])));
         var host = new RecordingApplicationRuntimeHost(entry, 0, 8);
-        var session = new GameSession(state, repository);
+        var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
         var publishedEvents = CollectPublishedEvents(session);
 
         var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
 
         Assert.Equal("洗练选择", result.JumpTarget);
-        Assert.Equal(0, state.Currency.Gold);
+        Assert.Equal(0, session.Profile.Yuanbao);
         Assert.Equal([oldAffix], entry.Equipment.ExtraAffixes);
-        Assert.Single(publishedEvents.OfType<CurrencyChangedEvent>());
+        Assert.Single(publishedEvents.OfType<ProfileChangedEvent>());
+        Assert.Empty(publishedEvents.OfType<CurrencyChangedEvent>());
         Assert.Empty(publishedEvents.OfType<InventoryChangedEvent>());
     }
 
@@ -486,13 +489,14 @@ public sealed class SessionEventsTests
             equipment: [equipment],
             equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
         var state = new GameState();
-        state.Currency.AddGold(1);
+        var profile = new GameProfile();
+        profile.SetYuanbao(1);
         var firstEntry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [firstAffix])));
         var secondEntry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [secondAffix])));
         var host = new RecordingApplicationRuntimeHost(secondEntry, 0, 0);
-        var session = new GameSession(state, repository);
+        var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
 
         var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
@@ -515,14 +519,15 @@ public sealed class SessionEventsTests
             equipment: [equipment],
             equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
         var state = new GameState();
-        state.Currency.AddGold(1);
+        var profile = new GameProfile();
+        profile.SetYuanbao(1);
         var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix])));
         var originalEquipment = entry.Equipment;
         var originalEquipmentId = entry.Equipment.Id;
         var originalEntryNumber = entry.EntryNumber;
         var host = new RecordingApplicationRuntimeHost(entry, 0, 0);
-        var session = new GameSession(state, repository);
+        var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
         var publishedEvents = CollectPublishedEvents(session);
 
@@ -535,8 +540,9 @@ public sealed class SessionEventsTests
         Assert.Same(originalEquipment, refinedEntry.Equipment);
         var speedAffix = Assert.IsType<StatModifierAffix>(Assert.Single(refinedEntry.Equipment.ExtraAffixes));
         Assert.Equal(StatType.Speed, speedAffix.Stat);
-        Assert.Equal(0, state.Currency.Gold);
-        Assert.Single(publishedEvents.OfType<CurrencyChangedEvent>());
+        Assert.Equal(0, session.Profile.Yuanbao);
+        Assert.Single(publishedEvents.OfType<ProfileChangedEvent>());
+        Assert.Empty(publishedEvents.OfType<CurrencyChangedEvent>());
         Assert.Single(publishedEvents.OfType<InventoryChangedEvent>());
         Assert.Contains(host.Commands, static command => command.Name == "effect" && command.Args[0].AsString("effect") == "音效.装备");
     }
@@ -550,11 +556,12 @@ public sealed class SessionEventsTests
             equipment: [equipment],
             equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
         var state = new GameState();
-        state.Currency.AddGold(1);
+        var profile = new GameProfile();
+        profile.SetYuanbao(1);
         var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix])));
         var host = new RecordingApplicationRuntimeHost(entry, 0, 8);
-        var session = new GameSession(state, repository);
+        var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
 
         await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
@@ -575,17 +582,18 @@ public sealed class SessionEventsTests
             equipment: [equipment],
             equipmentRandomAffixTables: [CreateSpeedAffixTable("0.125")]);
         var state = new GameState();
-        state.Currency.AddGold(1);
+        var profile = new GameProfile();
+        profile.SetYuanbao(1);
         var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix])));
         var host = new RecordingApplicationRuntimeHost(entry, 0);
-        var session = new GameSession(state, repository);
+        var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default));
 
-        Assert.Equal(1, state.Currency.Gold);
+        Assert.Equal(1, session.Profile.Yuanbao);
         Assert.Single(host.Choices);
     }
 
@@ -617,7 +625,8 @@ public sealed class SessionEventsTests
                 },
             ]);
         var state = new GameState();
-        state.Currency.AddGold(1);
+        var profile = new GameProfile();
+        profile.SetYuanbao(1);
         var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(
             equipment,
             [
@@ -625,7 +634,7 @@ public sealed class SessionEventsTests
                 new StatModifierAffix(StatType.CritChance, ModifierValue.Add(0.02)),
             ])));
         var host = new RecordingApplicationRuntimeHost(entry, 0, 0);
-        var session = new GameSession(state, repository);
+        var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
 
         var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);

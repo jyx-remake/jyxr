@@ -57,10 +57,10 @@ internal sealed class ApplicationPredicateLibrary
     private bool HaveSilverAtLeast(int amount) => State.Currency.Silver >= amount;
 
     [GamePredicate("gold_at_least")]
-    private bool HaveGoldAtLeast(int amount) => State.Currency.Gold >= amount;
+    private bool HaveGoldAtLeast(int amount) => _session.Profile.Yuanbao >= amount;
 
     [GamePredicate("have_yuanbao")]
-    private bool HaveYuanbao(int amount) => State.Currency.Gold >= amount;
+    private bool HaveYuanbao(int amount) => _session.Profile.Yuanbao >= amount;
 
     [GamePredicate("friendCount")]
     private bool FriendCountAtLeast(int count) => State.Party.Members.Count >= count;

@@ -22,7 +22,8 @@ public sealed record SaveGame(
     ShopStateRecord? ShopState = null,
     SpecialBattleStateRecord? SpecialBattleState = null)
 {
-    public const int CurrentVersion = 21;
+    public const int MinSupportedVersion = 21;
+    public const int CurrentVersion = 22;
 
     public static SaveGame Create(
         AdventureState adventure,

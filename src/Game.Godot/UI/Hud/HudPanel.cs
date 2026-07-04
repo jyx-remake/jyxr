@@ -53,7 +53,7 @@ public partial class HudPanel : Control
 		_mapLabel.Text = ResolveCurrentMapName();
 		_dateTimeLabel.Text = ClockFormatter.FormatDateTimeCn(Game.State.Clock);
 		_silverLabel.Text = Game.State.Currency.Silver.ToString();
-		_goldLabel.Text = Game.State.Currency.Gold.ToString();
+		_goldLabel.Text = Game.Profile.Yuanbao.ToString();
 		_runInfo.TooltipText = BuildAdventureInfoTooltip(Game.State.Adventure);
 		_heroBox.SetAvatarTexture(ResolveHeroPortrait());
 	}

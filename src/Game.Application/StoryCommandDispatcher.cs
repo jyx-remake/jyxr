@@ -84,10 +84,9 @@ public sealed class StoryCommandDispatcher
     }
 
     [StoryCommand("yuanbao")]
-    private ValueTask ExecuteChangeGoldAsync(int amount)
+    private ValueTask ExecuteChangeYuanbaoAsync(int amount)
     {
-        State.Currency.ChangeGold(amount);
-        _session.Events.Publish(new CurrencyChangedEvent());
+        _session.ProfileService.ChangeYuanbao(amount);
         return ValueTask.CompletedTask;
     }
 

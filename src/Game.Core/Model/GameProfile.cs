@@ -16,6 +16,8 @@ public sealed class GameProfile
 
     public int ZhenlongqijuLevel { get; private set; }
 
+    public int Yuanbao { get; private set; }
+
     public bool IsAchievementUnlocked(string achievementId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(achievementId);
@@ -80,6 +82,47 @@ public sealed class GameProfile
     }
 
     public void AdvanceZhenlongqijuLevel() => ZhenlongqijuLevel++;
+
+    public void ChangeYuanbao(int delta)
+    {
+        if (delta >= 0)
+        {
+            AddYuanbao(delta);
+            return;
+        }
+
+        ArgumentOutOfRangeException.ThrowIfEqual(delta, int.MinValue);
+        SpendYuanbao(-delta);
+    }
+
+    public void AddYuanbao(int amount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(amount);
+        Yuanbao = checked(Yuanbao + amount);
+    }
+
+    public void SpendYuanbao(int amount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(amount);
+        if (!CanSpendYuanbao(amount))
+        {
+            throw new InvalidOperationException("Not enough yuanbao.");
+        }
+
+        Yuanbao -= amount;
+    }
+
+    public bool CanSpendYuanbao(int amount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(amount);
+        return Yuanbao >= amount;
+    }
+
+    public void SetYuanbao(int amount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(amount);
+        Yuanbao = amount;
+    }
 
     public void SetUnlockedAchievementIds(IEnumerable<string> achievementIds)
     {

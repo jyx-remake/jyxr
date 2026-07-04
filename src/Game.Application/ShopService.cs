@@ -74,7 +74,11 @@ public sealed class ShopService
 
         Spend(selectedCurrency, totalPrice);
         State.Shop.AddPurchasedQuantity(product.PurchaseKey, quantity);
-        _session.Events.Publish(new CurrencyChangedEvent());
+        if (selectedCurrency == ShopCurrencyKind.Silver)
+        {
+            _session.Events.Publish(new CurrencyChangedEvent());
+        }
+
         _session.InventoryService.AddItem(product.Item, quantity);
         return ShopTransactionResult.Succeeded(FormatTransactionMessage("买入", product.DisplayName, quantity));
     }
@@ -135,7 +139,9 @@ public sealed class ShopService
         int? remainingLimit = product.PurchaseLimit is null
             ? null
             : Math.Max(0, product.PurchaseLimit.Value - purchasedQuantity);
-        var price = product.Price ?? productItem.Price;
+        int? price = product.PremiumPrice is not null && product.Price is null
+            ? null
+            : product.Price ?? productItem.Price;
 
         return new ShopProductView(
             productIndex,
@@ -159,7 +165,7 @@ public sealed class ShopService
         currencyKind switch
         {
             ShopCurrencyKind.Silver => State.Currency.CanSpendSilver(amount),
-            ShopCurrencyKind.Gold => State.Currency.CanSpendGold(amount),
+            ShopCurrencyKind.Gold => _session.ProfileService.CanSpendYuanbao(amount),
             _ => throw new ArgumentOutOfRangeException(nameof(currencyKind), currencyKind, null)
         };
 
@@ -171,7 +177,7 @@ public sealed class ShopService
                 State.Currency.SpendSilver(amount);
                 return;
             case ShopCurrencyKind.Gold:
-                State.Currency.SpendGold(amount);
+                _session.ProfileService.SpendYuanbao(amount);
                 return;
             default:
                 throw new ArgumentOutOfRangeException(nameof(currencyKind), currencyKind, null);

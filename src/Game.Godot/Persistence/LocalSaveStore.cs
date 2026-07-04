@@ -19,7 +19,7 @@ public enum LocalSaveReadFailureReason
 
 public sealed class LocalSaveStore
 {
-	public const int SlotCount = 8;
+	public const int SlotCount = 20;
 	public const int AutoSaveSlotIndex = 0;
 	private readonly ModStoragePaths? _storagePaths;
 
@@ -211,10 +211,10 @@ public sealed class LocalSaveStore
 				return Fail(out envelope, out failureReason, LocalSaveReadFailureReason.EnvelopeVersionMismatch);
 			}
 
-			if (rawEnvelope.SaveGame.Version != SaveGame.CurrentVersion)
+			if (rawEnvelope.SaveGame.Version is < SaveGame.MinSupportedVersion or > SaveGame.CurrentVersion)
 			{
 				Game.Logger.Warning(
-					$"Save file save version mismatch: {rawEnvelope.SaveGame.Version}, supported {SaveGame.CurrentVersion}. Path: {absolutePath}");
+					$"Save file save version mismatch: {rawEnvelope.SaveGame.Version}, supported {SaveGame.MinSupportedVersion}..{SaveGame.CurrentVersion}. Path: {absolutePath}");
 				return Fail(out envelope, out failureReason, LocalSaveReadFailureReason.SaveVersionMismatch);
 			}
 

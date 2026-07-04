@@ -84,7 +84,7 @@ public partial class UIRoot : Control
 	private DetailPanelHost _detailPanelHost = null!;
 	private SessionEvents? _sessionEvents;
 	private readonly List<IDisposable> _sessionSubscriptions = [];
-	private readonly LocalProfileStore _profileStore = new();
+	private ProfilePersistenceCoordinator _profilePersistence = null!;
 	private Control? _mainPanel;
 	private Control? _popupPanel;
 	private bool _isStoryPresentationActive;
@@ -105,7 +105,14 @@ public partial class UIRoot : Control
 		_hintBox = GetNode<HintBox>("%HintBox");
 		_confirmDialog = GetNode<ConfirmDialog>("%ConfirmDialog");
 		_detailPanelHost = GetNode<DetailPanelHost>("%DetailPanelHost");
+		_profilePersistence = new ProfilePersistenceCoordinator(this);
 		Instance = this;
+	}
+
+	public override void _ExitTree()
+	{
+		_profilePersistence.FlushNow();
+		DisposeSessionSubscriptions();
 	}
 	
 	public void ShowHud()
@@ -196,6 +203,7 @@ public partial class UIRoot : Control
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<SaveLoadedEvent>(OnSaveLoaded));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<AchievementUnlockedEvent>(OnAchievementUnlocked));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ProfileChangedEvent>(OnProfileChanged));
+		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ProfileLoadedEvent>(OnProfileLoaded));
 		RefreshHud();
 	}
 
@@ -610,22 +618,17 @@ public partial class UIRoot : Control
 		ShowToast($"获得称号【{sessionEvent.AchievementId}】");
 	}
 
-	private void OnProfileChanged(ProfileChangedEvent _) => PersistProfile();
-
-	private void PersistProfile()
+	private void OnProfileChanged(ProfileChangedEvent _)
 	{
-		try
-		{
-			_profileStore.SaveCurrentProfile();
-		}
-		catch (Exception exception)
-		{
-			Game.Logger.Error("Persisting global profile failed.", exception);
-		}
+		RefreshHud();
+		_profilePersistence.RequestSave();
 	}
+
+	private void OnProfileLoaded(ProfileLoadedEvent _) => RefreshHud();
 
 	private void DisposeSessionSubscriptions()
 	{
+		_profilePersistence.FlushNow();
 		foreach (var subscription in _sessionSubscriptions)
 		{
 			subscription.Dispose();

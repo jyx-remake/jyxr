@@ -28,13 +28,11 @@ public sealed class SessionFlowService
     public void StartNextRound()
     {
         var nextRound = checked(State.Adventure.Round + 1);
-        var carriedGold = State.Currency.Gold;
         var carriedChest = State.Chest.Clone(ContentRepository);
 
         ReplaceState(_newGameStateFactory.Create(
             Config.InitialPartyCharacterIds,
             nextRound,
-            carriedGold,
             carriedChest));
     }
 
