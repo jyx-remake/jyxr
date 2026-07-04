@@ -70,6 +70,9 @@ public sealed class BattleDamageCalculator
             * (1d + (targetInternalSkill?.DefenceRatio ?? 0d))
             + target.GetStat(StatType.Defence);
 
+        var ruleSettings = context.RuleSettings ?? BattleDamageRuleSettings.Neutral;
+        ApplyBattleDamageRuleSettings(ruleSettings, source, target, ref attackLow, ref attackHigh, ref defence);
+
         damageContext.AttackLow = attackLow;
         damageContext.AttackHigh = attackHigh;
         damageContext.CriticalChance = criticalChance;
@@ -214,6 +217,41 @@ public sealed class BattleDamageCalculator
             _ => throw new InvalidOperationException($"Unsupported skill weapon type '{weaponType}'."),
         };
 
+    private static void ApplyBattleDamageRuleSettings(
+        BattleDamageRuleSettings settings,
+        BattleUnit source,
+        BattleUnit target,
+        ref double attackLow,
+        ref double attackHigh,
+        ref double defence)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(settings.Round, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.RoundEnemyAttackAddRatio);
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.RoundEnemyDefenceAddRatio);
+
+        if (settings.EnableRoundEnemyAttackDefenceScaling && settings.Round > 1)
+        {
+            if (source.Team != settings.PlayerTeam)
+            {
+                var attackMultiplier = 1d + settings.RoundEnemyAttackAddRatio * (settings.Round - 1);
+                attackLow *= attackMultiplier;
+                attackHigh *= attackMultiplier;
+            }
+
+            if (target.Team != settings.PlayerTeam)
+            {
+                defence *= 1d + settings.RoundEnemyDefenceAddRatio * (settings.Round - 1);
+            }
+        }
+
+        if (settings.EnableDifficultyDamageScaling && settings.Difficulty == GameDifficulty.Normal)
+        {
+            var difficultyMultiplier = source.Team == settings.PlayerTeam ? 2d : 0.5d;
+            attackLow *= difficultyMultiplier;
+            attackHigh *= difficultyMultiplier;
+        }
+    }
+
     private sealed class SharedRandomService : IRandomService
     {
         public static SharedRandomService Instance { get; } = new();
@@ -227,7 +265,8 @@ public sealed class BattleDamageCalculator
 public sealed record BattleDamageContext(
     BattleUnit Source,
     BattleUnit Target,
-    SkillInstance Skill);
+    SkillInstance Skill,
+    BattleDamageRuleSettings? RuleSettings = null);
 
 public sealed record BattleDamageResult(
     int Amount,

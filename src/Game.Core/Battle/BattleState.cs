@@ -7,12 +7,16 @@ public sealed class BattleState
     private readonly List<BattleUnit> _units;
     private readonly List<BattleEvent> _events = [];
 
-    public BattleState(BattleGrid grid, IEnumerable<BattleUnit> units)
+    public BattleState(
+        BattleGrid grid,
+        IEnumerable<BattleUnit> units,
+        BattleDamageRuleSettings? damageRules = null)
     {
         ArgumentNullException.ThrowIfNull(grid);
         ArgumentNullException.ThrowIfNull(units);
 
         Grid = grid;
+        DamageRules = damageRules ?? BattleDamageRuleSettings.Neutral;
         _units = units.ToList();
         if (_units.Count == 0)
         {
@@ -38,6 +42,8 @@ public sealed class BattleState
     }
 
     public BattleGrid Grid { get; }
+
+    public BattleDamageRuleSettings DamageRules { get; }
 
     public IReadOnlyList<BattleUnit> Units => _units;
 

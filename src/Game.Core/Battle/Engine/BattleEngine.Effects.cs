@@ -27,7 +27,8 @@ public sealed partial class BattleEngine
             return new BattleSkillHitResolution(false, 0, hitCheck.SuppressHitEffects);
         }
 
-        var damageCalculation = _damageCalculator.CreateSkillDamageContext(new BattleDamageContext(source, target, skill));
+        var damageCalculation = _damageCalculator.CreateSkillDamageContext(
+            new BattleDamageContext(source, target, skill, state.DamageRules));
         ConfigureDamageCalculationHooks(state, source, target, skill, damageCalculation);
         var result = _damageCalculator.CalculateSkillDamage(damageCalculation);
         var damageMultiplier = BattleDamageRules.GetSkillDamageMultiplier(source, target);

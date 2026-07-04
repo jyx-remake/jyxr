@@ -90,7 +90,8 @@ public sealed class BattleService
                     : CreateArenaOpponentCharacter(hardLevel, index, tempFactory),
             (_, index, tempFactory) =>
                 CreateArenaOpponentCharacter(hardLevel, index + battle.Participants.Count, tempFactory),
-            ApplyNpcRoundPowerUp);
+            ApplyNpcRoundPowerUp,
+            CreateDamageRuleSettings(enableRoundEnemyAttackDefenceScaling: true));
     }
 
     public BattleState BuildZhenlongqijuBattleState(
@@ -105,7 +106,8 @@ public sealed class BattleService
             selectedCharacterIds,
             ResolveParticipantCharacter,
             CreateRandomParticipantCharacter,
-            character => PowerUpZhenlongqijuEnemy(character, level));
+            character => PowerUpZhenlongqijuEnemy(character, level),
+            CreateDamageRuleSettings(enableRoundEnemyAttackDefenceScaling: false));
     }
 
     public BattleState BuildBattleState(BattleDefinition battle, IReadOnlyList<string> selectedCharacterIds)
@@ -118,7 +120,8 @@ public sealed class BattleService
             selectedCharacterIds,
             ResolveParticipantCharacter,
             CreateRandomParticipantCharacter,
-            ApplyNpcRoundPowerUp);
+            ApplyNpcRoundPowerUp,
+            CreateDamageRuleSettings(enableRoundEnemyAttackDefenceScaling: true));
     }
 
     public OrdinaryBattleVictorySettlement PreviewVictorySettlement(
@@ -141,7 +144,8 @@ public sealed class BattleService
         IReadOnlyList<string> selectedCharacterIds,
         Func<BattleParticipantDefinition, int, IReadOnlyList<CharacterInstance?>, EquipmentInstanceFactory, CharacterInstance?> participantResolver,
         Func<BattleRandomParticipantDefinition, int, EquipmentInstanceFactory, CharacterInstance> randomParticipantResolver,
-        Action<CharacterInstance> npcCharacterProcessor)
+        Action<CharacterInstance> npcCharacterProcessor,
+        BattleDamageRuleSettings damageRuleSettings)
     {
         ArgumentNullException.ThrowIfNull(battle);
         ArgumentNullException.ThrowIfNull(selectedCharacterIds);
@@ -188,7 +192,7 @@ public sealed class BattleService
                 participant.Facing));
         }
 
-        var state = new BattleState(new BattleGrid(GridWidth, GridHeight), units);
+        var state = new BattleState(new BattleGrid(GridWidth, GridHeight), units, damageRuleSettings);
         if (!state.Units.Any(unit => unit.Team == PlayerTeam))
         {
             throw new InvalidOperationException($"Battle '{battle.Id}' must contain at least one player team unit.");
@@ -478,6 +482,24 @@ public sealed class BattleService
 
     private bool IsPartyCharacterInstance(CharacterInstance character) =>
         State.Party.GetAllCharacters().Any(partyCharacter => ReferenceEquals(partyCharacter, character));
+
+    private BattleDamageRuleSettings CreateDamageRuleSettings(bool enableRoundEnemyAttackDefenceScaling)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(State.Adventure.Round, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(Config.RoundEnemyAttackAddRatio);
+        ArgumentOutOfRangeException.ThrowIfNegative(Config.RoundEnemyDefenceAddRatio);
+
+        return new BattleDamageRuleSettings
+        {
+            Difficulty = State.Adventure.Difficulty,
+            Round = State.Adventure.Round,
+            PlayerTeam = PlayerTeam,
+            RoundEnemyAttackAddRatio = Config.RoundEnemyAttackAddRatio,
+            RoundEnemyDefenceAddRatio = Config.RoundEnemyDefenceAddRatio,
+            EnableRoundEnemyAttackDefenceScaling = enableRoundEnemyAttackDefenceScaling,
+            EnableDifficultyDamageScaling = true,
+        };
+    }
 
     private void ApplyNpcRoundPowerUp(CharacterInstance character)
     {
