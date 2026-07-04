@@ -602,7 +602,7 @@
 - 手动代码编辑使用 `apply_patch`。
 - 不要用 destructive git 命令。
 - 不要回滚用户或其他流程造成的未提交改动。
-- git 提交信息遵循 `Conventional Commits`。
+- git 提交信息遵循带 scope 的 `Conventional Commits`，格式为 `type(scope): subject`，例如 `feat(character): add round-scaled HP MP cap`。
 - 若只做方案讨论，不要直接改代码。
 - 用户明确要求实现或修改时再改代码。
 - 如果涉及最新外部信息，先查再答。
