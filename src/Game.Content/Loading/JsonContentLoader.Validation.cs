@@ -399,6 +399,7 @@ public sealed partial class JsonContentLoader
                 case AddMpBattleEffectDefinition:
                 case CancelHitBattleHookEffectDefinition:
                 case SetHitSuccessBattleHookEffectDefinition:
+                case ExtraStrikeBattleHookEffectDefinition:
                     ValidateSharedBattleEffect(effect, $"{ownerName} battle hook '{hook.Timing}'", repository);
                     break;
                 default:
@@ -489,6 +490,22 @@ public sealed partial class JsonContentLoader
                 break;
             case CancelHitBattleHookEffectDefinition:
             case SetHitSuccessBattleHookEffectDefinition:
+                break;
+            case ExtraStrikeBattleHookEffectDefinition extraStrike:
+                Ensure(extraStrike.Target is not null, $"{ownerName} extra_strike effect is missing target.");
+                Ensure(extraStrike.Chance >= 0d && extraStrike.Chance <= 100d,
+                    $"{ownerName} extra_strike effect has invalid chance '{extraStrike.Chance}'.");
+                Ensure(extraStrike.ChancePerBuffLevel >= 0d,
+                    $"{ownerName} extra_strike effect has invalid chancePerBuffLevel '{extraStrike.ChancePerBuffLevel}'.");
+                var damageFactors = extraStrike.DamageFactors;
+                Ensure(damageFactors is { Count: > 0 },
+                    $"{ownerName} extra_strike effect must provide at least one damage factor.");
+                foreach (var damageFactor in damageFactors)
+                {
+                    Ensure(damageFactor > 0d,
+                        $"{ownerName} extra_strike effect has invalid damage factor '{damageFactor}'.");
+                }
+                ValidateBattleTargetSelector(extraStrike.Target!, ownerName, null);
                 break;
             default:
                 throw new InvalidOperationException($"{ownerName} has unsupported shared battle effect '{effect.GetType().Name}'.");

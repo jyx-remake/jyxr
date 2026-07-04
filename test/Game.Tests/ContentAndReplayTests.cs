@@ -1106,6 +1106,47 @@ public sealed class ContentLoadingTests
         }
     }
 
+    [Fact]
+    public void JsonLoader_RejectsInvalidExtraStrikeBattleHookEffect()
+    {
+        var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["buffs.json"] =
+                """
+                [
+                  {
+                    "id": "左右互搏",
+                    "name": "左右互搏",
+                    "isDebuff": false,
+                    "affixes": [
+                      {
+                        "type": "hook",
+                        "timing": "OnHitConfirmed",
+                        "effects": [
+                          {
+                            "type": "extra_strike",
+                            "target": { "type": "target" },
+                            "chancePerBuffLevel": 5,
+                            "damageFactors": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+                """,
+        });
+
+        try
+        {
+            Assert.Throws<InvalidOperationException>(() => new JsonContentLoader().LoadFromDirectory(directoryPath));
+        }
+        finally
+        {
+            Directory.Delete(directoryPath, recursive: true);
+        }
+    }
+
     private static InMemoryContentRepository LoadRepositoryFromJson(string json)
     {
         var loader = new JsonContentLoader();

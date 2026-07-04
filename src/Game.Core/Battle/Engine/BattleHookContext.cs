@@ -61,6 +61,8 @@ public sealed class BattleHookContext
 
     public int? DamageAmount { get; set; }
 
+    public bool IsCritical { get; set; }
+
     public BattleHitState HitState { get; set; } = BattleHitState.Hit;
 
     public bool HitCancelled

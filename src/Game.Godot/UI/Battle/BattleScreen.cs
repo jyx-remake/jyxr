@@ -773,6 +773,7 @@ public partial class BattleScreen : Control
 				var unitName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 				var damage = battleEvent.Damage?.Amount ?? 0;
 				var isCritical = damage > 0 && battleEvent.Damage?.IsCritical == true;
+				var isExtraStrike = string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal);
 				if (damage > 0 &&
 					!string.Equals(battleEvent.Damage?.SourceUnitId, battleEvent.UnitId, StringComparison.Ordinal))
 				{
@@ -780,11 +781,18 @@ public partial class BattleScreen : Control
 				}
 				_boardGrid.PlayFloatText(
 					battleEvent.UnitId,
-					ResolveDamageFloatText(damage, isCritical),
+					ResolveDamageFloatText(damage, isCritical, isExtraStrike),
 					isCritical ? FloatCriticalColor : FloatDamageColor);
-				AppendLog(isCritical
-					? $"暴击！！{unitName} 受到 {damage} 点伤害。"
-					: $"{unitName} 受到 {damage} 点伤害。");
+				if (isExtraStrike)
+				{
+					AppendLog($"多重攻击！！{unitName} 受到 {damage} 点伤害。");
+				}
+				else
+				{
+					AppendLog(isCritical
+						? $"暴击！！{unitName} 受到 {damage} 点伤害。"
+						: $"{unitName} 受到 {damage} 点伤害。");
+				}
 				break;
 			case BattleEventKind.BuffApplied:
 				var buffName = ResolveBuffName(battleEvent.Detail);
@@ -950,10 +958,10 @@ public partial class BattleScreen : Control
 			? $"{skillExperience.SkillName}等级提升"
 			: $"{skillExperience.SkillName}等级升级";
 
-	private static string ResolveDamageFloatText(int damage, bool isCritical) =>
+	private static string ResolveDamageFloatText(int damage, bool isCritical, bool isExtraStrike = false) =>
 		damage <= 0
 			? "MISS"
-			: isCritical ? $"暴击 -{damage}" : $"-{damage}";
+			: isExtraStrike ? $"多重攻击-{damage}" : isCritical ? $"暴击 -{damage}" : $"-{damage}";
 
 	private static string ResolveBuffName(string? buffId)
 	{

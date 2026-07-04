@@ -102,6 +102,7 @@ public sealed class BattleHookExecutor
                 case AddMpBattleEffectDefinition:
                 case CancelHitBattleHookEffectDefinition:
                 case SetHitSuccessBattleHookEffectDefinition:
+                case ExtraStrikeBattleHookEffectDefinition:
                     throw new InvalidOperationException(
                         $"Preview battle hook execution does not support side-effect effect '{effect.GetType().Name}' on timing '{hook.Timing}'.");
                 default:
@@ -214,6 +215,13 @@ public sealed class BattleHookExecutor
             case SetHitSuccessBattleHookEffectDefinition:
                 context.HitState = BattleHitState.Hit;
                 context.SuppressHitEffects = false;
+                break;
+
+            case ExtraStrikeBattleHookEffectDefinition extraStrike:
+                ApplyToSelectedTargets(context, extraStrike.Target, target =>
+                {
+                    context.Engine.ApplyHookExtraStrikeEffect(context, target, extraStrike);
+                });
                 break;
 
             default:

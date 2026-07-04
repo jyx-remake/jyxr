@@ -89,6 +89,7 @@ public sealed partial class BattleEngine
                     context.Target = targetUnit;
                     context.Skill = resolvedSkill;
                     context.DamageAmount = hit.Damage;
+                    context.IsCritical = hit.IsCritical;
                 });
             }
 

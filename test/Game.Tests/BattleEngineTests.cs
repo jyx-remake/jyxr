@@ -2027,6 +2027,244 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_ExtraStrikeBuffDealsAdditionalDamageAfterHit()
+    {
+        var extraStrike = CreateExtraStrikeBuff("左右互搏", [0.6d]);
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1000);
+        source.ApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, source.Id, 0));
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        var mainDamage = Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == target.Id &&
+            string.Equals(battleEvent.Detail, source.Id, StringComparison.Ordinal))).Damage?.Amount ?? 0;
+        var extraDamage = Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == target.Id &&
+            string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal))).Damage?.Amount ?? 0;
+        Assert.Equal((int)(mainDamage * 0.6d), extraDamage);
+        Assert.Equal(1000 - mainDamage - extraDamage, target.Hp);
+    }
+
+    [Fact]
+    public void CastSkill_ExtraStrikeBuffSkipsMissAndZeroChance()
+    {
+        var extraStrike = CreateExtraStrikeBuff("醉酒", [0.6d]);
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var missSource = CreateUnit(
+            "miss_source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var missTarget = CreateUnit(
+            "miss_target",
+            team: 2,
+            new GridPosition(1, 0),
+            maxHp: 500,
+            talents: [CreateDamageContextTalent("易容", CreateBeforeHitCancelHook())]);
+        missSource.ApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, missSource.Id, 0));
+        missSource.ActionGauge = 100;
+        var missState = new BattleState(new BattleGrid(4, 4), [missSource, missTarget]);
+        var missEngine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d));
+        missEngine.BeginAction(missState, missSource.Id);
+
+        var missResult = missEngine.CastSkill(missState, missSource.Id, missSource.Character.GetExternalSkills().Single(), missTarget.Position);
+
+        Assert.True(missResult.Success);
+        Assert.Equal(500, missTarget.Hp);
+        Assert.DoesNotContain(missState.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal));
+
+        var zeroChanceSource = CreateUnit(
+            "zero_chance_source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var zeroChanceTarget = CreateUnit("zero_chance_target", team: 2, new GridPosition(1, 0), maxHp: 500);
+        zeroChanceSource.ApplyBuff(new BattleBuffInstance(extraStrike, level: 0, remainingTurns: 3, zeroChanceSource.Id, 0));
+        zeroChanceSource.ActionGauge = 100;
+        var zeroChanceState = new BattleState(new BattleGrid(4, 4), [zeroChanceSource, zeroChanceTarget]);
+        var zeroChanceEngine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0d));
+        zeroChanceEngine.BeginAction(zeroChanceState, zeroChanceSource.Id);
+
+        var zeroChanceResult = zeroChanceEngine.CastSkill(
+            zeroChanceState,
+            zeroChanceSource.Id,
+            zeroChanceSource.Character.GetExternalSkills().Single(),
+            zeroChanceTarget.Position);
+
+        Assert.True(zeroChanceResult.Success);
+        Assert.DoesNotContain(zeroChanceState.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal));
+
+        var lethalSource = CreateUnit(
+            "lethal_source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var lethalTarget = CreateUnit("lethal_target", team: 2, new GridPosition(1, 0), maxHp: 1);
+        lethalSource.ApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, lethalSource.Id, 0));
+        lethalSource.ActionGauge = 100;
+        var lethalState = new BattleState(new BattleGrid(4, 4), [lethalSource, lethalTarget]);
+        var lethalEngine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0d));
+        lethalEngine.BeginAction(lethalState, lethalSource.Id);
+
+        var lethalResult = lethalEngine.CastSkill(
+            lethalState,
+            lethalSource.Id,
+            lethalSource.Character.GetExternalSkills().Single(),
+            lethalTarget.Position);
+
+        Assert.True(lethalResult.Success);
+        Assert.False(lethalTarget.IsAlive);
+        Assert.DoesNotContain(lethalState.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void CastSkill_ExtraStrikeBuffRollsEachDamageFactorIndependently()
+    {
+        var extraStrike = CreateExtraStrikeBuff("神速攻击", [0.6d, 0.3d]);
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1000);
+        source.ApplyBuff(new BattleBuffInstance(extraStrike, level: 5, remainingTurns: 3, source.Id, 0));
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new SequenceRandomService([1d, 0.1d, 0.3d], fallback: 1d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        var mainDamage = Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == target.Id &&
+            string.Equals(battleEvent.Detail, source.Id, StringComparison.Ordinal))).Damage?.Amount ?? 0;
+        var extraDamages = state.Events
+            .Where(battleEvent =>
+                battleEvent.Kind == BattleEventKind.Damaged &&
+                battleEvent.UnitId == target.Id &&
+                string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal))
+            .Select(battleEvent => battleEvent.Damage?.Amount ?? 0)
+            .ToArray();
+        Assert.Equal([(int)(mainDamage * 0.6d)], extraDamages);
+    }
+
+    [Fact]
+    public void CastSkill_ExtraStrikeDoesNotRepeatSkillBuffs()
+    {
+        var extraStrike = CreateExtraStrikeBuff("左右互搏", [0.6d]);
+        var poison = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            buffs: [new SkillBuffDefinition(poison, level: 1, duration: 2)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1000);
+        source.ApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, source.Id, 0));
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(poison.Id, Assert.Single(target.Buffs).Definition.Id);
+        Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.BuffApplied &&
+            battleEvent.UnitId == target.Id));
+        Assert.Single(state.Events.Where(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged &&
+            battleEvent.UnitId == target.Id &&
+            string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal)));
+    }
+
+    [Fact]
     public void CastSkill_EvasionBuffCanCauseMissBeforeHooks()
     {
         var skillDefinition = TestContentFactory.CreateExternalSkill(
@@ -2881,6 +3119,29 @@ public sealed class BattleEngineTests
             ],
         };
 
+    private static BuffDefinition CreateExtraStrikeBuff(string id, IReadOnlyList<double> damageFactors) =>
+        new()
+        {
+            Id = id,
+            Name = id,
+            IsDebuff = false,
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.OnHitConfirmed,
+                    Conditions = [new DamagePositiveBattleHookConditionDefinition()],
+                    Effects =
+                    [
+                        new ExtraStrikeBattleHookEffectDefinition(
+                            new TargetBattleTargetSelectorDefinition(),
+                            damageFactors,
+                            ChancePerBuffLevel: 5d),
+                    ],
+                },
+            ],
+        };
+
     private static TalentDefinition CreateIshirenTalent() =>
         new()
         {
@@ -3189,6 +3450,22 @@ public sealed class BattleEngineTests
         }
 
         public double NextDouble() => _value;
+
+        public int Next(int minInclusive, int maxExclusive) => minInclusive;
+    }
+
+    private sealed class SequenceRandomService : IRandomService
+    {
+        private readonly Queue<double> _values;
+        private readonly double _fallback;
+
+        public SequenceRandomService(IEnumerable<double> values, double fallback)
+        {
+            _values = new Queue<double>(values);
+            _fallback = fallback;
+        }
+
+        public double NextDouble() => _values.Count > 0 ? _values.Dequeue() : _fallback;
 
         public int Next(int minInclusive, int maxExclusive) => minInclusive;
     }

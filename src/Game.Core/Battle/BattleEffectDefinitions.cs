@@ -45,6 +45,7 @@ public sealed record NearbyAlliesBattleTargetSelectorDefinition(
 [JsonDerivedType(typeof(ModifyDamageContextBattleHookEffectDefinition), "modify_damage_context")]
 [JsonDerivedType(typeof(ModifyMpCostBattleHookEffectDefinition), "modify_mp_cost")]
 [JsonDerivedType(typeof(StrengthenContextBuffBattleHookEffectDefinition), "strengthen_context_buff")]
+[JsonDerivedType(typeof(ExtraStrikeBattleHookEffectDefinition), "extra_strike")]
 public abstract record BattleEffectDefinition
 {
     public virtual void Resolve(IContentRepository contentRepository)
@@ -111,3 +112,9 @@ public sealed record AddMpBattleEffectDefinition(
 
 public sealed record CancelHitBattleHookEffectDefinition(
     bool SuppressHitEffects = true) : BattleEffectDefinition;
+
+public sealed record ExtraStrikeBattleHookEffectDefinition(
+    BattleTargetSelectorDefinition Target,
+    IReadOnlyList<double> DamageFactors,
+    double Chance = 0d,
+    double ChancePerBuffLevel = 0d) : BattleEffectDefinition;

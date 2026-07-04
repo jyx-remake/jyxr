@@ -10,7 +10,7 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
-    private readonly record struct BattleSkillHitResolution(bool IsHitConfirmed, int Damage, bool SuppressHitEffects);
+    private readonly record struct BattleSkillHitResolution(bool IsHitConfirmed, int Damage, bool IsCritical, bool SuppressHitEffects);
 
     private readonly record struct BattleSkillHitCheck(bool IsCancelled, bool SuppressHitEffects);
 
@@ -24,7 +24,7 @@ public sealed partial class BattleEngine
                 target.Id,
                 Detail: source.Id,
                 Damage: new BattleDamageEvent(0, SourceUnitId: source.Id)));
-            return new BattleSkillHitResolution(false, 0, hitCheck.SuppressHitEffects);
+            return new BattleSkillHitResolution(false, 0, false, hitCheck.SuppressHitEffects);
         }
 
         var damageCalculation = _damageCalculator.CreateSkillDamageContext(
@@ -46,7 +46,7 @@ public sealed partial class BattleEngine
             target.Id,
             Detail: source.Id,
             Damage: new BattleDamageEvent(damage, result.IsCritical, source.Id)));
-        return new BattleSkillHitResolution(true, damage, hitCheck.SuppressHitEffects || hookContext.SuppressHitEffects);
+        return new BattleSkillHitResolution(true, damage, result.IsCritical, hitCheck.SuppressHitEffects || hookContext.SuppressHitEffects);
     }
 
     private BattleSkillHitCheck ResolveSkillHit(
@@ -201,6 +201,62 @@ public sealed partial class BattleEngine
             effect.Level,
             effect.Duration,
             $"{context.Timing}:{effect.BuffId}");
+    }
+
+    internal void ApplyHookExtraStrikeEffect(
+        BattleHookContext context,
+        BattleUnit target,
+        ExtraStrikeBattleHookEffectDefinition effect)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(effect);
+
+        if (context.DamageAmount is not > 0 || !target.IsAlive)
+        {
+            return;
+        }
+
+        var chance = Math.Clamp(
+            (effect.Chance + effect.ChancePerBuffLevel * (context.Buff?.Level ?? 0)) / 100d,
+            0d,
+            1d);
+        if (chance <= 0d)
+        {
+            return;
+        }
+
+        foreach (var factor in effect.DamageFactors)
+        {
+            if (!target.IsAlive)
+            {
+                return;
+            }
+
+            if (!Probability.RollChance(_random, chance))
+            {
+                continue;
+            }
+
+            var amount = (int)(context.DamageAmount.Value * factor);
+            if (amount <= 0)
+            {
+                continue;
+            }
+
+            var damage = target.TakeDamage(amount);
+            if (damage <= 0)
+            {
+                continue;
+            }
+
+            AddEvent(context.State, new BattleEvent(
+                BattleEventKind.Damaged,
+                target.Id,
+                context.Timing,
+                Detail: "extra_strike",
+                Damage: new BattleDamageEvent(damage, context.IsCritical, context.Source?.Id ?? context.Unit.Id)));
+        }
     }
 
     internal IReadOnlyList<BattleBuffInstance> RemoveHookBuffById(
