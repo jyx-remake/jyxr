@@ -65,12 +65,12 @@ public sealed partial class BattleEngine
 
     private static bool IsSealedByBuff(BattleUnit unit, SkillInstance skill)
     {
-        if (!IsExternalMartialSkill(skill))
+        if (!IsSealableMartialSkill(skill))
         {
             return false;
         }
 
-        if (unit.HasBuff(BattleContentIds.AllSkillSeal))
+        if (IsOrdinaryExternalSkill(skill) && unit.HasBuff(BattleContentIds.AllSkillSeal))
         {
             return true;
         }
@@ -85,7 +85,11 @@ public sealed partial class BattleEngine
         };
     }
 
-    private static bool IsExternalMartialSkill(SkillInstance skill) =>
+    private static bool IsSealableMartialSkill(SkillInstance skill) =>
+        skill is not SpecialSkillInstance &&
+        skill.WeaponType is WeaponType.Quanzhang or WeaponType.Jianfa or WeaponType.Daofa or WeaponType.Qimen;
+
+    private static bool IsOrdinaryExternalSkill(SkillInstance skill) =>
         skill is ExternalSkillInstance ||
-        skill is FormSkillInstance { Parent: ExternalSkillInstance };
+        skill is LegendSkillInstance { Parent: ExternalSkillInstance };
 }
