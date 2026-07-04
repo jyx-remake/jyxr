@@ -100,6 +100,7 @@ public sealed record TraitAffix(TraitId TraitId) : AffixDefinition;
 [JsonDerivedType(typeof(ContextSkillNameEqualsBattleHookConditionDefinition), "context_skill_name_equals")]
 [JsonDerivedType(typeof(ContextSkillNameContainsBattleHookConditionDefinition), "context_skill_name_contains")]
 [JsonDerivedType(typeof(ContextSkillWeaponTypeBattleHookConditionDefinition), "context_skill_weapon_type")]
+[JsonDerivedType(typeof(ContextRecoveryKindBattleHookConditionDefinition), "context_recovery_kind")]
 public abstract record BattleHookConditionDefinition;
 
 public sealed record ChanceBattleHookConditionDefinition(double Value) : BattleHookConditionDefinition;
@@ -145,6 +146,9 @@ public sealed record ContextSkillNameContainsBattleHookConditionDefinition(
 public sealed record ContextSkillWeaponTypeBattleHookConditionDefinition(
     IReadOnlyList<WeaponType> WeaponTypes) : BattleHookConditionDefinition;
 
+public sealed record ContextRecoveryKindBattleHookConditionDefinition(
+    BattleRecoveryKind Kind) : BattleHookConditionDefinition;
+
 public enum BattleHookRounding
 {
     Truncate,
@@ -174,6 +178,12 @@ public sealed record ModifyMpCostBattleHookEffectDefinition(
     double Delta = 0d,
     double DeltaPerBuffLevel = 0d,
     BattleHookRounding Rounding = BattleHookRounding.Ceiling) : BattleEffectDefinition;
+
+public sealed record ModifyRecoveryBattleHookEffectDefinition(
+    ModifierOp Op,
+    double Delta = 0d,
+    double DeltaPerBuffLevel = 0d,
+    BattleHookRounding Rounding = BattleHookRounding.Truncate) : BattleEffectDefinition;
 
 public sealed record SetHitSuccessBattleHookEffectDefinition : BattleEffectDefinition;
 

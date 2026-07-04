@@ -44,7 +44,16 @@ public enum HookTiming
     BeforeBuffApplied,
     OnBuffApplied,
     OnBuffRemoved,
-    OnDamageTaken
+    OnDamageTaken,
+    BeforeRecoveryResolved
+}
+
+public enum BattleRecoveryKind
+{
+    [JsonStringEnumMemberName("hp")]
+    Hp,
+    [JsonStringEnumMemberName("mp")]
+    Mp
 }
 
 public enum TraitId

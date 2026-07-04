@@ -57,6 +57,8 @@ public sealed class BattleHookExecutor
             ContextSkillWeaponTypeBattleHookConditionDefinition skillWeaponType =>
                 context.Skill is not null &&
                 skillWeaponType.WeaponTypes.Contains(context.Skill.WeaponType),
+            ContextRecoveryKindBattleHookConditionDefinition recoveryKind =>
+                context.RecoveryKind == recoveryKind.Kind,
             _ => throw new NotSupportedException($"Unsupported battle hook condition '{condition.GetType().Name}'.")
         };
 
@@ -89,6 +91,7 @@ public sealed class BattleHookExecutor
                 case ModifyDamageBattleHookEffectDefinition:
                 case ModifyDamageContextBattleHookEffectDefinition:
                 case ModifyMpCostBattleHookEffectDefinition:
+                case ModifyRecoveryBattleHookEffectDefinition:
                     continue;
                 case StrengthenContextBuffBattleHookEffectDefinition:
                 case ApplyBuffBattleEffectDefinition:
@@ -126,6 +129,10 @@ public sealed class BattleHookExecutor
 
             case ModifyMpCostBattleHookEffectDefinition modifyMpCost:
                 context.MpCost = ApplyModifier(context.MpCost, context, modifyMpCost.Op, modifyMpCost.Delta, modifyMpCost.DeltaPerBuffLevel, modifyMpCost.Rounding);
+                break;
+
+            case ModifyRecoveryBattleHookEffectDefinition modifyRecovery:
+                context.RecoveryAmount = ApplyModifier(context.RecoveryAmount, context, modifyRecovery.Op, modifyRecovery.Delta, modifyRecovery.DeltaPerBuffLevel, modifyRecovery.Rounding);
                 break;
 
             case StrengthenContextBuffBattleHookEffectDefinition strengthenBuff:
@@ -194,7 +201,12 @@ public sealed class BattleHookExecutor
             case AddHpBattleEffectDefinition addHp:
                 ApplyToSelectedTargets(context, addHp.Target, target =>
                 {
-                    var restored = target.RestoreHp(addHp.Value);
+                    var restored = context.Engine.RestoreHookRecovery(
+                        context.State,
+                        context.Source ?? context.Unit,
+                        target,
+                        BattleRecoveryKind.Hp,
+                        addHp.Value);
                     context.State.AddEvent(new BattleEvent(BattleEventKind.Healed, target.Id, Detail: $"{context.Timing}:{restored}"));
                 });
                 break;
@@ -202,7 +214,12 @@ public sealed class BattleHookExecutor
             case AddMpBattleEffectDefinition addMp:
                 ApplyToSelectedTargets(context, addMp.Target, target =>
                 {
-                    target.RestoreMp(addMp.Value);
+                    context.Engine.RestoreHookRecovery(
+                        context.State,
+                        context.Source ?? context.Unit,
+                        target,
+                        BattleRecoveryKind.Mp,
+                        addMp.Value);
                 });
                 break;
 

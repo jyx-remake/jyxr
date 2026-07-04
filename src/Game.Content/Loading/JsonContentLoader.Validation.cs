@@ -100,6 +100,7 @@ public sealed partial class JsonContentLoader
                     case ModifyDamageBattleHookEffectDefinition:
                     case ModifyDamageContextBattleHookEffectDefinition:
                     case ModifyMpCostBattleHookEffectDefinition:
+                    case ModifyRecoveryBattleHookEffectDefinition:
                     case StrengthenContextBuffBattleHookEffectDefinition:
                     case CancelHitBattleHookEffectDefinition:
                     case SetHitSuccessBattleHookEffectDefinition:
@@ -367,6 +368,8 @@ public sealed partial class JsonContentLoader
                             $"{ownerName} has battle hook '{hook.Timing}' skill weapon type condition with unknown weapon type.");
                     }
                     break;
+                case ContextRecoveryKindBattleHookConditionDefinition:
+                    break;
                 default:
                     throw new InvalidOperationException($"{ownerName} has unsupported battle hook condition '{condition.GetType().Name}'.");
             }
@@ -378,6 +381,7 @@ public sealed partial class JsonContentLoader
             {
                 case ModifyDamageBattleHookEffectDefinition:
                 case ModifyMpCostBattleHookEffectDefinition:
+                case ModifyRecoveryBattleHookEffectDefinition:
                     break;
                 case ModifyDamageContextBattleHookEffectDefinition modifyDamageContext:
                     ValidateModifyDamageContextEffect(modifyDamageContext, $"{ownerName} battle hook '{hook.Timing}'");

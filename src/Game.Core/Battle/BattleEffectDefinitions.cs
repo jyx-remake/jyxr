@@ -44,6 +44,7 @@ public sealed record NearbyAlliesBattleTargetSelectorDefinition(
 [JsonDerivedType(typeof(ModifyDamageBattleHookEffectDefinition), "modify_damage")]
 [JsonDerivedType(typeof(ModifyDamageContextBattleHookEffectDefinition), "modify_damage_context")]
 [JsonDerivedType(typeof(ModifyMpCostBattleHookEffectDefinition), "modify_mp_cost")]
+[JsonDerivedType(typeof(ModifyRecoveryBattleHookEffectDefinition), "modify_recovery")]
 [JsonDerivedType(typeof(StrengthenContextBuffBattleHookEffectDefinition), "strengthen_context_buff")]
 [JsonDerivedType(typeof(ExtraStrikeBattleHookEffectDefinition), "extra_strike")]
 public abstract record BattleEffectDefinition

@@ -61,6 +61,10 @@ public sealed class BattleHookContext
 
     public int? DamageAmount { get; set; }
 
+    public BattleRecoveryKind? RecoveryKind { get; set; }
+
+    public int? RecoveryAmount { get; set; }
+
     public bool IsCritical { get; set; }
 
     public BattleHitState HitState { get; set; } = BattleHitState.Hit;
@@ -102,7 +106,13 @@ public sealed class BattleHookContext
         ArgumentNullException.ThrowIfNull(target);
         ArgumentOutOfRangeException.ThrowIfNegative(amount);
 
-        var restored = target.RestoreHp(amount);
+        var source = Source ?? Unit;
+        var restored = Engine.RestoreHookRecovery(
+            State,
+            source,
+            target,
+            BattleRecoveryKind.Hp,
+            amount);
         State.AddEvent(new BattleEvent(BattleEventKind.Healed, target.Id, Detail: detail ?? restored.ToString()));
         return restored;
     }

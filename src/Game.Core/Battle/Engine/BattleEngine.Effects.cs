@@ -322,6 +322,57 @@ public sealed partial class BattleEngine
         }
     }
 
+    internal int RestoreHookRecovery(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        BattleRecoveryKind kind,
+        int amount) =>
+        RestoreBattleResource(state, source, target, kind, amount);
+
+    private int RestoreBattleResource(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        BattleRecoveryKind kind,
+        int amount)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentOutOfRangeException.ThrowIfNegative(amount);
+
+        var resolvedAmount = ResolveRecoveryAmount(state, source, target, kind, amount);
+        return kind switch
+        {
+            BattleRecoveryKind.Hp => target.RestoreHp(resolvedAmount),
+            BattleRecoveryKind.Mp => target.RestoreMp(resolvedAmount),
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
+    private int ResolveRecoveryAmount(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        BattleRecoveryKind kind,
+        int amount)
+    {
+        var context = TriggerHooks(
+            state,
+            HookTiming.BeforeRecoveryResolved,
+            target,
+            hookContext =>
+            {
+                hookContext.Source = source;
+                hookContext.Target = target;
+                hookContext.RecoveryKind = kind;
+                hookContext.RecoveryAmount = amount;
+            });
+        var resolvedAmount = context.RecoveryAmount ?? amount;
+        return Math.Max(0, resolvedAmount);
+    }
+
     private void ApplySpecialSkillEffect(
         BattleState state,
         BattleUnit source,
@@ -357,12 +408,22 @@ public sealed partial class BattleEngine
                 break;
             case AddHpBattleEffectDefinition hp:
             {
-                var restored = target.RestoreHp(hp.Value);
+                var restored = RestoreBattleResource(
+                    state,
+                    source,
+                    target,
+                    BattleRecoveryKind.Hp,
+                    hp.Value);
                 AddEvent(state, new BattleEvent(BattleEventKind.Healed, target.Id, Detail: $"special_skill:{restored}"));
                 break;
             }
             case AddMpBattleEffectDefinition mp:
-                target.RestoreMp(mp.Value);
+                RestoreBattleResource(
+                    state,
+                    source,
+                    target,
+                    BattleRecoveryKind.Mp,
+                    mp.Value);
                 break;
             case ApplyBuffBattleEffectDefinition addBuff:
             {
@@ -476,16 +537,36 @@ public sealed partial class BattleEngine
             switch (effect)
             {
                 case AddHpItemUseEffectDefinition hp:
-                    target.RestoreHp(hp.Value);
+                    RestoreBattleResource(
+                        state,
+                        source,
+                        target,
+                        BattleRecoveryKind.Hp,
+                        hp.Value);
                     break;
                 case AddMpItemUseEffectDefinition mp:
-                    target.RestoreMp(mp.Value);
+                    RestoreBattleResource(
+                        state,
+                        source,
+                        target,
+                        BattleRecoveryKind.Mp,
+                        mp.Value);
                     break;
                 case AddHpPercentItemUseEffectDefinition hpPercent:
-                    target.RestoreHp(target.MaxHp * hpPercent.Value / 100);
+                    RestoreBattleResource(
+                        state,
+                        source,
+                        target,
+                        BattleRecoveryKind.Hp,
+                        target.MaxHp * hpPercent.Value / 100);
                     break;
                 case AddMpPercentItemUseEffectDefinition mpPercent:
-                    target.RestoreMp(target.MaxMp * mpPercent.Value / 100);
+                    RestoreBattleResource(
+                        state,
+                        source,
+                        target,
+                        BattleRecoveryKind.Mp,
+                        target.MaxMp * mpPercent.Value / 100);
                     break;
                 case AddRageItemUseEffectDefinition rage:
                     target.AddRage(rage.Value);
@@ -580,7 +661,13 @@ public sealed partial class BattleEngine
     {
         var roll = 1d + _random.NextDouble() * 0.5d;
         var amount = Math.Max(1, (int)(unit.GetStat(StatType.Gengu) / 3d * buff.Level * roll));
-        var restored = unit.RestoreHp(amount);
+        var source = state.TryGetUnit(buff.SourceUnitId) ?? unit;
+        var restored = RestoreBattleResource(
+            state,
+            source,
+            unit,
+            BattleRecoveryKind.Hp,
+            amount);
         AddEvent(state, new BattleEvent(BattleEventKind.Healed, unit.Id, Detail: $"{buff.Definition.Id}:{restored}"));
     }
 
