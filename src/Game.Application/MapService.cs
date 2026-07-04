@@ -116,7 +116,7 @@ public sealed class MapService
         {
             var mapEvent = location.Events[index];
             if (mapEvent.RepeatMode == RepeatMode.Once &&
-                State.MapEventProgress.IsCompleted(BuildLocationEventKey(mapId, location.Id, index)))
+                IsOnceEventCompleted(mapEvent, BuildLocationEventKey(mapId, location.Id, index)))
             {
                 continue;
             }
@@ -199,13 +199,23 @@ public sealed class MapService
 
     private void MarkEventCompletedIfNeeded(MapEventDefinition mapEvent, int eventIndex, string eventKey)
     {
-        if (mapEvent.RepeatMode != RepeatMode.Once || eventIndex < 0)
+        if (mapEvent.RepeatMode != RepeatMode.Once ||
+            IsStoryEvent(mapEvent) ||
+            eventIndex < 0)
         {
             return;
         }
 
         State.MapEventProgress.MarkCompleted(eventKey);
     }
+
+    private bool IsOnceEventCompleted(MapEventDefinition mapEvent, string eventKey) =>
+        IsStoryEvent(mapEvent)
+            ? State.Story.IsStoryCompleted(mapEvent.TargetId)
+            : State.MapEventProgress.IsCompleted(eventKey);
+
+    private static bool IsStoryEvent(MapEventDefinition mapEvent) =>
+        string.Equals(mapEvent.Type, "story", StringComparison.Ordinal);
 
     private static MapInteractionResult BuildInteractionResult(
         MapInteractionOutcome outcome,
