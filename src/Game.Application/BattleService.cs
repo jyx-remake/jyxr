@@ -81,17 +81,18 @@ public sealed class BattleService
         ArgumentOutOfRangeException.ThrowIfLessThan(hardLevel, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(hardLevel, 6);
 
+        var battleDifficulty = State.Adventure.Difficulty;
         return BuildBattleStateCore(
             battle,
             selectedCharacterIds,
             (participant, index, slotCharacters, tempFactory) =>
                 participant.Team == PlayerTeam
-                    ? ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory)
+                    ? ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory, battleDifficulty)
                     : CreateArenaOpponentCharacter(hardLevel, index, tempFactory),
             (_, index, tempFactory) =>
                 CreateArenaOpponentCharacter(hardLevel, index + battle.Participants.Count, tempFactory),
             ApplyNpcRoundPowerUp,
-            CreateDamageRuleSettings(enableRoundEnemyAttackDefenceScaling: true));
+            CreateBattleRuleSettings(battleDifficulty, enableRoundEnemyAttackDefenceScaling: true));
     }
 
     public BattleState BuildZhenlongqijuBattleState(
@@ -101,13 +102,16 @@ public sealed class BattleService
     {
         ArgumentOutOfRangeException.ThrowIfNegative(level);
 
+        const GameDifficulty battleDifficulty = GameDifficulty.Crazy;
         return BuildBattleStateCore(
             battle,
             selectedCharacterIds,
-            ResolveParticipantCharacter,
-            CreateRandomParticipantCharacter,
+            (participant, index, slotCharacters, tempFactory) =>
+                ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory, battleDifficulty),
+            (participant, index, tempFactory) =>
+                CreateRandomParticipantCharacter(participant, index, tempFactory, battleDifficulty),
             character => PowerUpZhenlongqijuEnemy(character, level),
-            CreateDamageRuleSettings(enableRoundEnemyAttackDefenceScaling: false));
+            CreateBattleRuleSettings(battleDifficulty, enableRoundEnemyAttackDefenceScaling: false));
     }
 
     public BattleState BuildBattleState(BattleDefinition battle, IReadOnlyList<string> selectedCharacterIds)
@@ -115,13 +119,16 @@ public sealed class BattleService
         ArgumentNullException.ThrowIfNull(battle);
         ArgumentNullException.ThrowIfNull(selectedCharacterIds);
 
+        var battleDifficulty = State.Adventure.Difficulty;
         return BuildBattleStateCore(
             battle,
             selectedCharacterIds,
-            ResolveParticipantCharacter,
-            CreateRandomParticipantCharacter,
+            (participant, index, slotCharacters, tempFactory) =>
+                ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory, battleDifficulty),
+            (participant, index, tempFactory) =>
+                CreateRandomParticipantCharacter(participant, index, tempFactory, battleDifficulty),
             ApplyNpcRoundPowerUp,
-            CreateDamageRuleSettings(enableRoundEnemyAttackDefenceScaling: true));
+            CreateBattleRuleSettings(battleDifficulty, enableRoundEnemyAttackDefenceScaling: true));
     }
 
     public OrdinaryBattleVictorySettlement PreviewVictorySettlement(
@@ -145,7 +152,7 @@ public sealed class BattleService
         Func<BattleParticipantDefinition, int, IReadOnlyList<CharacterInstance?>, EquipmentInstanceFactory, CharacterInstance?> participantResolver,
         Func<BattleRandomParticipantDefinition, int, EquipmentInstanceFactory, CharacterInstance> randomParticipantResolver,
         Action<CharacterInstance> npcCharacterProcessor,
-        BattleDamageRuleSettings damageRuleSettings)
+        BattleRuleSettings ruleSettings)
     {
         ArgumentNullException.ThrowIfNull(battle);
         ArgumentNullException.ThrowIfNull(selectedCharacterIds);
@@ -192,7 +199,7 @@ public sealed class BattleService
                 participant.Facing));
         }
 
-        var state = new BattleState(new BattleGrid(GridWidth, GridHeight), units, damageRuleSettings);
+        var state = new BattleState(new BattleGrid(GridWidth, GridHeight), units, ruleSettings);
         if (!state.Units.Any(unit => unit.Team == PlayerTeam))
         {
             throw new InvalidOperationException($"Battle '{battle.Id}' must contain at least one player team unit.");
@@ -315,13 +322,14 @@ public sealed class BattleService
     private CharacterInstance CreateRandomParticipantCharacter(
         BattleRandomParticipantDefinition participant,
         int index,
-        EquipmentInstanceFactory tempFactory)
+        EquipmentInstanceFactory tempFactory,
+        GameDifficulty battleDifficulty)
     {
         var character = participant.Boss
             ? CreateRandomBossCharacter(participant, index, tempFactory)
             : CreateRandomSoldierCharacter(participant, index, tempFactory);
 
-        ApplyDifficultyRandomTalents(character);
+        ApplyDifficultyRandomTalents(character, battleDifficulty);
         character.RebuildSnapshot();
         return character;
     }
@@ -446,7 +454,8 @@ public sealed class BattleService
         BattleParticipantDefinition participant,
         int index,
         IReadOnlyList<CharacterInstance?> slotCharacters,
-        EquipmentInstanceFactory tempFactory)
+        EquipmentInstanceFactory tempFactory,
+        GameDifficulty battleDifficulty)
     {
         if (!string.IsNullOrWhiteSpace(participant.CharacterId))
         {
@@ -463,7 +472,7 @@ public sealed class BattleService
                 tempFactory);
             if (participant.Team != PlayerTeam)
             {
-                ApplyDifficultyRandomTalents(character);
+                ApplyDifficultyRandomTalents(character, battleDifficulty);
                 character.RebuildSnapshot();
             }
 
@@ -483,21 +492,24 @@ public sealed class BattleService
     private bool IsPartyCharacterInstance(CharacterInstance character) =>
         State.Party.GetAllCharacters().Any(partyCharacter => ReferenceEquals(partyCharacter, character));
 
-    private BattleDamageRuleSettings CreateDamageRuleSettings(bool enableRoundEnemyAttackDefenceScaling)
+    private BattleRuleSettings CreateBattleRuleSettings(
+        GameDifficulty battleDifficulty,
+        bool enableRoundEnemyAttackDefenceScaling)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(State.Adventure.Round, 1);
         ArgumentOutOfRangeException.ThrowIfNegative(Config.RoundEnemyAttackAddRatio);
         ArgumentOutOfRangeException.ThrowIfNegative(Config.RoundEnemyDefenceAddRatio);
 
-        return new BattleDamageRuleSettings
+        return new BattleRuleSettings
         {
-            Difficulty = State.Adventure.Difficulty,
+            Difficulty = battleDifficulty,
             Round = State.Adventure.Round,
             PlayerTeam = PlayerTeam,
             RoundEnemyAttackAddRatio = Config.RoundEnemyAttackAddRatio,
             RoundEnemyDefenceAddRatio = Config.RoundEnemyDefenceAddRatio,
             EnableRoundEnemyAttackDefenceScaling = enableRoundEnemyAttackDefenceScaling,
             EnableDifficultyDamageScaling = true,
+            EnableDifficultyItemCooldownRules = true,
         };
     }
 
@@ -582,9 +594,9 @@ public sealed class BattleService
         return true;
     }
 
-    private void ApplyDifficultyRandomTalents(CharacterInstance character)
+    private void ApplyDifficultyRandomTalents(CharacterInstance character, GameDifficulty battleDifficulty)
     {
-        switch (State.Adventure.Difficulty)
+        switch (battleDifficulty)
         {
             case GameDifficulty.Hard:
                 TryAddRandomTalent(character, Config.EnemyRandomTalentIds);

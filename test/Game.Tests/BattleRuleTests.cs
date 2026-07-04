@@ -10,12 +10,12 @@ namespace Game.Tests;
 public sealed class BattleRuleTests
 {
     [Fact]
-    public void BattleState_DefaultsToNeutralDamageRules()
+    public void BattleState_DefaultsToNeutralBattleRules()
     {
         var unit = CreateUnit("hero", team: 1, new GridPosition(0, 0));
         var state = new BattleState(new BattleGrid(2, 2), [unit]);
 
-        Assert.Same(BattleDamageRuleSettings.Neutral, state.DamageRules);
+        Assert.Same(BattleRuleSettings.Neutral, state.RuleSettings);
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public sealed class BattleRuleTests
             source,
             target,
             skill,
-            new BattleDamageRuleSettings
+            new BattleRuleSettings
             {
                 Difficulty = GameDifficulty.Normal,
                 PlayerTeam = 1,
@@ -49,7 +49,7 @@ public sealed class BattleRuleTests
             source,
             target,
             skill,
-            new BattleDamageRuleSettings
+            new BattleRuleSettings
             {
                 Difficulty = GameDifficulty.Normal,
                 PlayerTeam = 1,
@@ -70,7 +70,7 @@ public sealed class BattleRuleTests
             source,
             target,
             skill,
-            new BattleDamageRuleSettings
+            new BattleRuleSettings
             {
                 Difficulty = GameDifficulty.Hard,
                 Round = 3,
@@ -97,7 +97,7 @@ public sealed class BattleRuleTests
                 [StatType.Gengu] = 90,
             });
         var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
-        var settings = new BattleDamageRuleSettings
+        var settings = new BattleRuleSettings
         {
             Difficulty = GameDifficulty.Hard,
             Round = 3,
@@ -125,7 +125,7 @@ public sealed class BattleRuleTests
             source,
             target,
             skill,
-            new BattleDamageRuleSettings
+            new BattleRuleSettings
             {
                 Difficulty = GameDifficulty.Hard,
                 Round = 5,

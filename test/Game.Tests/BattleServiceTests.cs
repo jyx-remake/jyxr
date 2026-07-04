@@ -27,14 +27,38 @@ public sealed class BattleServiceTests
         Assert.Contains("enemy_only", exception.Message, StringComparison.Ordinal);
     }
 
-    private static GameSession CreateSession(BattleDefinition battle)
+    [Fact]
+    public void BuildZhenlongqijuBattleState_UsesCrazyBattleDifficulty()
+    {
+        var session = CreateSession(
+            CreateFixedPlayerBattle(),
+            new GameConfig
+            {
+                EnemyRandomTalentIds = [],
+                EnemyRandomTalentCrazy1Ids = [],
+                EnemyRandomTalentCrazy2Ids = [],
+                EnemyRandomTalentCrazy3Ids = [],
+            });
+
+        var state = session.BattleService.BuildZhenlongqijuBattleState(
+            session.ContentRepository.GetBattle("fixed_player"),
+            [],
+            level: 0);
+
+        Assert.Equal(GameDifficulty.Crazy, state.RuleSettings.Difficulty);
+        Assert.True(state.RuleSettings.EnableDifficultyDamageScaling);
+        Assert.True(state.RuleSettings.EnableDifficultyItemCooldownRules);
+        Assert.False(state.RuleSettings.EnableRoundEnemyAttackDefenceScaling);
+    }
+
+    private static GameSession CreateSession(BattleDefinition battle, GameConfig? config = null)
     {
         var shadow = TestContentFactory.CreateCharacterDefinition("shadow");
         var enemy = TestContentFactory.CreateCharacterDefinition("enemy");
         var repository = TestContentFactory.CreateRepository(
             characters: [shadow, enemy],
             battles: [battle]);
-        return new GameSession(new GameState(), repository);
+        return new GameSession(new GameState(), repository, config: config);
     }
 
     private static BattleDefinition CreateFixedPlayerBattle() =>

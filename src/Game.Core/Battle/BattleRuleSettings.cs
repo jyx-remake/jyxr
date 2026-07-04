@@ -2,9 +2,9 @@ using Game.Core.Model;
 
 namespace Game.Core.Battle;
 
-public sealed record BattleDamageRuleSettings
+public sealed record BattleRuleSettings
 {
-    public static BattleDamageRuleSettings Neutral { get; } = new();
+    public static BattleRuleSettings Neutral { get; } = new();
 
     public GameDifficulty Difficulty { get; init; } = GameDifficulty.Normal;
 
@@ -19,4 +19,6 @@ public sealed record BattleDamageRuleSettings
     public bool EnableRoundEnemyAttackDefenceScaling { get; init; }
 
     public bool EnableDifficultyDamageScaling { get; init; }
+
+    public bool EnableDifficultyItemCooldownRules { get; init; }
 }

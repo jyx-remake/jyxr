@@ -284,14 +284,18 @@ public sealed partial class BattleEngine
                 return BattleActionResult.Failed("Ally item target is out of range.");
             }
         }
-        if (target.ItemCooldown > 0 && !unit.HasTrait(TraitId.IgnoreItemCooldown))
+        var useItemCooldown = IsItemCooldownEnabled(state.RuleSettings);
+        if (useItemCooldown && target.ItemCooldown > 0 && !unit.HasTrait(TraitId.IgnoreItemCooldown))
         {
             return BattleActionResult.Failed($"Item is cooling down. Remaining turns: {target.ItemCooldown}.");
         }
 
         TriggerHooks(state, HookTiming.BeforeItemUse, unit);
         ApplyItemEffects(state, unit, target, item.UseEffects);
-        target.AddItemCooldown(item.Cooldown);
+        if (useItemCooldown)
+        {
+            target.AddItemCooldown(item.Cooldown);
+        }
         UpdateFacingByTarget(unit, target.Position);
 
         var battleEvent = new BattleEvent(BattleEventKind.ItemUsed, unit.Id, Detail: item.Id);
@@ -300,6 +304,10 @@ public sealed partial class BattleEngine
         EndActionCore(state, unit, committedMainAction: true);
         return BattleActionResult.Succeeded("Item used.", [target.Id], [battleEvent]);
     }
+
+    private static bool IsItemCooldownEnabled(BattleRuleSettings ruleSettings) =>
+        !ruleSettings.EnableDifficultyItemCooldownRules ||
+        ruleSettings.Difficulty != GameDifficulty.Normal;
 
     public BattleActionResult Rest(BattleState state, string unitId)
     {

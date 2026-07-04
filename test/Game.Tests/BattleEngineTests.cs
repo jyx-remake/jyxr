@@ -2613,6 +2613,37 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void UseItem_NormalDifficultyItemCooldownRuleDoesNotAddOrBlockCooldown()
+    {
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0), maxMp: 20, mp: 5);
+        hero.AddItemCooldown(2);
+        hero.ActionGauge = 100;
+        var item = new NormalItemDefinition
+        {
+            Id = "mp_pill",
+            Name = "mp_pill",
+            Type = ItemType.Consumable,
+            Cooldown = 3,
+            UseEffects = [new AddMpItemUseEffectDefinition(1)],
+        };
+        var state = new BattleState(
+            new BattleGrid(4, 4),
+            [hero],
+            new BattleRuleSettings
+            {
+                Difficulty = GameDifficulty.Normal,
+                EnableDifficultyItemCooldownRules = true,
+            });
+        var engine = new BattleEngine();
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.UseItem(state, hero.Id, item, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(2, hero.ItemCooldown);
+    }
+
+    [Fact]
     public void UseItem_CannotBypassTargetItemCooldownWithOnlyAllyItemTrait()
     {
         var talent = new TalentDefinition

@@ -70,8 +70,8 @@ public sealed class BattleDamageCalculator
             * (1d + (targetInternalSkill?.DefenceRatio ?? 0d))
             + target.GetStat(StatType.Defence);
 
-        var ruleSettings = context.RuleSettings ?? BattleDamageRuleSettings.Neutral;
-        ApplyBattleDamageRuleSettings(ruleSettings, source, target, ref attackLow, ref attackHigh, ref defence);
+        var ruleSettings = context.RuleSettings ?? BattleRuleSettings.Neutral;
+        ApplyBattleRuleSettings(ruleSettings, source, target, ref attackLow, ref attackHigh, ref defence);
 
         damageContext.AttackLow = attackLow;
         damageContext.AttackHigh = attackHigh;
@@ -217,8 +217,8 @@ public sealed class BattleDamageCalculator
             _ => throw new InvalidOperationException($"Unsupported skill weapon type '{weaponType}'."),
         };
 
-    private static void ApplyBattleDamageRuleSettings(
-        BattleDamageRuleSettings settings,
+    private static void ApplyBattleRuleSettings(
+        BattleRuleSettings settings,
         BattleUnit source,
         BattleUnit target,
         ref double attackLow,
@@ -266,7 +266,7 @@ public sealed record BattleDamageContext(
     BattleUnit Source,
     BattleUnit Target,
     SkillInstance Skill,
-    BattleDamageRuleSettings? RuleSettings = null);
+    BattleRuleSettings? RuleSettings = null);
 
 public sealed record BattleDamageResult(
     int Amount,
