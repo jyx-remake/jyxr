@@ -444,10 +444,17 @@ public sealed class BattleService
             }
 
             var definition = ContentRepository.GetCharacter(participant.CharacterId);
-            return CharacterMapper.CreateInitial(
+            var character = CharacterMapper.CreateInitial(
                 $"battle_{index}_{definition.Id}",
                 definition,
                 tempFactory);
+            if (participant.Team != PlayerTeam)
+            {
+                ApplyDifficultyRandomTalents(character);
+                character.RebuildSnapshot();
+            }
+
+            return character;
         }
 
         if (participant.PartyIndex is not { } partyIndex ||
