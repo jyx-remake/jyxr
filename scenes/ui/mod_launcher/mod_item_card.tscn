@@ -157,7 +157,7 @@ theme_override_constants/separation = 8
 
 [node name="StartButton" type="Button" parent="Content/Rows/Actions" unique_id=1116525692]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(108, 38)
+custom_minimum_size = Vector2(140, 140)
 layout_mode = 2
 focus_mode = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -169,6 +169,7 @@ text = "启动"
 
 [node name="DownloadButton" type="Button" parent="Content/Rows/Actions" unique_id=519261549]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(108, 38)
 layout_mode = 2
 focus_mode = 0
@@ -181,6 +182,7 @@ text = "更新"
 
 [node name="DeleteButton" type="Button" parent="Content/Rows/Actions" unique_id=1590838283]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(108, 38)
 layout_mode = 2
 focus_mode = 0
