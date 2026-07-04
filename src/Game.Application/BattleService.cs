@@ -831,8 +831,11 @@ public sealed class BattleService
         }
 
         var maxResourceBonus = checked(level * 2000);
-        character.AddBaseStat(StatType.MaxHp, maxResourceBonus + character.GetBaseStat(StatType.MaxHp) * level / 10);
-        character.AddBaseStat(StatType.MaxMp, maxResourceBonus + character.GetBaseStat(StatType.MaxMp) * level / 10);
+        var resourceMultiplier = (int)(1.0d + level * 0.1d);
+        var maxHp = character.GetBaseStat(StatType.MaxHp);
+        var maxMp = character.GetBaseStat(StatType.MaxMp);
+        character.AddBaseStat(StatType.MaxHp, checked(maxHp * resourceMultiplier + maxResourceBonus - maxHp));
+        character.AddBaseStat(StatType.MaxMp, checked(maxMp * resourceMultiplier + maxResourceBonus - maxMp));
 
         foreach (var stat in new[]
         {
@@ -851,20 +854,14 @@ public sealed class BattleService
             character.AddBaseStat(stat, Random.Shared.Next(level * 2, level * 4 + 1));
         }
 
-        var skillLevelBonus = level < 5
-            ? 0
-            : Random.Shared.Next(level / 5, Math.Max(level / 5 + 1, level / 3 + 1));
-        if (skillLevelBonus > 0)
+        foreach (var skill in character.ExternalSkills)
         {
-            foreach (var skill in character.ExternalSkills)
-            {
-                skill.Level += skillLevelBonus;
-            }
+            skill.Level += Random.Shared.Next(level / 5, level / 3 + 1);
+        }
 
-            foreach (var skill in character.InternalSkills)
-            {
-                skill.Level += skillLevelBonus;
-            }
+        foreach (var skill in character.InternalSkills)
+        {
+            skill.Level += Random.Shared.Next(level / 5, level / 3 + 1);
         }
 
         character.RebuildSnapshot();
