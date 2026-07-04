@@ -413,6 +413,12 @@ public sealed partial class JsonContentLoader
         string ownerName)
     {
         var hasRange = effect.DeltaMin is not null || effect.DeltaMax is not null;
+        if (effect.DeltaPowerBasePerBuffLevel is { } powerBase)
+        {
+            Ensure(powerBase > 0d,
+                $"{ownerName} modify_damage_context effect has invalid deltaPowerBasePerBuffLevel '{powerBase}'.");
+        }
+
         if (!hasRange)
         {
             return;

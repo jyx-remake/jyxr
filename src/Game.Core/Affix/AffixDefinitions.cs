@@ -165,6 +165,7 @@ public sealed record ModifyDamageContextBattleHookEffectDefinition(
     double Delta = 0d,
     double DeltaPerUnitLevel = 0d,
     double DeltaPerBuffLevel = 0d,
+    double? DeltaPowerBasePerBuffLevel = null,
     double? DeltaMin = null,
     double? DeltaMax = null) : BattleEffectDefinition;
 

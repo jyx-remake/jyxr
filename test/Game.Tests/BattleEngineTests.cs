@@ -2364,6 +2364,74 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_BuffDamageContextHookCanScaleDeltaExponentiallyByBuffLevel()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 5000);
+        var damageDeepening = new BuffDefinition
+        {
+            Id = "伤害加深",
+            Name = "伤害加深",
+            IsDebuff = true,
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeDamageCalculation,
+                    Conditions =
+                    [
+                        new ContextUnitRelationBattleHookConditionDefinition(
+                            BattleHookContextUnitRole.Source,
+                            BattleHookRelation.Enemy),
+                    ],
+                    Effects =
+                    [
+                        new ModifyDamageContextBattleHookEffectDefinition(
+                            BattleDamageContextField.SourceAttack,
+                            ModifierOp.More,
+                            1d,
+                            DeltaPowerBasePerBuffLevel: 1.15d),
+                    ],
+                },
+            ],
+        };
+        target.ApplyBuff(new BattleBuffInstance(
+            damageDeepening,
+            level: 10,
+            remainingTurns: 3,
+            sourceUnitId: source.Id,
+            appliedAtActionSerial: 0));
+        var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
+        var expectedContext = calculator.CreateSkillDamageContext(new BattleDamageContext(source, target, source.Character.GetExternalSkills().Single()));
+        expectedContext.AddModifier(BattleDamageContextField.SourceAttack, ModifierOp.More, Math.Pow(1.15d, 10d));
+        var expected = calculator.CalculateSkillDamage(expectedContext).Amount;
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(calculator);
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(5000 - expected, target.Hp);
+    }
+
+    [Fact]
     public void CastSkill_AggregatesDamageContextHookModifiersBeforeDamageRoll()
     {
         var skillDefinition = TestContentFactory.CreateExternalSkill(

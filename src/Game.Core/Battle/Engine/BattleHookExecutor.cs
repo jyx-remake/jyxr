@@ -238,6 +238,11 @@ public sealed class BattleHookExecutor
         var delta = ResolveDamageContextDelta(context, effect)
             + effect.DeltaPerUnitLevel * context.Unit.Character.Level
             + effect.DeltaPerBuffLevel * (context.Buff?.Level ?? 0);
+        if (effect.DeltaPowerBasePerBuffLevel is { } powerBase)
+        {
+            delta *= Math.Pow(powerBase, context.Buff?.Level ?? 0);
+        }
+
         damageCalculation.AddModifier(effect.Field, effect.Op, delta);
     }
 
