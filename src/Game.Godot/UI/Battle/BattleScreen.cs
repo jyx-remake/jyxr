@@ -574,7 +574,7 @@ public partial class BattleScreen : Control
 			throw new InvalidOperationException("BattleSkillBox scene root must be BattleSkillBox.");
 		}
 
-		button.Setup(skillView.Skill, ReferenceEquals(_uiState.SelectedSkill, skillView.Skill), skillView.IsAvailable);
+		button.Setup(skillView.Skill, ReferenceEquals(_uiState.SelectedSkill, skillView.Skill), skillView.Availability);
 		button.ButtonGroup = _skillButtonGroup;
 		button.TooltipText = BuildSkillTooltip(skillView);
 		if (skillView.IsAvailable)

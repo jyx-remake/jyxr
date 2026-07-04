@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cao7kwtub078m" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="2_tooltip"]
 [ext_resource type="Texture2D" uid="uid://iuhrh668ir72" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_avatar"]
 [ext_resource type="FontFile" uid="uid://dhqmakafvt2fy" path="res://assets/font/行楷简.otf" id="4_font"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/battle/fengyin.png" id="5_seal"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_button"]
 
@@ -83,6 +84,20 @@ layout_mode = 2
 texture = ExtResource("3_avatar")
 expand_mode = 1
 stretch_mode = 4
+
+[node name="SealOverlay" type="TextureRect" parent="Panel" unique_id=1059044554]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_seal")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="." unique_id=2144378873]
 unique_name_in_owner = true

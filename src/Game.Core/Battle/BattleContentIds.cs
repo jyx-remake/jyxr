@@ -13,6 +13,11 @@ internal static class BattleContentIds
     public const string Slow = "缓速";
     public const string LightBody = "轻身";
     public const string Blind = "致盲";
+    public const string AllSkillSeal = "诸般封印";
+    public const string QuanzhangSeal = "拳掌封印";
+    public const string JianfaSeal = "剑封印";
+    public const string DaofaSeal = "刀封印";
+    public const string QimenSeal = "奇门封印";
     
     public const string PoisonResistance = "毒素抗性";
     public const string ClearMind = "清心";

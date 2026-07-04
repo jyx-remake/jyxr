@@ -1,4 +1,5 @@
 using Game.Core.Model.Skills;
+using Game.Core.Battle;
 using Game.Godot.Assets;
 using Game.Godot.UI;
 using Godot;
@@ -13,25 +14,28 @@ public partial class BattleSkillBox : Button
 	public PackedScene TooltipScene { get; set; } = null!;
 
 	private TextureRect _avatar = null!;
+	private TextureRect _sealOverlay = null!;
 	private Label _nameLabel = null!;
 	private Label _formNameLabel = null!;
 
 	private SkillInstance? _skill;
-	private bool _available = true;
+	private BattleSkillAvailability? _availability;
 
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_sealOverlay = GetNode<TextureRect>("%SealOverlay");
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_formNameLabel = GetNode<Label>("%FormNameLabel");
 		Refresh();
 	}
 
-	public void Setup(SkillInstance skill, bool selected, bool available)
+	public void Setup(SkillInstance skill, bool selected, BattleSkillAvailability availability)
 	{
 		ArgumentNullException.ThrowIfNull(skill);
+		ArgumentNullException.ThrowIfNull(availability);
 		_skill = skill;
-		_available = available;
+		_availability = availability;
 		SetPressedNoSignal(selected);
 		TooltipText = skill.Name;
 		Refresh();
@@ -60,14 +64,16 @@ public partial class BattleSkillBox : Button
 			return;
 		}
 
-		Disabled = !_available;
-		MouseDefaultCursorShape = _available
+		var available = _availability?.IsAvailable == true;
+		Disabled = !available;
+		MouseDefaultCursorShape = available
 			? CursorShape.PointingHand
 			: CursorShape.Arrow;
-		Modulate = _available
+		Modulate = available
 			? Colors.White
 			: DisabledModulate;
 		_avatar.Texture = AssetResolver.LoadSkillIconResource(_skill.Icon);
+		_sealOverlay.Visible = _availability?.IsSealed == true;
 		ApplySplitName(_skill.Name);
 	}
 
