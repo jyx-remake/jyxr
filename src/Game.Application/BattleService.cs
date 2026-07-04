@@ -43,6 +43,7 @@ public sealed class BattleService
     private IContentRepository ContentRepository => _session.ContentRepository;
     private CharacterService CharacterService => _session.CharacterService;
     private ProfileService ProfileService => _session.ProfileService;
+    private SkillMaxLevelPolicy SkillMaxLevelPolicy => _session.SkillMaxLevelPolicy;
     private int PlayerTeam => _session.Config.BattlePlayerTeam;
     private GameConfig Config => _session.Config;
 
@@ -200,6 +201,7 @@ public sealed class BattleService
             state,
             ContentRepository,
             _session.Config,
+            SkillMaxLevelPolicy,
             State.Adventure.Difficulty,
             State.Adventure.Round,
             PlayerTeam,
@@ -616,6 +618,7 @@ public sealed class BattleService
     {
         var candidates = ContentRepository.GetExternalSkills()
             .Where(predicate)
+            .Where(skill => SkillMaxLevelPolicy.GetExternalSkillMaxLevelWithoutRoundBonus(skill.Id) < Config.AbsoluteSkillMaxLevel)
             .ToArray();
         if (candidates.Length == 0)
         {

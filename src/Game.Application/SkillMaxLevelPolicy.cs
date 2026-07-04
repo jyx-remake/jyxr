@@ -59,6 +59,12 @@ public sealed class SkillMaxLevelPolicy
     public int GetInternalSkillMaxLevel(string skillId) =>
         ResolveMaxLevel(_configProvider().BaseInternalSkillMaxLevel, skillId);
 
+    public int GetExternalSkillMaxLevelWithoutRoundBonus(string skillId) =>
+        ResolveMaxLevelWithoutRoundBonus(_configProvider().BaseExternalSkillMaxLevel, skillId);
+
+    public int GetInternalSkillMaxLevelWithoutRoundBonus(string skillId) =>
+        ResolveMaxLevelWithoutRoundBonus(_configProvider().BaseInternalSkillMaxLevel, skillId);
+
     public int GetMaxLevelCommandRoundBonus()
     {
         var config = _configProvider();
@@ -67,12 +73,25 @@ public sealed class SkillMaxLevelPolicy
 
     private int ResolveMaxLevel(int baseMaxLevel, string skillId)
     {
+        var config = _configProvider();
+        var roundBonus = CalculateRoundBonus(_roundProvider(), config.RoundsPerMaxSkillLevelIncrease);
+        return ResolveMaxLevelCore(config, baseMaxLevel, skillId, roundBonus);
+    }
+
+    private int ResolveMaxLevelWithoutRoundBonus(int baseMaxLevel, string skillId) =>
+        ResolveMaxLevelCore(_configProvider(), baseMaxLevel, skillId, roundBonus: 0);
+
+    private int ResolveMaxLevelCore(
+        GameConfig config,
+        int baseMaxLevel,
+        string skillId,
+        int roundBonus)
+    {
         ArgumentOutOfRangeException.ThrowIfLessThan(baseMaxLevel, 1);
         ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
-        var config = _configProvider();
+        ArgumentOutOfRangeException.ThrowIfNegative(roundBonus);
         var absoluteMaxLevel = config.AbsoluteSkillMaxLevel;
         ArgumentOutOfRangeException.ThrowIfLessThan(absoluteMaxLevel, 1);
-        var roundBonus = CalculateRoundBonus(_roundProvider(), config.RoundsPerMaxSkillLevelIncrease);
         return Math.Min(
             checked(baseMaxLevel + _profileProvider().GetSkillMaxLevelBonus(skillId) + roundBonus),
             absoluteMaxLevel);

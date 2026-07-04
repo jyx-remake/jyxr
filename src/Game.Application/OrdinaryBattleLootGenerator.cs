@@ -13,6 +13,7 @@ public static class OrdinaryBattleLootGenerator
         BattleState state,
         IContentRepository contentRepository,
         GameConfig config,
+        SkillMaxLevelPolicy skillMaxLevelPolicy,
         GameDifficulty difficulty,
         int round,
         int playerTeam,
@@ -21,6 +22,7 @@ public static class OrdinaryBattleLootGenerator
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(contentRepository);
         ArgumentNullException.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(skillMaxLevelPolicy);
         ArgumentOutOfRangeException.ThrowIfLessThan(round, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(dropChance, 0d);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(dropChance, 1d);
@@ -38,6 +40,7 @@ public static class OrdinaryBattleLootGenerator
                 drops,
                 contentRepository,
                 config,
+                skillMaxLevelPolicy,
                 difficulty,
                 round,
                 enemyUnit.Character.Level);
@@ -80,6 +83,7 @@ public static class OrdinaryBattleLootGenerator
         List<OrdinaryBattleRewardDrop> drops,
         IContentRepository contentRepository,
         GameConfig config,
+        SkillMaxLevelPolicy skillMaxLevelPolicy,
         GameDifficulty difficulty,
         int round,
         int enemyLevel)
@@ -87,7 +91,11 @@ public static class OrdinaryBattleLootGenerator
         var externalDropChance = ResolveExternalSkillFragmentDropChance(config, difficulty, round);
         if (Probability.RollChance(externalDropChance))
         {
-            var candidates = ResolveExternalSkillFragmentCandidates(contentRepository, config, enemyLevel);
+            var candidates = ResolveExternalSkillFragmentCandidates(
+                contentRepository,
+                config,
+                skillMaxLevelPolicy,
+                enemyLevel);
             if (candidates.Count > 0)
             {
                 var skill = PickRandom(candidates);
@@ -102,7 +110,11 @@ public static class OrdinaryBattleLootGenerator
 
         if (Probability.RollChance(externalDropChance / config.CanzhangDropRateInternalRate))
         {
-            var candidates = ResolveInternalSkillFragmentCandidates(contentRepository, config, enemyLevel);
+            var candidates = ResolveInternalSkillFragmentCandidates(
+                contentRepository,
+                config,
+                skillMaxLevelPolicy,
+                enemyLevel);
             if (candidates.Count > 0)
             {
                 var skill = PickRandom(candidates);
@@ -126,6 +138,7 @@ public static class OrdinaryBattleLootGenerator
     private static IReadOnlyList<ExternalSkillDefinition> ResolveExternalSkillFragmentCandidates(
         IContentRepository contentRepository,
         GameConfig config,
+        SkillMaxLevelPolicy skillMaxLevelPolicy,
         int enemyLevel)
     {
         var levelHardLimit = ResolveSkillFragmentLevelHardLimit(config, enemyLevel);
@@ -134,20 +147,35 @@ public static class OrdinaryBattleLootGenerator
             .Where(skill => skill.Hard < levelHardLimit)
             .Where(skill => enemyLevel < 30 || skill.Hard >= 5d)
             .Where(skill => enemyLevel < 20 || skill.Hard >= 3d)
+            .Where(skill => !IsExternalSkillMaxed(config, skillMaxLevelPolicy, skill))
             .ToArray();
     }
 
     private static IReadOnlyList<InternalSkillDefinition> ResolveInternalSkillFragmentCandidates(
         IContentRepository contentRepository,
         GameConfig config,
+        SkillMaxLevelPolicy skillMaxLevelPolicy,
         int enemyLevel)
     {
         var levelHardLimit = ResolveSkillFragmentLevelHardLimit(config, enemyLevel);
         return contentRepository.GetInternalSkills()
             .Where(skill => skill.Hard < config.CanzhangMaxHardInternalSkill)
             .Where(skill => skill.Hard < levelHardLimit)
+            .Where(skill => !IsInternalSkillMaxed(config, skillMaxLevelPolicy, skill))
             .ToArray();
     }
+
+    private static bool IsExternalSkillMaxed(
+        GameConfig config,
+        SkillMaxLevelPolicy skillMaxLevelPolicy,
+        ExternalSkillDefinition skill) =>
+        skillMaxLevelPolicy.GetExternalSkillMaxLevelWithoutRoundBonus(skill.Id) >= config.AbsoluteSkillMaxLevel;
+
+    private static bool IsInternalSkillMaxed(
+        GameConfig config,
+        SkillMaxLevelPolicy skillMaxLevelPolicy,
+        InternalSkillDefinition skill) =>
+        skillMaxLevelPolicy.GetInternalSkillMaxLevelWithoutRoundBonus(skill.Id) >= config.AbsoluteSkillMaxLevel;
 
     private static double ResolveSkillFragmentLevelHardLimit(GameConfig config, int enemyLevel) =>
         enemyLevel >= config.MaxLevel
