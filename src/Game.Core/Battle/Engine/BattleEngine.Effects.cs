@@ -158,6 +158,11 @@ public sealed partial class BattleEngine
         int duration,
         string detail)
     {
+        if (buffDefinition.IsDebuff && target.HasBuff(BattleContentIds.HolyWar))
+        {
+            return false;
+        }
+
         var instance = new BattleBuffInstance(
             buffDefinition,
             level,

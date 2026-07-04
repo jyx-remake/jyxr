@@ -18,6 +18,7 @@ internal static class BattleContentIds
     public const string JianfaSeal = "剑封印";
     public const string DaofaSeal = "刀封印";
     public const string QimenSeal = "奇门封印";
+    public const string HolyWar = "圣战";
     
     public const string ClearMind = "清心";
     public const string Breeze = "清风";
