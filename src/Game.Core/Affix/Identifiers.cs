@@ -55,7 +55,8 @@ public enum TraitId
     IgnoreItemCooldown,
     Ghost,
     BroadLearning,
-    MindEye
+    MindEye,
+    PoisonResistance
 }
 
 public enum BattleDamageContextField

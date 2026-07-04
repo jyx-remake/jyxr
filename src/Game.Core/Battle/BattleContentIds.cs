@@ -19,7 +19,6 @@ internal static class BattleContentIds
     public const string DaofaSeal = "刀封印";
     public const string QimenSeal = "奇门封印";
     
-    public const string PoisonResistance = "毒素抗性";
     public const string ClearMind = "清心";
     public const string Breeze = "清风";
 }

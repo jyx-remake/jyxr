@@ -558,7 +558,7 @@ public sealed partial class BattleEngine
             damage = Math.Max(0, unit.Hp - 1);
         }
 
-        if (unit.Character.HasEffectiveTalent(BattleContentIds.PoisonResistance))
+        if (unit.HasTrait(TraitId.PoisonResistance))
         {
             damage /= 2;
         }
