@@ -25,7 +25,6 @@ public partial class InputNamePanel : Control
 	{
 		_hintLabel.Text = $"请输入{characterId}名称";
 		_nameEdit.Text = defaultName;
-		_nameEdit.GrabFocus();
 
 		using var registration = cancellationToken.CanBeCanceled
 			? cancellationToken.Register(() =>
