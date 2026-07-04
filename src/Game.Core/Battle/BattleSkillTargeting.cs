@@ -1,3 +1,4 @@
+using Game.Core.Affix;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
 
@@ -5,6 +6,22 @@ namespace Game.Core.Battle;
 
 public static class BattleSkillTargeting
 {
+    public static int ResolveEffectiveCastSize(BattleUnit source, SkillInstance skill)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(skill);
+
+        return ApplyBlindPenalty(source, skill.CastSize);
+    }
+
+    public static int ResolveEffectiveImpactSize(BattleUnit source, SkillInstance skill)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(skill);
+
+        return ApplyBlindPenalty(source, skill.ImpactSize);
+    }
+
     public static IReadOnlyList<BattleUnit> ResolveEffectiveTargets(
         BattleState state,
         BattleUnit source,
@@ -46,5 +63,18 @@ public static class BattleSkillTargeting
         }
 
         return targets;
+    }
+
+    private static int ApplyBlindPenalty(BattleUnit source, int originalSize)
+    {
+        if (originalSize <= 0 ||
+            source.HasTrait(TraitId.MindEye) ||
+            source.TryGetBuff(BattleContentIds.Blind) is not { } blind)
+        {
+            return originalSize;
+        }
+
+        var penalty = (int)(blind.Level * 1.5d);
+        return Math.Max(1, originalSize - penalty);
     }
 }

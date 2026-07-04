@@ -348,7 +348,9 @@ public partial class BattleScreen : Control
 
 	private BoardHighlights ResolveSkillHighlights(BattleState state, BattleUnit actingUnit, SkillInstance skill)
 	{
-		var skillTargets = EnumerateDiamond(actingUnit.Position, skill.CastSize)
+		var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(actingUnit, skill);
+		var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(actingUnit, skill);
+		var skillTargets = EnumerateDiamond(actingUnit.Position, castSize)
 			.Where(state.Grid.Contains)
 			.ToHashSet();
 		var possibleImpacts = new HashSet<GridPosition>();
@@ -358,7 +360,7 @@ public partial class BattleScreen : Control
 				actingUnit.Position,
 				target,
 				skill.ImpactType,
-				skill.ImpactSize).Where(state.Grid.Contains))
+				impactSize).Where(state.Grid.Contains))
 			{
 				possibleImpacts.Add(impactPosition);
 			}
@@ -369,7 +371,7 @@ public partial class BattleScreen : Control
 					actingUnit.Position,
 					hoveredPosition,
 					skill.ImpactType,
-					skill.ImpactSize)
+					impactSize)
 				.Where(state.Grid.Contains)
 				.ToHashSet()
 			: new HashSet<GridPosition>();

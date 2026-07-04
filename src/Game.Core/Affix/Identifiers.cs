@@ -54,7 +54,8 @@ public enum TraitId
     CanUseItemOnAlly,
     IgnoreItemCooldown,
     Ghost,
-    BroadLearning
+    BroadLearning,
+    MindEye
 }
 
 public enum BattleDamageContextField

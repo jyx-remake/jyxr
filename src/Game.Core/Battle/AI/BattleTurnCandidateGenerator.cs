@@ -44,9 +44,11 @@ public sealed class BattleTurnCandidateGenerator
                     continue;
                 }
 
-                foreach (var target in BattleSkillTargeting.EnumerateCastTargets(destination, skill.CastSize, state.Grid))
+                var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, skill);
+                var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, skill);
+                foreach (var target in BattleSkillTargeting.EnumerateCastTargets(destination, castSize, state.Grid))
                 {
-                    var impactedPositions = BattleEngine.GetImpactPositions(destination, target, skill.ImpactType, skill.ImpactSize)
+                    var impactedPositions = BattleEngine.GetImpactPositions(destination, target, skill.ImpactType, impactSize)
                         .Where(state.Grid.Contains)
                         .ToHashSet();
                     var targets = ResolveTargetsAtPosition(state, unit, skill, impactedPositions);

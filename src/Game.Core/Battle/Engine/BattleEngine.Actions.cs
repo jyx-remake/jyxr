@@ -51,7 +51,9 @@ public sealed partial class BattleEngine
             return BattleActionResult.Failed("Not enough rage.");
         }
 
-        if (unit.Position.ManhattanDistanceTo(target) > skill.CastSize)
+        var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, resolvedSkill);
+        var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, resolvedSkill);
+        if (unit.Position.ManhattanDistanceTo(target) > castSize)
         {
             return BattleActionResult.Failed("Target is out of cast range.");
         }
@@ -72,7 +74,7 @@ public sealed partial class BattleEngine
         resolvedSkill.CurrentCooldown = resolvedSkill.Cooldown;
         UpdateFacingByTarget(unit, target);
 
-        var impactedPositions = ResolveImpactPositions(unit.Position, target, resolvedSkill.ImpactType, resolvedSkill.ImpactSize)
+        var impactedPositions = ResolveImpactPositions(unit.Position, target, resolvedSkill.ImpactType, impactSize)
             .Where(state.Grid.Contains)
             .ToHashSet();
         var targets = BattleSkillTargeting.ResolveEffectiveTargets(state, unit, resolvedSkill, impactedPositions);
