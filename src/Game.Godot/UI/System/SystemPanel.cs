@@ -340,6 +340,11 @@ public partial class SystemPanel : Control
 
 	private void AppendConsoleLine(string source, string message)
 	{
+		if (!CanAppendConsoleLine())
+		{
+			return;
+		}
+
 		_consoleLines.Add($"[color=#513523]{source}[/color]  {message}");
 		while (_consoleLines.Count > MaxConsoleLineCount)
 		{
@@ -352,6 +357,12 @@ public partial class SystemPanel : Control
 			_consoleOutput.AppendText(line + "\n");
 		}
 	}
+
+	private bool CanAppendConsoleLine() =>
+		GodotObject.IsInstanceValid(this)
+		&& IsInsideTree()
+		&& _consoleOutput is not null
+		&& GodotObject.IsInstanceValid(_consoleOutput);
 
 	private static string FormatInvocation(StoryCommandInvocation invocation)
 	{
