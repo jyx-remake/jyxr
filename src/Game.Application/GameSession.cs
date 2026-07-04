@@ -33,6 +33,7 @@ public sealed class GameSession
         Settings = settings ?? new GameSettings();
         ContentRepository = contentRepository;
         SkillMaxLevelPolicy = new SkillMaxLevelPolicy(this);
+        CharacterResourceLimitPolicy = new CharacterResourceLimitPolicy(this);
         SaveGameService = new SaveGameService(this, logger);
         ProfileService = new ProfileService(this, logger);
         SessionFlowService = new SessionFlowService(this);
@@ -58,6 +59,7 @@ public sealed class GameSession
     public GameSettings Settings { get; }
     public IContentRepository ContentRepository { get; }
     public SkillMaxLevelPolicy SkillMaxLevelPolicy { get; }
+    public CharacterResourceLimitPolicy CharacterResourceLimitPolicy { get; }
     public SaveGameService SaveGameService { get; }
     public ProfileService ProfileService { get; }
     public SessionFlowService SessionFlowService { get; }

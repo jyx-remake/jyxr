@@ -21,6 +21,7 @@ public sealed class CharacterService
     private IContentRepository ContentRepository => _session.ContentRepository;
     private GameConfig Config => _session.Config;
     private SkillMaxLevelPolicy SkillMaxLevelPolicy => _session.SkillMaxLevelPolicy;
+    private CharacterResourceLimitPolicy CharacterResourceLimitPolicy => _session.CharacterResourceLimitPolicy;
 
     public void RenameCharacter(string characterId, string name)
     {
@@ -79,7 +80,14 @@ public sealed class CharacterService
     public void AddBaseStat(string characterId, string statName, int value)
     {
         var character = GetPartyMember(characterId);
-        character.AddBaseStat(StatCatalog.Parse(statName), value);
+        var statType = StatCatalog.Parse(statName);
+        character.AddBaseStat(statType, value);
+        if (CharacterResourceLimitPolicy.IsBaseResourceStat(statType))
+        {
+            CharacterResourceLimitPolicy.ClampBaseResourceStat(character, statType);
+            character.ClampBattleResources();
+        }
+
         PublishToastAndCharacterChanged(character, $"{character.Name} {statName} {value:+0;-0;0}");
     }
 
@@ -101,6 +109,8 @@ public sealed class CharacterService
                 character.AddBaseStat(statType, delta);
             }
         }
+        CharacterResourceLimitPolicy.ClampBaseResourceStats(character);
+        character.ClampBattleResources();
 
         var currentPoints = character.UnspentStatPoints;
         var targetPoints = (int)(currentPoints * ratio);
@@ -141,6 +151,9 @@ public sealed class CharacterService
             () => ResolveGrowTemplate(character));
         if (change.LeveledUp)
         {
+            CharacterResourceLimitPolicy.ClampBaseResourceStats(character);
+            character.ClampBattleResources();
+
             _session.Events.Publish(new CharacterLeveledUpEvent(character.Id, change.OldLevel, change.NewLevel));
         }
 

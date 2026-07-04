@@ -139,7 +139,8 @@ text = "门派：[color=red]无门派[/color]
 道德：[color=red]0[/color]
 女主角好感：[color=red]0[/color]
 难度：[color=red]简单[/color]
-周目：[color=red]1[/color]"
+周目：[color=red]1[/color]
+血内上限：[color=red]10000[/color]"
 fit_content = true
 
 [node name="AchievementTab" type="Control" parent="ContentRoot/HeroTabContainer" index="2" unique_id=728918971]

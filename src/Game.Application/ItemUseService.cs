@@ -17,6 +17,7 @@ public sealed class ItemUseService
     private GameState State => _session.State;
     private GameConfig Config => _session.Config;
     private SkillMaxLevelPolicy SkillMaxLevelPolicy => _session.SkillMaxLevelPolicy;
+    private CharacterResourceLimitPolicy CharacterResourceLimitPolicy => _session.CharacterResourceLimitPolicy;
 
     public ItemUseAnalysis Analyze(InventoryEntry entry)
     {
@@ -187,7 +188,8 @@ public sealed class ItemUseService
             }
         }
 
-        target.RebuildSnapshot();
+        CharacterResourceLimitPolicy.ClampBaseResourceStats(target);
+        target.ClampBattleResources();
         _session.InventoryService.RemoveItem(entry.Definition);
         _session.Events.Publish(new CharacterChangedEvent(target.Id));
         return ItemUseResult.Succeeded($"【{target.Name}】使用【{entry.Definition.Name}】");

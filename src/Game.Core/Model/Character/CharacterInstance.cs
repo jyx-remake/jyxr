@@ -453,7 +453,7 @@ public sealed class CharacterInstance
         }
     }
 
-    private void ClampBattleResources()
+    public void ClampBattleResources()
     {
         if (CurrentHp is not null)
         {
