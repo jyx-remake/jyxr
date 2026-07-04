@@ -5,6 +5,8 @@ namespace Game.Application;
 
 public sealed class SessionFlowService
 {
+    private const int NextRoundInitialSilver = 100;
+
     private readonly GameSession _session;
     private readonly NewGameStateFactory _newGameStateFactory;
 
@@ -29,11 +31,13 @@ public sealed class SessionFlowService
     {
         var nextRound = checked(State.Adventure.Round + 1);
         var carriedChest = State.Chest.Clone(ContentRepository);
-
-        ReplaceState(_newGameStateFactory.Create(
+        var nextState = _newGameStateFactory.Create(
             Config.InitialPartyCharacterIds,
             nextRound,
-            carriedChest));
+            carriedChest);
+        nextState.Currency.AddSilver(NextRoundInitialSilver);
+
+        ReplaceState(nextState);
     }
 
     private void ReplaceState(GameState state)
