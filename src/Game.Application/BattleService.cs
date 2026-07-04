@@ -89,7 +89,8 @@ public sealed class BattleService
                     ? ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory)
                     : CreateArenaOpponentCharacter(hardLevel, index, tempFactory),
             (_, index, tempFactory) =>
-                CreateArenaOpponentCharacter(hardLevel, index + battle.Participants.Count, tempFactory));
+                CreateArenaOpponentCharacter(hardLevel, index + battle.Participants.Count, tempFactory),
+            ApplyNpcRoundPowerUp);
     }
 
     public BattleState BuildZhenlongqijuBattleState(
@@ -99,13 +100,12 @@ public sealed class BattleService
     {
         ArgumentOutOfRangeException.ThrowIfNegative(level);
 
-        var state = BuildBattleState(battle, selectedCharacterIds);
-        foreach (var enemyUnit in state.Units.Where(unit => unit.Team != PlayerTeam))
-        {
-            PowerUpZhenlongqijuEnemy(enemyUnit.Character, level);
-        }
-
-        return state;
+        return BuildBattleStateCore(
+            battle,
+            selectedCharacterIds,
+            ResolveParticipantCharacter,
+            CreateRandomParticipantCharacter,
+            character => PowerUpZhenlongqijuEnemy(character, level));
     }
 
     public BattleState BuildBattleState(BattleDefinition battle, IReadOnlyList<string> selectedCharacterIds)
@@ -117,7 +117,8 @@ public sealed class BattleService
             battle,
             selectedCharacterIds,
             ResolveParticipantCharacter,
-            CreateRandomParticipantCharacter);
+            CreateRandomParticipantCharacter,
+            ApplyNpcRoundPowerUp);
     }
 
     public OrdinaryBattleVictorySettlement PreviewVictorySettlement(
@@ -139,12 +140,14 @@ public sealed class BattleService
         BattleDefinition battle,
         IReadOnlyList<string> selectedCharacterIds,
         Func<BattleParticipantDefinition, int, IReadOnlyList<CharacterInstance?>, EquipmentInstanceFactory, CharacterInstance?> participantResolver,
-        Func<BattleRandomParticipantDefinition, int, EquipmentInstanceFactory, CharacterInstance> randomParticipantResolver)
+        Func<BattleRandomParticipantDefinition, int, EquipmentInstanceFactory, CharacterInstance> randomParticipantResolver,
+        Action<CharacterInstance> npcCharacterProcessor)
     {
         ArgumentNullException.ThrowIfNull(battle);
         ArgumentNullException.ThrowIfNull(selectedCharacterIds);
         ArgumentNullException.ThrowIfNull(participantResolver);
         ArgumentNullException.ThrowIfNull(randomParticipantResolver);
+        ArgumentNullException.ThrowIfNull(npcCharacterProcessor);
 
         var units = new List<BattleUnit>();
         var tempFactory = new EquipmentInstanceFactory();
@@ -160,6 +163,11 @@ public sealed class BattleService
                 continue;
             }
 
+            if (!IsPartyCharacterInstance(character))
+            {
+                npcCharacterProcessor(character);
+            }
+
             units.Add(CreateUnit(
                 $"participant_{index}_{character.Id}",
                 character,
@@ -171,6 +179,7 @@ public sealed class BattleService
         foreach (var (participant, index) in battle.RandomParticipants.Select(static (participant, index) => (participant, index)))
         {
             var character = randomParticipantResolver(participant, index, tempFactory);
+            npcCharacterProcessor(character);
             units.Add(CreateUnit(
                 $"random_{index}_{character.Id}",
                 character,
@@ -465,6 +474,90 @@ public sealed class BattleService
         }
 
         return slotCharacters[partyIndex];
+    }
+
+    private bool IsPartyCharacterInstance(CharacterInstance character) =>
+        State.Party.GetAllCharacters().Any(partyCharacter => ReferenceEquals(partyCharacter, character));
+
+    private void ApplyNpcRoundPowerUp(CharacterInstance character)
+    {
+        var round = State.Adventure.Round;
+        ArgumentOutOfRangeException.ThrowIfLessThan(round, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(Config.RoundEnemyHpAddRatio);
+        ArgumentOutOfRangeException.ThrowIfNegative(Config.RoundEnemyMpAddRatio);
+        ArgumentOutOfRangeException.ThrowIfLessThan(Config.RoundsPerNpcSkillLevelIncrease, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(Config.AbsoluteSkillMaxLevel, 1);
+
+        var changed = false;
+        if (round > 1)
+        {
+            changed |= ScaleNpcRoundResource(
+                character,
+                StatType.MaxHp,
+                Config.RoundEnemyHpAddRatio,
+                round);
+            changed |= ScaleNpcRoundResource(
+                character,
+                StatType.MaxMp,
+                Config.RoundEnemyMpAddRatio,
+                round);
+        }
+
+        var skillLevelBonus = round / Config.RoundsPerNpcSkillLevelIncrease;
+        if (skillLevelBonus > 0)
+        {
+            foreach (var skill in character.ExternalSkills)
+            {
+                changed |= AddNpcRoundSkillLevel(skill, skillLevelBonus);
+            }
+
+            foreach (var skill in character.InternalSkills)
+            {
+                changed |= AddNpcRoundSkillLevel(skill, skillLevelBonus);
+            }
+        }
+
+        if (changed)
+        {
+            character.RebuildSnapshot();
+        }
+    }
+
+    private static bool ScaleNpcRoundResource(
+        CharacterInstance character,
+        StatType statType,
+        double ratio,
+        int round)
+    {
+        var currentValue = character.GetBaseStat(statType);
+        if (currentValue <= 0)
+        {
+            return false;
+        }
+
+        var multiplier = 1d + ratio * (round - 1);
+        var scaledValue = checked((int)(currentValue * multiplier));
+        if (scaledValue == currentValue)
+        {
+            return false;
+        }
+
+        character.BaseStats[statType] = scaledValue;
+        return true;
+    }
+
+    private bool AddNpcRoundSkillLevel(SkillInstance skill, int bonus)
+    {
+        var targetLevel = Math.Min(
+            checked(skill.Level + bonus),
+            Config.AbsoluteSkillMaxLevel);
+        if (targetLevel == skill.Level)
+        {
+            return false;
+        }
+
+        skill.Level = targetLevel;
+        return true;
     }
 
     private void ApplyDifficultyRandomTalents(CharacterInstance character)
