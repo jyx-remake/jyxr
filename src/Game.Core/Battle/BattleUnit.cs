@@ -263,7 +263,13 @@ public sealed class BattleUnit
             speed += swift.Level * 0.2d;
         }
 
-        return Math.Clamp(speed, 0.8d, 2.5d);
+        speed = Math.Clamp(speed, 0.8d, 2.5d);
+        if (HasBuff(BattleContentIds.Stun))
+        {
+            return 0d;
+        }
+
+        return speed;
     }
 
     public int GetMovePower()

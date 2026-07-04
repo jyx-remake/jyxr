@@ -25,6 +25,11 @@ public sealed partial class BattleEngine
             throw new InvalidOperationException($"Unit '{unit.Id}' is not ready to act.");
         }
 
+        if (unit.HasBuff(BattleContentIds.Stun))
+        {
+            throw new InvalidOperationException($"Unit '{unit.Id}' is stunned and cannot act.");
+        }
+
         var context = new BattleActionContext(unit);
         state.CurrentAction = context;
         state.ActionSerial++;
@@ -48,6 +53,11 @@ public sealed partial class BattleEngine
             var ready = SelectReadyUnit(state);
             if (ready is not null)
             {
+                if (TrySkipStunnedAction(state, ready))
+                {
+                    continue;
+                }
+
                 BeginAction(state, ready.Id);
                 return ready;
             }
@@ -66,6 +76,19 @@ public sealed partial class BattleEngine
             .ThenByDescending(static unit => unit.ActionSpeed)
             .ThenBy(static unit => unit.Id, StringComparer.Ordinal)
             .FirstOrDefault();
+
+    private bool TrySkipStunnedAction(BattleState state, BattleUnit unit)
+    {
+        if (!unit.HasBuff(BattleContentIds.Stun))
+        {
+            return false;
+        }
+
+        state.ActionSerial++;
+        unit.ActionGauge = 0d;
+        AddEvent(state, new BattleEvent(BattleEventKind.ActionSkipped, unit.Id, Detail: BattleContentIds.Stun));
+        return true;
+    }
 
     private void AdvanceTimelineTick(BattleState state)
     {

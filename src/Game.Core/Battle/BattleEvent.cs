@@ -41,6 +41,7 @@ public sealed record BattleCharacterExperienceEvent(
 public enum BattleEventKind
 {
     ActionStarted,
+    ActionSkipped,
     Moved,
     MovementRolledBack,
     SkillCast,

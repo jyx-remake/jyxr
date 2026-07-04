@@ -8,6 +8,7 @@ internal static class BattleContentIds
     public const string Charge = "集气";
     public const string Paralysis = "麻痹";
     public const string Swift = "神行";
+    public const string Stun = "晕眩";
     public const string Immobilized = "定身";
     public const string Slow = "缓速";
     public const string LightBody = "轻身";

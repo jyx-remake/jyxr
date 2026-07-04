@@ -737,6 +737,7 @@ public partial class BattleScreen : Control
 			case BattleEventKind.MpDamaged:
 			case BattleEventKind.Rested:
 			case BattleEventKind.ItemUsed:
+			case BattleEventKind.ActionSkipped:
 			case BattleEventKind.SkillLeveledUp:
 			case BattleEventKind.CharacterLeveledUp:
 				presentation.EnqueueImpactFloat(() => AppendEventImmediate(battleEvent));
@@ -809,6 +810,12 @@ public partial class BattleScreen : Control
 				break;
 			case BattleEventKind.ItemUsed:
 				_boardGrid.PlayFloatText(battleEvent.UnitId, ResolveItemName(battleEvent.Detail), FloatInfoColor);
+				break;
+			case BattleEventKind.ActionSkipped:
+				var skippedUnitName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
+				var skippedBuffName = ResolveBuffName(battleEvent.Detail);
+				_boardGrid.PlayFloatText(battleEvent.UnitId, $"{skippedBuffName}中", FloatStateColor);
+				AppendLog($"{skippedUnitName} 因【{skippedBuffName}】无法行动。");
 				break;
 			case BattleEventKind.SpeechRequested:
 				if (!string.IsNullOrWhiteSpace(battleEvent.Speech?.Text))
