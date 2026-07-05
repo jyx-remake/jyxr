@@ -175,6 +175,7 @@ public static class AffixFormatter
             ModifierOp.Increase => FormatMultiplierValueCn(value.Delta),
             ModifierOp.More => FormatMoreValueCn(value.Delta),
             ModifierOp.PostAdd => FormatAdditiveValueCn(value.Delta, displaySpec),
+            ModifierOp.Override => FormatOverrideValueCn(value.Delta, displaySpec),
             _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
         };
 
@@ -206,6 +207,20 @@ public static class AffixFormatter
         return value >= 1d
             ? $"提高{percentText}%"
             : $"降低{percentText}%";
+    }
+
+    private static string FormatOverrideValueCn(double value, ValueDisplaySpec displaySpec)
+    {
+        var scaledValue = Math.Round(
+            value * displaySpec.AdditiveScale,
+            6,
+            MidpointRounding.AwayFromZero);
+        return displaySpec.Kind switch
+        {
+            ValueDisplayKind.Plain => $"设为{FormatUnsignedNumber(scaledValue)}",
+            ValueDisplayKind.Percentage => $"设为{FormatUnsignedNumber(scaledValue)}%",
+            _ => throw new ArgumentOutOfRangeException(nameof(displaySpec), displaySpec, null)
+        };
     }
 
     private static string FormatSignedNumber(double value)

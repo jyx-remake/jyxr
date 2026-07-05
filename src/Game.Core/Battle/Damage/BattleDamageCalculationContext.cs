@@ -46,9 +46,14 @@ public sealed class BattleDamageCalculationContext
     public double Evaluate(BattleDamageContextField field, double baseValue) =>
         _modifiers.TryGetValue(field, out var bucket) ? bucket.Evaluate(baseValue) : baseValue;
 
-    private readonly record struct BattleDamageModifierBucket(double Add, double Increase, double Multiplier, double PostAdd)
+    private readonly record struct BattleDamageModifierBucket(
+        double Add,
+        double Increase,
+        double Multiplier,
+        double PostAdd,
+        double? Override)
     {
-        public static BattleDamageModifierBucket Empty => new(0d, 0d, 1d, 0d);
+        public static BattleDamageModifierBucket Empty => new(0d, 0d, 1d, 0d, null);
 
         public BattleDamageModifierBucket Apply(ModifierOp op, double value) =>
             op switch
@@ -57,9 +62,10 @@ public sealed class BattleDamageCalculationContext
                 ModifierOp.Increase => this with { Increase = Increase + value },
                 ModifierOp.More => this with { Multiplier = Multiplier * value },
                 ModifierOp.PostAdd => this with { PostAdd = PostAdd + value },
+                ModifierOp.Override => this with { Override = value },
                 _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
             };
 
-        public double Evaluate(double baseValue) => (baseValue + Add) * (1d + Increase) * Multiplier + PostAdd;
+        public double Evaluate(double baseValue) => Override ?? (baseValue + Add) * (1d + Increase) * Multiplier + PostAdd;
     }
 }

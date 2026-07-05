@@ -302,6 +302,7 @@ public sealed class BattleHookExecutor
             ModifierOp.Increase => currentValue.Value * (1d + resolvedDelta),
             ModifierOp.More => currentValue.Value * resolvedDelta,
             ModifierOp.PostAdd => currentValue.Value + resolvedDelta,
+            ModifierOp.Override => resolvedDelta,
             _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
         };
 

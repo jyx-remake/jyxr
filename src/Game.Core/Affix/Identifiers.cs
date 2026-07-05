@@ -21,7 +21,9 @@ public enum ModifierOp
     [JsonStringEnumMemberName("more")]
     More,
     [JsonStringEnumMemberName("post_add")]
-    PostAdd
+    PostAdd,
+    [JsonStringEnumMemberName("override")]
+    Override
 }
 
 public enum HookTiming
@@ -119,4 +121,6 @@ public readonly record struct ModifierValue(ModifierOp Op, double Delta)
     public static ModifierValue More(double delta) => new(ModifierOp.More, delta);
 
     public static ModifierValue PostAdd(double delta) => new(ModifierOp.PostAdd, delta);
+
+    public static ModifierValue Override(double value) => new(ModifierOp.Override, value);
 }
