@@ -734,6 +734,7 @@ public partial class BattleScreen : Control
 				return true;
 			case BattleEventKind.Damaged:
 			case BattleEventKind.BuffApplied:
+			case BattleEventKind.BuffResisted:
 			case BattleEventKind.BuffRemoved:
 			case BattleEventKind.Healed:
 			case BattleEventKind.MpDamaged:
@@ -802,6 +803,12 @@ public partial class BattleScreen : Control
 				var buffTargetName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 				_boardGrid.PlayFloatText(battleEvent.UnitId, buffName, FloatStateColor);
 				AppendLog($"{buffTargetName} 获得状态【{buffName}】。");
+				break;
+			case BattleEventKind.BuffResisted:
+				var resistedBuffName = ResolveBuffName(battleEvent.Detail);
+				var resistingUnitName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
+				_boardGrid.PlayFloatText(battleEvent.UnitId, "抵抗", FloatInfoColor);
+				AppendLog($"{resistingUnitName} 抵抗了状态【{resistedBuffName}】。");
 				break;
 			case BattleEventKind.BuffRemoved:
 				var expiredBuffName = ResolveBuffName(battleEvent.Detail);

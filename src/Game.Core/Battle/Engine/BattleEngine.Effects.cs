@@ -163,6 +163,12 @@ public sealed partial class BattleEngine
             return false;
         }
 
+        if (buffDefinition.IsDebuff && RollDebuffResistance(target))
+        {
+            AddEvent(state, new BattleEvent(BattleEventKind.BuffResisted, target.Id, Detail: detail));
+            return false;
+        }
+
         var instance = new BattleBuffInstance(
             buffDefinition,
             level,
@@ -189,6 +195,12 @@ public sealed partial class BattleEngine
             context.Buff = instance;
         });
         return true;
+    }
+
+    private bool RollDebuffResistance(BattleUnit target)
+    {
+        var resistance = Math.Clamp(target.GetStat(StatType.AntiDebuff), 0d, 1d);
+        return Probability.RollChance(_random, resistance);
     }
 
     internal bool ApplyHookBuffEffect(
