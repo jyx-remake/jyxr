@@ -186,6 +186,12 @@ internal sealed class StoryRuntimeSession(
         var selectedOutcome = await host.ResolveBattleAsync(context, ct);
         if (!battle.Outcomes.TryGetValue(selectedOutcome, out var steps))
         {
+            if (selectedOutcome == BattleOutcome.Win)
+            {
+                yield return StepResult.FromEvent(new BattleResolvedEvent(context, selectedOutcome));
+                yield break;
+            }
+
             if (selectedOutcome == BattleOutcome.Lose)
             {
                 var args = Array.Empty<ExprValue>();

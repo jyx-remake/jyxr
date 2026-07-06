@@ -167,6 +167,58 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
+    public async Task RunAsync_BattleWinWithoutWinOutcomeContinuesFollowingSteps()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "battle_story",
+                            [
+                                new BattleStep(
+                                    "battle_win",
+                                    new Dictionary<BattleOutcome, IReadOnlyList<Step>>
+                                    {
+                                        [BattleOutcome.Lose] =
+                                        [
+                                            new CommandStep(
+                                                "custom_cmd",
+                                                [new LiteralExprNode(ExprValue.FromString("lost"))]),
+                                        ],
+                                    }),
+                                new CommandStep(
+                                    "custom_cmd",
+                                    [new LiteralExprNode(ExprValue.FromString("after_battle"))]),
+                            ]),
+                    ]),
+            ]);
+
+        var host = new RecordingRuntimeHost
+        {
+            BattleOutcome = BattleOutcome.Win,
+        };
+        var session = new GameSession(new GameState(), repository, host);
+
+        var events = new List<StoryEvent>();
+        await foreach (var storyEvent in session.StoryService.RunAsync("battle_story"))
+        {
+            events.Add(storyEvent);
+        }
+
+        var battleResolved = Assert.Single(events.OfType<BattleResolvedEvent>());
+        Assert.Equal(BattleOutcome.Win, battleResolved.Outcome);
+        var command = Assert.Single(host.CustomCommands);
+        Assert.Equal("custom_cmd", command.Name);
+        Assert.Equal("after_battle", command.Args[0].AsString("custom_cmd"));
+        Assert.Contains(events, static storyEvent => storyEvent is SegmentCompletedEvent);
+        Assert.True(session.State.Story.IsStoryCompleted("battle_story"));
+        Assert.Equal("battle_story", session.State.Story.LastStoryId);
+    }
+
+    [Fact]
     public async Task RunAsync_BattleLoseWithoutLoseOutcomeTerminatesSegmentWithoutCompletingIt()
     {
         var repository = TestContentFactory.CreateRepository(
