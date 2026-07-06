@@ -138,11 +138,12 @@ public sealed class BattleService
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(request);
 
+        var battle = ContentRepository.GetBattle(request.BattleId);
         return request switch
         {
             ZhenlongqijuBattleRequest zhenlongqiju =>
                 PreviewZhenlongqijuVictorySettlement(state, zhenlongqiju.Level),
-            _ => PreviewOrdinaryVictorySettlement(state),
+            _ => PreviewOrdinaryVictorySettlement(state, battle.ExperienceMultiplier),
         };
     }
 
@@ -209,14 +210,16 @@ public sealed class BattleService
     }
 
     public OrdinaryBattleVictorySettlement PreviewOrdinaryVictorySettlement(
-        BattleState state)
+        BattleState state,
+        double experienceMultiplier = 1d)
     {
         var rewardUnits = GetRewardEligiblePlayerUnits(state).ToArray();
         var settlement = OrdinaryBattleVictorySettlementCalculator.Calculate(
             state,
             _session.Config.BattleGoldDropChance,
             PlayerTeam,
-            rewardUnits.Length);
+            rewardUnits.Length,
+            experienceMultiplier);
         var drops = OrdinaryBattleLootGenerator.Generate(
             state,
             ContentRepository,

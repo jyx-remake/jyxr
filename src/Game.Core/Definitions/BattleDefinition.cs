@@ -12,6 +12,8 @@ public sealed record BattleDefinition
 
     public string? Music { get; init; }
 
+    public double ExperienceMultiplier { get; init; } = 1d;
+
     public IReadOnlyList<string> RequiredCharacterIds { get; init; } = [];
 
     public IReadOnlyList<BattleParticipantDefinition> Participants { get; init; } = [];

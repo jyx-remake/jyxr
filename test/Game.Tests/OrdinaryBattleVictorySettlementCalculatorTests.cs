@@ -58,6 +58,26 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
     }
 
     [Fact]
+    public void Calculate_AppliesExperienceMultiplierAfterMinimumExperience()
+    {
+        var state = new BattleState(
+            new BattleGrid(4, 4),
+            [
+                CreateUnit("hero", team: 1, level: 1, new GridPosition(0, 0)),
+                CreateUnit("enemy", team: 2, level: 1, new GridPosition(3, 0)),
+            ]);
+
+        var settlement = OrdinaryBattleVictorySettlementCalculator.Calculate(
+            state,
+            goldDropChance: 0d,
+            experienceMultiplier: 8d);
+
+        Assert.Equal(40, settlement.ExperiencePerMember);
+        Assert.Equal(10, settlement.Silver);
+        Assert.Equal(0, settlement.Gold);
+    }
+
+    [Fact]
     public void Calculate_RollsSingleGoldWhenChanceSucceeds()
     {
         var state = new BattleState(
@@ -109,6 +129,46 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
         var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
 
         Assert.Equal(1, settlement.Gold);
+    }
+
+    [Fact]
+    public void BattleServicePreviewVictorySettlement_UsesBattleExperienceMultiplier()
+    {
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero", level: 1);
+        var enemyDefinition = TestContentFactory.CreateCharacterDefinition("enemy", level: 1);
+        var battle = new BattleDefinition
+        {
+            Id = "training_battle",
+            Name = "training_battle",
+            MapId = "test",
+            ExperienceMultiplier = 8d,
+        };
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition, enemyDefinition],
+            battles: [battle]);
+        var state = new GameState();
+        var hero = TestContentFactory.CreateCharacterInstance(
+            "hero",
+            heroDefinition,
+            state.EquipmentInstanceFactory);
+        state.Party.AddMember(hero);
+        var enemy = TestContentFactory.CreateCharacterInstance("enemy", enemyDefinition);
+        var session = new GameSession(
+            state,
+            repository,
+            config: new GameConfig { BattleGoldDropChance = 0d });
+        var battleState = new BattleState(
+            new BattleGrid(4, 4),
+            [
+                new BattleUnit("hero", hero, 1, new GridPosition(0, 0)),
+                new BattleUnit("enemy", enemy, 2, new GridPosition(3, 0)),
+            ]);
+
+        var settlement = session.BattleService.PreviewVictorySettlement(
+            battleState,
+            new OrdinaryBattleRequest("training_battle", ["hero"]));
+
+        Assert.Equal(40, settlement.ExperiencePerMember);
     }
 
     [Fact]

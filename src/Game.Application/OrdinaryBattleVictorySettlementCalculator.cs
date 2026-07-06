@@ -14,11 +14,13 @@ public static class OrdinaryBattleVictorySettlementCalculator
         BattleState state,
         double goldDropChance,
         int playerTeam = DefaultPlayerTeam,
-        int? rewardMemberCount = null)
+        int? rewardMemberCount = null,
+        double experienceMultiplier = 1d)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentOutOfRangeException.ThrowIfLessThan(goldDropChance, 0d);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(goldDropChance, 1d);
+        ArgumentOutOfRangeException.ThrowIfLessThan(experienceMultiplier, 0d);
         if (rewardMemberCount is not null)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(rewardMemberCount.Value);
@@ -39,11 +41,12 @@ public static class OrdinaryBattleVictorySettlementCalculator
 
         var totalExperienceBudget = enemyUnits.Sum(unit =>
             CharacterLevelProgression.GetLevelUpExperience(unit.Character.Level) / 15d);
-        var experiencePerMember = playerUnitCount > 0
+        var baseExperiencePerMember = playerUnitCount > 0
             ? Math.Max(
                 MinimumExperiencePerMember,
                 (int)(totalExperienceBudget / playerUnitCount))
             : 0;
+        var experiencePerMember = (int)Math.Round(baseExperiencePerMember * experienceMultiplier);
 
         var silver = Math.Max(
             MinimumSilverReward,
