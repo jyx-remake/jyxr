@@ -21,7 +21,6 @@ public partial class ChestPanel : JyPanel
 		new("Utility", "功能道具", ItemType.Utility),
 	];
 
-	private readonly List<IDisposable> _subscriptions = [];
 	private readonly Dictionary<string, Button> _buttonsByCategoryKey = [];
 	private ChestMode _mode = ChestMode.Deposit;
 	private ChestCategory _selectedCategory = Categories[0];
@@ -61,21 +60,8 @@ public partial class ChestPanel : JyPanel
 		_depositModeButton.Pressed += () => SelectMode(ChestMode.Deposit);
 		_withdrawModeButton.Pressed += () => SelectMode(ChestMode.Withdraw);
 		_leaveButton.Pressed += QueueFree;
-		_subscriptions.Add(Game.Session.Events.Subscribe<InventoryChangedEvent>(OnInventoryChanged));
-		_subscriptions.Add(Game.Session.Events.Subscribe<ChestChangedEvent>(OnChestChanged));
-		_subscriptions.Add(Game.Session.Events.Subscribe<SaveLoadedEvent>(OnSaveLoaded));
 
 		Refresh();
-	}
-
-	public override void _ExitTree()
-	{
-		foreach (var subscription in _subscriptions)
-		{
-			subscription.Dispose();
-		}
-
-		_subscriptions.Clear();
 	}
 
 	private void SelectMode(ChestMode mode)
@@ -219,12 +205,6 @@ public partial class ChestPanel : JyPanel
 				: Colors.White;
 		}
 	}
-
-	private void OnInventoryChanged(InventoryChangedEvent _) => Refresh();
-
-	private void OnChestChanged(ChestChangedEvent _) => Refresh();
-
-	private void OnSaveLoaded(SaveLoadedEvent _) => Refresh();
 
 	private void ClearGrid()
 	{

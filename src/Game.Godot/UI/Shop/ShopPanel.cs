@@ -23,7 +23,6 @@ public partial class ShopPanel : JyPanel
 		new("Utility", "功能道具", ItemType.Utility),
 	];
 
-	private readonly List<IDisposable> _subscriptions = [];
 	private readonly Dictionary<string, Button> _buttonsByCategoryKey = [];
 	private string _shopId = string.Empty;
 	private ShopView? _shop;
@@ -73,26 +72,11 @@ public partial class ShopPanel : JyPanel
 		_buyModeButton.Pressed += () => SelectMode(ShopMode.Buy);
 		_sellModeButton.Pressed += () => SelectMode(ShopMode.Sell);
 		_leaveButton.Pressed += QueueFree;
-		_subscriptions.Add(Game.Session.Events.Subscribe<InventoryChangedEvent>(OnInventoryChanged));
-		_subscriptions.Add(Game.Session.Events.Subscribe<CurrencyChangedEvent>(OnCurrencyChanged));
-		_subscriptions.Add(Game.Session.Events.Subscribe<ProfileChangedEvent>(OnProfileChanged));
-		_subscriptions.Add(Game.Session.Events.Subscribe<ProfileLoadedEvent>(OnProfileLoaded));
-		_subscriptions.Add(Game.Session.Events.Subscribe<SaveLoadedEvent>(OnSaveLoaded));
 
 		if (!string.IsNullOrWhiteSpace(_shopId))
 		{
 			LoadShop();
 		}
-	}
-
-	public override void _ExitTree()
-	{
-		foreach (var subscription in _subscriptions)
-		{
-			subscription.Dispose();
-		}
-
-		_subscriptions.Clear();
 	}
 
 	public void Configure(string shopId)
@@ -345,16 +329,6 @@ public partial class ShopPanel : JyPanel
 		_silverLabel.Text = Game.State.Currency.Silver.ToString();
 		_goldLabel.Text = Game.Profile.Yuanbao.ToString();
 	}
-
-	private void OnInventoryChanged(InventoryChangedEvent _) => Refresh();
-
-	private void OnCurrencyChanged(CurrencyChangedEvent _) => Refresh();
-
-	private void OnProfileChanged(ProfileChangedEvent _) => Refresh();
-
-	private void OnProfileLoaded(ProfileLoadedEvent _) => Refresh();
-
-	private void OnSaveLoaded(SaveLoadedEvent _) => Refresh();
 
 	private void ClearGrid()
 	{
