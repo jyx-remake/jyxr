@@ -72,6 +72,7 @@ public static class CharacterMapper
             Model = record.Model,
             GrowTemplateId = record.GrowTemplateId,
         };
+        character.SetAiType(record.AiType);
         
         character.SetLevel(record.Level);
         character.GrantExperience(record.Experience);
@@ -138,7 +139,8 @@ public static class CharacterMapper
             character.InternalSkills.Select(skill => new InternalSkillRecord(skill.Definition.Id, skill.Level, skill.Exp, skill.IsEquipped, skill.DisabledFormSkillIds.ToList())).ToList(),
             character.EquippedItems.ToDictionary(
                 entry => entry.Key,
-                entry => EquipmentMapper.ToRecord(entry.Value)));
+                entry => EquipmentMapper.ToRecord(entry.Value)),
+            character.AiType);
 
     private static void CopyStats(IReadOnlyDictionary<StatType, int> source, Dictionary<StatType, int> target)
     {

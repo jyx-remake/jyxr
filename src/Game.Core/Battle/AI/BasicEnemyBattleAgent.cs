@@ -3,10 +3,14 @@ namespace Game.Core.Battle;
 public sealed class BasicEnemyBattleAgent : IBattleAgent
 {
     private readonly BattleTurnCandidateGenerator _candidateGenerator;
+    private readonly IBattleAiPolicyResolver _policyResolver;
 
-    public BasicEnemyBattleAgent(BattleTurnCandidateGenerator candidateGenerator)
+    public BasicEnemyBattleAgent(
+        BattleTurnCandidateGenerator candidateGenerator,
+        IBattleAiPolicyResolver policyResolver)
     {
         _candidateGenerator = candidateGenerator ?? throw new ArgumentNullException(nameof(candidateGenerator));
+        _policyResolver = policyResolver ?? throw new ArgumentNullException(nameof(policyResolver));
     }
 
     public BattleTurnPlan Decide(BattleState state, string unitId)
@@ -17,7 +21,8 @@ public sealed class BasicEnemyBattleAgent : IBattleAgent
         var unit = state.GetUnit(unitId);
         var isLowHp = unit.MaxHp > 0 && (double)unit.Hp / unit.MaxHp < 0.3d;
         var restRecovery = ResolveRestRecovery(unit);
-        var candidates = _candidateGenerator.Generate(state, unitId)
+        var policy = _policyResolver.Resolve(unit.AiType);
+        var candidates = policy.GenerateCandidates(state, unit, _candidateGenerator)
             .Select(candidate => candidate with
             {
                 Score = ScoreCandidate(candidate, isLowHp, restRecovery),

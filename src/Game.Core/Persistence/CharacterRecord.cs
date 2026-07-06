@@ -41,4 +41,5 @@ public sealed record CharacterRecord(
     IReadOnlyList<SpecialSkillRecord> SpecialSkills,
     IReadOnlyList<ExternalSkillRecord> ExternalSkills,
     IReadOnlyList<InternalSkillRecord> InternalSkills,
-    IReadOnlyDictionary<EquipmentSlotType, EquipmentRecord> EquippedItems);
+    IReadOnlyDictionary<EquipmentSlotType, EquipmentRecord> EquippedItems,
+    BattleAiType AiType = BattleAiType.Basic);

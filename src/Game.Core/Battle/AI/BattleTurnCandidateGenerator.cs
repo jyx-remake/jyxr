@@ -16,75 +16,92 @@ public sealed class BattleTurnCandidateGenerator
         _skillScorers = skillScorers ?? [new DamageSkillAiScorer()];
     }
 
-    public IReadOnlyList<BattleTurnCandidate> Generate(BattleState state, string unitId)
+    public IReadOnlyList<BattleTurnCandidate> Generate(
+        BattleState state,
+        string unitId,
+        BattleTurnCandidateGenerationOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
 
+        options ??= BattleTurnCandidateGenerationOptions.Default;
         var unit = state.GetUnit(unitId);
-        var reachablePositions = _engine.GetReachablePositions(state, unitId).Keys
-            .Append(unit.Position)
-            .Distinct()
-            .ToArray();
+        var reachablePositions = options.AllowMovement
+            ? _engine.GetReachablePositions(state, unitId).Keys
+                .Append(unit.Position)
+                .Distinct()
+                .ToArray()
+            : [unit.Position];
         var candidates = new List<BattleTurnCandidate>();
 
         foreach (var destination in reachablePositions)
         {
-            foreach (var skill in BattleSkillCatalog.CollectSelectableSkills(unit))
+            if (options.AllowSkillCandidates)
             {
-                var availability = _engine.EvaluateSkillAvailability(state, unit.Id, skill);
-                if (skill is SpecialSkillInstance || !availability.IsAvailable)
+                foreach (var skill in BattleSkillCatalog.CollectSelectableSkills(unit))
                 {
-                    continue;
-                }
-
-                var scorer = _skillScorers.FirstOrDefault(candidateScorer => candidateScorer.CanScore(skill));
-                if (scorer is null)
-                {
-                    continue;
-                }
-
-                var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, skill);
-                var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, skill);
-                foreach (var target in BattleSkillTargeting.EnumerateCastTargets(destination, castSize, state.Grid))
-                {
-                    var impactedPositions = BattleEngine.GetImpactPositions(destination, target, skill.ImpactType, impactSize)
-                        .Where(state.Grid.Contains)
-                        .ToHashSet();
-                    var targets = ResolveTargetsAtPosition(state, unit, skill, impactedPositions);
-                    if (targets.Count == 0 || targets.All(targetUnit => !state.AreEnemies(unit, targetUnit)))
+                    if (options.SkillFilter is not null && !options.SkillFilter(skill))
                     {
                         continue;
                     }
 
-                    var evaluation = scorer.Score(new BattleSkillAiContext(
-                        state,
-                        unit,
-                        skill,
-                        destination,
-                        target,
-                        targets));
-                    candidates.Add(new BattleTurnCandidate(
-                        new BattleTurnPlan(unit.Id, destination, BattleMainActionPlan.CastSkill(skill.Id, target)),
-                        Score: 0d,
-                        evaluation.EnemyDamage,
-                        evaluation.AllyDamage,
-                        evaluation.EnemyKills,
-                        evaluation.AllyKills,
-                        evaluation.EnemyHitCount,
-                        DistanceToNearestEnemy: GetDistanceToNearestEnemy(state, unit, destination)));
+                    var availability = _engine.EvaluateSkillAvailability(state, unit.Id, skill);
+                    if (skill is SpecialSkillInstance || !availability.IsAvailable)
+                    {
+                        continue;
+                    }
+
+                    var scorer = _skillScorers.FirstOrDefault(candidateScorer => candidateScorer.CanScore(skill));
+                    if (scorer is null)
+                    {
+                        continue;
+                    }
+
+                    var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, skill);
+                    var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, skill);
+                    foreach (var target in BattleSkillTargeting.EnumerateCastTargets(destination, castSize, state.Grid))
+                    {
+                        var impactedPositions = BattleEngine.GetImpactPositions(destination, target, skill.ImpactType, impactSize)
+                            .Where(state.Grid.Contains)
+                            .ToHashSet();
+                        var targets = ResolveTargetsAtPosition(state, unit, skill, impactedPositions);
+                        if (targets.Count == 0 || targets.All(targetUnit => !state.AreEnemies(unit, targetUnit)))
+                        {
+                            continue;
+                        }
+
+                        var evaluation = scorer.Score(new BattleSkillAiContext(
+                            state,
+                            unit,
+                            skill,
+                            destination,
+                            target,
+                            targets));
+                        candidates.Add(new BattleTurnCandidate(
+                            new BattleTurnPlan(unit.Id, destination, BattleMainActionPlan.CastSkill(skill.Id, target)),
+                            Score: 0d,
+                            evaluation.EnemyDamage,
+                            evaluation.AllyDamage,
+                            evaluation.EnemyKills,
+                            evaluation.AllyKills,
+                            evaluation.EnemyHitCount,
+                            DistanceToNearestEnemy: GetDistanceToNearestEnemy(state, unit, destination)));
+                    }
                 }
             }
 
-            candidates.Add(new BattleTurnCandidate(
-                new BattleTurnPlan(unit.Id, destination, BattleMainActionPlan.Rest()),
-                Score: 0d,
-                EnemyDamage: 0,
-                AllyDamage: 0,
-                EnemyKills: 0,
-                AllyKills: 0,
-                EnemyHitCount: 0,
-                DistanceToNearestEnemy: GetDistanceToNearestEnemy(state, unit, destination)));
+            if (options.AllowRestCandidates)
+            {
+                candidates.Add(new BattleTurnCandidate(
+                    new BattleTurnPlan(unit.Id, destination, BattleMainActionPlan.Rest()),
+                    Score: 0d,
+                    EnemyDamage: 0,
+                    AllyDamage: 0,
+                    EnemyKills: 0,
+                    AllyKills: 0,
+                    EnemyHitCount: 0,
+                    DistanceToNearestEnemy: GetDistanceToNearestEnemy(state, unit, destination)));
+            }
         }
 
         return candidates;

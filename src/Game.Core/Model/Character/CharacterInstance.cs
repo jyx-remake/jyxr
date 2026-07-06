@@ -22,6 +22,7 @@ public sealed class CharacterInstance
     public int? CurrentHp { get; private set; }
     public int? CurrentMp { get; private set; }
     public int CurrentRage { get; private set; }
+    public BattleAiType AiType { get; private set; } = BattleAiType.Basic;
 
     public CharacterAffixSnapshot Snapshot { get; private set; } = CharacterAffixSnapshot.Empty;
     public IReadOnlySet<TalentDefinition> EffectiveTalents => Snapshot.EffectiveTalents;
@@ -59,6 +60,11 @@ public sealed class CharacterInstance
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(level, 1);
         Level = level;
+    }
+
+    public void SetAiType(BattleAiType aiType)
+    {
+        AiType = aiType;
     }
 
     public void AllocateStat(StatType statType, int points)

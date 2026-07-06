@@ -31,6 +31,7 @@ public sealed class BattleUnit
         Team = team;
         Position = position;
         Facing = facing;
+        AiType = character.AiType;
 
         var initialMaxHp = MaxHp;
         var initialMaxMp = MaxMp;
@@ -48,6 +49,8 @@ public sealed class BattleUnit
     public GridPosition Position { get; internal set; }
 
     public BattleFacing Facing { get; internal set; }
+
+    public BattleAiType AiType { get; private set; }
 
     public int MaxHp => ResolveMaxHp();
 
@@ -74,6 +77,11 @@ public sealed class BattleUnit
     public IReadOnlyList<BattleBuffInstance> Buffs => _buffs;
 
     public IReadOnlySet<string> DisabledSkillIds => _disabledSkillIds;
+
+    public void SetAiType(BattleAiType aiType)
+    {
+        AiType = aiType;
+    }
 
     public bool HasTrait(TraitId traitId) =>
         Character.Traits.Contains(traitId)
