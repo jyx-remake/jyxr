@@ -11,8 +11,9 @@ public sealed class EquipmentRefinementService
     private const int CandidateCount = 8;
     private const string NoEquipmentStoryId = "洗练_没有装备";
     private const string CancelStoryId = "洗练选择";
-    private const string SuccessStoryId = "洗练_洗练成功";
+    private const string InsufficientYuanbaoStoryId = "洗练元宝不够";
     private const string CancelOptionText = "不替换了";
+    private const string ExitOptionText = "退出洗练";
     private const string SuccessEffectId = "音效.装备";
 
     private readonly GameSession _session;
@@ -48,47 +49,65 @@ public sealed class EquipmentRefinementService
             return StoryCommandResult.Jump(CancelStoryId);
         }
 
-        var equipment = selectedEntry.Equipment;
+        return await RunRefinementLoopAsync(host, selectedEntry.Equipment, cancellationToken);
+    }
 
-        var affixGroups = EquipmentAffixGroups.Group(equipment.ExtraAffixes);
-        var affixTexts = affixGroups
-            .Select(group => FormatAffixGroup(group.Affixes))
-            .ToArray();
-        var selectedAffixIndex = await ChooseAsync(
-            host,
-            "主角",
-            "选择要替换的旧词条",
-            affixTexts,
-            cancellationToken);
-        var affixIndex = Array.FindIndex(
-            affixTexts,
-            text => string.Equals(text, affixTexts[selectedAffixIndex], StringComparison.Ordinal));
-
-        var candidates = GenerateCandidates(equipment, affixTexts);
-        _session.ProfileService.SpendYuanbao(1);
-
-        var candidateTexts = candidates
-            .Select(candidate => FormatAffixGroup(candidate.Affixes))
-            .Append(CancelOptionText)
-            .ToArray();
-        var candidateIndex = await ChooseAsync(
-            host,
-            "主角",
-            "选择新的附加词条",
-            candidateTexts,
-            cancellationToken);
-        if (candidateIndex == candidates.Count)
+    private async ValueTask<StoryCommandResult> RunRefinementLoopAsync(
+        IRuntimeHost host,
+        EquipmentInstance equipment,
+        CancellationToken cancellationToken)
+    {
+        while (true)
         {
-            return StoryCommandResult.Jump(CancelStoryId);
-        }
+            var affixGroups = EquipmentAffixGroups.Group(equipment.ExtraAffixes);
+            var affixTexts = affixGroups
+                .Select(group => FormatAffixGroup(group.Affixes))
+                .ToArray();
+            var oldAffixOptions = affixTexts
+                .Append(ExitOptionText)
+                .ToArray();
+            var selectedAffixIndex = await ChooseAsync(
+                host,
+                "主角",
+                "选择要替换的旧词条",
+                oldAffixOptions,
+                cancellationToken);
+            if (selectedAffixIndex == affixGroups.Count)
+            {
+                return StoryCommandResult.Jump(CancelStoryId);
+            }
 
-        ReplaceAffixGroup(equipment, affixGroups[affixIndex], candidates[candidateIndex].Affixes);
-        _session.Events.Publish(new InventoryChangedEvent());
-        await host.ExecuteCommandAsync(
-            "effect",
-            [ExprValue.FromString(SuccessEffectId)],
-            cancellationToken);
-        return StoryCommandResult.Jump(SuccessStoryId);
+            if (!_session.ProfileService.CanSpendYuanbao(1))
+            {
+                return StoryCommandResult.Jump(InsufficientYuanbaoStoryId);
+            }
+
+            var candidates = GenerateCandidates(equipment, affixTexts);
+            _session.ProfileService.SpendYuanbao(1);
+
+            var candidateTexts = candidates
+                .Select(candidate => FormatAffixGroup(candidate.Affixes))
+                .Append(CancelOptionText)
+                .ToArray();
+            var candidateIndex = await ChooseAsync(
+                host,
+                "主角",
+                "选择新的附加词条",
+                candidateTexts,
+                cancellationToken);
+            if (candidateIndex == candidates.Count)
+            {
+                continue;
+            }
+
+            ReplaceAffixGroup(equipment, affixGroups[selectedAffixIndex], candidates[candidateIndex].Affixes);
+            _session.Events.Publish(new InventoryChangedEvent());
+            _session.Events.Publish(new ToastRequestedEvent("洗练成功！"));
+            await host.ExecuteCommandAsync(
+                "effect",
+                [ExprValue.FromString(SuccessEffectId)],
+                cancellationToken);
+        }
     }
 
     private IReadOnlyList<GeneratedEquipmentAffixRoll> GenerateCandidates(

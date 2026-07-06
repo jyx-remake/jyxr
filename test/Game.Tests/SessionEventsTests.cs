@@ -489,7 +489,7 @@ public sealed class SessionEventsTests
         profile.SetYuanbao(1);
         var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix])));
-        var host = new RecordingApplicationRuntimeHost(entry, 0, 8);
+        var host = new RecordingApplicationRuntimeHost(entry, 0, 8, 1);
         var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
         var publishedEvents = CollectPublishedEvents(session);
@@ -520,16 +520,16 @@ public sealed class SessionEventsTests
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [firstAffix])));
         var secondEntry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [secondAffix])));
-        var host = new RecordingApplicationRuntimeHost(secondEntry, 0, 0);
+        var host = new RecordingApplicationRuntimeHost(secondEntry, 0, 0, 1);
         var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
 
         var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
 
-        Assert.Equal("洗练_洗练成功", result.JumpTarget);
+        Assert.Equal("洗练选择", result.JumpTarget);
         Assert.Equal([firstEntry, secondEntry], host.RefinementEquipmentSelections.Single());
-        Assert.Equal(2, host.Choices.Count);
-        Assert.Equal(["暴击率 +2%"], host.Choices[0].Options.Select(static option => option.Text).ToArray());
+        Assert.Equal(3, host.Choices.Count);
+        Assert.Equal(["暴击率 +2%", "退出洗练"], host.Choices[0].Options.Select(static option => option.Text).ToArray());
         Assert.Equal([firstAffix], firstEntry.Equipment.ExtraAffixes);
         var speedAffix = Assert.IsType<StatModifierAffix>(Assert.Single(secondEntry.Equipment.ExtraAffixes));
         Assert.Equal(StatType.Speed, speedAffix.Stat);
@@ -551,14 +551,14 @@ public sealed class SessionEventsTests
         var originalEquipment = entry.Equipment;
         var originalEquipmentId = entry.Equipment.Id;
         var originalEntryNumber = entry.EntryNumber;
-        var host = new RecordingApplicationRuntimeHost(entry, 0, 0);
+        var host = new RecordingApplicationRuntimeHost(entry, 0, 0, 1);
         var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
         var publishedEvents = CollectPublishedEvents(session);
 
         var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
 
-        Assert.Equal("洗练_洗练成功", result.JumpTarget);
+        Assert.Equal("洗练选择", result.JumpTarget);
         var refinedEntry = Assert.IsType<EquipmentInstanceInventoryEntry>(Assert.Single(state.Inventory.Entries));
         Assert.Equal(originalEntryNumber, refinedEntry.EntryNumber);
         Assert.Equal(originalEquipmentId, refinedEntry.Equipment.Id);
@@ -569,6 +569,7 @@ public sealed class SessionEventsTests
         Assert.Single(publishedEvents.OfType<ProfileChangedEvent>());
         Assert.Empty(publishedEvents.OfType<CurrencyChangedEvent>());
         Assert.Single(publishedEvents.OfType<InventoryChangedEvent>());
+        Assert.Single(publishedEvents.OfType<ToastRequestedEvent>());
         Assert.Contains(host.Commands, static command => command.Name == "effect" && command.Args[0].AsString("effect") == "音效.装备");
     }
 
@@ -585,7 +586,7 @@ public sealed class SessionEventsTests
         profile.SetYuanbao(1);
         var entry = Assert.IsType<EquipmentInstanceInventoryEntry>(
             state.Inventory.AddEquipmentInstance(state.EquipmentInstanceFactory.Create(equipment, [oldAffix])));
-        var host = new RecordingApplicationRuntimeHost(entry, 0, 8);
+        var host = new RecordingApplicationRuntimeHost(entry, 0, 8, 1);
         var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
 
@@ -658,13 +659,13 @@ public sealed class SessionEventsTests
                 new StatModifierAffix(StatType.Attack, ModifierValue.Add(10)),
                 new StatModifierAffix(StatType.CritChance, ModifierValue.Add(0.02)),
             ])));
-        var host = new RecordingApplicationRuntimeHost(entry, 0, 0);
+        var host = new RecordingApplicationRuntimeHost(entry, 0, 0, 1);
         var session = new GameSession(state, repository, initialProfile: profile);
         var dispatcher = new StoryCommandDispatcher(session, host);
 
         var result = await dispatcher.ExecuteCommandAsync("xilian", [ExprValue.FromNumber(0)], default);
 
-        Assert.Equal("洗练_洗练成功", result.JumpTarget);
+        Assert.Equal("洗练选择", result.JumpTarget);
         var refinedEntry = Assert.IsType<EquipmentInstanceInventoryEntry>(Assert.Single(state.Inventory.Entries));
         Assert.Collection(
             refinedEntry.Equipment.ExtraAffixes,
@@ -678,7 +679,7 @@ public sealed class SessionEventsTests
                 var statAffix = Assert.IsType<StatModifierAffix>(affix);
                 Assert.Equal(StatType.AntiCritChance, statAffix.Stat);
             });
-        Assert.Equal(["攻击力 +10，暴击率 +2%"], host.Choices[0].Options.Select(static option => option.Text).ToArray());
+        Assert.Equal(["攻击力 +10，暴击率 +2%", "退出洗练"], host.Choices[0].Options.Select(static option => option.Text).ToArray());
     }
 
     [Fact]
