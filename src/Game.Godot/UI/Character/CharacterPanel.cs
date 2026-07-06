@@ -11,6 +11,14 @@ namespace Game.Godot.UI;
 
 public partial class CharacterPanel : JyPanel
 {
+	private static readonly IReadOnlyList<(string Label, BattleAiType Value)> BattleAiOptions =
+	[
+		("均衡", BattleAiType.Basic),
+		("练功", BattleAiType.Training),
+		("强攻", BattleAiType.AttackOnly),
+		("休息", BattleAiType.RestOnly),
+	];
+
 	private string _characterId = string.Empty;
 	private CharacterPanelMode _mode = CharacterPanelMode.Editable;
 	private CharacterInstance? _character;
@@ -40,6 +48,7 @@ public partial class CharacterPanel : JyPanel
 	private Label _xpValueLabel = null!;
 	private Label _attackValueLabel = null!;
 	private Label _defenceValueLabel = null!;
+	private OptionButton _battleAiOptionButton = null!;
 	private TabContainer _tabContainer = null!;
 	private CharacterAttributeTab _attributeTab = null!;
 	private SkillTab _skillTab = null!;
@@ -64,6 +73,7 @@ public partial class CharacterPanel : JyPanel
 		_xpValueLabel = GetNode<Label>("%XpValueLabel");
 		_attackValueLabel = GetNode<Label>("%AttackValueLabel");
 		_defenceValueLabel = GetNode<Label>("%DefenceValueLabel");
+		_battleAiOptionButton = GetNode<OptionButton>("%BattleAiOptionButton");
 		_tabContainer = GetNode<TabContainer>("%TabContainer");
 		_attributeTab = GetNode<CharacterAttributeTab>("%AttributeTab");
 		_skillTab = GetNode<SkillTab>("%SkillTab");
@@ -82,7 +92,10 @@ public partial class CharacterPanel : JyPanel
 		_biographyButton.Pressed += () => ShowTab(4);
 		_skillTab.SkillToggleRequested += OnSkillToggleRequested;
 		_skillTab.SkillDetailRequested += OnSkillDetailRequested;
+		_battleAiOptionButton.ItemSelected += OnBattleAiSelected;
 		_subscriptions.Add(Game.Session.Events.Subscribe<CharacterChangedEvent>(OnCharacterChanged));
+
+		OptionButtonBinder.PopulateEnum(_battleAiOptionButton, BattleAiOptions);
 
 		if (!string.IsNullOrWhiteSpace(CharacterId))
 		{
@@ -146,6 +159,8 @@ public partial class CharacterPanel : JyPanel
 		_defenceValueLabel.Text = combatStats.Defence.ToString();
 
 		var isReadOnly = _mode == CharacterPanelMode.ReadOnly;
+		_battleAiOptionButton.Disabled = isReadOnly;
+		OptionButtonBinder.SelectEnumNoSignal(_battleAiOptionButton, character.AiType);
 		_attributeTab.IsReadOnly = isReadOnly;
 		_equipmentTab.IsReadOnly = isReadOnly;
 		_skillTab.IsReadOnly = isReadOnly;
@@ -192,6 +207,23 @@ public partial class CharacterPanel : JyPanel
 			? null
 			: CharacterSkillDetailActionFactory.CreateForgetAction(skill);
 		UIRoot.Instance.ShowSkillDetailPanel(skill, action);
+	}
+
+	private void OnBattleAiSelected(long index)
+	{
+		if (_mode == CharacterPanelMode.ReadOnly)
+		{
+			return;
+		}
+
+		var character = ResolveCharacter();
+		if (character is null)
+		{
+			return;
+		}
+
+		var aiType = OptionButtonBinder.ReadSelectedEnum(_battleAiOptionButton, character.AiType);
+		Game.CharacterService.SetBattleAiType(CharacterId, aiType);
 	}
 
 	private void OnCharacterChanged(CharacterChangedEvent sessionEvent)

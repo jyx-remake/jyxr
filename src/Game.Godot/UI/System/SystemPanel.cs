@@ -11,6 +11,13 @@ public partial class SystemPanel : Control
 	private const int MaxConsoleLineCount = 8;
 	private const int MinBattleSpeedMultiplier = 1;
 	private const int MaxBattleSpeedMultiplier = 5;
+	private static readonly IReadOnlyList<(string Label, ScreenAspectMode Value)> ScreenAspectOptions =
+	[
+		("无限制", ScreenAspectMode.Unlimited),
+		("16:9", ScreenAspectMode.Ratio16x9),
+		("18:9", ScreenAspectMode.Ratio18x9),
+		("20:9", ScreenAspectMode.Ratio20x9),
+	];
 
 	private readonly LocalUserSettingsStore _settingsStore = new();
 	private readonly List<string> _consoleLines = [];
@@ -210,47 +217,17 @@ public partial class SystemPanel : Control
 
 	private void PopulateScreenAspectOptions()
 	{
-		_screenAspectOptionButton.Clear();
-		AddScreenAspectOption("无限制", ScreenAspectMode.Unlimited);
-		AddScreenAspectOption("16:9", ScreenAspectMode.Ratio16x9);
-		AddScreenAspectOption("18:9", ScreenAspectMode.Ratio18x9);
-		AddScreenAspectOption("20:9", ScreenAspectMode.Ratio20x9);
-	}
-
-	private void AddScreenAspectOption(string label, ScreenAspectMode mode)
-	{
-		var index = _screenAspectOptionButton.ItemCount;
-		_screenAspectOptionButton.AddItem(label);
-		_screenAspectOptionButton.SetItemMetadata(index, (int)mode);
+		OptionButtonBinder.PopulateEnum(_screenAspectOptionButton, ScreenAspectOptions);
 	}
 
 	private ScreenAspectMode ReadSelectedScreenAspect()
 	{
-		var selected = _screenAspectOptionButton.Selected;
-		if (selected < 0)
-		{
-			return ScreenAspectMode.Unlimited;
-		}
-
-		var metadata = _screenAspectOptionButton.GetItemMetadata(selected);
-		return metadata.VariantType == Variant.Type.Int
-			? (ScreenAspectMode)metadata.AsInt32()
-			: ScreenAspectMode.Unlimited;
+		return OptionButtonBinder.ReadSelectedEnum(_screenAspectOptionButton, ScreenAspectMode.Unlimited);
 	}
 
 	private void SelectScreenAspectNoSignal(ScreenAspectMode mode)
 	{
-		for (var index = 0; index < _screenAspectOptionButton.ItemCount; index++)
-		{
-			var metadata = _screenAspectOptionButton.GetItemMetadata(index);
-			if (metadata.VariantType == Variant.Type.Int && metadata.AsInt32() == (int)mode)
-			{
-				_screenAspectOptionButton.Select(index);
-				return;
-			}
-		}
-
-		_screenAspectOptionButton.Select(0);
+		OptionButtonBinder.SelectEnumNoSignal(_screenAspectOptionButton, mode);
 	}
 
 	private static string FormatScreenAspect(ScreenAspectMode mode) =>

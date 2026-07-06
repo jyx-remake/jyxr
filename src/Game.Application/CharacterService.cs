@@ -55,6 +55,18 @@ public sealed class CharacterService
         PublishCharacterChanged(character);
     }
 
+    public void SetBattleAiType(string characterId, BattleAiType aiType)
+    {
+        var character = GetPartyMember(characterId);
+        if (character.AiType == aiType)
+        {
+            return;
+        }
+
+        character.SetAiType(aiType);
+        PublishCharacterChanged(character);
+    }
+
     public void ReplaceBaseStats(string characterId, IReadOnlyDictionary<StatType, int> stats)
     {
         ArgumentNullException.ThrowIfNull(stats);

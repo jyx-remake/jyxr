@@ -174,6 +174,28 @@ theme_override_font_sizes/font_size = 25
 text = "0"
 label_settings = ExtResource("19_under_avatar")
 
+[node name="AiTypeRow" type="HBoxContainer" parent="ContentRoot/Labels" index="2" unique_id=704475175]
+layout_mode = 0
+offset_left = -30.0
+offset_top = 318.0
+offset_right = 194.0
+offset_bottom = 374.0
+theme_override_constants/separation = 12
+
+[node name="AiTypeTitle" type="Label" parent="ContentRoot/Labels/AiTypeRow" index="0" unique_id=773668753]
+custom_minimum_size = Vector2(88, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "战斗AI"
+label_settings = ExtResource("19_under_avatar")
+vertical_alignment = 1
+
+[node name="BattleAiOptionButton" type="OptionButton" parent="ContentRoot/Labels/AiTypeRow" index="1" unique_id=441469515]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="Buttons" type="Control" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=1248383560]
 anchors_preset = 0
 

@@ -41,6 +41,7 @@ CheckBox/styles/pressed = SubResource("StyleBoxFlat_4tj8r")
 Label/font_sizes/font_size = 25
 Label/fonts/font = ExtResource("1_ag65a")
 LineEdit/font_sizes/font_size = 60
+OptionButton/font_sizes/font_size = 35
 Panel/styles/panel = SubResource("StyleBoxFlat_ni34w")
 PopupMenu/constants/v_separation = 12
 PopupMenu/font_sizes/font_size = 50
