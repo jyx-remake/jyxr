@@ -2,6 +2,7 @@ using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 
 namespace Game.Tests;
 
@@ -382,6 +383,7 @@ public sealed class ItemUseServiceTests
         state.Inventory.AddItem(book, 2);
         var repository = TestContentFactory.CreateRepository(
             characters: [heroDefinition],
+            growTemplates: [CreateDefaultGrowTemplate()],
             talents: [talent],
             items: [book]);
         var session = new GameSession(state, repository);
@@ -391,6 +393,49 @@ public sealed class ItemUseServiceTests
 
         Assert.True(result.Success);
         Assert.True(hero.HasTalent(talent.Id));
+        Assert.Equal(1, entry.Quantity);
+    }
+
+    [Fact]
+    public void AnalyzeTarget_DisablesTalentBookWhenWuxueCapacityIsInsufficient()
+    {
+        var expensiveTalent = new TalentDefinition
+        {
+            Id = "expensive",
+            Name = "expensive",
+            Point = 30,
+        };
+        var book = CreateItem(
+            "talent_book",
+            ItemType.TalentBook,
+            [new GrantTalentItemUseEffectDefinition(expensiveTalent.Id)]);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(book);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            growTemplates:
+            [
+                TestContentFactory.CreateGrowTemplate(
+                    CharacterExperienceProgression.DefaultGrowTemplateId,
+                    new Dictionary<StatType, int>
+                    {
+                        [StatType.Wuxue] = 0,
+                    }),
+            ],
+            talents: [expensiveTalent],
+            items: [book]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(book);
+
+        var candidate = session.ItemUseService.AnalyzeTarget(entry, hero);
+        var result = session.ItemUseService.Use(entry, hero.Id);
+
+        Assert.False(candidate.CanUse);
+        Assert.Equal("武学常识不足，需要30", candidate.Reason);
+        Assert.False(result.Success);
+        Assert.Equal("武学常识不足，需要30", result.Message);
+        Assert.False(hero.HasTalent(expensiveTalent.Id));
         Assert.Equal(1, entry.Quantity);
     }
 
@@ -471,4 +516,12 @@ public sealed class ItemUseServiceTests
             Type = type,
             UseEffects = effects,
         };
+
+    private static GrowTemplateDefinition CreateDefaultGrowTemplate() =>
+        TestContentFactory.CreateGrowTemplate(
+            CharacterExperienceProgression.DefaultGrowTemplateId,
+            new Dictionary<StatType, int>
+            {
+                [StatType.Wuxue] = 8,
+            });
 }

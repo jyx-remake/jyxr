@@ -8,12 +8,8 @@ namespace Game.Content.Loading;
 
 public sealed partial class JsonContentLoader
 {
-    private const int UnlimitedWuxueStatValue = 9999;
-
     private static InMemoryContentRepository BuildRepository(ContentPackage package)
     {
-        NormalizeCharacterStats(package.Characters);
-
         var repository = new InMemoryContentRepository
         {
             Battles = IndexById(package.Battles, "Battle"),
@@ -109,26 +105,6 @@ public sealed partial class JsonContentLoader
         package.Items.ToDictionary(
             definition => definition.Id,
             StringComparer.Ordinal);
-
-    // TODO remove?
-    private static void NormalizeCharacterStats(List<CharacterDefinition> characters)
-    {
-        for (var index = 0; index < characters.Count; index++)
-        {
-            var character = characters[index];
-            if (!character.Stats.TryGetValue(StatType.Wuxue, out var wuxue) || wuxue != -1)
-            {
-                continue;
-            }
-
-            var stats = character.Stats.ToDictionary(
-                entry => entry.Key,
-                entry => entry.Value,
-                EqualityComparer<StatType>.Default);
-            stats[StatType.Wuxue] = UnlimitedWuxueStatValue;
-            characters[index] = character with { Stats = stats };
-        }
-    }
 
     private static Dictionary<string, StorySegmentEntry> BuildStorySegments(
         IReadOnlyDictionary<string, StoryScript> storyScripts)

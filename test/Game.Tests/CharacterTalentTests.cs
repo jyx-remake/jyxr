@@ -2,11 +2,46 @@ using Game.Core.Affix;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 
 namespace Game.Tests;
 
 public sealed class CharacterTalentTests
 {
+    [Fact]
+    public void CreateInitial_IgnoresDefinedWuxueStat()
+    {
+        var definition = TestContentFactory.CreateCharacterDefinition(
+            "hero",
+            new Dictionary<StatType, int>
+            {
+                [StatType.Wuxue] = 9999,
+                [StatType.Bili] = 10,
+            });
+
+        var character = TestContentFactory.CreateCharacterInstance("char_001", definition);
+
+        Assert.Equal(0, character.GetBaseStat(StatType.Wuxue));
+        Assert.Equal(10, character.GetBaseStat(StatType.Bili));
+    }
+
+    [Fact]
+    public void TalentPointCapacity_UsesDefaultInnatePointsAndLevelGrowth()
+    {
+        var definition = TestContentFactory.CreateCharacterDefinition("hero", level: 3);
+        var growTemplate = TestContentFactory.CreateGrowTemplate(
+            CharacterExperienceProgression.DefaultGrowTemplateId,
+            new Dictionary<StatType, int>
+            {
+                [StatType.Wuxue] = 8,
+            });
+        var character = TestContentFactory.CreateCharacterInstance("char_001", definition);
+
+        var capacity = CharacterTalentPointCalculator.CalculateCapacity(character, growTemplate);
+
+        Assert.Equal(44, capacity);
+    }
+
     [Fact]
     public void CreateInitial_RebuildsSnapshotForEquippedInternalSkillGrantedTalent()
     {

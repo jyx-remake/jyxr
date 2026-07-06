@@ -79,7 +79,7 @@ public static class CharacterExperienceProgression
     {
         foreach (var (statType, delta) in growTemplate.StatGrowth)
         {
-            if (delta == 0)
+            if (delta == 0 || statType == StatType.Wuxue)
             {
                 continue;
             }

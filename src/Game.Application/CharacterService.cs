@@ -298,6 +298,18 @@ public sealed class CharacterService
         }
     }
 
+    public int GetTalentPointCapacity(CharacterInstance character)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+        return CharacterTalentPointCalculator.CalculateCapacity(character, ResolveGrowTemplate(character));
+    }
+
+    public int GetSpentTalentPoints(CharacterInstance character)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+        return CharacterTalentPointCalculator.CalculateSpentPoints(character);
+    }
+
     public void LearnSpecialSkill(CharacterInstance character, string specialSkillId)
     {
         ArgumentNullException.ThrowIfNull(character);

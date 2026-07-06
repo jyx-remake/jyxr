@@ -131,7 +131,7 @@ public sealed class ContentLoadingTests
     }
 
     [Fact]
-    public void JsonLoader_NormalizesUnlimitedWuxueSentinel()
+    public void JsonLoader_PreservesDefinedWuxueSentinel()
     {
         const string json = """
             {
@@ -163,7 +163,7 @@ public sealed class ContentLoadingTests
         var repository = LoadRepositoryFromJson(json);
         var character = repository.GetCharacter("aqing");
 
-        Assert.Equal(9999, character.Stats[StatType.Wuxue]);
+        Assert.Equal(-1, character.Stats[StatType.Wuxue]);
         Assert.Equal(12, character.Stats[StatType.Bili]);
     }
 

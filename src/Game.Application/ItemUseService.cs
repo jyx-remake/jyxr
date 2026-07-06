@@ -363,15 +363,28 @@ public sealed class ItemUseService
         return null;
     }
 
-    private static string? ValidateTalentBookTarget(
+    private string? ValidateTalentBookTarget(
         IReadOnlyList<ItemUseEffectDefinition> effects,
         CharacterInstance target)
     {
+        var requiredPoints = 0;
         foreach (var effect in effects.OfType<GrantTalentItemUseEffectDefinition>())
         {
             if (target.HasTalent(effect.TalentId))
             {
                 return "已习得该天赋";
+            }
+
+            requiredPoints = checked(requiredPoints + _session.ContentRepository.GetTalent(effect.TalentId).Point);
+        }
+
+        if (requiredPoints > 0)
+        {
+            var spentPoints = _session.CharacterService.GetSpentTalentPoints(target);
+            var capacity = _session.CharacterService.GetTalentPointCapacity(target);
+            if (spentPoints + requiredPoints > capacity)
+            {
+                return $"武学常识不足，需要{requiredPoints}";
             }
         }
 

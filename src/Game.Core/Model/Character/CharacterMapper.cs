@@ -149,6 +149,11 @@ public static class CharacterMapper
 
         foreach (var entry in source)
         {
+            if (entry.Key == StatType.Wuxue)
+            {
+                continue;
+            }
+
             if (entry.Value < 0)
             {
                 throw new InvalidOperationException($"Character stat '{entry.Key}' has invalid value '{entry.Value}'.");

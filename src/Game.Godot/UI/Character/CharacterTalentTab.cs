@@ -23,8 +23,8 @@ public partial class CharacterTalentTab : Control
 	{
 		ArgumentNullException.ThrowIfNull(character);
 
-		var spentPoints = character.UnlockedTalents.Sum(static talent => talent.Point);
-		var wuxuePoints = character.GetBaseStat(StatType.Wuxue);
+		var spentPoints = Game.CharacterService.GetSpentTalentPoints(character);
+		var wuxuePoints = Game.CharacterService.GetTalentPointCapacity(character);
 		var unlockedIds = new HashSet<string>(
 			character.UnlockedTalents.Select(static talent => talent.Id),
 			StringComparer.Ordinal);
