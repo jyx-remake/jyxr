@@ -89,7 +89,8 @@ public static class CharacterMapper
             new ExternalSkillInstance(
                 contentRepository.GetExternalSkill(skill.ExternalSkillDefinitionId),
                 character,
-                skill.IsActive)
+                skill.IsActive,
+                skill.DisabledFormSkillIds)
             {
                 Level = skill.Level,
                 Exp = skill.Exp,
@@ -97,7 +98,8 @@ public static class CharacterMapper
         character.InternalSkills.AddRange(record.InternalSkills.Select(skill =>
             new InternalSkillInstance(
                 contentRepository.GetInternalSkill(skill.InternalSkillDefinitionId),
-                character)
+                character,
+                skill.DisabledFormSkillIds)
             {
                 Level = skill.Level,
                 Exp = skill.Exp,
@@ -132,8 +134,8 @@ public static class CharacterMapper
             new Dictionary<StatType, int>(character.BaseStats),
             character.UnlockedTalents.Select(talent => talent.Id).ToList(),
             character.SpecialSkills.Select(skill => new SpecialSkillRecord(skill.Definition.Id, skill.IsActive)).ToList(),
-            character.ExternalSkills.Select(skill => new ExternalSkillRecord(skill.Definition.Id, skill.Level, skill.Exp, skill.IsActive)).ToList(),
-            character.InternalSkills.Select(skill => new InternalSkillRecord(skill.Definition.Id, skill.Level, skill.Exp, skill.IsEquipped)).ToList(),
+            character.ExternalSkills.Select(skill => new ExternalSkillRecord(skill.Definition.Id, skill.Level, skill.Exp, skill.IsActive, skill.DisabledFormSkillIds.ToList())).ToList(),
+            character.InternalSkills.Select(skill => new InternalSkillRecord(skill.Definition.Id, skill.Level, skill.Exp, skill.IsEquipped, skill.DisabledFormSkillIds.ToList())).ToList(),
             character.EquippedItems.ToDictionary(
                 entry => entry.Key,
                 entry => EquipmentMapper.ToRecord(entry.Value)));

@@ -1,4 +1,5 @@
 using Game.Core.Affix;
+using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Model;
@@ -414,19 +415,31 @@ public sealed class CharacterTests
         Assert.False(locked.IsActive);
         Assert.Equal(9d, locked.Power, 6);
 
-        var disabledCharacter = TestContentFactory.CreateCharacterInstance(
-            "char_disabled",
+        var parentDisabledCharacter = TestContentFactory.CreateCharacterInstance(
+            "char_parent_disabled",
             TestContentFactory.CreateCharacterDefinition(
-                "hero_disabled",
+                "hero_parent_disabled",
                 externalSkills: [new InitialExternalSkillEntryDefinition(definition, Level: 3)]));
-        disabledCharacter.SetExternalSkillState(definition, 3, 0, false);
-        var disabled = disabledCharacter.ExternalSkills[0].GetFormSkills().Single();
-        Assert.Equal(FormSkillInstanceState.Disabled, disabled.State);
-        Assert.False(disabled.IsActive);
-        Assert.Equal(11d, disabled.Power, 6);
-        Assert.Equal(2, disabled.Cooldown);
-        Assert.Equal(5, disabled.MpCost);
-        Assert.Equal(2, disabled.RageCost);
+        parentDisabledCharacter.SetExternalSkillState(definition, 3, 0, false);
+        var parentDisabled = parentDisabledCharacter.ExternalSkills[0].GetFormSkills().Single();
+        Assert.Equal(FormSkillInstanceState.Available, parentDisabled.State);
+        Assert.True(parentDisabled.IsActive);
+        Assert.Equal(11d, parentDisabled.Power, 6);
+        Assert.Equal(2, parentDisabled.Cooldown);
+        Assert.Equal(5, parentDisabled.MpCost);
+        Assert.Equal(2, parentDisabled.RageCost);
+
+        var formDisabledCharacter = TestContentFactory.CreateCharacterInstance(
+            "char_form_disabled",
+            TestContentFactory.CreateCharacterDefinition(
+                "hero_form_disabled",
+                externalSkills: [new InitialExternalSkillEntryDefinition(definition, Level: 3)]));
+        Assert.True(formDisabledCharacter.SetFormSkillActive(definition.Id, form.Id, false));
+        var formDisabled = formDisabledCharacter.ExternalSkills[0].GetFormSkills().Single();
+        Assert.Equal(FormSkillInstanceState.Disabled, formDisabled.State);
+        Assert.True(formDisabledCharacter.ExternalSkills[0].IsActive);
+        Assert.False(formDisabled.IsEnabled);
+        Assert.False(formDisabled.IsActive);
 
         var availableCharacter = TestContentFactory.CreateCharacterInstance(
             "char_available",
@@ -486,6 +499,11 @@ public sealed class CharacterTests
         Assert.Equal(1, equipped.RageCost);
         Assert.Same(equippedCharacter.InternalSkills[0], equipped.Parent);
         Assert.Same(equippedCharacter, equipped.Owner);
+
+        Assert.True(equippedCharacter.SetFormSkillActive(definition.Id, form.Id, false));
+        Assert.Equal(FormSkillInstanceState.Disabled, equipped.State);
+        Assert.False(equipped.IsEnabled);
+        Assert.False(equipped.IsActive);
     }
 
     [Fact]
@@ -537,6 +555,72 @@ public sealed class CharacterTests
         Assert.Equal(2, forms.Count);
         Assert.Contains(forms, form => form.Definition.Id == "sword_form" && form.State == FormSkillInstanceState.Available);
         Assert.Contains(forms, form => form.Definition.Id == "poison_form" && form.State == FormSkillInstanceState.Available);
+    }
+
+    [Fact]
+    public void BattleSkillCatalog_IncludesExternalFormWhenParentExternalSkillIsInactive()
+    {
+        var form = new FormSkillDefinition(
+            "sword_form",
+            "Sword Form",
+            "",
+            "",
+            1,
+            0,
+            new SkillCostDefinition(),
+            new SkillTargetingDefinition(CastSize: 0, ImpactSize: 0),
+            4d,
+            "",
+            "",
+            []);
+        var external = TestContentFactory.CreateExternalSkill(
+            "sword_skill",
+            formSkills: [form]);
+        var character = TestContentFactory.CreateCharacterInstance(
+            "char_001",
+            TestContentFactory.CreateCharacterDefinition(
+                "hero_knight",
+                externalSkills: [new InitialExternalSkillEntryDefinition(external)]));
+        character.SetExternalSkillState(external, 1, 0, false);
+        var unit = new BattleUnit("hero", character, team: 1, new GridPosition(0, 0));
+
+        var skills = BattleSkillCatalog.CollectSelectableSkills(unit);
+
+        Assert.DoesNotContain(skills, skill => skill.Id == external.Id);
+        Assert.Contains(skills, skill => skill.Id == form.Id);
+    }
+
+    [Fact]
+    public void BattleSkillCatalog_ExcludesDisabledExternalForm()
+    {
+        var form = new FormSkillDefinition(
+            "sword_form",
+            "Sword Form",
+            "",
+            "",
+            1,
+            0,
+            new SkillCostDefinition(),
+            new SkillTargetingDefinition(CastSize: 0, ImpactSize: 0),
+            4d,
+            "",
+            "",
+            []);
+        var external = TestContentFactory.CreateExternalSkill(
+            "sword_skill",
+            formSkills: [form]);
+        var character = TestContentFactory.CreateCharacterInstance(
+            "char_001",
+            TestContentFactory.CreateCharacterDefinition(
+                "hero_knight",
+                externalSkills: [new InitialExternalSkillEntryDefinition(external)]));
+        character.SetFormSkillActive(external.Id, form.Id, false);
+        var unit = new BattleUnit("hero", character, team: 1, new GridPosition(0, 0));
+
+        var skills = BattleSkillCatalog.CollectSelectableSkills(unit);
+
+        Assert.Contains(skills, skill => skill.Id == external.Id);
+        Assert.DoesNotContain(skills, skill => skill.Id == form.Id);
     }
 
     private static TalentDefinition CreateTalent(

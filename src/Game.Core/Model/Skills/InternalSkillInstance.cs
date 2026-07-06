@@ -5,8 +5,12 @@ namespace Game.Core.Model.Skills;
 
 public sealed class InternalSkillInstance(
     InternalSkillDefinition definition,
-    CharacterInstance owner) : SkillInstance(owner)
+    CharacterInstance owner,
+    IEnumerable<string>? disabledFormSkillIds = null) : SkillInstance(owner), IFormSkillSource
 {
+    private readonly FormSkillActivationState _formSkillActivation = new(
+        (definition ?? throw new ArgumentNullException(nameof(definition))).FormSkills,
+        disabledFormSkillIds);
     private IReadOnlyList<FormSkillInstance>? _formSkills;
 
     public InternalSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
@@ -47,6 +51,7 @@ public sealed class InternalSkillInstance(
     public bool IsEquipped => string.Equals(Owner.EquippedInternalSkillId, Definition.Id, StringComparison.Ordinal);
 
     public override bool IsActive => IsEquipped;
+    public IReadOnlySet<string> DisabledFormSkillIds => _formSkillActivation.DisabledFormSkillIds;
 
     public double DefenceRatio => Level / 10d * Definition.DefenceScale * (1 + Bonus);
 
@@ -86,6 +91,12 @@ public sealed class InternalSkillInstance(
         Level = level;
         Exp = exp;
     }
+
+    public bool IsFormSkillEnabled(string formSkillId) =>
+        _formSkillActivation.IsEnabled(Id, formSkillId);
+
+    public bool SetFormSkillActive(string formSkillId, bool isActive) =>
+        _formSkillActivation.SetActive(Id, formSkillId, isActive);
 
     public SkillLevelChange<InternalSkillInstance> UpgradeLevel(int levels, int maxLevel)
     {

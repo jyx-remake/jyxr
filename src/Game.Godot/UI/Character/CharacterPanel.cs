@@ -177,6 +177,9 @@ public partial class CharacterPanel : JyPanel
 			case SpecialSkillInstance specialSkill:
 				Game.CharacterService.SetSpecialSkillActive(CharacterId, specialSkill.Id, !specialSkill.IsActive);
 				break;
+			case FormSkillInstance formSkill:
+				Game.CharacterService.SetFormSkillActive(CharacterId, formSkill.SourceSkillId, formSkill.Id, !formSkill.IsEnabled);
+				break;
 			case InternalSkillInstance internalSkill when !internalSkill.IsEquipped:
 				Game.CharacterService.EquipInternalSkill(CharacterId, internalSkill.Id);
 				break;

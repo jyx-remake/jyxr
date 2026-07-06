@@ -415,6 +415,17 @@ public sealed class CharacterService
         PublishCharacterChanged(character);
     }
 
+    public void SetFormSkillActive(string characterId, string sourceSkillId, string formSkillId, bool isActive)
+    {
+        var character = GetPartyMember(characterId);
+        if (!character.SetFormSkillActive(sourceSkillId, formSkillId, isActive))
+        {
+            return;
+        }
+
+        PublishCharacterChanged(character);
+    }
+
     public void EquipInternalSkill(string characterId, string skillId)
     {
         var character = GetPartyMember(characterId);
@@ -498,4 +509,3 @@ public sealed class CharacterService
         return ContentRepository.GetGrowTemplate(growTemplateId);
     }
 }
-

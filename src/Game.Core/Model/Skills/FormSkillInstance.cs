@@ -64,12 +64,14 @@ public sealed class FormSkillInstance(
 
 	public bool IsSourceEquipped => Parent is not InternalSkillInstance internalSkill || internalSkill.IsEquipped;
 
+	public bool IsEnabled => Parent is not IFormSkillSource source || source.IsFormSkillEnabled(Id);
+
 	public FormSkillInstanceState State =>
 		Level < Definition.UnlockLevel
 			? FormSkillInstanceState.Locked
 			: !IsSourceEquipped
 				? FormSkillInstanceState.SourceNotEquipped
-				: !Parent.IsActive
+				: !IsEnabled
 					? FormSkillInstanceState.Disabled
 					: FormSkillInstanceState.Available;
 

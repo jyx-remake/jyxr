@@ -7,13 +7,15 @@ public sealed record ExternalSkillRecord(
     string ExternalSkillDefinitionId,
     int Level,
     int Exp,
-    bool IsActive);
+    bool IsActive,
+    IReadOnlyList<string>? DisabledFormSkillIds = null);
 
 public sealed record InternalSkillRecord(
     string InternalSkillDefinitionId,
     int Level,
     int Exp,
-    bool Equipped);
+    bool Equipped,
+    IReadOnlyList<string>? DisabledFormSkillIds = null);
 
 public sealed record SpecialSkillRecord(
     string SpecialSkillDefinitionId,

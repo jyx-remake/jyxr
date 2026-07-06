@@ -8,9 +8,13 @@ namespace Game.Core.Model.Skills;
 public sealed class ExternalSkillInstance(
     ExternalSkillDefinition definition,
     CharacterInstance owner,
-    bool active) : SkillInstance(owner)
+    bool active,
+    IEnumerable<string>? disabledFormSkillIds = null) : SkillInstance(owner), IFormSkillSource
 {
     private bool _isActive = active;
+    private readonly FormSkillActivationState _formSkillActivation = new(
+        (definition ?? throw new ArgumentNullException(nameof(definition))).FormSkills,
+        disabledFormSkillIds);
     private IReadOnlyList<FormSkillInstance>? _formSkills;
 
     public ExternalSkillDefinition Definition { get; } = definition ?? throw new ArgumentNullException(nameof(definition));
@@ -44,6 +48,7 @@ public sealed class ExternalSkillInstance(
     }
 
     public override bool IsActive => _isActive;
+    public IReadOnlySet<string> DisabledFormSkillIds => _formSkillActivation.DisabledFormSkillIds;
     public override int MpCost => Definition.Cost?.Mp ?? SkillHelper.GetMpCost(this);
     public override int RageCost => Definition.Cost.Rage;
     public override int Cooldown => CurrentLevelOverride?.Cooldown ?? Definition.Cooldown;
@@ -83,6 +88,12 @@ public sealed class ExternalSkillInstance(
         return true;
     }
 
+    public bool IsFormSkillEnabled(string formSkillId) =>
+        _formSkillActivation.IsEnabled(Id, formSkillId);
+
+    public bool SetFormSkillActive(string formSkillId, bool isActive) =>
+        _formSkillActivation.SetActive(Id, formSkillId, isActive);
+
     public void SetState(int level, int exp, bool isActive)
     {
         Level = level;
@@ -120,5 +131,4 @@ public sealed class ExternalSkillInstance(
 
     private SkillTargetingDefinition CurrentTargeting =>
         CurrentLevelOverride?.Targeting ?? Definition.Targeting;
-
 }

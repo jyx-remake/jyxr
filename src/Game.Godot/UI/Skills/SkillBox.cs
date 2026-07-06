@@ -79,8 +79,10 @@ public partial class SkillBox : Button
 
 		if (_skill is FormSkillInstance formSkill)
 		{
-			_activeButton.Visible = false;
-			_checkMark.Visible = false;
+			var showFormToggle = _showToggleButton && ShouldShowFormToggle(formSkill);
+			_activeButton.Visible = showFormToggle;
+			_activeButton.Disabled = !showFormToggle || !_isInteractive || !CanToggle(formSkill);
+			_checkMark.Visible = showFormToggle && formSkill.IsEnabled;
 			_avatar.Texture = ResolveTexture(formSkill) ?? _avatar.Texture;
 			_levelLabel.Visible = false;
 			_nameLabel.Visible = false;
@@ -138,7 +140,10 @@ public partial class SkillBox : Button
 		skill is ExternalSkillInstance or InternalSkillInstance;
 
 	private static bool CanToggle(SkillInstance skill) =>
-		skill is ExternalSkillInstance or InternalSkillInstance or SpecialSkillInstance;
+		skill is ExternalSkillInstance or InternalSkillInstance or SpecialSkillInstance or FormSkillInstance;
+
+	private static bool ShouldShowFormToggle(FormSkillInstance formSkill) =>
+		formSkill.Parent is not InternalSkillInstance { IsEquipped: false };
 
 	private static Color ResolveNameColor(SkillInstance skill) =>
 		skill switch

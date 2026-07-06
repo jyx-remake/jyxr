@@ -140,6 +140,24 @@ public sealed class CharacterInstance
         return SkillListMutation.GetRequired(ExternalSkills, skillId, "External skill").SetActive(isActive);
     }
 
+    public bool SetFormSkillActive(string sourceSkillId, string formSkillId, bool isActive)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceSkillId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(formSkillId);
+
+        if (SkillListMutation.Find(ExternalSkills, sourceSkillId) is IFormSkillSource externalSkill)
+        {
+            return externalSkill.SetFormSkillActive(formSkillId, isActive);
+        }
+
+        if (SkillListMutation.Find(InternalSkills, sourceSkillId) is IFormSkillSource internalSkill)
+        {
+            return internalSkill.SetFormSkillActive(formSkillId, isActive);
+        }
+
+        throw new InvalidOperationException($"Skill '{sourceSkillId}' is not unlocked.");
+    }
+
     public void LevelUpAllSkillsMaxLevel(
         Func<ExternalSkillInstance, int> externalSkillMaxLevelResolver,
         Func<InternalSkillInstance, int> internalSkillMaxLevelResolver)

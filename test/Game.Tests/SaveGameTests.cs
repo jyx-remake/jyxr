@@ -84,6 +84,7 @@ public sealed class SaveGameTests
         first.GrantExperience(120);
         first.GrantStatPoints(2);
         first.AllocateStat(StatType.Bili, 2);
+        first.SetFormSkillActive(basicAttack.Id, slashForm.Id, false);
         first.SetExternalSkillState(guardShout, 4, 20, false);
         first.AddEquipmentInstance(new EquipmentInstance("equip_bonus_001", repository.GetEquipment("ward_charm")));
 
@@ -114,6 +115,10 @@ public sealed class SaveGameTests
         Assert.Equal(120, restoredFirst.Experience);
         Assert.Equal(0, restoredFirst.UnspentStatPoints);
         Assert.Equal(2, restoredFirst.BaseStats[StatType.Bili]);
+        Assert.Contains(restoredFirst.ExternalSkills, skill =>
+            skill.Definition.Id == "basic_attack" &&
+            skill.GetFormSkills().Single().Definition.Id == "slash_form" &&
+            !skill.GetFormSkills().Single().IsEnabled);
         Assert.Contains(restoredFirst.ExternalSkills, skill => skill.Definition.Id == "guard_shout" && skill.Level == 4 && skill.Exp == 20 && !skill.IsActive);
         Assert.Contains(restoredFirst.InternalSkills, skill => skill.Definition.Id == "basic_internal" && skill.IsEquipped);
         Assert.Contains(restoredFirst.SpecialSkills, skill => skill.Definition.Id == "blood_rush" && skill.IsActive);
