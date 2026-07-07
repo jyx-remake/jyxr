@@ -1,0 +1,138 @@
+[gd_scene format=3 uid="uid://chmb657ktjrbe"]
+
+[ext_resource type="Script" uid="uid://dg4c8clum2nra" path="res://src/Game.Godot/UI/MiniGame/StrengthTrainingScreen.cs" id="1_strength"]
+[ext_resource type="Texture2D" uid="uid://bb8qkr5u278lf" path="res://assets/art/map/kezhan.jpg" id="2_background"]
+
+[node name="StrengthTrainingScreen" type="Control" unique_id=545250481]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_strength")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1230492097]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+
+[node name="PlayArea" type="Control" parent="." unique_id=1160924766]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BadTarget" type="TextureButton" parent="PlayArea" unique_id=726984630]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 0
+offset_right = 192.0
+offset_bottom = 192.0
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="FourPointTarget" type="TextureButton" parent="PlayArea" unique_id=1623422332]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 0
+offset_right = 160.0
+offset_bottom = 160.0
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="TwoPointTarget" type="TextureButton" parent="PlayArea" unique_id=1395255563]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 128.0
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ThreePointTarget" type="TextureButton" parent="PlayArea" unique_id=1468711718]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(144, 144)
+layout_mode = 0
+offset_right = 144.0
+offset_bottom = 144.0
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ItemTarget" type="TextureButton" parent="PlayArea" unique_id=1371138741]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 80.0
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="HitEffect" type="TextureRect" parent="PlayArea"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 0
+offset_right = 192.0
+offset_bottom = 192.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Header" type="HBoxContainer" parent="." unique_id=141999309]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 48.0
+offset_top = 4.0
+offset_right = -48.0
+offset_bottom = 64.0
+grow_horizontal = 2
+theme_override_constants/separation = 32
+
+[node name="TitleLabel" type="Label" parent="Header" unique_id=994665242]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.9, 0.74, 1)
+theme_override_font_sizes/font_size = 36
+text = "点穴训练"
+vertical_alignment = 1
+
+[node name="HintLabel" type="Label" parent="Header" unique_id=393734832]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.86, 0.84, 0.76, 1)
+theme_override_font_sizes/font_size = 24
+text = "点中目标得分和物品，别点老板娘。"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="ScoreLabel" type="Label" parent="Header" unique_id=1166728513]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.74, 1)
+theme_override_font_sizes/font_size = 28
+text = "点穴得分：0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="Header" unique_id=1402388042]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.74, 1)
+theme_override_font_sizes/font_size = 28
+text = "剩余时间：30 秒"
+horizontal_alignment = 2
+vertical_alignment = 1

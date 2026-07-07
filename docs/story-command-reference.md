@@ -157,6 +157,8 @@ command arg1 arg2 ...
 | `input_name` | `characterId [defaultName=""]` | 打开改名 UI，并写回角色名；目标不存在时创建到后备池。 | `input_name 主角 "小虾米"` |
 | `select_head` | `characterId` | 打开头像选择 UI，并写回角色头像。 | `select_head 主角` |
 | `roll_stats` | 无 | 打开主角随机属性 UI。 | `roll_stats` |
+| `game` | `qinggong` | 打开轻功训练小游戏，结束后按坚持秒数结算奖励与身法成长。 | `game qinggong` |
+| `game` | `dianxue` | 打开点穴训练小游戏，结束后按得分结算物品与臂力成长。 | `game dianxue` |
 | `mainmenu` | 无 | 返回主菜单。 | `mainmenu` |
 | `restart` | `[mode=restart]` | 重新开始新游戏；当前只支持 `restart`。 | `restart` |
 | `nextzhoumu` | 无 | 进入下一周目流程。 | `nextzhoumu` |
@@ -169,7 +171,6 @@ command arg1 arg2 ...
 
 | 指令 | 当前状态 |
 | --- | --- |
-| `game` | 小游戏流程占位。 |
 | `newbie` | 新手引导流程占位。 |
 | `tower` | 爬塔玩法占位。 |
 | `huashan` | 华山论剑玩法占位。 |

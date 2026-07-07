@@ -20,10 +20,11 @@ public sealed record SaveGame(
     StoryStateRecord? StoryState = null,
     JournalRecord? Journal = null,
     ShopStateRecord? ShopState = null,
-    SpecialBattleStateRecord? SpecialBattleState = null)
+    SpecialBattleStateRecord? SpecialBattleState = null,
+    MiniGameStateRecord? MiniGameState = null)
 {
     public const int MinSupportedVersion = 21;
-    public const int CurrentVersion = 22;
+    public const int CurrentVersion = 23;
 
     public static SaveGame Create(
         AdventureState adventure,
@@ -39,7 +40,8 @@ public sealed record SaveGame(
         StoryState? storyState = null,
         JournalState? journal = null,
         ShopState? shopState = null,
-        SpecialBattleState? specialBattleState = null)
+        SpecialBattleState? specialBattleState = null,
+        MiniGameState? miniGameState = null)
     {
         ArgumentNullException.ThrowIfNull(adventure);
         ArgumentNullException.ThrowIfNull(party);
@@ -68,7 +70,8 @@ public sealed record SaveGame(
             (storyState ?? new StoryState()).ToRecord(),
             (journal ?? new JournalState()).ToRecord(),
             (shopState ?? new ShopState()).ToRecord(),
-            (specialBattleState ?? new SpecialBattleState()).ToRecord());
+            (specialBattleState ?? new SpecialBattleState()).ToRecord(),
+            (miniGameState ?? new MiniGameState()).ToRecord());
     }
 
     public AdventureState RestoreAdventureState() =>
@@ -121,4 +124,7 @@ public sealed record SaveGame(
 
     public SpecialBattleState RestoreSpecialBattleState() =>
         Game.Core.Model.SpecialBattleState.Restore(SpecialBattleState);
+
+    public MiniGameState RestoreMiniGameState() =>
+        Game.Core.Model.MiniGameState.Restore(MiniGameState);
 }

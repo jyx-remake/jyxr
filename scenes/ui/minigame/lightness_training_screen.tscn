@@ -1,0 +1,136 @@
+[gd_scene format=3 uid="uid://dpdj5h0prmm2d"]
+
+[ext_resource type="Script" uid="uid://bqne6beaqcs0n" path="res://src/Game.Godot/UI/MiniGame/LightnessTrainingScreen.cs" id="1_lightness"]
+[ext_resource type="Texture2D" uid="uid://bb8qkr5u278lf" path="res://assets/art/map/kezhan.jpg" id="2_5djnk"]
+
+[node name="LightnessTrainingScreen" type="Control" unique_id=1628910134]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lightness")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1005864140]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_5djnk")
+expand_mode = 1
+
+[node name="PlayArea" type="Control" parent="." unique_id=1790063501]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Hero" type="TextureRect" parent="PlayArea" unique_id=620390880]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 200.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EastObstacle" type="TextureRect" parent="PlayArea" unique_id=1297026895]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 200.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SouthObstacle" type="TextureRect" parent="PlayArea" unique_id=1299385818]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 200.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WestObstacle" type="TextureRect" parent="PlayArea" unique_id=2095042704]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 200.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NorthObstacle" type="TextureRect" parent="PlayArea" unique_id=84936611]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 200.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Header" type="HBoxContainer" parent="." unique_id=1188388312]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 48.0
+offset_top = 4.0
+offset_right = -48.0
+offset_bottom = 64.0
+grow_horizontal = 2
+theme_override_constants/separation = 32
+
+[node name="TitleLabel" type="Label" parent="Header" unique_id=79195837]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.9, 0.74, 1)
+theme_override_font_sizes/font_size = 36
+text = "轻功训练"
+vertical_alignment = 1
+
+[node name="HintLabel" type="Label" parent="Header" unique_id=332446299]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.86, 0.84, 0.76, 1)
+theme_override_font_sizes/font_size = 24
+text = "点击开始后拖动头像，碰到其他头像即结束。"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="TimeLabel" type="Label" parent="Header" unique_id=685148640]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.74, 1)
+theme_override_font_sizes/font_size = 28
+text = "坚持时间：0 秒"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="StartButton" type="Button" parent="." unique_id=822657969]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -42.0
+offset_right = 140.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 34
+text = "开始"

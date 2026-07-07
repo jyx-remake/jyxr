@@ -6,7 +6,7 @@ using Godot;
 
 namespace Game.Godot.Story;
 
-public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeHost, IApplicationRuntimeHost
+public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeHost, IApplicationRuntimeHost, IMiniGameRuntimeHost
 {
 	private readonly StoryCommandBinder _binder;
 
@@ -87,6 +87,14 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeH
 		ArgumentNullException.ThrowIfNull(request);
 		return await UIRoot.Instance.ShowBattleScreenAsync(request, cancellationToken);
 	}
+
+	public ValueTask<int> RunLightnessTrainingAsync(CancellationToken cancellationToken) =>
+		new(UIRoot.Instance.ShowLightnessTrainingScreenAsync(cancellationToken));
+
+	public ValueTask<(int Score, IReadOnlyDictionary<string, int> ItemCounts)> RunStrengthTrainingAsync(
+		IReadOnlyList<string> itemIds,
+		CancellationToken cancellationToken) =>
+		new(UIRoot.Instance.ShowStrengthTrainingScreenAsync(itemIds, cancellationToken));
 
 	[StoryCommand("map", "set_map", "tutorial")]
 	private ValueTask ExecuteMapAsync(string mapId)

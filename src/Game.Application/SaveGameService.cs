@@ -34,7 +34,8 @@ public sealed class SaveGameService
 			State.Story,
 			State.Journal,
 			State.Shop,
-			State.SpecialBattle);
+			State.SpecialBattle,
+			State.MiniGame);
 		_logger.Info($"Created save game with {saveGame.Characters.Count} character(s).");
 		return saveGame;
 	}
@@ -56,6 +57,7 @@ public sealed class SaveGameService
 		var shop = saveGame.RestoreShopState();
 		var journal = saveGame.RestoreJournal();
 		var specialBattle = saveGame.RestoreSpecialBattleState();
+		var miniGame = saveGame.RestoreMiniGameState();
 		var state = new GameState();
 		state.SetAdventure(adventure);
 		state.SetParty(party);
@@ -71,6 +73,7 @@ public sealed class SaveGameService
 		state.SetStory(story);
 		state.SetJournal(journal);
 		state.SetSpecialBattle(specialBattle);
+		state.SetMiniGame(miniGame);
 		_session.ReplaceState(state);
 		_session.Events.Publish(new SaveLoadedEvent());
 		_logger.Info($"Loaded save game with {characters.Count} character(s).");

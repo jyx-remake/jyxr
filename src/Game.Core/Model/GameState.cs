@@ -30,6 +30,8 @@ public sealed class GameState
 
     public SpecialBattleState SpecialBattle { get; private set; } = new();
 
+    public MiniGameState MiniGame { get; private set; } = new();
+
     public void SetAdventure(AdventureState adventure) => Adventure = adventure;
 
     public void SetParty(Party party) => Party = party;
@@ -58,4 +60,6 @@ public sealed class GameState
     public void SetJournal(JournalState journal) => Journal = journal;
 
     public void SetSpecialBattle(SpecialBattleState specialBattle) => SpecialBattle = specialBattle;
+
+    public void SetMiniGame(MiniGameState miniGame) => MiniGame = miniGame;
 }

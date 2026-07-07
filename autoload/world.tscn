@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://byh01asg0e7rr" path="res://src/Game.Godot/World.cs" id="1_world"]
 [ext_resource type="PackedScene" uid="uid://cx0h6a41fqirj" path="res://scenes/map/map_screen.tscn" id="2_map_screen"]
 [ext_resource type="Script" uid="uid://b4kwdhhutdr0x" path="res://src/Game.Godot/Story/TimedStoryCoordinator.cs" id="3_timed_story"]
-[ext_resource type="Script" path="res://src/Game.Godot/Persistence/AutoSaveCoordinator.cs" id="4_auto_save"]
+[ext_resource type="Script" uid="uid://bmski24jx6cwn" path="res://src/Game.Godot/Persistence/AutoSaveCoordinator.cs" id="4_auto_save"]
 
 [node name="World" type="Control" unique_id=724556095]
 layout_mode = 3
@@ -26,7 +26,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 6
 
 [node name="TimedStoryCoordinator" type="Node" parent="." unique_id=1606403680]
 unique_name_in_owner = true

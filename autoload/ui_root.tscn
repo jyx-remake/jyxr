@@ -28,6 +28,8 @@
 [ext_resource type="PackedScene" uid="uid://di28xqh0osmwk" path="res://scenes/ui/battle/battle_screen.tscn" id="20_battle_screen"]
 [ext_resource type="PackedScene" uid="uid://52n8a1s5b8e0" path="res://scenes/ui/base/detail_panel.tscn" id="21_detail_panel"]
 [ext_resource type="PackedScene" uid="uid://bqpi5b5jp7vof" path="res://scenes/ui/equipment_refinement/refinement_equipment_selection_panel.tscn" id="22_refinement_equipment"]
+[ext_resource type="PackedScene" path="res://scenes/ui/minigame/lightness_training_screen.tscn" id="23_lightness_training"]
+[ext_resource type="PackedScene" path="res://scenes/ui/minigame/strength_training_screen.tscn" id="24_strength_training"]
 
 [node name="UIRoot" type="Control" unique_id=684934628]
 layout_mode = 3
@@ -50,6 +52,8 @@ ChestPanelScene = ExtResource("13_chest_panel")
 CombatantSelectPanelScene = ExtResource("19_combatant_select")
 BattleScreenScene = ExtResource("20_battle_screen")
 RefinementEquipmentSelectionPanelScene = ExtResource("22_refinement_equipment")
+LightnessTrainingScreenScene = ExtResource("23_lightness_training")
+StrengthTrainingScreenScene = ExtResource("24_strength_training")
 SelectSectScreenScene = ExtResource("14_select_sect")
 InputNamePanelScene = ExtResource("15_input_name")
 SelectHeadPanelScene = ExtResource("16_select_head")

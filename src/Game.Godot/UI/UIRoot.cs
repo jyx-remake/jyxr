@@ -53,6 +53,12 @@ public partial class UIRoot : Control
 	public PackedScene RefinementEquipmentSelectionPanelScene { get; set; } = null!;
 
 	[Export]
+	public PackedScene LightnessTrainingScreenScene { get; set; } = null!;
+
+	[Export]
+	public PackedScene StrengthTrainingScreenScene { get; set; } = null!;
+
+	[Export]
 	public PackedScene SelectSectScreenScene { get; set; } = null!;
 
 	[Export]
@@ -346,6 +352,33 @@ public partial class UIRoot : Control
 		ModalLayer.AddChild(panel);
 		panel.Configure(entries);
 		return await panel.AwaitSelectionAsync(cancellationToken);
+	}
+
+	public async Task<int> ShowLightnessTrainingScreenAsync(CancellationToken cancellationToken = default)
+	{
+		if (LightnessTrainingScreenScene.Instantiate() is not LightnessTrainingScreen screen)
+		{
+			throw new InvalidOperationException("Lightness training screen scene root must be LightnessTrainingScreen.");
+		}
+
+		ModalLayer.AddChild(screen);
+		return await screen.AwaitCompletionAsync(cancellationToken);
+	}
+
+	public async Task<(int Score, IReadOnlyDictionary<string, int> ItemCounts)> ShowStrengthTrainingScreenAsync(
+		IReadOnlyList<string> itemIds,
+		CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(itemIds);
+
+		if (StrengthTrainingScreenScene.Instantiate() is not StrengthTrainingScreen screen)
+		{
+			throw new InvalidOperationException("Strength training screen scene root must be StrengthTrainingScreen.");
+		}
+
+		screen.Configure(itemIds);
+		ModalLayer.AddChild(screen);
+		return await screen.AwaitCompletionAsync(cancellationToken);
 	}
 
 	public async Task<SectDefinition> ShowSelectSectScreenAsync(CancellationToken cancellationToken = default)

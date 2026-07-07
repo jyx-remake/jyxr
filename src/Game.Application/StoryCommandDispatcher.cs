@@ -426,9 +426,11 @@ public sealed class StoryCommandDispatcher
         return ValueTask.CompletedTask;
     }
 
-    // TODO: 小游戏需要独立运行流，当前先给出占位提示。
     [StoryCommand("game")]
-    private ValueTask ExecuteGamePlaceholderAsync(params ExprValue[] _) => ExecuteTodoCommandAsync("game");
+    private ValueTask<StoryCommandResult> ExecuteGameAsync(
+        string gameId,
+        CancellationToken cancellationToken = default) =>
+        _session.MiniGameService.RunAsync(_host, gameId, cancellationToken);
 
     // TODO: 新手引导流程需要独立宿主接线，当前先给出占位提示。
     [StoryCommand("newbie")]

@@ -46,6 +46,7 @@ public sealed class GameSession
         EquipmentRefinementService = new EquipmentRefinementService(this);
         BattleService = new BattleService(this);
         SpecialBattleService = new SpecialBattleService(this);
+        MiniGameService = new MiniGameService(this);
         WorldTriggerService = new WorldTriggerService(this);
         MapService = new MapService(this);
         StoryTimeKeyExpirationService = new StoryTimeKeyExpirationService(this);
@@ -72,6 +73,7 @@ public sealed class GameSession
     public EquipmentRefinementService EquipmentRefinementService { get; }
     public BattleService BattleService { get; }
     public SpecialBattleService SpecialBattleService { get; }
+    public MiniGameService MiniGameService { get; }
     public WorldTriggerService WorldTriggerService { get; }
     public MapService MapService { get; }
     public StoryTimeKeyExpirationService StoryTimeKeyExpirationService { get; }

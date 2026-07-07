@@ -18,6 +18,7 @@ public sealed class GameConfig
 	public int MaxExternalSkillCount { get; init; } = 12;
 	public int MaxInternalSkillCount { get; init; } = 8;
 	public int MaxAttribute { get; init; } = 300;
+	public int MiniGameMaxAttribute { get; init; } = 70;
 	public ItemRequirementStatSource ItemRequirementStatSource { get; init; } = ItemRequirementStatSource.Final;
 	public bool MaximizeNewPartyCharacterSkills { get; init; } = true;
 	public bool IgnoreSkillBookLevelLimit { get; init; }
