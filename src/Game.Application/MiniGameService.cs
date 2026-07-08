@@ -7,14 +7,23 @@ public sealed class MiniGameService
 {
     private const string LightnessTrainingScriptId = "qinggong";
     private const string StrengthTrainingScriptId = "dianxue";
+    private const string LevelUpTrainingScriptId = "levelup";
     private const string LightnessTrainingPracticeKey = "lightness_training";
     private const string StrengthTrainingPracticeKey = "strength_training";
     private const string HeroSpeaker = "主角";
     private const string TrainerSpeaker = "佟湘玉";
     private const string StrengthTrainerSpeaker = "白展堂";
+    private const string LevelUpEffectId = "音效.升级";
+    private const string DarkShadowStoryId = "mainStory_黑暗的阴影1";
+    private const string MysteriousSwordsmanStoryId = "mainStory_神秘剑客1";
+    private const string EmergencyStoryId = "mainStory_紧急1";
     private const int LightnessTrainingStatIncrease = 5;
     private const int LightnessTrainingPracticeMultiplier = 2;
     private const int StrengthTrainingStatIncrease = 5;
+    private const int LevelUpTrainingInitialThreshold = 12;
+    private const int LevelUpTrainingDarkShadowThreshold = 18;
+    private const int LevelUpTrainingMysteriousSwordsmanThreshold = 22;
+    private const int LevelUpTrainingEmergencyThreshold = 25;
 
     private static readonly HashSet<string> UniqueRewardIds = new(StringComparer.Ordinal)
     {
@@ -87,7 +96,7 @@ public sealed class MiniGameService
         {
             LightnessTrainingScriptId => await RunLightnessTrainingAsync(host, cancellationToken),
             StrengthTrainingScriptId => await RunStrengthTrainingAsync(host, cancellationToken),
-            "levelup" => ExecuteTodoCommand(),
+            LevelUpTrainingScriptId => await RunLevelUpTrainingAsync(host, cancellationToken),
             _ => ExecuteTodoCommand(),
         };
     }
@@ -141,6 +150,44 @@ public sealed class MiniGameService
         var (score, itemCounts) = await miniGameHost.RunStrengthTrainingAsync(availableItemIds, cancellationToken);
         await ResolveStrengthTrainingAsync(host, score, itemCounts, cancellationToken);
         return StoryCommandResult.None;
+    }
+
+    private async ValueTask<StoryCommandResult> RunLevelUpTrainingAsync(
+        IRuntimeHost host,
+        CancellationToken cancellationToken)
+    {
+        var threshold = ResolveLevelUpTrainingThreshold();
+        foreach (var character in State.Party.Members)
+        {
+            if (character.Level < threshold)
+            {
+                _session.CharacterService.LevelUp(character.Id);
+            }
+        }
+
+        await host.ExecuteCommandAsync("effect", [ExprValue.FromString(LevelUpEffectId)], cancellationToken);
+        return StoryCommandResult.None;
+    }
+
+    private int ResolveLevelUpTrainingThreshold()
+    {
+        var threshold = LevelUpTrainingInitialThreshold;
+        if (State.Story.IsStoryCompleted(DarkShadowStoryId))
+        {
+            threshold = LevelUpTrainingDarkShadowThreshold;
+        }
+
+        if (State.Story.IsStoryCompleted(MysteriousSwordsmanStoryId))
+        {
+            threshold = LevelUpTrainingMysteriousSwordsmanThreshold;
+        }
+
+        if (State.Story.IsStoryCompleted(EmergencyStoryId))
+        {
+            threshold = LevelUpTrainingEmergencyThreshold;
+        }
+
+        return threshold;
     }
 
     private IReadOnlyList<string> ResolveStrengthTrainingItemCandidates()
