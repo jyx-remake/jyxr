@@ -245,7 +245,7 @@ public sealed class CharacterService
     {
         ArgumentNullException.ThrowIfNull(character);
         var externalSkill = ContentRepository.GetExternalSkill(skillId);
-        ApplyGrantedExternalSkill(character, externalSkill, level);
+        ApplyGrantedExternalSkill(character, externalSkill, ResolveAbsoluteSkillLevel(level));
     }
 
     public void StudyExternalSkillFromBook(CharacterInstance character, string skillId, int level = 1)
@@ -258,14 +258,14 @@ public sealed class CharacterService
             throw new InvalidOperationException("External skill count limit reached.");
         }
 
-        ApplyGrantedExternalSkill(character, externalSkill, level);
+        ApplyGrantedExternalSkill(character, externalSkill, ResolveExternalSkillMaxLevel(externalSkill, level));
     }
 
     public void GrantInternalSkill(CharacterInstance character, string skillId, int level = 1)
     {
         ArgumentNullException.ThrowIfNull(character);
         var internalSkill = ContentRepository.GetInternalSkill(skillId);
-        ApplyGrantedInternalSkill(character, internalSkill, level);
+        ApplyGrantedInternalSkill(character, internalSkill, ResolveAbsoluteSkillLevel(level));
     }
 
     public void StudyInternalSkillFromBook(CharacterInstance character, string skillId, int level = 1)
@@ -278,7 +278,7 @@ public sealed class CharacterService
             throw new InvalidOperationException("Internal skill count limit reached.");
         }
 
-        ApplyGrantedInternalSkill(character, internalSkill, level);
+        ApplyGrantedInternalSkill(character, internalSkill, ResolveInternalSkillMaxLevel(internalSkill, level));
     }
 
     public void UpgradeExternalSkillLevel(string characterId, string skillId, int levels)
@@ -287,7 +287,7 @@ public sealed class CharacterService
         var definition = ContentRepository.GetExternalSkill(skillId);
         PublishSkillUpgradeResult(
             character,
-            character.UpgradeExternalSkillLevel(definition, levels, SkillMaxLevelPolicy.GetMaxLevel(definition)),
+            character.UpgradeExternalSkillLevel(definition, levels, ResolveAbsoluteSkillMaxLevel()),
             "外功");
     }
 
@@ -297,7 +297,7 @@ public sealed class CharacterService
         var definition = ContentRepository.GetInternalSkill(skillId);
         PublishSkillUpgradeResult(
             character,
-            character.UpgradeInternalSkillLevel(definition, levels, SkillMaxLevelPolicy.GetMaxLevel(definition)),
+            character.UpgradeInternalSkillLevel(definition, levels, ResolveAbsoluteSkillMaxLevel()),
             "内功");
     }
 
@@ -480,16 +480,31 @@ public sealed class CharacterService
 
     private void ApplyGrantedExternalSkill(CharacterInstance character, ExternalSkillDefinition externalSkill, int level)
     {
-        var resolvedLevel = Math.Min(level, SkillMaxLevelPolicy.GetMaxLevel(externalSkill));
-        character.SetExternalSkillState(externalSkill, resolvedLevel, 0, true);
-        PublishToastAndCharacterChanged(character, $"{character.Name} 习得外功【{externalSkill.Name}】 {resolvedLevel}级");
+        character.SetExternalSkillState(externalSkill, level, 0, true);
+        PublishToastAndCharacterChanged(character, $"{character.Name} 习得外功【{externalSkill.Name}】 {level}级");
     }
 
     private void ApplyGrantedInternalSkill(CharacterInstance character, InternalSkillDefinition internalSkill, int level)
     {
-        var resolvedLevel = Math.Min(level, SkillMaxLevelPolicy.GetMaxLevel(internalSkill));
-        character.SetInternalSkillState(internalSkill, resolvedLevel, 0);
-        PublishToastAndCharacterChanged(character, $"{character.Name} 习得内功【{internalSkill.Name}】 {resolvedLevel}级");
+        character.SetInternalSkillState(internalSkill, level, 0);
+        PublishToastAndCharacterChanged(character, $"{character.Name} 习得内功【{internalSkill.Name}】 {level}级");
+    }
+
+    private int ResolveExternalSkillMaxLevel(ExternalSkillDefinition externalSkill, int level) =>
+        Math.Min(level, SkillMaxLevelPolicy.GetMaxLevel(externalSkill));
+
+    private int ResolveInternalSkillMaxLevel(InternalSkillDefinition internalSkill, int level) =>
+        Math.Min(level, SkillMaxLevelPolicy.GetMaxLevel(internalSkill));
+
+    private int ResolveAbsoluteSkillLevel(int level)
+    {
+        return Math.Min(level, ResolveAbsoluteSkillMaxLevel());
+    }
+
+    private int ResolveAbsoluteSkillMaxLevel()
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(Config.AbsoluteSkillMaxLevel, 1);
+        return Config.AbsoluteSkillMaxLevel;
     }
 
     private void PublishToastAndCharacterChanged(CharacterInstance character, string message)
