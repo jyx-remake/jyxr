@@ -21,6 +21,11 @@ internal sealed class TrainingBattleAiPolicy : IBattleAiPolicy
         var progressionSkills = new HashSet<SkillInstance>(ReferenceEqualityComparer.Instance);
         foreach (var skill in BattleSkillCatalog.CollectSelectableSkills(unit))
         {
+            if (skill is FormSkillInstance)
+            {
+                continue;
+            }
+
             if (SkillExperienceProgression.NormalizeProgressionSkill(skill) is { } progressionSkill)
             {
                 progressionSkills.Add(progressionSkill);

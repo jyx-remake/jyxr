@@ -244,6 +244,61 @@ public sealed class BattleAiTests
     }
 
     [Fact]
+    public void Decide_TrainingIgnoresFormSkillsWhenCheckingForUnmaxedProgressionSkills()
+    {
+        var maxedSkill = TestContentFactory.CreateExternalSkill(
+            "maxed",
+            powerBase: 200,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var unmaxedSkill = TestContentFactory.CreateExternalSkill(
+            "unmaxed",
+            formSkills:
+            [
+                new FormSkillDefinition(
+                    "unmaxed_form",
+                    "unmaxed_form",
+                    string.Empty,
+                    null,
+                    UnlockLevel: 1,
+                    Cooldown: 0,
+                    Cost: new SkillCostDefinition(Rage: 99),
+                    Targeting: new SkillTargetingDefinition(CastSize: 3, ImpactType: SkillImpactType.Single, ImpactSize: 0),
+                    PowerExtra: 10,
+                    string.Empty,
+                    string.Empty,
+                    [])
+            ],
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var enemy = CreateUnit(
+            "enemy",
+            team: 2,
+            new GridPosition(1, 1),
+            aiType: BattleAiType.Training,
+            externalSkills:
+            [
+                new InitialExternalSkillEntryDefinition(maxedSkill, 10),
+                new InitialExternalSkillEntryDefinition(unmaxedSkill, 1),
+            ]);
+        enemy.Character.SetExternalSkillActive("unmaxed", false);
+        var player = CreateUnit("player", team: 1, new GridPosition(2, 1));
+        enemy.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(6, 6), [enemy, player]);
+        var engine = new BattleEngine();
+        engine.BeginAction(state, enemy.Id);
+        var agent = CreateAgent(engine);
+
+        var plan = agent.Decide(state, enemy.Id);
+
+        Assert.Equal(BattleMainActionKind.CastSkill, plan.MainAction.Kind);
+        Assert.Equal("maxed", plan.MainAction.SkillId);
+    }
+
+    [Fact]
     public void Decide_AttackOnlyChoosesAttackWhenBasicWouldRest()
     {
         var skillDefinition = TestContentFactory.CreateExternalSkill(
