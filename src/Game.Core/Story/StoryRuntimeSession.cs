@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Game.Core.Story;
 
-internal sealed class StoryRuntimeSession(
+internal sealed partial class StoryRuntimeSession(
     StoryScript script,
     IRuntimeHost host,
     string? startSegment,
@@ -30,29 +30,26 @@ internal sealed class StoryRuntimeSession(
 
         while (TryGetCurrentSegment(out var segment))
         {
-            yield return new SegmentStartedEvent(segment.Name);
             string? jumpTarget = null;
 
-            await foreach (var stepResult in ExecuteStepsAsync(segment.Steps, ct))
+            await foreach (var stepResult in ExecuteSegmentAsync(segment, ct))
             {
                 if (stepResult.Event is not null)
                 {
                     yield return stepResult.Event;
                 }
 
-                if (stepResult.IsTerminated)
+                if (stepResult.Control == StepControl.Jump)
+                {
+                    jumpTarget = stepResult.Target;
+                    break;
+                }
+
+                if (stepResult.Control is StepControl.Terminate or StepControl.Return)
                 {
                     yield break;
                 }
-
-                if (stepResult.JumpTarget is not null)
-                {
-                    jumpTarget = stepResult.JumpTarget;
-                    break;
-                }
             }
-
-            yield return new SegmentCompletedEvent(segment.Name);
 
             if (jumpTarget is null)
             {
@@ -73,6 +70,57 @@ internal sealed class StoryRuntimeSession(
         throw new StoryRuntimeException($"Segment '{_currentSegmentName}' does not exist.");
     }
 
+    private bool TryGetSegment(string name, out Segment segment)
+    {
+        if (_segments.TryGetValue(name, out segment!))
+        {
+            return true;
+        }
+
+        throw new StoryRuntimeException($"Segment '{name}' does not exist.");
+    }
+
+    private async IAsyncEnumerable<StepResult> ExecuteSegmentAsync(
+        Segment segment,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        yield return StepResult.FromEvent(new SegmentStartedEvent(segment.Name));
+
+        StepResult? control = null;
+        await foreach (var stepResult in ExecuteStepsAsync(segment.Steps, ct))
+        {
+            if (stepResult.Event is not null)
+            {
+                yield return stepResult;
+            }
+
+            if (stepResult.IsControl)
+            {
+                control = stepResult;
+                break;
+            }
+        }
+
+        if (control?.Control == StepControl.Terminate)
+        {
+            yield return StepResult.Terminate();
+            yield break;
+        }
+
+        yield return StepResult.FromEvent(new SegmentCompletedEvent(segment.Name));
+
+        if (control?.Control == StepControl.Jump)
+        {
+            yield return StepResult.Jump(control.Target!);
+            yield break;
+        }
+
+        if (control?.Control == StepControl.Return)
+        {
+            yield return StepResult.Return();
+        }
+    }
+
     private async IAsyncEnumerable<StepResult> ExecuteStepsAsync(
         IReadOnlyList<Step> steps,
         [EnumeratorCancellation] CancellationToken ct)
@@ -84,7 +132,7 @@ internal sealed class StoryRuntimeSession(
             await foreach (var result in ExecuteStepAsync(step, ct))
             {
                 yield return result;
-                if (result.IsTerminated || result.JumpTarget is not null)
+                if (result.IsControl)
                 {
                     yield break;
                 }
@@ -111,7 +159,7 @@ internal sealed class StoryRuntimeSession(
                 if (result.JumpTarget is not null)
                 {
                     yield return StepResult.FromEvent(new JumpEvent(result.JumpTarget));
-                    yield return StepResult.FromJump(result.JumpTarget);
+                    yield return StepResult.Jump(result.JumpTarget);
                 }
 
                 yield break;
@@ -139,121 +187,39 @@ internal sealed class StoryRuntimeSession(
                 yield break;
             case JumpStep jump:
                 yield return StepResult.FromEvent(new JumpEvent(jump.Target));
-                yield return StepResult.FromJump(jump.Target);
+                yield return StepResult.Jump(jump.Target);
                 yield break;
-            default:
-                throw new StoryRuntimeException($"Unsupported step type '{step.GetType().Name}'.");
-        }
-    }
-
-    private async IAsyncEnumerable<StepResult> ExecuteChoiceAsync(
-        ChoiceStep choice,
-        [EnumeratorCancellation] CancellationToken ct)
-    {
-        var context = new ChoiceContext(
-            choice.Prompt.Speaker,
-            choice.Prompt.Text,
-            choice.Options.Select((option, index) => new ChoiceOptionView(index, option.Text)).ToArray());
-
-        yield return StepResult.FromEvent(new ChoiceOfferedEvent(context));
-
-        var selectedIndex = await host.ChooseOptionAsync(context, ct);
-        if (selectedIndex < 0 || selectedIndex >= choice.Options.Count)
-        {
-            throw new StoryRuntimeException(
-                $"Choice selection index {selectedIndex} is out of range for {choice.Options.Count} options.");
-        }
-
-        yield return StepResult.FromEvent(new ChoiceResolvedEvent(context, selectedIndex));
-
-        await foreach (var result in ExecuteStepsAsync(choice.Options[selectedIndex].Steps, ct))
-        {
-            yield return result;
-            if (result.IsTerminated || result.JumpTarget is not null)
-            {
-                yield break;
-            }
-        }
-    }
-
-    private async IAsyncEnumerable<StepResult> ExecuteBattleAsync(
-        BattleStep battle,
-        [EnumeratorCancellation] CancellationToken ct)
-    {
-        var context = new BattleContext(battle.BattleId, battle.Outcomes.Keys.ToArray());
-        yield return StepResult.FromEvent(new BattleStartedEvent(context));
-
-        var selectedOutcome = await host.ResolveBattleAsync(context, ct);
-        if (!battle.Outcomes.TryGetValue(selectedOutcome, out var steps))
-        {
-            if (selectedOutcome == BattleOutcome.Win)
-            {
-                yield return StepResult.FromEvent(new BattleResolvedEvent(context, selectedOutcome));
-                yield break;
-            }
-
-            if (selectedOutcome == BattleOutcome.Lose)
-            {
-                var args = Array.Empty<ExprValue>();
-                await host.ExecuteCommandAsync(GameOverCommand, args, ct);
-                yield return StepResult.FromEvent(new BattleResolvedEvent(context, selectedOutcome));
-                yield return StepResult.FromEvent(new CommandExecutedEvent(GameOverCommand, args));
-                yield return StepResult.Terminate();
-                yield break;
-            }
-
-            throw new StoryRuntimeException(
-                $"Battle '{battle.BattleId}' resolved to '{selectedOutcome}', but the script does not define that outcome.");
-        }
-
-        yield return StepResult.FromEvent(new BattleResolvedEvent(context, selectedOutcome));
-
-        await foreach (var result in ExecuteStepsAsync(steps, ct))
-        {
-            yield return result;
-            if (result.IsTerminated || result.JumpTarget is not null)
-            {
-                yield break;
-            }
-        }
-    }
-
-    private async IAsyncEnumerable<StepResult> ExecuteBranchAsync(
-        BranchStep branch,
-        [EnumeratorCancellation] CancellationToken ct)
-    {
-        foreach (var branchCase in branch.Cases)
-        {
-            var result = await ExpressionEvaluator.EvaluateAsync(branchCase.When, host, ct);
-            if (!result.AsBoolean("branch condition"))
-            {
-                continue;
-            }
-
-            await foreach (var stepResult in ExecuteStepsAsync(branchCase.Steps, ct))
-            {
-                yield return stepResult;
-                if (stepResult.IsTerminated || stepResult.JumpTarget is not null)
+            case CallStep call:
+                if (!TryGetSegment(call.Target, out var segment))
                 {
                     yield break;
                 }
-            }
 
-            yield break;
-        }
+                await foreach (var result in ExecuteSegmentAsync(segment, ct))
+                {
+                    if (result.Event is not null)
+                    {
+                        yield return result;
+                    }
 
-        if (branch.Fallback is null)
-        {
-            yield break;
-        }
+                    if (result.Control is StepControl.Terminate or StepControl.Jump)
+                    {
+                        yield return result;
+                        yield break;
+                    }
 
-        await foreach (var stepResult in ExecuteStepsAsync(branch.Fallback, ct))
-        {
-            yield return stepResult;
-            if (stepResult.IsTerminated || stepResult.JumpTarget is not null)
-            {
+                    if (result.Control == StepControl.Return)
+                    {
+                        yield break;
+                    }
+                }
+
                 yield break;
-            }
+            case ReturnStep:
+                yield return StepResult.Return();
+                yield break;
+            default:
+                throw new StoryRuntimeException($"Unsupported step type '{step.GetType().Name}'.");
         }
     }
 
@@ -270,12 +236,4 @@ internal sealed class StoryRuntimeSession(
         return values;
     }
 
-    private sealed record StepResult(StoryEvent? Event, string? JumpTarget, bool IsTerminated)
-    {
-        public static StepResult FromEvent(StoryEvent storyEvent) => new(storyEvent, null, false);
-
-        public static StepResult FromJump(string jumpTarget) => new(null, jumpTarget, false);
-
-        public static StepResult Terminate() => new(null, null, true);
-    }
 }

@@ -769,6 +769,12 @@ public sealed partial class JsonContentLoader
                     Ensure(repository.StorySegments.ContainsKey(jump.Target),
                         $"{ownerName} jumps to missing story segment '{jump.Target}'.");
                     break;
+                case CallStep call:
+                    Ensure(repository.StorySegments.ContainsKey(call.Target),
+                        $"{ownerName} calls missing story segment '{call.Target}'.");
+                    break;
+                case ReturnStep:
+                    break;
                 case ChoiceStep choice:
                     Ensure(choice.Options.Count > 0, $"{ownerName} has choice without options.");
                     foreach (var option in choice.Options)

@@ -167,6 +167,226 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
+    public async Task RunAsync_CallReturnsToCallerAndContinuesNextStep()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "start",
+                            [
+                                CreateCustomCommandStep("before_call"),
+                                new CallStep("shared"),
+                                CreateCustomCommandStep("after_call"),
+                            ]),
+                        new Segment(
+                            "shared",
+                            [
+                                CreateCustomCommandStep("inside_call"),
+                                new ReturnStep(),
+                                CreateCustomCommandStep("after_return"),
+                            ]),
+                    ]),
+            ]);
+
+        var host = new RecordingRuntimeHost();
+        var session = new GameSession(new GameState(), repository, host);
+
+        await session.StoryService.ExecuteAsync("start");
+
+        Assert.Equal(
+            ["before_call", "inside_call", "after_call"],
+            host.CustomCommands.Select(command => command.Args[0].AsString(command.Name)).ToArray());
+        Assert.True(session.State.Story.IsStoryCompleted("start"));
+        Assert.True(session.State.Story.IsStoryCompleted("shared"));
+    }
+
+    [Fact]
+    public async Task RunAsync_NestedCallsReturnInStackOrder()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "start",
+                            [
+                                new CallStep("first"),
+                                CreateCustomCommandStep("after_first"),
+                            ]),
+                        new Segment(
+                            "first",
+                            [
+                                new CallStep("second"),
+                                CreateCustomCommandStep("after_second"),
+                                new ReturnStep(),
+                            ]),
+                        new Segment(
+                            "second",
+                            [
+                                CreateCustomCommandStep("inside_second"),
+                                new ReturnStep(),
+                            ]),
+                    ]),
+            ]);
+
+        var host = new RecordingRuntimeHost();
+        var session = new GameSession(new GameState(), repository, host);
+
+        await session.StoryService.ExecuteAsync("start");
+
+        Assert.Equal(
+            ["inside_second", "after_second", "after_first"],
+            host.CustomCommands.Select(command => command.Args[0].AsString(command.Name)).ToArray());
+    }
+
+    [Fact]
+    public async Task RunAsync_ReturnInsideNestedControlStructuresReturnsToCaller()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "start",
+                            [
+                                new CallStep("branch_return"),
+                                CreateCustomCommandStep("after_branch"),
+                                new CallStep("choice_return"),
+                                CreateCustomCommandStep("after_choice"),
+                                new CallStep("battle_return"),
+                                CreateCustomCommandStep("after_battle"),
+                            ]),
+                        new Segment(
+                            "branch_return",
+                            [
+                                new BranchStep(
+                                    [
+                                        new BranchCase(
+                                            new LiteralExprNode(ExprValue.FromBoolean(true)),
+                                            [new ReturnStep(), CreateCustomCommandStep("branch_unreachable")]),
+                                    ],
+                                    null),
+                            ]),
+                        new Segment(
+                            "choice_return",
+                            [
+                                new ChoiceStep(
+                                    new ChoicePrompt("旁白", "选"),
+                                    [
+                                        new ChoiceOption("返回", [new ReturnStep(), CreateCustomCommandStep("choice_unreachable")]),
+                                    ]),
+                            ]),
+                        new Segment(
+                            "battle_return",
+                            [
+                                new BattleStep(
+                                    "battle_win",
+                                    new Dictionary<BattleOutcome, IReadOnlyList<Step>>
+                                    {
+                                        [BattleOutcome.Win] = [new ReturnStep(), CreateCustomCommandStep("battle_unreachable")],
+                                    }),
+                            ]),
+                    ]),
+            ],
+            battles:
+            [
+                new BattleDefinition
+                {
+                    Id = "battle_win",
+                    Name = "battle_win",
+                    MapId = "battle_map",
+                },
+            ]);
+
+        var host = new RecordingRuntimeHost();
+        var session = new GameSession(new GameState(), repository, host);
+
+        await session.StoryService.ExecuteAsync("start");
+
+        Assert.Equal(
+            ["after_branch", "after_choice", "after_battle"],
+            host.CustomCommands.Select(command => command.Args[0].AsString(command.Name)).ToArray());
+        Assert.Single(host.Choices);
+    }
+
+    [Fact]
+    public async Task RunAsync_TopLevelReturnEndsStoryFlow()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "start",
+                            [
+                                CreateCustomCommandStep("before_return"),
+                                new ReturnStep(),
+                                CreateCustomCommandStep("after_return"),
+                            ]),
+                    ]),
+            ]);
+
+        var host = new RecordingRuntimeHost();
+        var session = new GameSession(new GameState(), repository, host);
+
+        await session.StoryService.ExecuteAsync("start");
+
+        var command = Assert.Single(host.CustomCommands);
+        Assert.Equal("before_return", command.Args[0].AsString(command.Name));
+        Assert.True(session.State.Story.IsStoryCompleted("start"));
+    }
+
+    [Fact]
+    public async Task RunAsync_JumpInsideCalledSegmentDoesNotReturnToCaller()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    1,
+                    [
+                        new Segment(
+                            "start",
+                            [
+                                new CallStep("shared"),
+                                CreateCustomCommandStep("after_call"),
+                            ]),
+                        new Segment(
+                            "shared",
+                            [
+                                new JumpStep("target"),
+                            ]),
+                        new Segment(
+                            "target",
+                            [
+                                CreateCustomCommandStep("landed"),
+                            ]),
+                    ]),
+            ]);
+
+        var host = new RecordingRuntimeHost();
+        var session = new GameSession(new GameState(), repository, host);
+
+        await session.StoryService.ExecuteAsync("start");
+
+        var command = Assert.Single(host.CustomCommands);
+        Assert.Equal("landed", command.Args[0].AsString(command.Name));
+        Assert.True(session.State.Story.IsStoryCompleted("start"));
+        Assert.True(session.State.Story.IsStoryCompleted("shared"));
+        Assert.True(session.State.Story.IsStoryCompleted("target"));
+    }
+
+    [Fact]
     public async Task RunAsync_BattleWinWithoutWinOutcomeContinuesFollowingSteps()
     {
         var repository = TestContentFactory.CreateRepository(

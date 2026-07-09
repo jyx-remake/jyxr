@@ -32,6 +32,11 @@ public readonly record struct StoryCommandResult(string? JumpTarget)
 public sealed record JumpStep(
     string Target) : Step;
 
+public sealed record CallStep(
+    string Target) : Step;
+
+public sealed record ReturnStep : Step;
+
 public sealed record ChoiceStep(
     ChoicePrompt Prompt,
     IReadOnlyList<ChoiceOption> Options) : Step;

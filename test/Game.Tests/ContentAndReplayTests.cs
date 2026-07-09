@@ -1000,6 +1000,37 @@ public sealed class ContentLoadingTests
     }
 
     [Fact]
+    public void JsonLoader_RejectsMissingStoryCallTarget()
+    {
+        var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["story/main.story.json"] =
+                """
+                {
+                  "version": 1,
+                  "segments": [
+                    {
+                      "name": "story_intro",
+                      "steps": [
+                        { "kind": "call", "target": "story_missing" }
+                      ]
+                    }
+                  ]
+                }
+                """,
+        });
+
+        try
+        {
+            Assert.Throws<InvalidOperationException>(() => new JsonContentLoader().LoadFromDirectory(directoryPath));
+        }
+        finally
+        {
+            Directory.Delete(directoryPath, recursive: true);
+        }
+    }
+
+    [Fact]
     public void JsonLoader_RejectsMissingStoryReferencedByMap()
     {
         var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)

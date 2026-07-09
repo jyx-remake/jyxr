@@ -53,6 +53,8 @@ internal sealed class StoryScriptJsonParser(JsonElement root)
                 GetRequiredString(element, "name"),
                 ParseValueArgs(GetRequiredProperty(element, "args"), "command.args")),
             "jump" => new JumpStep(GetRequiredString(element, "target")),
+            "call" => new CallStep(GetRequiredString(element, "target")),
+            "return" => new ReturnStep(),
             "choice" => ParseChoiceStep(element),
             "battle" => ParseBattleStep(element),
             "branch" => ParseBranchStep(element),
