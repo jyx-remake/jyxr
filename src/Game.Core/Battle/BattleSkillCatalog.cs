@@ -15,10 +15,11 @@ public static class BattleSkillCatalog
             .Where(static skill => skill.IsActive)
             .Cast<SkillInstance>()
             .Concat(externalSkills
-                .Where(static skill => skill.IsActive)
-                .Cast<SkillInstance>())
-            .Concat(externalSkills
-                .SelectMany(static skill => skill.GetFormSkills().Where(static formSkill => formSkill.IsActive)))
+                .SelectMany(static skill =>
+                    (skill.IsActive
+                        ? new[] { (SkillInstance)skill }
+                        : [])
+                    .Concat(skill.GetFormSkills().Where(static formSkill => formSkill.IsActive))))
             .Concat(internalSkills
                 .SelectMany(static skill => skill.GetFormSkills().Where(static formSkill => formSkill.IsActive)))
             .ToList();
