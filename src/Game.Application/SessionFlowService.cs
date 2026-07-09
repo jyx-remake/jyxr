@@ -1,5 +1,6 @@
 using Game.Core.Abstractions;
 using Game.Core.Model;
+using Game.Core.Story;
 
 namespace Game.Application;
 
@@ -30,12 +31,14 @@ public sealed class SessionFlowService
     public void StartNextRound()
     {
         var nextRound = checked(State.Adventure.Round + 1);
+        var lastTrialCount = State.SpecialBattle.TrialCompletedCharacterIds.Count;
         var carriedChest = State.Chest.Clone(ContentRepository);
         var nextState = _newGameStateFactory.Create(
             Config.InitialPartyCharacterIds,
             nextRound,
             carriedChest);
         nextState.Currency.AddSilver(NextRoundInitialSilver);
+        nextState.Story.SetVariable("last_trial_count", ExprValue.FromNumber(lastTrialCount));
 
         ReplaceState(nextState);
     }
