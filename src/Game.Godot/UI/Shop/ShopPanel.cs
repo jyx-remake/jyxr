@@ -170,7 +170,7 @@ public partial class ShopPanel : JyPanel
 		{
 			var sellPrice = Game.ShopService.GetSellPrice(entry.Definition);
 			var itemBox = CreateItemBox();
-			itemBox.SetupInventoryEntry(entry, sellPrice, entry.Definition.CanDrop && sellPrice > 0);
+			itemBox.SetupInventoryEntry(entry, sellPrice, Game.ShopService.CanSell(entry.Definition));
 			itemBox.InventoryEntrySelected += OnInventoryEntrySelected;
 			_gridContainer.AddChild(itemBox);
 		}
@@ -233,7 +233,7 @@ public partial class ShopPanel : JyPanel
 	private void OnInventoryEntrySelected(InventoryEntry entry)
 	{
 		var sellPrice = Game.ShopService.GetSellPrice(entry.Definition);
-		var canSell = entry.Definition.CanDrop && sellPrice > 0;
+		var canSell = Game.ShopService.CanSell(entry.Definition);
 		if (_quickSellCheckBox.ButtonPressed)
 		{
 			if (!canSell)

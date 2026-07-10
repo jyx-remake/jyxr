@@ -88,11 +88,12 @@ public sealed class ShopService
         ArgumentNullException.ThrowIfNull(entry);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
 
-        var unitPrice = GetSellPrice(entry.Definition);
-        if (unitPrice <= 0 || !entry.Definition.CanDrop)
+        if (!CanSell(entry.Definition))
         {
             return ShopTransactionResult.Failed($"【{entry.Definition.Name}】不能出售。");
         }
+
+        var unitPrice = GetSellPrice(entry.Definition);
 
         switch (entry)
         {
@@ -129,6 +130,12 @@ public sealed class ShopService
     {
         ArgumentNullException.ThrowIfNull(item);
         return item.Price <= 0 ? 0 : Math.Max(1, (int)Math.Floor(item.Price * SellPriceRatio));
+    }
+
+    public bool CanSell(ItemDefinition item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        return item.Price > 0;
     }
 
     private ShopProductView CreateProductView(string shopId, int productIndex, ShopProductDefinition product)
