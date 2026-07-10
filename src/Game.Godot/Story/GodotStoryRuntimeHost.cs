@@ -44,11 +44,14 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeH
 	}
 
 	public async ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken)
-		=> await UIRoot.Instance.ShowChoicesAsync(
+	{
+		var visibleIndex = await UIRoot.Instance.ShowChoicesAsync(
 			choice.PromptSpeaker,
 			choice.PromptText,
 			choice.Options.Select(static option => option.Text).ToArray(),
 			cancellationToken);
+		return choice.Options[visibleIndex].Index;
+	}
 
 	public async ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken)
 	{

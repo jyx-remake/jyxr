@@ -198,7 +198,7 @@ internal static class TestContentFactory
             .ToDictionary(entry => entry.Key, entry => entry.Script, StringComparer.Ordinal);
         var storySegments = new Dictionary<string, StorySegmentEntry>(StringComparer.Ordinal);
         var combinedStoryScript = new StoryScript(
-            storyScriptMap.Values.FirstOrDefault()?.Version ?? 1,
+            storyScriptMap.Values.FirstOrDefault()?.Version ?? StoryScript.CurrentVersion,
             storyScriptMap.Values.SelectMany(static script => script.Segments).ToList());
         foreach (var (scriptId, script) in storyScriptMap)
         {

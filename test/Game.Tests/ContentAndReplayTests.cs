@@ -927,7 +927,7 @@ public sealed class ContentLoadingTests
             ["story/main.story.json"] =
                 """
                 {
-                  "version": 1,
+                  "version": 2,
                   "segments": [
                     {
                       "name": "story_intro",
@@ -976,7 +976,7 @@ public sealed class ContentLoadingTests
             ["story/main.story.json"] =
                 """
                 {
-                  "version": 1,
+                  "version": 2,
                   "segments": [
                     {
                       "name": "story_intro",
@@ -1007,7 +1007,7 @@ public sealed class ContentLoadingTests
             ["story/main.story.json"] =
                 """
                 {
-                  "version": 1,
+                  "version": 2,
                   "segments": [
                     {
                       "name": "story_intro",
@@ -1061,7 +1061,7 @@ public sealed class ContentLoadingTests
             ["story/main.story.json"] =
                 """
                 {
-                  "version": 1,
+                  "version": 2,
                   "segments": [
                     {
                       "name": "story_intro",
@@ -1114,7 +1114,7 @@ public sealed class ContentLoadingTests
             ["story/main.story.json"] =
                 """
                 {
-                  "version": 1,
+                  "version": 2,
                   "segments": [
                     {
                       "name": "story_intro",

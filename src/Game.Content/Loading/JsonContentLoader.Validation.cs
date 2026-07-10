@@ -776,10 +776,14 @@ public sealed partial class JsonContentLoader
                 case ReturnStep:
                     break;
                 case ChoiceStep choice:
-                    Ensure(choice.Options.Count > 0, $"{ownerName} has choice without options.");
-                    foreach (var option in choice.Options)
+                    Ensure(choice.Groups.Count > 0, $"{ownerName} has choice without groups.");
+                    foreach (var group in choice.Groups)
                     {
-                        ValidateStorySteps(option.Steps, repository, $"{ownerName} choice option '{option.Text}'");
+                        Ensure(group.Options.Count > 0, $"{ownerName} has choice group without options.");
+                        foreach (var option in group.Options)
+                        {
+                            ValidateStorySteps(option.Steps, repository, $"{ownerName} choice option '{option.Text}'");
+                        }
                     }
 
                     break;

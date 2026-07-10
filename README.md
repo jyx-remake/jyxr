@@ -122,6 +122,8 @@
   - `LoadFromFile(...)`
   - `LoadFromPackage(...)`
 - 目录加载会扫描根 JSON 文件和 `story/*.story.json`，并把 story segment id 建入内容仓储。
+- story JSON 当前只接受 IR version 2；`choice` 使用按源码顺序排列的 `groups`，无条件组省略 `when`，条件组提供表达式 `when`。
+- 剧情运行时会在展示前逐组求值，每组只求值一次并只把可见选项交给宿主；过滤后没有可用选项会立即报错。
 - `ContentPackage` 当前是公开类型，保留给后续 pck/包式内容加载使用。
 - `GodotContentPackageLoader` 已不再是当前 MOD launcher 主运行路径；当前先走普通文件系统 loose MOD 目录。
 - 顶层 JSON 当前直接反序列化到 runtime definition，不维护完整 `XxxDto -> XxxDefinition` 平行层。

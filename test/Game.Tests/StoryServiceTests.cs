@@ -16,7 +16,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "story_intro",
@@ -124,7 +124,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start",
@@ -173,7 +173,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start",
@@ -211,7 +211,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start",
@@ -252,7 +252,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start",
@@ -281,7 +281,11 @@ public sealed class StoryServiceTests
                                 new ChoiceStep(
                                     new ChoicePrompt("旁白", "选"),
                                     [
-                                        new ChoiceOption("返回", [new ReturnStep(), CreateCustomCommandStep("choice_unreachable")]),
+                                        new ChoiceGroup(
+                                            null,
+                                            [
+                                                new ChoiceOption("返回", [new ReturnStep(), CreateCustomCommandStep("choice_unreachable")]),
+                                            ]),
                                     ]),
                             ]),
                         new Segment(
@@ -318,13 +322,97 @@ public sealed class StoryServiceTests
     }
 
     [Fact]
+    public async Task RunAsync_FiltersConditionalChoiceGroupsAndPreservesSourceIndexes()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    StoryScript.CurrentVersion,
+                    [
+                        new Segment(
+                            "conditional_choice",
+                            [
+                                new ChoiceStep(
+                                    new ChoicePrompt("掌柜", "客官需要什么？"),
+                                    [
+                                        new ChoiceGroup(
+                                            new PredicateExprNode("hidden_group", []),
+                                            [new ChoiceOption("隐藏选项", [CreateCustomCommandStep("hidden")])]),
+                                        new ChoiceGroup(
+                                            new PredicateExprNode("visible_group", []),
+                                            [
+                                                new ChoiceOption("购买", [CreateCustomCommandStep("buy")]),
+                                                new ChoiceOption("出售", [CreateCustomCommandStep("sell")]),
+                                            ]),
+                                    ]),
+                            ]),
+                    ]),
+            ]);
+        var host = new RecordingRuntimeHost
+        {
+            SelectedOptionIndex = 2,
+        };
+        host.PredicateResults["hidden_group"] = false;
+        host.PredicateResults["visible_group"] = true;
+        var session = new GameSession(new GameState(), repository, host);
+        var events = new List<StoryEvent>();
+
+        await foreach (var storyEvent in session.StoryService.RunAsync("conditional_choice"))
+        {
+            events.Add(storyEvent);
+        }
+
+        Assert.Equal(["hidden_group", "visible_group"], host.EvaluatedPredicates);
+        var choice = Assert.Single(host.Choices);
+        Assert.Equal([1, 2], choice.Options.Select(static option => option.Index).ToArray());
+        Assert.Equal(["购买", "出售"], choice.Options.Select(static option => option.Text).ToArray());
+        var offered = Assert.Single(events.OfType<ChoiceOfferedEvent>());
+        Assert.Equal([1, 2], offered.Choice.Options.Select(static option => option.Index).ToArray());
+        Assert.Equal("sell", Assert.Single(host.CustomCommands).Args[0].AsString("custom_cmd"));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_RejectsChoiceWithoutAvailableOptionsBeforeCallingHost()
+    {
+        var repository = TestContentFactory.CreateRepository(
+            storyScripts:
+            [
+                new StoryScript(
+                    StoryScript.CurrentVersion,
+                    [
+                        new Segment(
+                            "empty_choice",
+                            [
+                                new ChoiceStep(
+                                    new ChoicePrompt("旁白", "无人可选"),
+                                    [
+                                        new ChoiceGroup(
+                                            new PredicateExprNode("hidden_group", []),
+                                            [new ChoiceOption("隐藏选项", [])]),
+                                    ]),
+                            ]),
+                    ]),
+            ]);
+        var host = new RecordingRuntimeHost();
+        host.PredicateResults["hidden_group"] = false;
+        var session = new GameSession(new GameState(), repository, host);
+
+        var exception = await Assert.ThrowsAsync<StoryRuntimeException>(
+            () => session.StoryService.ExecuteAsync("empty_choice"));
+
+        Assert.Contains("no available options", exception.Message, StringComparison.Ordinal);
+        Assert.Empty(host.Choices);
+    }
+
+    [Fact]
     public async Task RunAsync_TopLevelReturnEndsStoryFlow()
     {
         var repository = TestContentFactory.CreateRepository(
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start",
@@ -353,7 +441,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start",
@@ -393,7 +481,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "battle_story",
@@ -445,7 +533,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "battle_story",
@@ -496,7 +584,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "story_intro",
@@ -603,7 +691,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "item_delta",
@@ -638,7 +726,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "currency_projection",
@@ -679,7 +767,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start_timer",
@@ -731,7 +819,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start_timer",
@@ -770,7 +858,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "timer_flow",
@@ -805,7 +893,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "start",
@@ -814,7 +902,7 @@ public sealed class StoryServiceTests
                             ]),
                     ]),
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "external_segment",
@@ -868,7 +956,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "learn_all",
@@ -953,7 +1041,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "upgrade_growth",
@@ -1011,7 +1099,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "legacy_predicates",
@@ -1092,7 +1180,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "interpolation",
@@ -1101,8 +1189,12 @@ public sealed class StoryServiceTests
                                 new ChoiceStep(
                                     new ChoicePrompt("旁白", "要和$FEMALE$一起行动吗？"),
                                     [
-                                        new ChoiceOption("$MALE$，出发。", []),
-                                        new ChoiceOption("再等等。", []),
+                                        new ChoiceGroup(
+                                            null,
+                                            [
+                                                new ChoiceOption("$MALE$，出发。", []),
+                                                new ChoiceOption("再等等。", []),
+                                            ]),
                                     ]),
                             ]),
                     ]),
@@ -1147,7 +1239,7 @@ public sealed class StoryServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    1,
+                    StoryScript.CurrentVersion,
                     [
                         new Segment(
                             "interpolation_fallback",
@@ -1195,9 +1287,15 @@ public sealed class StoryServiceTests
 
         public List<(string Name, IReadOnlyList<ExprValue> Args)> CustomCommands { get; } = [];
 
+        public Dictionary<string, bool> PredicateResults { get; } = new(StringComparer.Ordinal);
+
+        public List<string> EvaluatedPredicates { get; } = [];
+
         public Dictionary<string, string> CommandJumps { get; } = new(StringComparer.Ordinal);
 
         public BattleOutcome BattleOutcome { get; init; } = BattleOutcome.Win;
+
+        public int SelectedOptionIndex { get; init; }
 
         public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken)
         {
@@ -1215,8 +1313,13 @@ public sealed class StoryServiceTests
         public ValueTask<bool> EvaluatePredicateAsync(
             string name,
             IReadOnlyList<ExprValue> args,
-            CancellationToken cancellationToken) =>
-            ValueTask.FromException<bool>(new InvalidOperationException($"Unknown predicate '{name}'."));
+            CancellationToken cancellationToken)
+        {
+            EvaluatedPredicates.Add(name);
+            return PredicateResults.TryGetValue(name, out var result)
+                ? ValueTask.FromResult(result)
+                : ValueTask.FromException<bool>(new InvalidOperationException($"Unknown predicate '{name}'."));
+        }
 
         public ValueTask<StoryCommandResult> ExecuteCommandAsync(
             string name,
@@ -1232,7 +1335,7 @@ public sealed class StoryServiceTests
         public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken)
         {
             Choices.Add(choice);
-            return ValueTask.FromResult(0);
+            return ValueTask.FromResult(SelectedOptionIndex);
         }
 
         public ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken) =>

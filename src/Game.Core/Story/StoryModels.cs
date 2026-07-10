@@ -2,7 +2,10 @@ namespace Game.Core.Story;
 
 public sealed record StoryScript(
     int Version,
-    IReadOnlyList<Segment> Segments);
+    IReadOnlyList<Segment> Segments)
+{
+    public const int CurrentVersion = 2;
+}
 
 public sealed record Segment(
     string Name,
@@ -39,11 +42,15 @@ public sealed record ReturnStep : Step;
 
 public sealed record ChoiceStep(
     ChoicePrompt Prompt,
-    IReadOnlyList<ChoiceOption> Options) : Step;
+    IReadOnlyList<ChoiceGroup> Groups) : Step;
 
 public sealed record ChoicePrompt(
     string Speaker,
     string Text);
+
+public sealed record ChoiceGroup(
+    ExprNode? When,
+    IReadOnlyList<ChoiceOption> Options);
 
 public sealed record ChoiceOption(
     string Text,

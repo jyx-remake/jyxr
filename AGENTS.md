@@ -398,6 +398,8 @@
   - 已存在时只改名，不改变其当前池子。
 - `Game.Core/Story`
   - 当前已有轻量剧本解释器、表达式求值、JSON parser 与 runtime session。
+  - story JSON 当前使用 IR version 2；`choice` 由有序 `groups` 组成，无条件组省略 `when`，条件组只求值一次后整体显示或隐藏。
+  - `ChoiceOptionView.Index` 是宿主必须回传的原选项标识，不是过滤后可见数组的位置；过滤后无选项会在 Core runtime 报错。
 - `Game.Application`
   - 当前已有：
     - `StoryService`

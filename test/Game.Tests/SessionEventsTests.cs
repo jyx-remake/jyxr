@@ -234,7 +234,7 @@ public sealed class SessionEventsTests
         var repository = TestContentFactory.CreateRepository(
             storyScripts:
             [
-                new StoryScript(1, [new Segment("quiz_timeout", [])]),
+                new StoryScript(StoryScript.CurrentVersion, [new Segment("quiz_timeout", [])]),
             ]);
         var session = new GameSession(new GameState(), repository);
         var dispatcher = new StoryCommandDispatcher(session, new RecordingRuntimeHost());

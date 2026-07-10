@@ -41,6 +41,8 @@ public sealed record ChoiceContext(
     string PromptText,
     IReadOnlyList<ChoiceOptionView> Options);
 
+/// <param name="Index">Opaque source option index that the host must return when this option is selected.</param>
+/// <param name="Text">Option text presented to the player.</param>
 public sealed record ChoiceOptionView(
     int Index,
     string Text);

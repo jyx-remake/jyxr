@@ -114,7 +114,7 @@ public sealed partial class JsonContentLoader
             .SelectMany(static entry => entry.Value.Segments)
             .ToList();
         var combinedScript = new StoryScript(
-            storyScripts.Values.FirstOrDefault()?.Version ?? 1,
+            storyScripts.Values.FirstOrDefault()?.Version ?? StoryScript.CurrentVersion,
             allSegments);
 
         foreach (var (scriptId, script) in storyScripts)

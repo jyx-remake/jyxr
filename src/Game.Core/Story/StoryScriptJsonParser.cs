@@ -8,6 +8,11 @@ internal sealed class StoryScriptJsonParser(JsonElement root)
     {
         EnsureObject(root, "root");
         var version = GetRequiredInt32(root, "version");
+        if (version != StoryScript.CurrentVersion)
+        {
+            throw new StoryRuntimeException(
+                $"Unsupported story script version '{version}'. Expected version {StoryScript.CurrentVersion}.");
+        }
         var segmentsElement = GetRequiredProperty(root, "segments");
         EnsureArray(segmentsElement, "segments");
 
@@ -70,18 +75,48 @@ internal sealed class StoryScriptJsonParser(JsonElement root)
             GetRequiredString(promptElement, "speaker"),
             GetRequiredString(promptElement, "text"));
 
-        var optionsElement = GetRequiredProperty(element, "options");
-        EnsureArray(optionsElement, "choice.options");
-        var options = new List<ChoiceOption>();
-        foreach (var optionElement in optionsElement.EnumerateArray())
+        var groupsElement = GetRequiredProperty(element, "groups");
+        EnsureArray(groupsElement, "choice.groups");
+        var groups = new List<ChoiceGroup>();
+        foreach (var groupElement in groupsElement.EnumerateArray())
         {
-            EnsureObject(optionElement, "choice.option");
-            options.Add(new ChoiceOption(
-                GetRequiredString(optionElement, "text"),
-                ParseSteps(GetRequiredProperty(optionElement, "steps"), "choice.option.steps")));
+            EnsureObject(groupElement, "choice.group");
+            ExprNode? when = null;
+            if (TryGetProperty(groupElement, "when", out var whenElement))
+            {
+                if (whenElement.ValueKind == JsonValueKind.Null)
+                {
+                    throw new StoryRuntimeException("choice.group.when must be omitted for an unconditional group.");
+                }
+
+                when = ParseExpression(whenElement);
+            }
+
+            var optionsElement = GetRequiredProperty(groupElement, "options");
+            EnsureArray(optionsElement, "choice.group.options");
+            var options = new List<ChoiceOption>();
+            foreach (var optionElement in optionsElement.EnumerateArray())
+            {
+                EnsureObject(optionElement, "choice.option");
+                options.Add(new ChoiceOption(
+                    GetRequiredString(optionElement, "text"),
+                    ParseSteps(GetRequiredProperty(optionElement, "steps"), "choice.option.steps")));
+            }
+
+            if (options.Count == 0)
+            {
+                throw new StoryRuntimeException("choice.group.options must contain at least one option.");
+            }
+
+            groups.Add(new ChoiceGroup(when, options));
         }
 
-        return new ChoiceStep(prompt, options);
+        if (groups.Count == 0)
+        {
+            throw new StoryRuntimeException("choice.groups must contain at least one group.");
+        }
+
+        return new ChoiceStep(prompt, groups);
     }
 
     private BattleStep ParseBattleStep(JsonElement element)

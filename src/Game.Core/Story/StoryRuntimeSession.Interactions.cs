@@ -8,23 +8,54 @@ internal sealed partial class StoryRuntimeSession
         ChoiceStep choice,
         [EnumeratorCancellation] CancellationToken ct)
     {
+        var availableOptions = new Dictionary<int, ChoiceOption>();
+        var optionViews = new List<ChoiceOptionView>();
+        var sourceIndex = 0;
+
+        foreach (var group in choice.Groups)
+        {
+            var isAvailable = true;
+            if (group.When is not null)
+            {
+                var result = await ExpressionEvaluator.EvaluateAsync(group.When, host, ct);
+                isAvailable = result.AsBoolean("choice group condition");
+            }
+
+            foreach (var option in group.Options)
+            {
+                if (isAvailable)
+                {
+                    availableOptions.Add(sourceIndex, option);
+                    optionViews.Add(new ChoiceOptionView(sourceIndex, option.Text));
+                }
+
+                sourceIndex += 1;
+            }
+        }
+
+        if (availableOptions.Count == 0)
+        {
+            throw new StoryRuntimeException(
+                $"Choice '{choice.Prompt.Text}' has no available options after evaluating its conditions.");
+        }
+
         var context = new ChoiceContext(
             choice.Prompt.Speaker,
             choice.Prompt.Text,
-            choice.Options.Select((option, index) => new ChoiceOptionView(index, option.Text)).ToArray());
+            optionViews);
 
         yield return StepResult.FromEvent(new ChoiceOfferedEvent(context));
 
         var selectedIndex = await host.ChooseOptionAsync(context, ct);
-        if (selectedIndex < 0 || selectedIndex >= choice.Options.Count)
+        if (!availableOptions.TryGetValue(selectedIndex, out var selectedOption))
         {
             throw new StoryRuntimeException(
-                $"Choice selection index {selectedIndex} is out of range for {choice.Options.Count} options.");
+                $"Choice selection index {selectedIndex} is not an available option.");
         }
 
         yield return StepResult.FromEvent(new ChoiceResolvedEvent(context, selectedIndex));
 
-        await foreach (var result in ExecuteStepsAsync(choice.Options[selectedIndex].Steps, ct))
+        await foreach (var result in ExecuteStepsAsync(selectedOption.Steps, ct))
         {
             yield return result;
             if (result.IsControl)

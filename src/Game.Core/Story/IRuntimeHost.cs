@@ -10,6 +10,7 @@ public interface IRuntimeHost
 
     ValueTask<StoryCommandResult> ExecuteCommandAsync(string name, IReadOnlyList<ExprValue> args, CancellationToken cancellationToken);
 
+    /// <returns>The <see cref="ChoiceOptionView.Index"/> of the selected visible option.</returns>
     ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken);
 
     ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken);

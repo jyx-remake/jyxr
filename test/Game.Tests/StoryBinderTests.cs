@@ -43,7 +43,7 @@ public sealed class StoryBinderTests
     {
         const string json = """
         {
-          "version": 1,
+          "version": 2,
           "segments": [
             {
               "name": "start",
@@ -68,6 +68,103 @@ public sealed class StoryBinderTests
             item => Assert.Equal("胡斐", Assert.IsType<LiteralExprNode>(item).Value.Text),
             item => Assert.Equal("candidateId", Assert.IsType<VariableExprNode>(item).Name));
     }
+
+    [Fact]
+    public void StoryScriptJson_ParsesConditionalChoiceGroups()
+    {
+        const string json = """
+        {
+          "version": 2,
+          "segments": [
+            {
+              "name": "start",
+              "steps": [
+                {
+                  "kind": "choice",
+                  "prompt": { "speaker": "掌柜", "text": "选择" },
+                  "groups": [
+                    {
+                      "options": [
+                        { "text": "离开", "steps": [] }
+                      ]
+                    },
+                    {
+                      "when": ["pred", "shop_open"],
+                      "options": [
+                        { "text": "购买", "steps": [] },
+                        { "text": "出售", "steps": [] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        """;
+
+        var script = StoryScriptJson.Parse(json);
+        var choice = Assert.IsType<ChoiceStep>(Assert.Single(script.Segments[0].Steps));
+
+        Assert.Equal(StoryScript.CurrentVersion, script.Version);
+        Assert.Null(choice.Groups[0].When);
+        Assert.Equal("离开", Assert.Single(choice.Groups[0].Options).Text);
+        var predicate = Assert.IsType<PredicateExprNode>(choice.Groups[1].When);
+        Assert.Equal("shop_open", predicate.Name);
+        Assert.Equal(["购买", "出售"], choice.Groups[1].Options.Select(static option => option.Text).ToArray());
+    }
+
+    [Theory]
+    [MemberData(nameof(InvalidChoiceScripts))]
+    public void StoryScriptJson_RejectsInvalidVersion2ChoiceShapes(string json)
+    {
+        Assert.Throws<StoryRuntimeException>(() => StoryScriptJson.Parse(json));
+    }
+
+    public static TheoryData<string> InvalidChoiceScripts { get; } = new()
+    {
+        {
+            """
+        { "version": 1, "segments": [] }
+        """
+        },
+        {
+            """
+        {
+          "version": 2,
+          "segments": [{ "name": "start", "steps": [{
+            "kind": "choice",
+            "prompt": { "speaker": "", "text": "" },
+            "options": []
+          }] }]
+        }
+        """
+        },
+        {
+            """
+        {
+          "version": 2,
+          "segments": [{ "name": "start", "steps": [{
+            "kind": "choice",
+            "prompt": { "speaker": "", "text": "" },
+            "groups": [{ "when": null, "options": [{ "text": "A", "steps": [] }] }]
+          }] }]
+        }
+        """
+        },
+        {
+            """
+        {
+          "version": 2,
+          "segments": [{ "name": "start", "steps": [{
+            "kind": "choice",
+            "prompt": { "speaker": "", "text": "" },
+            "groups": [{ "options": [] }]
+          }] }]
+        }
+        """
+        },
+    };
 
     [Fact]
     public async Task StoryCommandBinder_AllowsCommandsToReturnJumpResults()
