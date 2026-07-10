@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://chrogm14esosr" path="res://src/Game.Godot/UI/Inventory/InventoryPanel.cs" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://bhq13l0u7c1hg" path="res://scenes/ui/inventory_panel/inventory_item_box.tscn" id="3_item_box"]
 [ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="4_filter_button"]
-[ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/item_target_selection_panel.tscn" id="5_target_panel"]
+[ext_resource type="PackedScene" uid="uid://dnacvsxreo2hx" path="res://scenes/ui/inventory_panel/item_target_selection_panel.tscn" id="5_target_panel"]
 
 [sub_resource type="StyleBoxTexture" id="1_button_normal"]
 texture = ExtResource("4_filter_button")
@@ -163,8 +163,8 @@ vertical_alignment = 1
 layout_mode = 0
 offset_left = 368.0
 offset_top = 172.0
-offset_right = 1664.0
-offset_bottom = 920.0
+offset_right = 1683.0
+offset_bottom = 902.0
 
 [node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=2085090513]
 unique_name_in_owner = true

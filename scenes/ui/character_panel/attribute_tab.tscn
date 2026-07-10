@@ -393,11 +393,29 @@ custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 texture_normal = ExtResource("8_bili")
 
+[node name="Label" type="Label" parent="AssignStatWidget/HBoxContainer/AddBiliButton" unique_id=246526480]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 88.0
+offset_right = 128.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 50
+text = "臂力"
+
 [node name="AddShenfaButton" parent="AssignStatWidget/HBoxContainer" unique_id=1008068573 instance=ExtResource("15_button")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 texture_normal = ExtResource("9_shenfa")
+
+[node name="Label" type="Label" parent="AssignStatWidget/HBoxContainer/AddShenfaButton" unique_id=1435965183]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 88.0
+offset_right = 128.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 50
+text = "身法"
 
 [node name="AddWuxingButton" parent="AssignStatWidget/HBoxContainer" unique_id=1266303661 instance=ExtResource("15_button")]
 unique_name_in_owner = true
@@ -405,11 +423,29 @@ custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 texture_normal = ExtResource("10_wuxing")
 
+[node name="Label" type="Label" parent="AssignStatWidget/HBoxContainer/AddWuxingButton" unique_id=2003443164]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 88.0
+offset_right = 128.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 50
+text = "悟性"
+
 [node name="AddFuyuanButton" parent="AssignStatWidget/HBoxContainer" unique_id=325414288 instance=ExtResource("15_button")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 texture_normal = ExtResource("11_fuyuan")
+
+[node name="Label" type="Label" parent="AssignStatWidget/HBoxContainer/AddFuyuanButton" unique_id=891115450]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 88.0
+offset_right = 128.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 50
+text = "福源"
 
 [node name="AddGenguButton" parent="AssignStatWidget/HBoxContainer" unique_id=1383911500 instance=ExtResource("15_button")]
 unique_name_in_owner = true
@@ -417,11 +453,29 @@ custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 texture_normal = ExtResource("12_gengu")
 
+[node name="Label" type="Label" parent="AssignStatWidget/HBoxContainer/AddGenguButton" unique_id=1968002736]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 88.0
+offset_right = 128.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 50
+text = "根骨"
+
 [node name="AddDingliButton" parent="AssignStatWidget/HBoxContainer" unique_id=170449178 instance=ExtResource("15_button")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 texture_normal = ExtResource("13_dingli")
+
+[node name="Label" type="Label" parent="AssignStatWidget/HBoxContainer/AddDingliButton" unique_id=731423961]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 88.0
+offset_right = 128.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 50
+text = "定力"
 
 [node name="CloseButton" parent="AssignStatWidget" unique_id=332136538 instance=ExtResource("15_button")]
 unique_name_in_owner = true
