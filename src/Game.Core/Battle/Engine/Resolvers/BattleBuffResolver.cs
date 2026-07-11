@@ -79,11 +79,15 @@ internal sealed class BattleBuffResolver(
     {
         foreach (var removedBuff in removedBuffs)
         {
-            state.AddMessage(new BattleFact(
-                BattleFactKind.BuffRemoved,
-                target.Id,
-                timing,
-                detail: removedBuff.Definition.Id));
+            if (!target.HasBuff(removedBuff.Definition.Id))
+            {
+                state.AddMessage(new BattleFact(
+                    BattleFactKind.BuffRemoved,
+                    target.Id,
+                    timing,
+                    detail: removedBuff.Definition.Id));
+            }
+
             triggerHooks(state, HookTiming.OnBuffRemoved, target, context =>
             {
                 context.Source = source;

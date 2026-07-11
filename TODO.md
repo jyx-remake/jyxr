@@ -27,6 +27,7 @@
 - 装备选择 UI 当前直接复用背包物品格与 tooltip，后续如装备比较、替换确认、套装/词条高亮变复杂，应抽专门 presenter，而不是把规则继续堆在 Godot 控件脚本里。
 - 战场系统后续按 `docs/battlefield-system-design.md` 重建，不保留旧 `BattleEngine` / `CombatantState` / battle hook 运行实现的兼容层。
 - `BattleUnit.GetActiveBuffs()` 当前每次调用都会过滤、按 buff id 分组、排序并创建列表；`MaxHp` / `MaxMp`、`ActionSpeed`、属性读取、UI 刷新等路径会间接重复触发。当前规模下先保持语义清晰，后续如战斗单位数、buff 数或自动推进 tick 压力上升，应按“buff 变更时刷新 active buff 快照/缓存”的方式重构，而不是在各调用点做临时缓存补丁。
+- 当前同 ID 高等级 Buff 失效、低等级 Buff 接替生效时不播放解除飘字；后续可考虑增加独立的 Buff 降级事件与飘字，明确区分“降级”和“彻底解除”。
 - 当前轻量战斗内核的技能使用经验与角色使用经验由宿主通过队伍判定限制为我方单位。后续如果支持网络对战，需要重新建模“哪一方可获得持久化成长”和服务端权威校验，避免客户端队伍归属或自动战斗流程导致成长写入错误。
 - 当前战斗内角色升级直接修改 `CharacterInstance` 并通过 `BattleEventKind.CharacterLeveledUp` 做战斗内表现，没有发布应用层 `CharacterChangedEvent` / `CharacterLeveledUpEvent`。后续如果战斗中角色升级需要驱动 HUD、档案、成就或其他 session 订阅者，应把这条成长路径收敛回应用层服务或补明确的战斗结算事件桥接。
 - 普通战斗装备掉落的随机词条抽样当前按 legacy `ItemInstance.GenerateRandomTrigger()` 复刻：合并匹配等级表后，按配置顺序逐项执行 `weight / totalWeight` 试投，未命中则整轮重试，重复词条再重抽。该行为不是标准权重轮盘抽样；后续如改成一次随机数累计权重命中，应作为明确设计变更评估掉落分布差异。
