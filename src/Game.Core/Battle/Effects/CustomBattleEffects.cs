@@ -105,6 +105,10 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("toad_mastery_attack", new ToadMasteryAttackBattleEffectHandler());
         registry.Register("attribute_contest_debuff", new AttributeContestDebuffBattleEffectHandler());
         registry.Register("soul_chasing", new SoulChasingBattleEffectHandler());
+        registry.Register("medical_immortal", new MedicalImmortalBattleEffectHandler());
+        registry.Register("heal_the_wounded", new HealTheWoundedBattleEffectHandler());
+        registry.Register("flying_skyward", new FlyingSkywardBattleEffectHandler());
+        registry.Register("life_and_death", new LifeAndDeathBattleEffectHandler());
         return registry;
     }
 

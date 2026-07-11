@@ -34,6 +34,8 @@ public sealed class BattleDamageCalculationContext
 
     public double Defence { get; set; }
 
+    public double AdditionalLifestealRate { get; set; }
+
     public void AddModifier(BattleDamageContextField field, ModifierOp op, double value)
     {
         var bucket = _modifiers.TryGetValue(field, out var existing)

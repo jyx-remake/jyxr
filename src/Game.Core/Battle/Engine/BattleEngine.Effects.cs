@@ -78,7 +78,8 @@ public sealed partial class BattleEngine
             target,
             resolvedDamageAmount,
             skill,
-            result.IsCritical);
+            result.IsCritical,
+            lifestealRateBonus: damageCalculation.AdditionalLifestealRate);
 
         return new BattleSkillHitResolution(
             damageApplication.Target,

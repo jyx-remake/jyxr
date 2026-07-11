@@ -26,7 +26,7 @@ internal sealed class BattleAbilityEffectContext(
         state.Grid.IsWalkable(position) && !state.IsOccupied(position, movingUnit.Id);
 
     public bool TryRelocate(BattleUnit target, GridPosition destination) =>
-        engine.TryRelocateByAbility(state, target, destination);
+        engine.TryRelocateByEffect(state, target, destination);
 
     public int ApplyHpRecovery(BattleUnit target, int amount) =>
         engine.ApplyDirectHpRecovery(state, Source, target, amount);

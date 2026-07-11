@@ -1,5 +1,6 @@
 using Game.Core.Abstractions;
 using Game.Core.Affix;
+using Game.Core.Model;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -340,6 +341,29 @@ public sealed class BattleHookContext :
         BattleUnit target,
         int amount,
         string? detail) => RestoreHp(target, amount, detail);
+
+    bool IHitConfirmedEffectContext.IsCellAvailable(GridPosition position, BattleUnit movingUnit)
+    {
+        if (Timing != HookTiming.OnHitConfirmed)
+        {
+            throw new InvalidOperationException(
+                $"Hit-confirmed relocation can only inspect cells during '{HookTiming.OnHitConfirmed}'.");
+        }
+
+        ArgumentNullException.ThrowIfNull(movingUnit);
+        return State.Grid.IsWalkable(position) && !State.IsOccupied(position, movingUnit.Id);
+    }
+
+    bool IHitConfirmedEffectContext.TryRelocate(BattleUnit target, GridPosition destination)
+    {
+        if (Timing != HookTiming.OnHitConfirmed)
+        {
+            throw new InvalidOperationException(
+                $"Hit-confirmed relocation can only occur during '{HookTiming.OnHitConfirmed}'.");
+        }
+
+        return Engine.TryRelocateByEffect(State, target, destination);
+    }
 
     bool IHitConfirmedEffectContext.ApplyBuff(
         BattleUnit target,

@@ -49,6 +49,8 @@ public interface IHitResultEffectContext : IBattleEffectContext
 
 public interface IHitConfirmedEffectContext : IBattleEffectContext
 {
+    bool IsCellAvailable(GridPosition position, BattleUnit movingUnit);
+    bool TryRelocate(BattleUnit target, GridPosition destination);
     bool ApplyBuff(
         BattleUnit target,
         string buffId,

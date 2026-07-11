@@ -47,6 +47,7 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
         SkillInstance? skill = null,
         bool isCritical = false,
         bool runBeforeDamageApplied = true,
+        double lifestealRateBonus = 0d,
         HookTiming? eventTiming = null,
         string? detail = null)
     {
@@ -119,7 +120,9 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
                 });
             }
 
-            var lifestealRate = Math.Max(0d, takenContext.Source.GetStat(StatType.Lifesteal));
+            var lifestealRate = Math.Max(
+                0d,
+                takenContext.Source.GetStat(StatType.Lifesteal) + lifestealRateBonus);
             var dealt = engine.TriggerHooks(state, HookTiming.OnDamageDealt, takenContext.Source, context =>
             {
                 context.Source = takenContext.Source;

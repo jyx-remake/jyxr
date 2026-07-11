@@ -64,12 +64,6 @@
         "conditions": [
           {
             "type": "damage_positive"
-          },
-          {
-            "type": "unit_level_chance",
-            "baseValue": 0,
-            "valuePerLevel": 0.005,
-            "maxValue": 1
           }
         ],
         "effects": [
@@ -307,7 +301,33 @@
     "id": "刀封印",
     "name": "刀封印",
     "point": 20,
-    "description": "攻击一定概率造成刀封印效果。"
+    "description": "攻击一定概率造成刀封印效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "attribute_contest_debuff",
+            "parameters": {
+              "sourceStat": "fuyuan",
+              "targetStat": "dingli",
+              "scale": 0.01,
+              "buffId": "刀封印",
+              "level": 0,
+              "duration": 2
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "刀法增益",
@@ -362,7 +382,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "太极拳",
               "太极剑",
@@ -400,7 +420,33 @@
     "id": "剑封印",
     "name": "剑封印",
     "point": 20,
-    "description": "攻击一定概率造成剑封印效果。"
+    "description": "攻击一定概率造成剑封印效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "attribute_contest_debuff",
+            "parameters": {
+              "sourceStat": "fuyuan",
+              "targetStat": "dingli",
+              "scale": 0.01,
+              "buffId": "剑封印",
+              "level": 0,
+              "duration": 2
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "剑法增益",
@@ -524,7 +570,20 @@
     "id": "医仙",
     "name": "医仙",
     "point": 70,
-    "description": "医仙周围的队友每回合回复一定生命。"
+    "description": "医仙周围的队友每回合回复一定生命。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "medical_immortal",
+            "parameters": {}
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "博览群书",
@@ -635,7 +694,30 @@
     "id": "嗜血狂魔",
     "name": "嗜血狂魔",
     "point": 5,
-    "description": "随着等级逐步提升，提高吸血效果。"
+    "description": "随着等级逐步提升，提高吸血效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnDamageDealt",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_lifesteal",
+            "factor": 0.05,
+            "factorPerUnitLevel": 0.00167
+          }
+        ],
+        "speech": {
+          "lines": [
+            "看我血刀门的厉害！"
+          ]
+        }
+      }
+    ]
   },
   {
     "id": "嗜酒如命",
@@ -693,7 +775,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "六脉神剑",
               "一阳指"
@@ -735,7 +817,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "降龙十八掌",
               "擒龙功",
@@ -942,7 +1024,33 @@
     "id": "奇门封印",
     "name": "奇门封印",
     "point": 20,
-    "description": "攻击一定概率造成奇门封印效果。"
+    "description": "攻击一定概率造成奇门封印效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "attribute_contest_debuff",
+            "parameters": {
+              "sourceStat": "fuyuan",
+              "targetStat": "dingli",
+              "scale": 0.01,
+              "buffId": "奇门封印",
+              "level": 0,
+              "duration": 2
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "奇门装备",
@@ -1256,7 +1364,32 @@
     "id": "寒冰真气",
     "name": "寒冰真气",
     "point": 50,
-    "description": "攻击有一定概率附加重度麻痹效果。"
+    "description": "攻击有一定概率附加重度麻痹效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "unit_level_chance",
+            "baseValue": 0,
+            "valuePerLevel": 0.005,
+            "maxValue": 1
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "target"
+            },
+            "buffId": "麻痹",
+            "level": 3,
+            "duration": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "寸长寸强",
@@ -1279,7 +1412,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "降龙十八掌",
               "打狗棒法",
@@ -1346,7 +1479,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "飘雪穿云掌",
               "四象掌",
@@ -1454,6 +1587,12 @@
         "conditions": [
           {
             "type": "damage_positive"
+          },
+          {
+            "type": "unit_level_chance",
+            "baseValue": 0,
+            "valuePerLevel": 0.005,
+            "maxValue": 1
           }
         ],
         "effects": [
@@ -1626,13 +1765,66 @@
     "id": "御剑",
     "name": "御剑",
     "point": 5,
-    "description": "随着等级逐步提升，提高暴击的概率和暴击伤害。"
+    "description": "随着等级逐步提升，提高暴击的概率和暴击伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "deltaPerUnitLevel": 0.007
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_multiplier",
+            "op": "add",
+            "deltaPerUnitLevel": 0.007
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "御风",
     "name": "御风",
     "point": 5,
-    "description": "随着等级逐步提升，降低受到暴击的概率。"
+    "description": "随着等级逐步提升，降低受到暴击的概率。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "deltaPerUnitLevel": -0.005
+          }
+        ],
+        "speech": {
+          "lines": [
+            "髣髴兮若轻云之蔽月",
+            "飘飖兮若流风之回雪"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
   },
   {
     "id": "心眼通明",
@@ -1702,7 +1894,33 @@
     "id": "拳掌封印",
     "name": "拳掌封印",
     "point": 20,
-    "description": "攻击一定概率造成拳掌封印效果。"
+    "description": "攻击一定概率造成拳掌封印效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "attribute_contest_debuff",
+            "parameters": {
+              "sourceStat": "fuyuan",
+              "targetStat": "dingli",
+              "scale": 0.01,
+              "buffId": "拳掌封印",
+              "level": 0,
+              "duration": 2
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "拳系装备",
@@ -1742,7 +1960,20 @@
     "id": "救死扶伤",
     "name": "救死扶伤",
     "point": 30,
-    "description": "救死扶伤的高明医术，每回合对周围随机一名队友进行医治，不能对自己使用。"
+    "description": "救死扶伤的高明医术，每回合对周围随机一名队友进行医治，不能对自己使用。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "heal_the_wounded",
+            "parameters": {}
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "斗转星移",
@@ -1818,7 +2049,29 @@
     "id": "无相",
     "name": "无相",
     "point": 5,
-    "description": "战斗中每回合有一定概率恢复生命值。"
+    "description": "战斗中每回合有一定概率恢复生命值。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.3
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "formless_healing",
+            "parameters": {
+              "baseValue": 50,
+              "valuePerLevel": 30
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "易经伐髓",
@@ -1835,7 +2088,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "罗汉拳",
               "韦陀棍",
@@ -1925,7 +2178,26 @@
     "id": "死生茫茫",
     "name": "死生茫茫",
     "point": 25,
-    "description": "一定几率吸收气血上限转化为自己的气血。"
+    "description": "一定几率追加伤害并将伤害转化为自己的气血。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "life_and_death",
+            "parameters": {}
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "段王爷的电眼",
@@ -2440,7 +2712,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "打狗棒法",
               "九阴神功"
@@ -2549,7 +2821,30 @@
     "id": "百变千幻",
     "name": "百变千幻",
     "point": 75,
-    "description": "每回合有一定概率自动易容，可以藏于暗处伏击对手。"
+    "description": "每回合有一定概率自动易容，可以藏于暗处伏击对手。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.1
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "self"
+            },
+            "buffId": "易容",
+            "level": 2,
+            "duration": 3
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "百穴归一",
@@ -2915,7 +3210,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "玄铁剑法"
             ]
@@ -2950,7 +3245,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "黯然销魂掌"
             ]
@@ -3232,7 +3527,69 @@
     "id": "臭蛤蟆",
     "name": "臭蛤蟆",
     "point": 10,
-    "description": "只有被称为臭蛤蟆的人才对蛤蟆功精要具有绝对的掌握。"
+    "description": "只有被称为臭蛤蟆的人才对蛤蟆功精要具有绝对的掌握。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_equipped_internal_skill",
+            "internalSkillIds": [
+              "蛤蟆功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 1.3
+          }
+        ],
+        "speech": {
+          "lines": [
+            "呱！！！尝尝我蛤蟆功的厉害。"
+          ],
+          "chance": 0.1
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "toad_mastery_attack",
+            "parameters": {
+              "skillNameFragment": "蛤蟆功",
+              "internalSkillId": "蛤蟆功",
+              "skillAttackBonus": 400,
+              "internalSkillAttackBonus": 250,
+              "speechChance": 0.1,
+              "skillSpeechLines": [
+                "让你们见识见识蛤蟆功的威力！",
+                "呱！！！尝尝我蛤蟆功的厉害。"
+              ],
+              "internalSkillSpeechLines": [
+                "呱！！"
+              ]
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "至刚至阳",
@@ -3315,19 +3672,101 @@
     "id": "血海魔功",
     "name": "血海魔功",
     "point": 25,
-    "description": "使用血刀大法增加20%吸血能力"
+    "description": "使用血刀大法增加20%吸血能力",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnDamageDealt",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "血刀大法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_lifesteal",
+            "factor": 0.2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "嘿嘿嘿，吸光你们！"
+          ]
+        }
+      }
+    ]
   },
   {
     "id": "血魔刀法",
     "name": "血魔刀法",
     "point": 15,
-    "description": "使用血刀大法增加15%吸血能力"
+    "description": "使用血刀大法增加15%吸血能力",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnDamageDealt",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "血刀大法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_lifesteal",
+            "factor": 0.15
+          }
+        ],
+        "speech": {
+          "lines": [
+            "血..."
+          ]
+        }
+      }
+    ]
   },
   {
     "id": "诸般封印",
     "name": "诸般封印",
     "point": 80,
-    "description": "精通奇经八脉，攻击一定概率造成诸般封印效果。"
+    "description": "精通奇经八脉，攻击一定概率造成诸般封印效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "attribute_contest_debuff",
+            "parameters": {
+              "sourceStat": "fuyuan",
+              "targetStat": "dingli",
+              "scale": 0.01,
+              "buffId": "诸般封印",
+              "level": 0,
+              "duration": 2
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "赵敏的眷念",
@@ -3406,7 +3845,32 @@
     "id": "追魂",
     "name": "追魂",
     "point": 30,
-    "description": "不将敌人打倒决不罢休，无道德可言。攻击造成伤害加深效果。"
+    "description": "不将敌人打倒决不罢休，无道德可言。攻击造成伤害加深效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "soul_chasing",
+            "parameters": {
+              "buffId": "伤害加深",
+              "speechChance": 0.1,
+              "speechLines": [
+                "夺命追魂！"
+              ]
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "金刚",
@@ -3583,7 +4047,7 @@
             "role": "source"
           },
           {
-            "type": "context_skill_name_equals",
+            "type": "context_skill_name_contains",
             "values": [
               "铁剑剑法",
               "漫天花雨",
@@ -4044,7 +4508,20 @@
     "id": "飞向天际",
     "name": "飞向天际",
     "point": 5,
-    "description": "神秘的绝学，攻击时一定概率吹飞对手。"
+    "description": "神秘的绝学，攻击时一定概率吹飞对手。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "flying_skyward",
+            "parameters": {}
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "鬼魅",

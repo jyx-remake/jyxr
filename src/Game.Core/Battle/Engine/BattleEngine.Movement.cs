@@ -5,7 +5,7 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
-    internal bool TryRelocateByAbility(BattleState state, BattleUnit unit, GridPosition destination)
+    internal bool TryRelocateByEffect(BattleState state, BattleUnit unit, GridPosition destination)
     {
         if (!unit.IsAlive || !state.Grid.IsWalkable(destination) || state.IsOccupied(destination, unit.Id))
         {
