@@ -15,6 +15,11 @@ namespace Game.Core.Battle;
 [JsonDerivedType(typeof(NearbyAlliesBattleTargetSelectorDefinition), "nearby_allies")]
 public abstract record BattleTargetSelectorDefinition;
 
+public interface ITargetedBattleEffectDefinition
+{
+    BattleTargetSelectorDefinition Target { get; }
+}
+
 public sealed record SelfBattleTargetSelectorDefinition : BattleTargetSelectorDefinition;
 
 public sealed record SourceBattleTargetSelectorDefinition : BattleTargetSelectorDefinition;
@@ -61,7 +66,7 @@ public sealed record ApplyBuffBattleEffectDefinition(
     string BuffId,
     int Level,
     int Duration,
-    int Chance = 100) : BattleEffectDefinition
+    int Chance = 100) : BattleEffectDefinition, ITargetedBattleEffectDefinition
 {
     [JsonIgnore]
     public BuffDefinition Buff { get; private set; } = null!;
@@ -75,7 +80,7 @@ public sealed record ApplyBuffBattleEffectDefinition(
 
 public sealed record RemoveBuffBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,
-    string BuffId) : BattleEffectDefinition
+    string BuffId) : BattleEffectDefinition, ITargetedBattleEffectDefinition
 {
     [JsonIgnore]
     public BuffDefinition Buff { get; private set; } = null!;
@@ -88,30 +93,30 @@ public sealed record RemoveBuffBattleEffectDefinition(
 }
 
 public sealed record RemoveNegativeBuffsBattleEffectDefinition(
-    BattleTargetSelectorDefinition Target) : BattleEffectDefinition;
+    BattleTargetSelectorDefinition Target) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record RemovePositiveBuffsBattleEffectDefinition(
-    BattleTargetSelectorDefinition Target) : BattleEffectDefinition;
+    BattleTargetSelectorDefinition Target) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record AddRageBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,
-    int Value) : BattleEffectDefinition;
+    int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record SetRageBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,
-    int Value) : BattleEffectDefinition;
+    int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record SetActionGaugeBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,
-    int Value) : BattleEffectDefinition;
+    int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record AddHpBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,
-    int Value) : BattleEffectDefinition;
+    int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record AddMpBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,
-    int Value) : BattleEffectDefinition;
+    int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record CancelHitBattleHookEffectDefinition(
     bool SuppressHitEffects = true) : BattleEffectDefinition;
@@ -120,7 +125,7 @@ public sealed record ExtraStrikeBattleHookEffectDefinition(
     BattleTargetSelectorDefinition Target,
     IReadOnlyList<double> DamageFactors,
     double Chance = 0d,
-    double ChancePerBuffLevel = 0d) : BattleEffectDefinition;
+    double ChancePerBuffLevel = 0d) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record CustomBattleEffectDefinition(
     string EffectId,

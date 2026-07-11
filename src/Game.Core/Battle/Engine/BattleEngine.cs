@@ -22,6 +22,7 @@ public sealed partial class BattleEngine
 
     private readonly BattleDamageCalculator _damageCalculator;
     private readonly BattleDamageResolver _damageResolver;
+    private readonly BattleEffectExecutor _effectExecutor;
     private readonly BattleHookExecutor _hookExecutor;
     private readonly LegendSkillResolver _legendSkillResolver;
     private readonly Func<IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
@@ -46,7 +47,9 @@ public sealed partial class BattleEngine
     {
         _damageCalculator = damageCalculator ?? new BattleDamageCalculator();
         _damageResolver = new BattleDamageResolver(this);
+        _effectExecutor = new BattleEffectExecutor(this);
         _hookExecutor = hookExecutor ?? new BattleHookExecutor();
+        _hookExecutor.EffectExecutor = _effectExecutor;
         _legendSkillResolver = legendSkillResolver ?? new LegendSkillResolver();
         _legendSkillsProvider = legendSkillsProvider ?? EmptyLegendSkillProvider;
         _random = random ?? SharedRandomService.Instance;
@@ -122,13 +125,15 @@ public sealed partial class BattleEngine
 
     internal static void AddEvent(BattleState state, BattleEvent battleEvent) => state.AddEvent(battleEvent);
 
+    internal IRandomService RandomService => _random;
+
     private sealed class SharedRandomService : IRandomService
     {
         public static SharedRandomService Instance { get; } = new();
 
-        public double NextDouble() => Random.Shared.NextDouble();
+        public double NextDouble() => System.Random.Shared.NextDouble();
 
-        public int Next(int minInclusive, int maxExclusive) => Random.Shared.Next(minInclusive, maxExclusive);
+        public int Next(int minInclusive, int maxExclusive) => System.Random.Shared.Next(minInclusive, maxExclusive);
     }
 
     private static BuffDefinition MissingBuffResolver(string buffId) =>

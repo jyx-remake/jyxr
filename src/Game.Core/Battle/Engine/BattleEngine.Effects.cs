@@ -216,7 +216,7 @@ public sealed partial class BattleEngine
         }
     }
 
-    private bool ApplyBattleBuff(
+    internal bool ApplyBattleBuff(
         BattleState state,
         BattleUnit source,
         BattleUnit target,
@@ -265,28 +265,13 @@ public sealed partial class BattleEngine
         return true;
     }
 
+    internal BuffDefinition ResolveBuff(ApplyBuffBattleEffectDefinition effect) =>
+        effect.Buff ?? _buffResolver(effect.BuffId);
+
     private bool RollDebuffResistance(BattleUnit target)
     {
         var resistance = Math.Clamp(target.GetStat(StatType.AntiDebuff), 0d, 1d);
         return Probability.RollChance(_random, resistance);
-    }
-
-    internal bool ApplyHookBuffEffect(
-        BattleHookContext context,
-        BattleUnit target,
-        ApplyBuffBattleEffectDefinition effect)
-    {
-        var source = context.Source ?? context.Unit;
-        var buffDefinition = effect.Buff ?? _buffResolver(effect.BuffId);
-        return ApplyBattleBuff(
-            context.State,
-            source,
-            target,
-            buffDefinition,
-            effect.Level,
-            effect.Duration,
-            effect.BuffId,
-            context.Timing);
     }
 
     internal void ApplyHookExtraStrikeEffect(
@@ -346,46 +331,6 @@ public sealed partial class BattleEngine
         }
     }
 
-    internal IReadOnlyList<BattleBuffInstance> RemoveHookBuffById(
-        BattleHookContext context,
-        BattleUnit target,
-        string buffId)
-    {
-        var source = context.Source ?? context.Unit;
-        return RemoveBattleBuffs(
-            context.State,
-            source,
-            target,
-            buff => string.Equals(buff.Definition.Id, buffId, StringComparison.Ordinal),
-            context.Timing);
-    }
-
-    internal IReadOnlyList<BattleBuffInstance> RemoveHookNegativeBuffs(
-        BattleHookContext context,
-        BattleUnit target)
-    {
-        var source = context.Source ?? context.Unit;
-        return RemoveBattleBuffs(
-            context.State,
-            source,
-            target,
-            buff => buff.Definition.IsDebuff,
-            context.Timing);
-    }
-
-    internal IReadOnlyList<BattleBuffInstance> RemoveHookPositiveBuffs(
-        BattleHookContext context,
-        BattleUnit target)
-    {
-        var source = context.Source ?? context.Unit;
-        return RemoveBattleBuffs(
-            context.State,
-            source,
-            target,
-            buff => !buff.Definition.IsDebuff,
-            context.Timing);
-    }
-
     private void ApplySpecialSkillEffects(
         BattleState state,
         BattleUnit source,
@@ -399,10 +344,8 @@ public sealed partial class BattleEngine
 
         foreach (var effect in effects)
         {
-            foreach (var target in SelectSpecialSkillEffectTargets(state, source, targets, effect))
-            {
-                ApplySpecialSkillEffect(state, source, target, effect);
-            }
+            using var effectScope = state.EnterEffect();
+            _effectExecutor.ExecuteAbility(state, source, targets, effect);
         }
     }
 
@@ -414,7 +357,7 @@ public sealed partial class BattleEngine
         int amount) =>
         RestoreBattleResource(state, source, target, kind, amount);
 
-    private int RestoreBattleResource(
+    internal int RestoreBattleResource(
         BattleState state,
         BattleUnit source,
         BattleUnit target,
@@ -457,100 +400,7 @@ public sealed partial class BattleEngine
         return Math.Max(0, resolvedAmount);
     }
 
-    private void ApplySpecialSkillEffect(
-        BattleState state,
-        BattleUnit source,
-        BattleUnit target,
-        BattleEffectDefinition effect)
-    {
-        switch (effect)
-        {
-            case RemoveBuffBattleEffectDefinition removeBuff:
-                RemoveBattleBuffs(
-                    state,
-                    source,
-                    target,
-                    buff => string.Equals(buff.Definition.Id, removeBuff.BuffId, StringComparison.Ordinal));
-                break;
-            case RemoveNegativeBuffsBattleEffectDefinition:
-                RemoveBattleBuffs(state, source, target, buff => buff.Definition.IsDebuff);
-                break;
-            case RemovePositiveBuffsBattleEffectDefinition:
-                RemoveBattleBuffs(state, source, target, buff => !buff.Definition.IsDebuff);
-                break;
-            case AddRageBattleEffectDefinition rage:
-                target.AddRage(rage.Value);
-                AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: rage.Value.ToString()));
-                break;
-            case SetRageBattleEffectDefinition rage:
-                target.SetRage(rage.Value);
-                AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"set:{rage.Value}"));
-                break;
-            case SetActionGaugeBattleEffectDefinition gauge:
-                target.SetActionGauge(gauge.Value);
-                break;
-            case AddHpBattleEffectDefinition hp:
-            {
-                var restored = RestoreBattleResource(
-                    state,
-                    source,
-                    target,
-                    BattleRecoveryKind.Hp,
-                    hp.Value);
-                AddEvent(state, new BattleEvent(BattleEventKind.Healed, target.Id, Detail: restored.ToString()));
-                break;
-            }
-            case AddMpBattleEffectDefinition mp:
-                RestoreBattleResource(
-                    state,
-                    source,
-                    target,
-                    BattleRecoveryKind.Mp,
-                    mp.Value);
-                break;
-            case ApplyBuffBattleEffectDefinition addBuff:
-            {
-                var buffDefinition = addBuff.Buff ?? _buffResolver(addBuff.BuffId);
-                if (!Probability.RollPercentage(_random, addBuff.Chance))
-                {
-                    break;
-                }
-
-                ApplyBattleBuff(
-                    state,
-                    source,
-                    target,
-                    buffDefinition,
-                    addBuff.Level,
-                    addBuff.Duration,
-                    addBuff.BuffId);
-                break;
-            }
-            default:
-                throw new NotSupportedException($"Unsupported special skill effect '{effect.GetType().Name}'.");
-        }
-    }
-
-    private static IReadOnlyList<BattleUnit> SelectSpecialSkillEffectTargets(
-        BattleState state,
-        BattleUnit source,
-        IReadOnlyList<BattleUnit> impactedTargets,
-        BattleEffectDefinition effect) =>
-        effect switch
-        {
-            ApplyBuffBattleEffectDefinition applyBuff => BattleTargetResolver.Resolve(state, source, source, impactedTargets, applyBuff.Target),
-            RemoveBuffBattleEffectDefinition removeBuff => BattleTargetResolver.Resolve(state, source, source, impactedTargets, removeBuff.Target),
-            RemoveNegativeBuffsBattleEffectDefinition removeNegativeBuffs => BattleTargetResolver.Resolve(state, source, source, impactedTargets, removeNegativeBuffs.Target),
-            RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs => BattleTargetResolver.Resolve(state, source, source, impactedTargets, removePositiveBuffs.Target),
-            AddRageBattleEffectDefinition addRage => BattleTargetResolver.Resolve(state, source, source, impactedTargets, addRage.Target),
-            SetRageBattleEffectDefinition setRage => BattleTargetResolver.Resolve(state, source, source, impactedTargets, setRage.Target),
-            SetActionGaugeBattleEffectDefinition setActionGauge => BattleTargetResolver.Resolve(state, source, source, impactedTargets, setActionGauge.Target),
-            AddHpBattleEffectDefinition addHp => BattleTargetResolver.Resolve(state, source, source, impactedTargets, addHp.Target),
-            AddMpBattleEffectDefinition addMp => BattleTargetResolver.Resolve(state, source, source, impactedTargets, addMp.Target),
-            _ => throw new NotSupportedException($"Unsupported special skill effect '{effect.GetType().Name}'.")
-        };
-
-    private IReadOnlyList<BattleBuffInstance> RemoveBattleBuffs(
+    internal IReadOnlyList<BattleBuffInstance> RemoveBattleBuffs(
         BattleState state,
         BattleUnit source,
         BattleUnit target,
