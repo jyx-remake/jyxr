@@ -279,7 +279,23 @@
     "id": "光明圣火阵",
     "name": "光明圣火阵",
     "point": 10,
-    "description": "明教顶级阵法，置于阵法之中，几乎不受任何负面效果影响。"
+    "description": "明教顶级阵法，置于阵法之中，几乎不受任何负面效果影响。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionReadiness",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "bright_sacred_fire_formation",
+            "parameters": {
+              "chancePerAlly": 0.2,
+              "floatText": "光明圣火阵，清除负面效果"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "八卦阵",

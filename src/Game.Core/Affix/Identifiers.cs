@@ -29,6 +29,7 @@ public enum ModifierOp
 public enum HookTiming
 {
     OnBattleStart,
+    BeforeActionReadiness,
     BeforeActionStart,
     AfterActionEnd,
     AfterBuffRound,

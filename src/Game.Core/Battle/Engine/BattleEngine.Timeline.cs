@@ -25,7 +25,6 @@ public sealed partial class BattleEngine
         var unit = state.GetUnit(unitId);
         if (!unit.IsAlive) return $"Unit '{unit.Id}' is defeated.";
         if (unit.ActionGauge < ActionGaugeThreshold) return $"Unit '{unit.Id}' is not ready to act.";
-        if (unit.HasBuff(BattleContentIds.Stun)) return $"Unit '{unit.Id}' is stunned and cannot act.";
         return null;
     }
 
@@ -48,14 +47,16 @@ public sealed partial class BattleEngine
             throw new InvalidOperationException($"Unit '{unit.Id}' is not ready to act.");
         }
 
-        if (unit.HasBuff(BattleContentIds.Stun))
-        {
-            throw new InvalidOperationException($"Unit '{unit.Id}' is stunned and cannot act.");
-        }
-
         var context = new BattleActionContext(unit);
         state.CurrentAction = context;
         state.ActionSerial++;
+        TriggerHooks(state, HookTiming.BeforeActionReadiness, unit);
+        if (unit.HasBuff(BattleContentIds.Stun))
+        {
+            SkipAction(state, unit, BattleContentIds.Stun);
+            return null;
+        }
+
         var hookContext = TriggerHooks(state, HookTiming.BeforeActionStart, unit);
         if (hookContext.IsActionSkipRequested)
         {
@@ -84,11 +85,6 @@ public sealed partial class BattleEngine
             var ready = SelectReadyUnit(state);
             if (ready is not null)
             {
-                if (TrySkipStunnedAction(state, ready))
-                {
-                    continue;
-                }
-
                 if (BeginActionCore(state, ready.Id) is not null)
                 {
                     return BattleCommandResult<BattleUnit>.Succeeded(ready, command.Messages);
@@ -112,18 +108,6 @@ public sealed partial class BattleEngine
             .ThenByDescending(static unit => unit.ActionSpeed)
             .ThenBy(static unit => unit.Id, StringComparer.Ordinal)
             .FirstOrDefault();
-
-    private bool TrySkipStunnedAction(BattleState state, BattleUnit unit)
-    {
-        if (!unit.HasBuff(BattleContentIds.Stun))
-        {
-            return false;
-        }
-
-        state.ActionSerial++;
-        SkipAction(state, unit, BattleContentIds.Stun);
-        return true;
-    }
 
     private static void SkipAction(BattleState state, BattleUnit unit, string? reason)
     {

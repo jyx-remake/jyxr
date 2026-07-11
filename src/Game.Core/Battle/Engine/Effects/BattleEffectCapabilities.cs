@@ -99,3 +99,8 @@ public interface IActionStartEffectContext : IBattleEffectContext
     void SkipCurrentAction(string? reason = null);
     int SetRage(int value, string? detail = null);
 }
+
+public interface IActionReadinessEffectContext : IBattleEffectContext
+{
+    int RemoveNegativeBuffs();
+}

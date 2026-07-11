@@ -83,6 +83,7 @@ public sealed class CustomBattleEffectRegistry
         var registry = new CustomBattleEffectRegistry();
         registry.Register("illness", new IllnessBattleEffectHandler());
         registry.Register("drunkenness", new DrunkennessBattleEffectHandler());
+        registry.Register("bright_sacred_fire_formation", new BrightSacredFireFormationBattleEffectHandler());
         registry.Register("zhenwu_formation_attack", new ZhenwuFormationAttackBattleEffectHandler());
         registry.Register("zhenwu_formation_intercept", new ZhenwuFormationInterceptBattleEffectHandler());
         registry.Register("careful_defense", new CarefulDefenseBattleEffectHandler());
@@ -199,6 +200,7 @@ internal static class BattleEffectCapabilityPolicy
             [typeof(ISkillCostEffectContext)] = HookTiming.BeforeSkillCost,
             [typeof(IBuffApplicationEffectContext)] = HookTiming.BeforeBuffApplied,
             [typeof(IActionStartEffectContext)] = HookTiming.BeforeActionStart,
+            [typeof(IActionReadinessEffectContext)] = HookTiming.BeforeActionReadiness,
         };
 
     public static bool Supports<TContext>(HookTiming timing)

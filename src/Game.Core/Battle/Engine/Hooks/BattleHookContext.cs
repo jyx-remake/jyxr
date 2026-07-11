@@ -20,6 +20,7 @@ public sealed class BattleHookContext :
     IRecoveryEffectContext,
     ISkillCostEffectContext,
     IBuffApplicationEffectContext,
+    IActionReadinessEffectContext,
     IActionStartEffectContext,
     IDamageApplicationRuntimeContext
 {
@@ -160,6 +161,22 @@ public sealed class BattleHookContext :
         }
 
         return BattleResourceResolver.SetRage(State, Unit, value, Timing, detail);
+    }
+
+    public int RemoveNegativeBuffs()
+    {
+        if (Timing != HookTiming.BeforeActionReadiness)
+        {
+            throw new InvalidOperationException(
+                $"Negative buffs can only be removed through an action-readiness effect during '{HookTiming.BeforeActionReadiness}'.");
+        }
+
+        return Engine.BuffResolver.Remove(
+            State,
+            Unit,
+            Unit,
+            static buff => buff.Definition.IsDebuff,
+            Timing).Count;
     }
 
     public void RequestSpeech(BattleUnit speaker, string text)
