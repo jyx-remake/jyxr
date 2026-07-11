@@ -28,7 +28,6 @@ public sealed partial class BattleEngine
         foreach (var target in targets)
         {
             var hit = ApplySkillDamage(state, source, target, skill);
-            TryGainRageFromTakingDamage(state, source, hit.Target, hit.Damage);
             if (hit.IsHitConfirmed)
             {
                 TriggerHooks(state, HookTiming.OnHitConfirmed, source, context =>
@@ -428,16 +427,6 @@ public sealed partial class BattleEngine
         }
 
         BattleResourceResolver.AddRage(state, unit, 1, detailSource: "attack");
-    }
-
-    private void TryGainRageFromTakingDamage(BattleState state, BattleUnit source, BattleUnit target, int damage)
-    {
-        if (damage <= 0 || !state.AreEnemies(source, target) || !RollRageGain(target))
-        {
-            return;
-        }
-
-        BattleResourceResolver.AddRage(state, target, 1, detailSource: "damaged");
     }
 
     private bool RollRageGain(BattleUnit unit)

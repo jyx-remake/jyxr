@@ -76,7 +76,9 @@ public enum TraitId
     IncreaseInternalSkillYangAffinity,
     MindEye,
     PoisonResistance,
-    AvoidFriendlyFire
+    AvoidFriendlyFire,
+    Irascible,
+    DoubleDamageTakenRageGain
 }
 
 public enum BattleDamageContextField

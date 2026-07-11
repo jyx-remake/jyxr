@@ -108,6 +108,8 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
                 context.IsCritical = takenContext.IsCritical;
             });
 
+            TryGainRageFromTakingDamage(state, takenContext.Source, takenContext.Target);
+
             if (!takenContext.Target.IsAlive)
             {
                 engine.TriggerHooks(state, HookTiming.BeforeDefeated, takenContext.Target, context =>
@@ -141,6 +143,33 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
             applicationContext.Target,
             actualAmount,
             applicationContext.SuppressHitEffects);
+    }
+
+    private void TryGainRageFromTakingDamage(BattleState state, BattleUnit source, BattleUnit target)
+    {
+        if (!state.AreEnemies(source, target))
+        {
+            return;
+        }
+
+        var chance = 0.5d + target.GetStat(StatType.Fuyuan) / 1000d;
+        if (target.HasTrait(TraitId.Irascible))
+        {
+            chance += 0.15d;
+        }
+
+        if (!Probability.RollChance(engine.RandomService, chance))
+        {
+            return;
+        }
+
+        var amount = target.HasTrait(TraitId.DoubleDamageTakenRageGain) ? 2 : 1;
+        BattleResourceResolver.AddRage(
+            state,
+            target,
+            amount,
+            HookTiming.OnDamageTaken,
+            "damaged");
     }
 
     private void ApplyLifesteal(BattleState state, BattleDamageTakenContext context, double rate)
