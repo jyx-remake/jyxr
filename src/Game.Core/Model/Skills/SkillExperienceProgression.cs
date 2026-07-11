@@ -38,9 +38,10 @@ public static class SkillExperienceProgression
             return null;
         }
 
+        var addedExperience = ExperienceGainPolicy.Resolve(progressSkill.Owner, experience);
         var oldLevel = progressSkill.Level;
         var effectiveMaxLevel = Math.Max(maxLevel, oldLevel);
-        progressSkill.Exp = checked(progressSkill.Exp + experience);
+        progressSkill.Exp = checked(progressSkill.Exp + addedExperience);
         while (progressSkill.Exp >= GetLevelUpExp(progressSkill))
         {
             if (progressSkill.Level < effectiveMaxLevel)
@@ -59,7 +60,7 @@ public static class SkillExperienceProgression
             progressSkill.Owner.RebuildSnapshot();
         }
 
-        return new SkillExperienceChange(progressSkill, experience, oldLevel, progressSkill.Level);
+        return new SkillExperienceChange(progressSkill, addedExperience, oldLevel, progressSkill.Level);
     }
 
     public static SkillInstance? NormalizeProgressionSkill(SkillInstance skill)

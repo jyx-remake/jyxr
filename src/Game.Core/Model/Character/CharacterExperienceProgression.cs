@@ -29,8 +29,9 @@ public static class CharacterExperienceProgression
         ArgumentOutOfRangeException.ThrowIfLessThan(maxLevel, 1);
         ArgumentOutOfRangeException.ThrowIfNegative(levelUpGrantedStatPoints);
 
+        var addedExperience = ExperienceGainPolicy.Resolve(character, experience);
         var oldLevel = character.Level;
-        character.GrantExperience(experience);
+        character.GrantExperience(addedExperience);
 
         var resolvedLevel = Math.Max(
             oldLevel,
@@ -41,7 +42,7 @@ public static class CharacterExperienceProgression
             character.RebuildSnapshot();
         }
 
-        return new CharacterExperienceChange(character, experience, oldLevel, character.Level);
+        return new CharacterExperienceChange(character, addedExperience, oldLevel, character.Level);
     }
 
     public static CharacterExperienceChange TryAddExperience(

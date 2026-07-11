@@ -71,6 +71,9 @@ public enum TraitId
     IgnoreItemCooldown,
     Ghost,
     BroadLearning,
+    DoubleExperienceGain,
+    DoubleSkillEquipmentTenDimensionAffixes,
+    IncreaseInternalSkillYangAffinity,
     MindEye,
     PoisonResistance,
     AvoidFriendlyFire

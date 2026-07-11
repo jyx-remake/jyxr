@@ -17,12 +17,21 @@ public static class SnapshotBuilder
         var hooksByTiming = new Dictionary<HookTiming, List<HookAffix>>();
         GrantModelAffix? selectedModel = null;
 
+        foreach (var traitAffix in resolvedAffixSet.Affixes.OfType<TraitAffix>())
+        {
+            traits.Add(traitAffix.TraitId);
+        }
+
         foreach (var affix in resolvedAffixSet.Affixes)
         {
             switch (affix)
             {
                 case StatModifierAffix statModifierAffix:
                     statBuckets[statModifierAffix.Stat] = GetOrEmpty(statBuckets, statModifierAffix.Stat).Apply(statModifierAffix.Value);
+                    if (ShouldDoubleTenDimensionModifier(statModifierAffix, traits))
+                    {
+                        statBuckets[statModifierAffix.Stat] = statBuckets[statModifierAffix.Stat].Apply(statModifierAffix.Value);
+                    }
                     break;
 
                 case SkillBonusModifierAffix skillModifierAffix:
@@ -37,8 +46,7 @@ public static class SnapshotBuilder
                     legendBuckets[legendModifierAffix.SkillId] = GetOrEmpty(legendBuckets, legendModifierAffix.SkillId).Apply(legendModifierAffix.Value);
                     break;
 
-                case TraitAffix traitAffix:
-                    traits.Add(traitAffix.TraitId);
+                case TraitAffix:
                     break;
 
                 case HookAffix hookAffix:
@@ -61,6 +69,13 @@ public static class SnapshotBuilder
             weaponModifierBuckets: new ReadOnlyDictionary<WeaponType, ModifierBucket>(weaponBuckets),
             legendChanceModifierBuckets: new ReadOnlyDictionary<string, ModifierBucket>(legendBuckets));
     }
+
+    private static bool ShouldDoubleTenDimensionModifier(
+        StatModifierAffix affix,
+        IReadOnlySet<TraitId> traits) =>
+        traits.Contains(TraitId.DoubleSkillEquipmentTenDimensionAffixes) &&
+        StatCatalog.TenDimensionStats.Contains(affix.Stat) &&
+        affix.SourceKind is ProviderKind.Equipment or ProviderKind.ExternalSkill or ProviderKind.InternalSkill;
 
     private static bool ShouldReplaceModel(GrantModelAffix? current, GrantModelAffix candidate)
     {

@@ -1,4 +1,5 @@
 using Game.Core.Definitions.Skills;
+using Game.Core.Affix;
 using Game.Core.Model.Character;
 
 namespace Game.Core.Model.Skills;
@@ -32,7 +33,16 @@ public sealed class InternalSkillInstance(
 
     public int Yin => Definition.Yin * Level / 10;
 
-    public int Yang => Definition.Yang * Level / 10;
+    public int Yang
+    {
+        get
+        {
+            var value = Definition.Yang * Level / 10;
+            return Owner.Traits.Contains(TraitId.IncreaseInternalSkillYangAffinity)
+                ? (int)(value * 1.3d)
+                : value;
+        }
+    }
 
     public double AttackRatio => Level / 10d * Definition.AttackScale * (1 + Bonus);
 
