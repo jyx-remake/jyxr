@@ -27,8 +27,8 @@ internal sealed class LifeAndDeathBattleEffectHandler
 
         context.DamageCalculation.AddModifier(
             BattleDamageContextField.FinalDamage,
-            ModifierOp.Increase,
-            0.05d);
+            ModifierOp.PostAdd,
+            target.MaxHp * 0.1d);
         context.DamageCalculation.AdditionalLifestealRate += 0.5d;
 
         context.RequestSpeech(target, "啊！好疼！！");
