@@ -1,3 +1,5 @@
+using Game.Core.Model.Skills;
+
 namespace Game.Core.Battle;
 
 internal sealed class BattleSkillExecutor(
@@ -25,7 +27,7 @@ internal sealed class BattleSkillExecutor(
                     }
                     break;
                 case ApplyDefinedSkillEffectsStep definedEffects:
-                    ExecuteDefinedEffects(state, source, targets, definedEffects.Effects);
+                    ExecuteDefinedEffects(state, source, targets, plan.Skill, definedEffects.Effects);
                     break;
                 default:
                     throw new NotSupportedException($"Unsupported skill execution step '{step.GetType().Name}'.");
@@ -37,13 +39,14 @@ internal sealed class BattleSkillExecutor(
         BattleState state,
         BattleUnit source,
         IReadOnlyList<BattleUnit> targets,
+        SkillInstance skill,
         IReadOnlyList<BattleEffectDefinition>? effects)
     {
         if (effects is null) return;
         foreach (var effect in effects)
         {
             using var effectScope = state.EnterEffect($"skill:{effect.GetType().Name}");
-            effectExecutor.ExecuteAbility(state, source, targets, effect);
+            effectExecutor.ExecuteAbility(state, source, targets, effect, skill);
         }
     }
 }

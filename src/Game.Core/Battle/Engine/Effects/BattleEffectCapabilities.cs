@@ -20,6 +20,17 @@ public interface IBattleEffectContext
     void RequestFloatText(BattleUnit target, string text, BattleFloatTextStyle style = BattleFloatTextStyle.Default);
 }
 
+public interface IBattleAbilityEffectContext
+{
+    BattleUnit Source { get; }
+    SkillInstance Skill { get; }
+    IReadOnlyList<BattleUnit> Targets { get; }
+    IRandomService Random { get; }
+    BattleExecutionScope? ExecutionScope { get; }
+
+    int ApplyDirectDamage(BattleUnit target, int amount, string? detail = null);
+}
+
 public interface IDamageCalculationEffectContext : IBattleEffectContext
 {
     BattleDamageCalculationContext DamageCalculation { get; }

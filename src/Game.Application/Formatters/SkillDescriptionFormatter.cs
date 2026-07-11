@@ -171,6 +171,11 @@ public static class SkillDescriptionFormatter
     {
         foreach (var effect in effects ?? [])
         {
+            if (effect is CustomBattleEffectDefinition or CustomAbilityBattleEffectDefinition)
+            {
+                continue;
+            }
+
             AppendLine(builder, effect switch
             {
                 RemoveBuffBattleEffectDefinition removeBuff =>

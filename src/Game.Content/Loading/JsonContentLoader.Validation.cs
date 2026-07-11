@@ -106,6 +106,11 @@ public sealed partial class JsonContentLoader
                     case SetHitSuccessBattleHookEffectDefinition:
                         throw new InvalidOperationException(
                             $"SpecialSkill '{skill.Id}' uses unsupported hook-only effect '{effect.GetType().Name}'.");
+                    case CustomAbilityBattleEffectDefinition custom:
+                        Ensure(custom.SupportsAbility,
+                            $"SpecialSkill '{skill.Id}' uses custom effect '{custom.EffectId}' that does not support ability execution.");
+                        ValidateBattleTargetSelector(custom.Target, $"SpecialSkill '{skill.Id}'", null);
+                        break;
                     default:
                         ValidateSharedBattleEffect(effect, $"SpecialSkill '{skill.Id}'", repository);
                         break;

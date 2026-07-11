@@ -1,4 +1,5 @@
 using Game.Core.Affix;
+using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
 
@@ -12,8 +13,29 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
         BattleState state,
         BattleUnit source,
         IReadOnlyList<BattleUnit> primaryTargets,
-        BattleEffectDefinition effect) =>
+        BattleEffectDefinition effect,
+        SkillInstance skill)
+    {
+        if (effect is CustomAbilityBattleEffectDefinition custom)
+        {
+            var targets = BattleTargetResolver.Resolve(
+                state,
+                source,
+                source,
+                primaryTargets,
+                custom.Target);
+            custom.ExecuteAbility(new BattleAbilityEffectContext(
+                engine,
+                state,
+                source,
+                targets,
+                skill,
+                engine.RandomService));
+            return;
+        }
+
         Execute(state, source, source, primaryTargets, effect, null, null);
+    }
 
     private void Execute(
         BattleState state,
@@ -107,7 +129,7 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
                 foreach (var target in targets) engine.ApplyHookExtraStrikeEffect(RequireHook(), target, extra);
                 break;
             case CustomBattleEffectDefinition custom:
-                custom.Execute(RequireHook());
+                custom.ExecuteHook(RequireHook());
                 break;
             default:
                 throw new NotSupportedException($"Unsupported battle effect '{effect.GetType().Name}'.");

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Game.Core.Abstractions;
 using Game.Core.Affix;
 using Game.Core.Definitions;
+using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
 
@@ -54,6 +55,7 @@ public sealed record NearbyAlliesBattleTargetSelectorDefinition(
 [JsonDerivedType(typeof(StrengthenContextBuffBattleHookEffectDefinition), "strengthen_context_buff")]
 [JsonDerivedType(typeof(ExtraStrikeBattleHookEffectDefinition), "extra_strike")]
 [JsonDerivedType(typeof(CustomBattleEffectDefinition), "custom")]
+[JsonDerivedType(typeof(CustomAbilityBattleEffectDefinition), "custom_ability")]
 public abstract record BattleEffectDefinition
 {
     public virtual void Resolve(IContentRepository contentRepository)
@@ -145,7 +147,7 @@ public sealed record CustomBattleEffectDefinition(
         Invocation = CustomBattleEffectRegistry.Default.Bind(EffectId, Parameters);
     }
 
-    internal void Execute(BattleHookContext context)
+    internal void ExecuteHook(BattleHookContext context)
     {
         if (!SupportsTiming(context.Timing))
         {
@@ -153,6 +155,32 @@ public sealed record CustomBattleEffectDefinition(
                 $"Custom battle effect '{EffectId}' does not support timing '{context.Timing}'.");
         }
 
-        Invocation.Execute(context);
+        (Invocation.ExecuteHook ?? throw new InvalidOperationException(
+            $"Custom battle effect '{EffectId}' does not support hook execution."))(context);
+    }
+
+}
+
+public sealed record CustomAbilityBattleEffectDefinition(
+    string EffectId,
+    BattleTargetSelectorDefinition Target,
+    JsonElement Parameters) : BattleEffectDefinition, ITargetedBattleEffectDefinition
+{
+    [JsonIgnore]
+    internal CustomBattleEffectInvocation Invocation { get; private set; } = null!;
+
+    [JsonIgnore]
+    public bool SupportsAbility => Invocation.SupportsAbility;
+
+    public override void Resolve(IContentRepository contentRepository)
+    {
+        ArgumentNullException.ThrowIfNull(contentRepository);
+        Invocation = CustomBattleEffectRegistry.Default.Bind(EffectId, Parameters);
+    }
+
+    internal void ExecuteAbility(IBattleAbilityEffectContext context)
+    {
+        (Invocation.ExecuteAbility ?? throw new InvalidOperationException(
+            $"Custom ability battle effect '{EffectId}' does not support ability execution."))(context);
     }
 }
