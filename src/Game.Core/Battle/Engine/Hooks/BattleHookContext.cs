@@ -14,6 +14,7 @@ public sealed class BattleHookContext :
     IBattleEffectContext,
     IDamageCalculationEffectContext,
     IHitResultEffectContext,
+    IHitConfirmedEffectContext,
     IDamageApplicationEffectContext,
     IDamageTakenEffectContext,
     IDefeatPreventionEffectContext,
@@ -296,7 +297,11 @@ public sealed class BattleHookContext :
             target,
             BattleRecoveryKind.Hp,
             amount).ActualAmount;
-        State.AddMessage(new BattleFact(BattleFactKind.Healed, target.Id, detail: detail ?? restored.ToString()));
+        State.AddMessage(new BattleFact(
+            BattleFactKind.Healed,
+            target.Id,
+            Timing,
+            detail: detail ?? restored.ToString()));
         return restored;
     }
 
@@ -319,6 +324,41 @@ public sealed class BattleHookContext :
         BattleUnit target,
         int amount,
         string? detail) => RestoreHp(target, amount, detail);
+
+    int IActionStartEffectContext.ApplyHpRecovery(
+        BattleUnit target,
+        int amount,
+        string? detail) => RestoreHp(target, amount, detail);
+
+    bool IHitConfirmedEffectContext.ApplyBuff(
+        BattleUnit target,
+        string buffId,
+        int level,
+        int duration,
+        string? detail)
+    {
+        if (Timing != HookTiming.OnHitConfirmed)
+        {
+            throw new InvalidOperationException(
+                $"A hit-confirmed buff can only be applied during '{HookTiming.OnHitConfirmed}'.");
+        }
+
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentException.ThrowIfNullOrWhiteSpace(buffId);
+        ArgumentOutOfRangeException.ThrowIfNegative(level);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(duration);
+
+        var source = Source ?? Unit;
+        return Engine.BuffResolver.Apply(
+            State,
+            source,
+            target,
+            Engine.BuffResolver.Resolve(buffId),
+            level,
+            duration,
+            detail ?? buffId,
+            Timing);
+    }
 
     int IDamageApplicationRuntimeContext.ApplyMpDamage(
         BattleUnit target,

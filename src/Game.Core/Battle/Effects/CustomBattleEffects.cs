@@ -101,6 +101,10 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("sever_in_two", new SeverInTwoBattleEffectHandler());
         registry.Register("mutual_destruction_sword", new MutualDestructionSwordBattleEffectHandler());
         registry.Register("heaven_and_earth_same_lifespan", new HeavenAndEarthSameLifespanBattleEffectHandler());
+        registry.Register("formless_healing", new FormlessHealingBattleEffectHandler());
+        registry.Register("toad_mastery_attack", new ToadMasteryAttackBattleEffectHandler());
+        registry.Register("attribute_contest_debuff", new AttributeContestDebuffBattleEffectHandler());
+        registry.Register("soul_chasing", new SoulChasingBattleEffectHandler());
         return registry;
     }
 
@@ -193,6 +197,7 @@ internal static class BattleEffectCapabilityPolicy
         {
             [typeof(IDamageCalculationEffectContext)] = HookTiming.BeforeDamageCalculation,
             [typeof(IHitResultEffectContext)] = HookTiming.BeforeHitResolved,
+            [typeof(IHitConfirmedEffectContext)] = HookTiming.OnHitConfirmed,
             [typeof(IDamageApplicationEffectContext)] = HookTiming.BeforeDamageApplied,
             [typeof(IDamageApplicationRuntimeContext)] = HookTiming.BeforeDamageApplied,
             [typeof(IDamageTakenEffectContext)] = HookTiming.OnDamageTaken,

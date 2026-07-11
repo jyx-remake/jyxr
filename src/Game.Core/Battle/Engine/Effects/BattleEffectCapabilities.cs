@@ -47,6 +47,16 @@ public interface IHitResultEffectContext : IBattleEffectContext
     bool SuppressHitEffects { get; set; }
 }
 
+public interface IHitConfirmedEffectContext : IBattleEffectContext
+{
+    bool ApplyBuff(
+        BattleUnit target,
+        string buffId,
+        int level,
+        int duration,
+        string? detail = null);
+}
+
 public interface IDamageApplicationEffectContext : IBattleEffectContext
 {
     int DamageAmount { get; }
@@ -98,6 +108,7 @@ public interface IActionStartEffectContext : IBattleEffectContext
 {
     void SkipCurrentAction(string? reason = null);
     int SetRage(int value, string? detail = null);
+    int ApplyHpRecovery(BattleUnit target, int amount, string? detail = null);
 }
 
 public interface IActionReadinessEffectContext : IBattleEffectContext
