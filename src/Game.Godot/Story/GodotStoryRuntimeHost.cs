@@ -58,8 +58,7 @@ public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeH
 		ArgumentNullException.ThrowIfNull(battle);
 		var selectedCharacterIds = await UIRoot.Instance.ShowCombatantSelectPanelAsync(battle.BattleId, cancellationToken);
 		var isWin = await UIRoot.Instance.ShowBattleScreenAsync(
-			battle.BattleId,
-			selectedCharacterIds,
+			new OrdinaryBattleRequest(battle.BattleId, selectedCharacterIds.ToArray()),
 			cancellationToken);
 		return isWin ? BattleOutcome.Win : BattleOutcome.Lose;
 	}

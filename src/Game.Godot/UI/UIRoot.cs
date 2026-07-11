@@ -315,19 +315,6 @@ public partial class UIRoot : Control
 	}
 
 	public async Task<bool> ShowBattleScreenAsync(
-		string battleId,
-		IReadOnlyList<string> selectedCharacterIds,
-		CancellationToken cancellationToken = default)
-	{
-		ArgumentException.ThrowIfNullOrWhiteSpace(battleId);
-		ArgumentNullException.ThrowIfNull(selectedCharacterIds);
-
-		return await ShowBattleScreenCoreAsync(
-			screen => screen.Configure(battleId, selectedCharacterIds),
-			cancellationToken);
-	}
-
-	public async Task<bool> ShowBattleScreenAsync(
 		SpecialBattleRequest request,
 		CancellationToken cancellationToken = default)
 	{
