@@ -108,10 +108,10 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
     }
 
     [Fact]
-    public void BattleServicePreviewOrdinaryVictorySettlement_UsesConfiguredGoldDropChance()
+    public void BattleServicePreviewVictorySettlement_UsesConfiguredGoldDropChance()
     {
         var state = new GameState();
-        var repository = TestContentFactory.CreateRepository();
+        var repository = TestContentFactory.CreateRepository(battles: [CreateSettlementBattle()]);
         var session = new GameSession(
             state,
             repository,
@@ -126,7 +126,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
                 CreateUnit("enemy", team: 2, level: 10, new GridPosition(3, 0)),
             ]);
 
-        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+        var settlement = PreviewOrdinarySettlement(session, battleState);
 
         Assert.Equal(1, settlement.Gold);
     }
@@ -172,7 +172,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
     }
 
     [Fact]
-    public void BattleServicePreviewOrdinaryVictorySettlement_UsesConfiguredPlayerTeam()
+    public void BattleServicePreviewVictorySettlement_UsesConfiguredPlayerTeam()
     {
         var state = new GameState();
         var configuredPlayerDefinition = TestContentFactory.CreateCharacterDefinition("configured_player", level: 1);
@@ -180,7 +180,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
             "configured_player",
             configuredPlayerDefinition,
             state.EquipmentInstanceFactory));
-        var repository = TestContentFactory.CreateRepository();
+        var repository = TestContentFactory.CreateRepository(battles: [CreateSettlementBattle()]);
         var session = new GameSession(
             state,
             repository,
@@ -196,7 +196,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
                 CreateUnit("configured_enemy", team: 1, level: 10, new GridPosition(3, 0)),
             ]);
 
-        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+        var settlement = PreviewOrdinarySettlement(session, battleState);
 
         Assert.Equal(
             Math.Max(5, (int)(CharacterLevelProgression.GetLevelUpExperience(10) / 15d)),
@@ -204,13 +204,14 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
     }
 
     [Fact]
-    public void BattleServicePreviewOrdinaryVictorySettlement_DividesExperienceByRewardEligibleMembersOnly()
+    public void BattleServicePreviewVictorySettlement_DividesExperienceByRewardEligibleMembersOnly()
     {
         var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero", level: 1);
         var allyDefinition = TestContentFactory.CreateCharacterDefinition("fixed_ally", level: 1);
         var enemyDefinition = TestContentFactory.CreateCharacterDefinition("enemy", level: 10);
         var repository = TestContentFactory.CreateRepository(
-            characters: [heroDefinition, allyDefinition, enemyDefinition]);
+            characters: [heroDefinition, allyDefinition, enemyDefinition],
+            battles: [CreateSettlementBattle()]);
         var state = new GameState();
         var hero = TestContentFactory.CreateCharacterInstance("hero", heroDefinition, state.EquipmentInstanceFactory);
         state.Party.AddMember(hero);
@@ -225,7 +226,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
                 new BattleUnit("enemy", enemy, 2, new GridPosition(3, 0)),
             ]);
 
-        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+        var settlement = PreviewOrdinarySettlement(session, battleState);
 
         Assert.Equal(
             Math.Max(5, (int)(CharacterLevelProgression.GetLevelUpExperience(10) / 15d)),
@@ -233,13 +234,14 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
     }
 
     [Fact]
-    public void BattleServicePreviewOrdinaryVictorySettlement_NormalDifficultyDoesNotDropFragments()
+    public void BattleServicePreviewVictorySettlement_NormalDifficultyDoesNotDropFragments()
     {
         var externalSkill = TestContentFactory.CreateExternalSkill("dragon_palm", hard: 1d);
         var internalSkill = TestContentFactory.CreateInternalSkill("yijinjing", hard: 1d);
         var repository = TestContentFactory.CreateRepository(
             externalSkills: [externalSkill],
-            internalSkills: [internalSkill]);
+            internalSkills: [internalSkill],
+            battles: [CreateSettlementBattle()]);
         var state = new GameState();
         var session = new GameSession(
             state,
@@ -257,13 +259,13 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
                 CreateUnit("enemy", team: 2, level: 10, new GridPosition(3, 0)),
             ]);
 
-        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+        var settlement = PreviewOrdinarySettlement(session, battleState);
 
         Assert.Empty(settlement.Drops.OfType<OrdinaryBattleSkillFragmentRewardDrop>());
     }
 
     [Fact]
-    public void BattleServicePreviewOrdinaryVictorySettlement_HardDifficultyDropsFilteredExternalFragments()
+    public void BattleServicePreviewVictorySettlement_HardDifficultyDropsFilteredExternalFragments()
     {
         var low = TestContentFactory.CreateExternalSkill("too_low", hard: 2d);
         var eligible = TestContentFactory.CreateExternalSkill("eligible", hard: 5d);
@@ -271,7 +273,8 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
         var internalSkill = TestContentFactory.CreateInternalSkill("internal", hard: 1d);
         var repository = TestContentFactory.CreateRepository(
             externalSkills: [low, eligible, tooHard],
-            internalSkills: [internalSkill]);
+            internalSkills: [internalSkill],
+            battles: [CreateSettlementBattle()]);
         var state = new GameState();
         state.Adventure.SetDifficulty(GameDifficulty.Hard);
         var session = new GameSession(
@@ -292,7 +295,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
                 CreateUnit("enemy", team: 2, level: 30, new GridPosition(3, 0)),
             ]);
 
-        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+        var settlement = PreviewOrdinarySettlement(session, battleState);
 
         var fragment = Assert.Single(settlement.Drops.OfType<OrdinaryBattleSkillFragmentRewardDrop>());
         Assert.Equal(SkillFragmentKind.External, fragment.Kind);
@@ -301,13 +304,14 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
     }
 
     [Fact]
-    public void BattleServicePreviewOrdinaryVictorySettlement_CrazyDifficultyDropsInternalFragmentsWithRoundScaling()
+    public void BattleServicePreviewVictorySettlement_CrazyDifficultyDropsInternalFragmentsWithRoundScaling()
     {
         var lowExternal = TestContentFactory.CreateExternalSkill("too_hard_external", hard: 9d);
         var internalSkill = TestContentFactory.CreateInternalSkill("eligible_internal", hard: 2d);
         var repository = TestContentFactory.CreateRepository(
             externalSkills: [lowExternal],
-            internalSkills: [internalSkill]);
+            internalSkills: [internalSkill],
+            battles: [CreateSettlementBattle()]);
         var state = new GameState();
         state.Adventure.SetDifficulty(GameDifficulty.Crazy);
         state.Adventure.SetRound(3);
@@ -329,7 +333,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
                 CreateUnit("enemy", team: 2, level: 10, new GridPosition(3, 0)),
             ]);
 
-        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+        var settlement = PreviewOrdinarySettlement(session, battleState);
 
         var fragment = Assert.Single(settlement.Drops.OfType<OrdinaryBattleSkillFragmentRewardDrop>());
         Assert.Equal(SkillFragmentKind.Internal, fragment.Kind);
@@ -337,13 +341,14 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
     }
 
     [Fact]
-    public void BattleServicePreviewOrdinaryVictorySettlement_NoFragmentCandidatesDoesNotThrow()
+    public void BattleServicePreviewVictorySettlement_NoFragmentCandidatesDoesNotThrow()
     {
         var externalSkill = TestContentFactory.CreateExternalSkill("too_hard", hard: 9d);
         var internalSkill = TestContentFactory.CreateInternalSkill("also_too_hard", hard: 9d);
         var repository = TestContentFactory.CreateRepository(
             externalSkills: [externalSkill],
-            internalSkills: [internalSkill]);
+            internalSkills: [internalSkill],
+            battles: [CreateSettlementBattle()]);
         var state = new GameState();
         state.Adventure.SetDifficulty(GameDifficulty.Hard);
         var session = new GameSession(
@@ -362,7 +367,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
                 CreateUnit("enemy", team: 2, level: 10, new GridPosition(3, 0)),
             ]);
 
-        var settlement = session.BattleService.PreviewOrdinaryVictorySettlement(battleState);
+        var settlement = PreviewOrdinarySettlement(session, battleState);
 
         Assert.Empty(settlement.Drops.OfType<OrdinaryBattleSkillFragmentRewardDrop>());
     }
@@ -571,6 +576,16 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
         Assert.Equal("青锋剑", equipmentEntry.Equipment.Definition.Name);
         Assert.Single(equipmentEntry.Equipment.ExtraAffixes);
     }
+
+    private static OrdinaryBattleVictorySettlement PreviewOrdinarySettlement(
+        GameSession session,
+        BattleState state) =>
+        session.BattleService.PreviewVictorySettlement(
+            state,
+            new OrdinaryBattleRequest("settlement", []));
+
+    private static BattleDefinition CreateSettlementBattle() =>
+        new() { Id = "settlement", Name = "settlement", MapId = "test" };
 
     private static BattleUnit CreateUnit(
         string id,

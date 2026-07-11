@@ -16,7 +16,7 @@ public sealed class BattleServiceTests
     {
         var session = CreateSession(CreateFixedPlayerBattle());
 
-        var state = session.BattleService.BuildBattleState("fixed_player", []);
+        var state = session.BattleService.BuildBattleState(new OrdinaryBattleRequest("fixed_player", []));
 
         Assert.Contains(state.Units, unit => unit.Team == 1 && unit.Character.Definition.Id == "shadow");
         Assert.Contains(state.Units, unit => unit.Team == 2 && unit.Character.Definition.Id == "enemy");
@@ -28,21 +28,18 @@ public sealed class BattleServiceTests
         var session = CreateSession(CreateEnemyOnlyBattle());
 
         var exception = Assert.Throws<InvalidOperationException>(
-            () => session.BattleService.BuildBattleState("enemy_only", []));
+            () => session.BattleService.BuildBattleState(new OrdinaryBattleRequest("enemy_only", [])));
         Assert.Contains("enemy_only", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void BuildZhenlongqijuBattleState_UsesCrazyBattleDifficulty()
+    public void BuildBattleState_ZhenlongqijuUsesCrazyBattleDifficulty()
     {
         var session = CreateSession(
             CreateFixedPlayerBattle(),
             CreateConfigWithoutEnemyRandomTalents());
 
-        var state = session.BattleService.BuildZhenlongqijuBattleState(
-            session.ContentRepository.GetBattle("fixed_player"),
-            [],
-            level: 0);
+        var state = session.BattleService.BuildBattleState(new ZhenlongqijuBattleRequest("fixed_player", [], 0));
 
         Assert.Equal(GameDifficulty.Crazy, state.RuleSettings.Difficulty);
         Assert.True(state.RuleSettings.EnableDifficultyDamageScaling);
@@ -53,7 +50,7 @@ public sealed class BattleServiceTests
     [Theory]
     [InlineData(5, 100, 120, 10100, 10120)]
     [InlineData(10, 100, 120, 20200, 20240)]
-    public void BuildZhenlongqijuBattleState_AppliesLegacyHpMpFormula(
+    public void BuildBattleState_ZhenlongqijuAppliesLegacyHpMpFormula(
         int level,
         int baseHp,
         int baseMp,
@@ -72,10 +69,7 @@ public sealed class BattleServiceTests
             CreateConfigWithoutEnemyRandomTalents(),
             enemyDefinition: enemy);
 
-        var state = session.BattleService.BuildZhenlongqijuBattleState(
-            session.ContentRepository.GetBattle("fixed_player"),
-            [],
-            level);
+        var state = session.BattleService.BuildBattleState(new ZhenlongqijuBattleRequest("fixed_player", [], level));
         var poweredEnemy = Assert.Single(state.Units.Where(unit => unit.Team == 2)).Character;
 
         Assert.Equal(expectedHp, poweredEnemy.GetBaseStat(StatType.MaxHp));
@@ -83,7 +77,7 @@ public sealed class BattleServiceTests
     }
 
     [Fact]
-    public void BuildZhenlongqijuBattleState_RollsSkillLevelBonusPerSkill()
+    public void BuildBattleState_ZhenlongqijuRollsSkillLevelBonusPerSkill()
     {
         var externalSkills = Enumerable.Range(0, 20)
             .Select(index => TestContentFactory.CreateExternalSkill($"external_{index}"))
@@ -104,10 +98,7 @@ public sealed class BattleServiceTests
             CreateConfigWithoutEnemyRandomTalents(),
             enemyDefinition: enemy);
 
-        var state = session.BattleService.BuildZhenlongqijuBattleState(
-            session.ContentRepository.GetBattle("fixed_player"),
-            [],
-            level: 15);
+        var state = session.BattleService.BuildBattleState(new ZhenlongqijuBattleRequest("fixed_player", [], 15));
         var poweredEnemy = Assert.Single(state.Units.Where(unit => unit.Team == 2)).Character;
         var bonuses = poweredEnemy.ExternalSkills.Select(skill => skill.Level - 1)
             .Concat(poweredEnemy.InternalSkills.Select(skill => skill.Level - 1))
@@ -118,7 +109,7 @@ public sealed class BattleServiceTests
     }
 
     [Fact]
-    public void BuildZhenlongqijuBattleState_ReplacesEnemyEquipmentWithConfiguredRandomSet()
+    public void BuildBattleState_ZhenlongqijuReplacesEnemyEquipmentWithConfiguredRandomSet()
     {
         var oldWeapon = TestContentFactory.CreateEquipment("old_weapon", EquipmentSlotType.Weapon);
         var enemy = TestContentFactory.CreateCharacterDefinition(
@@ -130,10 +121,7 @@ public sealed class BattleServiceTests
             enemyDefinition: enemy,
             equipment: [oldWeapon]);
 
-        var state = session.BattleService.BuildZhenlongqijuBattleState(
-            session.ContentRepository.GetBattle("fixed_player"),
-            [],
-            level: 1);
+        var state = session.BattleService.BuildBattleState(new ZhenlongqijuBattleRequest("fixed_player", [], 1));
         var poweredEnemy = Assert.Single(state.Units.Where(unit => unit.Team == 2)).Character;
 
         Assert.Equal(
@@ -152,7 +140,7 @@ public sealed class BattleServiceTests
     [InlineData(EquipmentSlotType.Weapon)]
     [InlineData(EquipmentSlotType.Armor)]
     [InlineData(EquipmentSlotType.Accessory)]
-    public void BuildZhenlongqijuBattleState_Throws_WhenConfiguredEnemyEquipmentSlotPoolIsEmpty(
+    public void BuildBattleState_ZhenlongqijuThrows_WhenConfiguredEnemyEquipmentSlotPoolIsEmpty(
         EquipmentSlotType slotType)
     {
         var config = CreateConfigWithoutEnemyRandomTalents(
@@ -162,10 +150,7 @@ public sealed class BattleServiceTests
         var session = CreateSession(CreateFixedPlayerBattle(), config);
 
         var exception = Assert.Throws<InvalidOperationException>(
-            () => session.BattleService.BuildZhenlongqijuBattleState(
-                session.ContentRepository.GetBattle("fixed_player"),
-                [],
-                level: 1));
+            () => session.BattleService.BuildBattleState(new ZhenlongqijuBattleRequest("fixed_player", [], 1)));
 
         Assert.Contains("Zhenlongqiju enemy equipment", exception.Message, StringComparison.Ordinal);
         Assert.Contains(slotType.ToString(), exception.Message, StringComparison.Ordinal);
@@ -175,7 +160,7 @@ public sealed class BattleServiceTests
     [InlineData(EquipmentSlotType.Weapon, EquipmentSlotType.Armor)]
     [InlineData(EquipmentSlotType.Armor, EquipmentSlotType.Accessory)]
     [InlineData(EquipmentSlotType.Accessory, EquipmentSlotType.Weapon)]
-    public void BuildZhenlongqijuBattleState_Throws_WhenConfiguredEnemyEquipmentSlotTypeMismatches(
+    public void BuildBattleState_ZhenlongqijuThrows_WhenConfiguredEnemyEquipmentSlotTypeMismatches(
         EquipmentSlotType expectedSlotType,
         EquipmentSlotType actualSlotType)
     {
@@ -191,10 +176,7 @@ public sealed class BattleServiceTests
             equipment: [wrongEquipment]);
 
         var exception = Assert.Throws<InvalidOperationException>(
-            () => session.BattleService.BuildZhenlongqijuBattleState(
-                session.ContentRepository.GetBattle("fixed_player"),
-                [],
-                level: 1));
+            () => session.BattleService.BuildBattleState(new ZhenlongqijuBattleRequest("fixed_player", [], 1)));
 
         Assert.Contains(wrongEquipment.Id, exception.Message, StringComparison.Ordinal);
         Assert.Contains(expectedSlotType.ToString(), exception.Message, StringComparison.Ordinal);
