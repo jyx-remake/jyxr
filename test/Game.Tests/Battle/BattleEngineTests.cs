@@ -3712,6 +3712,228 @@ public sealed class BattleEngineTests
         };
     }
 
+    [Fact]
+    public void CastSkill_MutualDestructionSword_DealsScaledDamageThenOneThousandSelfDamage()
+    {
+        var skill = CreateCustomSpecialSkill("mutual_destruction_test", "mutual_destruction_sword");
+        var onDamageTaken = new TalentDefinition
+        {
+            Id = "self_damage_observer",
+            Name = "self_damage_observer",
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.OnDamageTaken,
+                    Effects = [],
+                },
+            ],
+        };
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            maxHp: 3000,
+            talents: [onDamageTaken],
+            specialSkills: [skill]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 5000);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(3, 2), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetSpecialSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(4000, target.Hp);
+        Assert.Equal(2000, source.Hp);
+        var damageFacts = result.Messages.OfType<BattleFact>()
+            .Where(message => message.Kind == BattleFactKind.Damaged)
+            .ToList();
+        Assert.Collection(
+            damageFacts,
+            damage =>
+            {
+                Assert.Equal(target.Id, damage.UnitId);
+                Assert.Equal(1000, damage.Damage?.Amount);
+            },
+            damage =>
+            {
+                Assert.Equal(source.Id, damage.UnitId);
+                Assert.Equal(1000, damage.Damage?.Amount);
+            });
+        Assert.Contains(result.Messages, message =>
+            message is BattleTrace { Kind: BattleTraceKind.HooksTriggered, UnitId: "source", Timing: HookTiming.OnDamageTaken });
+    }
+
+    [Fact]
+    public void CastSkill_MutualDestructionSword_UsesTwentyPercentTargetMaximumHpAtUpperRoll()
+    {
+        var skill = CreateCustomSpecialSkill("mutual_destruction_upper_test", "mutual_destruction_sword");
+        var source = CreateUnit("source", team: 1, new GridPosition(0, 0), maxHp: 3000, specialSkills: [skill]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 5000);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(3, 2), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(1d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetSpecialSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(3000, target.Hp);
+        Assert.Equal(2000, source.Hp);
+    }
+
+    [Fact]
+    public void CastSkill_HeavenAndEarthSameLifespan_UsesHpSnapshotWithoutReducingMaximumHpAndCanDraw()
+    {
+        var skill = CreateCustomSpecialSkill("same_lifespan_test", "heaven_and_earth_same_lifespan");
+        var source = CreateUnit("source", team: 1, new GridPosition(0, 0), maxHp: 1200, specialSkills: [skill]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 600);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(3, 2), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetSpecialSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(0, target.Hp);
+        Assert.Equal(0, source.Hp);
+        Assert.Equal(1200, source.MaxHp);
+        Assert.Equal(BattleOutcome.Draw, BattleOutcomeEvaluator.Evaluate(state));
+        var damageFacts = result.Messages.OfType<BattleFact>()
+            .Where(message => message.Kind == BattleFactKind.Damaged)
+            .ToList();
+        Assert.Collection(
+            damageFacts,
+            damage => Assert.Equal(600, damage.Damage?.Amount),
+            damage => Assert.Equal(1200, damage.Damage?.Amount));
+    }
+
+    [Fact]
+    public void CastSkill_HuatuoReborn_HealsFromHealerStatsAndTargetMaximumHp()
+    {
+        var skill = CreateCustomSpecialSkill("huatuo_reborn_test", "huatuo_reborn_healing");
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Gengu] = 10,
+                [StatType.Fuyuan] = 20,
+            },
+            specialSkills: [skill]);
+        var target = CreateUnit("target", team: 1, new GridPosition(1, 0), maxHp: 1000, hp: 100);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(3, 2), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetSpecialSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(350, target.Hp);
+        Assert.Contains(result.Messages, message =>
+            message is BattleFact { Kind: BattleFactKind.Healed, UnitId: "target", Detail: "250" });
+    }
+
+    [Fact]
+    public void CastSkill_SeverInTwo_OnSuccessfulRollDealsHalfCurrentHp()
+    {
+        var skill = CreateCustomSpecialSkill("sever_in_two_test", "sever_in_two");
+        var source = CreateUnit("source", team: 1, new GridPosition(0, 0), specialSkills: [skill]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1001);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(3, 2), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetSpecialSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(501, target.Hp);
+        var damage = Assert.Single(result.Messages.OfType<BattleFact>().Where(message =>
+            message is BattleFact { Kind: BattleFactKind.Damaged, UnitId: "target" }));
+        Assert.Equal(500, damage.Damage?.Amount);
+    }
+
+    [Fact]
+    public void CastSkill_ShoulderThrow_MovesTargetBehindSourceAndDealsResolveDifferenceDamage()
+    {
+        var skill = CreateCustomSpecialSkill("shoulder_throw_test", "shoulder_throw");
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(2, 1),
+            maxHp: 1000,
+            stats: new Dictionary<StatType, int> { [StatType.Dingli] = 50 },
+            specialSkills: [skill]);
+        var target = CreateUnit(
+            "target",
+            team: 2,
+            new GridPosition(3, 1),
+            maxHp: 1000,
+            stats: new Dictionary<StatType, int> { [StatType.Dingli] = 30 });
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(5, 3), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetSpecialSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(new GridPosition(1, 1), target.Position);
+        Assert.Equal(900, target.Hp);
+        Assert.Contains(result.Messages, message =>
+            message is BattleFact { Kind: BattleFactKind.Moved, UnitId: "target", Detail: "1,1" });
+    }
+
+    [Fact]
+    public void CastSkill_DragonTailSweep_PushesToLastOpenCellAndScalesDamageWithDistance()
+    {
+        var skill = CreateCustomSpecialSkill("dragon_tail_sweep_test", "dragon_tail_sweep");
+        var source = CreateUnit("source", team: 1, new GridPosition(0, 1), specialSkills: [skill]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 1), maxHp: 5000);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(5, 3), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetSpecialSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(new GridPosition(4, 1), target.Position);
+        Assert.Equal(4600, target.Hp);
+        Assert.Contains(result.Messages, message =>
+            message is BattleFact { Kind: BattleFactKind.Moved, UnitId: "target", Detail: "4,1" });
+    }
+
+    private static SpecialSkillDefinition CreateCustomSpecialSkill(string id, string effectId)
+    {
+        using var parameters = JsonDocument.Parse("{}");
+        var effect = new CustomAbilityBattleEffectDefinition(
+            effectId,
+            new TargetBattleTargetSelectorDefinition(),
+            parameters.RootElement.Clone());
+        var skill = new SpecialSkillDefinition(
+            id,
+            id,
+            string.Empty,
+            string.Empty,
+            Cooldown: 0,
+            SkillCostDefinition.None,
+            new SkillTargetingDefinition(CastSize: 1, ImpactType: SkillImpactType.Single, ImpactSize: 0),
+            string.Empty,
+            string.Empty,
+            Speech: null,
+            Buffs: [],
+            Effects: [effect]);
+        effect.Resolve(TestContentFactory.CreateRepository(specialSkills: [skill]));
+        return skill;
+    }
+
     private static BattleUnit CreateUnit(
         string id,
         int team,
@@ -3800,4 +4022,5 @@ public sealed class BattleEngineTests
 
         public int Next(int minInclusive, int maxExclusive) => minInclusive;
     }
+
 }

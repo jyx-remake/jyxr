@@ -5,6 +5,17 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
+    internal int ApplyDirectHpRecovery(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        int amount)
+    {
+        var actual = _recoveryResolver.Apply(state, source, target, BattleRecoveryKind.Hp, amount).ActualAmount;
+        AddMessage(state, new BattleFact(BattleFactKind.Healed, target.Id, detail: actual.ToString()));
+        return actual;
+    }
+
     internal int ApplyDirectDamage(
         BattleState state,
         BattleUnit source,

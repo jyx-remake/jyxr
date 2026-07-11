@@ -85,6 +85,12 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("zhenwu_formation_intercept", new ZhenwuFormationInterceptBattleEffectHandler());
         registry.Register("xiang_er_wish_damage", new XiangErWishDamageBattleEffectHandler());
         registry.Register("firearm_damage", new FirearmDamageBattleEffectHandler());
+        registry.Register("shoulder_throw", new ShoulderThrowBattleEffectHandler());
+        registry.Register("dragon_tail_sweep", new DragonTailSweepBattleEffectHandler());
+        registry.Register("huatuo_reborn_healing", new HuatuoRebornHealingBattleEffectHandler());
+        registry.Register("sever_in_two", new SeverInTwoBattleEffectHandler());
+        registry.Register("mutual_destruction_sword", new MutualDestructionSwordBattleEffectHandler());
+        registry.Register("heaven_and_earth_same_lifespan", new HeavenAndEarthSameLifespanBattleEffectHandler());
         return registry;
     }
 

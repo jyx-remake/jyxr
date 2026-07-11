@@ -1,5 +1,6 @@
 using Game.Core.Abstractions;
 using Game.Core.Affix;
+using Game.Core.Model;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -28,6 +29,9 @@ public interface IBattleAbilityEffectContext
     IRandomService Random { get; }
     BattleExecutionScope? ExecutionScope { get; }
 
+    bool IsCellAvailable(GridPosition position, BattleUnit movingUnit);
+    bool TryRelocate(BattleUnit target, GridPosition destination);
+    int ApplyHpRecovery(BattleUnit target, int amount);
     int ApplyDirectDamage(BattleUnit target, int amount, string? detail = null);
 }
 

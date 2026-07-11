@@ -1,4 +1,5 @@
 using Game.Core.Abstractions;
+using Game.Core.Model;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -20,6 +21,15 @@ internal sealed class BattleAbilityEffectContext(
     public IRandomService Random { get; } = random;
 
     public BattleExecutionScope? ExecutionScope => state.CurrentExecutionScope;
+
+    public bool IsCellAvailable(GridPosition position, BattleUnit movingUnit) =>
+        state.Grid.IsWalkable(position) && !state.IsOccupied(position, movingUnit.Id);
+
+    public bool TryRelocate(BattleUnit target, GridPosition destination) =>
+        engine.TryRelocateByAbility(state, target, destination);
+
+    public int ApplyHpRecovery(BattleUnit target, int amount) =>
+        engine.ApplyDirectHpRecovery(state, Source, target, amount);
 
     public int ApplyDirectDamage(BattleUnit target, int amount, string? detail = null) =>
         engine.ApplyDirectDamage(state, Source, target, amount, detail: detail);
