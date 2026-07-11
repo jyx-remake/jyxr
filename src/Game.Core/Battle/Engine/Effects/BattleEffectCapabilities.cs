@@ -59,6 +59,15 @@ public interface IDamageTakenEffectContext : IBattleEffectContext
     bool IsCritical { get; }
 }
 
+public interface IDefeatPreventionEffectContext : IBattleEffectContext
+{
+    int IncomingDamageAmount { get; }
+    int ActualDamageAmount { get; }
+    bool IsCritical { get; }
+    bool IsDefeatPrevented { get; }
+    void PreventDefeat(string abilityId);
+}
+
 public interface IRecoveryEffectContext : IBattleEffectContext
 {
     BattleRecoveryKind RecoveryKind { get; }

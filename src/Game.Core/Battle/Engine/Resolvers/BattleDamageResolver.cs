@@ -32,6 +32,7 @@ internal sealed record BattleDamageTakenContext(
     BattleUnit Source,
     BattleUnit Target,
     SkillInstance? Skill,
+    int IncomingAmount,
     int ActualAmount,
     bool IsCritical);
 
@@ -92,6 +93,7 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
                 source,
                 applicationContext.Target,
                 skill,
+                applicationContext.ProposedAmount,
                 actualAmount,
                 isCritical);
             engine.TriggerHooks(state, HookTiming.OnDamageTaken, takenContext.Target, context =>
@@ -102,6 +104,19 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
                 context.DamageAmount = takenContext.ActualAmount;
                 context.IsCritical = takenContext.IsCritical;
             });
+
+            if (!takenContext.Target.IsAlive)
+            {
+                engine.TriggerHooks(state, HookTiming.BeforeDefeated, takenContext.Target, context =>
+                {
+                    context.Source = takenContext.Source;
+                    context.Target = takenContext.Target;
+                    context.Skill = takenContext.Skill;
+                    context.IncomingDamageAmount = takenContext.IncomingAmount;
+                    context.DamageAmount = takenContext.ActualAmount;
+                    context.IsCritical = takenContext.IsCritical;
+                });
+            }
         }
 
         return new BattleDamageApplicationResult(

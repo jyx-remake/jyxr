@@ -31,6 +31,8 @@
 - 当前战斗内角色升级直接修改 `CharacterInstance` 并通过 `BattleEventKind.CharacterLeveledUp` 做战斗内表现，没有发布应用层 `CharacterChangedEvent` / `CharacterLeveledUpEvent`。后续如果战斗中角色升级需要驱动 HUD、档案、成就或其他 session 订阅者，应把这条成长路径收敛回应用层服务或补明确的战斗结算事件桥接。
 - 普通战斗装备掉落的随机词条抽样当前按 legacy `ItemInstance.GenerateRandomTrigger()` 复刻：合并匹配等级表后，按配置顺序逐项执行 `weight / totalWeight` 试投，未命中则整轮重试，重复词条再重抽。该行为不是标准权重轮盘抽样；后续如改成一次随机数累计权重命中，应作为明确设计变更评估掉落分布差异。
 - 当前轻量战斗内核的命中结算暂按 legacy 顺序处理：目标侧 `BeforeHitResolved` 闪避/反制先落地，来源侧破闪避/失手后处理。因此可能出现“最终命中但目标闪避反制副作用已生效”的结果；后续正式战场系统重建时需明确这是保留为原版结算顺序，还是拆成命中状态解析与最终结果副作用两阶段。
+- 当前普通技能造成伤害后会在技能命中流程中独立进行受击回怒判定（`50% + 福缘 / 1000`），尚未收敛为 `OnDamageTaken` 响应；直接/真实伤害与 Buff 周期伤害虽然都会触发 `OnDamageTaken`，目前不会触发这项受击回怒。后续统一伤害响应语义时再迁移，本阶段保持现状。
+- 当前所有通过公共伤害 resolver 结算的 HP 伤害都会触发 `OnDamageTaken`，包括普通技能伤害、直接/真实伤害、多重攻击的每段追加伤害与 Buff 周期伤害。后续若某项规则只应响应普通技能伤害，不能无条件挂到现有 `OnDamageTaken`；应根据正式语义增加独立 timing、为伤害上下文补来源分类条件，或重新编排伤害响应阶段，避免在具体天赋处理器中按技能是否为空等偶然信息打补丁。
 - `BeforeHitResolved` 应只承载命中结果确定前的闪避、破闪避、失手等逻辑。后续内容校验应禁止来源侧 `context_hit_state == hit` 的 hook，命中确认后的追加效果应使用 `OnHitConfirmed`，避免数据写法被运行时静默跳过。
 - 奥义音效配置列表目前由 `GameConfig.LegendFemaleVoiceSfxIds` / `LegendMaleVoiceSfxIds` / `LegendEffectSfxIds` 驱动。后续需要在配置加载或内容校验阶段保证这些列表非空，避免运行时随机取值时因空列表崩溃。
 - 天关 `achievementIds` 当前数据仍为空，legacy `nick` 未实际落入 `data/towers.json`。后续需要重新确认 legacy tower XML 的 `nick` 来源和转换逻辑，并补内容测试断言预期关卡能加载出成就。

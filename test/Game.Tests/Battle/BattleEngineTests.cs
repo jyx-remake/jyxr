@@ -1803,6 +1803,252 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void BattleUnit_RecordsBattleLocalUsageByAbilityId()
+    {
+        var unit = CreateUnit("unit", team: 1, new GridPosition(0, 0));
+
+        Assert.Equal(0, unit.GetAbilityUsageCount("endless_fighting_spirit"));
+        Assert.Equal(1, unit.RecordAbilityUsage("endless_fighting_spirit"));
+        Assert.Equal(2, unit.RecordAbilityUsage("endless_fighting_spirit"));
+        Assert.Equal(1, unit.RecordAbilityUsage("another_ability"));
+        Assert.Equal(2, unit.AbilityUsageCounts["endless_fighting_spirit"]);
+        Assert.Equal(1, unit.AbilityUsageCounts["another_ability"]);
+    }
+
+    [Fact]
+    public void CastSkill_LethalDamageTriggersOnDamageTakenBeforeBeforeDefeated()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var talent = new TalentDefinition
+        {
+            Id = "defeat_timings",
+            Name = "defeat_timings",
+            Affixes =
+            [
+                new HookAffix { Timing = HookTiming.BeforeDefeated },
+                new HookAffix { Timing = HookTiming.OnDamageTaken },
+            ],
+        };
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1, talents: [talent]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.5d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state,
+            source.Id,
+            source.Character.GetExternalSkills().Single(),
+            target.Position);
+
+        Assert.True(result.Success);
+        Assert.False(target.IsAlive);
+        var messages = result.Messages.ToList();
+        var damageIndex = messages.FindIndex(message =>
+            message is BattleFact { Kind: BattleFactKind.Damaged, UnitId: "target" });
+        var beforeDefeatedIndex = messages.FindIndex(message =>
+            message is BattleTrace { Timing: HookTiming.BeforeDefeated, UnitId: "target" });
+        var onDamageTakenIndex = messages.FindIndex(message =>
+            message is BattleTrace { Timing: HookTiming.OnDamageTaken, UnitId: "target" });
+        Assert.True(damageIndex < onDamageTakenIndex);
+        Assert.True(onDamageTakenIndex < beforeDefeatedIndex);
+    }
+
+    [Fact]
+    public void CastSkill_OnDamageTakenRecoverySkipsBeforeDefeated()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 10, impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var recovery = new TalentDefinition
+        {
+            Id = "damage_recovery",
+            Name = "damage_recovery",
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.OnDamageTaken,
+                    Effects = [new AddHpBattleEffectDefinition(new SelfBattleTargetSelectorDefinition(), 1)],
+                },
+                new HookAffix { Timing = HookTiming.BeforeDefeated },
+            ],
+        };
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1, talents: [recovery]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.5d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(1, target.Hp);
+        Assert.DoesNotContain(result.Messages, message =>
+            message is BattleTrace { Timing: HookTiming.BeforeDefeated, UnitId: "target" });
+    }
+
+    [Fact]
+    public void CastSkill_DefeatPreventionUsesPriorityAndStopsAfterFirstSuccess()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 10, impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var endless = CreateDefeatPreventionTalent(
+            "无尽斗志", "endless_fighting_spirit", priority: 100,
+            """{"abilityId":"无尽斗志","guaranteedFirstTalentId":"我就是神","chance":1}""");
+        var qiShield = CreateDefeatPreventionTalent(
+            "真气护体", "qi_shield_defeat_prevention", priority: 200,
+            """{"abilityId":"真气护体","chance":1,"mpCostPerDamage":2}""");
+        var survive = CreateDefeatPreventionTalent(
+            "百足之虫", "survive_at_one_hp", priority: 300,
+            """{"abilityId":"百足之虫","chance":1}""");
+        var target = CreateUnit(
+            "target", team: 2, new GridPosition(1, 0), maxHp: 1, maxMp: 10000,
+            talents: [endless, qiShield, survive]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(1, target.Hp);
+        Assert.Equal(10000, target.Mp);
+        Assert.Equal(0, target.GetAbilityUsageCount("无尽斗志"));
+        Assert.Contains(result.Messages, message =>
+            message is BattleFact
+            {
+                Kind: BattleFactKind.DefeatPrevented,
+                UnitId: "target",
+                Detail: "百足之虫",
+            });
+        Assert.DoesNotContain(result.Messages, message =>
+            message is BattleFact { Kind: BattleFactKind.DefeatPrevented, Detail: "真气护体" or "无尽斗志" });
+    }
+
+    [Fact]
+    public void CastSkill_QiShieldUsesIncomingDamageForMpCost()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 10, impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var qiShield = CreateDefeatPreventionTalent(
+            "真气护体", "qi_shield_defeat_prevention", priority: 200,
+            """{"abilityId":"真气护体","chance":1,"mpCostPerDamage":2}""");
+        var target = CreateUnit(
+            "target", team: 2, new GridPosition(1, 0), maxHp: 1, maxMp: 10000, talents: [qiShield]);
+        var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
+        var incomingDamage = calculator.CalculateSkillDamage(
+            new BattleDamageContext(source, target, source.Character.GetExternalSkills().Single())).Amount;
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(calculator, random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(1, target.Hp);
+        Assert.Equal(10000 - incomingDamage * 2, target.Mp);
+    }
+
+    [Fact]
+    public void CastSkill_EndlessFightingSpiritGodGuaranteesOnlyFirstSuccessfulRevival()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 10, cooldown: 0,
+            impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var endless = CreateDefeatPreventionTalent(
+            "无尽斗志", "endless_fighting_spirit", priority: 100,
+            """{"abilityId":"无尽斗志","guaranteedFirstTalentId":"我就是神","chance":0.1}""");
+        var god = new TalentDefinition { Id = "我就是神", Name = "我就是神" };
+        var target = CreateUnit(
+            "target", team: 2, new GridPosition(1, 0), maxHp: 1, maxMp: 30,
+            talents: [endless, god]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.5d));
+        engine.BeginAction(state, source.Id);
+
+        var first = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(first.Success);
+        Assert.Equal(target.MaxHp, target.Hp);
+        Assert.Equal(target.MaxMp, target.Mp);
+        Assert.Equal(BattleUnit.MaxRage, target.Rage);
+        Assert.Equal(1, target.GetAbilityUsageCount("无尽斗志"));
+
+        engine.EndAction(state, source.Id);
+        target.TakeDamage(target.MaxHp - 1);
+        source.ActionGauge = 100;
+        engine.BeginAction(state, source.Id);
+        var second = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(second.Success);
+        Assert.False(target.IsAlive);
+        Assert.Equal(1, target.GetAbilityUsageCount("无尽斗志"));
+    }
+
+    [Fact]
     public void CastSkill_SpecialSkillSkipsDefaultDamageAndExecutesDefinedEffects()
     {
         var specialSkill = new SpecialSkillDefinition(
@@ -4067,6 +4313,32 @@ public sealed class BattleEngineTests
             hp: hp,
             mp: mp,
             rage: rage);
+    }
+
+    private static TalentDefinition CreateDefeatPreventionTalent(
+        string talentId,
+        string effectId,
+        int priority,
+        string parametersJson)
+    {
+        using var parameters = JsonDocument.Parse(parametersJson);
+        var effect = new CustomBattleEffectDefinition(effectId, parameters.RootElement.Clone());
+        var talent = new TalentDefinition
+        {
+            Id = talentId,
+            Name = talentId,
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeDefeated,
+                    Priority = priority,
+                    Effects = [effect],
+                },
+            ],
+        };
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        return talent;
     }
 
     private sealed class FixedRandomService : IRandomService

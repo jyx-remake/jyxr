@@ -85,6 +85,9 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("drunkenness", new DrunkennessBattleEffectHandler());
         registry.Register("zhenwu_formation_attack", new ZhenwuFormationAttackBattleEffectHandler());
         registry.Register("zhenwu_formation_intercept", new ZhenwuFormationInterceptBattleEffectHandler());
+        registry.Register("survive_at_one_hp", new SurviveAtOneHpBattleEffectHandler());
+        registry.Register("qi_shield_defeat_prevention", new QiShieldDefeatPreventionBattleEffectHandler());
+        registry.Register("endless_fighting_spirit", new EndlessFightingSpiritBattleEffectHandler());
         registry.Register("xiang_er_wish_damage", new XiangErWishDamageBattleEffectHandler());
         registry.Register("firearm_damage", new FirearmDamageBattleEffectHandler());
         registry.Register("shoulder_throw", new ShoulderThrowBattleEffectHandler());
@@ -187,6 +190,7 @@ internal static class BattleEffectCapabilityPolicy
             [typeof(IHitResultEffectContext)] = HookTiming.BeforeHitResolved,
             [typeof(IDamageApplicationEffectContext)] = HookTiming.BeforeDamageApplied,
             [typeof(IDamageTakenEffectContext)] = HookTiming.OnDamageTaken,
+            [typeof(IDefeatPreventionEffectContext)] = HookTiming.BeforeDefeated,
             [typeof(IRecoveryEffectContext)] = HookTiming.BeforeRecoveryResolved,
             [typeof(ISkillCostEffectContext)] = HookTiming.BeforeSkillCost,
             [typeof(IBuffApplicationEffectContext)] = HookTiming.BeforeBuffApplied,

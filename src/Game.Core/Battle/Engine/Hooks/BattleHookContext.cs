@@ -16,6 +16,7 @@ public sealed class BattleHookContext :
     IHitResultEffectContext,
     IDamageApplicationEffectContext,
     IDamageTakenEffectContext,
+    IDefeatPreventionEffectContext,
     IRecoveryEffectContext,
     ISkillCostEffectContext,
     IBuffApplicationEffectContext,
@@ -72,6 +73,8 @@ public sealed class BattleHookContext :
 
     public int? DamageAmount { get; internal set; }
 
+    public int? IncomingDamageAmount { get; internal set; }
+
     BattleDamageCalculationContext IDamageCalculationEffectContext.DamageCalculation =>
         DamageCalculation ?? throw MissingCapability(nameof(IDamageCalculationEffectContext));
 
@@ -92,6 +95,12 @@ public sealed class BattleHookContext :
     int IDamageTakenEffectContext.ActualDamageAmount =>
         DamageAmount ?? throw MissingCapability(nameof(IDamageTakenEffectContext));
     bool IDamageTakenEffectContext.IsCritical => IsCritical;
+    int IDefeatPreventionEffectContext.IncomingDamageAmount =>
+        IncomingDamageAmount ?? throw MissingCapability(nameof(IDefeatPreventionEffectContext));
+    int IDefeatPreventionEffectContext.ActualDamageAmount =>
+        DamageAmount ?? throw MissingCapability(nameof(IDefeatPreventionEffectContext));
+    bool IDefeatPreventionEffectContext.IsCritical => IsCritical;
+    bool IDefeatPreventionEffectContext.IsDefeatPrevented => IsDefeatPrevented;
     BattleRecoveryKind IRecoveryEffectContext.RecoveryKind =>
         RecoveryKind ?? throw MissingCapability(nameof(IRecoveryEffectContext));
     int IRecoveryEffectContext.RecoveryAmount
@@ -119,6 +128,8 @@ public sealed class BattleHookContext :
     public bool SuppressHitEffects { get; internal set; }
 
     public bool Cancel { get; internal set; }
+
+    public bool IsDefeatPrevented { get; private set; }
 
     public bool IsActionSkipRequested { get; private set; }
 
@@ -183,6 +194,35 @@ public sealed class BattleHookContext :
         ArgumentOutOfRangeException.ThrowIfNegative(damageFactor);
         Target = target;
         DamageAmount = Math.Max(0, (int)((DamageAmount ?? 0) * damageFactor));
+    }
+
+    public void PreventDefeat(string abilityId)
+    {
+        if (Timing != HookTiming.BeforeDefeated)
+        {
+            throw new InvalidOperationException(
+                $"Defeat can only be prevented during '{HookTiming.BeforeDefeated}'.");
+        }
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(abilityId);
+        if (!Unit.IsAlive)
+        {
+            throw new InvalidOperationException(
+                $"Unit '{Unit.Id}' must be alive before defeat can be prevented.");
+        }
+
+        if (IsDefeatPrevented)
+        {
+            throw new InvalidOperationException(
+                $"Defeat has already been prevented for unit '{Unit.Id}'.");
+        }
+
+        IsDefeatPrevented = true;
+        State.AddMessage(new BattleFact(
+            BattleFactKind.DefeatPrevented,
+            Unit.Id,
+            Timing,
+            detail: abilityId));
     }
 
     private InvalidOperationException MissingCapability(string capability) =>

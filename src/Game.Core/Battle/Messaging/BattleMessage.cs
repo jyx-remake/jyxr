@@ -94,6 +94,7 @@ public enum BattleFactKind
     Healed,
     MpDamaged,
     RageChanged,
+    DefeatPrevented,
     SkillLeveledUp,
     CharacterLeveledUp,
 }

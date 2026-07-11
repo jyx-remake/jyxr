@@ -11,6 +11,7 @@ public sealed class BattleUnit
 
     private readonly List<BattleBuffInstance> _buffs = [];
     private readonly HashSet<string> _disabledSkillIds = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, int> _abilityUsageCounts = new(StringComparer.Ordinal);
 
     public BattleUnit(
         string id,
@@ -78,6 +79,8 @@ public sealed class BattleUnit
 
     public IReadOnlySet<string> DisabledSkillIds => _disabledSkillIds;
 
+    public IReadOnlyDictionary<string, int> AbilityUsageCounts => _abilityUsageCounts;
+
     public void SetAiType(BattleAiType aiType)
     {
         AiType = aiType;
@@ -99,6 +102,20 @@ public sealed class BattleUnit
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(skillId);
         return _disabledSkillIds.Remove(skillId);
+    }
+
+    public int GetAbilityUsageCount(string abilityId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(abilityId);
+        return _abilityUsageCounts.GetValueOrDefault(abilityId);
+    }
+
+    public int RecordAbilityUsage(string abilityId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(abilityId);
+        var count = checked(GetAbilityUsageCount(abilityId) + 1);
+        _abilityUsageCounts[abilityId] = count;
+        return count;
     }
 
     internal void ClampResourcesToLimits()

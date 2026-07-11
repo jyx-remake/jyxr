@@ -100,6 +100,9 @@ internal sealed class BattleEventPresenter(
             case BattleFactKind.CharacterLeveledUp when fact.CharacterExperience is not null:
                 board.PlayFloatText(fact.UnitId, "角色等级提升", HealColor);
                 break;
+            case BattleFactKind.DefeatPrevented:
+                AppendLog($"{unitName} 的天赋【{ResolveTalentName(fact.Detail)}】发动，避免了被击败。");
+                break;
         }
     }
 
@@ -180,5 +183,11 @@ internal sealed class BattleEventPresenter(
     {
         if (string.IsNullOrWhiteSpace(id)) return "物品";
         return GameRoot.ContentRepository.TryGetItem(id, out var definition) ? definition.Name : id;
+    }
+
+    private static string ResolveTalentName(string? id)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return "天赋";
+        return GameRoot.ContentRepository.TryGetTalent(id, out var definition) ? definition.Name : id;
     }
 }

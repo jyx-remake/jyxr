@@ -69,6 +69,8 @@ public sealed record HookAffix : AffixDefinition
 {
     public required HookTiming Timing { get; init; }
 
+    public int Priority { get; init; }
+
     public IReadOnlyList<BattleHookConditionDefinition> Conditions { get; init; } = [];
 
     public IReadOnlyList<BattleEffectDefinition> Effects { get; init; } = [];
