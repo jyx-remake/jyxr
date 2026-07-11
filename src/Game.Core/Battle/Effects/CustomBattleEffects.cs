@@ -113,6 +113,7 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("formless_sword_qi", new FormlessSwordQiBattleEffectHandler());
         registry.Register("internal_energy_attack", new InternalEnergyAttackBattleEffectHandler());
         registry.Register("grieving_breeze", new GrievingBreezeBattleEffectHandler());
+        registry.Register("beloved_companion_damage", new BelovedCompanionDamageBattleEffectHandler());
         return registry;
     }
 
