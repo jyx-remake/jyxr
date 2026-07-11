@@ -78,7 +78,8 @@ public enum TraitId
     PoisonResistance,
     AvoidFriendlyFire,
     Irascible,
-    DoubleDamageTakenRageGain
+    DoubleDamageTakenRageGain,
+    ExtendedSkillImpactSize
 }
 
 public enum BattleDamageContextField
