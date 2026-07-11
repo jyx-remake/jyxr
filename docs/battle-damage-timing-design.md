@@ -1,5 +1,9 @@
 # 战斗伤害 Timing 设计
 
+> 当前实现说明：伤害阶段已按本文顺序落地，并通过能力型 Context 限制各阶段可执行的操作。
+> Effect、Context 和消息流总览见 `battle-runtime-architecture.md` 与
+> `battle-effect-phase-hook-design.md`。
+
 ## 目标
 
 本文只定义伤害相关 timing 的职责边界，不讨论完整战斗状态机。
