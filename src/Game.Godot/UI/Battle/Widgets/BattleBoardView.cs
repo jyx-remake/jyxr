@@ -39,7 +39,7 @@ public partial class BattleBoardView : Control
 	private Node2D _effectLayer = null!;
 	private bool _showBaseBoard = true;
 
-	private sealed record QueuedFloatText(string Text, Color Color);
+	private sealed record QueuedFloatText(string Text, BattleFloatTextStyle Style);
 
 	public event Action<GridPosition>? CellPressed;
 
@@ -263,7 +263,7 @@ public partial class BattleBoardView : Control
 		return effectView.PlayAsync(skillAnimation);
 	}
 
-	public void PlayFloatText(string unitId, string text, Color color)
+	public void PlayFloatText(string unitId, string text, BattleFloatTextStyle style)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
 		ArgumentException.ThrowIfNullOrWhiteSpace(text);
@@ -279,18 +279,18 @@ public partial class BattleBoardView : Control
 			_queuedFloatTexts[unitId] = queue;
 		}
 
-		queue.Enqueue(new QueuedFloatText(text, color));
+		queue.Enqueue(new QueuedFloatText(text, style));
 		if (_processingFloatTextUnits.Add(unitId))
 		{
 			ProcessFloatTextQueueAsync(unitId);
 		}
 	}
 
-	public void PlayPopupText(string text, Color color)
+	public void PlayPopupText(string text, BattleFloatTextStyle style)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(text);
 
-		PlayFloatTextAt(CustomMinimumSize * 0.5f, text, color, popup: true);
+		PlayFloatTextAt(CustomMinimumSize * 0.5f, text, style, popup: true);
 	}
 
 	public void PlaySpeech(string unitId, string text)
@@ -454,7 +454,7 @@ public partial class BattleBoardView : Control
 		return unitView;
 	}
 
-	private void PlayFloatTextAt(Vector2 position, string text, Color color, bool popup = false)
+	private void PlayFloatTextAt(Vector2 position, string text, BattleFloatTextStyle style, bool popup = false)
 	{
 		if (BattleFloatTextScene is null)
 		{
@@ -472,11 +472,11 @@ public partial class BattleBoardView : Control
 		_effectLayer.AddChild(floatText);
 		if (popup)
 		{
-			floatText.PlayPopup(text, color);
+			floatText.PlayPopup(text, BattleFloatTextTheme.ResolveColor(style));
 			return;
 		}
 
-		floatText.Play(text, color);
+		floatText.Play(text, BattleFloatTextTheme.ResolveColor(style));
 	}
 
 	private async void ProcessFloatTextQueueAsync(string unitId)
@@ -489,7 +489,7 @@ public partial class BattleBoardView : Control
 				var item = queue.Dequeue();
 				if (_unitViews.TryGetValue(unitId, out var unitView))
 				{
-					PlayFloatTextAt(unitView.Position + new Vector2(0f, -FloatTextHeadOffsetY), item.Text, item.Color);
+					PlayFloatTextAt(unitView.Position + new Vector2(0f, -FloatTextHeadOffsetY), item.Text, item.Style);
 				}
 
 				await ToSignal(GetTree().CreateTimer(FloatTextQueueSpacingSeconds), SceneTreeTimer.SignalName.Timeout);

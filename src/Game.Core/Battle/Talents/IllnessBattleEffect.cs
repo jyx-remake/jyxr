@@ -21,7 +21,7 @@ public sealed class IllnessBattleEffectHandler : CustomBattleEffectHandler<Illne
             context.RequestFloatText(
                 context.Unit,
                 parameters.FloatText,
-                BattleFloatTextStyle.Negative);
+                BattleFloatTextStyle.Harmful);
         }
 
         var protectorIsPresent = context.State.GetLivingUnits().Any(unit =>

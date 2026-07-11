@@ -171,7 +171,7 @@ public sealed class BattleHookContext :
     public void RequestFloatText(
         BattleUnit target,
         string text,
-        BattleFloatTextStyle style = BattleFloatTextStyle.Default)
+        BattleFloatTextStyle style = BattleFloatTextStyle.Normal)
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentException.ThrowIfNullOrWhiteSpace(text);

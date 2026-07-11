@@ -13,13 +13,6 @@ internal sealed class BattleEventPresenter(
     Func<BattleMessage, bool> schedule)
 {
     private const string RestSfxId = "音效.休息";
-    private static readonly Color DamageColor = Colors.White;
-    private static readonly Color CriticalColor = Colors.Yellow;
-    private static readonly Color HealColor = Colors.Green;
-    private static readonly Color ManaColor = Colors.Blue;
-    private static readonly Color StateColor = Colors.Red;
-    private static readonly Color SpecialColor = Colors.Magenta;
-    private static readonly Color InfoColor = Colors.Yellow;
     private readonly List<string> _logLines = [];
 
     public void Clear() { _logLines.Clear(); RefreshLog(); }
@@ -48,7 +41,7 @@ internal sealed class BattleEventPresenter(
             if (cue.Kind == BattleCueKind.SpeechRequested && !string.IsNullOrWhiteSpace(cue.Speech?.Text))
                 board.PlaySpeech(cue.UnitId, cue.Speech.Text);
             else if (cue.Kind == BattleCueKind.FloatTextRequested && !string.IsNullOrWhiteSpace(cue.FloatText?.Text))
-                board.PlayFloatText(cue.UnitId, cue.FloatText.Text, ResolveFloatTextColor(cue.FloatText.Style));
+                board.PlayFloatText(cue.UnitId, cue.FloatText.Text, cue.FloatText.Style);
             return;
         }
 
@@ -57,7 +50,7 @@ internal sealed class BattleEventPresenter(
         switch (fact.Kind)
         {
             case BattleFactKind.SkillCast when fact.SkillCast is { } skill:
-                board.PlayFloatText(fact.UnitId, skill.ResolvedSkillName, ResolveSkillColor(skill));
+                board.PlayFloatText(fact.UnitId, skill.ResolvedSkillName, ResolveSkillStyle(skill));
                 AppendLog(skill.IsLegend
                     ? $"{unitName} 施展奥义【{skill.ResolvedSkillName}】。"
                     : $"{unitName} 施展【{skill.ResolvedSkillName}】。");
@@ -67,26 +60,35 @@ internal sealed class BattleEventPresenter(
                 break;
             case BattleFactKind.BuffApplied:
                 var applied = ResolveBuffName(fact.Detail);
-                board.PlayFloatText(fact.UnitId, applied, StateColor);
+                board.PlayFloatText(fact.UnitId, applied, ResolveBuffStyle(fact.Detail));
                 AppendLog($"{unitName} 获得状态【{applied}】。");
                 break;
             case BattleFactKind.BuffResisted:
                 var resisted = ResolveBuffName(fact.Detail);
-                board.PlayFloatText(fact.UnitId, "抵抗", InfoColor);
+                board.PlayFloatText(fact.UnitId, "抵抗", BattleFloatTextStyle.Beneficial);
                 AppendLog($"{unitName} 抵抗了状态【{resisted}】。");
                 break;
             case BattleFactKind.BuffRemoved:
-                board.PlayFloatText(fact.UnitId, $"{ResolveBuffName(fact.Detail)}解除", InfoColor);
+                board.PlayFloatText(fact.UnitId, $"{ResolveBuffName(fact.Detail)}解除", BattleFloatTextStyle.Beneficial);
+                break;
+            case BattleFactKind.Healed:
+                PresentResourceChange(fact, BattleFloatTextStyle.Recovery, "+");
+                break;
+            case BattleFactKind.MpDamaged:
+                PresentResourceChange(fact, BattleFloatTextStyle.Mana, "-");
+                break;
+            case BattleFactKind.RageChanged:
+                PresentSignedResourceChange(fact, BattleFloatTextStyle.Energy, "怒气");
                 break;
             case BattleFactKind.Rested:
                 PresentRest(fact, unitName);
                 break;
             case BattleFactKind.ItemUsed:
-                board.PlayFloatText(fact.UnitId, ResolveItemName(fact.Detail), InfoColor);
+                board.PlayFloatText(fact.UnitId, ResolveItemName(fact.Detail), BattleFloatTextStyle.Normal);
                 break;
             case BattleFactKind.ActionSkipped:
                 var reason = ResolveBuffName(fact.Detail);
-                board.PlayFloatText(fact.UnitId, $"{reason}中", StateColor);
+                board.PlayFloatText(fact.UnitId, $"{reason}中", BattleFloatTextStyle.Harmful);
                 AppendLog($"{unitName} 因【{reason}】无法行动。");
                 break;
             case BattleFactKind.SkillLeveledUp when fact.SkillExperience is { } experience:
@@ -95,10 +97,10 @@ internal sealed class BattleEventPresenter(
                     experience.SkillKind == SkillKind.Internal
                         ? $"{experience.SkillName}等级提升"
                         : $"{experience.SkillName}等级升级",
-                    HealColor);
+                    BattleFloatTextStyle.Recovery);
                 break;
             case BattleFactKind.CharacterLeveledUp when fact.CharacterExperience is not null:
-                board.PlayFloatText(fact.UnitId, "角色等级提升", HealColor);
+                board.PlayFloatText(fact.UnitId, "角色等级提升", BattleFloatTextStyle.Recovery);
                 break;
             case BattleFactKind.DefeatPrevented:
                 AppendLog($"{unitName} 的天赋【{ResolveTalentName(fact.Detail)}】发动，避免了被击败。");
@@ -124,7 +126,7 @@ internal sealed class BattleEventPresenter(
         board.PlayFloatText(
             fact.UnitId,
             damage <= 0 ? "MISS" : extraStrike ? $"多重攻击-{damage}" : critical ? $"暴击 -{damage}" : $"-{damage}",
-            critical ? CriticalColor : DamageColor);
+            critical ? BattleFloatTextStyle.Critical : BattleFloatTextStyle.Normal);
         AppendLog(extraStrike
             ? $"多重攻击！！{unitName} 受到 {damage} 点伤害。"
             : critical ? $"暴击！！{unitName} 受到 {damage} 点伤害。" : $"{unitName} 受到 {damage} 点伤害。");
@@ -137,12 +139,12 @@ internal sealed class BattleEventPresenter(
         AppendLog($"{unitName}休息。");
         if (hp > 0)
         {
-            board.PlayFloatText(fact.UnitId, $"+{hp}", HealColor);
+            board.PlayFloatText(fact.UnitId, $"+{hp}", BattleFloatTextStyle.Recovery);
             AppendLog($"{unitName}回复生命值{hp}");
         }
         if (mp > 0)
         {
-            board.PlayFloatText(fact.UnitId, $"+{mp}", ManaColor);
+            board.PlayFloatText(fact.UnitId, $"+{mp}", BattleFloatTextStyle.Mana);
             AppendLog($"{unitName}回复内力{mp}");
         }
         if (hp > 0 || mp > 0) AudioManager.Instance.PlaySfx(RestSfxId);
@@ -153,25 +155,42 @@ internal sealed class BattleEventPresenter(
         logLabel.Text = string.Join('\n', _logLines);
     }
 
-    private static Color ResolveSkillColor(BattleSkillCastInfo skill) =>
+    private static BattleFloatTextStyle ResolveSkillStyle(BattleSkillCastInfo skill) =>
         skill.IsLegend
-            ? SpecialColor
+            ? BattleFloatTextStyle.Special
             : skill.ResolvedSkillKind switch
             {
-                SkillKind.Special => SpecialColor,
-                SkillKind.Internal => ManaColor,
-                _ => InfoColor,
+                SkillKind.Special => BattleFloatTextStyle.Special,
+                SkillKind.Internal => BattleFloatTextStyle.Mana,
+                _ => BattleFloatTextStyle.Normal,
             };
 
-    private static Color ResolveFloatTextColor(BattleFloatTextStyle style) => style switch
+    private void PresentResourceChange(BattleFact fact, BattleFloatTextStyle style, string prefix)
     {
-        BattleFloatTextStyle.Positive => HealColor,
-        BattleFloatTextStyle.Negative => StateColor,
-        BattleFloatTextStyle.Status => StateColor,
-        BattleFloatTextStyle.Info => InfoColor,
-        BattleFloatTextStyle.Special => SpecialColor,
-        _ => DamageColor,
-    };
+        if (TryResolveAmount(fact.Detail, out var amount) && amount != 0)
+            board.PlayFloatText(fact.UnitId, $"{prefix}{Math.Abs(amount)}", style);
+    }
+
+    private void PresentSignedResourceChange(BattleFact fact, BattleFloatTextStyle style, string resourceName)
+    {
+        if (TryResolveAmount(fact.Detail, out var amount) && amount != 0)
+            board.PlayFloatText(fact.UnitId, $"{resourceName}{amount:+#;-#;0}", style);
+    }
+
+    private static bool TryResolveAmount(string? detail, out int amount)
+    {
+        var value = string.IsNullOrWhiteSpace(detail)
+            ? null
+            : detail[(detail.LastIndexOf(':') + 1)..];
+        return int.TryParse(value, out amount);
+    }
+
+    private static BattleFloatTextStyle ResolveBuffStyle(string? id) =>
+        !string.IsNullOrWhiteSpace(id) &&
+        GameRoot.ContentRepository.TryGetBuff(id, out var definition) &&
+        !definition.IsDebuff
+            ? BattleFloatTextStyle.Beneficial
+            : BattleFloatTextStyle.Harmful;
 
     private static string ResolveBuffName(string? id)
     {

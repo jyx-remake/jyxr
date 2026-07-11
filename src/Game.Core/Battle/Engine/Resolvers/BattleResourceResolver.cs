@@ -36,7 +36,7 @@ internal static class BattleResourceResolver
             BattleFactKind.RageChanged,
             target.Id,
             timing,
-            detail: detailSource is null ? $"set:{target.Rage}" : $"{detailSource}:{actual}"));
+            detail: detailSource is null ? actual.ToString() : $"{detailSource}:{actual}"));
         return actual;
     }
 

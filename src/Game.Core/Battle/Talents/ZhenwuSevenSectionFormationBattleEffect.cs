@@ -45,7 +45,7 @@ public sealed class ZhenwuFormationAttackBattleEffectHandler
                 context.RequestFloatText(
                     supporter,
                     parameters.FloatText,
-                    BattleFloatTextStyle.Negative);
+                    BattleFloatTextStyle.Beneficial);
             }
         }
     }

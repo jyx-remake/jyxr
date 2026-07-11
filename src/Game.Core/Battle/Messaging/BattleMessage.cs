@@ -111,14 +111,16 @@ public enum BattleTraceKind
 }
 
 public sealed record BattleSpeechCue(string Text);
-public sealed record BattleFloatTextCue(string Text, BattleFloatTextStyle Style = BattleFloatTextStyle.Default);
+public sealed record BattleFloatTextCue(string Text, BattleFloatTextStyle Style = BattleFloatTextStyle.Normal);
 public enum BattleFloatTextStyle
 {
-    Default,
-    Positive,
-    Negative,
-    Status,
-    Info,
+    Normal,
+    Critical,
+    Recovery,
+    Mana,
+    Energy,
+    Beneficial,
+    Harmful,
     Special,
 }
 public sealed record BattleDamageEvent(int Amount, bool IsCritical = false, string? SourceUnitId = null);

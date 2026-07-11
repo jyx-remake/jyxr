@@ -18,7 +18,7 @@ public interface IBattleEffectContext
     bool IsPreview { get; }
     BattleExecutionScope? ExecutionScope { get; }
     void RequestSpeech(BattleUnit speaker, string text);
-    void RequestFloatText(BattleUnit target, string text, BattleFloatTextStyle style = BattleFloatTextStyle.Default);
+    void RequestFloatText(BattleUnit target, string text, BattleFloatTextStyle style = BattleFloatTextStyle.Normal);
 }
 
 public interface IBattleAbilityEffectContext
