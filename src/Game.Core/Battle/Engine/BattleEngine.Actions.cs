@@ -79,18 +79,17 @@ public sealed partial class BattleEngine
             .ToHashSet();
         var targets = BattleSkillTargeting.ResolveEffectiveTargets(state, unit, resolvedSkill, impactedPositions);
 
-        _skillExecutor.Execute(
-            state,
-            unit,
-            targets,
-            BattleSkillExecutionPlanFactory.Create(resolvedSkill));
-
         var battleEvent = new BattleFact(
             BattleFactKind.SkillCast,
             unit.Id,
             detail: resolvedSkill.Id,
             skillCast: skillCastInfo);
         AddMessage(state, battleEvent);
+        _skillExecutor.Execute(
+            state,
+            unit,
+            targets,
+            BattleSkillExecutionPlanFactory.Create(resolvedSkill));
         TriggerHooks(state, HookTiming.AfterSkillCast, unit, context =>
         {
             context.Source = unit;
