@@ -1,20 +1,26 @@
 [CmdletBinding()]
 param(
-    [string]$SourceRoot = (Join-Path $PSScriptRoot '..\src')
+    [string[]]$SourceRoots = @(
+        (Join-Path $PSScriptRoot '..\src'),
+        (Join-Path $PSScriptRoot '..\test')
+    )
 )
 
-$resolvedRoot = (Resolve-Path -LiteralPath $SourceRoot).Path
+$resolvedRoots = $SourceRoots | ForEach-Object { (Resolve-Path -LiteralPath $_).Path }
 $ignoredSegments = @('.godot', 'bin', 'obj')
 
 function Test-IgnoredPath([string]$Path) {
-    $relativePath = [System.IO.Path]::GetRelativePath($resolvedRoot, $Path)
-    $segments = $relativePath -split '[\\/]'
+    $segments = $Path -split '[\\/]'
     return $segments | Where-Object { $ignoredSegments -contains $_ }
 }
 
-$scripts = Get-ChildItem -LiteralPath $resolvedRoot -Recurse -File -Filter '*.cs' |
+$scripts = $resolvedRoots | ForEach-Object {
+    Get-ChildItem -LiteralPath $_ -Recurse -File -Filter '*.cs'
+} |
     Where-Object { -not (Test-IgnoredPath $_.FullName) }
-$uids = Get-ChildItem -LiteralPath $resolvedRoot -Recurse -File -Filter '*.cs.uid' |
+$uids = $resolvedRoots | ForEach-Object {
+    Get-ChildItem -LiteralPath $_ -Recurse -File -Filter '*.cs.uid'
+} |
     Where-Object { -not (Test-IgnoredPath $_.FullName) }
 
 $missingUids = $scripts |
