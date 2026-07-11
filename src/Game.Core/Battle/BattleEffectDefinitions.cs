@@ -145,5 +145,14 @@ public sealed record CustomBattleEffectDefinition(
         Invocation = CustomBattleEffectRegistry.Default.Bind(EffectId, Parameters);
     }
 
-    internal void Execute(BattleHookContext context) => Invocation.Execute(context);
+    internal void Execute(BattleHookContext context)
+    {
+        if (!SupportsTiming(context.Timing))
+        {
+            throw new InvalidOperationException(
+                $"Custom battle effect '{EffectId}' does not support timing '{context.Timing}'.");
+        }
+
+        Invocation.Execute(context);
+    }
 }

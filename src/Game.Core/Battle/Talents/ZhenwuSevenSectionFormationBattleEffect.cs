@@ -8,7 +8,7 @@ public sealed record ZhenwuFormationAttackBattleEffectParameters(
     string? FloatText = null);
 
 public sealed class ZhenwuFormationAttackBattleEffectHandler
-    : CustomBattleEffectHandler<ZhenwuFormationAttackBattleEffectParameters>
+    : CustomBattleEffectHandler<ZhenwuFormationAttackBattleEffectParameters, IDamageCalculationEffectContext>
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDamageCalculation };
@@ -23,11 +23,10 @@ public sealed class ZhenwuFormationAttackBattleEffectHandler
     }
 
     public override void Execute(
-        BattleHookContext context,
+        IDamageCalculationEffectContext context,
         ZhenwuFormationAttackBattleEffectParameters parameters)
     {
-        var calculation = context.DamageCalculation
-            ?? throw new InvalidOperationException("Zhenwu attack formation requires a damage calculation context.");
+        var calculation = context.DamageCalculation;
         if (context.Skill?.Power is not > 0)
         {
             return;
@@ -59,7 +58,7 @@ public sealed record ZhenwuFormationInterceptBattleEffectParameters(
     string? Speech = null);
 
 public sealed class ZhenwuFormationInterceptBattleEffectHandler
-    : CustomBattleEffectHandler<ZhenwuFormationInterceptBattleEffectParameters>
+    : CustomBattleEffectHandler<ZhenwuFormationInterceptBattleEffectParameters, IDamageApplicationEffectContext>
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDamageApplied };
@@ -79,10 +78,10 @@ public sealed class ZhenwuFormationInterceptBattleEffectHandler
     }
 
     public override void Execute(
-        BattleHookContext context,
+        IDamageApplicationEffectContext context,
         ZhenwuFormationInterceptBattleEffectParameters parameters)
     {
-        if (context.DamageAmount is not > 0)
+        if (context.DamageAmount <= 0)
         {
             return;
         }
@@ -108,7 +107,7 @@ public sealed class ZhenwuFormationInterceptBattleEffectHandler
 internal static class ZhenwuFormationMembers
 {
     public static IEnumerable<BattleUnit> GetOthers(
-        BattleHookContext context,
+        IBattleEffectContext context,
         string formationTalentId) =>
         context.State.GetLivingUnits().Where(unit =>
             unit.Team == context.Unit.Team &&

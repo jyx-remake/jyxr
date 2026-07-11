@@ -7,13 +7,13 @@ public sealed record IllnessBattleEffectParameters(
     string? FloatText = null,
     string? SkipReason = null);
 
-public sealed class IllnessBattleEffectHandler : CustomBattleEffectHandler<IllnessBattleEffectParameters>
+public sealed class IllnessBattleEffectHandler : CustomBattleEffectHandler<IllnessBattleEffectParameters, IActionStartEffectContext>
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeActionStart };
 
     public override void Execute(
-        BattleHookContext context,
+        IActionStartEffectContext context,
         IllnessBattleEffectParameters parameters)
     {
         if (!string.IsNullOrWhiteSpace(parameters.FloatText))

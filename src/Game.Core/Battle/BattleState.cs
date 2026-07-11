@@ -7,6 +7,7 @@ public sealed class BattleState
     private readonly List<BattleUnit> _units;
     private readonly List<BattleEvent> _events = [];
     private int _effectDepth;
+    private long _effectSequence;
 
     public BattleState(
         BattleGrid grid,
@@ -68,6 +69,8 @@ public sealed class BattleState
 
     public long ActionSerial { get; internal set; }
 
+    public BattleExecutionScope? CurrentExecutionScope { get; private set; }
+
     public BattleUnit GetUnit(string unitId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
@@ -96,19 +99,26 @@ public sealed class BattleState
 
     internal void AddEvent(BattleEvent battleEvent) => _events.Add(battleEvent);
 
-    internal IDisposable EnterEffect()
+    internal IDisposable EnterEffect(string ruleSource)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(ruleSource);
         const int maxEffectDepth = 64;
         if (_effectDepth >= maxEffectDepth)
         {
             throw new InvalidOperationException($"Battle effect chain exceeded maximum depth '{maxEffectDepth}'.");
         }
 
+        var parent = CurrentExecutionScope;
         _effectDepth++;
-        return new EffectScope(this);
+        CurrentExecutionScope = new BattleExecutionScope(
+            ++_effectSequence,
+            parent?.Sequence,
+            _effectDepth,
+            ruleSource);
+        return new EffectScope(this, parent);
     }
 
-    private sealed class EffectScope(BattleState state) : IDisposable
+    private sealed class EffectScope(BattleState state, BattleExecutionScope? parent) : IDisposable
     {
         private bool _disposed;
 
@@ -120,6 +130,7 @@ public sealed class BattleState
             }
 
             state._effectDepth--;
+            state.CurrentExecutionScope = parent;
             _disposed = true;
         }
     }

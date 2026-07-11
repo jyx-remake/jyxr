@@ -27,7 +27,13 @@ public sealed class BattleHookExecutor
 
         foreach (var effect in hook.Effects)
         {
-            using var effectScope = context.State.EnterEffect();
+            if (!BattleEffectTimingPolicy.Supports(context.Timing, effect))
+            {
+                throw new InvalidOperationException(
+                    $"Effect '{effect.GetType().Name}' cannot execute at timing '{context.Timing}'.");
+            }
+
+            using var effectScope = context.State.EnterEffect($"hook:{hook.Timing}:{effect.GetType().Name}");
             (EffectExecutor ?? throw new InvalidOperationException("Battle hook executor is not attached to a battle engine."))
                 .ExecuteHook(context, effect);
         }

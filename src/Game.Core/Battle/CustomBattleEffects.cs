@@ -5,7 +5,8 @@ using Game.Core.Affix;
 
 namespace Game.Core.Battle;
 
-public abstract class CustomBattleEffectHandler<TParameters>
+public abstract class CustomBattleEffectHandler<TParameters, TContext>
+    where TContext : class, IBattleEffectContext
 {
     public virtual bool SupportsPreview => false;
 
@@ -15,7 +16,7 @@ public abstract class CustomBattleEffectHandler<TParameters>
     {
     }
 
-    public abstract void Execute(BattleHookContext context, TParameters parameters);
+    public abstract void Execute(TContext context, TParameters parameters);
 }
 
 public sealed class CustomBattleEffectRegistry
@@ -28,14 +29,15 @@ public sealed class CustomBattleEffectRegistry
 
     public static CustomBattleEffectRegistry Default { get; } = CreateDefault();
 
-    public void Register<TParameters>(
+    public void Register<TParameters, TContext>(
         string effectId,
-        CustomBattleEffectHandler<TParameters> handler)
+        CustomBattleEffectHandler<TParameters, TContext> handler)
+        where TContext : class, IBattleEffectContext
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(effectId);
         ArgumentNullException.ThrowIfNull(handler);
 
-        if (!_handlers.TryAdd(effectId, new CustomBattleEffectHandlerAdapter<TParameters>(handler)))
+        if (!_handlers.TryAdd(effectId, new CustomBattleEffectHandlerAdapter<TParameters, TContext>(handler)))
         {
             throw new InvalidOperationException($"Custom battle effect '{effectId}' is already registered.");
         }
@@ -66,11 +68,21 @@ public sealed class CustomBattleEffectRegistry
         CustomBattleEffectInvocation Bind(string effectId, JsonElement parameters);
     }
 
-    private sealed class CustomBattleEffectHandlerAdapter<TParameters>(
-        CustomBattleEffectHandler<TParameters> handler) : ICustomBattleEffectHandler
+    private sealed class CustomBattleEffectHandlerAdapter<TParameters, TContext>(
+        CustomBattleEffectHandler<TParameters, TContext> handler) : ICustomBattleEffectHandler
+        where TContext : class, IBattleEffectContext
     {
         public CustomBattleEffectInvocation Bind(string effectId, JsonElement parameters)
         {
+            foreach (var timing in handler.SupportedTimings)
+            {
+                if (!BattleEffectCapabilityPolicy.Supports<TContext>(timing))
+                {
+                    throw new InvalidOperationException(
+                        $"Custom battle effect '{effectId}' cannot use capability '{typeof(TContext).Name}' at timing '{timing}'.");
+                }
+            }
+
             TParameters parsedParameters;
             try
             {
@@ -88,7 +100,10 @@ public sealed class CustomBattleEffectRegistry
             return new CustomBattleEffectInvocation(
                 handler.SupportsPreview,
                 handler.SupportedTimings,
-                context => handler.Execute(context, parsedParameters));
+                context => handler.Execute(
+                    context as TContext ?? throw new InvalidOperationException(
+                        $"Custom battle effect '{effectId}' requires capability '{typeof(TContext).Name}'."),
+                    parsedParameters));
         }
     }
 }
@@ -97,3 +112,26 @@ internal sealed record CustomBattleEffectInvocation(
     bool SupportsPreview,
     IReadOnlySet<HookTiming> SupportedTimings,
     Action<BattleHookContext> Execute);
+
+internal static class BattleEffectCapabilityPolicy
+{
+    public static bool Supports<TContext>(HookTiming timing)
+        where TContext : class, IBattleEffectContext =>
+        typeof(TContext) == typeof(IDamageCalculationEffectContext)
+            ? timing == HookTiming.BeforeDamageCalculation
+            : typeof(TContext) == typeof(IHitResultEffectContext)
+                ? timing == HookTiming.BeforeHitResolved
+            : typeof(TContext) == typeof(IDamageApplicationEffectContext)
+                ? timing == HookTiming.BeforeDamageApplied
+                : typeof(TContext) == typeof(IDamageTakenEffectContext)
+                    ? timing == HookTiming.OnDamageTaken
+                    : typeof(TContext) == typeof(IRecoveryEffectContext)
+                        ? timing == HookTiming.BeforeRecoveryResolved
+                        : typeof(TContext) == typeof(ISkillCostEffectContext)
+                            ? timing == HookTiming.BeforeSkillCost
+                            : typeof(TContext) == typeof(IBuffApplicationEffectContext)
+                                ? timing == HookTiming.BeforeBuffApplied
+                : typeof(TContext) == typeof(IActionStartEffectContext)
+                    ? timing == HookTiming.BeforeActionStart
+                    : typeof(TContext) == typeof(IBattleEffectContext);
+}

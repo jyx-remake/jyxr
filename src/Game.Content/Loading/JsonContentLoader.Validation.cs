@@ -420,19 +420,7 @@ public sealed partial class JsonContentLoader
         BattleEffectDefinition effect,
         string ownerName)
     {
-        var supported = effect switch
-        {
-            ModifyDamageBattleHookEffectDefinition => timing == HookTiming.BeforeDamageApplied,
-            ModifyDamageContextBattleHookEffectDefinition => timing == HookTiming.BeforeDamageCalculation,
-            ModifyMpCostBattleHookEffectDefinition => timing == HookTiming.BeforeSkillCost,
-            ModifyRecoveryBattleHookEffectDefinition => timing == HookTiming.BeforeRecoveryResolved,
-            StrengthenContextBuffBattleHookEffectDefinition => timing == HookTiming.BeforeBuffApplied,
-            CancelHitBattleHookEffectDefinition or SetHitSuccessBattleHookEffectDefinition =>
-                timing == HookTiming.BeforeHitResolved,
-            ExtraStrikeBattleHookEffectDefinition => timing == HookTiming.OnHitConfirmed,
-            CustomBattleEffectDefinition custom => custom.SupportsTiming(timing),
-            _ => true,
-        };
+        var supported = BattleEffectTimingPolicy.Supports(timing, effect);
 
         Ensure(supported,
             $"{ownerName} battle hook '{timing}' does not support effect '{effect.GetType().Name}'.");

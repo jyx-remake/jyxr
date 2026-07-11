@@ -10,7 +10,16 @@ public enum BattleHookExecutionMode
     Preview,
 }
 
-public sealed class BattleHookContext
+public sealed class BattleHookContext :
+    IBattleEffectContext,
+    IDamageCalculationEffectContext,
+    IHitResultEffectContext,
+    IDamageApplicationEffectContext,
+    IDamageTakenEffectContext,
+    IRecoveryEffectContext,
+    ISkillCostEffectContext,
+    IBuffApplicationEffectContext,
+    IActionStartEffectContext
 {
     internal BattleHookContext(
         BattleEngine engine,
@@ -47,6 +56,8 @@ public sealed class BattleHookContext
 
     public bool IsPreview => ExecutionMode == BattleHookExecutionMode.Preview;
 
+    public BattleExecutionScope? ExecutionScope => State.CurrentExecutionScope;
+
     public BattleUnit? Source { get; internal set; }
 
     public BattleUnit? Target { get; internal set; }
@@ -60,6 +71,42 @@ public sealed class BattleHookContext
     public int? MpCost { get; internal set; }
 
     public int? DamageAmount { get; internal set; }
+
+    BattleDamageCalculationContext IDamageCalculationEffectContext.DamageCalculation =>
+        DamageCalculation ?? throw MissingCapability(nameof(IDamageCalculationEffectContext));
+
+    int IDamageApplicationEffectContext.DamageAmount =>
+        DamageAmount ?? throw MissingCapability(nameof(IDamageApplicationEffectContext));
+
+    BattleHitState IHitResultEffectContext.HitState { get => HitState; set => HitState = value; }
+    int IHitResultEffectContext.DamageAmount
+    {
+        get => DamageAmount ?? throw MissingCapability(nameof(IHitResultEffectContext));
+        set => DamageAmount = value;
+    }
+    bool IHitResultEffectContext.SuppressHitEffects
+    {
+        get => SuppressHitEffects;
+        set => SuppressHitEffects = value;
+    }
+    int IDamageTakenEffectContext.ActualDamageAmount =>
+        DamageAmount ?? throw MissingCapability(nameof(IDamageTakenEffectContext));
+    bool IDamageTakenEffectContext.IsCritical => IsCritical;
+    BattleRecoveryKind IRecoveryEffectContext.RecoveryKind =>
+        RecoveryKind ?? throw MissingCapability(nameof(IRecoveryEffectContext));
+    int IRecoveryEffectContext.RecoveryAmount
+    {
+        get => RecoveryAmount ?? throw MissingCapability(nameof(IRecoveryEffectContext));
+        set => RecoveryAmount = value;
+    }
+    int ISkillCostEffectContext.MpCost
+    {
+        get => MpCost ?? throw MissingCapability(nameof(ISkillCostEffectContext));
+        set => MpCost = value;
+    }
+    BattleBuffInstance IBuffApplicationEffectContext.AppliedBuff =>
+        Buff ?? throw MissingCapability(nameof(IBuffApplicationEffectContext));
+    bool IBuffApplicationEffectContext.Cancel { get => Cancel; set => Cancel = value; }
 
     public BattleRecoveryKind? RecoveryKind { get; internal set; }
 
@@ -126,6 +173,9 @@ public sealed class BattleHookContext
         Target = target;
         DamageAmount = Math.Max(0, (int)((DamageAmount ?? 0) * damageFactor));
     }
+
+    private InvalidOperationException MissingCapability(string capability) =>
+        new($"Timing '{Timing}' did not provide required capability '{capability}'.");
 
     public int Damage(BattleUnit target, int amount, string? detail = null)
     {

@@ -27,6 +27,7 @@ public sealed partial class BattleEngine
     {
         foreach (var step in plan.Steps)
         {
+            using var stepScope = state.EnterEffect($"skill-step:{plan.Skill.Id}:{step.GetType().Name}");
             switch (step)
             {
                 case ResolveSkillDamageStep:
@@ -344,7 +345,7 @@ public sealed partial class BattleEngine
 
         foreach (var effect in effects)
         {
-            using var effectScope = state.EnterEffect();
+            using var effectScope = state.EnterEffect($"skill:{effect.GetType().Name}");
             _effectExecutor.ExecuteAbility(state, source, targets, effect);
         }
     }
