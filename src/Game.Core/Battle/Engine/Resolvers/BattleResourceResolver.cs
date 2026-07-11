@@ -4,16 +4,40 @@ namespace Game.Core.Battle;
 
 internal static class BattleResourceResolver
 {
-    public static void AddRage(BattleState state, BattleUnit target, int value, HookTiming? timing = null)
+    public static int AddRage(
+        BattleState state,
+        BattleUnit target,
+        int value,
+        HookTiming? timing = null,
+        string? detailSource = null)
     {
+        var before = target.Rage;
         target.AddRage(value);
-        state.AddMessage(new BattleFact(BattleFactKind.RageChanged, target.Id, timing, detail: value.ToString()));
+        var actual = target.Rage - before;
+        state.AddMessage(new BattleFact(
+            BattleFactKind.RageChanged,
+            target.Id,
+            timing,
+            detail: detailSource is null ? actual.ToString() : $"{detailSource}:{actual}"));
+        return actual;
     }
 
-    public static void SetRage(BattleState state, BattleUnit target, int value, HookTiming? timing = null)
+    public static int SetRage(
+        BattleState state,
+        BattleUnit target,
+        int value,
+        HookTiming? timing = null,
+        string? detailSource = null)
     {
+        var before = target.Rage;
         target.SetRage(value);
-        state.AddMessage(new BattleFact(BattleFactKind.RageChanged, target.Id, timing, detail: $"set:{value}"));
+        var actual = target.Rage - before;
+        state.AddMessage(new BattleFact(
+            BattleFactKind.RageChanged,
+            target.Id,
+            timing,
+            detail: detailSource is null ? $"set:{target.Rage}" : $"{detailSource}:{actual}"));
+        return actual;
     }
 
     public static void SetActionGauge(BattleUnit target, int value) => target.SetActionGauge(value);

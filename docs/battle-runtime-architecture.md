@@ -22,6 +22,7 @@ Godot 只调用命令、播放消息并维护界面状态。
 - `BattleSkillExecutor`：技能计划；
 - `BattleEffectExecutor`：统一 Effect 执行；
 - 各状态 resolver：伤害、恢复、Buff、资源与成长；
+- `BattleHookRunner`：角色与 Buff Hook 的收集、稳定顺序和 Trace；
 - `BattleOutcomeEvaluator`：阵营存活结果；
 - `BattleTargetResolver` / `BattleSkillTargeting`：Effect 与技能空间目标；
 - `BattleExecutionScope`：Effect 链顺序和递归保护。

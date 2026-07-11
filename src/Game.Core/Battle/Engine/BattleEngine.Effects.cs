@@ -184,66 +184,8 @@ public sealed partial class BattleEngine
             }
 
             var buffTarget = buff.Buff.IsDebuff ? target : source;
-            ApplyBattleBuff(state, source, buffTarget, buff.Buff, buff.Level, buff.Duration, buff.Id);
+            _battleBuffResolver.Apply(state, source, buffTarget, buff.Buff, buff.Level, buff.Duration, buff.Id);
         }
-    }
-
-    internal bool ApplyBattleBuff(
-        BattleState state,
-        BattleUnit source,
-        BattleUnit target,
-        BuffDefinition buffDefinition,
-        int level,
-        int duration,
-        string detail,
-        HookTiming? timing = null)
-    {
-        if (buffDefinition.IsDebuff && target.HasBuff(BattleContentIds.HolyWar))
-        {
-            return false;
-        }
-
-        if (buffDefinition.IsDebuff && RollDebuffResistance(target))
-        {
-            AddMessage(state, new BattleFact(BattleFactKind.BuffResisted, target.Id, timing, detail: detail));
-            return false;
-        }
-
-        var instance = new BattleBuffInstance(
-            buffDefinition,
-            level,
-            duration,
-            source.Id,
-            state.ActionSerial);
-        var hookContext = TriggerHooks(state, HookTiming.BeforeBuffApplied, source, context =>
-        {
-            context.Source = source;
-            context.Target = target;
-            context.Buff = instance;
-        });
-        if (hookContext.Cancel)
-        {
-            return false;
-        }
-
-        target.ApplyBuff(instance);
-        AddMessage(state, new BattleFact(BattleFactKind.BuffApplied, target.Id, timing, detail: detail));
-        TriggerHooks(state, HookTiming.OnBuffApplied, target, context =>
-        {
-            context.Source = source;
-            context.Target = target;
-            context.Buff = instance;
-        });
-        return true;
-    }
-
-    internal BuffDefinition ResolveBuff(ApplyBuffBattleEffectDefinition effect) =>
-        effect.Buff ?? _buffResolver(effect.BuffId);
-
-    private bool RollDebuffResistance(BattleUnit target)
-    {
-        var resistance = Math.Clamp(target.GetStat(StatType.AntiDebuff), 0d, 1d);
-        return Probability.RollChance(_random, resistance);
     }
 
     internal void ApplyHookExtraStrikeEffect(
@@ -303,92 +245,6 @@ public sealed partial class BattleEngine
         }
     }
 
-    internal int RestoreHookRecovery(
-        BattleState state,
-        BattleUnit source,
-        BattleUnit target,
-        BattleRecoveryKind kind,
-        int amount) =>
-        RestoreBattleResource(state, source, target, kind, amount);
-
-    internal int RestoreBattleResource(
-        BattleState state,
-        BattleUnit source,
-        BattleUnit target,
-        BattleRecoveryKind kind,
-        int amount)
-    {
-        ArgumentNullException.ThrowIfNull(state);
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(target);
-        ArgumentOutOfRangeException.ThrowIfNegative(amount);
-
-        var resolvedAmount = ResolveRecoveryAmount(state, source, target, kind, amount);
-        return kind switch
-        {
-            BattleRecoveryKind.Hp => target.RestoreHp(resolvedAmount),
-            BattleRecoveryKind.Mp => target.RestoreMp(resolvedAmount),
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
-        };
-    }
-
-    private int ResolveRecoveryAmount(
-        BattleState state,
-        BattleUnit source,
-        BattleUnit target,
-        BattleRecoveryKind kind,
-        int amount)
-    {
-        var context = TriggerHooks(
-            state,
-            HookTiming.BeforeRecoveryResolved,
-            target,
-            hookContext =>
-            {
-                hookContext.Source = source;
-                hookContext.Target = target;
-                hookContext.RecoveryKind = kind;
-                hookContext.RecoveryAmount = amount;
-            });
-        var resolvedAmount = context.RecoveryAmount ?? amount;
-        return Math.Max(0, resolvedAmount);
-    }
-
-    internal IReadOnlyList<BattleBuffInstance> RemoveBattleBuffs(
-        BattleState state,
-        BattleUnit source,
-        BattleUnit target,
-        Func<BattleBuffInstance, bool> predicate,
-        HookTiming? timing = null)
-    {
-        var removedBuffs = target.RemoveBuffs(predicate);
-        EmitBuffRemovedEvents(state, source, target, removedBuffs, timing);
-        return removedBuffs;
-    }
-
-    private void EmitBuffRemovedEvents(
-        BattleState state,
-        BattleUnit source,
-        BattleUnit target,
-        IReadOnlyList<BattleBuffInstance> removedBuffs,
-        HookTiming? timing = null)
-    {
-        foreach (var removedBuff in removedBuffs)
-        {
-            AddMessage(state, new BattleFact(
-                BattleFactKind.BuffRemoved,
-                target.Id,
-                timing,
-                detail: removedBuff.Definition.Id));
-            TriggerHooks(state, HookTiming.OnBuffRemoved, target, context =>
-            {
-                context.Source = source;
-                context.Target = target;
-                context.Buff = removedBuff;
-            });
-        }
-    }
-
     private void ApplyItemEffects(
         BattleState state,
         BattleUnit source,
@@ -400,7 +256,7 @@ public sealed partial class BattleEngine
             switch (effect)
             {
                 case AddHpItemUseEffectDefinition hp:
-                    RestoreBattleResource(
+                    _recoveryResolver.Apply(
                         state,
                         source,
                         target,
@@ -408,7 +264,7 @@ public sealed partial class BattleEngine
                         hp.Value);
                     break;
                 case AddMpItemUseEffectDefinition mp:
-                    RestoreBattleResource(
+                    _recoveryResolver.Apply(
                         state,
                         source,
                         target,
@@ -416,7 +272,7 @@ public sealed partial class BattleEngine
                         mp.Value);
                     break;
                 case AddHpPercentItemUseEffectDefinition hpPercent:
-                    RestoreBattleResource(
+                    _recoveryResolver.Apply(
                         state,
                         source,
                         target,
@@ -424,7 +280,7 @@ public sealed partial class BattleEngine
                         target.MaxHp * hpPercent.Value / 100);
                     break;
                 case AddMpPercentItemUseEffectDefinition mpPercent:
-                    RestoreBattleResource(
+                    _recoveryResolver.Apply(
                         state,
                         source,
                         target,
@@ -432,12 +288,12 @@ public sealed partial class BattleEngine
                         target.MaxMp * mpPercent.Value / 100);
                     break;
                 case AddRageItemUseEffectDefinition rage:
-                    target.AddRage(rage.Value);
+                    BattleResourceResolver.AddRage(state, target, rage.Value, detailSource: "item");
                     break;
                 case AddBuffItemUseEffectDefinition addBuff:
                 {
-                    var definition = _buffResolver(addBuff.BuffId);
-                    ApplyBattleBuff(
+                    var definition = _battleBuffResolver.Resolve(addBuff.BuffId);
+                    _battleBuffResolver.Apply(
                         state,
                         source,
                         target,
@@ -468,7 +324,7 @@ public sealed partial class BattleEngine
         foreach (var buff in expired)
         {
             var source = state.TryGetUnit(buff.SourceUnitId) ?? unit;
-            EmitBuffRemovedEvents(state, source, unit, [buff]);
+            _battleBuffResolver.NotifyRemoved(state, source, unit, [buff]);
         }
     }
 
@@ -527,12 +383,12 @@ public sealed partial class BattleEngine
         var roll = 1d + _random.NextDouble() * 0.5d;
         var amount = Math.Max(1, (int)(unit.GetStat(StatType.Gengu) / 3d * buff.Level * roll));
         var source = state.TryGetUnit(buff.SourceUnitId) ?? unit;
-        var restored = RestoreBattleResource(
+        var restored = _recoveryResolver.Apply(
             state,
             source,
             unit,
             BattleRecoveryKind.Hp,
-            amount);
+            amount).ActualAmount;
         AddMessage(state, new BattleFact(BattleFactKind.Healed, unit.Id, detail: $"{buff.Definition.Id}:{restored}"));
     }
 
@@ -553,8 +409,7 @@ public sealed partial class BattleEngine
             return;
         }
 
-        unit.AddRage(1);
-        AddMessage(state, new BattleFact(BattleFactKind.RageChanged, unit.Id, detail: $"{buff.Definition.Id}:1"));
+        BattleResourceResolver.AddRage(state, unit, 1, detailSource: buff.Definition.Id);
     }
 
     private void TryGainRageFromAttack(BattleState state, BattleUnit unit)
@@ -564,8 +419,7 @@ public sealed partial class BattleEngine
             return;
         }
 
-        unit.AddRage(1);
-        AddMessage(state, new BattleFact(BattleFactKind.RageChanged, unit.Id, detail: "attack:1"));
+        BattleResourceResolver.AddRage(state, unit, 1, detailSource: "attack");
     }
 
     private void TryGainRageFromTakingDamage(BattleState state, BattleUnit source, BattleUnit target, int damage)
@@ -575,8 +429,7 @@ public sealed partial class BattleEngine
             return;
         }
 
-        target.AddRage(1);
-        AddMessage(state, new BattleFact(BattleFactKind.RageChanged, target.Id, detail: "damaged:1"));
+        BattleResourceResolver.AddRage(state, target, 1, detailSource: "damaged");
     }
 
     private bool RollRageGain(BattleUnit unit)

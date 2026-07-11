@@ -17,8 +17,9 @@
 
 ## 2. Hook 职责
 
-`BattleHookExecutor` 是 `BattleEngine` 公共构造参数所保留的 Hook 运行入口，内部职责已拆为：
+`BattleHookExecutor` 是 `BattleEngine` 公共构造参数所保留的单条 Hook 执行入口，职责拆为：
 
+- `BattleHookRunner`：收集角色与 Buff Hook，保持稳定顺序并记录 Trace；
 - `BattleHookEvaluator`：条件求值；
 - `BattleHookPreviewPolicy`：拒绝随机、表现和有副作用的预览组合；
 - `BattleEffectTimingPolicy`：校验 Effect 是否允许出现在当前 timing；
@@ -46,8 +47,8 @@ Effect handler 通过窄接口申请能力：
 ## 4. 状态变化入口
 
 - `BattleDamageResolver`：普通伤害与实际扣血；
-- BattleEngine 的恢复入口：恢复量修正和实际恢复；
-- BattleEngine 的 Buff 入口：Buff 应用、抵抗、强化与移除；
+- `BattleRecoveryResolver`：恢复量修正和实际恢复，返回请求量、修正量和实际量；
+- `BattleBuffResolver`：Buff 应用、抵抗、强化与移除；
 - `BattleResourceResolver`：怒气、行动条等资源；
 - `BattleGrowthResolver`：技能、内功和角色经验及升级事实。
 

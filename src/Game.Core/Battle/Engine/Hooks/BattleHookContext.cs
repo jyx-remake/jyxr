@@ -197,12 +197,12 @@ public sealed class BattleHookContext :
         ArgumentOutOfRangeException.ThrowIfNegative(amount);
 
         var source = Source ?? Unit;
-        var restored = Engine.RestoreHookRecovery(
+        var restored = Engine.RecoveryResolver.Apply(
             State,
             source,
             target,
             BattleRecoveryKind.Hp,
-            amount);
+            amount).ActualAmount;
         State.AddMessage(new BattleFact(BattleFactKind.Healed, target.Id, detail: detail ?? restored.ToString()));
         return restored;
     }

@@ -54,23 +54,23 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
                 {
                     if (Probability.RollPercentage(hookContext?.Random ?? engine.RandomService, applyBuff.Chance))
                     {
-                        engine.ApplyBattleBuff(state, source, target, engine.ResolveBuff(applyBuff), applyBuff.Level,
+                        engine.BuffResolver.Apply(state, source, target, engine.BuffResolver.Resolve(applyBuff), applyBuff.Level,
                             applyBuff.Duration, applyBuff.BuffId, timing);
                     }
                 }
                 break;
             case RemoveBuffBattleEffectDefinition remove:
                 foreach (var target in targets)
-                    engine.RemoveBattleBuffs(state, source, target,
+                    engine.BuffResolver.Remove(state, source, target,
                         buff => string.Equals(buff.Definition.Id, remove.BuffId, StringComparison.Ordinal), timing);
                 break;
             case RemoveNegativeBuffsBattleEffectDefinition:
                 foreach (var target in targets)
-                    engine.RemoveBattleBuffs(state, source, target, buff => buff.Definition.IsDebuff, timing);
+                    engine.BuffResolver.Remove(state, source, target, buff => buff.Definition.IsDebuff, timing);
                 break;
             case RemovePositiveBuffsBattleEffectDefinition:
                 foreach (var target in targets)
-                    engine.RemoveBattleBuffs(state, source, target, buff => !buff.Definition.IsDebuff, timing);
+                    engine.BuffResolver.Remove(state, source, target, buff => !buff.Definition.IsDebuff, timing);
                 break;
             case AddRageBattleEffectDefinition addRage:
                 foreach (var target in targets) BattleResourceResolver.AddRage(state, target, addRage.Value, timing);
@@ -84,13 +84,15 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
             case AddHpBattleEffectDefinition hp:
                 foreach (var target in targets)
                 {
-                    var actual = engine.RestoreBattleResource(state, source, target, BattleRecoveryKind.Hp, hp.Value);
+                    var actual = engine.RecoveryResolver
+                        .Apply(state, source, target, BattleRecoveryKind.Hp, hp.Value)
+                        .ActualAmount;
                     state.AddMessage(new BattleFact(BattleFactKind.Healed, target.Id, timing, detail: actual.ToString()));
                 }
                 break;
             case AddMpBattleEffectDefinition mp:
                 foreach (var target in targets)
-                    engine.RestoreBattleResource(state, source, target, BattleRecoveryKind.Mp, mp.Value);
+                    engine.RecoveryResolver.Apply(state, source, target, BattleRecoveryKind.Mp, mp.Value);
                 break;
             case CancelHitBattleHookEffectDefinition cancel:
                 RequireHook().HitState = BattleHitState.Miss;

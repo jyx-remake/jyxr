@@ -207,18 +207,18 @@ public sealed partial class BattleEngine
         TriggerHooks(state, HookTiming.BeforeRest, unit);
 
         var recovery = BattleRestCalculator.Roll(unit, _random);
-        var restoredHp = RestoreBattleResource(
+        var restoredHp = _recoveryResolver.Apply(
             state,
             unit,
             unit,
             BattleRecoveryKind.Hp,
-            recovery.Hp);
-        var restoredMp = RestoreBattleResource(
+            recovery.Hp).ActualAmount;
+        var restoredMp = _recoveryResolver.Apply(
             state,
             unit,
             unit,
             BattleRecoveryKind.Mp,
-            recovery.Mp);
+            recovery.Mp).ActualAmount;
 
         var battleEvent = new BattleFact(
             BattleFactKind.Rested,

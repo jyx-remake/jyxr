@@ -3117,6 +3117,36 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void UseItem_AddRageReportsActualClampedChange()
+    {
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            rage: BattleUnit.MaxRage - 1);
+        hero.ActionGauge = 100;
+        var item = new NormalItemDefinition
+        {
+            Id = "rage_pill",
+            Name = "rage_pill",
+            Type = ItemType.Consumable,
+            UseEffects = [new AddRageItemUseEffectDefinition(10)],
+        };
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine();
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.UseItem(state, hero.Id, item, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(BattleUnit.MaxRage, hero.Rage);
+        Assert.Contains(result.Messages.OfType<BattleFact>(), fact =>
+            fact.Kind == BattleFactKind.RageChanged &&
+            fact.UnitId == hero.Id &&
+            fact.Detail == "item:1");
+    }
+
+    [Fact]
     public void UseItem_AddsTargetItemCooldownAndBlocksRegularReuse()
     {
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0), maxMp: 20, mp: 5);

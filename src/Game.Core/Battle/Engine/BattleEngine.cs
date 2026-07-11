@@ -21,14 +21,16 @@ public sealed partial class BattleEngine
 
     private readonly BattleDamageCalculator _damageCalculator;
     private readonly BattleDamageResolver _damageResolver;
+    private readonly BattleBuffResolver _battleBuffResolver;
     private readonly BattleEffectExecutor _effectExecutor;
     private readonly BattleSkillExecutor _skillExecutor;
     private readonly BattleGrowthResolver _growthResolver;
+    private readonly BattleRecoveryResolver _recoveryResolver;
     private readonly BattleHookExecutor _hookExecutor;
+    private readonly BattleHookRunner _hookRunner;
     private readonly LegendSkillResolver _legendSkillResolver;
     private readonly Func<IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
     private readonly IRandomService _random;
-    private readonly Func<string, BuffDefinition> _buffResolver;
 
     public BattleEngine(
         BattleDamageCalculator? damageCalculator = null,
@@ -51,13 +53,23 @@ public sealed partial class BattleEngine
         _legendSkillResolver = legendSkillResolver ?? new LegendSkillResolver();
         _legendSkillsProvider = legendSkillsProvider ?? EmptyLegendSkillProvider;
         _random = random ?? SharedRandomService.Instance;
-        _buffResolver = buffResolver ?? MissingBuffResolver;
+        _hookRunner = new BattleHookRunner(this, _hookExecutor, _random);
+        _battleBuffResolver = new BattleBuffResolver(
+            (state, timing, unit, configure) => TriggerHooks(state, timing, unit, configure),
+            _random,
+            buffResolver ?? MissingBuffResolver);
         _growthResolver = new BattleGrowthResolver(
             skillMaxLevelResolver ?? DefaultSkillMaxLevelResolver,
             characterGrowTemplateResolver ?? DefaultCharacterGrowTemplateResolver,
             characterMaxLevelResolver ?? DefaultCharacterMaxLevelResolver,
             battleExperienceEligibilityResolver ?? DefaultBattleExperienceEligibilityResolver);
+        _recoveryResolver = new BattleRecoveryResolver(
+            (state, timing, unit, configure) => TriggerHooks(state, timing, unit, configure));
     }
+
+    internal BattleRecoveryResolver RecoveryResolver => _recoveryResolver;
+
+    internal BattleBuffResolver BuffResolver => _battleBuffResolver;
 
     private static (bool Success, string Message) ValidateActingUnit(
         BattleState state,
