@@ -28,6 +28,7 @@ public sealed class AffixFormatterTests
             "special_001",
             "凌波微步",
             "",
+            SpecialSkillIntent.Support,
             "",
             0,
             SkillCostDefinition.None,

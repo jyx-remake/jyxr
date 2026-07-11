@@ -72,7 +72,8 @@ public enum TraitId
     Ghost,
     BroadLearning,
     MindEye,
-    PoisonResistance
+    PoisonResistance,
+    AvoidFriendlyFire
 }
 
 public enum BattleDamageContextField

@@ -3,10 +3,17 @@ using Game.Core.Battle;
 
 namespace Game.Core.Definitions.Skills;
 
+public enum SpecialSkillIntent
+{
+    Offensive,
+    Support
+}
+
 public sealed record SpecialSkillDefinition(
     string Id,
     string Name,
     string Description,
+    SpecialSkillIntent Intent,
     string Icon,
     int Cooldown,
     SkillCostDefinition Cost,

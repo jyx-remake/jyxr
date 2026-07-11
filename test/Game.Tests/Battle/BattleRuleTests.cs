@@ -177,7 +177,7 @@ public sealed class BattleRuleTests
     }
 
     [Fact]
-    public void CastSkill_AppliesQuarterDamageToFriendlyUnits()
+    public void CastSkill_NormalDifficultyExcludesFriendlyUnits()
     {
         var skillDefinition = TestContentFactory.CreateExternalSkill(
             "line_strike",
@@ -190,22 +190,6 @@ public sealed class BattleRuleTests
             [StatType.Quanzhang] = 100,
             [StatType.Bili] = 120,
         };
-        var enemySource = CreateUnit(
-            "source",
-            team: 1,
-            new GridPosition(0, 0),
-            stats: stats,
-            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
-        var enemy = CreateUnit("enemy", team: 2, new GridPosition(2, 0), maxHp: 500);
-        var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
-        enemySource.ActionGauge = 100;
-
-        var enemyState = new BattleState(new BattleGrid(4, 4), [enemySource, enemy]);
-        var enemyEngine = new BattleEngine(calculator);
-        enemyEngine.BeginAction(enemyState, enemySource.Id);
-        enemyEngine.CastSkill(enemyState, enemySource.Id, enemySource.Character.GetExternalSkills().Single(), enemy.Position);
-        var enemyDamage = 500 - enemy.Hp;
-
         var allySource = CreateUnit(
             "source_ally",
             team: 1,
@@ -215,13 +199,14 @@ public sealed class BattleRuleTests
         var ally = CreateUnit("ally", team: 1, new GridPosition(1, 0), maxHp: 500);
         allySource.ActionGauge = 100;
         var allyState = new BattleState(new BattleGrid(4, 4), [allySource, ally]);
-        var allyEngine = new BattleEngine(calculator);
+        var allyEngine = new BattleEngine();
         allyEngine.BeginAction(allyState, allySource.Id);
         var result = allyEngine.CastSkill(allyState, allySource.Id, allySource.Character.GetExternalSkills().Single(), ally.Position);
         var allyDamage = 500 - ally.Hp;
 
         Assert.True(result.Success);
-        Assert.Equal((int)Math.Floor(enemyDamage * BattleDamageRules.FriendlyFireDamageMultiplier), allyDamage);
+        Assert.Equal(0, allyDamage);
+        Assert.DoesNotContain(ally.Id, result.Value!.AffectedUnitIds);
     }
 
     private static BattleUnit CreateUnit(

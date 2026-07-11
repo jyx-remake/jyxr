@@ -341,6 +341,7 @@ public sealed class ItemUseServiceTests
             "six_pulse",
             "six_pulse",
             "",
+            SpecialSkillIntent.Support,
             "",
             0,
             new SkillCostDefinition(),

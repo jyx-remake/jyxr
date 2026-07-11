@@ -1,4 +1,5 @@
 using Game.Core.Affix;
+using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
 
@@ -38,8 +39,33 @@ public static class BattleSkillTargeting
             .Where(targetUnit =>
                 !string.Equals(targetUnit.Id, source.Id, StringComparison.Ordinal) ||
                 skill.CanTargetSelf)
-            .Where(targetUnit => skill is not LegendSkillInstance || state.AreEnemies(source, targetUnit))
+            .Where(targetUnit => ShouldIncludeTarget(state, source, targetUnit, skill))
             .ToList();
+    }
+
+    private static bool ShouldIncludeTarget(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        SkillInstance skill)
+    {
+        if (skill is LegendSkillInstance)
+        {
+            return state.AreEnemies(source, target);
+        }
+
+        var isOffensive = skill is ExternalSkillInstance or FormSkillInstance ||
+                          skill is SpecialSkillInstance
+                          {
+                              Definition.Intent: SpecialSkillIntent.Offensive
+                          };
+        if (!isOffensive || state.AreEnemies(source, target))
+        {
+            return true;
+        }
+
+        return state.RuleSettings.Difficulty != GameDifficulty.Normal &&
+               !source.HasTrait(TraitId.AvoidFriendlyFire);
     }
 
     public static IReadOnlySet<GridPosition> EnumerateCastTargets(

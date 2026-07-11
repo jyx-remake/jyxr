@@ -938,6 +938,7 @@ public sealed class StoryServiceTests
             "flash_step",
             "Flash Step",
             "",
+            SpecialSkillIntent.Support,
             "",
             0,
             new SkillCostDefinition(),

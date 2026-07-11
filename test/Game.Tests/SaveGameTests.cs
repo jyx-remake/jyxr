@@ -36,6 +36,7 @@ public sealed class SaveGameTests
             "blood_rush",
             "blood_rush",
             "",
+            SpecialSkillIntent.Support,
             "",
             0,
             new SkillCostDefinition(),
