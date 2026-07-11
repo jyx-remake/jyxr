@@ -13,7 +13,6 @@ public sealed partial class BattleEngine
     internal const int TimelineTicksPerRound = BattleBuffInstance.TimelineTicksPerRound;
     private const double ActionGaugeThreshold = 100d;
     private const int DefaultBattleExperienceTeam = 1;
-    private const int SkillCastCharacterExperience = 3;
     private static readonly GrowTemplateDefinition EmptyGrowTemplate = new()
     {
         Id = CharacterExperienceProgression.DefaultGrowTemplateId,
@@ -23,15 +22,13 @@ public sealed partial class BattleEngine
     private readonly BattleDamageCalculator _damageCalculator;
     private readonly BattleDamageResolver _damageResolver;
     private readonly BattleEffectExecutor _effectExecutor;
+    private readonly BattleSkillExecutor _skillExecutor;
+    private readonly BattleGrowthResolver _growthResolver;
     private readonly BattleHookExecutor _hookExecutor;
     private readonly LegendSkillResolver _legendSkillResolver;
     private readonly Func<IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
     private readonly IRandomService _random;
     private readonly Func<string, BuffDefinition> _buffResolver;
-    private readonly Func<SkillInstance, int> _skillMaxLevelResolver;
-    private readonly Func<CharacterInstance, GrowTemplateDefinition> _characterGrowTemplateResolver;
-    private readonly Func<CharacterInstance, int> _characterMaxLevelResolver;
-    private readonly Func<BattleUnit, bool> _battleExperienceEligibilityResolver;
 
     public BattleEngine(
         BattleDamageCalculator? damageCalculator = null,
@@ -48,16 +45,18 @@ public sealed partial class BattleEngine
         _damageCalculator = damageCalculator ?? new BattleDamageCalculator();
         _damageResolver = new BattleDamageResolver(this);
         _effectExecutor = new BattleEffectExecutor(this);
+        _skillExecutor = new BattleSkillExecutor(this, _effectExecutor);
         _hookExecutor = hookExecutor ?? new BattleHookExecutor();
         _hookExecutor.EffectExecutor = _effectExecutor;
         _legendSkillResolver = legendSkillResolver ?? new LegendSkillResolver();
         _legendSkillsProvider = legendSkillsProvider ?? EmptyLegendSkillProvider;
         _random = random ?? SharedRandomService.Instance;
         _buffResolver = buffResolver ?? MissingBuffResolver;
-        _skillMaxLevelResolver = skillMaxLevelResolver ?? DefaultSkillMaxLevelResolver;
-        _characterGrowTemplateResolver = characterGrowTemplateResolver ?? DefaultCharacterGrowTemplateResolver;
-        _characterMaxLevelResolver = characterMaxLevelResolver ?? DefaultCharacterMaxLevelResolver;
-        _battleExperienceEligibilityResolver = battleExperienceEligibilityResolver ?? DefaultBattleExperienceEligibilityResolver;
+        _growthResolver = new BattleGrowthResolver(
+            skillMaxLevelResolver ?? DefaultSkillMaxLevelResolver,
+            characterGrowTemplateResolver ?? DefaultCharacterGrowTemplateResolver,
+            characterMaxLevelResolver ?? DefaultCharacterMaxLevelResolver,
+            battleExperienceEligibilityResolver ?? DefaultBattleExperienceEligibilityResolver);
     }
 
     private static (bool Success, string Message) ValidateActingUnit(

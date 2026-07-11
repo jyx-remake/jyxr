@@ -1,7 +1,6 @@
 using Game.Core.Affix;
 using Game.Core.Definitions;
 using Game.Core.Model;
-using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -80,7 +79,7 @@ public sealed partial class BattleEngine
             .ToHashSet();
         var targets = BattleSkillTargeting.ResolveEffectiveTargets(state, unit, resolvedSkill, impactedPositions);
 
-        ExecuteSkillPlan(
+        _skillExecutor.Execute(
             state,
             unit,
             targets,
@@ -97,8 +96,7 @@ public sealed partial class BattleEngine
             context.Source = unit;
             context.Skill = resolvedSkill;
         });
-        TryGainSkillExperience(state, unit, skill);
-        TryGainCharacterExperience(state, unit);
+        _growthResolver.ApplySkillUseGrowth(state, unit, skill);
         unit.RecordUsedSkill(skill.Id);
         EndActionCore(state, unit, committedMainAction: true);
         return BattleCommandResult<BattleActionResult>.Succeeded(
@@ -107,94 +105,6 @@ public sealed partial class BattleEngine
                 impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList(),
                 skillCastInfo),
             command.Messages);
-    }
-
-    private void TryGainSkillExperience(
-        BattleState state,
-        BattleUnit unit,
-        SkillInstance usedSkill)
-    {
-        if (!_battleExperienceEligibilityResolver(unit))
-        {
-            return;
-        }
-
-        var experience = SkillExperienceProgression.CalculateBattleUseExperience(unit.Character);
-        var progressedSkills = new HashSet<SkillInstance>(ReferenceEqualityComparer.Instance);
-        TryGainSkillExperience(state, unit, usedSkill, experience, progressedSkills);
-
-        var equippedInternalSkill = unit.Character.GetInternalSkills()
-            .FirstOrDefault(static skill => skill.IsEquipped);
-        if (equippedInternalSkill is not null)
-        {
-            TryGainSkillExperience(state, unit, equippedInternalSkill, experience, progressedSkills);
-        }
-    }
-
-    private void TryGainSkillExperience(
-        BattleState state,
-        BattleUnit unit,
-        SkillInstance skill,
-        int experience,
-        HashSet<SkillInstance> progressedSkills)
-    {
-        if (SkillExperienceProgression.NormalizeProgressionSkill(skill) is not { } progressSkill ||
-            !progressedSkills.Add(progressSkill))
-        {
-            return;
-        }
-
-        var change = SkillExperienceProgression.TryAddExperience(
-            progressSkill,
-            experience,
-            _skillMaxLevelResolver(progressSkill));
-        if (change is not { LeveledUp: true })
-        {
-            return;
-        }
-
-        unit.ClampResourcesToLimits();
-        var battleEvent = new BattleFact(
-            BattleFactKind.SkillLeveledUp,
-            unit.Id,
-            skillExperience: new BattleSkillExperienceEvent(
-                progressSkill.Id,
-                progressSkill.Name,
-                progressSkill.SkillKind,
-                change.AddedExperience,
-                change.OldLevel,
-                change.NewLevel));
-        AddMessage(state, battleEvent);
-    }
-
-    private void TryGainCharacterExperience(BattleState state, BattleUnit unit)
-    {
-        if (!_battleExperienceEligibilityResolver(unit))
-        {
-            return;
-        }
-
-        var change = CharacterExperienceProgression.TryAddExperience(
-            unit.Character,
-            SkillCastCharacterExperience,
-            _characterMaxLevelResolver(unit.Character),
-            () => _characterGrowTemplateResolver(unit.Character));
-        if (!change.LeveledUp)
-        {
-            return;
-        }
-
-        unit.ClampResourcesToLimits();
-        var battleEvent = new BattleFact(
-            BattleFactKind.CharacterLeveledUp,
-            unit.Id,
-            characterExperience: new BattleCharacterExperienceEvent(
-                unit.Character.Id,
-                unit.Character.Name,
-                change.AddedExperience,
-                change.OldLevel,
-                change.NewLevel));
-        AddMessage(state, battleEvent);
     }
 
     private void TryRequestSpecialSkillSpeech(

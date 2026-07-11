@@ -323,9 +323,12 @@ internal sealed class BattleFlowOrchestrator
         }
 
         _autoBattleEnabled = false;
-        _screen.ShowBattleEnded(outcome.Kind == BattleOutcomeKind.Winner && outcome.WinningTeam == PlayerTeam);
+        _screen.ShowBattleEnded(IsPlayerVictory(outcome));
         return true;
     }
+
+    private bool IsPlayerVictory(BattleOutcome outcome) =>
+        outcome.Kind == BattleOutcomeKind.Winner && outcome.WinningTeam == PlayerTeam;
 
     private static SkillInstance? TryResolveSkill(BattleUnit actingUnit, string? skillId)
     {

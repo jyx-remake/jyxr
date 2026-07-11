@@ -19,36 +19,7 @@ public sealed partial class BattleEngine
 
     private readonly record struct BattleSkillHitCheck(bool IsCancelled, bool SuppressHitEffects);
 
-    private void ExecuteSkillPlan(
-        BattleState state,
-        BattleUnit source,
-        IReadOnlyList<BattleUnit> targets,
-        BattleSkillExecutionPlan plan)
-    {
-        foreach (var step in plan.Steps)
-        {
-            using var stepScope = state.EnterEffect($"skill-step:{plan.Skill.Id}:{step.GetType().Name}");
-            switch (step)
-            {
-                case ResolveSkillDamageStep:
-                    ExecuteSkillDamageStep(state, source, targets, plan.Skill);
-                    break;
-                case ApplySkillBuffsStep:
-                    foreach (var target in targets)
-                    {
-                        ApplySkillBuffs(state, source, target, plan.Skill.Buffs);
-                    }
-                    break;
-                case ApplyDefinedSkillEffectsStep definedEffects:
-                    ApplySpecialSkillEffects(state, source, targets, definedEffects.Effects);
-                    break;
-                default:
-                    throw new NotSupportedException($"Unsupported skill execution step '{step.GetType().Name}'.");
-            }
-        }
-    }
-
-    private void ExecuteSkillDamageStep(
+    internal void ExecuteSkillDamageStep(
         BattleState state,
         BattleUnit source,
         IReadOnlyList<BattleUnit> targets,
@@ -199,7 +170,7 @@ public sealed partial class BattleEngine
         }
     }
 
-    private void ApplySkillBuffs(
+    internal void ApplySkillBuffs(
         BattleState state,
         BattleUnit source,
         BattleUnit target,
@@ -329,24 +300,6 @@ public sealed partial class BattleEngine
             {
                 continue;
             }
-        }
-    }
-
-    private void ApplySpecialSkillEffects(
-        BattleState state,
-        BattleUnit source,
-        IReadOnlyList<BattleUnit> targets,
-        IReadOnlyList<BattleEffectDefinition>? effects)
-    {
-        if (effects is null || effects.Count == 0)
-        {
-            return;
-        }
-
-        foreach (var effect in effects)
-        {
-            using var effectScope = state.EnterEffect($"skill:{effect.GetType().Name}");
-            _effectExecutor.ExecuteAbility(state, source, targets, effect);
         }
     }
 
