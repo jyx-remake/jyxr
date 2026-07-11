@@ -323,15 +323,14 @@ internal sealed class BattleFlowOrchestrator
             return true;
         }
 
-        var playerAlive = State.Units.Any(unit => unit.Team == PlayerTeam && unit.IsAlive);
-        var enemyAlive = State.Units.Any(unit => unit.Team != PlayerTeam && unit.IsAlive);
-        if (playerAlive && enemyAlive)
+        var outcome = BattleOutcomeEvaluator.Evaluate(State);
+        if (outcome.Kind == BattleOutcomeKind.Ongoing)
         {
             return false;
         }
 
         _autoBattleEnabled = false;
-        _screen.ShowBattleEnded(playerAlive);
+        _screen.ShowBattleEnded(outcome.Kind == BattleOutcomeKind.Winner && outcome.WinningTeam == PlayerTeam);
         return true;
     }
 

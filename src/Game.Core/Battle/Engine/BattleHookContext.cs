@@ -69,12 +69,6 @@ public sealed class BattleHookContext
 
     public BattleHitState HitState { get; internal set; } = BattleHitState.Hit;
 
-    public bool HitCancelled
-    {
-        get => HitState == BattleHitState.Miss;
-        internal set => HitState = value ? BattleHitState.Miss : BattleHitState.Hit;
-    }
-
     public bool SuppressHitEffects { get; internal set; }
 
     public bool Cancel { get; internal set; }

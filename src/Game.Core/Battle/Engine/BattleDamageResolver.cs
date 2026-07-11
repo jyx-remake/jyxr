@@ -5,7 +5,6 @@ namespace Game.Core.Battle;
 
 internal sealed record BattleDamageApplicationResult(
     BattleUnit Target,
-    int ProposedAmount,
     int ActualAmount,
     bool SuppressHitEffects);
 
@@ -17,8 +16,6 @@ internal sealed class BattleDamageApplicationContext(
     bool isCritical)
 {
     public BattleUnit Source { get; } = source;
-
-    public BattleUnit OriginalTarget { get; } = target;
 
     public BattleUnit Target { get; set; } = target;
 
@@ -109,7 +106,6 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
 
         return new BattleDamageApplicationResult(
             applicationContext.Target,
-            applicationContext.ProposedAmount,
             actualAmount,
             applicationContext.SuppressHitEffects);
     }
