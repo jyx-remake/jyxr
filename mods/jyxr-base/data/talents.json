@@ -2178,7 +2178,7 @@
     "id": "死生茫茫",
     "name": "死生茫茫",
     "point": 25,
-    "description": "一定几率追加伤害并将伤害转化为自己的气血。",
+    "description": "10%几率追加目标最大生命10%伤害，并使攻击附带50%吸血效果。",
     "affixes": [
       {
         "type": "hook",
@@ -2193,7 +2193,13 @@
           {
             "type": "custom",
             "effectId": "life_and_death",
-            "parameters": {}
+            "parameters": {
+              "chance": 0.1,
+              "targetMaxHpDamageFactor": 0.1,
+              "lifestealRate": 0.5,
+              "sourceSpeech": "嘿嘿...（{source}天赋【死生茫茫】发动！）",
+              "targetSpeech": "啊！好疼！！"
+            }
           }
         ]
       }
