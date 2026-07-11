@@ -676,93 +676,97 @@ public partial class BattleScreen : Control
 			: AssetResolver.LoadCharacterPortrait(actingUnit.Character);
 	}
 
-	internal void AppendResult(BattleActionResult result, IReadOnlyList<BattleEvent> events)
+	internal void AppendResult(BattleCommandResult<BattleActionResult> result)
 	{
 		ArgumentNullException.ThrowIfNull(result);
-		ArgumentNullException.ThrowIfNull(events);
 
 		if (!string.IsNullOrWhiteSpace(result.Message))
 		{
 			AppendLog(result.Message);
 		}
 
-		AppendEvents(events);
+		AppendMessages(result.Messages);
 	}
 
-	internal void AppendEvents(IReadOnlyList<BattleEvent> events)
+	internal void AppendMessages(IReadOnlyList<BattleMessage> messages)
 	{
-		ArgumentNullException.ThrowIfNull(events);
+		ArgumentNullException.ThrowIfNull(messages);
 
-		foreach (var battleEvent in events)
+		foreach (var message in messages)
 		{
-			AppendEvent(battleEvent);
+			AppendMessage(message);
 		}
 	}
 
-	private void AppendEvent(BattleEvent battleEvent)
+	private void AppendMessage(BattleMessage message)
 	{
 		if (_state is null)
 		{
 			return;
 		}
 
-		if (TryScheduleSkillPresentationEvent(battleEvent))
+		if (TryScheduleSkillPresentationMessage(message))
 		{
 			return;
 		}
 
-		AppendEventImmediate(battleEvent);
+		AppendMessageImmediate(message);
 	}
 
-	private bool TryScheduleSkillPresentationEvent(BattleEvent battleEvent)
+	private bool TryScheduleSkillPresentationMessage(BattleMessage message)
 	{
 		if (_activeSkillPresentation is not { } presentation)
 		{
 			return false;
 		}
 
-		switch (battleEvent.Kind)
+		switch (message)
 		{
-			case BattleEventKind.SkillCast when
-				string.Equals(battleEvent.UnitId, presentation.ActingUnitId, StringComparison.Ordinal) &&
+			case BattleFact { Kind: BattleFactKind.SkillCast } fact when
+				string.Equals(fact.UnitId, presentation.ActingUnitId, StringComparison.Ordinal) &&
 				string.Equals(
-					battleEvent.SkillCast?.ResolvedSkillId ?? battleEvent.Detail,
+					fact.SkillCast?.ResolvedSkillId ?? fact.Detail,
 					presentation.SkillCast.ResolvedSkillId,
 					StringComparison.Ordinal):
-				presentation.EnqueueSkillName(() => AppendEventImmediate(battleEvent));
+				presentation.EnqueueSkillName(() => AppendMessageImmediate(fact));
 				return true;
-			case BattleEventKind.SpeechRequested:
-				presentation.EnqueueImpact(() => AppendEventImmediate(battleEvent));
+			case BattleCue { Kind: BattleCueKind.SpeechRequested } cue:
+				presentation.EnqueueImpact(() => AppendMessageImmediate(cue));
 				return true;
-			case BattleEventKind.Damaged:
-			case BattleEventKind.BuffApplied:
-			case BattleEventKind.BuffResisted:
-			case BattleEventKind.BuffRemoved:
-			case BattleEventKind.Healed:
-			case BattleEventKind.MpDamaged:
-			case BattleEventKind.Rested:
-			case BattleEventKind.ItemUsed:
-			case BattleEventKind.ActionSkipped:
-			case BattleEventKind.FloatTextRequested:
-			case BattleEventKind.SkillLeveledUp:
-			case BattleEventKind.CharacterLeveledUp:
-				presentation.EnqueueImpactFloat(() => AppendEventImmediate(battleEvent));
+			case BattleFact { Kind: BattleFactKind.Damaged or BattleFactKind.BuffApplied or
+				BattleFactKind.BuffResisted or BattleFactKind.BuffRemoved or BattleFactKind.Healed or
+				BattleFactKind.MpDamaged or BattleFactKind.Rested or BattleFactKind.ItemUsed or
+				BattleFactKind.ActionSkipped or BattleFactKind.SkillLeveledUp or BattleFactKind.CharacterLeveledUp } fact:
+				presentation.EnqueueImpactFloat(() => AppendMessageImmediate(fact));
+				return true;
+			case BattleCue { Kind: BattleCueKind.FloatTextRequested } cue:
+				presentation.EnqueueImpactFloat(() => AppendMessageImmediate(cue));
 				return true;
 			default:
 				return false;
 		}
 	}
 
-	private void AppendEventImmediate(BattleEvent battleEvent)
+	private void AppendMessageImmediate(BattleMessage message)
 	{
 		if (_state is null)
 		{
 			return;
 		}
 
+		if (message is BattleCue cue)
+		{
+			if (cue.Kind == BattleCueKind.SpeechRequested && !string.IsNullOrWhiteSpace(cue.Speech?.Text))
+				_boardGrid.PlaySpeech(cue.UnitId, cue.Speech.Text);
+			else if (cue.Kind == BattleCueKind.FloatTextRequested && !string.IsNullOrWhiteSpace(cue.FloatText?.Text))
+				_boardGrid.PlayFloatText(cue.UnitId, cue.FloatText.Text, ResolveFloatTextColor(cue.FloatText.Style));
+			return;
+		}
+
+		if (message is not BattleFact battleEvent) return;
 		switch (battleEvent.Kind)
 		{
-			case BattleEventKind.SkillCast:
+			case BattleFactKind.SkillCast:
 				var skillCast = battleEvent.SkillCast;
 				if (skillCast is not null)
 				{
@@ -776,7 +780,7 @@ public partial class BattleScreen : Control
 						: $"{casterName} 施展【{skillCast.ResolvedSkillName}】。");
 				}
 				break;
-			case BattleEventKind.Damaged:
+			case BattleFactKind.Damaged:
 				var unitName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 				var damage = battleEvent.Damage?.Amount ?? 0;
 				var isCritical = damage > 0 && battleEvent.Damage?.IsCritical == true;
@@ -801,50 +805,35 @@ public partial class BattleScreen : Control
 						: $"{unitName} 受到 {damage} 点伤害。");
 				}
 				break;
-			case BattleEventKind.BuffApplied:
+			case BattleFactKind.BuffApplied:
 				var buffName = ResolveBuffName(battleEvent.Detail);
 				var buffTargetName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 				_boardGrid.PlayFloatText(battleEvent.UnitId, buffName, FloatStateColor);
 				AppendLog($"{buffTargetName} 获得状态【{buffName}】。");
 				break;
-			case BattleEventKind.BuffResisted:
+			case BattleFactKind.BuffResisted:
 				var resistedBuffName = ResolveBuffName(battleEvent.Detail);
 				var resistingUnitName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 				_boardGrid.PlayFloatText(battleEvent.UnitId, "抵抗", FloatInfoColor);
 				AppendLog($"{resistingUnitName} 抵抗了状态【{resistedBuffName}】。");
 				break;
-			case BattleEventKind.BuffRemoved:
+			case BattleFactKind.BuffRemoved:
 				var expiredBuffName = ResolveBuffName(battleEvent.Detail);
 				_boardGrid.PlayFloatText(battleEvent.UnitId, $"{expiredBuffName}解除", FloatInfoColor);
 				break;
-			case BattleEventKind.Rested:
+			case BattleFactKind.Rested:
 				AppendRestEvent(battleEvent);
 				break;
-			case BattleEventKind.ItemUsed:
+			case BattleFactKind.ItemUsed:
 				_boardGrid.PlayFloatText(battleEvent.UnitId, ResolveItemName(battleEvent.Detail), FloatInfoColor);
 				break;
-			case BattleEventKind.ActionSkipped:
+			case BattleFactKind.ActionSkipped:
 				var skippedUnitName = _state.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 				var skippedBuffName = ResolveBuffName(battleEvent.Detail);
 				_boardGrid.PlayFloatText(battleEvent.UnitId, $"{skippedBuffName}中", FloatStateColor);
 				AppendLog($"{skippedUnitName} 因【{skippedBuffName}】无法行动。");
 				break;
-			case BattleEventKind.SpeechRequested:
-				if (!string.IsNullOrWhiteSpace(battleEvent.Speech?.Text))
-				{
-					_boardGrid.PlaySpeech(battleEvent.UnitId, battleEvent.Speech.Text);
-				}
-				break;
-			case BattleEventKind.FloatTextRequested:
-				if (!string.IsNullOrWhiteSpace(battleEvent.FloatText?.Text))
-				{
-					_boardGrid.PlayFloatText(
-						battleEvent.UnitId,
-						battleEvent.FloatText.Text,
-						ResolveFloatTextColor(battleEvent.FloatText.Style));
-				}
-				break;
-			case BattleEventKind.SkillLeveledUp:
+			case BattleFactKind.SkillLeveledUp:
 				if (battleEvent.SkillExperience is { } skillExperience)
 				{
 					_boardGrid.PlayFloatText(
@@ -853,7 +842,7 @@ public partial class BattleScreen : Control
 						FloatHealColor);
 				}
 				break;
-			case BattleEventKind.CharacterLeveledUp:
+			case BattleFactKind.CharacterLeveledUp:
 				if (battleEvent.CharacterExperience is not null)
 				{
 					_boardGrid.PlayFloatText(
@@ -865,7 +854,7 @@ public partial class BattleScreen : Control
 		}
 	}
 
-	private void AppendRestEvent(BattleEvent battleEvent)
+	private void AppendRestEvent(BattleFact battleEvent)
 	{
 		var unitName = _state?.TryGetUnit(battleEvent.UnitId)?.Character.Name ?? battleEvent.UnitId;
 		var hp = battleEvent.Rest?.Hp ?? 0;
@@ -1175,9 +1164,9 @@ public partial class BattleScreen : Control
 	private async Task PlaySkillPresentationAsync(
 		BattleUnit actingUnit,
 		SkillInstance skill,
-		BattleActionResult result,
-		IReadOnlyList<BattleEvent> events)
+		BattleCommandResult<BattleActionResult> result)
 	{
+		var action = result.Value ?? throw new InvalidOperationException("Successful skill command has no action result.");
 		_boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
 		_isResolvingSkillPresentation = true;
 		RefreshActions();
@@ -1189,10 +1178,10 @@ public partial class BattleScreen : Control
 			actingUnit.Character.Name,
 			actingUnit.Character.Definition.Gender,
 			AssetResolver.LoadCharacterPortrait(actingUnit.Character),
-			result.SkillCast ?? BattleSkillCastInfo.Create(skill, skill),
-			result.ImpactedPositions);
+			action.SkillCast ?? BattleSkillCastInfo.Create(skill, skill),
+			action.ImpactedPositions);
 		var presentationTask = _activeSkillPresentation.RunAsync();
-		AppendResult(result, events);
+		AppendResult(result);
 		try
 		{
 			await presentationTask;
@@ -1384,9 +1373,8 @@ public partial class BattleScreen : Control
 	internal Task PlaySkillAsync(
 		BattleUnit actingUnit,
 		SkillInstance skill,
-		BattleActionResult result,
-		IReadOnlyList<BattleEvent> events) =>
-		PlaySkillPresentationAsync(actingUnit, skill, result, events);
+		BattleCommandResult<BattleActionResult> result) =>
+		PlaySkillPresentationAsync(actingUnit, skill, result);
 
 	private void FinishBattle()
 	{

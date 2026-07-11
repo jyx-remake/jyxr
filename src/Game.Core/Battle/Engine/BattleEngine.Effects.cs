@@ -87,11 +87,11 @@ public sealed partial class BattleEngine
         var hitCheck = ResolveSkillHit(state, source, target, skill);
         if (hitCheck.IsCancelled)
         {
-            AddEvent(state, new BattleEvent(
-                BattleEventKind.Damaged,
+            AddMessage(state, new BattleFact(
+                BattleFactKind.Damaged,
                 target.Id,
-                Detail: source.Id,
-                Damage: new BattleDamageEvent(0, SourceUnitId: source.Id)));
+                detail: source.Id,
+                damage: new BattleDamageEvent(0, SourceUnitId: source.Id)));
             return new BattleSkillHitResolution(target, false, 0, false, hitCheck.SuppressHitEffects);
         }
 
@@ -234,7 +234,7 @@ public sealed partial class BattleEngine
 
         if (buffDefinition.IsDebuff && RollDebuffResistance(target))
         {
-            AddEvent(state, new BattleEvent(BattleEventKind.BuffResisted, target.Id, timing, Detail: detail));
+            AddMessage(state, new BattleFact(BattleFactKind.BuffResisted, target.Id, timing, detail: detail));
             return false;
         }
 
@@ -256,7 +256,7 @@ public sealed partial class BattleEngine
         }
 
         target.ApplyBuff(instance);
-        AddEvent(state, new BattleEvent(BattleEventKind.BuffApplied, target.Id, timing, Detail: detail));
+        AddMessage(state, new BattleFact(BattleFactKind.BuffApplied, target.Id, timing, detail: detail));
         TriggerHooks(state, HookTiming.OnBuffApplied, target, context =>
         {
             context.Source = source;
@@ -422,11 +422,11 @@ public sealed partial class BattleEngine
     {
         foreach (var removedBuff in removedBuffs)
         {
-            AddEvent(state, new BattleEvent(
-                BattleEventKind.BuffRemoved,
+            AddMessage(state, new BattleFact(
+                BattleFactKind.BuffRemoved,
                 target.Id,
                 timing,
-                Detail: removedBuff.Definition.Id));
+                detail: removedBuff.Definition.Id));
             TriggerHooks(state, HookTiming.OnBuffRemoved, target, context =>
             {
                 context.Source = source;
@@ -580,7 +580,7 @@ public sealed partial class BattleEngine
             unit,
             BattleRecoveryKind.Hp,
             amount);
-        AddEvent(state, new BattleEvent(BattleEventKind.Healed, unit.Id, Detail: $"{buff.Definition.Id}:{restored}"));
+        AddMessage(state, new BattleFact(BattleFactKind.Healed, unit.Id, detail: $"{buff.Definition.Id}:{restored}"));
     }
 
     private void ApplyInternalInjuryTick(BattleState state, BattleUnit unit, BattleBuffInstance buff)
@@ -589,7 +589,7 @@ public sealed partial class BattleEngine
         var roll = 1d + _random.NextDouble() * 0.5d;
         var amount = Math.Max(1, (int)(baseValue * buff.Level * roll));
         var drained = unit.DamageMp(amount);
-        AddEvent(state, new BattleEvent(BattleEventKind.MpDamaged, unit.Id, Detail: $"{buff.Definition.Id}:{drained}"));
+        AddMessage(state, new BattleFact(BattleFactKind.MpDamaged, unit.Id, detail: $"{buff.Definition.Id}:{drained}"));
     }
 
     private void ApplyChargeTick(BattleState state, BattleUnit unit, BattleBuffInstance buff)
@@ -601,7 +601,7 @@ public sealed partial class BattleEngine
         }
 
         unit.AddRage(1);
-        AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, unit.Id, Detail: $"{buff.Definition.Id}:1"));
+        AddMessage(state, new BattleFact(BattleFactKind.RageChanged, unit.Id, detail: $"{buff.Definition.Id}:1"));
     }
 
     private void TryGainRageFromAttack(BattleState state, BattleUnit unit)
@@ -612,7 +612,7 @@ public sealed partial class BattleEngine
         }
 
         unit.AddRage(1);
-        AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, unit.Id, Detail: "attack:1"));
+        AddMessage(state, new BattleFact(BattleFactKind.RageChanged, unit.Id, detail: "attack:1"));
     }
 
     private void TryGainRageFromTakingDamage(BattleState state, BattleUnit source, BattleUnit target, int damage)
@@ -623,7 +623,7 @@ public sealed partial class BattleEngine
         }
 
         target.AddRage(1);
-        AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: "damaged:1"));
+        AddMessage(state, new BattleFact(BattleFactKind.RageChanged, target.Id, detail: "damaged:1"));
     }
 
     private bool RollRageGain(BattleUnit unit)

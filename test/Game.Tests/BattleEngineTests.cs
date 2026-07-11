@@ -131,7 +131,7 @@ public sealed class BattleEngineTests
 
         var acting = engine.AdvanceUntilNextAction(state);
 
-        Assert.Equal("fast", acting.Id);
+        Assert.Equal("fast", acting.Value!.Id);
         Assert.NotNull(state.CurrentAction);
         Assert.Equal("fast", state.CurrentAction.ActingUnitId);
     }
@@ -164,7 +164,7 @@ public sealed class BattleEngineTests
         Assert.Equal(575, hero.Hp);
         Assert.Equal(430, hero.Mp);
         Assert.Equal(string.Empty, result.Message);
-        var restEvent = Assert.Single(result.Events.Where(static battleEvent => battleEvent.Kind == BattleEventKind.Rested));
+        var restEvent = Assert.Single(result.Messages.OfType<BattleFact>().Where(static battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.Rested }));
         Assert.Equal(new BattleRestRecovery(175, 330), restEvent.Rest);
         Assert.Null(state.CurrentAction);
     }
@@ -286,8 +286,8 @@ public sealed class BattleEngineTests
         Assert.Equal(4, hero.Rage);
         Assert.True(enemy.Hp < 500);
         Assert.Equal(1, skill.CurrentCooldown);
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == enemy.Id);
         var appliedBuff = Assert.Single(enemy.Buffs);
         Assert.Equal("中毒", appliedBuff.Definition.Id);
@@ -320,8 +320,8 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         Assert.Equal(2, skill.Level);
         Assert.Equal(15, skill.Exp);
-        var levelEvent = Assert.Single(state.Events.Where(static battleEvent =>
-            battleEvent.Kind == BattleEventKind.SkillLeveledUp));
+        var levelEvent = Assert.Single(result.Messages.OfType<BattleFact>().Where(static battleEvent =>
+            battleEvent.Kind == BattleFactKind.SkillLeveledUp));
         Assert.Equal(hero.Id, levelEvent.UnitId);
         Assert.Equal(new BattleSkillExperienceEvent("strike", "strike", SkillKind.External, 30, 1, 2), levelEvent.SkillExperience);
     }
@@ -408,7 +408,7 @@ public sealed class BattleEngineTests
         Assert.Equal(40, hero.Hp);
         Assert.Equal(42, hero.MaxMp);
         Assert.Equal(10, hero.Mp);
-        Assert.Contains(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.CharacterLeveledUp);
+        Assert.Contains(result.Messages.OfType<BattleFact>(), static battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.CharacterLeveledUp });
     }
 
     [Fact]
@@ -451,8 +451,8 @@ public sealed class BattleEngineTests
         Assert.Equal(1, hero.Character.Level);
         Assert.Equal(CharacterLevelProgression.GetTotalExperienceRequiredForLevel(2) - 3, hero.Character.Experience);
         Assert.Equal(1, hero.Character.GetExternalSkills().Single().Level);
-        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.SkillLeveledUp);
-        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.CharacterLeveledUp);
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), static battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.SkillLeveledUp });
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), static battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.CharacterLeveledUp });
     }
 
     [Fact]
@@ -568,7 +568,7 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         Assert.Equal(30, externalSkill.Exp);
         Assert.Equal(30, internalSkill.Exp);
-        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.SkillLeveledUp);
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), static battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.SkillLeveledUp });
     }
 
     [Fact]
@@ -638,7 +638,7 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         Assert.Equal(1, skill.Level);
         Assert.Equal(skill.LevelUpExp, skill.Exp);
-        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.SkillLeveledUp);
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), static battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.SkillLeveledUp });
     }
 
     [Fact]
@@ -669,7 +669,7 @@ public sealed class BattleEngineTests
         Assert.False(result.Success);
         Assert.Equal(1, skill.Level);
         Assert.Equal(0, skill.Exp);
-        Assert.DoesNotContain(state.Events, static battleEvent => battleEvent.Kind == BattleEventKind.SkillLeveledUp);
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), static battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.SkillLeveledUp });
     }
 
     [Fact]
@@ -697,8 +697,8 @@ public sealed class BattleEngineTests
 
         Assert.True(result.Success);
         Assert.Empty(enemy.Buffs);
-        Assert.DoesNotContain(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.BuffApplied &&
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.BuffApplied &&
             battleEvent.UnitId == enemy.Id &&
             battleEvent.Detail == "中毒");
     }
@@ -729,8 +729,8 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         var appliedBuff = Assert.Single(enemy.Buffs);
         Assert.Equal("中毒", appliedBuff.Definition.Id);
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.BuffApplied &&
+        Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.BuffApplied &&
             battleEvent.UnitId == enemy.Id &&
             battleEvent.Detail == "中毒");
     }
@@ -764,8 +764,8 @@ public sealed class BattleEngineTests
         var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
 
         Assert.True(result.Success);
-        var damageEvent = Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        var damageEvent = Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == enemy.Id));
         Assert.NotNull(damageEvent.Damage);
         Assert.True(damageEvent.Damage.IsCritical);
@@ -831,7 +831,7 @@ public sealed class BattleEngineTests
         Assert.Equal(0, hero.Rage);
         Assert.Equal(10, hero.Mp);
         Assert.Equal(0, skill.CurrentCooldown);
-        Assert.DoesNotContain(state.Events, battleEvent => battleEvent.Kind == BattleEventKind.SkillCast);
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.SkillCast });
         Assert.Empty(enemy.Buffs);
     }
 
@@ -933,7 +933,7 @@ public sealed class BattleEngineTests
             enemy.Position);
 
         Assert.True(result.Success);
-        Assert.False(result.SkillCast?.IsLegend);
+        Assert.False(result.Value!.SkillCast?.IsLegend);
     }
 
     [Fact]
@@ -988,7 +988,7 @@ public sealed class BattleEngineTests
             enemy.Position);
 
         Assert.True(result.Success);
-        Assert.True(result.SkillCast?.IsLegend);
+        Assert.True(result.Value!.SkillCast?.IsLegend);
     }
 
     [Fact]
@@ -1037,12 +1037,12 @@ public sealed class BattleEngineTests
         var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
 
         Assert.True(result.Success);
-        Assert.True(result.SkillCast?.IsLegend);
+        Assert.True(result.Value!.SkillCast?.IsLegend);
         Assert.Equal(0, hero.Rage);
         Assert.Equal(500, ally.Hp);
         Assert.True(enemy.Hp < 500);
-        Assert.DoesNotContain(ally.Id, result.AffectedUnitIds);
-        Assert.Contains(enemy.Id, result.AffectedUnitIds);
+        Assert.DoesNotContain(ally.Id, result.Value!.AffectedUnitIds);
+        Assert.Contains(enemy.Id, result.Value!.AffectedUnitIds);
     }
 
     [Fact]
@@ -1099,12 +1099,12 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         Assert.Equal(1, hero.Rage);
         Assert.Equal(1, enemy.Rage);
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.RageChanged &&
+        Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.RageChanged &&
             battleEvent.UnitId == hero.Id &&
             battleEvent.Detail == "attack:1");
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.RageChanged &&
+        Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.RageChanged &&
             battleEvent.UnitId == enemy.Id &&
             battleEvent.Detail == "damaged:1");
     }
@@ -1121,12 +1121,13 @@ public sealed class BattleEngineTests
         var state = new BattleState(new BattleGrid(4, 4), [hero]);
         var engine = new BattleEngine(random: new FixedRandomService(0.5d));
 
-        Assert.Throws<InvalidOperationException>(() => engine.AdvanceUntilNextAction(state, maxTicks: 50));
+        var result = engine.AdvanceUntilNextAction(state, maxTicks: 50);
 
+        Assert.False(result.Success);
         Assert.Equal(48, hero.Hp);
         Assert.Equal(1, Assert.Single(hero.Buffs).RemainingTurns);
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == hero.Id &&
             battleEvent.Detail == "中毒" &&
             battleEvent.Damage is { Amount: 52, IsCritical: false });
@@ -1486,12 +1487,12 @@ public sealed class BattleEngineTests
 
         var action = engine.BeginAction(state, hero.Id);
 
-        Assert.NotNull(action);
+        Assert.NotNull(action.Value);
         var applied = Assert.Single(hero.Buffs);
         Assert.Equal(3, applied.Level);
         Assert.Equal(3, applied.RemainingTurns);
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.BuffApplied &&
+        Assert.Contains(action.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.BuffApplied &&
             battleEvent.UnitId == hero.Id &&
             battleEvent.Timing == HookTiming.BeforeActionStart &&
             battleEvent.Detail == "恢复");
@@ -1558,13 +1559,13 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         Assert.Empty(target.Buffs);
         Assert.Equal(3, target.Rage);
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.BuffRemoved &&
+        Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.BuffRemoved &&
             battleEvent.UnitId == target.Id &&
             battleEvent.Timing == HookTiming.OnHitConfirmed &&
             battleEvent.Detail == "中毒");
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.RageChanged &&
+        Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.RageChanged &&
             battleEvent.UnitId == target.Id &&
             battleEvent.Timing == HookTiming.OnBuffRemoved &&
             battleEvent.Detail == "2");
@@ -1660,7 +1661,7 @@ public sealed class BattleEngineTests
         var state = new BattleState(new BattleGrid(4, 4), [hero]);
         var engine = new BattleEngine();
 
-        Assert.Throws<InvalidOperationException>(() => engine.AdvanceUntilNextAction(state, maxTicks: 50));
+        Assert.False(engine.AdvanceUntilNextAction(state, maxTicks: 50).Success);
 
         Assert.Equal(1, hero.Character.GetExternalSkills().Single().CurrentCooldown);
     }
@@ -1769,47 +1770,36 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         Assert.Equal(500 - expected, target.Hp);
         Assert.Equal(2, target.Rage);
-        var events = state.Events.ToList();
-        var beforeIndex = events.FindIndex(battleEvent =>
-            battleEvent.Kind == BattleEventKind.HooksTriggered &&
-            battleEvent.Timing == HookTiming.BeforeDamageApplied);
-        var damageIndex = events.FindIndex(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged && battleEvent.UnitId == target.Id);
-        var afterIndex = events.FindIndex(battleEvent =>
-            battleEvent.Kind == BattleEventKind.HooksTriggered &&
-            battleEvent.Timing == HookTiming.OnDamageTaken);
+        var events = result.Messages.ToList();
+        var beforeIndex = events.FindIndex(message =>
+            message is BattleTrace { Kind: BattleTraceKind.HooksTriggered, Timing: HookTiming.BeforeDamageApplied });
+        var damageIndex = events.FindIndex(message =>
+            message is BattleFact { Kind: BattleFactKind.Damaged } fact && fact.UnitId == target.Id);
+        var afterIndex = events.FindIndex(message =>
+            message is BattleTrace { Kind: BattleTraceKind.HooksTriggered, Timing: HookTiming.OnDamageTaken });
         Assert.True(beforeIndex < damageIndex);
         Assert.True(damageIndex < afterIndex);
     }
 
     [Fact]
-    public void BattleState_DrainEventsReturnsOneBatchAndClearsPendingEvents()
+    public void BeginAction_ReturnsOneCommandMessageBatch()
     {
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
         hero.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(2, 2), [hero]);
         var engine = new BattleEngine();
 
-        engine.BeginAction(state, hero.Id);
+        var result = engine.BeginAction(state, hero.Id);
 
-        var events = state.DrainEvents();
-        Assert.Contains(events, battleEvent => battleEvent.Kind == BattleEventKind.ActionStarted);
-        Assert.Empty(state.Events);
-        Assert.Empty(state.DrainEvents());
+        Assert.Contains(result.Messages, message => message is BattleFact { Kind: BattleFactKind.ActionStarted });
     }
 
     [Fact]
-    public void BattleEvent_CategorySeparatesFactsCuesAndTraces()
+    public void BattleMessage_UsesIndependentFactCueAndTraceTypes()
     {
-        Assert.Equal(
-            BattleEventCategory.Fact,
-            new BattleEvent(BattleEventKind.Damaged, "unit").Category);
-        Assert.Equal(
-            BattleEventCategory.Cue,
-            new BattleEvent(BattleEventKind.SpeechRequested, "unit").Category);
-        Assert.Equal(
-            BattleEventCategory.Trace,
-            new BattleEvent(BattleEventKind.HooksTriggered, "unit").Category);
+        Assert.IsType<BattleFact>(new BattleFact(BattleFactKind.Damaged, "unit"));
+        Assert.IsType<BattleCue>(new BattleCue(BattleCueKind.SpeechRequested, "unit"));
+        Assert.IsType<BattleTrace>(new BattleTrace(BattleTraceKind.HooksTriggered, "unit"));
     }
 
     [Fact]
@@ -1854,8 +1844,8 @@ public sealed class BattleEngineTests
         Assert.Equal(500, target.Hp);
         Assert.Equal(0, source.Rage);
         Assert.Equal(3, target.Rage);
-        Assert.DoesNotContain(state.Events, battleEvent => battleEvent.Kind == BattleEventKind.Damaged);
-        Assert.DoesNotContain(state.Events, battleEvent =>
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.Damaged });
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), battleEvent =>
             battleEvent.Timing is HookTiming.BeforeHitResolved or
                 HookTiming.BeforeDamageCalculation or
                 HookTiming.BeforeDamageApplied or
@@ -1924,12 +1914,20 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         Assert.Equal(500, target.Hp);
         Assert.Equal(500 - expected, defender.Hp);
-        var damage = Assert.Single(state.Events.Where(battleEvent => battleEvent.Kind == BattleEventKind.Damaged));
+        var damage = Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.Damaged }));
         Assert.Equal(defender.Id, damage.UnitId);
         Assert.Equal(expected, damage.Damage?.Amount);
-        Assert.Contains(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.SpeechRequested &&
-            battleEvent.UnitId == defender.Id);
+        Assert.Contains(result.Messages.OfType<BattleCue>(), cue =>
+            cue.Kind == BattleCueKind.SpeechRequested && cue.UnitId == defender.Id);
+        var messages = result.Messages.ToList();
+        var traceIndex = messages.FindIndex(message =>
+            message is BattleTrace { Timing: HookTiming.BeforeDamageApplied });
+        var cueIndex = messages.FindIndex(message =>
+            message is BattleCue { Kind: BattleCueKind.SpeechRequested } cue && cue.UnitId == defender.Id);
+        var factIndex = messages.FindIndex(message =>
+            message is BattleFact { Kind: BattleFactKind.Damaged } fact && fact.UnitId == defender.Id);
+        Assert.True(traceIndex < cueIndex);
+        Assert.True(cueIndex < factIndex);
     }
 
     [Fact]
@@ -1989,12 +1987,12 @@ public sealed class BattleEngineTests
         Assert.Equal(0, target.Rage);
         Assert.Empty(target.Buffs);
 
-        var damageEvent = Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        var damageEvent = Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == target.Id));
         Assert.Equal(0, damageEvent.Damage?.Amount ?? -1);
-        Assert.DoesNotContain(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.RageChanged &&
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.RageChanged &&
             battleEvent.UnitId == target.Id &&
             string.Equals(battleEvent.Detail, "OnDamageTaken:2", StringComparison.Ordinal));
     }
@@ -2043,8 +2041,8 @@ public sealed class BattleEngineTests
 
         Assert.True(result.Success);
         Assert.Equal(500, target.Hp);
-        var damageEvent = Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        var damageEvent = Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == target.Id));
         Assert.Equal(0, damageEvent.Damage?.Amount ?? -1);
     }
@@ -2288,12 +2286,12 @@ public sealed class BattleEngineTests
         var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
 
         Assert.True(result.Success);
-        var mainDamage = Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        var mainDamage = Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == target.Id &&
             string.Equals(battleEvent.Detail, source.Id, StringComparison.Ordinal))).Damage?.Amount ?? 0;
-        var extraDamage = Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        var extraDamage = Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == target.Id &&
             string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal))).Damage?.Amount ?? 0;
         Assert.Equal((int)(mainDamage * 0.6d), extraDamage);
@@ -2338,8 +2336,8 @@ public sealed class BattleEngineTests
 
         Assert.True(missResult.Success);
         Assert.Equal(500, missTarget.Hp);
-        Assert.DoesNotContain(missState.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        Assert.DoesNotContain(missResult.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal));
 
         var zeroChanceSource = CreateUnit(
@@ -2368,8 +2366,8 @@ public sealed class BattleEngineTests
             zeroChanceTarget.Position);
 
         Assert.True(zeroChanceResult.Success);
-        Assert.DoesNotContain(zeroChanceState.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        Assert.DoesNotContain(zeroChanceResult.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal));
 
         var lethalSource = CreateUnit(
@@ -2399,8 +2397,8 @@ public sealed class BattleEngineTests
 
         Assert.True(lethalResult.Success);
         Assert.False(lethalTarget.IsAlive);
-        Assert.DoesNotContain(lethalState.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        Assert.DoesNotContain(lethalResult.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal));
     }
 
@@ -2436,13 +2434,13 @@ public sealed class BattleEngineTests
         var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
 
         Assert.True(result.Success);
-        var mainDamage = Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        var mainDamage = Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == target.Id &&
             string.Equals(battleEvent.Detail, source.Id, StringComparison.Ordinal))).Damage?.Amount ?? 0;
-        var extraDamages = state.Events
+        var extraDamages = result.Messages.OfType<BattleFact>()
             .Where(battleEvent =>
-                battleEvent.Kind == BattleEventKind.Damaged &&
+                battleEvent.Kind == BattleFactKind.Damaged &&
                 battleEvent.UnitId == target.Id &&
                 string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal))
             .Select(battleEvent => battleEvent.Damage?.Amount ?? 0)
@@ -2485,11 +2483,11 @@ public sealed class BattleEngineTests
 
         Assert.True(result.Success);
         Assert.Equal(poison.Id, Assert.Single(target.Buffs).Definition.Id);
-        Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.BuffApplied &&
+        Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.BuffApplied &&
             battleEvent.UnitId == target.Id));
-        Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == target.Id &&
             string.Equals(battleEvent.Detail, "extra_strike", StringComparison.Ordinal)));
     }
@@ -2537,8 +2535,8 @@ public sealed class BattleEngineTests
 
         Assert.True(result.Success);
         Assert.Equal(500, target.Hp);
-        var damageEvent = Assert.Single(state.Events.Where(battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        var damageEvent = Assert.Single(result.Messages.OfType<BattleFact>().Where(battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == target.Id));
         Assert.Equal(0, damageEvent.Damage?.Amount ?? -1);
     }
@@ -2587,8 +2585,8 @@ public sealed class BattleEngineTests
 
         Assert.True(result.Success);
         Assert.True(target.Hp < 500);
-        Assert.DoesNotContain(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == target.Id &&
             battleEvent.Damage?.Amount == 0);
     }
@@ -2971,7 +2969,7 @@ public sealed class BattleEngineTests
         var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
 
         Assert.True(result.Success);
-        var speech = Assert.Single(state.Events, battleEvent => battleEvent.Kind == BattleEventKind.SpeechRequested);
+        var speech = Assert.Single(result.Messages.OfType<BattleCue>(), battleEvent => battleEvent.Kind == BattleCueKind.SpeechRequested);
         Assert.Equal(source.Id, speech.UnitId);
         Assert.Equal("无招胜有招!", speech.Speech?.Text);
     }
@@ -3014,7 +3012,7 @@ public sealed class BattleEngineTests
         var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
 
         Assert.True(result.Success);
-        Assert.DoesNotContain(state.Events, battleEvent => battleEvent.Kind == BattleEventKind.SpeechRequested);
+        Assert.DoesNotContain(result.Messages.OfType<BattleCue>(), battleEvent => battleEvent.Kind == BattleCueKind.SpeechRequested);
     }
 
     [Fact]
@@ -3055,7 +3053,7 @@ public sealed class BattleEngineTests
         var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
 
         Assert.True(result.Success);
-        var speech = Assert.Single(state.Events, battleEvent => battleEvent.Kind == BattleEventKind.SpeechRequested);
+        var speech = Assert.Single(result.Messages.OfType<BattleCue>(), battleEvent => battleEvent.Kind == BattleCueKind.SpeechRequested);
         Assert.Equal(HookTiming.AfterSkillCast, speech.Timing);
         Assert.Equal("剑随心动", speech.Speech?.Text);
     }
@@ -3249,7 +3247,7 @@ public sealed class BattleEngineTests
         var state = new BattleState(new BattleGrid(4, 4), [hero]);
         var engine = new BattleEngine();
 
-        Assert.Throws<InvalidOperationException>(() => engine.AdvanceUntilNextAction(state, maxTicks: 50));
+        Assert.False(engine.AdvanceUntilNextAction(state, maxTicks: 50).Success);
 
         Assert.Equal(1, hero.ItemCooldown);
     }

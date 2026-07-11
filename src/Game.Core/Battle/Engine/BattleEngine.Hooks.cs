@@ -39,7 +39,7 @@ public sealed partial class BattleEngine
         {
             if (recordEvents)
             {
-                AddEvent(state, new BattleEvent(BattleEventKind.HooksTriggered, unit.Id, timing, BuildHookLabels(hooks)));
+                AddMessage(state, new BattleTrace(BattleTraceKind.HooksTriggered, unit.Id, timing, BuildHookLabels(hooks), state.CurrentExecutionScope));
             }
 
             foreach (var hook in hooks)
@@ -62,7 +62,7 @@ public sealed partial class BattleEngine
 
             if (recordEvents)
             {
-                AddEvent(state, new BattleEvent(BattleEventKind.HooksTriggered, unit.Id, timing, BuildHookLabels(buffHooks)));
+                AddMessage(state, new BattleTrace(BattleTraceKind.HooksTriggered, unit.Id, timing, BuildHookLabels(buffHooks), state.CurrentExecutionScope));
             }
 
             var previousBuff = context.Buff;

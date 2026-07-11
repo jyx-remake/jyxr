@@ -7,13 +7,13 @@ internal static class BattleResourceResolver
     public static void AddRage(BattleState state, BattleUnit target, int value, HookTiming? timing = null)
     {
         target.AddRage(value);
-        state.AddEvent(new BattleEvent(BattleEventKind.RageChanged, target.Id, timing, Detail: value.ToString()));
+        state.AddMessage(new BattleFact(BattleFactKind.RageChanged, target.Id, timing, detail: value.ToString()));
     }
 
     public static void SetRage(BattleState state, BattleUnit target, int value, HookTiming? timing = null)
     {
         target.SetRage(value);
-        state.AddEvent(new BattleEvent(BattleEventKind.RageChanged, target.Id, timing, Detail: $"set:{value}"));
+        state.AddMessage(new BattleFact(BattleFactKind.RageChanged, target.Id, timing, detail: $"set:{value}"));
     }
 
     public static void SetActionGauge(BattleUnit target, int value) => target.SetActionGauge(value);
@@ -21,7 +21,7 @@ internal static class BattleResourceResolver
     public static int DamageMp(BattleState state, BattleUnit target, int value, HookTiming? timing = null, string? detail = null)
     {
         var actual = target.DamageMp(value);
-        state.AddEvent(new BattleEvent(BattleEventKind.MpDamaged, target.Id, timing, Detail: detail ?? actual.ToString()));
+        state.AddMessage(new BattleFact(BattleFactKind.MpDamaged, target.Id, timing, detail: detail ?? actual.ToString()));
         return actual;
     }
 }

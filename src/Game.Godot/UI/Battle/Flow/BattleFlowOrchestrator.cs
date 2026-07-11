@@ -80,7 +80,7 @@ internal sealed class BattleFlowOrchestrator
         }
 
         var rollbackResult = _engine.RollbackMove(State, actingUnit.Id);
-        _screen.AppendResult(rollbackResult, DrainBattleEvents());
+        _screen.AppendResult(rollbackResult);
         _screen.RefreshAll();
         return Task.CompletedTask;
     }
@@ -97,7 +97,7 @@ internal sealed class BattleFlowOrchestrator
         var movementPath = result.Success && State.CurrentAction is not null
             ? State.CurrentAction.MovementTrace.ToArray()
             : Array.Empty<GridPosition>();
-        _screen.AppendResult(result, DrainBattleEvents());
+        _screen.AppendResult(result);
         if (!result.Success)
         {
             _screen.RefreshAll();
@@ -118,15 +118,14 @@ internal sealed class BattleFlowOrchestrator
         }
 
         var result = _engine.CastSkill(State, actingUnit.Id, skill, target);
-        var events = DrainBattleEvents();
         if (!result.Success)
         {
-            _screen.AppendResult(result, events);
+            _screen.AppendResult(result);
             _screen.RefreshAll();
             return;
         }
 
-        await _screen.PlaySkillAsync(actingUnit, skill, result, events);
+        await _screen.PlaySkillAsync(actingUnit, skill, result);
         await ContinueAfterResolvedPlayerActionAsync();
     }
 
@@ -146,7 +145,7 @@ internal sealed class BattleFlowOrchestrator
             _screen.ApplyActingUnitFacing(actingUnit);
         }
 
-        _screen.AppendResult(result, DrainBattleEvents());
+        _screen.AppendResult(result);
         if (!result.Success)
         {
             _screen.RefreshAll();
@@ -166,7 +165,7 @@ internal sealed class BattleFlowOrchestrator
         }
 
         var result = _engine.Rest(State, actingUnit.Id);
-        _screen.AppendResult(result, DrainBattleEvents());
+        _screen.AppendResult(result);
         if (!result.Success)
         {
             _screen.RefreshAll();
@@ -185,7 +184,7 @@ internal sealed class BattleFlowOrchestrator
         }
 
         var result = _engine.EndAction(State, actingUnit.Id);
-        _screen.AppendResult(result, DrainBattleEvents());
+        _screen.AppendResult(result);
         if (!result.Success)
         {
             _screen.RefreshAll();
@@ -239,9 +238,9 @@ internal sealed class BattleFlowOrchestrator
     private BattleUnit AdvanceTimelineToNextAction()
     {
         _screen.ShowWaitingTimeline();
-        var actingUnit = _engine.AdvanceUntilNextAction(State);
-        _screen.AppendEvents(DrainBattleEvents());
-        return actingUnit;
+        var result = _engine.AdvanceUntilNextAction(State);
+        _screen.AppendMessages(result.Messages);
+        return result.Value ?? throw new InvalidOperationException("Timeline command returned no acting unit.");
     }
 
     private async Task HandlePlayerPostMoveAsync(BattleUnit actingUnit)
@@ -279,7 +278,7 @@ internal sealed class BattleFlowOrchestrator
             var movementPath = moveResult.Success && State.CurrentAction is not null
                 ? State.CurrentAction.MovementTrace.ToArray()
                 : Array.Empty<GridPosition>();
-            _screen.AppendResult(moveResult, DrainBattleEvents());
+            _screen.AppendResult(moveResult);
             if (moveResult.Success)
             {
                 await _screen.PlayMoveAsync(actingUnit, movementPath);
@@ -295,23 +294,17 @@ internal sealed class BattleFlowOrchestrator
             TryResolveSkill(actingUnit, plan.MainAction.SkillId) is { } skill)
         {
             var result = _engine.CastSkill(State, actingUnit.Id, skill, targetPosition);
-            var events = DrainBattleEvents();
             if (result.Success)
             {
-                await _screen.PlaySkillAsync(actingUnit, skill, result, events);
+                await _screen.PlaySkillAsync(actingUnit, skill, result);
                 return;
             }
 
-            _screen.AppendResult(result, events);
+            _screen.AppendResult(result);
         }
 
         var restResult = _engine.Rest(State, actingUnit.Id);
-        _screen.AppendResult(restResult, DrainBattleEvents());
-    }
-
-    private IReadOnlyList<BattleEvent> DrainBattleEvents()
-    {
-        return State.DrainEvents();
+        _screen.AppendResult(restResult);
     }
 
     private bool TryCompleteBattle()

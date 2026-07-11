@@ -60,7 +60,7 @@ public sealed partial class BattleEngine
         _battleExperienceEligibilityResolver = battleExperienceEligibilityResolver ?? DefaultBattleExperienceEligibilityResolver;
     }
 
-    private static BattleActionResult ValidateActingUnit(
+    private static (bool Success, string Message) ValidateActingUnit(
         BattleState state,
         string unitId,
         bool requireMainActionAvailable)
@@ -69,20 +69,20 @@ public sealed partial class BattleEngine
 
         if (state.CurrentAction is null)
         {
-            return BattleActionResult.Failed("No unit is acting.");
+            return (false, "No unit is acting.");
         }
 
         if (!string.Equals(state.CurrentAction.ActingUnitId, unitId, StringComparison.Ordinal))
         {
-            return BattleActionResult.Failed("It is not this unit's action.");
+            return (false, "It is not this unit's action.");
         }
 
         if (requireMainActionAvailable && state.CurrentAction.HasCommittedMainAction)
         {
-            return BattleActionResult.Failed("Main action has already been committed.");
+            return (false, "Main action has already been committed.");
         }
 
-        return BattleActionResult.Succeeded("Valid.");
+        return (true, "Valid.");
     }
 
     private void EndActionCore(BattleState state, BattleUnit unit, bool committedMainAction)
@@ -98,7 +98,7 @@ public sealed partial class BattleEngine
         unit.ActionGauge = Math.Max(0, unit.ActionGauge - ActionGaugeThreshold);
         state.CurrentAction = null;
 
-        AddEvent(state, new BattleEvent(BattleEventKind.ActionEnded, unit.Id));
+        AddMessage(state, new BattleFact(BattleFactKind.ActionEnded, unit.Id));
     }
 
     private static void UpdateFacingByMovement(BattleUnit unit, IReadOnlyList<GridPosition> path)
@@ -123,7 +123,7 @@ public sealed partial class BattleEngine
         }
     }
 
-    internal static void AddEvent(BattleState state, BattleEvent battleEvent) => state.AddEvent(battleEvent);
+    internal static void AddMessage(BattleState state, BattleMessage message) => state.AddMessage(message);
 
     internal IRandomService RandomService => _random;
 

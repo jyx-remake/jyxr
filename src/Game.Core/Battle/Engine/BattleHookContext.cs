@@ -153,11 +153,11 @@ public sealed class BattleHookContext :
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentException.ThrowIfNullOrWhiteSpace(text);
-        State.AddEvent(new BattleEvent(
-            BattleEventKind.FloatTextRequested,
+        State.AddMessage(new BattleCue(
+            BattleCueKind.FloatTextRequested,
             target.Id,
             Timing,
-            FloatText: new BattleFloatTextCue(text, style)));
+            floatText: new BattleFloatTextCue(text, style)));
     }
 
     public void RedirectDamage(BattleUnit target, double damageFactor)
@@ -203,7 +203,7 @@ public sealed class BattleHookContext :
             target,
             BattleRecoveryKind.Hp,
             amount);
-        State.AddEvent(new BattleEvent(BattleEventKind.Healed, target.Id, Detail: detail ?? restored.ToString()));
+        State.AddMessage(new BattleFact(BattleFactKind.Healed, target.Id, detail: detail ?? restored.ToString()));
         return restored;
     }
 
@@ -213,7 +213,7 @@ public sealed class BattleHookContext :
         ArgumentOutOfRangeException.ThrowIfNegative(amount);
 
         var drained = target.DamageMp(amount);
-        State.AddEvent(new BattleEvent(BattleEventKind.MpDamaged, target.Id, Detail: detail ?? drained.ToString()));
+        State.AddMessage(new BattleFact(BattleFactKind.MpDamaged, target.Id, detail: detail ?? drained.ToString()));
         return drained;
     }
 

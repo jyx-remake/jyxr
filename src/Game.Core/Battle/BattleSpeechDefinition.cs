@@ -64,11 +64,11 @@ public static class BattleSpeechRuntime
             return;
         }
 
-        state.AddEvent(new BattleEvent(
-            BattleEventKind.SpeechRequested,
+        state.AddMessage(new BattleCue(
+            BattleCueKind.SpeechRequested,
             speaker.Id,
             timing,
-            Speech: new BattleSpeechCue(text)));
+            speech: new BattleSpeechCue(text)));
     }
 
     public static string? FormatText(

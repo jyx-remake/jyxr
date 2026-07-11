@@ -5,7 +5,8 @@ namespace Game.Core.Battle;
 public sealed class BattleState
 {
     private readonly List<BattleUnit> _units;
-    private readonly List<BattleEvent> _events = [];
+    private List<BattleMessage>? _commandMessages;
+    private int _commandDepth;
     private int _effectDepth;
     private long _effectSequence;
 
@@ -49,20 +50,6 @@ public sealed class BattleState
 
     public IReadOnlyList<BattleUnit> Units => _units;
 
-    public IReadOnlyList<BattleEvent> Events => _events;
-
-    public IReadOnlyList<BattleEvent> DrainEvents()
-    {
-        if (_events.Count == 0)
-        {
-            return [];
-        }
-
-        var events = _events.ToArray();
-        _events.Clear();
-        return events;
-    }
-
     public BattleActionContext? CurrentAction { get; internal set; }
 
     public long Tick { get; internal set; }
@@ -97,7 +84,38 @@ public sealed class BattleState
     public IReadOnlyList<BattleUnit> GetLivingUnits() =>
         _units.Where(static unit => unit.IsAlive).ToList();
 
-    internal void AddEvent(BattleEvent battleEvent) => _events.Add(battleEvent);
+    internal void AddMessage(BattleMessage message)
+    {
+        if (_commandMessages is null)
+        {
+            throw new InvalidOperationException("Battle messages can only be emitted while a command is executing.");
+        }
+
+        _commandMessages.Add(message);
+    }
+
+    internal BattleCommandScope BeginCommand()
+    {
+        _commandMessages ??= [];
+        _commandDepth++;
+        return new BattleCommandScope(this, _commandMessages.Count);
+    }
+
+    internal sealed class BattleCommandScope(BattleState state, int startIndex) : IDisposable
+    {
+        private bool _disposed;
+
+        public IReadOnlyList<BattleMessage> Messages =>
+            state._commandMessages?.Skip(startIndex).ToArray() ?? [];
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            state._commandDepth--;
+            if (state._commandDepth == 0) state._commandMessages = null;
+            _disposed = true;
+        }
+    }
 
     internal IDisposable EnterEffect(string ruleSource)
     {

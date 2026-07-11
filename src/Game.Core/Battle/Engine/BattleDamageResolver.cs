@@ -79,12 +79,12 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
         }
 
         var actualAmount = applicationContext.Target.TakeDamage(applicationContext.ProposedAmount);
-        BattleEngine.AddEvent(state, new BattleEvent(
-            BattleEventKind.Damaged,
+        BattleEngine.AddMessage(state, new BattleFact(
+            BattleFactKind.Damaged,
             applicationContext.Target.Id,
             eventTiming,
-            Detail: detail ?? source.Id,
-            Damage: new BattleDamageEvent(actualAmount, isCritical, source.Id)));
+            detail: detail ?? source.Id,
+            damage: new BattleDamageEvent(actualAmount, isCritical, source.Id)));
 
         if (actualAmount > 0)
         {

@@ -4,10 +4,33 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
-    public BattleActionContext? BeginAction(BattleState state, string unitId)
+    public BattleCommandResult<BattleActionContext?> BeginAction(BattleState state, string unitId)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
+        using var command = state.BeginCommand();
+
+        if (TryGetBeginActionFailure(state, unitId) is { } failure)
+        {
+            return BattleCommandResult<BattleActionContext?>.Failed(failure, command.Messages);
+        }
+
+        var context = BeginActionCore(state, unitId);
+        return BattleCommandResult<BattleActionContext?>.Succeeded(context, command.Messages);
+    }
+
+    private static string? TryGetBeginActionFailure(BattleState state, string unitId)
+    {
+        if (state.CurrentAction is not null) return "A unit is already acting.";
+        var unit = state.GetUnit(unitId);
+        if (!unit.IsAlive) return $"Unit '{unit.Id}' is defeated.";
+        if (unit.ActionGauge < ActionGaugeThreshold) return $"Unit '{unit.Id}' is not ready to act.";
+        if (unit.HasBuff(BattleContentIds.Stun)) return $"Unit '{unit.Id}' is stunned and cannot act.";
+        return null;
+    }
+
+    private BattleActionContext? BeginActionCore(BattleState state, string unitId)
+    {
 
         if (state.CurrentAction is not null)
         {
@@ -40,18 +63,20 @@ public sealed partial class BattleEngine
             return null;
         }
 
-        AddEvent(state, new BattleEvent(BattleEventKind.ActionStarted, unit.Id));
+        AddMessage(state, new BattleFact(BattleFactKind.ActionStarted, unit.Id));
         return context;
     }
 
-    public BattleUnit AdvanceUntilNextAction(BattleState state, int maxTicks = 100_000)
+    public BattleCommandResult<BattleUnit> AdvanceUntilNextAction(BattleState state, int maxTicks = 100_000)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentOutOfRangeException.ThrowIfLessThan(maxTicks, 1);
+        using var command = state.BeginCommand();
 
         if (state.CurrentAction is not null)
         {
-            throw new InvalidOperationException("Cannot advance timeline while a unit is acting.");
+            return BattleCommandResult<BattleUnit>.Failed(
+                "Cannot advance timeline while a unit is acting.", command.Messages);
         }
 
         for (var i = 0; i < maxTicks; i++)
@@ -64,9 +89,9 @@ public sealed partial class BattleEngine
                     continue;
                 }
 
-                if (BeginAction(state, ready.Id) is not null)
+                if (BeginActionCore(state, ready.Id) is not null)
                 {
-                    return ready;
+                    return BattleCommandResult<BattleUnit>.Succeeded(ready, command.Messages);
                 }
 
                 continue;
@@ -76,7 +101,8 @@ public sealed partial class BattleEngine
             AdvanceTimelineTick(state);
         }
 
-        throw new InvalidOperationException("No unit became actionable before maxTicks was reached.");
+        return BattleCommandResult<BattleUnit>.Failed(
+            "No unit became actionable before maxTicks was reached.", command.Messages);
     }
 
     private static BattleUnit? SelectReadyUnit(BattleState state) =>
@@ -103,7 +129,7 @@ public sealed partial class BattleEngine
     {
         unit.ActionGauge = 0d;
         state.CurrentAction = null;
-        state.AddEvent(new BattleEvent(BattleEventKind.ActionSkipped, unit.Id, Detail: reason));
+        state.AddMessage(new BattleFact(BattleFactKind.ActionSkipped, unit.Id, detail: reason));
     }
 
     private void AdvanceTimelineTick(BattleState state)

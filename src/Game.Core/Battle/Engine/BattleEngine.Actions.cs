@@ -8,38 +8,39 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
-    public BattleActionResult CastSkill(BattleState state, string unitId, SkillInstance skill, GridPosition target)
+    public BattleCommandResult<BattleActionResult> CastSkill(BattleState state, string unitId, SkillInstance skill, GridPosition target)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(skill);
+        using var command = state.BeginCommand();
 
         var validation = ValidateActingUnit(state, unitId, requireMainActionAvailable: true);
         if (!validation.Success)
         {
-            return validation;
+            return BattleCommandResult<BattleActionResult>.Failed(validation.Message, command.Messages);
         }
 
         var unit = state.GetUnit(unitId);
         if (!ReferenceEquals(skill.Owner, unit.Character))
         {
-            return BattleActionResult.Failed("Skill does not belong to acting unit.");
+            return BattleCommandResult<BattleActionResult>.Failed("Skill does not belong to acting unit.", command.Messages);
         }
 
         if (!skill.IsActive)
         {
-            return BattleActionResult.Failed("Skill is not active.");
+            return BattleCommandResult<BattleActionResult>.Failed("Skill is not active.", command.Messages);
         }
 
         var availability = EvaluateSkillAvailabilityCore(state, unit, skill);
         if (!availability.IsAvailable)
         {
-            return BattleActionResult.Failed(GetSkillUnavailableMessage(availability));
+            return BattleCommandResult<BattleActionResult>.Failed(GetSkillUnavailableMessage(availability), command.Messages);
         }
 
         var mpCost = ResolveSkillMpCostExecute(state, unit, skill);
         if (unit.Mp < mpCost)
         {
-            return BattleActionResult.Failed("Not enough MP.");
+            return BattleCommandResult<BattleActionResult>.Failed("Not enough MP.", command.Messages);
         }
 
         var resolvedSkill = _legendSkillResolver.Resolve(_legendSkillsProvider(), skill, _random);
@@ -48,14 +49,14 @@ public sealed partial class BattleEngine
 
         if (unit.Rage < resolvedSkill.RageCost)
         {
-            return BattleActionResult.Failed("Not enough rage.");
+            return BattleCommandResult<BattleActionResult>.Failed("Not enough rage.", command.Messages);
         }
 
         var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, resolvedSkill);
         var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, resolvedSkill);
         if (unit.Position.ManhattanDistanceTo(target) > castSize)
         {
-            return BattleActionResult.Failed("Target is out of cast range.");
+            return BattleCommandResult<BattleActionResult>.Failed("Target is out of cast range.", command.Messages);
         }
 
         TriggerHooks(state, HookTiming.BeforeSkillCast, unit, context =>
@@ -85,52 +86,49 @@ public sealed partial class BattleEngine
             targets,
             BattleSkillExecutionPlanFactory.Create(resolvedSkill));
 
-        var battleEvent = new BattleEvent(
-            BattleEventKind.SkillCast,
+        var battleEvent = new BattleFact(
+            BattleFactKind.SkillCast,
             unit.Id,
-            Detail: resolvedSkill.Id,
-            SkillCast: skillCastInfo);
-        AddEvent(state, battleEvent);
+            detail: resolvedSkill.Id,
+            skillCast: skillCastInfo);
+        AddMessage(state, battleEvent);
         TriggerHooks(state, HookTiming.AfterSkillCast, unit, context =>
         {
             context.Source = unit;
             context.Skill = resolvedSkill;
         });
-        var skillExperienceEvents = TryGainSkillExperience(state, unit, skill);
-        var characterExperienceEvents = TryGainCharacterExperience(state, unit);
+        TryGainSkillExperience(state, unit, skill);
+        TryGainCharacterExperience(state, unit);
         unit.RecordUsedSkill(skill.Id);
         EndActionCore(state, unit, committedMainAction: true);
-        return BattleActionResult.Succeeded(
-            string.Empty,
-            targets.Select(static targetUnit => targetUnit.Id).ToList(),
-            [battleEvent, .. skillExperienceEvents, .. characterExperienceEvents],
-            impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList(),
-            skillCastInfo);
+        return BattleCommandResult<BattleActionResult>.Succeeded(
+            new BattleActionResult(
+                targets.Select(static targetUnit => targetUnit.Id).ToList(),
+                impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList(),
+                skillCastInfo),
+            command.Messages);
     }
 
-    private IReadOnlyList<BattleEvent> TryGainSkillExperience(
+    private void TryGainSkillExperience(
         BattleState state,
         BattleUnit unit,
         SkillInstance usedSkill)
     {
         if (!_battleExperienceEligibilityResolver(unit))
         {
-            return [];
+            return;
         }
 
         var experience = SkillExperienceProgression.CalculateBattleUseExperience(unit.Character);
-        var events = new List<BattleEvent>();
         var progressedSkills = new HashSet<SkillInstance>(ReferenceEqualityComparer.Instance);
-        TryGainSkillExperience(state, unit, usedSkill, experience, progressedSkills, events);
+        TryGainSkillExperience(state, unit, usedSkill, experience, progressedSkills);
 
         var equippedInternalSkill = unit.Character.GetInternalSkills()
             .FirstOrDefault(static skill => skill.IsEquipped);
         if (equippedInternalSkill is not null)
         {
-            TryGainSkillExperience(state, unit, equippedInternalSkill, experience, progressedSkills, events);
+            TryGainSkillExperience(state, unit, equippedInternalSkill, experience, progressedSkills);
         }
-
-        return events;
     }
 
     private void TryGainSkillExperience(
@@ -138,8 +136,7 @@ public sealed partial class BattleEngine
         BattleUnit unit,
         SkillInstance skill,
         int experience,
-        HashSet<SkillInstance> progressedSkills,
-        List<BattleEvent> events)
+        HashSet<SkillInstance> progressedSkills)
     {
         if (SkillExperienceProgression.NormalizeProgressionSkill(skill) is not { } progressSkill ||
             !progressedSkills.Add(progressSkill))
@@ -157,25 +154,24 @@ public sealed partial class BattleEngine
         }
 
         unit.ClampResourcesToLimits();
-        var battleEvent = new BattleEvent(
-            BattleEventKind.SkillLeveledUp,
+        var battleEvent = new BattleFact(
+            BattleFactKind.SkillLeveledUp,
             unit.Id,
-            SkillExperience: new BattleSkillExperienceEvent(
+            skillExperience: new BattleSkillExperienceEvent(
                 progressSkill.Id,
                 progressSkill.Name,
                 progressSkill.SkillKind,
                 change.AddedExperience,
                 change.OldLevel,
                 change.NewLevel));
-        AddEvent(state, battleEvent);
-        events.Add(battleEvent);
+        AddMessage(state, battleEvent);
     }
 
-    private IReadOnlyList<BattleEvent> TryGainCharacterExperience(BattleState state, BattleUnit unit)
+    private void TryGainCharacterExperience(BattleState state, BattleUnit unit)
     {
         if (!_battleExperienceEligibilityResolver(unit))
         {
-            return [];
+            return;
         }
 
         var change = CharacterExperienceProgression.TryAddExperience(
@@ -185,21 +181,20 @@ public sealed partial class BattleEngine
             () => _characterGrowTemplateResolver(unit.Character));
         if (!change.LeveledUp)
         {
-            return [];
+            return;
         }
 
         unit.ClampResourcesToLimits();
-        var battleEvent = new BattleEvent(
-            BattleEventKind.CharacterLeveledUp,
+        var battleEvent = new BattleFact(
+            BattleFactKind.CharacterLeveledUp,
             unit.Id,
-            CharacterExperience: new BattleCharacterExperienceEvent(
+            characterExperience: new BattleCharacterExperienceEvent(
                 unit.Character.Id,
                 unit.Character.Name,
                 change.AddedExperience,
                 change.OldLevel,
                 change.NewLevel));
-        AddEvent(state, battleEvent);
-        return [battleEvent];
+        AddMessage(state, battleEvent);
     }
 
     private void TryRequestSpecialSkillSpeech(
@@ -221,7 +216,7 @@ public sealed partial class BattleEngine
             _ => "Skill is not available.",
         };
 
-    public BattleActionResult UseItem(
+    public BattleCommandResult<BattleActionResult> UseItem(
         BattleState state,
         string unitId,
         ItemDefinition item,
@@ -230,41 +225,42 @@ public sealed partial class BattleEngine
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(item);
         ArgumentException.ThrowIfNullOrWhiteSpace(targetUnitId);
+        using var command = state.BeginCommand();
 
         var validation = ValidateActingUnit(state, unitId, requireMainActionAvailable: true);
         if (!validation.Success)
         {
-            return validation;
+            return BattleCommandResult<BattleActionResult>.Failed(validation.Message, command.Messages);
         }
 
         var unit = state.GetUnit(unitId);
         var target = state.TryGetUnit(targetUnitId);
         if (target is null || !target.IsAlive)
         {
-            return BattleActionResult.Failed("Invalid item target.");
+            return BattleCommandResult<BattleActionResult>.Failed("Invalid item target.", command.Messages);
         }
 
         if (target.Id != unit.Id)
         {
             if (state.AreEnemies(unit, target))
             {
-                return BattleActionResult.Failed("Items cannot target enemies.");
+                return BattleCommandResult<BattleActionResult>.Failed("Items cannot target enemies.", command.Messages);
             }
 
             if (!unit.HasTrait(TraitId.CanUseItemOnAlly))
             {
-                return BattleActionResult.Failed("Unit cannot use items on allies.");
+                return BattleCommandResult<BattleActionResult>.Failed("Unit cannot use items on allies.", command.Messages);
             }
 
             if (unit.Position.ManhattanDistanceTo(target.Position) > 2)
             {
-                return BattleActionResult.Failed("Ally item target is out of range.");
+                return BattleCommandResult<BattleActionResult>.Failed("Ally item target is out of range.", command.Messages);
             }
         }
         var useItemCooldown = IsItemCooldownEnabled(state.RuleSettings);
         if (useItemCooldown && target.ItemCooldown > 0 && !unit.HasTrait(TraitId.IgnoreItemCooldown))
         {
-            return BattleActionResult.Failed($"Item is cooling down. Remaining turns: {target.ItemCooldown}.");
+            return BattleCommandResult<BattleActionResult>.Failed($"Item is cooling down. Remaining turns: {target.ItemCooldown}.", command.Messages);
         }
 
         TriggerHooks(state, HookTiming.BeforeItemUse, unit);
@@ -275,24 +271,26 @@ public sealed partial class BattleEngine
         }
         UpdateFacingByTarget(unit, target.Position);
 
-        var battleEvent = new BattleEvent(BattleEventKind.ItemUsed, unit.Id, Detail: item.Id);
-        AddEvent(state, battleEvent);
+        var battleEvent = new BattleFact(BattleFactKind.ItemUsed, unit.Id, detail: item.Id);
+        AddMessage(state, battleEvent);
         TriggerHooks(state, HookTiming.AfterItemUse, unit);
         EndActionCore(state, unit, committedMainAction: true);
-        return BattleActionResult.Succeeded("Item used.", [target.Id], [battleEvent]);
+        return BattleCommandResult<BattleActionResult>.Succeeded(
+            new BattleActionResult([target.Id], []), command.Messages, "Item used.");
     }
 
     private static bool IsItemCooldownEnabled(BattleRuleSettings ruleSettings) =>
         !ruleSettings.EnableDifficultyItemCooldownRules ||
         ruleSettings.Difficulty != GameDifficulty.Normal;
 
-    public BattleActionResult Rest(BattleState state, string unitId)
+    public BattleCommandResult<BattleActionResult> Rest(BattleState state, string unitId)
     {
         ArgumentNullException.ThrowIfNull(state);
+        using var command = state.BeginCommand();
         var validation = ValidateActingUnit(state, unitId, requireMainActionAvailable: true);
         if (!validation.Success)
         {
-            return validation;
+            return BattleCommandResult<BattleActionResult>.Failed(validation.Message, command.Messages);
         }
 
         var unit = state.GetUnit(unitId);
@@ -312,27 +310,30 @@ public sealed partial class BattleEngine
             BattleRecoveryKind.Mp,
             recovery.Mp);
 
-        var battleEvent = new BattleEvent(
-            BattleEventKind.Rested,
+        var battleEvent = new BattleFact(
+            BattleFactKind.Rested,
             unit.Id,
-            Rest: new BattleRestRecovery(restoredHp, restoredMp));
-        AddEvent(state, battleEvent);
+            rest: new BattleRestRecovery(restoredHp, restoredMp));
+        AddMessage(state, battleEvent);
         TriggerHooks(state, HookTiming.AfterRest, unit);
         EndActionCore(state, unit, committedMainAction: true);
-        return BattleActionResult.Succeeded(string.Empty, [unit.Id], [battleEvent]);
+        return BattleCommandResult<BattleActionResult>.Succeeded(
+            new BattleActionResult([unit.Id], []), command.Messages);
     }
 
-    public BattleActionResult EndAction(BattleState state, string unitId)
+    public BattleCommandResult<BattleActionResult> EndAction(BattleState state, string unitId)
     {
         ArgumentNullException.ThrowIfNull(state);
+        using var command = state.BeginCommand();
         var validation = ValidateActingUnit(state, unitId, requireMainActionAvailable: false);
         if (!validation.Success)
         {
-            return validation;
+            return BattleCommandResult<BattleActionResult>.Failed(validation.Message, command.Messages);
         }
 
         var unit = state.GetUnit(unitId);
         EndActionCore(state, unit, committedMainAction: false);
-        return BattleActionResult.Succeeded("Action ended.", [unit.Id]);
+        return BattleCommandResult<BattleActionResult>.Succeeded(
+            new BattleActionResult([unit.Id], []), command.Messages, "Action ended.");
     }
 }

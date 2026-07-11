@@ -85,7 +85,7 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
                 foreach (var target in targets)
                 {
                     var actual = engine.RestoreBattleResource(state, source, target, BattleRecoveryKind.Hp, hp.Value);
-                    state.AddEvent(new BattleEvent(BattleEventKind.Healed, target.Id, timing, Detail: actual.ToString()));
+                    state.AddMessage(new BattleFact(BattleFactKind.Healed, target.Id, timing, detail: actual.ToString()));
                 }
                 break;
             case AddMpBattleEffectDefinition mp:

@@ -169,10 +169,10 @@ public sealed class BattleRuleTests
 
         Assert.True(result.Success);
         Assert.Equal(500, hero.Hp);
-        Assert.Empty(result.AffectedUnitIds);
-        Assert.Contains(state.Events, battleEvent => battleEvent.Kind == BattleEventKind.SkillCast);
-        Assert.DoesNotContain(state.Events, battleEvent =>
-            battleEvent.Kind == BattleEventKind.Damaged &&
+        Assert.Empty(result.Value!.AffectedUnitIds);
+        Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent => battleEvent is BattleFact { Kind: BattleFactKind.SkillCast });
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == hero.Id);
     }
 
