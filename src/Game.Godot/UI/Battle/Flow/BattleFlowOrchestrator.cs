@@ -58,12 +58,12 @@ internal sealed class BattleFlowOrchestrator
         await ContinueBattleFlowAsync();
     }
 
-    public void Surrender()
+    public async Task SurrenderAsync()
     {
         _autoBattleEnabled = false;
         _forcedBattleResult = false;
         _screen.AppendLog("我方选择投降。");
-        _screen.ShowBattleEnded(isWin: false);
+        await _screen.ShowBattleEndedAsync(isWin: false);
     }
 
     public void SetAutoBattleEnabled(bool enabled)
@@ -206,7 +206,7 @@ internal sealed class BattleFlowOrchestrator
         {
             while (true)
             {
-                if (TryCompleteBattle())
+                if (await TryCompleteBattleAsync())
                 {
                     return;
                 }
@@ -245,7 +245,7 @@ internal sealed class BattleFlowOrchestrator
 
     private async Task HandlePlayerPostMoveAsync(BattleUnit actingUnit)
     {
-        if (TryCompleteBattle())
+        if (await TryCompleteBattleAsync())
         {
             return;
         }
@@ -261,7 +261,7 @@ internal sealed class BattleFlowOrchestrator
 
     private async Task ContinueAfterResolvedPlayerActionAsync()
     {
-        if (TryCompleteBattle())
+        if (await TryCompleteBattleAsync())
         {
             return;
         }
@@ -282,7 +282,7 @@ internal sealed class BattleFlowOrchestrator
             if (moveResult.Success)
             {
                 await _screen.PlayMoveAsync(actingUnit, movementPath);
-                if (TryCompleteBattle())
+                if (await TryCompleteBattleAsync())
                 {
                     return;
                 }
@@ -307,12 +307,12 @@ internal sealed class BattleFlowOrchestrator
         _screen.AppendResult(restResult);
     }
 
-    private bool TryCompleteBattle()
+    private async Task<bool> TryCompleteBattleAsync()
     {
         if (_forcedBattleResult is { } forcedBattleResult)
         {
             _autoBattleEnabled = false;
-            _screen.ShowBattleEnded(forcedBattleResult);
+            await _screen.ShowBattleEndedAsync(forcedBattleResult);
             return true;
         }
 
@@ -323,7 +323,7 @@ internal sealed class BattleFlowOrchestrator
         }
 
         _autoBattleEnabled = false;
-        _screen.ShowBattleEnded(IsPlayerVictory(outcome));
+        await _screen.ShowBattleEndedAsync(IsPlayerVictory(outcome));
         return true;
     }
 

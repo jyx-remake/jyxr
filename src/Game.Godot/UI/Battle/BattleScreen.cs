@@ -36,6 +36,7 @@ public partial class BattleScreen : Control
 	private BattleState? _state;
 	private BattleFlowOrchestrator? _orchestrator;
 	private bool _isConfigured;
+	private Task _startTask = Task.CompletedTask;
 	private bool _isResolvingSkillPresentation;
 	private BattleSettlementController _settlementController = null!;
 	private BattleSettingsController _settingsController = null!;
@@ -160,12 +161,25 @@ public partial class BattleScreen : Control
 
 		if (_isConfigured)
 		{
-			StartBattle();
+			_startTask = StartBattleAsync();
 		}
 	}
 
 	public async Task<bool> AwaitBattleAsync(CancellationToken cancellationToken = default)
-		=> await _settlementController.AwaitAsync(cancellationToken);
+	{
+		var completionTask = _settlementController.AwaitAsync(cancellationToken);
+		try
+		{
+			await _startTask.WaitAsync(cancellationToken);
+			return await completionTask;
+		}
+		catch
+		{
+			_settlementController.Cancel();
+			if (GodotObject.IsInstanceValid(this)) QueueFree();
+			throw;
+		}
+	}
 
 	public override void _ExitTree()
 	{
@@ -174,7 +188,7 @@ public partial class BattleScreen : Control
 		_settlementController.Cancel();
 	}
 
-	private async void StartBattle()
+	private async Task StartBattleAsync()
 	{
 		if (_battleDefinition is null || _battleRequest is null)
 		{
@@ -242,7 +256,7 @@ public partial class BattleScreen : Control
 
 		if (IsInsideTree())
 		{
-			StartBattle();
+			_startTask = StartBattleAsync();
 		}
 	}
 
@@ -253,14 +267,14 @@ public partial class BattleScreen : Control
 		_eventPresenter.AppendMessages(messages);
 
 	internal void AppendLog(string text) => _eventPresenter.AppendLog(text);
-	private void SurrenderBattle()
+	private async void SurrenderBattle()
 	{
 		if (_uiState.Mode == BattleUiMode.BattleEnded || _orchestrator is null)
 		{
 			return;
 		}
 
-		_orchestrator.Surrender();
+		await _orchestrator.SurrenderAsync();
 		RefreshAll();
 	}
 
@@ -289,8 +303,8 @@ public partial class BattleScreen : Control
 		RefreshAll();
 	}
 
-	internal void ShowBattleEnded(bool isWin) =>
-		_settlementController.Complete(isWin, _state, _battleRequest);
+	internal Task ShowBattleEndedAsync(bool isWin) =>
+		_settlementController.CompleteAsync(isWin, _state, _battleRequest);
 
 	internal void ApplyActingUnitFacing(BattleUnit actingUnit) => _boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
 

@@ -26,32 +26,37 @@ internal sealed class BattleSettlementController(
         return await _completion.Task;
     }
 
-    public async void Complete(bool isWin, BattleState? state, SpecialBattleRequest? request)
+    public async Task CompleteAsync(bool isWin, BattleState? state, SpecialBattleRequest? request)
     {
         if (_isEnding) return;
         _isEnding = true;
-        endUiState();
-        appendLog(isWin ? "战斗胜利。" : "战斗失败。");
-
-        OrdinaryBattleVictorySettlement? settlement = null;
-        if (state is not null && request is not null)
-        {
-            GameRoot.BattleService.ApplyPlayerBattleCarryover(state);
-            if (isWin)
-            {
-                settlement = GameRoot.BattleService.PreviewVictorySettlement(state, request);
-                GameRoot.BattleService.ApplyOrdinaryVictorySettlement(state, settlement);
-            }
-        }
-
-        refresh();
         try
         {
+            endUiState();
+            appendLog(isWin ? "战斗胜利。" : "战斗失败。");
+
+            OrdinaryBattleVictorySettlement? settlement = null;
+            if (state is not null && request is not null)
+            {
+                GameRoot.BattleService.ApplyPlayerBattleCarryover(state);
+                if (isWin)
+                {
+                    settlement = GameRoot.BattleService.PreviewVictorySettlement(state, request);
+                    GameRoot.BattleService.ApplyOrdinaryVictorySettlement(state, settlement);
+                }
+            }
+
+            refresh();
             await ShowPanelAsync(isWin, settlement);
+            _completion.TrySetResult(isWin);
+        }
+        catch (Exception exception)
+        {
+            _completion.TrySetException(exception);
         }
         finally
         {
-            if (_completion.TrySetResult(isWin) && GodotObject.IsInstanceValid(owner)) owner.QueueFree();
+            if (GodotObject.IsInstanceValid(owner)) owner.QueueFree();
         }
     }
 
