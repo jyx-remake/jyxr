@@ -115,23 +115,24 @@ internal sealed record CustomBattleEffectInvocation(
 
 internal static class BattleEffectCapabilityPolicy
 {
+    private static readonly IReadOnlyDictionary<Type, HookTiming> SupportedTimings =
+        new Dictionary<Type, HookTiming>
+        {
+            [typeof(IDamageCalculationEffectContext)] = HookTiming.BeforeDamageCalculation,
+            [typeof(IHitResultEffectContext)] = HookTiming.BeforeHitResolved,
+            [typeof(IDamageApplicationEffectContext)] = HookTiming.BeforeDamageApplied,
+            [typeof(IDamageTakenEffectContext)] = HookTiming.OnDamageTaken,
+            [typeof(IRecoveryEffectContext)] = HookTiming.BeforeRecoveryResolved,
+            [typeof(ISkillCostEffectContext)] = HookTiming.BeforeSkillCost,
+            [typeof(IBuffApplicationEffectContext)] = HookTiming.BeforeBuffApplied,
+            [typeof(IActionStartEffectContext)] = HookTiming.BeforeActionStart,
+        };
+
     public static bool Supports<TContext>(HookTiming timing)
-        where TContext : class, IBattleEffectContext =>
-        typeof(TContext) == typeof(IDamageCalculationEffectContext)
-            ? timing == HookTiming.BeforeDamageCalculation
-            : typeof(TContext) == typeof(IHitResultEffectContext)
-                ? timing == HookTiming.BeforeHitResolved
-            : typeof(TContext) == typeof(IDamageApplicationEffectContext)
-                ? timing == HookTiming.BeforeDamageApplied
-                : typeof(TContext) == typeof(IDamageTakenEffectContext)
-                    ? timing == HookTiming.OnDamageTaken
-                    : typeof(TContext) == typeof(IRecoveryEffectContext)
-                        ? timing == HookTiming.BeforeRecoveryResolved
-                        : typeof(TContext) == typeof(ISkillCostEffectContext)
-                            ? timing == HookTiming.BeforeSkillCost
-                            : typeof(TContext) == typeof(IBuffApplicationEffectContext)
-                                ? timing == HookTiming.BeforeBuffApplied
-                : typeof(TContext) == typeof(IActionStartEffectContext)
-                    ? timing == HookTiming.BeforeActionStart
-                    : typeof(TContext) == typeof(IBattleEffectContext);
+        where TContext : class, IBattleEffectContext
+    {
+        var contextType = typeof(TContext);
+        return contextType == typeof(IBattleEffectContext) ||
+            SupportedTimings.TryGetValue(contextType, out var supportedTiming) && supportedTiming == timing;
+    }
 }
