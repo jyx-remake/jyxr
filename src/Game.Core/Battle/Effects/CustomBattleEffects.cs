@@ -85,6 +85,9 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("drunkenness", new DrunkennessBattleEffectHandler());
         registry.Register("zhenwu_formation_attack", new ZhenwuFormationAttackBattleEffectHandler());
         registry.Register("zhenwu_formation_intercept", new ZhenwuFormationInterceptBattleEffectHandler());
+        registry.Register("careful_defense", new CarefulDefenseBattleEffectHandler());
+        registry.Register("shifting_stars_reflection", new ShiftingStarsReflectionBattleEffectHandler());
+        registry.Register("eternal_spring", new EternalSpringBattleEffectHandler());
         registry.Register("survive_at_one_hp", new SurviveAtOneHpBattleEffectHandler());
         registry.Register("qi_shield_defeat_prevention", new QiShieldDefeatPreventionBattleEffectHandler());
         registry.Register("endless_fighting_spirit", new EndlessFightingSpiritBattleEffectHandler());
@@ -189,6 +192,7 @@ internal static class BattleEffectCapabilityPolicy
             [typeof(IDamageCalculationEffectContext)] = HookTiming.BeforeDamageCalculation,
             [typeof(IHitResultEffectContext)] = HookTiming.BeforeHitResolved,
             [typeof(IDamageApplicationEffectContext)] = HookTiming.BeforeDamageApplied,
+            [typeof(IDamageApplicationRuntimeContext)] = HookTiming.BeforeDamageApplied,
             [typeof(IDamageTakenEffectContext)] = HookTiming.OnDamageTaken,
             [typeof(IDefeatPreventionEffectContext)] = HookTiming.BeforeDefeated,
             [typeof(IRecoveryEffectContext)] = HookTiming.BeforeRecoveryResolved,

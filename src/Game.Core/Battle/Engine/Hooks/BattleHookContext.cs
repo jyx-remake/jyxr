@@ -20,7 +20,8 @@ public sealed class BattleHookContext :
     IRecoveryEffectContext,
     ISkillCostEffectContext,
     IBuffApplicationEffectContext,
-    IActionStartEffectContext
+    IActionStartEffectContext,
+    IDamageApplicationRuntimeContext
 {
     internal BattleHookContext(
         BattleEngine engine,
@@ -196,6 +197,30 @@ public sealed class BattleHookContext :
         DamageAmount = Math.Max(0, (int)((DamageAmount ?? 0) * damageFactor));
     }
 
+    public void CapDamage(int maximum)
+    {
+        if (Timing != HookTiming.BeforeDamageApplied)
+        {
+            throw new InvalidOperationException(
+                $"Damage can only be capped during '{HookTiming.BeforeDamageApplied}'.");
+        }
+
+        ArgumentOutOfRangeException.ThrowIfNegative(maximum);
+        DamageAmount = Math.Min(DamageAmount ?? 0, maximum);
+    }
+
+    public void CancelDamage(bool suppressHitEffects)
+    {
+        if (Timing != HookTiming.BeforeDamageApplied)
+        {
+            throw new InvalidOperationException(
+                $"Damage can only be cancelled during '{HookTiming.BeforeDamageApplied}'.");
+        }
+
+        DamageAmount = 0;
+        SuppressHitEffects |= suppressHitEffects;
+    }
+
     public void PreventDefeat(string abilityId)
     {
         if (Timing != HookTiming.BeforeDefeated)
@@ -267,5 +292,20 @@ public sealed class BattleHookContext :
         State.AddMessage(new BattleFact(BattleFactKind.MpDamaged, target.Id, detail: detail ?? drained.ToString()));
         return drained;
     }
+
+    int IDamageApplicationRuntimeContext.ApplyDirectDamage(
+        BattleUnit target,
+        int amount,
+        string? detail) => Damage(target, amount, detail);
+
+    int IDamageApplicationRuntimeContext.ApplyHpRecovery(
+        BattleUnit target,
+        int amount,
+        string? detail) => RestoreHp(target, amount, detail);
+
+    int IDamageApplicationRuntimeContext.ApplyMpDamage(
+        BattleUnit target,
+        int amount,
+        string? detail) => DamageMp(target, amount, detail);
 
 }

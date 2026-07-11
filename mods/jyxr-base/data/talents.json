@@ -1,0 +1,4067 @@
+[
+  {
+    "id": "万年长春",
+    "name": "万年长春",
+    "point": 15,
+    "description": "提升不老长春功回血概率。"
+  },
+  {
+    "id": "不稳定的六脉神剑",
+    "name": "不稳定的六脉神剑",
+    "point": 0,
+    "description": "段誉时灵时不灵的六脉神剑，但爆发起来威力很恐怖。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "六脉神剑"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack_low",
+            "op": "more",
+            "delta": 0.5
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack_high",
+            "op": "more",
+            "delta": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "还是不能随心所欲施展…… ",
+            "六脉神剑，给我挣点气呀",
+            "啊呀，对不起！"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "不老长春",
+    "name": "不老长春",
+    "point": 60,
+    "description": "永葆青春的神奇功法，一定概率将受到的伤害转为气血。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageApplied",
+        "priority": 100,
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "eternal_spring",
+            "parameters": {
+              "enhancedTalentId": "万年长春",
+              "chance": 0.1,
+              "enhancedChance": 0.2,
+              "recoveryFactor": 0.35,
+              "floatText": "不老长春回血"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "乾坤大挪移",
+    "name": "乾坤大挪移",
+    "point": 80,
+    "description": "防御圣品，一定概率伤害减半。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "chance",
+            "value": 0.5
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "final_damage",
+            "op": "more",
+            "delta": 0.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "我挪！",
+            "乾坤大挪移！",
+            "打不疼我"
+          ],
+          "chance": 0.15
+        }
+      }
+    ]
+  },
+  {
+    "id": "乾坤大挪移奥义",
+    "name": "乾坤大挪移奥义",
+    "point": 80,
+    "description": "防御圣品，受到伤害减半。",
+    "replaceTalentIds": [
+      "乾坤大挪移"
+    ],
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "final_damage",
+            "op": "more",
+            "delta": 0.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "铜墙铁壁！（乾坤大挪移奥义发动）",
+            "乾坤大挪移奥义式！",
+            "打不疼我（乾坤大挪移奥义发动）"
+          ],
+          "chance": 0.15
+        }
+      }
+    ]
+  },
+  {
+    "id": "五行阵",
+    "name": "五行阵",
+    "point": 15,
+    "description": "腾挪移遁的高明阵法，当周围有队友受伤时，发动阵法分担其所受伤害。"
+  },
+  {
+    "id": "令狐冲的怪病",
+    "name": "令狐冲的怪病",
+    "point": 0,
+    "description": "令狐冲的怪病让他咳嗽不止。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.4
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "illness",
+            "parameters": {
+              "protectorCharacterId": "平一指",
+              "skipReason": "令狐冲的怪病"
+            }
+          }
+        ],
+        "floatText": {
+          "text": "咳嗽..",
+          "style": "Harmful"
+        }
+      }
+    ]
+  },
+  {
+    "id": "伤口撕裂",
+    "name": "伤口撕裂",
+    "point": 30,
+    "description": "无穷无尽地撕裂伤口，造成伤害会随着攻击次数不断累积增大。"
+  },
+  {
+    "id": "俗家弟子",
+    "name": "俗家弟子",
+    "point": 5,
+    "description": "随着等级的提高，有一定概率忽略对方一定数额防御力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "chance",
+            "value": 0.3
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 0.8,
+            "deltaPerUnitLevel": -0.005
+          }
+        ],
+        "speech": {
+          "lines": [
+            "少林美名天下传",
+            "内练一口气，外练筋骨皮",
+            "看我少林俗家弟子的厉害"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "倚天屠龙",
+    "name": "倚天屠龙",
+    "point": 75,
+    "description": "每回合有一定概率获得圣战状态。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.2
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "self"
+            },
+            "buffId": "圣战",
+            "level": 2,
+            "duration": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "光明圣火阵",
+    "name": "光明圣火阵",
+    "point": 10,
+    "description": "明教顶级阵法，置于阵法之中，几乎不受任何负面效果影响。"
+  },
+  {
+    "id": "八卦阵",
+    "name": "八卦阵",
+    "point": 15,
+    "description": "腾挪移遁的高明阵法，当自己收到伤害时，将80%的伤害转移给范围内一名随机队友。"
+  },
+  {
+    "id": "刀封印",
+    "name": "刀封印",
+    "point": 20,
+    "description": "攻击一定概率造成刀封印效果。"
+  },
+  {
+    "id": "刀法增益",
+    "name": "刀法增益",
+    "point": 5,
+    "description": "刀法威力增加5%",
+    "affixes": [
+      {
+        "type": "weapon_bonus_modifier",
+        "weaponType": "daofa",
+        "value": {
+          "op": "more",
+          "delta": 1.05
+        }
+      }
+    ]
+  },
+  {
+    "id": "刀系装备",
+    "name": "刀系装备",
+    "point": 0,
+    "description": "使用刀法以外的武功，有伤害减益。"
+  },
+  {
+    "id": "刚柔并济",
+    "name": "刚柔并济",
+    "point": 0,
+    "description": "略微提高武当派所有武学威力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "太极拳",
+              "太极剑",
+              "绵掌",
+              "玄虚刀法",
+              "倚天屠龙笔法",
+              "柔云剑法",
+              "绕指柔剑",
+              "神门十三剑",
+              "绝户虎爪手"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.1,
+            "deltaMax": 1.2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "以静制动，以柔克刚",
+            "辩位于尺寸毫厘，制动于擒扑封闭",
+            "太极生圆"
+          ],
+          "chance": 0.3
+        }
+      }
+    ]
+  },
+  {
+    "id": "剑封印",
+    "name": "剑封印",
+    "point": 20,
+    "description": "攻击一定概率造成剑封印效果。"
+  },
+  {
+    "id": "剑法增益",
+    "name": "剑法增益",
+    "point": 5,
+    "description": "剑法威力增加5%",
+    "affixes": [
+      {
+        "type": "weapon_bonus_modifier",
+        "weaponType": "jianfa",
+        "value": {
+          "op": "more",
+          "delta": 1.05
+        }
+      }
+    ]
+  },
+  {
+    "id": "剑系装备",
+    "name": "剑系装备",
+    "point": 0,
+    "description": "使用剑法以外的武功，有伤害减益。"
+  },
+  {
+    "id": "化功大法",
+    "name": "化功大法",
+    "point": 40,
+    "description": "攻击可以有概率化去对方大量内力。"
+  },
+  {
+    "id": "北冥真气",
+    "name": "北冥真气",
+    "point": 10,
+    "description": "北冥神功精义，使用内功为北冥神功时，攻击提高80%，防御提高100%",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_equipped_internal_skill",
+            "internalSkillIds": [
+              "北冥神功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "北冥真气护体，岂是轻易可破。"
+          ],
+          "chance": 0.25
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_unit_equipped_internal_skill",
+            "internalSkillIds": [
+              "北冥神功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.8
+          }
+        ],
+        "speech": {
+          "lines": [
+            "且试试我北冥真气的厉害。"
+          ],
+          "chance": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "北冥神功",
+    "name": "北冥神功",
+    "point": 0,
+    "description": "攻击带有吸取大量内力效果。"
+  },
+  {
+    "id": "医仙",
+    "name": "医仙",
+    "point": 70,
+    "description": "医仙周围的队友每回合回复一定生命。"
+  },
+  {
+    "id": "博览群书",
+    "name": "博览群书",
+    "point": 80,
+    "description": "大幅增加奥义的发动几率。",
+    "affixes": [
+      {
+        "type": "trait",
+        "traitId": "BroadLearning"
+      }
+    ]
+  },
+  {
+    "id": "右臂有伤",
+    "name": "右臂有伤",
+    "point": 5,
+    "description": "小伤而已，不碍事！攻击力降低5%，怒气每回合额外增加1",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "effects": [
+          {
+            "type": "add_rage",
+            "target": {
+              "type": "self"
+            },
+            "value": 1
+          }
+        ]
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 0.95
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "吴侬软语",
+    "name": "吴侬软语",
+    "point": 50,
+    "description": "在唱出吴侬软语时，可以使所有敌人陶醉而晕眩。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "AfterSkillCast",
+        "conditions": [
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "吴侬软语"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "all_enemies"
+            },
+            "buffId": "晕眩",
+            "level": 0,
+            "duration": 2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "风轻轻，柳青青，侬的怒气快平息~"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "吴钩霜雪",
+    "name": "吴钩霜雪",
+    "point": 0,
+    "description": "太玄神功施展范围+3"
+  },
+  {
+    "id": "吸星大法",
+    "name": "吸星大法",
+    "point": 50,
+    "description": "令江湖中人闻之色变的吸星大法，攻击时吸收一定内力，并造成封穴效果，使对方无法恢复内力。"
+  },
+  {
+    "id": "哀歌",
+    "name": "哀歌",
+    "point": 70,
+    "description": "哀声四起，降低周围敌人的攻击力。"
+  },
+  {
+    "id": "嗜血狂魔",
+    "name": "嗜血狂魔",
+    "point": 5,
+    "description": "随着等级逐步提升，提高吸血效果。"
+  },
+  {
+    "id": "嗜酒如命",
+    "name": "嗜酒如命",
+    "point": 15,
+    "description": "每回合有一定概率进入醉酒状态。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.15
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "self"
+            },
+            "buffId": "醉酒",
+            "level": 2,
+            "duration": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "墨家传人",
+    "name": "墨家传人",
+    "point": 0,
+    "description": "战国墨家的世代传人，使用墨家古武术附加随机不良状态"
+  },
+  {
+    "id": "大小姐",
+    "name": "大小姐",
+    "point": 5,
+    "description": "任性的大小姐，大家都必须围着她团团转。降低所有场上队友能力，提高自己能力，俗称坑队友。坑得越多，自己越强。"
+  },
+  {
+    "id": "大理世家",
+    "name": "大理世家",
+    "point": 10,
+    "description": "大理世族的象征，相关武学威力提升。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "六脉神剑",
+              "一阳指"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.2,
+            "deltaMax": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "无形剑气！",
+            "大理段氏的威名!",
+            "我戳死你!"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "天龙.盖世英雄",
+    "name": "天龙.盖世英雄",
+    "point": 10,
+    "description": "乔峰专属天赋，出手惊风雷，提升乔峰相关的武学威力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "降龙十八掌",
+              "擒龙功",
+              "易筋经",
+              "打狗棒法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.2,
+            "deltaMax": 1.8
+          }
+        ],
+        "speech": {
+          "lines": [
+            "龙战于野！",
+            "或跃在渊!",
+            "吃我这一招!"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "太极宗师",
+    "name": "太极宗师",
+    "point": 30,
+    "description": "对太极的掌握已经达到无我的境界，能够最大效率的发挥以柔克刚的效果。太极系武功增加20%伤害，15%暴击概率，装备太极神功、纯阳无极功防御力提高20%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_equipped_internal_skill",
+            "internalSkillIds": [
+              "太极神功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 1.2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "意体相随！",
+            "四两拨千斤！"
+          ],
+          "chance": 0.15
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_equipped_internal_skill",
+            "internalSkillIds": [
+              "纯阳无极功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 1.2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "我几十年的童子身不是白守的！",
+            "纯阳无极功"
+          ],
+          "chance": 0.2
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "太极"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.2
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.15
+          }
+        ],
+        "speech": {
+          "lines": [
+            "意体相随！",
+            "四两拨千斤！",
+            "以柔克刚！",
+            "左右野马分鬃",
+            "白鹤晾翅",
+            "左揽雀尾"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "太极高手",
+    "name": "太极高手",
+    "point": 10,
+    "description": "精通太极，太极剑、太极拳暴击概率增加25%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "太极"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.25
+          }
+        ],
+        "speech": {
+          "lines": [
+            "以柔克刚！",
+            "左右野马分鬃",
+            "白鹤晾翅",
+            "左揽雀尾"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "夫妻同心",
+    "name": "夫妻同心",
+    "point": 0,
+    "description": "场上若己方有一男一女同时拥有【夫妻同心】天赋，则两人攻防提高随机20%到100%"
+  },
+  {
+    "id": "奇门增益",
+    "name": "奇门增益",
+    "point": 5,
+    "description": "奇门威力增加5%",
+    "affixes": [
+      {
+        "type": "weapon_bonus_modifier",
+        "weaponType": "qimen",
+        "value": {
+          "op": "more",
+          "delta": 1.05
+        }
+      }
+    ]
+  },
+  {
+    "id": "奇门封印",
+    "name": "奇门封印",
+    "point": 20,
+    "description": "攻击一定概率造成奇门封印效果。"
+  },
+  {
+    "id": "奇门装备",
+    "name": "奇门装备",
+    "point": 0,
+    "description": "使用奇门以外的武功，有伤害减益。"
+  },
+  {
+    "id": "奇门遁甲",
+    "name": "奇门遁甲",
+    "point": 50,
+    "description": "擅长奇门五行之术，增加9%的闪避概率，极大的增加自己的攻击命中率。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "chance",
+            "value": 0.09
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "看我五行之术！"
+          ],
+          "chance": 0.5
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_hit_state",
+            "state": "miss"
+          },
+          {
+            "type": "chance",
+            "value": 0.8
+          }
+        ],
+        "effects": [
+          {
+            "type": "set_hit_success"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "看我五行之术！"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "奋战",
+    "name": "奋战",
+    "point": 35,
+    "description": "浴血奋战，战斗力随着血量减少大幅度提高。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_unit_hp_ratio",
+            "maxInclusive": 0.3
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.5
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "more",
+            "delta": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "杀杀杀！",
+            "跟我来！"
+          ],
+          "chance": 0.2
+        }
+      }
+    ]
+  },
+  {
+    "id": "好色",
+    "name": "好色",
+    "point": 0,
+    "description": "见一个爱一个。对女性的攻击力提高，防御力降低。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_unit_gender",
+            "role": "target",
+            "genders": [
+              "female"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "花姑娘，大大的！",
+            "哟西，花姑娘 ",
+            "美女，我所欲也"
+          ],
+          "chance": 0.15
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_gender",
+            "role": "source",
+            "genders": [
+              "female"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 0.8
+          }
+        ],
+        "speech": {
+          "speaker": "source",
+          "lines": [
+            "色狼，受死吧！",
+            "讨厌！"
+          ],
+          "chance": 0.15
+        }
+      }
+    ]
+  },
+  {
+    "id": "妙手仁心",
+    "name": "妙手仁心",
+    "point": 50,
+    "description": "对药物属性了如指掌，使用药物无CD。",
+    "affixes": [
+      {
+        "type": "trait",
+        "traitId": "IgnoreItemCooldown"
+      }
+    ]
+  },
+  {
+    "id": "孤独求败",
+    "name": "孤独求败",
+    "point": 80,
+    "description": "站在武林巅峰，几乎洞悉一切敌人的弱点。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "chance",
+            "value": 0.05
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "我立于天下武学的巅峰！ (天赋*孤独求败发动)"
+          ],
+          "chance": 0.2
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "chance",
+            "value": 0.3
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 0.3
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.25
+          }
+        ],
+        "speech": {
+          "lines": [
+            "洞悉一切弱点",
+            "你不是我的对手",
+            "我，站在天下武学之巅"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "宝甲",
+    "name": "宝甲",
+    "point": 5,
+    "description": "穿上这护身宝甲就觉着安全。受到的伤害减少5%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "final_damage",
+            "op": "more",
+            "delta": 0.95
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "寒冰真气",
+    "name": "寒冰真气",
+    "point": 50,
+    "description": "攻击有一定概率附加重度麻痹效果。"
+  },
+  {
+    "id": "寸长寸强",
+    "name": "寸长寸强",
+    "point": 30,
+    "description": "增加一格攻击距离。"
+  },
+  {
+    "id": "射雕英雄",
+    "name": "射雕英雄",
+    "point": 10,
+    "description": "郭靖专属天赋，提升郭靖相关武学威力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "降龙十八掌",
+              "打狗棒法",
+              "九阴神功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.2,
+            "deltaMax": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "蓉儿，看我的!",
+            "侠之大者，为国为民",
+            "呵！！"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "屌丝",
+    "name": "屌丝",
+    "point": 0,
+    "description": "带上这个草帽就成为屌丝了，据说能增加屌丝逆袭的概率。",
+    "affixes": [
+      {
+        "type": "legend_skill_chance_modifier",
+        "skillId": "草头百姓的逆袭.百姓也有春天-野球拳",
+        "value": {
+          "op": "add",
+          "delta": 0.1
+        }
+      },
+      {
+        "type": "legend_skill_chance_modifier",
+        "skillId": "草头百姓的逆袭.这下子逆天了-野球拳",
+        "value": {
+          "op": "add",
+          "delta": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "峨眉宗师",
+    "name": "峨眉宗师",
+    "point": 0,
+    "description": "郭襄专属天赋，大幅度提高与峨眉派及郭襄相关武学威力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "飘雪穿云掌",
+              "四象掌",
+              "佛光普照",
+              "截手九式",
+              "峨眉剑法",
+              "回风拂柳剑",
+              "灭剑绝剑",
+              "九阴白骨爪",
+              "霹雳雷火弹",
+              "落英神剑掌",
+              "玉箫剑法",
+              "弹指神通"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.5,
+            "deltaMax": 3.0
+          }
+        ],
+        "speech": {
+          "lines": [
+            "庄生晓梦迷蝴蝶，望帝春心托杜鹃...",
+            "佛光普照空悲切,西子捧心谁能绝!",
+            "貂蝉拜月望不断,昭君出塞意缠绵!"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "左右互搏",
+    "name": "左右互搏",
+    "point": 70,
+    "description": "周伯通原汁原味的左右互搏之术，每回合攻击较高几率造成两次伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "extra_strike",
+            "target": {
+              "type": "target"
+            },
+            "chance": 0.3,
+            "damageFactors": [0.6]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "左手剑",
+    "name": "左手剑",
+    "point": 10,
+    "description": "什么？你说用右手？？增加伤害5%，降低暴击概率2%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.05
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": -0.02
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "幽居",
+    "name": "幽居",
+    "point": 5,
+    "description": "随着等级逐步提升，提高多重攻击的概率。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "extra_strike",
+            "target": {
+              "type": "target"
+            },
+            "chance": 0.075,
+            "damageFactors": [0.6]
+          }
+        ]
+      }
+    ]
+  },
+    {
+      "id": "异世人",
+      "name": "异世人",
+      "point": 0,
+      "description": "来自另外一个世界的神秘人，具有深不见底的潜力。在危机时刻能够爆发出最大的能力。",
+      "replaceTalentIds": [
+        "奋战"
+      ],
+      "affixes": [
+        {
+          "type": "hook",
+          "timing": "BeforeDamageCalculation",
+          "conditions": [
+            {
+              "type": "context_unit_role",
+              "role": "source"
+            },
+            {
+              "type": "context_unit_hp_ratio",
+              "maxInclusive": 0.2
+            }
+          ],
+          "effects": [
+            {
+              "type": "modify_damage_context",
+              "field": "source_attack",
+              "op": "more",
+              "delta": 2.0
+            },
+            {
+              "type": "modify_damage_context",
+              "field": "critical_chance",
+              "op": "more",
+              "delta": 2.0
+            }
+          ],
+          "speech": {
+            "lines": [
+              "来自异世的威力！",
+              "天外飞仙！"
+            ],
+            "chance": 0.2
+          }
+        },
+        {
+          "type": "hook",
+          "timing": "BeforeDamageCalculation",
+          "conditions": [
+            {
+              "type": "context_unit_role",
+              "role": "source"
+            },
+            {
+              "type": "context_unit_hp_ratio",
+              "minExclusive": 0.2,
+              "maxInclusive": 0.5
+            },
+            {
+              "type": "context_unit_effective_talent",
+              "talentIds": [
+                "草头百姓"
+              ]
+            }
+          ],
+          "effects": [
+            {
+              "type": "modify_damage_context",
+              "field": "source_attack",
+              "op": "more",
+              "delta": 2.0
+            },
+            {
+              "type": "modify_damage_context",
+              "field": "critical_chance",
+              "op": "more",
+              "delta": 2.0
+            }
+          ],
+          "speech": {
+            "lines": [
+              "来自异世的威力！",
+              "天外飞仙！"
+            ],
+            "chance": 0.2
+          }
+        },
+        {
+          "type": "hook",
+          "timing": "BeforeDamageCalculation",
+          "conditions": [
+            {
+              "type": "context_unit_role",
+              "role": "target"
+            },
+            {
+              "type": "context_unit_hp_ratio",
+              "maxInclusive": 0.2
+            }
+          ],
+          "effects": [
+            {
+              "type": "modify_damage_context",
+              "field": "target_defence",
+              "op": "more",
+              "delta": 1.5
+            }
+          ],
+          "speech": {
+            "lines": [
+              "绝不会倒下！",
+              "固若金汤！"
+            ],
+            "chance": 0.2
+          }
+        },
+        {
+          "type": "hook",
+          "timing": "BeforeDamageCalculation",
+          "conditions": [
+            {
+              "type": "context_unit_role",
+              "role": "target"
+            },
+            {
+              "type": "context_unit_hp_ratio",
+              "minExclusive": 0.2,
+              "maxInclusive": 0.5
+            },
+            {
+              "type": "context_unit_effective_talent",
+              "talentIds": [
+                "草头百姓"
+              ]
+            }
+          ],
+          "effects": [
+            {
+              "type": "modify_damage_context",
+              "field": "target_defence",
+              "op": "more",
+              "delta": 1.5
+            }
+          ],
+          "speech": {
+            "lines": [
+              "绝不会倒下！",
+              "固若金汤！"
+            ],
+            "chance": 0.2
+          }
+        }
+      ]
+    },
+  {
+    "id": "御剑",
+    "name": "御剑",
+    "point": 5,
+    "description": "随着等级逐步提升，提高暴击的概率和暴击伤害。"
+  },
+  {
+    "id": "御风",
+    "name": "御风",
+    "point": 5,
+    "description": "随着等级逐步提升，降低受到暴击的概率。"
+  },
+  {
+    "id": "心眼通明",
+    "name": "心眼通明",
+    "point": 10,
+    "description": "能够用心眼视物，致盲无效",
+    "affixes": [
+      {
+        "type": "trait",
+        "traitId": "MindEye"
+      }
+    ]
+  },
+  {
+    "id": "怒不可遏",
+    "name": "怒不可遏",
+    "point": 50,
+    "description": "怒气值将提高所有伤害，怒气越多，伤害越高。"
+  },
+  {
+    "id": "悲酥清风",
+    "name": "悲酥清风",
+    "point": 70,
+    "description": "悲酥清风！三步之内敌人内力大减。"
+  },
+  {
+    "id": "情花奇毒",
+    "name": "情花奇毒",
+    "point": 50,
+    "description": "攻击一定概率附加恐怖的情花奇毒。"
+  },
+  {
+    "id": "慕容世家",
+    "name": "慕容世家",
+    "point": 10,
+    "description": "斗转星移反弹几率大幅提升。"
+  },
+  {
+    "id": "我就是神",
+    "name": "我就是神",
+    "point": 15,
+    "description": "每场战斗的第一次【无尽斗志】必定判定成功。"
+  },
+  {
+    "id": "我是疯子",
+    "name": "我是疯子",
+    "point": 0,
+    "description": "逆运自身内功，所有造成的不良状态随机增加0-2的不良状态程度和持续时间。"
+  },
+  {
+    "id": "拳掌增益",
+    "name": "拳掌增益",
+    "point": 5,
+    "description": "拳掌威力增加5%",
+    "affixes": [
+      {
+        "type": "weapon_bonus_modifier",
+        "weaponType": "quanzhang",
+        "value": {
+          "op": "more",
+          "delta": 1.05
+        }
+      }
+    ]
+  },
+  {
+    "id": "拳掌封印",
+    "name": "拳掌封印",
+    "point": 20,
+    "description": "攻击一定概率造成拳掌封印效果。"
+  },
+  {
+    "id": "拳系装备",
+    "name": "拳系装备",
+    "point": 0,
+    "description": "使用拳法以外的武功，有伤害减益。"
+  },
+  {
+    "id": "摧筋破骨",
+    "name": "摧筋破骨",
+    "point": 60,
+    "description": "力大无穷的猛击直至筋骨深处，直接对气血上限造成打击。"
+  },
+  {
+    "id": "攀云乘龙",
+    "name": "攀云乘龙",
+    "point": 50,
+    "description": "一定概率造成基于身法值的真实伤害，身法值越高，伤害越高。"
+  },
+  {
+    "id": "救死扶伤",
+    "name": "救死扶伤",
+    "point": 30,
+    "description": "救死扶伤的高明医术，每回合对周围随机一名队友进行医治，不能对自己使用。"
+  },
+  {
+    "id": "斗转星移",
+    "name": "斗转星移",
+    "point": 80,
+    "description": "武学奇才慕容龙城所领悟的借力打力的神奇招式，一定概率反弹一定伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageApplied",
+        "priority": 200,
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "shifting_stars_reflection",
+            "parameters": {
+              "familyTalentId": "慕容世家",
+              "chance": 0.1,
+              "familyChance": 0.2,
+              "damageFactor": 0.25,
+              "floatText": "斗转星移",
+              "speech": "以彼之道，还施彼身！"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "斗魂",
+    "name": "斗魂",
+    "point": 40,
+    "description": "斗志昂扬，怒气增长效率翻倍。"
+  },
+  {
+    "id": "无尽斗志",
+    "name": "无尽斗志",
+    "point": 50,
+    "description": "濒死时有10%概率满气血、满内力、满怒气原地复活。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDefeated",
+        "priority": 100,
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "endless_fighting_spirit",
+            "parameters": {
+              "abilityId": "无尽斗志",
+              "guaranteedFirstTalentId": "我就是神",
+              "chance": 0.1,
+              "floatText": "原地满血复活!",
+              "speech": "天道不息，斗气不止！"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "无形剑气",
+    "name": "无形剑气",
+    "point": 0,
+    "description": "使用六脉神剑攻击时，附加基于敌我当前内力值差的真实伤害。"
+  },
+  {
+    "id": "无相",
+    "name": "无相",
+    "point": 5,
+    "description": "战斗中每回合有一定概率恢复生命值。"
+  },
+  {
+    "id": "易经伐髓",
+    "name": "易经伐髓",
+    "point": 0,
+    "description": "达摩菩提专属天赋，增加少林派武学威力",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "罗汉拳",
+              "韦陀棍",
+              "般若掌",
+              "拈花指",
+              "伏魔棍",
+              "达摩剑法",
+              "大金刚掌",
+              "如来千叶手",
+              "天竺佛指",
+              "须弥山掌",
+              "燃木刀法",
+              "龙爪手"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.2,
+            "deltaMax": 2.0
+          }
+        ],
+        "speech": {
+          "lines": [
+            "无色无相，无嗔无狂。",
+            "一花一世界，一叶一菩提。",
+            "扫地扫地扫心地，心地不扫空扫地。"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "普照",
+    "name": "普照",
+    "point": 50,
+    "description": "由自身强大的佛法向自己及身边队友进行治疗。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.4
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "nearby_allies",
+              "radius": 2,
+              "includeSelf": true
+            },
+            "buffId": "恢复",
+            "level": 2,
+            "duration": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "暴躁",
+    "name": "暴躁",
+    "point": 5,
+    "description": "火爆脾气，更容易受到致命一击，也更容易在战斗获得怒气。"
+  },
+  {
+    "id": "木婉清的眷恋",
+    "name": "木婉清的眷恋",
+    "point": 0,
+    "description": "木婉清出场的情况下，提升段誉所有武学的威力。"
+  },
+  {
+    "id": "武学奇才",
+    "name": "武学奇才",
+    "point": 10,
+    "description": "天生的武学奇才，经验值成长翻倍，来自技能、装备的兵器熟练度及角色属性加成翻倍。"
+  },
+  {
+    "id": "死生茫茫",
+    "name": "死生茫茫",
+    "point": 25,
+    "description": "一定几率吸收气血上限转化为自己的气血。"
+  },
+  {
+    "id": "段王爷的电眼",
+    "name": "段王爷的电眼",
+    "point": 20,
+    "description": "风流潇洒中年大叔镇南王段正淳的无敌电眼，对女性及太监极有杀伤力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_unit_gender",
+            "role": "target",
+            "genders": [
+              "female",
+              "eunuch"
+            ]
+          },
+          {
+            "type": "chance",
+            "value": 0.5
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "target"
+            },
+            "buffId": "晕眩",
+            "level": 0,
+            "duration": 2,
+            "chance": 100
+          }
+        ],
+        "speech": {
+          "speaker": "source",
+          "lines": [
+            "我段某人帅么~",
+            "哎呀，看我段某人给你秀秀~",
+            "我就是镇南王爷段正淳~"
+          ]
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_relation",
+            "role": "source",
+            "relation": "enemy"
+          },
+          {
+            "type": "context_unit_gender",
+            "role": "source",
+            "genders": [
+              "female",
+              "eunuch"
+            ]
+          },
+          {
+            "type": "chance",
+            "value": 0.5
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "speaker": "source",
+          "lines": [
+            "他好帅，真舍不得伤害他...(天赋*段王爷的电眼发动)"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "毒圣",
+    "name": "毒圣",
+    "point": 25,
+    "description": "用毒的老祖宗，用毒等级提高5。增加毒功持续时间。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeBuffApplied",
+        "conditions": [
+          {
+            "type": "context_buff_id",
+            "buffId": "中毒"
+          }
+        ],
+        "effects": [
+          {
+            "type": "strengthen_context_buff",
+            "levelDelta": 5,
+            "turnDelta": 4
+          }
+        ],
+        "speech": {
+          "lines": [
+            "无人能解！（天赋*毒圣发动)"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "毒系精通",
+    "name": "毒系精通",
+    "point": 10,
+    "description": "精通用毒的高手，用毒等级提高3。增加毒功持续时间。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeBuffApplied",
+        "conditions": [
+          {
+            "type": "context_buff_id",
+            "buffId": "中毒"
+          }
+        ],
+        "effects": [
+          {
+            "type": "strengthen_context_buff",
+            "levelDelta": 3,
+            "turnDelta": 2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "我毒！（天赋*毒系精通发动)"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "毒素抗性",
+    "name": "毒素抗性",
+    "point": 20,
+    "description": "中毒所受的伤害减少为50%",
+    "affixes": [
+      {
+        "type": "trait",
+        "traitId": "PoisonResistance"
+      }
+    ]
+  },
+  {
+    "id": "沾衣十八跌",
+    "name": "沾衣十八跌",
+    "point": 80,
+    "description": "高深玄妙的内家技巧，受到攻击时一定概率让攻击者晕眩。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_relation",
+            "role": "source",
+            "relation": "enemy"
+          },
+          {
+            "type": "chance",
+            "value": 0.1
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          },
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "source"
+            },
+            "buffId": "晕眩",
+            "level": 0,
+            "duration": 2,
+            "chance": 100
+          }
+        ],
+        "speech": {
+          "lines": [
+            "沾衣十八跌！"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "浪子剑客",
+    "name": "浪子剑客",
+    "point": 20,
+    "description": "令狐冲专属天赋，御剑技巧评估提高20%。",
+    "affixes": [
+      {
+        "type": "stat_modifier",
+        "stat": "jianfa",
+        "value": {
+          "op": "more",
+          "delta": 1.2
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeSkillCast",
+        "conditions": [
+          {
+            "type": "context_skill_weapon_type",
+            "weaponTypes": [
+              "jianfa"
+            ]
+          }
+        ],
+        "speech": {
+          "lines": [
+            "无招胜有招!",
+            "剑随心动"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "混元一气",
+    "name": "混元一气",
+    "point": 5,
+    "description": "对混元功融会贯通，混元功防御增加50%，混元掌暴击概率提高25%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_equipped_internal_skill",
+            "internalSkillIds": [
+              "混元功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "混元一气！",
+            "引气归田",
+            "抱元归一"
+          ],
+          "chance": 0.1
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "混元掌"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.25
+          }
+        ],
+        "speech": {
+          "lines": [
+            "混元一气！",
+            "引气归田",
+            "抱元归一"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "清心",
+    "name": "清心",
+    "point": 50,
+    "description": "清心寡欲，每回合有50%概率解除不良状态。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.5
+          }
+        ],
+        "effects": [
+          {
+            "type": "remove_negative_buffs",
+            "target": {
+              "type": "self"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "清风",
+    "name": "清风",
+    "point": 5,
+    "description": "随着等级逐步提升，提高每回合解除负面效果的概率。"
+  },
+  {
+    "id": "灵心慧质",
+    "name": "灵心慧质",
+    "point": 20,
+    "description": "对武学之掌握，收放自如，不会误伤队友。"
+  },
+  {
+    "id": "狗杂种",
+    "name": "狗杂种",
+    "point": 0,
+    "description": "石破天专属天赋，装备内功为罗汉伏魔神功或太玄神功时大幅度提高暴击概率及防御力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_equipped_internal_skill",
+            "internalSkillIds": [
+              "罗汉伏魔功",
+              "太玄神功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "add",
+            "delta": 250
+          }
+        ],
+        "speech": {
+          "lines": [
+            "不许叫我狗杂种！",
+            "狗杂种也能逆袭啊❤"
+          ],
+          "chance": 0.2
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_unit_equipped_internal_skill",
+            "internalSkillIds": [
+              "罗汉伏魔功",
+              "太玄神功"
+            ]
+          },
+          {
+            "type": "chance",
+            "value": 0.3
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.3
+          }
+        ],
+        "speech": {
+          "lines": [
+            "阿黄叫你回家吃饭啦！",
+            "不许叫我狗杂种！",
+            "狗杂种也能逆袭啊❤"
+          ],
+          "chance": 0.2
+        }
+      }
+    ]
+  },
+  {
+    "id": "猎人",
+    "name": "猎人",
+    "point": 5,
+    "description": "擅长捕猎，对动物系列具有额外的攻击加成。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_unit_gender",
+            "role": "target",
+            "genders": [
+              "animal"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "颤抖吧，猎物们！",
+            "我，是打猎的能手！"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "玄门罡气",
+    "name": "玄门罡气",
+    "point": 0,
+    "description": "装备内功为九阴真经时，攻击造成减少对手集气效果。"
+  },
+  {
+    "id": "玲珑璇玑",
+    "name": "玲珑璇玑",
+    "point": 0,
+    "description": "黄蓉专属天赋，增强黄蓉相关武学。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "打狗棒法",
+              "九阴神功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.2,
+            "deltaMax": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "靖哥哥，看我的!"
+          ],
+          "chance": 0.35
+        }
+      }
+    ]
+  },
+  {
+    "id": "琴胆剑心",
+    "name": "琴胆剑心",
+    "point": 40,
+    "description": "笑傲江湖，一路高歌。每回合一定几率提高周围队友攻击力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.4
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "nearby_allies",
+              "radius": 2,
+              "includeSelf": true
+            },
+            "buffId": "攻击强化",
+            "level": 3,
+            "duration": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "瘸子",
+    "name": "瘸子",
+    "point": 0,
+    "description": "这人竟是一个瘸子!移动距离下降1",
+    "affixes":[
+      {
+        "type": "stat_modifier",
+        "stat": "movement",
+        "value": {
+          "op": "add",
+          "delta": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "白内障",
+    "name": "白内障",
+    "point": 0,
+    "description": "让我穿针眼？算了吧！命中率下降10%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "chance",
+            "value": 0.1
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "让我穿针眼？算了吧！"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "百变千幻",
+    "name": "百变千幻",
+    "point": 75,
+    "description": "每回合有一定概率自动易容，可以藏于暗处伏击对手。"
+  },
+  {
+    "id": "百穴归一",
+    "name": "百穴归一",
+    "point": 50,
+    "description": "打通全身经脉，百穴归一，内力运转生生不息。每回合自动增加怒气和内力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "effects": [
+          {
+            "type": "add_rage",
+            "target": {
+              "type": "self"
+            },
+            "value": 1
+          },
+          {
+            "type": "add_mp",
+            "target": {
+              "type": "self"
+            },
+            "value": 125
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "百足之虫",
+    "name": "百足之虫",
+    "point": 50,
+    "description": "濒死时有20%概率保留1点气血。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDefeated",
+        "priority": 300,
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "survive_at_one_hp",
+            "parameters": {
+              "abilityId": "百足之虫",
+              "chance": 0.2,
+              "floatText": "不死",
+              "speech": "只要还有一口气，就不会轻易死去！"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "真武七截阵",
+    "name": "真武七截阵",
+    "point": 25,
+    "description": "武当派镇派绝技，威力可敌六十四位当世高手！(50%几率为队友挡刀，一定几率增强攻击杀伤力)",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "zhenwu_formation_attack",
+            "parameters": {
+              "formationTalentId": "真武七截阵",
+              "maxAttackIncrease": 0.1,
+              "floatText": "真武七截阵"
+            }
+          }
+        ]
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageApplied",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "zhenwu_formation_intercept",
+            "parameters": {
+              "formationTalentId": "真武七截阵",
+              "interceptChance": 0.5,
+              "damageFactor": 0.3,
+              "speech": "真武七截阵"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "真气护体",
+    "name": "真气护体",
+    "point": 50,
+    "description": "濒死且内力足够时，有50%概率消耗本次结算伤害两倍的内力并保留1点气血。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDefeated",
+        "priority": 200,
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "qi_shield_defeat_prevention",
+            "parameters": {
+              "abilityId": "真气护体",
+              "chance": 0.5,
+              "mpCostPerDamage": 2,
+              "floatText": "真气护体",
+              "speech": "猛提起一口真气，又有了几分精神！"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "破甲",
+    "name": "破甲",
+    "point": 40,
+    "description": "攻击有一定概率忽视对方一定数额护甲。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "chance",
+            "value": 0.3
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 0.9
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "post_add",
+            "delta": -70
+          }
+        ],
+        "speech": {
+          "lines": [
+            "看我致命一击！",
+            "无视护甲！"
+          ],
+          "chance": 0.3
+        }
+      }
+    ]
+  },
+  {
+    "id": "碎裂的怒吼",
+    "name": "碎裂的怒吼",
+    "point": 50,
+    "description": "惊天怒吼，施放奥义时一定概率造成周围敌人晕眩。"
+  },
+  {
+    "id": "神兵",
+    "name": "神兵",
+    "point": 5,
+    "description": "这把武器锋芒锐利的紧。伤害增加5%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.05
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "神拳无敌",
+    "name": "神拳无敌",
+    "point": 40,
+    "description": "对拳法的掌握达到入微的境界，提升拳法类伤害，并提升铁拳无双发动概率。",
+    "affixes": [
+      {
+        "type": "weapon_bonus_modifier",
+        "weaponType": "quanzhang",
+        "value": {
+          "op": "more",
+          "delta": 1.1
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeSkillCast",
+        "conditions": [
+          {
+            "type": "context_skill_weapon_type",
+            "weaponTypes": [
+              "quanzhang"
+            ]
+          }
+        ],
+        "speech": {
+          "lines": [
+            "一双铁拳打天下!",
+            "看谁的拳头更硬！"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "神经病",
+    "name": "神经病",
+    "point": 5,
+    "description": "我想抱抱你！攻击上限增加10%，遭到的伤害增加10%",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "final_damage",
+            "op": "more",
+            "delta": 1.1
+          }
+        ]
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack_high",
+            "op": "more",
+            "delta": 1.1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "神行百变",
+    "name": "神行百变",
+    "point": 80,
+    "description": "铁剑门轻功绝学，在生命值大于80%时，15%闪避概率。否则7%闪避概率。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_hp_ratio",
+            "minInclusive": 0.8
+          },
+          {
+            "type": "chance",
+            "value": 0.15
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "看我神行百变！"
+          ],
+          "chance": 0.5
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_hp_ratio",
+            "maxExclusive": 0.8
+          },
+          {
+            "type": "chance",
+            "value": 0.07
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "看我神行百变！"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "神雕大侠",
+    "name": "神雕大侠",
+    "point": 30,
+    "description": "作为神雕大侠的招牌武功，玄铁剑法和黯然销魂掌暴击概率提高25%，威力提高40%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "玄铁剑法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.3
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.25
+          }
+        ],
+        "speech": {
+          "lines": [
+            "重剑无锋，大巧不工。"
+          ]
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "黯然销魂掌"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.3
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.25
+          }
+        ],
+        "speech": {
+          "lines": [
+            "黯然销魂，唯别而已。"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "精打细算",
+    "name": "精打细算",
+    "point": 50,
+    "description": "心思缜密，回避致命伤害。提升暴击概率，一定概率将受到的伤害强制降为200点。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "chance",
+            "value": 0.25
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "more",
+            "deltaMin": 1.0,
+            "deltaMax": 2.0
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.0,
+            "deltaMax": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "你漫天要价,我落地还钱",
+            "九出十三归!"
+          ],
+          "chance": 0.1
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageApplied",
+        "priority": 300,
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "careful_defense",
+            "parameters": {
+              "mode": "careful",
+              "carefulTalentId": "精打细算",
+              "smartTalentId": "精明",
+              "carefulChance": 0.2,
+              "carefulDamageCap": 200,
+              "smartChance": 0.25,
+              "smartDamageCap": 500,
+              "carefulSpeech": "嘿嘿，你可伤不到我。",
+              "smartSpeech": "这一招太狠了，我得躲开一点。"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "精明",
+    "name": "精明",
+    "point": 30,
+    "description": "心思缜密，回避致命伤害。提升暴击概率，一定概率将受到的伤害强制降为500点，多余伤害转化为内力伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "more",
+            "deltaMin": 1.0,
+            "deltaMax": 1.5
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.0,
+            "deltaMax": 1.3
+          }
+        ],
+        "speech": {
+          "lines": [
+            "想要骗我不容易",
+            "说好的倍伤呢?"
+          ],
+          "chance": 0.025
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageApplied",
+        "priority": 300,
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "careful_defense",
+            "parameters": {
+              "mode": "smart",
+              "carefulTalentId": "精打细算",
+              "smartTalentId": "精明",
+              "carefulChance": 0.2,
+              "carefulDamageCap": 200,
+              "smartChance": 0.25,
+              "smartDamageCap": 500,
+              "carefulSpeech": "嘿嘿，你可伤不到我。",
+              "smartSpeech": "这一招太狠了，我得躲开一点。"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "素心神剑",
+    "name": "素心神剑",
+    "point": 70,
+    "description": "小龙女由于机缘巧合所领悟的左右互搏之术，每回合攻击一定几率造成两次伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "extra_strike",
+            "target": {
+              "type": "target"
+            },
+            "chance": 0.1,
+            "damageFactors": [0.6]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "老江湖",
+    "name": "老江湖",
+    "point": 5,
+    "description": "这位老江湖很沉稳，降低攻击上限，提高攻击下限。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack_low",
+            "op": "more",
+            "delta": 1.2
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack_high",
+            "op": "more",
+            "delta": 0.9
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "自我主义",
+    "name": "自我主义",
+    "point": 25,
+    "description": "为了达到目的，不管队友死活。降低所有场上队友能力，提高自己能力，俗称坑队友。坑得越多，自己越强。"
+  },
+  {
+    "id": "臭叫花",
+    "name": "臭叫花",
+    "point": 20,
+    "description": "只有被称为臭叫花的人才对打狗棒法精要具有绝对的掌握。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "打狗棒法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.2
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "叫花子人穷志不穷！",
+            "这年头叫花子也不好当啊。"
+          ],
+          "chance": 0.2
+        }
+      }
+    ]
+  },
+  {
+    "id": "臭蛤蟆",
+    "name": "臭蛤蟆",
+    "point": 10,
+    "description": "只有被称为臭蛤蟆的人才对蛤蟆功精要具有绝对的掌握。"
+  },
+  {
+    "id": "至刚至阳",
+    "name": "至刚至阳",
+    "point": 60,
+    "description": "大幅度增加内功阳性适性。"
+  },
+  {
+    "id": "至空至明",
+    "name": "至空至明",
+    "point": 10,
+    "description": "被攻击时有一定概率冷却所有技能。"
+  },
+  {
+    "id": "芷若的眷念",
+    "name": "芷若的眷念",
+    "point": 0,
+    "description": "峨眉掌门周芷若，用她卓绝的武功帮助她的夫君上阵杀敌。(张无忌攻击增加10%)",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.1
+          }
+        ],
+        "speech": {
+          "lines": [
+            "芷若，看我的！",
+            "芷若，我永不会忘记汉江之遇。"
+          ],
+          "chance": 0.2
+        }
+      }
+    ]
+  },
+  {
+    "id": "苦命儿",
+    "name": "苦命儿",
+    "point": 5,
+    "description": "他生来便是为了受苦，而受苦会让他更坚强。防御力增加30",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "add",
+            "delta": 30
+          }
+        ]
+      }
+    ]
+  },
+    {
+      "id": "草头百姓",
+      "name": "草头百姓",
+      "point": 0,
+      "description": "证明你是无门无派的草头小百姓，据说有着神秘的意义。（触发野球拳奥义，提高异世人触发血线比例）"
+  },
+  {
+    "id": "血海魔功",
+    "name": "血海魔功",
+    "point": 25,
+    "description": "使用血刀大法增加20%吸血能力"
+  },
+  {
+    "id": "血魔刀法",
+    "name": "血魔刀法",
+    "point": 15,
+    "description": "使用血刀大法增加15%吸血能力"
+  },
+  {
+    "id": "诸般封印",
+    "name": "诸般封印",
+    "point": 80,
+    "description": "精通奇经八脉，攻击一定概率造成诸般封印效果。"
+  },
+  {
+    "id": "赵敏的眷念",
+    "name": "赵敏的眷念",
+    "point": 0,
+    "description": "蒙元郡主赵敏精通百家武学，提醒她的夫君敌之所长。（张无忌闪避+10%）",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "chance",
+            "value": 0.1
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "敏敏，我没事的！ (天赋*赵敏的眷念发动)"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "越女剑",
+    "name": "越女剑",
+    "point": 0,
+    "description": "越女剑法奥义发动时，全场所有敌人集气减少。"
+  },
+  {
+    "id": "软猬宝甲",
+    "name": "软猬宝甲",
+    "point": 60,
+    "description": "软猬甲护身，直接对周遭敌人造成伤害。"
+  },
+  {
+    "id": "轻功大师",
+    "name": "轻功大师",
+    "point": 15,
+    "description": "精通轻功，可以在战场上来去无踪，无视敌方阵型对行动的阻碍。",
+    "affixes": [
+      {
+        "type": "trait",
+        "traitId": "IgnoreZoneOfControl"
+      }
+    ]
+  },
+  {
+    "id": "轻功高超",
+    "name": "轻功高超",
+    "point": 5,
+    "description": "这人曾下苦功练习轻功。移动格子增加1。",
+    "affixes":[
+      {
+        "type": "stat_modifier",
+        "stat": "movement",
+        "value": {
+          "op": "add",
+          "delta": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "追魂",
+    "name": "追魂",
+    "point": 30,
+    "description": "不将敌人打倒决不罢休，无道德可言。攻击造成伤害加深效果。"
+  },
+  {
+    "id": "金刚",
+    "name": "金刚",
+    "point": 5,
+    "description": "随着等级逐步提升，提高防御效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 1.2
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "post_add",
+            "delta": 0,
+            "deltaPerUnitLevel": 10
+          }
+        ],
+        "speech": {
+          "lines": [
+            "金刚不坏很耐打！",
+            "壮哉我！抗住啊！"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "金刚伏魔圈",
+    "name": "金刚伏魔圈",
+    "point": 30,
+    "description": "少林三大神僧的组成的强力阵法。组阵时不能移动，但互相给予强大的攻击加成。"
+  },
+  {
+    "id": "金蛇狂舞",
+    "name": "金蛇狂舞",
+    "point": 25,
+    "description": "只有装备了金蛇剑，金蛇剑法才能发挥绝对的威力",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "金蛇剑法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.4
+          }
+        ],
+        "speech": {
+          "lines": [
+            "金蛇狂舞!"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "金蛇郎君",
+    "name": "金蛇郎君",
+    "point": 30,
+    "description": "作为金蛇郎君的招牌武功，金蛇剑法暴击概率增加50%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "金蛇剑法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "金蛇郎君的意志!",
+            "看我的金蛇剑法"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "金钟罩",
+    "name": "金钟罩",
+    "point": 25,
+    "description": "具有强大的防御力，有一定概率在战斗中大幅度减免伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "chance",
+            "value": 0.25
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "target_defence",
+            "op": "more",
+            "delta": 2.0
+          }
+        ],
+        "speech": {
+          "lines": [
+            "我扛！",
+            "切换防御姿态！"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "铁剑掌门",
+    "name": "铁剑掌门",
+    "point": 25,
+    "description": "对铁剑门武学有深刻的了解，提升相应武学威力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_equals",
+            "values": [
+              "铁剑剑法",
+              "漫天花雨",
+              "碧落苍穹",
+              "铁血大旗功"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.4
+          }
+        ],
+        "speech": {
+          "lines": [
+            "看我铁剑门的厉害！",
+            "吃我这一招!"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "铁口直断",
+    "name": "铁口直断",
+    "point": 10,
+    "description": "我掐指一算，哎呀，你有血光之灾！我这有一贴，可以趋凶。（增加命中率）",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_hit_state",
+            "state": "miss"
+          },
+          {
+            "type": "chance",
+            "value": 0.1
+          }
+        ],
+        "effects": [
+          {
+            "type": "set_hit_success"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "我掐指一算，哎呀，你有血光之灾！"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "铁拳无双",
+    "name": "铁拳无双",
+    "point": 40,
+    "description": "拳头硬才有话语权！使用拳掌系武功攻击一定概率造成晕眩效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_weapon_type",
+            "weaponTypes": [
+              "quanzhang"
+            ]
+          },
+          {
+            "type": "chance",
+            "value": 0.25
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "target"
+            },
+            "buffId": "晕眩",
+            "level": 0,
+            "duration": 2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "尝尝我的拳头的滋味！",
+            "拳头硬才是硬道理！"
+          ],
+          "chance": 0.1
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_weapon_type",
+            "weaponTypes": [
+              "quanzhang"
+            ]
+          },
+          {
+            "type": "context_unit_effective_talent",
+            "talentIds": [
+              "神拳无敌"
+            ]
+          },
+          {
+            "type": "chance",
+            "value": 0.12
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "target"
+            },
+            "buffId": "晕眩",
+            "level": 0,
+            "duration": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "铁骨墨萼",
+    "name": "铁骨墨萼",
+    "point": 40,
+    "description": "大侠梅念笙的看家本领，连城剑法攻击力提高40%，暴击概率提高20%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "连城剑法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.4
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.2
+          }
+        ],
+        "speech": {
+          "lines": [
+            "天花落不尽，处处鸟衔飞",
+            "孤鸿海上来，池潢不敢顾",
+            "俯听闻惊风，连山若波涛",
+            "落日照大旗，马鸣风萧萧"
+          ],
+          "chance": 0.2
+        }
+      }
+    ]
+  },
+  {
+    "id": "锐眼",
+    "name": "锐眼",
+    "point": 5,
+    "description": "哼！我看到了真相！增加命中率。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_hit_state",
+            "state": "miss"
+          },
+          {
+            "type": "chance",
+            "value": 0.05
+          }
+        ],
+        "effects": [
+          {
+            "type": "set_hit_success"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "哼！我看到了真相！"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "长平公主的眷恋",
+    "name": "长平公主的眷恋",
+    "point": 10,
+    "description": "长平公主阿九魂牵梦绕的眷恋，提升袁承志所有武学的威力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "deltaMin": 1.2,
+            "deltaMax": 1.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "阿九，我绝不辜负你的期望！",
+            "阿九妹子...你如今真的出家了么？！",
+            "阿九..."
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "阉人",
+    "name": "阉人",
+    "point": 5,
+    "description": "已经去“势”，内力消耗增大，使用葵花宝典、辟邪剑法必定暴击。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "葵花宝典",
+              "辟邪剑法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "override",
+            "delta": 1.0
+          }
+        ],
+        "speech": {
+          "lines": [
+            "你以为我JJ是白切的？",
+            "嘿嘿嘿嘿……"
+          ],
+          "chance": 0.1
+        }
+      }
+    ]
+  },
+  {
+    "id": "阴毒",
+    "name": "阴毒",
+    "point": 5,
+    "description": "随着等级逐步提升，提高对中毒的敌人的伤害。"
+  },
+  {
+    "id": "阴谋家",
+    "name": "阴谋家",
+    "point": 25,
+    "description": "阴谋得逞，敌方生命值越低，对其造成伤害越高。"
+  },
+  {
+    "id": "阴阳",
+    "name": "阴阳",
+    "point": 5,
+    "description": "随着等级逐步提升，攻击有一定概率附加麻痹效果。"
+  },
+  {
+    "id": "隔空取物",
+    "name": "隔空取物",
+    "point": 15,
+    "description": "战斗时可以给队友使用物品。",
+    "affixes": [
+      {
+        "type": "trait",
+        "traitId": "CanUseItemOnAlly"
+      }
+    ]
+  },
+  {
+    "id": "雪山飞狐",
+    "name": "雪山飞狐",
+    "point": 30,
+    "description": "飞天狐狸绝学，胡家刀法暴击概率增加50%，另外增加10%闪避",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "chance",
+            "value": 0.1
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "雪山飞狐！"
+          ],
+          "chance": 0.5
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          },
+          {
+            "type": "context_skill_name_contains",
+            "values": [
+              "胡家刀法"
+            ]
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "add",
+            "delta": 0.5
+          }
+        ],
+        "speech": {
+          "lines": [
+            "雪山飞狐！",
+            "飞天狐狸！"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "飘然",
+    "name": "飘然",
+    "point": 50,
+    "description": "飘然如一叶，一定概率回避所受伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "chance",
+            "value": 0.08
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "我闪！ (天赋*飘然发动)"
+          ],
+          "chance": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "飞向天际",
+    "name": "飞向天际",
+    "point": 5,
+    "description": "神秘的绝学，攻击时一定概率吹飞对手。"
+  },
+  {
+    "id": "鬼魅",
+    "name": "鬼魅",
+    "point": 150,
+    "description": "像鬼魅一样身形飘忽不定，集气速度突破极限。且不受任何状态影响。",
+    "affixes": [
+      {
+        "type": "trait",
+        "traitId": "Ghost"
+      }
+    ]
+  },
+  {
+    "id": "魔神降临",
+    "name": "魔神降临",
+    "point": 75,
+    "description": "每回合有一定概率变身为恐怖的魔神。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "conditions": [
+          {
+            "type": "chance",
+            "value": 0.12
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "self"
+            },
+            "buffId": "魔神降临",
+            "level": 2,
+            "duration": 3
+          }
+        ],
+        "speech": {
+          "lines": [
+            "尝尝魔神的威力！",
+            "嘿嘿嘿嘿嘿！"
+          ],
+          "chance": 0.2
+        }
+      }
+    ]
+  },
+  {
+    "id": "鲁莽",
+    "name": "鲁莽",
+    "point": 5,
+    "description": "勇气和鲁莽往往只有一线之隔。伤害增加6%，受到的伤害增加10%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "final_damage",
+            "op": "more",
+            "delta": 1.1
+          }
+        ]
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.06
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "鲲跃北溟",
+    "name": "鲲跃北溟",
+    "point": 50,
+    "description": "攻击有50%概率吸取对手内力。"
+  },
+  {
+    "id": "鹿鼎.一品鹿鼎公",
+    "name": "鹿鼎.一品鹿鼎公",
+    "point": 40,
+    "description": "功勋盖世的韦小宝，被攻击时一定几率胡言乱语念晕敌人。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_unit_relation",
+            "role": "source",
+            "relation": "enemy"
+          },
+          {
+            "type": "chance",
+            "value": 0.25
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          },
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "source"
+            },
+            "buffId": "晕眩",
+            "level": 0,
+            "duration": 3,
+            "chance": 100
+          }
+        ],
+        "speech": {
+          "lines": [
+            "好汉，饶命饶命饶命饶命（念晕你！）"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "黑天死炎",
+    "name": "黑天死炎",
+    "point": 25,
+    "description": "攻击一定几率自动触发“一刀两断”效果。"
+  }
+]

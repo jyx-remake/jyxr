@@ -50,7 +50,16 @@ public interface IHitResultEffectContext : IBattleEffectContext
 public interface IDamageApplicationEffectContext : IBattleEffectContext
 {
     int DamageAmount { get; }
+    void CapDamage(int maximum);
+    void CancelDamage(bool suppressHitEffects);
     void RedirectDamage(BattleUnit target, double damageFactor);
+}
+
+internal interface IDamageApplicationRuntimeContext : IDamageApplicationEffectContext
+{
+    int ApplyDirectDamage(BattleUnit target, int amount, string? detail = null);
+    int ApplyHpRecovery(BattleUnit target, int amount, string? detail = null);
+    int ApplyMpDamage(BattleUnit target, int amount, string? detail = null);
 }
 
 public interface IDamageTakenEffectContext : IBattleEffectContext
