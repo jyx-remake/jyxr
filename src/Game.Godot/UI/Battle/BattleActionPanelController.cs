@@ -7,92 +7,52 @@ using GameRoot = Game.Godot.Game;
 
 namespace Game.Godot.UI.Battle;
 
-internal sealed class BattleActionPanelController
-{
-	private readonly BattlePresenter _presenter;
-	private readonly BattleUiStateMachine _uiState;
-	private readonly int _playerTeam;
-	private readonly Func<BattleState?> _state;
-	private readonly Func<BattleFlowOrchestrator?> _orchestrator;
-	private readonly Func<bool> _isResolvingPresentation;
-	private readonly Func<bool> _isAutoBattleEnabled;
-	private readonly Action<bool> _refreshAll;
-	private readonly BattleSelectedSkillBox _selectedSkillBox;
-	private readonly BaseButton _moveButton;
-	private readonly BaseButton _statusButton;
-	private readonly BaseButton _itemButton;
-	private readonly BaseButton _restButton;
-	private readonly BaseButton _endButton;
-	private readonly BaseButton _surrenderButton;
-	private readonly TextureRect _avatar;
-	private readonly HBoxContainer _listContainer;
-	private readonly Control _overlayRoot;
-	private readonly PackedScene _skillBoxScene;
-	private readonly PackedScene _itemPanelScene;
-	private readonly PackedScene _statusPanelScene;
-	private ButtonGroup _skillButtonGroup = new();
+internal sealed record BattleActionPanelView(
+	BattleSelectedSkillBox SelectedSkillBox,
+	BaseButton MoveButton,
+	BaseButton StatusButton,
+	BaseButton ItemButton,
+	BaseButton RestButton,
+	BaseButton EndButton,
+	BaseButton SurrenderButton,
+	TextureRect Avatar,
+	HBoxContainer ListContainer,
+	Control OverlayRoot);
 
-	public BattleActionPanelController(
-		BattlePresenter presenter,
-		BattleUiStateMachine uiState,
-		int playerTeam,
-		Func<BattleState?> state,
-		Func<BattleFlowOrchestrator?> orchestrator,
-		Func<bool> isResolvingPresentation,
-		Func<bool> isAutoBattleEnabled,
-		Action<bool> refreshAll,
-		BattleSelectedSkillBox selectedSkillBox,
-		BaseButton moveButton,
-		BaseButton statusButton,
-		BaseButton itemButton,
-		BaseButton restButton,
-		BaseButton endButton,
-		BaseButton surrenderButton,
-		TextureRect avatar,
-		HBoxContainer listContainer,
-		Control overlayRoot,
-		PackedScene skillBoxScene,
-		PackedScene itemPanelScene,
-		PackedScene statusPanelScene)
-	{
-		_presenter = presenter;
-		_uiState = uiState;
-		_playerTeam = playerTeam;
-		_state = state;
-		_orchestrator = orchestrator;
-		_isResolvingPresentation = isResolvingPresentation;
-		_isAutoBattleEnabled = isAutoBattleEnabled;
-		_refreshAll = refreshAll;
-		_selectedSkillBox = selectedSkillBox;
-		_moveButton = moveButton;
-		_statusButton = statusButton;
-		_itemButton = itemButton;
-		_restButton = restButton;
-		_endButton = endButton;
-		_surrenderButton = surrenderButton;
-		_avatar = avatar;
-		_listContainer = listContainer;
-		_overlayRoot = overlayRoot;
-		_skillBoxScene = skillBoxScene;
-		_itemPanelScene = itemPanelScene;
-		_statusPanelScene = statusPanelScene;
-	}
+internal sealed record BattleActionPanelScenes(
+	PackedScene SkillBox,
+	PackedScene ItemPanel,
+	PackedScene StatusPanel);
+
+internal sealed class BattleActionPanelController(
+	BattlePresenter presenter,
+	BattleUiStateMachine uiState,
+	int playerTeam,
+	Func<BattleState?> getState,
+	Func<BattleFlowOrchestrator?> getOrchestrator,
+	Func<bool> isResolvingPresentation,
+	Func<bool> isAutoBattleEnabled,
+	Action<bool> refreshAll,
+	BattleActionPanelView view,
+	BattleActionPanelScenes scenes)
+{
+	private ButtonGroup _skillButtonGroup = new();
 
 	public void BindButtons()
 	{
-		_moveButton.Pressed += async () => await SelectMoveAsync();
-		_statusButton.Pressed += OpenStatusPanel;
-		_itemButton.Pressed += async () => await OpenItemPanelAsync();
-		_restButton.Pressed += async () =>
+		view.MoveButton.Pressed += async () => await SelectMoveAsync();
+		view.StatusButton.Pressed += OpenStatusPanel;
+		view.ItemButton.Pressed += async () => await OpenItemPanelAsync();
+		view.RestButton.Pressed += async () =>
 		{
-			if (_orchestrator() is { } orchestrator)
+			if (getOrchestrator() is { } orchestrator)
 			{
 				await orchestrator.TryRestAsync();
 			}
 		};
-		_endButton.Pressed += async () =>
+		view.EndButton.Pressed += async () =>
 		{
-			if (_orchestrator() is { } orchestrator)
+			if (getOrchestrator() is { } orchestrator)
 			{
 				await orchestrator.TryEndActionAsync();
 			}
@@ -109,60 +69,60 @@ internal sealed class BattleActionPanelController
 
 	public void RefreshSelectedSkill()
 	{
-		var state = _state();
+		var state = getState();
 		if (state is null)
 		{
-			_selectedSkillBox.Setup(null);
+			view.SelectedSkillBox.Setup(null);
 			return;
 		}
 
-		_selectedSkillBox.Setup(ResolvePreviewSkill(BattlePresenter.TryGetActingUnit(state)));
+		view.SelectedSkillBox.Setup(ResolvePreviewSkill(BattlePresenter.TryGetActingUnit(state)));
 	}
 
 	public void RefreshActions()
 	{
-		var state = _state();
+		var state = getState();
 		var actingUnit = state is null ? null : BattlePresenter.TryGetActingUnit(state);
 		var isActing = actingUnit is not null &&
-			actingUnit.Team == _playerTeam &&
-			_uiState.Mode != BattleUiMode.BattleEnded &&
-			!_isResolvingPresentation() &&
-			!_isAutoBattleEnabled();
-		_moveButton.Disabled = !isActing;
-		_statusButton.Disabled = state is null || _uiState.Mode == BattleUiMode.BattleEnded || _isResolvingPresentation();
-		_itemButton.Disabled = !isActing;
-		_restButton.Disabled = !isActing;
-		_endButton.Disabled = !isActing;
-		_surrenderButton.Disabled = _uiState.Mode == BattleUiMode.BattleEnded;
-		_surrenderButton.Visible = _uiState.Mode != BattleUiMode.BattleEnded;
+			actingUnit.Team == playerTeam &&
+			uiState.Mode != BattleUiMode.BattleEnded &&
+			!isResolvingPresentation() &&
+			!isAutoBattleEnabled();
+		view.MoveButton.Disabled = !isActing;
+		view.StatusButton.Disabled = state is null || uiState.Mode == BattleUiMode.BattleEnded || isResolvingPresentation();
+		view.ItemButton.Disabled = !isActing;
+		view.RestButton.Disabled = !isActing;
+		view.EndButton.Disabled = !isActing;
+		view.SurrenderButton.Disabled = uiState.Mode == BattleUiMode.BattleEnded;
+		view.SurrenderButton.Visible = uiState.Mode != BattleUiMode.BattleEnded;
 	}
 
 	public void RefreshList()
 	{
-		ClearChildren(_listContainer);
+		ClearChildren(view.ListContainer);
 		_skillButtonGroup = new ButtonGroup();
-		var state = _state();
+		var state = getState();
 		if (state is null)
 		{
 			return;
 		}
 
 		var actingUnit = BattlePresenter.TryGetActingUnit(state);
-		if (actingUnit is null || actingUnit.Team != _playerTeam)
+		if (actingUnit is null || actingUnit.Team != playerTeam)
 		{
 			AddListLabel("无可选项");
 			return;
 		}
 
-		if (_uiState.Mode == BattleUiMode.SelectingItem)
+		if (uiState.Mode == BattleUiMode.SelectingItem)
 		{
 			AddListLabel("从物品面板中选择消耗品。");
 			return;
 		}
 
-		if (_uiState.Mode == BattleUiMode.SelectingItemTarget)
+		if (uiState.Mode == BattleUiMode.SelectingItemTarget)
 		{
-			AddListLabel(_uiState.SelectedItem is null ? "点击高亮目标使用。" : $"使用：{_uiState.SelectedItem.Definition.Name}");
+			AddListLabel(uiState.SelectedItem is null ? "点击高亮目标使用。" : $"使用：{uiState.SelectedItem.Definition.Name}");
 			return;
 		}
 
@@ -174,9 +134,9 @@ internal sealed class BattleActionPanelController
 
 	public void RefreshAvatar()
 	{
-		var state = _state();
+		var state = getState();
 		var actingUnit = state is null ? null : BattlePresenter.TryGetActingUnit(state);
-		_avatar.Texture = actingUnit is null ? null : AssetResolver.LoadCharacterPortrait(actingUnit.Character);
+		view.Avatar.Texture = actingUnit is null ? null : AssetResolver.LoadCharacterPortrait(actingUnit.Character);
 	}
 
 	public void SelectDefaultPostMoveMode(BattleUnit actingUnit)
@@ -184,49 +144,49 @@ internal sealed class BattleActionPanelController
 		var defaultSkill = ResolveDefaultSkill(actingUnit, GetSkillOptions(actingUnit));
 		if (defaultSkill is null)
 		{
-			_uiState.ActUnit();
+			uiState.ActUnit();
 			return;
 		}
 
-		_uiState.SelectSkillTarget(defaultSkill);
+		uiState.SelectSkillTarget(defaultSkill);
 	}
 
 	private async Task SelectMoveAsync()
 	{
-		if (_orchestrator() is not { } orchestrator)
+		if (getOrchestrator() is not { } orchestrator)
 		{
 			return;
 		}
 
-		var state = _state();
+		var state = getState();
 		if (state is not null && BattlePresenter.TryGetActingUnit(state) is not null &&
 			state.CurrentAction is { HasMoved: true, HasCommittedMainAction: false })
 		{
 			await orchestrator.TryRollbackMoveAsync();
 		}
 
-		_uiState.SelectMove();
-		_refreshAll(true);
+		uiState.SelectMove();
+		refreshAll(true);
 	}
 
 	private async Task OpenItemPanelAsync()
 	{
-		var state = _state();
+		var state = getState();
 		if (state is null || BattlePresenter.TryGetActingUnit(state) is null)
 		{
 			return;
 		}
 
-		var itemEntries = _presenter.CreateItemList(GameRoot.State.Inventory).Select(static view => view.Entry).ToArray();
+		var itemEntries = presenter.CreateItemList(GameRoot.State.Inventory).Select(static view => view.Entry).ToArray();
 		if (itemEntries.Length == 0)
 		{
 			UIRoot.Instance.ShowSuggestion("当前没有可用的消耗品。");
 			return;
 		}
 
-		_uiState.SelectItemList();
-		_refreshAll(true);
-		var instance = _itemPanelScene.Instantiate();
+		uiState.SelectItemList();
+		refreshAll(true);
+		var instance = scenes.ItemPanel.Instantiate();
 		if (instance is not BattleItemPanel panel)
 		{
 			instance.QueueFree();
@@ -234,45 +194,45 @@ internal sealed class BattleActionPanelController
 		}
 
 		panel.Configure(itemEntries);
-		_overlayRoot.AddChild(panel);
+		view.OverlayRoot.AddChild(panel);
 		var selectedEntry = await panel.AwaitSelectionAsync();
 		if (selectedEntry is null)
 		{
-			if (_uiState.Mode == BattleUiMode.SelectingItem)
+			if (uiState.Mode == BattleUiMode.SelectingItem)
 			{
-				_uiState.ActUnit();
-				_refreshAll(true);
+				uiState.ActUnit();
+				refreshAll(true);
 			}
 			return;
 		}
 
-		_uiState.SelectItemTarget(selectedEntry);
-		_refreshAll(true);
+		uiState.SelectItemTarget(selectedEntry);
+		refreshAll(true);
 	}
 
 	private void OpenStatusPanel()
 	{
-		var state = _state();
-		if (state is null || _uiState.Mode == BattleUiMode.BattleEnded)
+		var state = getState();
+		if (state is null || uiState.Mode == BattleUiMode.BattleEnded)
 		{
 			return;
 		}
 
-		var instance = _statusPanelScene.Instantiate();
+		var instance = scenes.StatusPanel.Instantiate();
 		if (instance is not BattleStatusPanel panel)
 		{
 			instance.QueueFree();
 			throw new InvalidOperationException("Battle status panel scene root must be BattleStatusPanel.");
 		}
 
-		panel.Configure(state, _playerTeam);
-		_overlayRoot.AddChild(panel);
+		panel.Configure(state, playerTeam);
+		view.OverlayRoot.AddChild(panel);
 	}
 
 	private SkillInstance? ResolvePreviewSkill(BattleUnit? actingUnit)
 	{
 		var skillOptions = actingUnit is null ? [] : GetSkillOptions(actingUnit);
-		if (_uiState.SelectedSkill is { } selected && skillOptions.Any(view => view.IsAvailable && ReferenceEquals(view.Skill, selected)))
+		if (uiState.SelectedSkill is { } selected && skillOptions.Any(view => view.IsAvailable && ReferenceEquals(view.Skill, selected)))
 		{
 			return selected;
 		}
@@ -281,9 +241,9 @@ internal sealed class BattleActionPanelController
 
 	private IReadOnlyList<BattleSkillOptionView> GetSkillOptions(BattleUnit actingUnit)
 	{
-		var state = _state();
-		var orchestrator = _orchestrator();
-		return state is null || orchestrator is null ? [] : _presenter.CreateSkillList(state, orchestrator.Engine, actingUnit);
+		var state = getState();
+		var orchestrator = getOrchestrator();
+		return state is null || orchestrator is null ? [] : presenter.CreateSkillList(state, orchestrator.Engine, actingUnit);
 	}
 
 	private static SkillInstance? ResolveDefaultSkill(BattleUnit actingUnit, IReadOnlyList<BattleSkillOptionView> skillOptions)
@@ -304,27 +264,27 @@ internal sealed class BattleActionPanelController
 		var label = new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart };
 		label.AddThemeFontSizeOverride("font_size", 18);
 		label.AddThemeColorOverride("font_color", Colors.White);
-		_listContainer.AddChild(label);
+		view.ListContainer.AddChild(label);
 	}
 
 	private void AddSkillButton(BattleSkillOptionView skillView)
 	{
-		if (_skillBoxScene.Instantiate() is not BattleSkillBox button)
+		if (scenes.SkillBox.Instantiate() is not BattleSkillBox button)
 		{
 			throw new InvalidOperationException("BattleSkillBox scene root must be BattleSkillBox.");
 		}
-		button.Setup(skillView.Skill, ReferenceEquals(_uiState.SelectedSkill, skillView.Skill), skillView.Availability);
+		button.Setup(skillView.Skill, ReferenceEquals(uiState.SelectedSkill, skillView.Skill), skillView.Availability);
 		button.ButtonGroup = _skillButtonGroup;
 		button.TooltipText = skillView.IsAvailable ? skillView.Label : $"{skillView.Label}\n{ResolveUnavailableSkillText(skillView.Availability)}";
 		if (skillView.IsAvailable)
 		{
 			button.Pressed += () =>
 			{
-				_uiState.SelectSkillTarget(skillView.Skill);
-				_refreshAll(false);
+				uiState.SelectSkillTarget(skillView.Skill);
+				refreshAll(false);
 			};
 		}
-		_listContainer.AddChild(button);
+		view.ListContainer.AddChild(button);
 	}
 
 	private static string ResolveUnavailableSkillText(BattleSkillAvailability availability) => availability.Status switch
