@@ -34,6 +34,8 @@ internal static class BattleHookEvaluator
                 skillName.Values.Any(value => string.Equals(context.Skill.Name, value, StringComparison.Ordinal)),
             ContextSkillNameContainsBattleHookConditionDefinition skillName => context.Skill is not null &&
                 skillName.Values.Any(value => context.Skill.Name.Contains(value, StringComparison.Ordinal)),
+            ContextSkillKindBattleHookConditionDefinition skillKind => context.Skill is not null &&
+                skillKind.Kinds.Contains(context.Skill.SkillKind),
             ContextSkillWeaponTypeBattleHookConditionDefinition skillWeaponType => context.Skill is not null &&
                 skillWeaponType.WeaponTypes.Contains(context.Skill.WeaponType),
             ContextRecoveryKindBattleHookConditionDefinition recoveryKind => context.RecoveryKind == recoveryKind.Kind,

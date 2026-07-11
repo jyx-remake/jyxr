@@ -380,6 +380,10 @@ public sealed partial class JsonContentLoader
                             $"{ownerName} has battle hook '{hook.Timing}' skill name condition with empty value.");
                     }
                     break;
+                case ContextSkillKindBattleHookConditionDefinition skillKindCondition:
+                    Ensure(skillKindCondition.Kinds.Count > 0,
+                        $"{ownerName} has battle hook '{hook.Timing}' skill kind condition without kinds.");
+                    break;
                 case ContextSkillWeaponTypeBattleHookConditionDefinition skillWeaponTypeCondition:
                     Ensure(skillWeaponTypeCondition.WeaponTypes.Count > 0,
                         $"{ownerName} has battle hook '{hook.Timing}' skill weapon type condition without weaponTypes.");
@@ -427,6 +431,7 @@ public sealed partial class JsonContentLoader
                 case RemoveContextBuffBattleEffectDefinition:
                 case AddRageBattleEffectDefinition:
                 case SetRageBattleEffectDefinition:
+                case AddActionGaugeBattleEffectDefinition:
                 case SetActionGaugeBattleEffectDefinition:
                 case AddHpBattleEffectDefinition:
                 case AddMpBattleEffectDefinition:
@@ -527,6 +532,10 @@ public sealed partial class JsonContentLoader
                     $"{ownerName} set_rage effect has invalid value '{setRage.Value}'.");
                 ValidateBattleTargetSelector(setRage.Target!, ownerName, null);
                 break;
+            case AddActionGaugeBattleEffectDefinition addActionGauge:
+                Ensure(addActionGauge.Target is not null, $"{ownerName} add_action_gauge effect is missing target.");
+                ValidateBattleTargetSelector(addActionGauge.Target!, ownerName, null);
+                break;
             case SetActionGaugeBattleEffectDefinition setActionGauge:
                 Ensure(setActionGauge.Target is not null, $"{ownerName} set_action_gauge effect is missing target.");
                 Ensure(setActionGauge.Value >= 0, $"{ownerName} set_action_gauge effect has invalid value '{setActionGauge.Value}'.");
@@ -618,6 +627,10 @@ public sealed partial class JsonContentLoader
             case NearbyAlliesBattleTargetSelectorDefinition nearbyAllies:
                 Ensure(nearbyAllies.Radius >= 0,
                     $"{scope} nearby_allies selector has invalid radius '{nearbyAllies.Radius}'.");
+                break;
+            case NearbyEnemiesBattleTargetSelectorDefinition nearbyEnemies:
+                Ensure(nearbyEnemies.Radius >= 0,
+                    $"{scope} nearby_enemies selector has invalid radius '{nearbyEnemies.Radius}'.");
                 break;
             default:
                 throw new InvalidOperationException($"{scope} has unsupported battle target selector '{selector.GetType().Name}'.");

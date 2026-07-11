@@ -84,6 +84,9 @@ internal sealed class BattleEventPresenter(
             case BattleFactKind.RageChanged:
                 PresentSignedResourceChange(fact, BattleFloatTextStyle.Energy, "怒气");
                 break;
+            case BattleFactKind.ActionGaugeChanged:
+                PresentActionGaugeChange(fact);
+                break;
             case BattleFactKind.Rested:
                 PresentRest(fact, unitName);
                 break;
@@ -179,6 +182,23 @@ internal sealed class BattleEventPresenter(
     {
         if (TryResolveAmount(fact.Detail, out var amount) && amount != 0)
             board.PlayFloatText(fact.UnitId, $"{resourceName}{amount:+#;-#;0}", style);
+    }
+
+    private void PresentActionGaugeChange(BattleFact fact)
+    {
+        if (!double.TryParse(
+                fact.Detail,
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out var amount) || Math.Abs(amount) <= double.Epsilon)
+        {
+            return;
+        }
+
+        board.PlayFloatText(
+            fact.UnitId,
+            $"集气{amount:+0.#;-0.#;0}",
+            BattleFloatTextStyle.Energy);
     }
 
     private static bool TryResolveAmount(string? detail, out int amount)

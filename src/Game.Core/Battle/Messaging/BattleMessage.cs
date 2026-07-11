@@ -99,6 +99,7 @@ public enum BattleFactKind
     Lifesteal,
     MpDamaged,
     RageChanged,
+    ActionGaugeChanged,
     DefeatPrevented,
     SkillLeveledUp,
     CharacterLeveledUp,

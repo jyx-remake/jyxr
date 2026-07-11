@@ -114,6 +114,9 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
             case SetRageBattleEffectDefinition setRage:
                 foreach (var target in targets) BattleResourceResolver.SetRage(state, target, setRage.Value, timing);
                 break;
+            case AddActionGaugeBattleEffectDefinition addGauge:
+                foreach (var target in targets) BattleResourceResolver.AddActionGauge(state, target, addGauge.Value, timing);
+                break;
             case SetActionGaugeBattleEffectDefinition gauge:
                 foreach (var target in targets) BattleResourceResolver.SetActionGauge(target, gauge.Value);
                 break;

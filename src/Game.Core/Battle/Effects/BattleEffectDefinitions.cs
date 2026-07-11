@@ -14,6 +14,7 @@ namespace Game.Core.Battle;
 [JsonDerivedType(typeof(AllAlliesBattleTargetSelectorDefinition), "all_allies")]
 [JsonDerivedType(typeof(AllEnemiesBattleTargetSelectorDefinition), "all_enemies")]
 [JsonDerivedType(typeof(NearbyAlliesBattleTargetSelectorDefinition), "nearby_allies")]
+[JsonDerivedType(typeof(NearbyEnemiesBattleTargetSelectorDefinition), "nearby_enemies")]
 public abstract record BattleTargetSelectorDefinition;
 
 public interface ITargetedBattleEffectDefinition
@@ -36,6 +37,9 @@ public sealed record NearbyAlliesBattleTargetSelectorDefinition(
     int Radius,
     bool IncludeSelf = true) : BattleTargetSelectorDefinition;
 
+public sealed record NearbyEnemiesBattleTargetSelectorDefinition(
+    int Radius) : BattleTargetSelectorDefinition;
+
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(ApplyBuffBattleEffectDefinition), "apply_buff")]
 [JsonDerivedType(typeof(RemoveBuffBattleEffectDefinition), "remove_buff")]
@@ -44,6 +48,7 @@ public sealed record NearbyAlliesBattleTargetSelectorDefinition(
 [JsonDerivedType(typeof(RemoveContextBuffBattleEffectDefinition), "remove_context_buff")]
 [JsonDerivedType(typeof(AddRageBattleEffectDefinition), "add_rage")]
 [JsonDerivedType(typeof(SetRageBattleEffectDefinition), "set_rage")]
+[JsonDerivedType(typeof(AddActionGaugeBattleEffectDefinition), "add_action_gauge")]
 [JsonDerivedType(typeof(SetActionGaugeBattleEffectDefinition), "set_action_gauge")]
 [JsonDerivedType(typeof(AddHpBattleEffectDefinition), "add_hp")]
 [JsonDerivedType(typeof(AddMpBattleEffectDefinition), "add_mp")]
@@ -109,6 +114,10 @@ public sealed record AddRageBattleEffectDefinition(
     int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 
 public sealed record SetRageBattleEffectDefinition(
+    BattleTargetSelectorDefinition Target,
+    int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
+
+public sealed record AddActionGaugeBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,
     int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
 

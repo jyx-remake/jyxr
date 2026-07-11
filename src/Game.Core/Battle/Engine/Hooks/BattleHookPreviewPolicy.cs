@@ -47,6 +47,7 @@ internal static class BattleHookPreviewPolicy
                 case RemoveContextBuffBattleEffectDefinition:
                 case AddRageBattleEffectDefinition:
                 case SetRageBattleEffectDefinition:
+                case AddActionGaugeBattleEffectDefinition:
                 case SetActionGaugeBattleEffectDefinition:
                 case AddHpBattleEffectDefinition:
                 case AddMpBattleEffectDefinition:

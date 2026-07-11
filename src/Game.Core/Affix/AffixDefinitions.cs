@@ -3,6 +3,7 @@ using Game.Core.Abstractions;
 using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Core.Model.Skills;
 
 namespace Game.Core.Affix;
 
@@ -105,6 +106,7 @@ public sealed record TraitAffix(TraitId TraitId) : AffixDefinition;
 [JsonDerivedType(typeof(ContextHitStateBattleHookConditionDefinition), "context_hit_state")]
 [JsonDerivedType(typeof(ContextSkillNameEqualsBattleHookConditionDefinition), "context_skill_name_equals")]
 [JsonDerivedType(typeof(ContextSkillNameContainsBattleHookConditionDefinition), "context_skill_name_contains")]
+[JsonDerivedType(typeof(ContextSkillKindBattleHookConditionDefinition), "context_skill_kind")]
 [JsonDerivedType(typeof(ContextSkillWeaponTypeBattleHookConditionDefinition), "context_skill_weapon_type")]
 [JsonDerivedType(typeof(ContextRecoveryKindBattleHookConditionDefinition), "context_recovery_kind")]
 public abstract record BattleHookConditionDefinition;
@@ -155,6 +157,9 @@ public sealed record ContextSkillNameEqualsBattleHookConditionDefinition(
 
 public sealed record ContextSkillNameContainsBattleHookConditionDefinition(
     IReadOnlyList<string> Values) : BattleHookConditionDefinition;
+
+public sealed record ContextSkillKindBattleHookConditionDefinition(
+    IReadOnlyList<SkillKind> Kinds) : BattleHookConditionDefinition;
 
 public sealed record ContextSkillWeaponTypeBattleHookConditionDefinition(
     IReadOnlyList<WeaponType> WeaponTypes) : BattleHookConditionDefinition;

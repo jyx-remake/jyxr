@@ -25,6 +25,10 @@ internal static class BattleTargetResolver
                 .Where(unit => nearbyAllies.IncludeSelf || !string.Equals(unit.Id, contextUnit.Id, StringComparison.Ordinal))
                 .Where(unit => unit.Position.ManhattanDistanceTo(contextUnit.Position) <= nearbyAllies.Radius)
                 .ToList(),
+            NearbyEnemiesBattleTargetSelectorDefinition nearbyEnemies => state.GetLivingUnits()
+                .Where(unit => unit.Team != contextUnit.Team)
+                .Where(unit => unit.Position.ManhattanDistanceTo(contextUnit.Position) <= nearbyEnemies.Radius)
+                .ToList(),
             _ => throw new NotSupportedException($"Unsupported battle target selector '{selector.GetType().Name}'."),
         };
 }
