@@ -84,6 +84,7 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("illness", new IllnessBattleEffectHandler());
         registry.Register("drunkenness", new DrunkennessBattleEffectHandler());
         registry.Register("bright_sacred_fire_formation", new BrightSacredFireFormationBattleEffectHandler());
+        registry.Register("weapon_equipment_penalty", new WeaponEquipmentPenaltyBattleEffectHandler());
         registry.Register("zhenwu_formation_attack", new ZhenwuFormationAttackBattleEffectHandler());
         registry.Register("zhenwu_formation_intercept", new ZhenwuFormationInterceptBattleEffectHandler());
         registry.Register("careful_defense", new CarefulDefenseBattleEffectHandler());

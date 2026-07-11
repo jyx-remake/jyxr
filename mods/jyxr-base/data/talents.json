@@ -329,7 +329,23 @@
     "id": "刀系装备",
     "name": "刀系装备",
     "point": 0,
-    "description": "使用刀法以外的武功，有伤害减益。"
+    "description": "使用刀法以外的武功，有伤害减益。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "weapon_equipment_penalty",
+            "parameters": {
+              "expectedWeaponType": "daofa",
+              "damageFactor": 0.9
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "刚柔并济",
@@ -406,7 +422,23 @@
     "id": "剑系装备",
     "name": "剑系装备",
     "point": 0,
-    "description": "使用剑法以外的武功，有伤害减益。"
+    "description": "使用剑法以外的武功，有伤害减益。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "weapon_equipment_penalty",
+            "parameters": {
+              "expectedWeaponType": "jianfa",
+              "damageFactor": 0.9
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "化功大法",
@@ -916,7 +948,23 @@
     "id": "奇门装备",
     "name": "奇门装备",
     "point": 0,
-    "description": "使用奇门以外的武功，有伤害减益。"
+    "description": "使用奇门以外的武功，有伤害减益。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "weapon_equipment_penalty",
+            "parameters": {
+              "expectedWeaponType": "qimen",
+              "damageFactor": 0.9
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "奇门遁甲",
@@ -1660,7 +1708,23 @@
     "id": "拳系装备",
     "name": "拳系装备",
     "point": 0,
-    "description": "使用拳法以外的武功，有伤害减益。"
+    "description": "使用拳法以外的武功，有伤害减益。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "weapon_equipment_penalty",
+            "parameters": {
+              "expectedWeaponType": "quanzhang",
+              "damageFactor": 0.9
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "摧筋破骨",
