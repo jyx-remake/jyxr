@@ -322,9 +322,7 @@ public sealed class BattleHookContext :
         ArgumentNullException.ThrowIfNull(target);
         ArgumentOutOfRangeException.ThrowIfNegative(amount);
 
-        var drained = target.DamageMp(amount);
-        State.AddMessage(new BattleFact(BattleFactKind.MpDamaged, target.Id, detail: detail ?? drained.ToString()));
-        return drained;
+        return BattleResourceResolver.DamageMp(State, target, amount, Timing, detail);
     }
 
     int IDamageApplicationRuntimeContext.ApplyDirectDamage(

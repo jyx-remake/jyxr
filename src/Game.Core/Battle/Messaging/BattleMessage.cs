@@ -98,6 +98,7 @@ public enum BattleFactKind
     Healed,
     Lifesteal,
     MpDamaged,
+    MpRecovered,
     RageChanged,
     ActionGaugeChanged,
     DefeatPrevented,

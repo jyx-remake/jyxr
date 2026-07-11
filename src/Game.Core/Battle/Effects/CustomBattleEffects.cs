@@ -111,6 +111,8 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("life_and_death", new LifeAndDeathBattleEffectHandler());
         registry.Register("cloud_climbing_dragon", new CloudClimbingDragonBattleEffectHandler());
         registry.Register("formless_sword_qi", new FormlessSwordQiBattleEffectHandler());
+        registry.Register("internal_energy_attack", new InternalEnergyAttackBattleEffectHandler());
+        registry.Register("grieving_breeze", new GrievingBreezeBattleEffectHandler());
         return registry;
     }
 

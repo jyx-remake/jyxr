@@ -81,6 +81,9 @@ internal sealed class BattleEventPresenter(
             case BattleFactKind.MpDamaged:
                 PresentResourceChange(fact, BattleFloatTextStyle.Mana, "-");
                 break;
+            case BattleFactKind.MpRecovered:
+                PresentResourceChange(fact, BattleFloatTextStyle.Mana, "+");
+                break;
             case BattleFactKind.RageChanged:
                 PresentSignedResourceChange(fact, BattleFloatTextStyle.Energy, "怒气");
                 break;
