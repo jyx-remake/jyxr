@@ -244,8 +244,9 @@ public sealed partial class JsonContentLoader
             return;
         }
 
-        Ensure(hook.Effects.Count > 0 || hook.Speech is not null,
-            $"{ownerName} has battle hook '{hook.Timing}' without effects or speech.");
+        Ensure(hook.Effects.Count > 0 || hook.FloatText is not null || hook.Speech is not null,
+            $"{ownerName} has battle hook '{hook.Timing}' without effects, float text, or speech.");
+        ValidateBattleHookFloatText(hook, ownerName);
         ValidateBattleHookSpeech(hook, ownerName);
 
         foreach (var condition in hook.Conditions)
@@ -549,6 +550,17 @@ public sealed partial class JsonContentLoader
         }
 
         ValidateBattleSpeech(hook.Speech, $"{ownerName} battle hook '{hook.Timing}'");
+    }
+
+    private static void ValidateBattleHookFloatText(HookAffix hook, string ownerName)
+    {
+        if (hook.FloatText is null)
+        {
+            return;
+        }
+
+        Ensure(!string.IsNullOrWhiteSpace(hook.FloatText.Text),
+            $"{ownerName} battle hook '{hook.Timing}' has empty float text.");
     }
 
     private static void ValidateBattleSpeech(BattleSpeechDefinition speech, string ownerName)

@@ -75,6 +75,8 @@ public sealed record HookAffix : AffixDefinition
 
     public IReadOnlyList<BattleEffectDefinition> Effects { get; init; } = [];
 
+    public BattleFloatTextDefinition? FloatText { get; init; }
+
     public BattleSpeechDefinition? Speech { get; init; }
 
     public override void Resolve(IContentRepository contentRepository)

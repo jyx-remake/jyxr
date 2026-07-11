@@ -16,6 +16,11 @@ internal static class BattleHookPreviewPolicy
             throw Unsupported(context, "speech");
         }
 
+        if (hook.FloatText is not null)
+        {
+            throw Unsupported(context, "float text");
+        }
+
         if (hook.Conditions.Any(static condition => condition is ChanceBattleHookConditionDefinition))
         {
             throw Unsupported(context, "random chance conditions");

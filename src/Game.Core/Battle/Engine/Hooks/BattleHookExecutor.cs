@@ -38,7 +38,29 @@ public sealed class BattleHookExecutor
                 .ExecuteHook(context, effect);
         }
 
+        TryRequestFloatText(context, hook.FloatText);
         TryRequestSpeech(context, hook.Speech);
+    }
+
+    private static void TryRequestFloatText(BattleHookContext context, BattleFloatTextDefinition? floatText)
+    {
+        if (floatText is null)
+        {
+            return;
+        }
+
+        var target = floatText.Target switch
+        {
+            BattleFloatTextTarget.Owner => context.Unit,
+            BattleFloatTextTarget.Source => context.Source,
+            BattleFloatTextTarget.Target => context.Target,
+            _ => throw new ArgumentOutOfRangeException(nameof(floatText.Target), floatText.Target, null),
+        };
+        var text = BattleCueTextFormatter.Format(floatText.Text, context.Unit, context.Source, context.Target);
+        if (target is not null && !string.IsNullOrWhiteSpace(text))
+        {
+            context.RequestFloatText(target, text, floatText.Style);
+        }
     }
 
     private static void TryRequestSpeech(BattleHookContext context, BattleSpeechDefinition? speech)
@@ -50,7 +72,7 @@ public sealed class BattleHookExecutor
 
         var speaker = ResolveSpeaker(context, speech.Speaker);
         var line = BattleSpeechRuntime.TryPickLine(speech, context.Random);
-        line = BattleSpeechRuntime.FormatText(line, context.Unit, context.Source, context.Target);
+        line = BattleCueTextFormatter.Format(line, context.Unit, context.Source, context.Target);
         BattleSpeechRuntime.TryEmit(context.State, speaker, line, context.Timing);
     }
 

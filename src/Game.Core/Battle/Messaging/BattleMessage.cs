@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Game.Core.Affix;
 using Game.Core.Model.Skills;
 
@@ -111,6 +112,21 @@ public enum BattleTraceKind
 }
 
 public sealed record BattleSpeechCue(string Text);
+public enum BattleFloatTextTarget
+{
+    [JsonStringEnumMemberName("owner")]
+    Owner,
+    [JsonStringEnumMemberName("source")]
+    Source,
+    [JsonStringEnumMemberName("target")]
+    Target,
+}
+public sealed record BattleFloatTextDefinition
+{
+    public BattleFloatTextTarget Target { get; init; } = BattleFloatTextTarget.Owner;
+    public required string Text { get; init; }
+    public BattleFloatTextStyle Style { get; init; } = BattleFloatTextStyle.Normal;
+}
 public sealed record BattleFloatTextCue(string Text, BattleFloatTextStyle Style = BattleFloatTextStyle.Normal);
 public enum BattleFloatTextStyle
 {

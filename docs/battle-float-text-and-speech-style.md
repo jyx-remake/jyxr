@@ -120,6 +120,23 @@
 
 颜色只允许在 Godot 宿主主题中定义。战斗核心、自定义效果和 Presenter 不直接传递或声明 `Color`；需要新的视觉区别时，应先判断现有 8 种语义是否足够，而不是为单个技能增加颜色。
 
+天赋 Hook 可以在 `floatText` 中声明一次触发飘字，与 `speech` 并列：
+
+```json
+"floatText": {
+  "target": "owner",
+  "text": "咳嗽..",
+  "style": "Harmful"
+}
+```
+
+- `text` 必填且不能为空，支持 `{owner}`、`{source}`、`{target}` 占位符。
+- `target` 可选 `owner`、`source`、`target`，默认 `owner`。
+- `style` 使用上述 8 种表现语义，默认 `Normal`。
+- 飘字没有独立概率，完全服从所在 Hook 的条件；需要概率时使用 Hook 的 `chance` 条件。
+- Hook 触发后的表现顺序为 `effects -> floatText -> speech`。
+- 已经由伤害、Buff 或资源变化事实产生提示时，不再额外声明同义 Hook 飘字。多目标、效果内部概率或成功判定产生的飘字仍由对应效果负责。
+
 ## 6. 全局提示飘字
 
 全局提示仍复用 `AttackInfo` prefab，但调用的是 `DisplayPopinfo(...)`。

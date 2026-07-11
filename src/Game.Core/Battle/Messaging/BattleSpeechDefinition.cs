@@ -71,20 +71,4 @@ public static class BattleSpeechRuntime
             speech: new BattleSpeechCue(text)));
     }
 
-    public static string? FormatText(
-        string? text,
-        BattleUnit? owner = null,
-        BattleUnit? source = null,
-        BattleUnit? target = null)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return null;
-        }
-
-        return text
-            .Replace("{owner}", owner?.Character.Name ?? string.Empty, StringComparison.Ordinal)
-            .Replace("{source}", source?.Character.Name ?? string.Empty, StringComparison.Ordinal)
-            .Replace("{target}", target?.Character.Name ?? string.Empty, StringComparison.Ordinal);
-    }
 }

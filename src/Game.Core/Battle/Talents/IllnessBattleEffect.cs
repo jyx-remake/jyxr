@@ -4,7 +4,6 @@ namespace Game.Core.Battle.Talents;
 
 public sealed record IllnessBattleEffectParameters(
     string? ProtectorCharacterId = null,
-    string? FloatText = null,
     string? SkipReason = null);
 
 public sealed class IllnessBattleEffectHandler : CustomBattleEffectHandler<IllnessBattleEffectParameters, IActionStartEffectContext>
@@ -16,14 +15,6 @@ public sealed class IllnessBattleEffectHandler : CustomBattleEffectHandler<Illne
         IActionStartEffectContext context,
         IllnessBattleEffectParameters parameters)
     {
-        if (!string.IsNullOrWhiteSpace(parameters.FloatText))
-        {
-            context.RequestFloatText(
-                context.Unit,
-                parameters.FloatText,
-                BattleFloatTextStyle.Harmful);
-        }
-
         var protectorIsPresent = context.State.GetLivingUnits().Any(unit =>
             unit.Team == context.Unit.Team &&
             string.Equals(
