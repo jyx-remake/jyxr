@@ -459,7 +459,7 @@ public sealed class CharacterInstance
         where TKey : notnull =>
         buckets.TryGetValue(key, out var bucket) ? bucket : ModifierBucket.Empty;
 
-    private void ResetSkillCooldowns()
+    internal void ResetSkillCooldowns()
     {
         foreach (var skill in ExternalSkills)
         {

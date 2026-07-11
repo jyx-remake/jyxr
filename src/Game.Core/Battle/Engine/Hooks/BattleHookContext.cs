@@ -99,6 +99,8 @@ public sealed class BattleHookContext :
         get => SuppressHitEffects;
         set => SuppressHitEffects = value;
     }
+    void IHitResultEffectContext.ResetUnitSkillCooldowns(string? detail) =>
+        ResetUnitSkillCooldowns(detail);
     int IDamageTakenEffectContext.ActualDamageAmount =>
         DamageAmount ?? throw MissingCapability(nameof(IDamageTakenEffectContext));
     bool IDamageTakenEffectContext.IsCritical => IsCritical;
@@ -249,6 +251,22 @@ public sealed class BattleHookContext :
 
         DamageAmount = 0;
         SuppressHitEffects |= suppressHitEffects;
+    }
+
+    private void ResetUnitSkillCooldowns(string? detail)
+    {
+        if (Timing != HookTiming.BeforeHitResolved)
+        {
+            throw new InvalidOperationException(
+                $"Skill cooldowns can only be reset during '{HookTiming.BeforeHitResolved}'.");
+        }
+
+        Unit.Character.ResetSkillCooldowns();
+        State.AddMessage(new BattleFact(
+            BattleFactKind.SkillCooldownsReset,
+            Unit.Id,
+            Timing,
+            detail: detail));
     }
 
     public void PreventDefeat(string abilityId)

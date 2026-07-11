@@ -88,6 +88,7 @@ public enum BattleFactKind
     Moved,
     MovementRolledBack,
     SkillCast,
+    SkillCooldownsReset,
     Damaged,
     ItemUsed,
     Rested,

@@ -45,6 +45,7 @@ public interface IHitResultEffectContext : IBattleEffectContext
     BattleHitState HitState { get; set; }
     int DamageAmount { get; set; }
     bool SuppressHitEffects { get; set; }
+    void ResetUnitSkillCooldowns(string? detail = null);
 }
 
 public interface IHitConfirmedEffectContext : IBattleEffectContext

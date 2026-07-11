@@ -114,6 +114,12 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("internal_energy_attack", new InternalEnergyAttackBattleEffectHandler());
         registry.Register("grieving_breeze", new GrievingBreezeBattleEffectHandler());
         registry.Register("beloved_companion_damage", new BelovedCompanionDamageBattleEffectHandler());
+        registry.Register("low_health_target_damage", new LowHealthTargetDamageBattleEffectHandler());
+        registry.Register("rage_damage", new RageDamageBattleEffectHandler());
+        registry.Register("poisoned_target_level_damage", new PoisonedTargetLevelDamageBattleEffectHandler());
+        registry.Register("reset_skill_cooldowns", new ResetSkillCooldownsBattleEffectHandler());
+        registry.Register("random_debuff", new RandomDebuffBattleEffectHandler());
+        registry.Register("random_strengthen_context_buff", new RandomStrengthenContextBuffBattleEffectHandler());
         return registry;
     }
 

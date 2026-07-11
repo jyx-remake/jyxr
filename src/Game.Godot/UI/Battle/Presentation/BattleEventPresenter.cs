@@ -55,6 +55,10 @@ internal sealed class BattleEventPresenter(
                     ? $"{unitName} 施展奥义【{skill.ResolvedSkillName}】。"
                     : $"{unitName} 施展【{skill.ResolvedSkillName}】。");
                 break;
+            case BattleFactKind.SkillCooldownsReset:
+                board.PlayFloatText(fact.UnitId, "冷却重置", BattleFloatTextStyle.Beneficial);
+                AppendLog($"{unitName} 的天赋【{ResolveTalentName(fact.Detail)}】发动，所有技能冷却重置。");
+                break;
             case BattleFactKind.Damaged:
                 PresentDamage(fact, unitName);
                 break;
