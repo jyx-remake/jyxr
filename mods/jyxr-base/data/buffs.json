@@ -1,0 +1,480 @@
+[
+  {
+    "id": "中毒",
+    "name": "中毒",
+    "isDebuff": true,
+    "description": "每回合减少生命值"
+  },
+  {
+    "id": "伤害加深",
+    "name": "伤害加深",
+    "isDebuff": true,
+    "description": "伤害不停加深，受到与BUFF等级相关的额外伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_relation",
+            "role": "source",
+            "relation": "enemy"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "source_attack",
+            "op": "more",
+            "delta": 1.0,
+            "deltaPowerBasePerBuffLevel": 1.15
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "内伤",
+    "name": "内伤",
+    "isDebuff": true,
+    "description": "每回合减少内力值，内力消耗增加",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeSkillCost",
+        "effects": [
+          {
+            "type": "modify_mp_cost",
+            "op": "increase",
+            "deltaPerBuffLevel": 0.1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "刀封印",
+    "name": "刀封印",
+    "isDebuff": true,
+    "description": "无法施展刀系外功，无法施展相关绝技"
+  },
+  {
+    "id": "剑封印",
+    "name": "剑封印",
+    "isDebuff": true,
+    "description": "无法施展剑系外功，无法施展相关绝技"
+  },
+  {
+    "id": "圣战",
+    "name": "圣战",
+    "isDebuff": false,
+    "description": "不受任何不良状态影响。"
+  },
+  {
+    "id": "坚守",
+    "name": "坚守",
+    "isDebuff": false,
+    "description": "以减少攻击输出为代价，减少所受伤害。"
+  },
+  {
+    "id": "奇门封印",
+    "name": "奇门封印",
+    "isDebuff": true,
+    "description": "无法施展奇门外功，无法施展相关绝技"
+  },
+  {
+    "id": "定身",
+    "name": "定身",
+    "isDebuff": true,
+    "description": "无法移动。"
+  },
+  {
+    "id": "封穴",
+    "name": "封穴",
+    "isDebuff": true,
+    "description": "穴道被封，无法恢复内力。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeRecoveryResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          },
+          {
+            "type": "context_recovery_kind",
+            "kind": "mp"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_recovery",
+            "op": "more",
+            "delta": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "左右互搏",
+    "name": "左右互搏",
+    "isDebuff": false,
+    "description": "一定概率出两次攻击",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "extra_strike",
+            "target": {
+              "type": "target"
+            },
+            "chancePerBuffLevel": 5,
+            "damageFactors": [0.6]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "恢复",
+    "name": "恢复",
+    "isDebuff": false,
+    "description": "每回合回复生命值"
+  },
+  {
+    "id": "拳掌封印",
+    "name": "拳掌封印",
+    "isDebuff": true,
+    "description": "无法施展拳系外功，无法施展相关绝技"
+  },
+  {
+    "id": "攻击弱化",
+    "name": "攻击弱化",
+    "isDebuff": true,
+    "description": "减少攻击力",
+    "affixes": [
+      {
+        "type": "buff_level_stat_modifier",
+        "stat": "attack",
+        "mulPerLevel": -0.1
+      }
+    ]
+  },
+  {
+    "id": "攻击强化",
+    "name": "攻击强化",
+    "isDebuff": false,
+    "description": "增加攻击力",
+    "affixes": [
+      {
+        "type": "buff_level_stat_modifier",
+        "stat": "attack",
+        "mulPerLevel": 0.1
+      }
+    ]
+  },
+  {
+    "id": "易容",
+    "name": "易容",
+    "isDebuff": false,
+    "description": "易容改面，藏于暗处。伺机发动致命伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_relation",
+            "role": "target",
+            "relation": "enemy"
+          }
+        ],
+        "effects": [
+            {
+              "type": "modify_damage_context",
+              "field": "final_damage",
+              "op": "more",
+              "deltaMin": 1.1,
+              "deltaMax": 1.3
+            },
+          {
+            "type": "remove_buff",
+            "target": {
+              "type": "self"
+            },
+            "buffId": "易容"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "看招！（{owner}易容后，发动奇袭！）"
+          ]
+        }
+      },
+      {
+        "type": "hook",
+        "timing": "BeforeHitResolved",
+        "conditions": [
+          {
+            "type": "context_unit_relation",
+            "role": "source",
+            "relation": "enemy"
+          }
+        ],
+        "effects": [
+          {
+            "type": "cancel_hit"
+          }
+        ],
+        "speech": {
+          "lines": [
+            "改面易容，伺机而动！ (易容生效)"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "晕眩",
+    "name": "晕眩",
+    "isDebuff": true,
+    "description": "无法行动"
+  },
+  {
+    "id": "沾衣十八跌",
+    "name": "沾衣十八跌",
+    "isDebuff": false,
+    "description": "气劲充满全身，攻击命中的敌人有一定概率被气劲反伤晕眩。"
+  },
+  {
+    "id": "溜须拍马",
+    "name": "溜须拍马",
+    "isDebuff": false,
+    "description": "溜须拍马，跪地求饶，不受伤害。"
+  },
+  {
+    "id": "狂战",
+    "name": "狂战",
+    "isDebuff": false,
+    "description": "以受到更多伤害为代价，提升攻击力。"
+  },
+  {
+    "id": "神行",
+    "name": "神行",
+    "isDebuff": false,
+    "description": "提高战斗中的集气速度。"
+  },
+  {
+    "id": "神速攻击",
+    "name": "神速攻击",
+    "isDebuff": false,
+    "description": "一定概率出三次攻击",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "extra_strike",
+            "target": {
+              "type": "target"
+            },
+            "chancePerBuffLevel": 5,
+            "damageFactors": [0.6, 0.3]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "缓速",
+    "name": "缓速",
+    "isDebuff": true,
+    "description": "减少移动范围",
+    "affixes": [
+      {
+        "type": "buff_level_stat_modifier",
+        "stat": "movement",
+        "addPerLevel": -1.5
+      }
+    ]
+  },
+  {
+    "id": "致盲",
+    "name": "致盲",
+    "isDebuff": true,
+    "description": "减少技能攻击范围"
+  },
+  {
+    "id": "诸般封印",
+    "name": "诸般封印",
+    "isDebuff": true,
+    "description": "无法施展拳、刀、剑、奇门外功，可以施展绝技"
+  },
+  {
+    "id": "轻身",
+    "name": "轻身",
+    "isDebuff": false,
+    "description": "增加移动能力。",
+    "affixes": [
+      {
+        "type": "buff_level_stat_modifier",
+        "stat": "movement",
+        "addBase": 1,
+        "addPerLevel": 1
+      }
+    ]
+  },
+  {
+    "id": "醉酒",
+    "name": "醉酒",
+    "isDebuff": false,
+    "description": "20%概率因为醉酒不能行动，80%概率怒气全满，同时攻击有一定几率出两次攻击",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeActionStart",
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "drunkenness",
+            "parameters": {
+              "skipChance": 0.2,
+              "rage": 6,
+              "skipReason": "醉酒"
+            }
+          }
+        ]
+      },
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "damage_positive"
+          }
+        ],
+        "effects": [
+          {
+            "type": "extra_strike",
+            "target": {
+              "type": "target"
+            },
+            "chancePerBuffLevel": 5,
+            "damageFactors": [0.6]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "重伤",
+    "name": "重伤",
+    "isDebuff": true,
+    "description": "受到的任何回复效果减半。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeRecoveryResolved",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "target"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_recovery",
+            "op": "increase",
+            "delta": -0.5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "防御强化",
+    "name": "防御强化",
+    "isDebuff": false,
+    "description": "提升防御力。",
+    "affixes": [
+      {
+        "type": "buff_level_stat_modifier",
+        "stat": "defence",
+        "addBase": 20,
+        "addPerLevel": 20
+      }
+    ]
+  },
+  {
+    "id": "集气",
+    "name": "集气",
+    "isDebuff": false,
+    "description": "每回合增加蓄力值"
+  },
+  {
+    "id": "飘渺",
+    "name": "飘渺",
+    "isDebuff": false,
+    "description": "一定概率躲避攻击",
+    "affixes": [
+      {
+        "type": "buff_level_stat_modifier",
+        "stat": "evasion",
+        "addPerLevel": 0.07
+      }
+    ]
+  },
+  {
+    "id": "魔神降临",
+    "name": "魔神降临",
+    "isDebuff": false,
+    "description": "犹如魔神附体，所有攻击必定暴击，暴击伤害提高25%。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "modify_damage_context",
+            "field": "critical_chance",
+            "op": "override",
+            "delta": 1.0
+          },
+          {
+            "type": "modify_damage_context",
+            "field": "critical_multiplier",
+            "op": "add",
+            "delta": 0.25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "麻痹",
+    "name": "麻痹",
+    "isDebuff": true,
+    "description": "降低战斗中的集气速度。"
+  }
+]

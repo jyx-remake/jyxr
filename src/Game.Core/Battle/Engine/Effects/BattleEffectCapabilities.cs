@@ -79,4 +79,5 @@ public interface IBuffApplicationEffectContext : IBattleEffectContext
 public interface IActionStartEffectContext : IBattleEffectContext
 {
     void SkipCurrentAction(string? reason = null);
+    int SetRage(int value, string? detail = null);
 }

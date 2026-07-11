@@ -2,6 +2,7 @@ using System.Text.Json;
 using Game.Core.Serialization;
 using Game.Core.Battle.Talents;
 using Game.Core.Battle.SpecialSkills;
+using Game.Core.Battle.Buffs;
 using Game.Core.Affix;
 
 namespace Game.Core.Battle;
@@ -81,6 +82,7 @@ public sealed class CustomBattleEffectRegistry
     {
         var registry = new CustomBattleEffectRegistry();
         registry.Register("illness", new IllnessBattleEffectHandler());
+        registry.Register("drunkenness", new DrunkennessBattleEffectHandler());
         registry.Register("zhenwu_formation_attack", new ZhenwuFormationAttackBattleEffectHandler());
         registry.Register("zhenwu_formation_intercept", new ZhenwuFormationInterceptBattleEffectHandler());
         registry.Register("xiang_er_wish_damage", new XiangErWishDamageBattleEffectHandler());

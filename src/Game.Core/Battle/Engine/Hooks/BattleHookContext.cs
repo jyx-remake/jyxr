@@ -139,6 +139,17 @@ public sealed class BattleHookContext :
         }
     }
 
+    public int SetRage(int value, string? detail = null)
+    {
+        if (Timing != HookTiming.BeforeActionStart)
+        {
+            throw new InvalidOperationException(
+                $"Rage can only be set through an action-start effect during '{HookTiming.BeforeActionStart}'.");
+        }
+
+        return BattleResourceResolver.SetRage(State, Unit, value, Timing, detail);
+    }
+
     public void RequestSpeech(BattleUnit speaker, string text)
     {
         ArgumentNullException.ThrowIfNull(speaker);

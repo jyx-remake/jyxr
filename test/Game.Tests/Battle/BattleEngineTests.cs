@@ -1853,6 +1853,53 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void BeginAction_DrunkennessSkipsActionWhenRollIsBelowChance()
+    {
+        var drunkenness = CreateDrunkennessBuff(skipChance: 0.2d, rage: 6);
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0), rage: 2);
+        hero.ApplyBuff(new BattleBuffInstance(drunkenness, 1, 3, hero.Id, 0));
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(random: new FixedRandomService(0.19d));
+
+        var action = engine.BeginAction(state, hero.Id);
+
+        Assert.True(action.Success);
+        Assert.Null(action.Value);
+        Assert.Null(state.CurrentAction);
+        Assert.Equal(2, hero.Rage);
+        Assert.Contains(action.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.ActionSkipped &&
+            battleEvent.UnitId == hero.Id &&
+            battleEvent.Detail == "醉酒");
+        Assert.DoesNotContain(action.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.RageChanged);
+    }
+
+    [Fact]
+    public void BeginAction_DrunkennessSetsRageWhenRollIsAtChanceBoundary()
+    {
+        var drunkenness = CreateDrunkennessBuff(skipChance: 0.2d, rage: 6);
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0), rage: 2);
+        hero.ApplyBuff(new BattleBuffInstance(drunkenness, 1, 3, hero.Id, 0));
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine(random: new FixedRandomService(0.2d));
+
+        var action = engine.BeginAction(state, hero.Id);
+
+        Assert.True(action.Success);
+        Assert.NotNull(action.Value);
+        Assert.NotNull(state.CurrentAction);
+        Assert.Equal(6, hero.Rage);
+        Assert.Contains(action.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.RageChanged &&
+            battleEvent.UnitId == hero.Id &&
+            battleEvent.Timing == HookTiming.BeforeActionStart &&
+            battleEvent.Detail == "drunkenness:4");
+    }
+
+    [Fact]
     public void CastSkill_ZhenwuFormationInterceptRedirectsBeforeDamageIsApplied()
     {
         var skillDefinition = TestContentFactory.CreateExternalSkill(
@@ -3317,6 +3364,35 @@ public sealed class BattleEngineTests
                 new ModifyMpCostBattleHookEffectDefinition(ModifierOp.Increase, DeltaPerBuffLevel: 0.1d),
             ],
         };
+
+    private static BuffDefinition CreateDrunkennessBuff(double skipChance, int rage)
+    {
+        using var parameters = JsonDocument.Parse(
+            $$"""
+            {
+              "skipChance": {{skipChance}},
+              "rage": {{rage}},
+              "skipReason": "醉酒"
+            }
+            """);
+        var effect = new CustomBattleEffectDefinition("drunkenness", parameters.RootElement.Clone());
+        var definition = new BuffDefinition
+        {
+            Id = "醉酒",
+            Name = "醉酒",
+            IsDebuff = false,
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeActionStart,
+                    Effects = [effect],
+                },
+            ],
+        };
+        effect.Resolve(TestContentFactory.CreateRepository(buffs: [definition]));
+        return definition;
+    }
 
     private static HookAffix CreatePoisonMasteryHook() =>
         new()
