@@ -1954,7 +1954,35 @@
     "id": "攀云乘龙",
     "name": "攀云乘龙",
     "point": 50,
-    "description": "一定概率造成基于身法值的真实伤害，身法值越高，伤害越高。"
+    "description": "一定概率造成基于身法值的额外伤害，身法值越高，伤害越高。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "cloud_climbing_dragon",
+            "parameters": {
+              "chance": 0.5,
+              "minimumShenfaFactor": 1.0,
+              "maximumShenfaFactor": 2.0,
+              "speechLines": [
+                "我从月下来，偷走你最爱……",
+                "攀云乘龙，神行百变，千变万劫！"
+              ],
+              "speechChance": 0.1
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "救死扶伤",
@@ -2043,7 +2071,31 @@
     "id": "无形剑气",
     "name": "无形剑气",
     "point": 0,
-    "description": "使用六脉神剑攻击时，附加基于敌我当前内力值差的真实伤害。"
+    "description": "使用六脉神剑攻击时，附加基于敌我当前内力值差的额外伤害。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "BeforeDamageCalculation",
+        "conditions": [
+          {
+            "type": "context_unit_role",
+            "role": "source"
+          }
+        ],
+        "effects": [
+          {
+            "type": "custom",
+            "effectId": "formless_sword_qi",
+            "parameters": {
+              "skillName": "六脉神剑",
+              "mpDifferenceCap": 10000,
+              "minimumFactor": 0.1,
+              "maximumFactor": 0.25
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "无相",

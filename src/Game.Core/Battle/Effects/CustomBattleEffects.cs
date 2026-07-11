@@ -109,6 +109,8 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("heal_the_wounded", new HealTheWoundedBattleEffectHandler());
         registry.Register("flying_skyward", new FlyingSkywardBattleEffectHandler());
         registry.Register("life_and_death", new LifeAndDeathBattleEffectHandler());
+        registry.Register("cloud_climbing_dragon", new CloudClimbingDragonBattleEffectHandler());
+        registry.Register("formless_sword_qi", new FormlessSwordQiBattleEffectHandler());
         return registry;
     }
 
