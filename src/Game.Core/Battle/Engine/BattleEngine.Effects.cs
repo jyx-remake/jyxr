@@ -318,6 +318,12 @@ public sealed partial class BattleEngine
 
             ApplyPeriodicBuffEffect(state, unit, buff);
             buff.ConsumeRound();
+            TriggerHooks(state, HookTiming.AfterBuffRound, unit, context =>
+            {
+                context.Source = state.TryGetUnit(buff.SourceUnitId) ?? unit;
+                context.Target = unit;
+                context.Buff = buff;
+            });
         }
 
         var expired = unit.RemoveExpiredBuffs();

@@ -17,6 +17,7 @@ public static class BattleEffectTimingPolicy
             CancelHitBattleHookEffectDefinition or SetHitSuccessBattleHookEffectDefinition =>
                 timing == HookTiming.BeforeHitResolved,
             ExtraStrikeBattleHookEffectDefinition => timing == HookTiming.OnHitConfirmed,
+            RemoveContextBuffBattleEffectDefinition => timing == HookTiming.AfterBuffRound,
             CustomBattleEffectDefinition custom => custom.SupportsTiming(timing),
             _ => true,
         };

@@ -41,6 +41,7 @@ public sealed record NearbyAlliesBattleTargetSelectorDefinition(
 [JsonDerivedType(typeof(RemoveBuffBattleEffectDefinition), "remove_buff")]
 [JsonDerivedType(typeof(RemoveNegativeBuffsBattleEffectDefinition), "remove_negative_buffs")]
 [JsonDerivedType(typeof(RemovePositiveBuffsBattleEffectDefinition), "remove_positive_buffs")]
+[JsonDerivedType(typeof(RemoveContextBuffBattleEffectDefinition), "remove_context_buff")]
 [JsonDerivedType(typeof(AddRageBattleEffectDefinition), "add_rage")]
 [JsonDerivedType(typeof(SetRageBattleEffectDefinition), "set_rage")]
 [JsonDerivedType(typeof(SetActionGaugeBattleEffectDefinition), "set_action_gauge")]
@@ -99,6 +100,8 @@ public sealed record RemoveNegativeBuffsBattleEffectDefinition(
 
 public sealed record RemovePositiveBuffsBattleEffectDefinition(
     BattleTargetSelectorDefinition Target) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
+
+public sealed record RemoveContextBuffBattleEffectDefinition : BattleEffectDefinition;
 
 public sealed record AddRageBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,

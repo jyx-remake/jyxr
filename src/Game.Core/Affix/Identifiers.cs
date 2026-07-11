@@ -31,6 +31,7 @@ public enum HookTiming
     OnBattleStart,
     BeforeActionStart,
     AfterActionEnd,
+    AfterBuffRound,
     BeforeMove,
     AfterMove,
     BeforeSkillCost,

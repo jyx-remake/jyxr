@@ -64,6 +64,12 @@
         "conditions": [
           {
             "type": "damage_positive"
+          },
+          {
+            "type": "unit_level_chance",
+            "baseValue": 0,
+            "valuePerLevel": 0.005,
+            "maxValue": 1
           }
         ],
         "effects": [
@@ -1392,7 +1398,7 @@
             "target": {
               "type": "target"
             },
-            "chance": 0.075,
+            "chance": 100,
             "damageFactors": [0.6]
           }
         ]
@@ -2164,8 +2170,11 @@
     "affixes": [
       {
         "type": "hook",
-        "timing": "BeforeActionStart",
+        "timing": "AfterBuffRound",
         "conditions": [
+          {
+            "type": "context_buff_negative"
+          },
           {
             "type": "chance",
             "value": 0.5
@@ -2173,10 +2182,7 @@
         ],
         "effects": [
           {
-            "type": "remove_negative_buffs",
-            "target": {
-              "type": "self"
-            }
+            "type": "remove_context_buff"
           }
         ]
       }
@@ -2186,7 +2192,29 @@
     "id": "清风",
     "name": "清风",
     "point": 5,
-    "description": "随着等级逐步提升，提高每回合解除负面效果的概率。"
+    "description": "随着等级逐步提升，提高每回合解除负面效果的概率。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "AfterBuffRound",
+        "conditions": [
+          {
+            "type": "context_buff_negative"
+          },
+          {
+            "type": "unit_level_chance",
+            "baseValue": 0,
+            "valuePerLevel": 0.015,
+            "maxValue": 1
+          }
+        ],
+        "effects": [
+          {
+            "type": "remove_context_buff"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "灵心慧质",
@@ -3797,7 +3825,32 @@
     "id": "阴阳",
     "name": "阴阳",
     "point": 5,
-    "description": "随着等级逐步提升，攻击有一定概率附加麻痹效果。"
+    "description": "随着等级逐步提升，攻击有一定概率附加麻痹效果。",
+    "affixes": [
+      {
+        "type": "hook",
+        "timing": "OnHitConfirmed",
+        "conditions": [
+          {
+            "type": "unit_level_chance",
+            "baseValue": 0,
+            "valuePerLevel": 0.01,
+            "maxValue": 1
+          }
+        ],
+        "effects": [
+          {
+            "type": "apply_buff",
+            "target": {
+              "type": "target"
+            },
+            "buffId": "麻痹",
+            "level": 0,
+            "duration": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "隔空取物",

@@ -257,6 +257,16 @@ public sealed partial class JsonContentLoader
                     Ensure(chance.Value >= 0d && chance.Value <= 1d,
                         $"{ownerName} has battle hook '{hook.Timing}' with invalid chance '{chance.Value}'.");
                     break;
+                case UnitLevelChanceBattleHookConditionDefinition chance:
+                    Ensure(chance.BaseValue >= 0d && chance.BaseValue <= 1d,
+                        $"{ownerName} has battle hook '{hook.Timing}' with invalid base chance '{chance.BaseValue}'.");
+                    Ensure(chance.ValuePerLevel >= 0d,
+                        $"{ownerName} has battle hook '{hook.Timing}' with invalid chance per level '{chance.ValuePerLevel}'.");
+                    Ensure(chance.MaxValue >= 0d && chance.MaxValue <= 1d,
+                        $"{ownerName} has battle hook '{hook.Timing}' with invalid maximum chance '{chance.MaxValue}'.");
+                    Ensure(chance.BaseValue <= chance.MaxValue,
+                        $"{ownerName} has battle hook '{hook.Timing}' with base chance greater than its maximum chance.");
+                    break;
                 case DamagePositiveBattleHookConditionDefinition:
                     break;
                 case ContextBuffIdBattleHookConditionDefinition buffCondition:
@@ -267,6 +277,11 @@ public sealed partial class JsonContentLoader
                         Ensure(repository.Buffs.ContainsKey(buffCondition.BuffId),
                             $"{ownerName} has battle hook '{hook.Timing}' condition referencing missing buff '{buffCondition.BuffId}'.");
                     }
+                    break;
+                case ContextBuffNegativeBattleHookConditionDefinition:
+                    Ensure(hook.Timing is HookTiming.BeforeBuffApplied or HookTiming.OnBuffApplied or
+                            HookTiming.OnBuffRemoved or HookTiming.AfterBuffRound,
+                        $"{ownerName} has battle hook '{hook.Timing}' with a context buff condition outside a buff timing.");
                     break;
                 case ContextUnitHpRatioBattleHookConditionDefinition hpRatioCondition:
                     Ensure(
@@ -403,6 +418,7 @@ public sealed partial class JsonContentLoader
                 case RemoveBuffBattleEffectDefinition:
                 case RemoveNegativeBuffsBattleEffectDefinition:
                 case RemovePositiveBuffsBattleEffectDefinition:
+                case RemoveContextBuffBattleEffectDefinition:
                 case AddRageBattleEffectDefinition:
                 case SetRageBattleEffectDefinition:
                 case SetActionGaugeBattleEffectDefinition:
@@ -491,6 +507,8 @@ public sealed partial class JsonContentLoader
             case RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs:
                 Ensure(removePositiveBuffs.Target is not null, $"{ownerName} remove_positive_buffs effect is missing target.");
                 ValidateBattleTargetSelector(removePositiveBuffs.Target!, ownerName, null);
+                break;
+            case RemoveContextBuffBattleEffectDefinition:
                 break;
             case AddRageBattleEffectDefinition addRage:
                 Ensure(addRage.Target is not null, $"{ownerName} add_rage effect is missing target.");

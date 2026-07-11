@@ -21,7 +21,8 @@ internal static class BattleHookPreviewPolicy
             throw Unsupported(context, "float text");
         }
 
-        if (hook.Conditions.Any(static condition => condition is ChanceBattleHookConditionDefinition))
+        if (hook.Conditions.Any(static condition => condition is
+                ChanceBattleHookConditionDefinition or UnitLevelChanceBattleHookConditionDefinition))
         {
             throw Unsupported(context, "random chance conditions");
         }
@@ -43,6 +44,7 @@ internal static class BattleHookPreviewPolicy
                 case RemoveBuffBattleEffectDefinition:
                 case RemoveNegativeBuffsBattleEffectDefinition:
                 case RemovePositiveBuffsBattleEffectDefinition:
+                case RemoveContextBuffBattleEffectDefinition:
                 case AddRageBattleEffectDefinition:
                 case SetRageBattleEffectDefinition:
                 case SetActionGaugeBattleEffectDefinition:

@@ -92,8 +92,10 @@ public sealed record TraitAffix(TraitId TraitId) : AffixDefinition;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(ChanceBattleHookConditionDefinition), "chance")]
+[JsonDerivedType(typeof(UnitLevelChanceBattleHookConditionDefinition), "unit_level_chance")]
 [JsonDerivedType(typeof(DamagePositiveBattleHookConditionDefinition), "damage_positive")]
 [JsonDerivedType(typeof(ContextBuffIdBattleHookConditionDefinition), "context_buff_id")]
+[JsonDerivedType(typeof(ContextBuffNegativeBattleHookConditionDefinition), "context_buff_negative")]
 [JsonDerivedType(typeof(ContextUnitHpRatioBattleHookConditionDefinition), "context_unit_hp_ratio")]
 [JsonDerivedType(typeof(ContextUnitEffectiveTalentBattleHookConditionDefinition), "context_unit_effective_talent")]
 [JsonDerivedType(typeof(ContextUnitEquippedInternalSkillBattleHookConditionDefinition), "context_unit_equipped_internal_skill")]
@@ -109,9 +111,16 @@ public abstract record BattleHookConditionDefinition;
 
 public sealed record ChanceBattleHookConditionDefinition(double Value) : BattleHookConditionDefinition;
 
+public sealed record UnitLevelChanceBattleHookConditionDefinition(
+    double BaseValue,
+    double ValuePerLevel,
+    double MaxValue = 1d) : BattleHookConditionDefinition;
+
 public sealed record DamagePositiveBattleHookConditionDefinition : BattleHookConditionDefinition;
 
 public sealed record ContextBuffIdBattleHookConditionDefinition(string BuffId) : BattleHookConditionDefinition;
+
+public sealed record ContextBuffNegativeBattleHookConditionDefinition : BattleHookConditionDefinition;
 
 public sealed record ContextUnitHpRatioBattleHookConditionDefinition(
     double? MinExclusive = null,

@@ -8,9 +8,16 @@ internal static class BattleHookEvaluator
         condition switch
         {
             ChanceBattleHookConditionDefinition chance => Probability.RollChance(context.Random, chance.Value),
+            UnitLevelChanceBattleHookConditionDefinition chance => Probability.RollChance(
+                context.Random,
+                Math.Clamp(
+                    chance.BaseValue + chance.ValuePerLevel * context.Unit.Character.Level,
+                    0d,
+                    chance.MaxValue)),
             DamagePositiveBattleHookConditionDefinition => context.DamageAmount is > 0,
             ContextBuffIdBattleHookConditionDefinition buffId => context.Buff is not null &&
                 string.Equals(context.Buff.Definition.Id, buffId.BuffId, StringComparison.Ordinal),
+            ContextBuffNegativeBattleHookConditionDefinition => context.Buff?.Definition.IsDebuff == true,
             ContextUnitHpRatioBattleHookConditionDefinition hpRatio => IsContextUnitHpRatio(context, hpRatio),
             ContextUnitEffectiveTalentBattleHookConditionDefinition talent =>
                 talent.TalentIds.Any(context.Unit.Character.HasEffectiveTalent),

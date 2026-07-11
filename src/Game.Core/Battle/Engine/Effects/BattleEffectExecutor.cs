@@ -94,6 +94,20 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
                 foreach (var target in targets)
                     engine.BuffResolver.Remove(state, source, target, buff => !buff.Definition.IsDebuff, timing);
                 break;
+            case RemoveContextBuffBattleEffectDefinition:
+                var context = RequireHook();
+                var contextBuff = context.Buff
+                    ?? throw new InvalidOperationException("Battle effect requires a context buff.");
+                if (!contextBuff.IsExpired)
+                {
+                    engine.BuffResolver.Remove(
+                        state,
+                        source,
+                        context.Unit,
+                        buff => ReferenceEquals(buff, contextBuff),
+                        timing);
+                }
+                break;
             case AddRageBattleEffectDefinition addRage:
                 foreach (var target in targets) BattleResourceResolver.AddRage(state, target, addRage.Value, timing);
                 break;
