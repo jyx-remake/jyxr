@@ -6,12 +6,12 @@ namespace Game.Core.Battle.Talents;
 public sealed record AttributeContestDebuffBattleEffectParameters(
     StatType SourceStat,
     StatType TargetStat,
-    double Scale,
-    string BuffId,
-    int Level,
-    int Duration,
-    double MinimumChance = 0d,
-    double MaximumChance = 1d);
+    [property: NonNegative] double Scale,
+    [property: NotWhiteSpace] string BuffId,
+    [property: NonNegative] int Level,
+    [property: Positive] int Duration,
+    [property: Probability] double MinimumChance = 0d,
+    [property: Probability] double MaximumChance = 1d);
 
 internal sealed class AttributeContestDebuffBattleEffectHandler
     : CustomBattleEffectHandler<AttributeContestDebuffBattleEffectParameters, IHitConfirmedEffectContext>
@@ -21,20 +21,6 @@ internal sealed class AttributeContestDebuffBattleEffectHandler
 
     public override void Validate(AttributeContestDebuffBattleEffectParameters parameters)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(parameters.Scale);
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.BuffId);
-        ArgumentOutOfRangeException.ThrowIfNegative(parameters.Level);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameters.Duration);
-        if (parameters.MinimumChance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Minimum contest chance must be between 0 and 1.");
-        }
-
-        if (parameters.MaximumChance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Maximum contest chance must be between 0 and 1.");
-        }
-
         if (parameters.MaximumChance < parameters.MinimumChance)
         {
             throw new InvalidOperationException("Maximum contest chance cannot be lower than minimum contest chance.");

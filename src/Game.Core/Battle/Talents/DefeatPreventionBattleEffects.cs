@@ -3,8 +3,8 @@ using Game.Core.Affix;
 namespace Game.Core.Battle.Talents;
 
 public sealed record SurviveAtOneHpBattleEffectParameters(
-    string AbilityId,
-    double Chance,
+    [property: NotWhiteSpace] string AbilityId,
+    [property: Probability] double Chance,
     string? FloatText = null,
     string? Speech = null);
 
@@ -13,15 +13,6 @@ public sealed class SurviveAtOneHpBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDefeated };
-
-    public override void Validate(SurviveAtOneHpBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.AbilityId);
-        if (parameters.Chance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Survival chance must be between 0 and 1.");
-        }
-    }
 
     public override void Execute(
         IDefeatPreventionEffectContext context,
@@ -56,9 +47,9 @@ public sealed class SurviveAtOneHpBattleEffectHandler
 }
 
 public sealed record QiShieldDefeatPreventionBattleEffectParameters(
-    string AbilityId,
-    double Chance,
-    int MpCostPerDamage,
+    [property: NotWhiteSpace] string AbilityId,
+    [property: Probability] double Chance,
+    [property: Positive] int MpCostPerDamage,
     string? FloatText = null,
     string? Speech = null);
 
@@ -67,17 +58,6 @@ public sealed class QiShieldDefeatPreventionBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDefeated };
-
-    public override void Validate(QiShieldDefeatPreventionBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.AbilityId);
-        if (parameters.Chance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Qi shield chance must be between 0 and 1.");
-        }
-
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(parameters.MpCostPerDamage);
-    }
 
     public override void Execute(
         IDefeatPreventionEffectContext context,
@@ -100,9 +80,9 @@ public sealed class QiShieldDefeatPreventionBattleEffectHandler
 }
 
 public sealed record EndlessFightingSpiritBattleEffectParameters(
-    string AbilityId,
-    string GuaranteedFirstTalentId,
-    double Chance,
+    [property: NotWhiteSpace] string AbilityId,
+    [property: NotWhiteSpace] string GuaranteedFirstTalentId,
+    [property: Probability] double Chance,
     string? FloatText = null,
     string? Speech = null);
 
@@ -111,16 +91,6 @@ public sealed class EndlessFightingSpiritBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDefeated };
-
-    public override void Validate(EndlessFightingSpiritBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.AbilityId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.GuaranteedFirstTalentId);
-        if (parameters.Chance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Revival chance must be between 0 and 1.");
-        }
-    }
 
     public override void Execute(
         IDefeatPreventionEffectContext context,

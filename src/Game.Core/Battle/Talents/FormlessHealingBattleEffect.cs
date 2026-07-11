@@ -3,20 +3,14 @@ using Game.Core.Affix;
 namespace Game.Core.Battle.Talents;
 
 public sealed record FormlessHealingBattleEffectParameters(
-    int BaseValue,
-    int ValuePerLevel);
+    [property: NonNegative] int BaseValue,
+    [property: NonNegative] int ValuePerLevel);
 
 internal sealed class FormlessHealingBattleEffectHandler
     : CustomBattleEffectHandler<FormlessHealingBattleEffectParameters, IActionStartEffectContext>
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeActionStart };
-
-    public override void Validate(FormlessHealingBattleEffectParameters parameters)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(parameters.BaseValue);
-        ArgumentOutOfRangeException.ThrowIfNegative(parameters.ValuePerLevel);
-    }
 
     public override void Execute(
         IActionStartEffectContext context,

@@ -5,7 +5,7 @@ namespace Game.Core.Battle.Talents;
 
 public sealed record WeaponEquipmentPenaltyBattleEffectParameters(
     WeaponType ExpectedWeaponType,
-    double DamageFactor = 0.9d);
+    [property: Probability] double DamageFactor = 0.9d);
 
 public sealed class WeaponEquipmentPenaltyBattleEffectHandler
     : CustomBattleEffectHandler<WeaponEquipmentPenaltyBattleEffectParameters, IDamageCalculationEffectContext>
@@ -27,11 +27,6 @@ public sealed class WeaponEquipmentPenaltyBattleEffectHandler
         {
             throw new InvalidOperationException(
                 $"Equipment penalty expected weapon type '{parameters.ExpectedWeaponType}' is not an external weapon type.");
-        }
-
-        if (parameters.DamageFactor is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Equipment penalty damage factor must be between 0 and 1.");
         }
     }
 

@@ -145,6 +145,7 @@ public sealed class CustomBattleEffectRegistry
                     exception);
             }
 
+            BattleEffectParameterValidation.Validate(effectId, parsedParameters);
             handler.Validate(parsedParameters);
             return new CustomBattleEffectInvocation(
                 handler.SupportsPreview,
@@ -175,6 +176,7 @@ public sealed class CustomBattleEffectRegistry
                     exception);
             }
 
+            BattleEffectParameterValidation.Validate(effectId, parsedParameters);
             handler.Validate(parsedParameters);
             return new CustomBattleEffectInvocation(
                 SupportsPreview: false,

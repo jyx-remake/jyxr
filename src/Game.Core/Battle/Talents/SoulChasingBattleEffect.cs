@@ -4,8 +4,8 @@ using Game.Core.Model;
 namespace Game.Core.Battle.Talents;
 
 public sealed record SoulChasingBattleEffectParameters(
-    string BuffId,
-    double SpeechChance,
+    [property: NotWhiteSpace] string BuffId,
+    [property: Probability] double SpeechChance,
     IReadOnlyList<string> SpeechLines);
 
 internal sealed class SoulChasingBattleEffectHandler
@@ -13,15 +13,6 @@ internal sealed class SoulChasingBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.OnHitConfirmed };
-
-    public override void Validate(SoulChasingBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.BuffId);
-        if (parameters.SpeechChance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Soul chasing speech chance must be between 0 and 1.");
-        }
-    }
 
     public override void Execute(
         IBattleEffectContext context,

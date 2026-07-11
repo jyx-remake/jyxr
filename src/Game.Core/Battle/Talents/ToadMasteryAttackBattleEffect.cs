@@ -3,11 +3,11 @@ using Game.Core.Affix;
 namespace Game.Core.Battle.Talents;
 
 public sealed record ToadMasteryAttackBattleEffectParameters(
-    string SkillNameFragment,
-    string InternalSkillId,
-    double SkillAttackBonus,
-    double InternalSkillAttackBonus,
-    double SpeechChance,
+    [property: NotWhiteSpace] string SkillNameFragment,
+    [property: NotWhiteSpace] string InternalSkillId,
+    [property: NonNegative] double SkillAttackBonus,
+    [property: NonNegative] double InternalSkillAttackBonus,
+    [property: Probability] double SpeechChance,
     IReadOnlyList<string> SkillSpeechLines,
     IReadOnlyList<string> InternalSkillSpeechLines);
 
@@ -16,18 +16,6 @@ internal sealed class ToadMasteryAttackBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDamageCalculation };
-
-    public override void Validate(ToadMasteryAttackBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.SkillNameFragment);
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.InternalSkillId);
-        ArgumentOutOfRangeException.ThrowIfNegative(parameters.SkillAttackBonus);
-        ArgumentOutOfRangeException.ThrowIfNegative(parameters.InternalSkillAttackBonus);
-        if (parameters.SpeechChance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Toad mastery speech chance must be between 0 and 1.");
-        }
-    }
 
     public override void Execute(
         IDamageCalculationEffectContext context,

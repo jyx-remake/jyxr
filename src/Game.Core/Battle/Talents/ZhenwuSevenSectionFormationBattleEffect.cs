@@ -3,8 +3,8 @@ using Game.Core.Affix;
 namespace Game.Core.Battle.Talents;
 
 public sealed record ZhenwuFormationAttackBattleEffectParameters(
-    string FormationTalentId,
-    double MaxAttackIncrease = 0.1d,
+    [property: NotWhiteSpace] string FormationTalentId,
+    [property: NonNegative] double MaxAttackIncrease = 0.1d,
     string? FloatText = null);
 
 public sealed class ZhenwuFormationAttackBattleEffectHandler
@@ -12,15 +12,6 @@ public sealed class ZhenwuFormationAttackBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDamageCalculation };
-
-    public override void Validate(ZhenwuFormationAttackBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.FormationTalentId);
-        if (parameters.MaxAttackIncrease < 0d)
-        {
-            throw new InvalidOperationException("Formation max attack increase cannot be negative.");
-        }
-    }
 
     public override void Execute(
         IDamageCalculationEffectContext context,
@@ -52,9 +43,9 @@ public sealed class ZhenwuFormationAttackBattleEffectHandler
 }
 
 public sealed record ZhenwuFormationInterceptBattleEffectParameters(
-    string FormationTalentId,
-    double InterceptChance = 0.5d,
-    double DamageFactor = 0.3d,
+    [property: NotWhiteSpace] string FormationTalentId,
+    [property: Probability] double InterceptChance = 0.5d,
+    [property: Probability] double DamageFactor = 0.3d,
     string? Speech = null);
 
 public sealed class ZhenwuFormationInterceptBattleEffectHandler
@@ -62,20 +53,6 @@ public sealed class ZhenwuFormationInterceptBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDamageApplied };
-
-    public override void Validate(ZhenwuFormationInterceptBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.FormationTalentId);
-        if (parameters.InterceptChance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Formation intercept chance must be between 0 and 1.");
-        }
-
-        if (parameters.DamageFactor is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Formation damage factor must be between 0 and 1.");
-        }
-    }
 
     public override void Execute(
         IDamageApplicationEffectContext context,

@@ -4,12 +4,12 @@ namespace Game.Core.Battle.Talents;
 
 public sealed record CarefulDefenseBattleEffectParameters(
     string Mode,
-    string CarefulTalentId,
-    string SmartTalentId,
-    double CarefulChance,
-    int CarefulDamageCap,
-    double SmartChance,
-    int SmartDamageCap,
+    [property: NotWhiteSpace] string CarefulTalentId,
+    [property: NotWhiteSpace] string SmartTalentId,
+    [property: Probability] double CarefulChance,
+    [property: NonNegative] int CarefulDamageCap,
+    [property: Probability] double SmartChance,
+    [property: NonNegative] int SmartDamageCap,
     string CarefulSpeech,
     string SmartSpeech);
 
@@ -26,12 +26,6 @@ internal sealed class CarefulDefenseBattleEffectHandler
             throw new InvalidOperationException("Careful defense mode must be 'careful' or 'smart'.");
         }
 
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.CarefulTalentId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.SmartTalentId);
-        ValidateChance(parameters.CarefulChance, nameof(parameters.CarefulChance));
-        ValidateChance(parameters.SmartChance, nameof(parameters.SmartChance));
-        ArgumentOutOfRangeException.ThrowIfNegative(parameters.CarefulDamageCap);
-        ArgumentOutOfRangeException.ThrowIfNegative(parameters.SmartDamageCap);
     }
 
     public override void Execute(
@@ -86,20 +80,13 @@ internal sealed class CarefulDefenseBattleEffectHandler
         context.RequestSpeech(context.Unit, parameters.CarefulSpeech);
     }
 
-    private static void ValidateChance(double chance, string parameterName)
-    {
-        if (chance is < 0d or > 1d)
-        {
-            throw new InvalidOperationException($"{parameterName} must be between 0 and 1.");
-        }
-    }
 }
 
 public sealed record ShiftingStarsReflectionBattleEffectParameters(
-    string FamilyTalentId,
-    double Chance,
-    double FamilyChance,
-    double DamageFactor,
+    [property: NotWhiteSpace] string FamilyTalentId,
+    [property: Probability] double Chance,
+    [property: Probability] double FamilyChance,
+    [property: Probability] double DamageFactor,
     string FloatText,
     string Speech);
 
@@ -108,14 +95,6 @@ internal sealed class ShiftingStarsReflectionBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDamageApplied };
-
-    public override void Validate(ShiftingStarsReflectionBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.FamilyTalentId);
-        ValidateProbability(parameters.Chance, nameof(parameters.Chance));
-        ValidateProbability(parameters.FamilyChance, nameof(parameters.FamilyChance));
-        ValidateProbability(parameters.DamageFactor, nameof(parameters.DamageFactor));
-    }
 
     public override void Execute(
         IDamageApplicationRuntimeContext context,
@@ -147,20 +126,13 @@ internal sealed class ShiftingStarsReflectionBattleEffectHandler
         context.CancelDamage(suppressHitEffects: true);
     }
 
-    private static void ValidateProbability(double value, string parameterName)
-    {
-        if (value is < 0d or > 1d)
-        {
-            throw new InvalidOperationException($"{parameterName} must be between 0 and 1.");
-        }
-    }
 }
 
 public sealed record EternalSpringBattleEffectParameters(
-    string EnhancedTalentId,
-    double Chance,
-    double EnhancedChance,
-    double RecoveryFactor,
+    [property: NotWhiteSpace] string EnhancedTalentId,
+    [property: Probability] double Chance,
+    [property: Probability] double EnhancedChance,
+    [property: Probability] double RecoveryFactor,
     string FloatText);
 
 internal sealed class EternalSpringBattleEffectHandler
@@ -168,14 +140,6 @@ internal sealed class EternalSpringBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeDamageApplied };
-
-    public override void Validate(EternalSpringBattleEffectParameters parameters)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(parameters.EnhancedTalentId);
-        ValidateProbability(parameters.Chance, nameof(parameters.Chance));
-        ValidateProbability(parameters.EnhancedChance, nameof(parameters.EnhancedChance));
-        ValidateProbability(parameters.RecoveryFactor, nameof(parameters.RecoveryFactor));
-    }
 
     public override void Execute(
         IDamageApplicationRuntimeContext context,
@@ -203,11 +167,4 @@ internal sealed class EternalSpringBattleEffectHandler
         context.CancelDamage(suppressHitEffects: true);
     }
 
-    private static void ValidateProbability(double value, string parameterName)
-    {
-        if (value is < 0d or > 1d)
-        {
-            throw new InvalidOperationException($"{parameterName} must be between 0 and 1.");
-        }
-    }
 }

@@ -3,7 +3,7 @@ using Game.Core.Affix;
 namespace Game.Core.Battle.Talents;
 
 public sealed record BrightSacredFireFormationBattleEffectParameters(
-    double ChancePerAlly = 0.2d,
+    [property: Probability] double ChancePerAlly = 0.2d,
     string? FloatText = null);
 
 public sealed class BrightSacredFireFormationBattleEffectHandler
@@ -11,14 +11,6 @@ public sealed class BrightSacredFireFormationBattleEffectHandler
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.BeforeActionReadiness };
-
-    public override void Validate(BrightSacredFireFormationBattleEffectParameters parameters)
-    {
-        if (parameters.ChancePerAlly is < 0d or > 1d)
-        {
-            throw new InvalidOperationException("Formation chance per ally must be between 0 and 1.");
-        }
-    }
 
     public override void Execute(
         IActionReadinessEffectContext context,
