@@ -11,7 +11,6 @@ internal sealed class BattleFlowOrchestrator
     private readonly BattleScreen _screen;
     private readonly BattleEngine _engine;
     private readonly IBattleAgent _battleAgent;
-    private int _nextBattleEventIndex;
     private bool _autoBattleEnabled;
     private bool _isContinuingFlow;
     private bool? _forcedBattleResult;
@@ -312,16 +311,7 @@ internal sealed class BattleFlowOrchestrator
 
     private IReadOnlyList<BattleEvent> DrainBattleEvents()
     {
-        if (_nextBattleEventIndex > State.Events.Count)
-        {
-            throw new InvalidOperationException("Battle event stream moved backwards.");
-        }
-
-        var events = State.Events
-            .Skip(_nextBattleEventIndex)
-            .ToArray();
-        _nextBattleEventIndex = State.Events.Count;
-        return events;
+        return State.DrainEvents();
     }
 
     private bool TryCompleteBattle()

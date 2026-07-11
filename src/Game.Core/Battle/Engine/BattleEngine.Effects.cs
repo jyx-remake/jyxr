@@ -19,6 +19,68 @@ public sealed partial class BattleEngine
 
     private readonly record struct BattleSkillHitCheck(bool IsCancelled, bool SuppressHitEffects);
 
+    private void ExecuteSkillPlan(
+        BattleState state,
+        BattleUnit source,
+        IReadOnlyList<BattleUnit> targets,
+        BattleSkillExecutionPlan plan)
+    {
+        foreach (var step in plan.Steps)
+        {
+            switch (step)
+            {
+                case ResolveSkillDamageStep:
+                    ExecuteSkillDamageStep(state, source, targets, plan.Skill);
+                    break;
+                case ApplySkillBuffsStep:
+                    foreach (var target in targets)
+                    {
+                        ApplySkillBuffs(state, source, target, plan.Skill.Buffs);
+                    }
+                    break;
+                case ApplyDefinedSkillEffectsStep definedEffects:
+                    ApplySpecialSkillEffects(state, source, targets, definedEffects.Effects);
+                    break;
+                default:
+                    throw new NotSupportedException($"Unsupported skill execution step '{step.GetType().Name}'.");
+            }
+        }
+    }
+
+    private void ExecuteSkillDamageStep(
+        BattleState state,
+        BattleUnit source,
+        IReadOnlyList<BattleUnit> targets,
+        SkillInstance skill)
+    {
+        foreach (var target in targets)
+        {
+            var hit = ApplySkillDamage(state, source, target, skill);
+            TryGainRageFromTakingDamage(state, source, hit.Target, hit.Damage);
+            if (hit.IsHitConfirmed)
+            {
+                TriggerHooks(state, HookTiming.OnHitConfirmed, source, context =>
+                {
+                    context.Source = source;
+                    context.Target = hit.Target;
+                    context.Skill = skill;
+                    context.DamageAmount = hit.Damage;
+                    context.IsCritical = hit.IsCritical;
+                });
+            }
+
+            if (!hit.SuppressHitEffects)
+            {
+                ApplySkillBuffs(state, source, hit.Target, skill.Buffs);
+            }
+        }
+
+        if (targets.Any(target => state.AreEnemies(source, target)))
+        {
+            TryGainRageFromAttack(state, source);
+        }
+    }
+
     private BattleSkillHitResolution ApplySkillDamage(BattleState state, BattleUnit source, BattleUnit target, SkillInstance skill)
     {
         var hitCheck = ResolveSkillHit(state, source, target, skill);
@@ -38,26 +100,20 @@ public sealed partial class BattleEngine
         var result = _damageCalculator.CalculateSkillDamage(damageCalculation);
         var damageMultiplier = BattleDamageRules.GetSkillDamageMultiplier(source, target);
         var resolvedDamageAmount = (int)Math.Floor(result.Amount * damageMultiplier);
-        var hookContext = TriggerHooks(state, HookTiming.OnDamageTaken, target, context =>
-        {
-            context.Source = source;
-            context.Target = target;
-            context.Skill = skill;
-            context.DamageAmount = resolvedDamageAmount;
-        });
-        var resolvedTarget = hookContext.Target ?? target;
-        var damage = resolvedTarget.TakeDamage(Math.Max(0, hookContext.DamageAmount ?? resolvedDamageAmount));
-        AddEvent(state, new BattleEvent(
-            BattleEventKind.Damaged,
-            resolvedTarget.Id,
-            Detail: source.Id,
-            Damage: new BattleDamageEvent(damage, result.IsCritical, source.Id)));
+        var damageApplication = _damageResolver.Apply(
+            state,
+            source,
+            target,
+            resolvedDamageAmount,
+            skill,
+            result.IsCritical);
+
         return new BattleSkillHitResolution(
-            resolvedTarget,
+            damageApplication.Target,
             true,
-            damage,
+            damageApplication.ActualAmount,
             result.IsCritical,
-            hitCheck.SuppressHitEffects || hookContext.SuppressHitEffects);
+            hitCheck.SuppressHitEffects || damageApplication.SuppressHitEffects);
     }
 
     private BattleSkillHitCheck ResolveSkillHit(
@@ -274,18 +330,19 @@ public sealed partial class BattleEngine
                 continue;
             }
 
-            var damage = target.TakeDamage(amount);
-            if (damage <= 0)
+            var damage = _damageResolver.Apply(
+                context.State,
+                context.Source ?? context.Unit,
+                target,
+                amount,
+                context.Skill,
+                context.IsCritical,
+                eventTiming: context.Timing,
+                detail: "extra_strike");
+            if (damage.ActualAmount <= 0)
             {
                 continue;
             }
-
-            AddEvent(context.State, new BattleEvent(
-                BattleEventKind.Damaged,
-                target.Id,
-                context.Timing,
-                Detail: "extra_strike",
-                Damage: new BattleDamageEvent(damage, context.IsCritical, context.Source?.Id ?? context.Unit.Id)));
         }
     }
 
@@ -481,41 +538,16 @@ public sealed partial class BattleEngine
         BattleEffectDefinition effect) =>
         effect switch
         {
-            ApplyBuffBattleEffectDefinition applyBuff => SelectSpecialSkillEffectTargets(state, source, impactedTargets, applyBuff.Target),
-            RemoveBuffBattleEffectDefinition removeBuff => SelectSpecialSkillEffectTargets(state, source, impactedTargets, removeBuff.Target),
-            RemoveNegativeBuffsBattleEffectDefinition removeNegativeBuffs => SelectSpecialSkillEffectTargets(state, source, impactedTargets, removeNegativeBuffs.Target),
-            RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs => SelectSpecialSkillEffectTargets(state, source, impactedTargets, removePositiveBuffs.Target),
-            AddRageBattleEffectDefinition addRage => SelectSpecialSkillEffectTargets(state, source, impactedTargets, addRage.Target),
-            SetRageBattleEffectDefinition setRage => SelectSpecialSkillEffectTargets(state, source, impactedTargets, setRage.Target),
-            SetActionGaugeBattleEffectDefinition setActionGauge => SelectSpecialSkillEffectTargets(state, source, impactedTargets, setActionGauge.Target),
-            AddHpBattleEffectDefinition addHp => SelectSpecialSkillEffectTargets(state, source, impactedTargets, addHp.Target),
-            AddMpBattleEffectDefinition addMp => SelectSpecialSkillEffectTargets(state, source, impactedTargets, addMp.Target),
+            ApplyBuffBattleEffectDefinition applyBuff => BattleTargetResolver.Resolve(state, source, source, impactedTargets, applyBuff.Target),
+            RemoveBuffBattleEffectDefinition removeBuff => BattleTargetResolver.Resolve(state, source, source, impactedTargets, removeBuff.Target),
+            RemoveNegativeBuffsBattleEffectDefinition removeNegativeBuffs => BattleTargetResolver.Resolve(state, source, source, impactedTargets, removeNegativeBuffs.Target),
+            RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs => BattleTargetResolver.Resolve(state, source, source, impactedTargets, removePositiveBuffs.Target),
+            AddRageBattleEffectDefinition addRage => BattleTargetResolver.Resolve(state, source, source, impactedTargets, addRage.Target),
+            SetRageBattleEffectDefinition setRage => BattleTargetResolver.Resolve(state, source, source, impactedTargets, setRage.Target),
+            SetActionGaugeBattleEffectDefinition setActionGauge => BattleTargetResolver.Resolve(state, source, source, impactedTargets, setActionGauge.Target),
+            AddHpBattleEffectDefinition addHp => BattleTargetResolver.Resolve(state, source, source, impactedTargets, addHp.Target),
+            AddMpBattleEffectDefinition addMp => BattleTargetResolver.Resolve(state, source, source, impactedTargets, addMp.Target),
             _ => throw new NotSupportedException($"Unsupported special skill effect '{effect.GetType().Name}'.")
-        };
-
-    private static IReadOnlyList<BattleUnit> SelectSpecialSkillEffectTargets(
-        BattleState state,
-        BattleUnit source,
-        IReadOnlyList<BattleUnit> impactedTargets,
-        BattleTargetSelectorDefinition selector) =>
-        selector switch
-        {
-            SelfBattleTargetSelectorDefinition => [source],
-            SourceBattleTargetSelectorDefinition => [source],
-            TargetBattleTargetSelectorDefinition => impactedTargets,
-            AllAlliesBattleTargetSelectorDefinition allAllies => state.GetLivingUnits()
-                .Where(unit => unit.Team == source.Team)
-                .Where(unit => allAllies.IncludeSelf || !string.Equals(unit.Id, source.Id, StringComparison.Ordinal))
-                .ToList(),
-            AllEnemiesBattleTargetSelectorDefinition => state.GetLivingUnits()
-                .Where(unit => unit.Team != source.Team)
-                .ToList(),
-            NearbyAlliesBattleTargetSelectorDefinition nearbyAllies => state.GetLivingUnits()
-                .Where(unit => unit.Team == source.Team)
-                .Where(unit => nearbyAllies.IncludeSelf || !string.Equals(unit.Id, source.Id, StringComparison.Ordinal))
-                .Where(unit => unit.Position.ManhattanDistanceTo(source.Position) <= nearbyAllies.Radius)
-                .ToList(),
-            _ => throw new NotSupportedException($"Unsupported battle target selector '{selector.GetType().Name}'.")
         };
 
     private IReadOnlyList<BattleBuffInstance> RemoveBattleBuffs(
@@ -676,12 +708,14 @@ public sealed partial class BattleEngine
             return;
         }
 
-        unit.TakeDamage(damage);
-        AddEvent(state, new BattleEvent(
-            BattleEventKind.Damaged,
-            unit.Id,
-            Detail: buff.Definition.Id,
-            Damage: new BattleDamageEvent(damage, SourceUnitId: buff.SourceUnitId)));
+        var source = state.TryGetUnit(buff.SourceUnitId) ?? unit;
+        _damageResolver.Apply(
+            state,
+            source,
+            unit,
+            damage,
+            runBeforeDamageApplied: false,
+            detail: buff.Definition.Id);
     }
 
     private void ApplyRecoveryTick(BattleState state, BattleUnit unit, BattleBuffInstance buff)

@@ -25,6 +25,7 @@ public sealed class BattleHookExecutor
 
         foreach (var effect in hook.Effects)
         {
+            using var effectScope = context.State.EnterEffect();
             ApplyEffect(context, effect);
         }
 
@@ -351,25 +352,12 @@ public sealed class BattleHookExecutor
     }
 
     private static IReadOnlyList<BattleUnit> SelectTargets(BattleHookContext context, BattleTargetSelectorDefinition selector) =>
-        selector switch
-        {
-            SelfBattleTargetSelectorDefinition => [context.Unit],
-            SourceBattleTargetSelectorDefinition => context.Source is null ? [] : [context.Source],
-            TargetBattleTargetSelectorDefinition => context.Target is null ? [] : [context.Target],
-            AllAlliesBattleTargetSelectorDefinition allAllies => context.State.GetLivingUnits()
-                .Where(unit => unit.Team == context.Unit.Team)
-                .Where(unit => allAllies.IncludeSelf || !string.Equals(unit.Id, context.Unit.Id, StringComparison.Ordinal))
-                .ToList(),
-            AllEnemiesBattleTargetSelectorDefinition => context.State.GetLivingUnits()
-                .Where(unit => unit.Team != context.Unit.Team)
-                .ToList(),
-            NearbyAlliesBattleTargetSelectorDefinition nearbyAllies => context.State.GetLivingUnits()
-                .Where(unit => unit.Team == context.Unit.Team)
-                .Where(unit => nearbyAllies.IncludeSelf || !string.Equals(unit.Id, context.Unit.Id, StringComparison.Ordinal))
-                .Where(unit => unit.Position.ManhattanDistanceTo(context.Unit.Position) <= nearbyAllies.Radius)
-                .ToList(),
-            _ => throw new NotSupportedException($"Unsupported battle target selector '{selector.GetType().Name}'.")
-        };
+        BattleTargetResolver.Resolve(
+            context.State,
+            context.Unit,
+            context.Source ?? context.Unit,
+            context.Target is null ? [] : [context.Target],
+            selector);
 
     private static void TryRequestSpeech(
         BattleHookContext context,

@@ -6,6 +6,7 @@ public sealed class BattleState
 {
     private readonly List<BattleUnit> _units;
     private readonly List<BattleEvent> _events = [];
+    private int _effectDepth;
 
     public BattleState(
         BattleGrid grid,
@@ -49,6 +50,18 @@ public sealed class BattleState
 
     public IReadOnlyList<BattleEvent> Events => _events;
 
+    public IReadOnlyList<BattleEvent> DrainEvents()
+    {
+        if (_events.Count == 0)
+        {
+            return [];
+        }
+
+        var events = _events.ToArray();
+        _events.Clear();
+        return events;
+    }
+
     public BattleActionContext? CurrentAction { get; internal set; }
 
     public long Tick { get; internal set; }
@@ -82,4 +95,32 @@ public sealed class BattleState
         _units.Where(static unit => unit.IsAlive).ToList();
 
     internal void AddEvent(BattleEvent battleEvent) => _events.Add(battleEvent);
+
+    internal IDisposable EnterEffect()
+    {
+        const int maxEffectDepth = 64;
+        if (_effectDepth >= maxEffectDepth)
+        {
+            throw new InvalidOperationException($"Battle effect chain exceeded maximum depth '{maxEffectDepth}'.");
+        }
+
+        _effectDepth++;
+        return new EffectScope(this);
+    }
+
+    private sealed class EffectScope(BattleState state) : IDisposable
+    {
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            state._effectDepth--;
+            _disposed = true;
+        }
+    }
 }

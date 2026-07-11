@@ -5,7 +5,23 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
-    private BattleHookContext TriggerHooks(
+    internal int ApplyDirectDamage(
+        BattleState state,
+        BattleUnit source,
+        BattleUnit target,
+        int amount,
+        HookTiming? timing = null,
+        string? detail = null) =>
+        _damageResolver.Apply(
+            state,
+            source,
+            target,
+            amount,
+            runBeforeDamageApplied: false,
+            eventTiming: timing,
+            detail: detail).ActualAmount;
+
+    internal BattleHookContext TriggerHooks(
         BattleState state,
         HookTiming timing,
         BattleUnit unit,

@@ -1,12 +1,15 @@
 using System.Text.Json;
 using Game.Core.Serialization;
 using Game.Core.Battle.Talents;
+using Game.Core.Affix;
 
 namespace Game.Core.Battle;
 
 public abstract class CustomBattleEffectHandler<TParameters>
 {
     public virtual bool SupportsPreview => false;
+
+    public abstract IReadOnlySet<HookTiming> SupportedTimings { get; }
 
     public virtual void Validate(TParameters parameters)
     {
@@ -84,6 +87,7 @@ public sealed class CustomBattleEffectRegistry
             handler.Validate(parsedParameters);
             return new CustomBattleEffectInvocation(
                 handler.SupportsPreview,
+                handler.SupportedTimings,
                 context => handler.Execute(context, parsedParameters));
         }
     }
@@ -91,4 +95,5 @@ public sealed class CustomBattleEffectRegistry
 
 internal sealed record CustomBattleEffectInvocation(
     bool SupportsPreview,
+    IReadOnlySet<HookTiming> SupportedTimings,
     Action<BattleHookContext> Execute);

@@ -36,6 +36,7 @@ public enum HookTiming
     BeforeSkillCost,
     BeforeHitResolved,
     BeforeDamageCalculation,
+    BeforeDamageApplied,
     BeforeSkillCast,
     AfterSkillCast,
     OnHitConfirmed,

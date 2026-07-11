@@ -79,37 +79,11 @@ public sealed partial class BattleEngine
             .ToHashSet();
         var targets = BattleSkillTargeting.ResolveEffectiveTargets(state, unit, resolvedSkill, impactedPositions);
 
-        foreach (var targetUnit in targets)
-        {
-            var hit = ApplySkillDamage(state, unit, targetUnit, resolvedSkill);
-            TryGainRageFromTakingDamage(state, unit, hit.Target, hit.Damage);
-            if (hit.IsHitConfirmed)
-            {
-                TriggerHooks(state, HookTiming.OnHitConfirmed, unit, context =>
-                {
-                    context.Source = unit;
-                    context.Target = hit.Target;
-                    context.Skill = resolvedSkill;
-                    context.DamageAmount = hit.Damage;
-                    context.IsCritical = hit.IsCritical;
-                });
-            }
-
-            if (!hit.SuppressHitEffects)
-            {
-                ApplySkillBuffs(state, unit, hit.Target, resolvedSkill.Buffs);
-            }
-        }
-
-        if (resolvedSpecialSkill is not null)
-        {
-            ApplySpecialSkillEffects(state, unit, targets, resolvedSpecialSkill.Definition.Effects);
-        }
-
-        if (targets.Any(targetUnit => state.AreEnemies(unit, targetUnit)))
-        {
-            TryGainRageFromAttack(state, unit);
-        }
+        ExecuteSkillPlan(
+            state,
+            unit,
+            targets,
+            BattleSkillExecutionPlanFactory.Create(resolvedSkill));
 
         var battleEvent = new BattleEvent(
             BattleEventKind.SkillCast,

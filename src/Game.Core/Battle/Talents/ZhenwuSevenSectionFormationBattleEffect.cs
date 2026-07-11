@@ -10,6 +10,9 @@ public sealed record ZhenwuFormationAttackBattleEffectParameters(
 public sealed class ZhenwuFormationAttackBattleEffectHandler
     : CustomBattleEffectHandler<ZhenwuFormationAttackBattleEffectParameters>
 {
+    public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
+        new HashSet<HookTiming> { HookTiming.BeforeDamageCalculation };
+
     public override void Validate(ZhenwuFormationAttackBattleEffectParameters parameters)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(parameters.FormationTalentId);
@@ -58,6 +61,9 @@ public sealed record ZhenwuFormationInterceptBattleEffectParameters(
 public sealed class ZhenwuFormationInterceptBattleEffectHandler
     : CustomBattleEffectHandler<ZhenwuFormationInterceptBattleEffectParameters>
 {
+    public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
+        new HashSet<HookTiming> { HookTiming.BeforeDamageApplied };
+
     public override void Validate(ZhenwuFormationInterceptBattleEffectParameters parameters)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(parameters.FormationTalentId);

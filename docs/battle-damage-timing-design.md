@@ -10,7 +10,7 @@
 - 明确普通伤害与真实伤害分别走哪些 timing
 - 避免把“命中前拦截”“防御修正”“扣血后触发”混在同一个 timing
 
-本文是后续重构目标，不要求兼容当前运行时代码。
+本文是伤害阶段的现行语义规范，不要求兼容旧运行时代码。
 
 ## 核心原则
 
@@ -145,8 +145,8 @@
 
 当前适合挂载的 effect 原语：
 
-- 当前仓库里还没有专门为这一层收敛出完整 effect 集
-- 现阶段可以预期后续主要会落到这里的 effect 方向：
+- 当前运行时已提供 `BeforeDamageApplied`，并以 `modify_damage` 和少量 custom effect 承载落血前改写
+- 后续主要会落到这里的 effect 方向：
   - 伤害封顶
   - 溢出转资源
   - 分摊 / 转移
@@ -510,6 +510,7 @@
 
 ## 落地建议
 
-- 当前 `OnDamageTaken` 中承载的命中拦截逻辑应迁出到 `BeforeHitResolved`
+- 运行时必须保持 `BeforeDamageCalculation -> BeforeDamageApplied -> TakeDamage -> OnDamageTaken` 的顺序
+- 真武七截阵的挡刀属于 `BeforeDamageApplied`；乾坤大挪移和宝甲继续使用 `BeforeDamageCalculation + final_damage`
 - 当前真实伤害 effect 后续应明确走“命中判定 -> 直接扣血 -> 扣血后触发”的窄管线
 - `BeforeDamageApplied` 只保留真正依赖“本次伤害值”的防御与反制效果，不要再次混入闪避或普通攻防修正

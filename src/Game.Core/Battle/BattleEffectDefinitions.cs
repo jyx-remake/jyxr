@@ -132,6 +132,8 @@ public sealed record CustomBattleEffectDefinition(
     [JsonIgnore]
     internal bool SupportsPreview => Invocation.SupportsPreview;
 
+    public bool SupportsTiming(HookTiming timing) => Invocation.SupportedTimings.Contains(timing);
+
     public override void Resolve(IContentRepository contentRepository)
     {
         ArgumentNullException.ThrowIfNull(contentRepository);

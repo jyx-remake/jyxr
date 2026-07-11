@@ -1178,6 +1178,47 @@ public sealed class ContentLoadingTests
         }
     }
 
+    [Theory]
+    [InlineData("OnDamageTaken", "modify_damage")]
+    [InlineData("BeforeDamageApplied", "modify_damage_context")]
+    [InlineData("BeforeDamageCalculation", "cancel_hit")]
+    public void JsonLoader_RejectsBattleEffectsAtUnsupportedTimings(string timing, string effectType)
+    {
+        var effect = effectType == "modify_damage_context"
+            ? """{ "type": "modify_damage_context", "field": "final_damage", "op": "more", "delta": 0.5 }"""
+            : effectType == "modify_damage"
+                ? """{ "type": "modify_damage", "op": "more", "delta": 0.5 }"""
+                : """{ "type": "cancel_hit" }""";
+        var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["talents.json"] =
+                $$"""
+                [
+                  {
+                    "id": "invalid_timing",
+                    "name": "invalid_timing",
+                    "affixes": [
+                      {
+                        "type": "hook",
+                        "timing": "{{timing}}",
+                        "effects": [{{effect}}]
+                      }
+                    ]
+                  }
+                ]
+                """,
+        });
+
+        try
+        {
+            Assert.Throws<InvalidOperationException>(() => new JsonContentLoader().LoadFromDirectory(directoryPath));
+        }
+        finally
+        {
+            Directory.Delete(directoryPath, recursive: true);
+        }
+    }
+
     private static InMemoryContentRepository LoadRepositoryFromJson(string json)
     {
         var loader = new JsonContentLoader();

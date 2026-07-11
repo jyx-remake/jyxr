@@ -21,6 +21,7 @@ public sealed partial class BattleEngine
     };
 
     private readonly BattleDamageCalculator _damageCalculator;
+    private readonly BattleDamageResolver _damageResolver;
     private readonly BattleHookExecutor _hookExecutor;
     private readonly LegendSkillResolver _legendSkillResolver;
     private readonly Func<IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
@@ -44,6 +45,7 @@ public sealed partial class BattleEngine
         Func<BattleUnit, bool>? battleExperienceEligibilityResolver = null)
     {
         _damageCalculator = damageCalculator ?? new BattleDamageCalculator();
+        _damageResolver = new BattleDamageResolver(this);
         _hookExecutor = hookExecutor ?? new BattleHookExecutor();
         _legendSkillResolver = legendSkillResolver ?? new LegendSkillResolver();
         _legendSkillsProvider = legendSkillsProvider ?? EmptyLegendSkillProvider;
@@ -118,7 +120,7 @@ public sealed partial class BattleEngine
         }
     }
 
-    private static void AddEvent(BattleState state, BattleEvent battleEvent) => state.AddEvent(battleEvent);
+    internal static void AddEvent(BattleState state, BattleEvent battleEvent) => state.AddEvent(battleEvent);
 
     private sealed class SharedRandomService : IRandomService
     {

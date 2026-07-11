@@ -47,37 +47,37 @@ public sealed class BattleHookContext
 
     public bool IsPreview => ExecutionMode == BattleHookExecutionMode.Preview;
 
-    public BattleUnit? Source { get; set; }
+    public BattleUnit? Source { get; internal set; }
 
-    public BattleUnit? Target { get; set; }
+    public BattleUnit? Target { get; internal set; }
 
-    public BattleBuffInstance? Buff { get; set; }
+    public BattleBuffInstance? Buff { get; internal set; }
 
-    public SkillInstance? Skill { get; set; }
+    public SkillInstance? Skill { get; internal set; }
 
-    public BattleDamageCalculationContext? DamageCalculation { get; set; }
+    public BattleDamageCalculationContext? DamageCalculation { get; internal set; }
 
-    public int? MpCost { get; set; }
+    public int? MpCost { get; internal set; }
 
-    public int? DamageAmount { get; set; }
+    public int? DamageAmount { get; internal set; }
 
-    public BattleRecoveryKind? RecoveryKind { get; set; }
+    public BattleRecoveryKind? RecoveryKind { get; internal set; }
 
-    public int? RecoveryAmount { get; set; }
+    public int? RecoveryAmount { get; internal set; }
 
-    public bool IsCritical { get; set; }
+    public bool IsCritical { get; internal set; }
 
-    public BattleHitState HitState { get; set; } = BattleHitState.Hit;
+    public BattleHitState HitState { get; internal set; } = BattleHitState.Hit;
 
     public bool HitCancelled
     {
         get => HitState == BattleHitState.Miss;
-        set => HitState = value ? BattleHitState.Miss : BattleHitState.Hit;
+        internal set => HitState = value ? BattleHitState.Miss : BattleHitState.Hit;
     }
 
-    public bool SuppressHitEffects { get; set; }
+    public bool SuppressHitEffects { get; internal set; }
 
-    public bool Cancel { get; set; }
+    public bool Cancel { get; internal set; }
 
     public bool IsActionSkipRequested { get; private set; }
 
@@ -121,10 +121,10 @@ public sealed class BattleHookContext
 
     public void RedirectDamage(BattleUnit target, double damageFactor)
     {
-        if (Timing != HookTiming.OnDamageTaken)
+        if (Timing != HookTiming.BeforeDamageApplied)
         {
             throw new InvalidOperationException(
-                $"Damage can only be redirected during '{HookTiming.OnDamageTaken}'.");
+                $"Damage can only be redirected during '{HookTiming.BeforeDamageApplied}'.");
         }
 
         ArgumentNullException.ThrowIfNull(target);
@@ -138,14 +138,13 @@ public sealed class BattleHookContext
         ArgumentNullException.ThrowIfNull(target);
         ArgumentOutOfRangeException.ThrowIfNegative(amount);
 
-        var damage = target.TakeDamage(amount);
-        State.AddEvent(new BattleEvent(
-            BattleEventKind.Damaged,
-            target.Id,
+        return Engine.ApplyDirectDamage(
+            State,
+            Source ?? Unit,
+            target,
+            amount,
             Timing,
-            Detail: detail,
-            Damage: new BattleDamageEvent(damage, SourceUnitId: Source?.Id)));
-        return damage;
+            detail);
     }
 
     public int RestoreHp(BattleUnit target, int amount, string? detail = null)

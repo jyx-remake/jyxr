@@ -377,6 +377,7 @@ public sealed partial class JsonContentLoader
 
         foreach (var effect in hook.Effects)
         {
+            ValidateBattleHookEffectTiming(hook.Timing, effect, ownerName);
             switch (effect)
             {
                 case ModifyDamageBattleHookEffectDefinition:
@@ -412,6 +413,29 @@ public sealed partial class JsonContentLoader
                     throw new InvalidOperationException($"{ownerName} has unsupported battle hook effect '{effect.GetType().Name}'.");
             }
         }
+    }
+
+    private static void ValidateBattleHookEffectTiming(
+        HookTiming timing,
+        BattleEffectDefinition effect,
+        string ownerName)
+    {
+        var supported = effect switch
+        {
+            ModifyDamageBattleHookEffectDefinition => timing == HookTiming.BeforeDamageApplied,
+            ModifyDamageContextBattleHookEffectDefinition => timing == HookTiming.BeforeDamageCalculation,
+            ModifyMpCostBattleHookEffectDefinition => timing == HookTiming.BeforeSkillCost,
+            ModifyRecoveryBattleHookEffectDefinition => timing == HookTiming.BeforeRecoveryResolved,
+            StrengthenContextBuffBattleHookEffectDefinition => timing == HookTiming.BeforeBuffApplied,
+            CancelHitBattleHookEffectDefinition or SetHitSuccessBattleHookEffectDefinition =>
+                timing == HookTiming.BeforeHitResolved,
+            ExtraStrikeBattleHookEffectDefinition => timing == HookTiming.OnHitConfirmed,
+            CustomBattleEffectDefinition custom => custom.SupportsTiming(timing),
+            _ => true,
+        };
+
+        Ensure(supported,
+            $"{ownerName} battle hook '{timing}' does not support effect '{effect.GetType().Name}'.");
     }
 
     private static void ValidateModifyDamageContextEffect(

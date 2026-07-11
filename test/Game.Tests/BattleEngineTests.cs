@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Game.Core.Abstractions;
 using Game.Core.Affix;
 using Game.Core.Battle;
@@ -1665,7 +1666,7 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
-    public void CastSkill_QiankunShiftCanHalveIncomingDamage()
+    public void CastSkill_BeforeDamageCalculationFinalDamageCanHalveIncomingDamage()
     {
         var skillDefinition = TestContentFactory.CreateExternalSkill(
             "strike",
@@ -1703,6 +1704,232 @@ public sealed class BattleEngineTests
 
         Assert.True(result.Success);
         Assert.Equal(500 - expected / 2, qiankunTarget.Hp);
+    }
+
+    [Fact]
+    public void CastSkill_DamageApplicationRunsBeforeDamageAndDamageTakenRunsAfterDamage()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var talent = new TalentDefinition
+        {
+            Id = "damage_phases",
+            Name = "damage_phases",
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeDamageApplied,
+                    Conditions = [new DamagePositiveBattleHookConditionDefinition()],
+                    Effects =
+                    [
+                        new ModifyDamageBattleHookEffectDefinition(
+                            ModifierOp.More,
+                            Delta: 0.5d),
+                    ],
+                },
+                new HookAffix
+                {
+                    Timing = HookTiming.OnDamageTaken,
+                    Conditions = [new DamagePositiveBattleHookConditionDefinition()],
+                    Effects =
+                    [
+                        new AddRageBattleEffectDefinition(
+                            new SelfBattleTargetSelectorDefinition(),
+                            Value: 2),
+                    ],
+                },
+            ],
+        };
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500, talents: [talent]);
+        var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
+        var expected = calculator.CalculateSkillDamage(
+            new BattleDamageContext(source, target, source.Character.GetExternalSkills().Single())).Amount / 2;
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(calculator, random: new FixedRandomService(0.5d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(500 - expected, target.Hp);
+        Assert.Equal(2, target.Rage);
+        var events = state.Events.ToList();
+        var beforeIndex = events.FindIndex(battleEvent =>
+            battleEvent.Kind == BattleEventKind.HooksTriggered &&
+            battleEvent.Timing == HookTiming.BeforeDamageApplied);
+        var damageIndex = events.FindIndex(battleEvent =>
+            battleEvent.Kind == BattleEventKind.Damaged && battleEvent.UnitId == target.Id);
+        var afterIndex = events.FindIndex(battleEvent =>
+            battleEvent.Kind == BattleEventKind.HooksTriggered &&
+            battleEvent.Timing == HookTiming.OnDamageTaken);
+        Assert.True(beforeIndex < damageIndex);
+        Assert.True(damageIndex < afterIndex);
+    }
+
+    [Fact]
+    public void BattleState_DrainEventsReturnsOneBatchAndClearsPendingEvents()
+    {
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(2, 2), [hero]);
+        var engine = new BattleEngine();
+
+        engine.BeginAction(state, hero.Id);
+
+        var events = state.DrainEvents();
+        Assert.Contains(events, battleEvent => battleEvent.Kind == BattleEventKind.ActionStarted);
+        Assert.Empty(state.Events);
+        Assert.Empty(state.DrainEvents());
+    }
+
+    [Fact]
+    public void BattleEvent_CategorySeparatesFactsCuesAndTraces()
+    {
+        Assert.Equal(
+            BattleEventCategory.Fact,
+            new BattleEvent(BattleEventKind.Damaged, "unit").Category);
+        Assert.Equal(
+            BattleEventCategory.Cue,
+            new BattleEvent(BattleEventKind.SpeechRequested, "unit").Category);
+        Assert.Equal(
+            BattleEventCategory.Trace,
+            new BattleEvent(BattleEventKind.HooksTriggered, "unit").Category);
+    }
+
+    [Fact]
+    public void CastSkill_SpecialSkillSkipsDefaultDamageAndExecutesDefinedEffects()
+    {
+        var specialSkill = new SpecialSkillDefinition(
+            "battle_cry",
+            "battle_cry",
+            string.Empty,
+            string.Empty,
+            Cooldown: 0,
+            SkillCostDefinition.None,
+            new SkillTargetingDefinition(CastSize: 3, ImpactType: SkillImpactType.Single, ImpactSize: 0),
+            string.Empty,
+            string.Empty,
+            Speech: null,
+            Buffs: [],
+            Effects:
+            [
+                new AddRageBattleEffectDefinition(
+                    new TargetBattleTargetSelectorDefinition(),
+                    Value: 3),
+            ]);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            specialSkills: [specialSkill]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state,
+            source.Id,
+            source.Character.GetSpecialSkills().Single(),
+            target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(500, target.Hp);
+        Assert.Equal(0, source.Rage);
+        Assert.Equal(3, target.Rage);
+        Assert.DoesNotContain(state.Events, battleEvent => battleEvent.Kind == BattleEventKind.Damaged);
+        Assert.DoesNotContain(state.Events, battleEvent =>
+            battleEvent.Timing is HookTiming.BeforeHitResolved or
+                HookTiming.BeforeDamageCalculation or
+                HookTiming.BeforeDamageApplied or
+                HookTiming.OnDamageTaken);
+    }
+
+    [Fact]
+    public void CastSkill_ZhenwuFormationInterceptRedirectsBeforeDamageIsApplied()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        using var parameters = JsonDocument.Parse(
+            """
+            {
+              "formationTalentId": "真武七截阵",
+              "interceptChance": 1,
+              "damageFactor": 0.3,
+              "speech": "真武七截阵"
+            }
+            """);
+        var intercept = new CustomBattleEffectDefinition(
+            "zhenwu_formation_intercept",
+            parameters.RootElement.Clone());
+        var formation = new TalentDefinition
+        {
+            Id = "真武七截阵",
+            Name = "真武七截阵",
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeDamageApplied,
+                    Conditions = [new DamagePositiveBattleHookConditionDefinition()],
+                    Effects = [intercept],
+                },
+            ],
+        };
+        intercept.Resolve(TestContentFactory.CreateRepository(talents: [formation]));
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500, talents: [formation]);
+        var defender = CreateUnit("defender", team: 2, new GridPosition(2, 0), maxHp: 500, talents: [formation]);
+        var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
+        var calculated = calculator.CalculateSkillDamage(
+            new BattleDamageContext(source, target, source.Character.GetExternalSkills().Single())).Amount;
+        var expected = (int)(calculated * 0.3d);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target, defender]);
+        var engine = new BattleEngine(calculator, random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(500, target.Hp);
+        Assert.Equal(500 - expected, defender.Hp);
+        var damage = Assert.Single(state.Events.Where(battleEvent => battleEvent.Kind == BattleEventKind.Damaged));
+        Assert.Equal(defender.Id, damage.UnitId);
+        Assert.Equal(expected, damage.Damage?.Amount);
+        Assert.Contains(state.Events, battleEvent =>
+            battleEvent.Kind == BattleEventKind.SpeechRequested &&
+            battleEvent.UnitId == defender.Id);
     }
 
     [Fact]
@@ -3098,15 +3325,18 @@ public sealed class BattleEngineTests
     private static HookAffix CreateQiankunShiftHook() =>
         new()
         {
-            Timing = HookTiming.OnDamageTaken,
+            Timing = HookTiming.BeforeDamageCalculation,
             Conditions =
             [
-                new DamagePositiveBattleHookConditionDefinition(),
+                new ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole.Target),
                 new ChanceBattleHookConditionDefinition(0.5d),
             ],
             Effects =
             [
-                new ModifyDamageBattleHookEffectDefinition(ModifierOp.Increase, Delta: -0.5d),
+                new ModifyDamageContextBattleHookEffectDefinition(
+                    BattleDamageContextField.FinalDamage,
+                    ModifierOp.More,
+                    Delta: 0.5d),
             ],
         };
 
@@ -3469,6 +3699,7 @@ public sealed class BattleEngineTests
         IReadOnlyList<TalentDefinition>? talents = null,
         IReadOnlyList<InitialExternalSkillEntryDefinition>? externalSkills = null,
         IReadOnlyList<InitialInternalSkillEntryDefinition>? internalSkills = null,
+        IReadOnlyList<SpecialSkillDefinition>? specialSkills = null,
         int level = 1,
         CharacterGender gender = CharacterGender.Neutral)
     {
@@ -3499,7 +3730,8 @@ public sealed class BattleEngineTests
             internalSkills: internalSkills,
             talents: talents,
             level: level,
-            gender: gender);
+            gender: gender,
+            specialSkills: specialSkills);
         var character = TestContentFactory.CreateCharacterInstance(id, definition);
         return new BattleUnit(
             id,

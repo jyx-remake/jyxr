@@ -15,7 +15,22 @@ public sealed record BattleEvent(
     BattleRestRecovery? Rest = null,
     BattleSkillExperienceEvent? SkillExperience = null,
     BattleCharacterExperienceEvent? CharacterExperience = null,
-    BattleFloatTextCue? FloatText = null);
+    BattleFloatTextCue? FloatText = null)
+{
+    public BattleEventCategory Category => Kind switch
+    {
+        BattleEventKind.SpeechRequested or BattleEventKind.FloatTextRequested => BattleEventCategory.Cue,
+        BattleEventKind.HooksTriggered => BattleEventCategory.Trace,
+        _ => BattleEventCategory.Fact,
+    };
+}
+
+public enum BattleEventCategory
+{
+    Fact,
+    Cue,
+    Trace,
+}
 
 public sealed record BattleSpeechCue(string Text);
 

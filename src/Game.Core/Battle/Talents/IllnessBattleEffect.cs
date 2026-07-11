@@ -1,3 +1,5 @@
+using Game.Core.Affix;
+
 namespace Game.Core.Battle.Talents;
 
 public sealed record IllnessBattleEffectParameters(
@@ -7,6 +9,9 @@ public sealed record IllnessBattleEffectParameters(
 
 public sealed class IllnessBattleEffectHandler : CustomBattleEffectHandler<IllnessBattleEffectParameters>
 {
+    public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
+        new HashSet<HookTiming> { HookTiming.BeforeActionStart };
+
     public override void Execute(
         BattleHookContext context,
         IllnessBattleEffectParameters parameters)
