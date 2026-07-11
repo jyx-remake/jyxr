@@ -108,6 +108,11 @@ public sealed class BattleHookExecutor
                 case ExtraStrikeBattleHookEffectDefinition:
                     throw new InvalidOperationException(
                         $"Preview battle hook execution does not support side-effect effect '{effect.GetType().Name}' on timing '{hook.Timing}'.");
+                case CustomBattleEffectDefinition customEffect when customEffect.SupportsPreview:
+                    continue;
+                case CustomBattleEffectDefinition:
+                    throw new InvalidOperationException(
+                        $"Preview battle hook execution does not support side-effect effect '{effect.GetType().Name}' on timing '{hook.Timing}'.");
                 default:
                     throw new NotSupportedException(
                         $"Unsupported preview battle hook effect '{effect.GetType().Name}'.");
@@ -156,22 +161,21 @@ public sealed class BattleHookExecutor
                     context.Engine.RemoveHookBuffById(
                         context,
                         target,
-                        removeBuff.BuffId,
-                        context.Timing.ToString());
+                        removeBuff.BuffId);
                 });
                 break;
 
             case RemoveNegativeBuffsBattleEffectDefinition removeNegativeBuffs:
                 ApplyToSelectedTargets(context, removeNegativeBuffs.Target, target =>
                 {
-                    context.Engine.RemoveHookNegativeBuffs(context, target, context.Timing.ToString());
+                    context.Engine.RemoveHookNegativeBuffs(context, target);
                 });
                 break;
 
             case RemovePositiveBuffsBattleEffectDefinition removePositiveBuffs:
                 ApplyToSelectedTargets(context, removePositiveBuffs.Target, target =>
                 {
-                    context.Engine.RemoveHookPositiveBuffs(context, target, context.Timing.ToString());
+                    context.Engine.RemoveHookPositiveBuffs(context, target);
                 });
                 break;
 
@@ -179,7 +183,11 @@ public sealed class BattleHookExecutor
                 ApplyToSelectedTargets(context, addRage.Target, target =>
                 {
                     target.AddRage(addRage.Value);
-                    context.State.AddEvent(new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"{context.Timing}:{addRage.Value}"));
+                    context.State.AddEvent(new BattleEvent(
+                        BattleEventKind.RageChanged,
+                        target.Id,
+                        context.Timing,
+                        Detail: addRage.Value.ToString()));
                 });
                 break;
 
@@ -187,7 +195,11 @@ public sealed class BattleHookExecutor
                 ApplyToSelectedTargets(context, setRage.Target, target =>
                 {
                     target.SetRage(setRage.Value);
-                    context.State.AddEvent(new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"{context.Timing}:set:{setRage.Value}"));
+                    context.State.AddEvent(new BattleEvent(
+                        BattleEventKind.RageChanged,
+                        target.Id,
+                        context.Timing,
+                        Detail: $"set:{setRage.Value}"));
                 });
                 break;
 
@@ -207,7 +219,11 @@ public sealed class BattleHookExecutor
                         target,
                         BattleRecoveryKind.Hp,
                         addHp.Value);
-                    context.State.AddEvent(new BattleEvent(BattleEventKind.Healed, target.Id, Detail: $"{context.Timing}:{restored}"));
+                    context.State.AddEvent(new BattleEvent(
+                        BattleEventKind.Healed,
+                        target.Id,
+                        context.Timing,
+                        Detail: restored.ToString()));
                 });
                 break;
 
@@ -239,6 +255,10 @@ public sealed class BattleHookExecutor
                 {
                     context.Engine.ApplyHookExtraStrikeEffect(context, target, extraStrike);
                 });
+                break;
+
+            case CustomBattleEffectDefinition customEffect:
+                customEffect.Execute(context);
                 break;
 
             default:

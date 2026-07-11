@@ -1492,7 +1492,8 @@ public sealed class BattleEngineTests
         Assert.Contains(state.Events, battleEvent =>
             battleEvent.Kind == BattleEventKind.BuffApplied &&
             battleEvent.UnitId == hero.Id &&
-            battleEvent.Detail == "BeforeActionStart:恢复");
+            battleEvent.Timing == HookTiming.BeforeActionStart &&
+            battleEvent.Detail == "恢复");
     }
 
     [Fact]
@@ -1559,11 +1560,13 @@ public sealed class BattleEngineTests
         Assert.Contains(state.Events, battleEvent =>
             battleEvent.Kind == BattleEventKind.BuffRemoved &&
             battleEvent.UnitId == target.Id &&
-            battleEvent.Detail == "OnHitConfirmed:中毒");
+            battleEvent.Timing == HookTiming.OnHitConfirmed &&
+            battleEvent.Detail == "中毒");
         Assert.Contains(state.Events, battleEvent =>
             battleEvent.Kind == BattleEventKind.RageChanged &&
             battleEvent.UnitId == target.Id &&
-            battleEvent.Detail == "OnBuffRemoved:2");
+            battleEvent.Timing == HookTiming.OnBuffRemoved &&
+            battleEvent.Detail == "2");
     }
 
     [Fact]

@@ -10,7 +10,12 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
-    private readonly record struct BattleSkillHitResolution(bool IsHitConfirmed, int Damage, bool IsCritical, bool SuppressHitEffects);
+    private readonly record struct BattleSkillHitResolution(
+        BattleUnit Target,
+        bool IsHitConfirmed,
+        int Damage,
+        bool IsCritical,
+        bool SuppressHitEffects);
 
     private readonly record struct BattleSkillHitCheck(bool IsCancelled, bool SuppressHitEffects);
 
@@ -24,7 +29,7 @@ public sealed partial class BattleEngine
                 target.Id,
                 Detail: source.Id,
                 Damage: new BattleDamageEvent(0, SourceUnitId: source.Id)));
-            return new BattleSkillHitResolution(false, 0, false, hitCheck.SuppressHitEffects);
+            return new BattleSkillHitResolution(target, false, 0, false, hitCheck.SuppressHitEffects);
         }
 
         var damageCalculation = _damageCalculator.CreateSkillDamageContext(
@@ -40,13 +45,19 @@ public sealed partial class BattleEngine
             context.Skill = skill;
             context.DamageAmount = resolvedDamageAmount;
         });
-        var damage = target.TakeDamage(Math.Max(0, hookContext.DamageAmount ?? resolvedDamageAmount));
+        var resolvedTarget = hookContext.Target ?? target;
+        var damage = resolvedTarget.TakeDamage(Math.Max(0, hookContext.DamageAmount ?? resolvedDamageAmount));
         AddEvent(state, new BattleEvent(
             BattleEventKind.Damaged,
-            target.Id,
+            resolvedTarget.Id,
             Detail: source.Id,
             Damage: new BattleDamageEvent(damage, result.IsCritical, source.Id)));
-        return new BattleSkillHitResolution(true, damage, result.IsCritical, hitCheck.SuppressHitEffects || hookContext.SuppressHitEffects);
+        return new BattleSkillHitResolution(
+            resolvedTarget,
+            true,
+            damage,
+            result.IsCritical,
+            hitCheck.SuppressHitEffects || hookContext.SuppressHitEffects);
     }
 
     private BattleSkillHitCheck ResolveSkillHit(
@@ -156,7 +167,8 @@ public sealed partial class BattleEngine
         BuffDefinition buffDefinition,
         int level,
         int duration,
-        string detail)
+        string detail,
+        HookTiming? timing = null)
     {
         if (buffDefinition.IsDebuff && target.HasBuff(BattleContentIds.HolyWar))
         {
@@ -165,7 +177,7 @@ public sealed partial class BattleEngine
 
         if (buffDefinition.IsDebuff && RollDebuffResistance(target))
         {
-            AddEvent(state, new BattleEvent(BattleEventKind.BuffResisted, target.Id, Detail: detail));
+            AddEvent(state, new BattleEvent(BattleEventKind.BuffResisted, target.Id, timing, Detail: detail));
             return false;
         }
 
@@ -187,7 +199,7 @@ public sealed partial class BattleEngine
         }
 
         target.ApplyBuff(instance);
-        AddEvent(state, new BattleEvent(BattleEventKind.BuffApplied, target.Id, Detail: detail));
+        AddEvent(state, new BattleEvent(BattleEventKind.BuffApplied, target.Id, timing, Detail: detail));
         TriggerHooks(state, HookTiming.OnBuffApplied, target, context =>
         {
             context.Source = source;
@@ -217,7 +229,8 @@ public sealed partial class BattleEngine
             buffDefinition,
             effect.Level,
             effect.Duration,
-            $"{context.Timing}:{effect.BuffId}");
+            effect.BuffId,
+            context.Timing);
     }
 
     internal void ApplyHookExtraStrikeEffect(
@@ -279,8 +292,7 @@ public sealed partial class BattleEngine
     internal IReadOnlyList<BattleBuffInstance> RemoveHookBuffById(
         BattleHookContext context,
         BattleUnit target,
-        string buffId,
-        string? detailPrefix)
+        string buffId)
     {
         var source = context.Source ?? context.Unit;
         return RemoveBattleBuffs(
@@ -288,13 +300,12 @@ public sealed partial class BattleEngine
             source,
             target,
             buff => string.Equals(buff.Definition.Id, buffId, StringComparison.Ordinal),
-            detailPrefix);
+            context.Timing);
     }
 
     internal IReadOnlyList<BattleBuffInstance> RemoveHookNegativeBuffs(
         BattleHookContext context,
-        BattleUnit target,
-        string? detailPrefix)
+        BattleUnit target)
     {
         var source = context.Source ?? context.Unit;
         return RemoveBattleBuffs(
@@ -302,13 +313,12 @@ public sealed partial class BattleEngine
             source,
             target,
             buff => buff.Definition.IsDebuff,
-            detailPrefix);
+            context.Timing);
     }
 
     internal IReadOnlyList<BattleBuffInstance> RemoveHookPositiveBuffs(
         BattleHookContext context,
-        BattleUnit target,
-        string? detailPrefix)
+        BattleUnit target)
     {
         var source = context.Source ?? context.Unit;
         return RemoveBattleBuffs(
@@ -316,7 +326,7 @@ public sealed partial class BattleEngine
             source,
             target,
             buff => !buff.Definition.IsDebuff,
-            detailPrefix);
+            context.Timing);
     }
 
     private void ApplySpecialSkillEffects(
@@ -403,22 +413,21 @@ public sealed partial class BattleEngine
                     state,
                     source,
                     target,
-                    buff => string.Equals(buff.Definition.Id, removeBuff.BuffId, StringComparison.Ordinal),
-                    "special_skill");
+                    buff => string.Equals(buff.Definition.Id, removeBuff.BuffId, StringComparison.Ordinal));
                 break;
             case RemoveNegativeBuffsBattleEffectDefinition:
-                RemoveBattleBuffs(state, source, target, buff => buff.Definition.IsDebuff, "special_skill");
+                RemoveBattleBuffs(state, source, target, buff => buff.Definition.IsDebuff);
                 break;
             case RemovePositiveBuffsBattleEffectDefinition:
-                RemoveBattleBuffs(state, source, target, buff => !buff.Definition.IsDebuff, "special_skill");
+                RemoveBattleBuffs(state, source, target, buff => !buff.Definition.IsDebuff);
                 break;
             case AddRageBattleEffectDefinition rage:
                 target.AddRage(rage.Value);
-                AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"special_skill:{rage.Value}"));
+                AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: rage.Value.ToString()));
                 break;
             case SetRageBattleEffectDefinition rage:
                 target.SetRage(rage.Value);
-                AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"special_skill:set:{rage.Value}"));
+                AddEvent(state, new BattleEvent(BattleEventKind.RageChanged, target.Id, Detail: $"set:{rage.Value}"));
                 break;
             case SetActionGaugeBattleEffectDefinition gauge:
                 target.SetActionGauge(gauge.Value);
@@ -431,7 +440,7 @@ public sealed partial class BattleEngine
                     target,
                     BattleRecoveryKind.Hp,
                     hp.Value);
-                AddEvent(state, new BattleEvent(BattleEventKind.Healed, target.Id, Detail: $"special_skill:{restored}"));
+                AddEvent(state, new BattleEvent(BattleEventKind.Healed, target.Id, Detail: restored.ToString()));
                 break;
             }
             case AddMpBattleEffectDefinition mp:
@@ -514,10 +523,10 @@ public sealed partial class BattleEngine
         BattleUnit source,
         BattleUnit target,
         Func<BattleBuffInstance, bool> predicate,
-        string? detailPrefix = null)
+        HookTiming? timing = null)
     {
         var removedBuffs = target.RemoveBuffs(predicate);
-        EmitBuffRemovedEvents(state, source, target, removedBuffs, detailPrefix);
+        EmitBuffRemovedEvents(state, source, target, removedBuffs, timing);
         return removedBuffs;
     }
 
@@ -526,14 +535,15 @@ public sealed partial class BattleEngine
         BattleUnit source,
         BattleUnit target,
         IReadOnlyList<BattleBuffInstance> removedBuffs,
-        string? detailPrefix = null)
+        HookTiming? timing = null)
     {
         foreach (var removedBuff in removedBuffs)
         {
-            var detail = string.IsNullOrWhiteSpace(detailPrefix)
-                ? removedBuff.Definition.Id
-                : $"{detailPrefix}:{removedBuff.Definition.Id}";
-            AddEvent(state, new BattleEvent(BattleEventKind.BuffRemoved, target.Id, Detail: detail));
+            AddEvent(state, new BattleEvent(
+                BattleEventKind.BuffRemoved,
+                target.Id,
+                timing,
+                Detail: removedBuff.Definition.Id));
             TriggerHooks(state, HookTiming.OnBuffRemoved, target, context =>
             {
                 context.Source = source;

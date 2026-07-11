@@ -79,11 +79,58 @@ public sealed class BattleHookContext
 
     public bool Cancel { get; set; }
 
+    public bool IsActionSkipRequested { get; private set; }
+
+    public string? ActionSkipReason { get; private set; }
+
+    public void SkipCurrentAction(string? reason = null)
+    {
+        if (Timing != HookTiming.BeforeActionStart)
+        {
+            throw new InvalidOperationException(
+                $"An action can only be skipped during '{HookTiming.BeforeActionStart}'.");
+        }
+
+        IsActionSkipRequested = true;
+        if (!string.IsNullOrWhiteSpace(reason))
+        {
+            ActionSkipReason ??= reason;
+        }
+    }
+
     public void RequestSpeech(BattleUnit speaker, string text)
     {
         ArgumentNullException.ThrowIfNull(speaker);
         ArgumentException.ThrowIfNullOrWhiteSpace(text);
         BattleSpeechRuntime.TryEmit(State, speaker, text, Timing);
+    }
+
+    public void RequestFloatText(
+        BattleUnit target,
+        string text,
+        BattleFloatTextStyle style = BattleFloatTextStyle.Default)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentException.ThrowIfNullOrWhiteSpace(text);
+        State.AddEvent(new BattleEvent(
+            BattleEventKind.FloatTextRequested,
+            target.Id,
+            Timing,
+            FloatText: new BattleFloatTextCue(text, style)));
+    }
+
+    public void RedirectDamage(BattleUnit target, double damageFactor)
+    {
+        if (Timing != HookTiming.OnDamageTaken)
+        {
+            throw new InvalidOperationException(
+                $"Damage can only be redirected during '{HookTiming.OnDamageTaken}'.");
+        }
+
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentOutOfRangeException.ThrowIfNegative(damageFactor);
+        Target = target;
+        DamageAmount = Math.Max(0, (int)((DamageAmount ?? 0) * damageFactor));
     }
 
     public int Damage(BattleUnit target, int amount, string? detail = null)

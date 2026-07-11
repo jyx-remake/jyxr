@@ -676,21 +676,23 @@ public partial class BattleScreen : Control
 			: AssetResolver.LoadCharacterPortrait(actingUnit.Character);
 	}
 
-	internal void AppendResult(BattleActionResult result, int stateEventStartIndex)
+	internal void AppendResult(BattleActionResult result, IReadOnlyList<BattleEvent> events)
 	{
+		ArgumentNullException.ThrowIfNull(result);
+		ArgumentNullException.ThrowIfNull(events);
+
 		if (!string.IsNullOrWhiteSpace(result.Message))
 		{
 			AppendLog(result.Message);
 		}
 
-		if (!result.Success)
-		{
-			return;
-		}
+		AppendEvents(events);
+	}
 
-		var events = _state is not null && stateEventStartIndex >= 0
-			? _state.Events.Skip(stateEventStartIndex)
-			: result.Events;
+	internal void AppendEvents(IReadOnlyList<BattleEvent> events)
+	{
+		ArgumentNullException.ThrowIfNull(events);
+
 		foreach (var battleEvent in events)
 		{
 			AppendEvent(battleEvent);
@@ -741,6 +743,7 @@ public partial class BattleScreen : Control
 			case BattleEventKind.Rested:
 			case BattleEventKind.ItemUsed:
 			case BattleEventKind.ActionSkipped:
+			case BattleEventKind.FloatTextRequested:
 			case BattleEventKind.SkillLeveledUp:
 			case BattleEventKind.CharacterLeveledUp:
 				presentation.EnqueueImpactFloat(() => AppendEventImmediate(battleEvent));
@@ -830,6 +833,15 @@ public partial class BattleScreen : Control
 				if (!string.IsNullOrWhiteSpace(battleEvent.Speech?.Text))
 				{
 					_boardGrid.PlaySpeech(battleEvent.UnitId, battleEvent.Speech.Text);
+				}
+				break;
+			case BattleEventKind.FloatTextRequested:
+				if (!string.IsNullOrWhiteSpace(battleEvent.FloatText?.Text))
+				{
+					_boardGrid.PlayFloatText(
+						battleEvent.UnitId,
+						battleEvent.FloatText.Text,
+						ResolveFloatTextColor(battleEvent.FloatText.Style));
 				}
 				break;
 			case BattleEventKind.SkillLeveledUp:
@@ -977,7 +989,19 @@ public partial class BattleScreen : Control
 	private static string ResolveDamageFloatText(int damage, bool isCritical, bool isExtraStrike = false) =>
 		damage <= 0
 			? "MISS"
-			: isExtraStrike ? $"多重攻击-{damage}" : isCritical ? $"暴击 -{damage}" : $"-{damage}";
+		: isExtraStrike ? $"多重攻击-{damage}" : isCritical ? $"暴击 -{damage}" : $"-{damage}";
+
+	private static Color ResolveFloatTextColor(BattleFloatTextStyle style) =>
+		style switch
+		{
+			BattleFloatTextStyle.Default => FloatDamageColor,
+			BattleFloatTextStyle.Positive => FloatHealColor,
+			BattleFloatTextStyle.Negative => FloatStateColor,
+			BattleFloatTextStyle.Status => FloatStateColor,
+			BattleFloatTextStyle.Info => FloatInfoColor,
+			BattleFloatTextStyle.Special => FloatSpecialColor,
+			_ => throw new ArgumentOutOfRangeException(nameof(style), style, null),
+		};
 
 	private static string ResolveBuffName(string? buffId)
 	{
@@ -1148,7 +1172,11 @@ public partial class BattleScreen : Control
 		RefreshAll();
 	}
 
-	private async Task PlaySkillPresentationAsync(BattleUnit actingUnit, SkillInstance skill, BattleActionResult result, int stateEventStartIndex)
+	private async Task PlaySkillPresentationAsync(
+		BattleUnit actingUnit,
+		SkillInstance skill,
+		BattleActionResult result,
+		IReadOnlyList<BattleEvent> events)
 	{
 		_boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
 		_isResolvingSkillPresentation = true;
@@ -1164,7 +1192,7 @@ public partial class BattleScreen : Control
 			result.SkillCast ?? BattleSkillCastInfo.Create(skill, skill),
 			result.ImpactedPositions);
 		var presentationTask = _activeSkillPresentation.RunAsync();
-		AppendResult(result, stateEventStartIndex);
+		AppendResult(result, events);
 		try
 		{
 			await presentationTask;
@@ -1353,8 +1381,12 @@ public partial class BattleScreen : Control
 	internal Task PlayMoveAsync(BattleUnit actingUnit, IReadOnlyList<GridPosition> movementPath) =>
 		PlayMovePresentationAsync(actingUnit, movementPath);
 
-	internal Task PlaySkillAsync(BattleUnit actingUnit, SkillInstance skill, BattleActionResult result, int stateEventStartIndex) =>
-		PlaySkillPresentationAsync(actingUnit, skill, result, stateEventStartIndex);
+	internal Task PlaySkillAsync(
+		BattleUnit actingUnit,
+		SkillInstance skill,
+		BattleActionResult result,
+		IReadOnlyList<BattleEvent> events) =>
+		PlaySkillPresentationAsync(actingUnit, skill, result, events);
 
 	private void FinishBattle()
 	{

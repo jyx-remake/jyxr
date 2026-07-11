@@ -14,9 +14,24 @@ public sealed record BattleEvent(
     BattleDamageEvent? Damage = null,
     BattleRestRecovery? Rest = null,
     BattleSkillExperienceEvent? SkillExperience = null,
-    BattleCharacterExperienceEvent? CharacterExperience = null);
+    BattleCharacterExperienceEvent? CharacterExperience = null,
+    BattleFloatTextCue? FloatText = null);
 
 public sealed record BattleSpeechCue(string Text);
+
+public sealed record BattleFloatTextCue(
+    string Text,
+    BattleFloatTextStyle Style = BattleFloatTextStyle.Default);
+
+public enum BattleFloatTextStyle
+{
+    Default,
+    Positive,
+    Negative,
+    Status,
+    Info,
+    Special,
+}
 
 public sealed record BattleDamageEvent(
     int Amount,
@@ -57,6 +72,7 @@ public enum BattleEventKind
     MpDamaged,
     RageChanged,
     SpeechRequested,
+    FloatTextRequested,
     SkillLeveledUp,
     CharacterLeveledUp,
 }

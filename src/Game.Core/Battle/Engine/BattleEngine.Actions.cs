@@ -82,13 +82,13 @@ public sealed partial class BattleEngine
         foreach (var targetUnit in targets)
         {
             var hit = ApplySkillDamage(state, unit, targetUnit, resolvedSkill);
-            TryGainRageFromTakingDamage(state, unit, targetUnit, hit.Damage);
+            TryGainRageFromTakingDamage(state, unit, hit.Target, hit.Damage);
             if (hit.IsHitConfirmed)
             {
                 TriggerHooks(state, HookTiming.OnHitConfirmed, unit, context =>
                 {
                     context.Source = unit;
-                    context.Target = targetUnit;
+                    context.Target = hit.Target;
                     context.Skill = resolvedSkill;
                     context.DamageAmount = hit.Damage;
                     context.IsCritical = hit.IsCritical;
@@ -97,7 +97,7 @@ public sealed partial class BattleEngine
 
             if (!hit.SuppressHitEffects)
             {
-                ApplySkillBuffs(state, unit, targetUnit, resolvedSkill.Buffs);
+                ApplySkillBuffs(state, unit, hit.Target, resolvedSkill.Buffs);
             }
         }
 

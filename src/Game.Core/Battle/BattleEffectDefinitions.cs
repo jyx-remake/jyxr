@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Game.Core.Abstractions;
 using Game.Core.Affix;
@@ -47,6 +48,7 @@ public sealed record NearbyAlliesBattleTargetSelectorDefinition(
 [JsonDerivedType(typeof(ModifyRecoveryBattleHookEffectDefinition), "modify_recovery")]
 [JsonDerivedType(typeof(StrengthenContextBuffBattleHookEffectDefinition), "strengthen_context_buff")]
 [JsonDerivedType(typeof(ExtraStrikeBattleHookEffectDefinition), "extra_strike")]
+[JsonDerivedType(typeof(CustomBattleEffectDefinition), "custom")]
 public abstract record BattleEffectDefinition
 {
     public virtual void Resolve(IContentRepository contentRepository)
@@ -119,3 +121,22 @@ public sealed record ExtraStrikeBattleHookEffectDefinition(
     IReadOnlyList<double> DamageFactors,
     double Chance = 0d,
     double ChancePerBuffLevel = 0d) : BattleEffectDefinition;
+
+public sealed record CustomBattleEffectDefinition(
+    string EffectId,
+    JsonElement Parameters) : BattleEffectDefinition
+{
+    [JsonIgnore]
+    internal CustomBattleEffectInvocation Invocation { get; private set; } = null!;
+
+    [JsonIgnore]
+    internal bool SupportsPreview => Invocation.SupportsPreview;
+
+    public override void Resolve(IContentRepository contentRepository)
+    {
+        ArgumentNullException.ThrowIfNull(contentRepository);
+        Invocation = CustomBattleEffectRegistry.Default.Bind(EffectId, Parameters);
+    }
+
+    internal void Execute(BattleHookContext context) => Invocation.Execute(context);
+}

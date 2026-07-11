@@ -11,6 +11,7 @@ internal sealed class BattleFlowOrchestrator
     private readonly BattleScreen _screen;
     private readonly BattleEngine _engine;
     private readonly IBattleAgent _battleAgent;
+    private int _nextBattleEventIndex;
     private bool _autoBattleEnabled;
     private bool _isContinuingFlow;
     private bool? _forcedBattleResult;
@@ -79,9 +80,8 @@ internal sealed class BattleFlowOrchestrator
             return Task.CompletedTask;
         }
 
-        var eventStart = State.Events.Count;
         var rollbackResult = _engine.RollbackMove(State, actingUnit.Id);
-        _screen.AppendResult(rollbackResult, eventStart);
+        _screen.AppendResult(rollbackResult, DrainBattleEvents());
         _screen.RefreshAll();
         return Task.CompletedTask;
     }
@@ -94,12 +94,11 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
-        var eventStart = State.Events.Count;
         var result = _engine.MoveTo(State, actingUnit.Id, destination);
         var movementPath = result.Success && State.CurrentAction is not null
             ? State.CurrentAction.MovementTrace.ToArray()
             : Array.Empty<GridPosition>();
-        _screen.AppendResult(result, eventStart);
+        _screen.AppendResult(result, DrainBattleEvents());
         if (!result.Success)
         {
             _screen.RefreshAll();
@@ -119,16 +118,16 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
-        var eventStart = State.Events.Count;
         var result = _engine.CastSkill(State, actingUnit.Id, skill, target);
+        var events = DrainBattleEvents();
         if (!result.Success)
         {
-            _screen.AppendResult(result, eventStart);
+            _screen.AppendResult(result, events);
             _screen.RefreshAll();
             return;
         }
 
-        await _screen.PlaySkillAsync(actingUnit, skill, result, eventStart);
+        await _screen.PlaySkillAsync(actingUnit, skill, result, events);
         await ContinueAfterResolvedPlayerActionAsync();
     }
 
@@ -142,14 +141,13 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
-        var eventStart = State.Events.Count;
         var result = _engine.UseItem(State, actingUnit.Id, item.Definition, targetUnitId);
         if (result.Success)
         {
             _screen.ApplyActingUnitFacing(actingUnit);
         }
 
-        _screen.AppendResult(result, eventStart);
+        _screen.AppendResult(result, DrainBattleEvents());
         if (!result.Success)
         {
             _screen.RefreshAll();
@@ -168,9 +166,8 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
-        var eventStart = State.Events.Count;
         var result = _engine.Rest(State, actingUnit.Id);
-        _screen.AppendResult(result, eventStart);
+        _screen.AppendResult(result, DrainBattleEvents());
         if (!result.Success)
         {
             _screen.RefreshAll();
@@ -188,9 +185,8 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
-        var eventStart = State.Events.Count;
         var result = _engine.EndAction(State, actingUnit.Id);
-        _screen.AppendResult(result, eventStart);
+        _screen.AppendResult(result, DrainBattleEvents());
         if (!result.Success)
         {
             _screen.RefreshAll();
@@ -244,7 +240,9 @@ internal sealed class BattleFlowOrchestrator
     private BattleUnit AdvanceTimelineToNextAction()
     {
         _screen.ShowWaitingTimeline();
-        return _engine.AdvanceUntilNextAction(State);
+        var actingUnit = _engine.AdvanceUntilNextAction(State);
+        _screen.AppendEvents(DrainBattleEvents());
+        return actingUnit;
     }
 
     private async Task HandlePlayerPostMoveAsync(BattleUnit actingUnit)
@@ -278,12 +276,11 @@ internal sealed class BattleFlowOrchestrator
         var plan = _battleAgent.Decide(State, actingUnit.Id);
         if (plan.MoveDestination != actingUnit.Position)
         {
-            var moveEventStart = State.Events.Count;
             var moveResult = _engine.MoveTo(State, actingUnit.Id, plan.MoveDestination);
             var movementPath = moveResult.Success && State.CurrentAction is not null
                 ? State.CurrentAction.MovementTrace.ToArray()
                 : Array.Empty<GridPosition>();
-            _screen.AppendResult(moveResult, moveEventStart);
+            _screen.AppendResult(moveResult, DrainBattleEvents());
             if (moveResult.Success)
             {
                 await _screen.PlayMoveAsync(actingUnit, movementPath);
@@ -298,19 +295,33 @@ internal sealed class BattleFlowOrchestrator
             plan.MainAction.TargetPosition is { } targetPosition &&
             TryResolveSkill(actingUnit, plan.MainAction.SkillId) is { } skill)
         {
-            var skillEventStart = State.Events.Count;
             var result = _engine.CastSkill(State, actingUnit.Id, skill, targetPosition);
+            var events = DrainBattleEvents();
             if (result.Success)
             {
-                await _screen.PlaySkillAsync(actingUnit, skill, result, skillEventStart);
+                await _screen.PlaySkillAsync(actingUnit, skill, result, events);
                 return;
             }
 
-            _screen.AppendResult(result, skillEventStart);
+            _screen.AppendResult(result, events);
         }
 
-        var restEventStart = State.Events.Count;
-        _screen.AppendResult(_engine.Rest(State, actingUnit.Id), restEventStart);
+        var restResult = _engine.Rest(State, actingUnit.Id);
+        _screen.AppendResult(restResult, DrainBattleEvents());
+    }
+
+    private IReadOnlyList<BattleEvent> DrainBattleEvents()
+    {
+        if (_nextBattleEventIndex > State.Events.Count)
+        {
+            throw new InvalidOperationException("Battle event stream moved backwards.");
+        }
+
+        var events = State.Events
+            .Skip(_nextBattleEventIndex)
+            .ToArray();
+        _nextBattleEventIndex = State.Events.Count;
+        return events;
     }
 
     private bool TryCompleteBattle()

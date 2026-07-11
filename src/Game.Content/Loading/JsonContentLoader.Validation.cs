@@ -406,6 +406,8 @@ public sealed partial class JsonContentLoader
                 case ExtraStrikeBattleHookEffectDefinition:
                     ValidateSharedBattleEffect(effect, $"{ownerName} battle hook '{hook.Timing}'", repository);
                     break;
+                case CustomBattleEffectDefinition:
+                    break;
                 default:
                     throw new InvalidOperationException($"{ownerName} has unsupported battle hook effect '{effect.GetType().Name}'.");
             }

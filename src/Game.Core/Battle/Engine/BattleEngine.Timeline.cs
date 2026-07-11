@@ -4,7 +4,7 @@ namespace Game.Core.Battle;
 
 public sealed partial class BattleEngine
 {
-    public BattleActionContext BeginAction(BattleState state, string unitId)
+    public BattleActionContext? BeginAction(BattleState state, string unitId)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
@@ -33,8 +33,14 @@ public sealed partial class BattleEngine
         var context = new BattleActionContext(unit);
         state.CurrentAction = context;
         state.ActionSerial++;
+        var hookContext = TriggerHooks(state, HookTiming.BeforeActionStart, unit);
+        if (hookContext.IsActionSkipRequested)
+        {
+            SkipAction(state, unit, hookContext.ActionSkipReason);
+            return null;
+        }
+
         AddEvent(state, new BattleEvent(BattleEventKind.ActionStarted, unit.Id));
-        TriggerHooks(state, HookTiming.BeforeActionStart, unit);
         return context;
     }
 
@@ -58,8 +64,12 @@ public sealed partial class BattleEngine
                     continue;
                 }
 
-                BeginAction(state, ready.Id);
-                return ready;
+                if (BeginAction(state, ready.Id) is not null)
+                {
+                    return ready;
+                }
+
+                continue;
             }
 
             state.Tick++;
@@ -85,9 +95,15 @@ public sealed partial class BattleEngine
         }
 
         state.ActionSerial++;
-        unit.ActionGauge = 0d;
-        AddEvent(state, new BattleEvent(BattleEventKind.ActionSkipped, unit.Id, Detail: BattleContentIds.Stun));
+        SkipAction(state, unit, BattleContentIds.Stun);
         return true;
+    }
+
+    private static void SkipAction(BattleState state, BattleUnit unit, string? reason)
+    {
+        unit.ActionGauge = 0d;
+        state.CurrentAction = null;
+        state.AddEvent(new BattleEvent(BattleEventKind.ActionSkipped, unit.Id, Detail: reason));
     }
 
     private void AdvanceTimelineTick(BattleState state)
