@@ -452,6 +452,15 @@ public sealed class CharacterInstance
     public double GetLegendChanceValue(string skillId, double baseValue) =>
         GetBucket(Snapshot.LegendChanceModifierBuckets, skillId).Evaluate(baseValue);
 
+    public int GetSkillTargetingValue(string sourceSkillId, SkillTargetingField field, int baseValue)
+    {
+        var globalKey = new SkillTargetingModifierKey(null, field);
+        var sourceKey = new SkillTargetingModifierKey(sourceSkillId, field);
+        var bucket = GetBucket(Snapshot.SkillTargetingModifierBuckets, globalKey)
+            .Combine(GetBucket(Snapshot.SkillTargetingModifierBuckets, sourceKey));
+        return checked((int)bucket.Evaluate(baseValue));
+    }
+
     public IReadOnlyList<HookAffix> GetHooks(HookTiming timing) =>
         Snapshot.HooksByTiming.TryGetValue(timing, out var hooks) ? hooks : Array.Empty<HookAffix>();
 

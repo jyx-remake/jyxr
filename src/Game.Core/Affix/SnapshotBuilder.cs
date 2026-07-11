@@ -12,6 +12,7 @@ public static class SnapshotBuilder
         var statBuckets = new Dictionary<StatType, ModifierBucket>();
         var skillBuckets = new Dictionary<string, ModifierBucket>();
         var weaponBuckets = new Dictionary<WeaponType, ModifierBucket>();
+        var targetingBuckets = new Dictionary<SkillTargetingModifierKey, ModifierBucket>();
         var legendBuckets = new Dictionary<string, ModifierBucket>();
         var traits = new HashSet<TraitId>();
         var hooksByTiming = new Dictionary<HookTiming, List<HookAffix>>();
@@ -46,6 +47,13 @@ public static class SnapshotBuilder
                     legendBuckets[legendModifierAffix.SkillId] = GetOrEmpty(legendBuckets, legendModifierAffix.SkillId).Apply(legendModifierAffix.Value);
                     break;
 
+                case SkillTargetingModifierAffix targetingModifierAffix:
+                    var targetingKey = new SkillTargetingModifierKey(
+                        targetingModifierAffix.SourceSkillId,
+                        targetingModifierAffix.Field);
+                    targetingBuckets[targetingKey] = GetOrEmpty(targetingBuckets, targetingKey).Apply(targetingModifierAffix.Value);
+                    break;
+
                 case TraitAffix:
                     break;
 
@@ -67,6 +75,7 @@ public static class SnapshotBuilder
             statModifierBuckets: new ReadOnlyDictionary<StatType, ModifierBucket>(statBuckets),
             skillModifierBuckets: new ReadOnlyDictionary<string, ModifierBucket>(skillBuckets),
             weaponModifierBuckets: new ReadOnlyDictionary<WeaponType, ModifierBucket>(weaponBuckets),
+            skillTargetingModifierBuckets: new ReadOnlyDictionary<SkillTargetingModifierKey, ModifierBucket>(targetingBuckets),
             legendChanceModifierBuckets: new ReadOnlyDictionary<string, ModifierBucket>(legendBuckets));
     }
 

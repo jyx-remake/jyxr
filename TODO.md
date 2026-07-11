@@ -8,7 +8,7 @@
 - 内容加载目前只是“DTO 校验 + 按顺序构建 runtime definitions”，还不是真正的二阶段加载。后续如需支持定义间循环依赖，应改成“先注册 runtime definition 空壳，再统一 resolve 引用”的两阶段装配流程。
 - 当前 affix 引用解析集中在 `JsonContentLoader.ResolveAffixes(...)`，而不是各 definition 自己的 `Resolve(...)` 方法。后续如继续扩展 affix 来源，应把 affix 引用解析入口收敛成更明确的专门服务或 definition 统一协议，避免新增来源时漏掉 `GrantTalentAffix` 等需要 resolve 的条目。
 - `博览群书` 当前先用现有无参数 trait 表达，并在奥义触发率计算中写死触发倍率 `+0.5`；后续如果类似规则增多，可考虑把 trait 升级为带参数规则 trait，避免规则数值长期散落在代码里。
-- `寸长寸强`当前通过无参数 trait 表达影响范围 `+1`；`吴钩霜雪`与`金刚伏魔圈`的太玄神功施放距离 `+3`、日月神鞭施放距离覆盖为 `10`仍按 legacy 语义集中硬编码在 `BattleSkillTargeting`。后续范围修改规则增多时，应迁移为可按作用字段、源技能、运算方式及致盲结算顺序配置的 targeting affix，避免规则数值和天赋 ID 长期散落在代码里。
+- 技能范围修改已迁移为 `SkillTargetingModifierAffix`，当前支持按源技能或全技能修改 `cast_size` / `impact_size`；后续如需表达拳掌、剑法等某类技能范围，应引入独立 `SkillSelectorDefinition`，至少支持源技能、`WeaponType`、技能形态和来源类别。届时应新增与 `SkillKind` 正交的 `SkillSourceKind`，让招式/奥义保留自身形态并继承父技能来源；targeting affix 在 snapshot 中应按原始顺序匹配和应用，避免全局 bucket 与指定技能 bucket 组合时弱化多个 `add` / `override` 的顺序语义。
 - `IContentRepository` 在真实游戏中是否需要全局可访问，后续需要结合地图、事件、宿主装配再判断。
 - 当前 `Party` 是全局队伍，无队伍 id/name；如果后续支持多队伍/多编队，需要重新建模队伍集合、队伍标识与存档结构。
 - 统一空值校验策略：内部代码以 C# nullable reference types 为主，边界层（宿主入口、内容加载入口、外部输入入口）保留显式运行时校验，避免在内部领域代码中堆积大量 `ArgumentNullException.ThrowIfNull`。

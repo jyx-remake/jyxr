@@ -449,6 +449,7 @@ public sealed class CharacterTests
                 "hero_available",
                 externalSkills: [new InitialExternalSkillEntryDefinition(definition, Level: 3)]));
         var available = availableCharacter.ExternalSkills[0].GetFormSkills().Single();
+        Assert.Equal(SkillKind.Form, available.SkillKind);
         Assert.Equal(FormSkillInstanceState.Available, available.State);
         Assert.True(available.IsActive);
     }

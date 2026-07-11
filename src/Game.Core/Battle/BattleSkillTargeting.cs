@@ -7,31 +7,15 @@ namespace Game.Core.Battle;
 
 public static class BattleSkillTargeting
 {
-    private const string TaixuanCastSizeTalentId = "吴钩霜雪";
-    private const string VajraWhipCastSizeTalentId = "金刚伏魔圈";
-    private const string TaixuanSkillId = "太玄神功";
-    private const string SunMoonWhipSkillId = "日月神鞭";
-    private const int TaixuanCastSizeBonus = 3;
-    private const int VajraWhipCastSize = 10;
-
     public static int ResolveEffectiveCastSize(BattleUnit source, SkillInstance skill)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(skill);
 
-        if (source.Character.HasEffectiveTalent(VajraWhipCastSizeTalentId) &&
-            MatchesSourceSkill(skill, SunMoonWhipSkillId))
-        {
-            return VajraWhipCastSize;
-        }
-
-        var castSize = skill.CastSize;
-        if (source.Character.HasEffectiveTalent(TaixuanCastSizeTalentId) &&
-            MatchesSourceSkill(skill, TaixuanSkillId))
-        {
-            castSize += TaixuanCastSizeBonus;
-        }
-
+        var castSize = source.Character.GetSkillTargetingValue(
+            skill.SourceSkillId,
+            SkillTargetingField.CastSize,
+            skill.CastSize);
         return ApplyBlindPenalty(source, castSize);
     }
 
@@ -40,10 +24,11 @@ public static class BattleSkillTargeting
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(skill);
 
-        var impactSize = ApplyBlindPenalty(source, skill.ImpactSize);
-        return source.HasTrait(TraitId.ExtendedSkillImpactSize)
-            ? checked(impactSize + 1)
-            : impactSize;
+        var impactSize = source.Character.GetSkillTargetingValue(
+            skill.SourceSkillId,
+            SkillTargetingField.ImpactSize,
+            skill.ImpactSize);
+        return ApplyBlindPenalty(source, impactSize);
     }
 
     public static IReadOnlyList<BattleUnit> ResolveEffectiveTargets(
@@ -127,18 +112,4 @@ public static class BattleSkillTargeting
         return Math.Max(1, originalSize - penalty);
     }
 
-    private static bool MatchesSourceSkill(SkillInstance skill, string sourceSkillId)
-    {
-        if (string.Equals(skill.Id, sourceSkillId, StringComparison.Ordinal))
-        {
-            return true;
-        }
-
-        return skill switch
-        {
-            FormSkillInstance formSkill => MatchesSourceSkill(formSkill.Parent, sourceSkillId),
-            LegendSkillInstance legendSkill => MatchesSourceSkill(legendSkill.Parent, sourceSkillId),
-            _ => false,
-        };
-    }
 }

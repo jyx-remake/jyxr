@@ -15,6 +15,7 @@ public sealed class CharacterAffixSnapshot
         statModifierBuckets: new ReadOnlyDictionary<StatType, ModifierBucket>(new Dictionary<StatType, ModifierBucket>()),
         skillModifierBuckets: new ReadOnlyDictionary<string, ModifierBucket>(new Dictionary<string, ModifierBucket>()),
         weaponModifierBuckets: new ReadOnlyDictionary<WeaponType, ModifierBucket>(new Dictionary<WeaponType, ModifierBucket>()),
+        skillTargetingModifierBuckets: new ReadOnlyDictionary<SkillTargetingModifierKey, ModifierBucket>(new Dictionary<SkillTargetingModifierKey, ModifierBucket>()),
         legendChanceModifierBuckets: new ReadOnlyDictionary<string, ModifierBucket>(new Dictionary<string, ModifierBucket>()));
 
     public CharacterAffixSnapshot(
@@ -25,6 +26,7 @@ public sealed class CharacterAffixSnapshot
         IReadOnlyDictionary<StatType, ModifierBucket> statModifierBuckets,
         IReadOnlyDictionary<string, ModifierBucket> skillModifierBuckets,
         IReadOnlyDictionary<WeaponType, ModifierBucket> weaponModifierBuckets,
+        IReadOnlyDictionary<SkillTargetingModifierKey, ModifierBucket> skillTargetingModifierBuckets,
         IReadOnlyDictionary<string, ModifierBucket> legendChanceModifierBuckets)
     {
         ArgumentNullException.ThrowIfNull(effectiveTalents);
@@ -33,6 +35,7 @@ public sealed class CharacterAffixSnapshot
         ArgumentNullException.ThrowIfNull(statModifierBuckets);
         ArgumentNullException.ThrowIfNull(skillModifierBuckets);
         ArgumentNullException.ThrowIfNull(weaponModifierBuckets);
+        ArgumentNullException.ThrowIfNull(skillTargetingModifierBuckets);
         ArgumentNullException.ThrowIfNull(legendChanceModifierBuckets);
 
         EffectiveTalents = effectiveTalents;
@@ -42,6 +45,7 @@ public sealed class CharacterAffixSnapshot
         StatModifierBuckets = statModifierBuckets;
         SkillModifierBuckets = skillModifierBuckets;
         WeaponModifierBuckets = weaponModifierBuckets;
+        SkillTargetingModifierBuckets = skillTargetingModifierBuckets;
         LegendChanceModifierBuckets = legendChanceModifierBuckets;
     }
 
@@ -58,6 +62,8 @@ public sealed class CharacterAffixSnapshot
     public IReadOnlyDictionary<string, ModifierBucket> SkillModifierBuckets { get; }
 
     public IReadOnlyDictionary<WeaponType, ModifierBucket> WeaponModifierBuckets { get; }
+
+    public IReadOnlyDictionary<SkillTargetingModifierKey, ModifierBucket> SkillTargetingModifierBuckets { get; }
 
     public IReadOnlyDictionary<string, ModifierBucket> LegendChanceModifierBuckets { get; }
 }

@@ -22,6 +22,7 @@ public interface IAffixProvider
 [JsonDerivedType(typeof(WeaponBonusModifierAffix), "weapon_bonus_modifier")]
 [JsonDerivedType(typeof(LegendSkillChanceModifierAffix), "legend_skill_chance_modifier")]
 [JsonDerivedType(typeof(BuffLevelStatModifierAffix), "buff_level_stat_modifier")]
+[JsonDerivedType(typeof(SkillTargetingModifierAffix), "skill_targeting_modifier")]
 [JsonDerivedType(typeof(HookAffix), "hook")]
 [JsonDerivedType(typeof(TraitAffix), "trait")]
 public abstract record AffixDefinition
@@ -65,6 +66,29 @@ public sealed record BuffLevelStatModifierAffix(
     double AddBase = 0d,
     double AddPerLevel = 0d,
     double MulPerLevel = 0d) : AffixDefinition;
+
+public sealed record SkillTargetingModifierAffix(
+    string? SourceSkillId,
+    SkillTargetingField Field,
+    ModifierValue Value) : AffixDefinition
+{
+    public override void Resolve(IContentRepository contentRepository)
+    {
+        if (SourceSkillId is null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(SourceSkillId) ||
+            (!contentRepository.TryGetExternalSkill(SourceSkillId, out _) &&
+            !contentRepository.TryGetInternalSkill(SourceSkillId, out _) &&
+            !contentRepository.TryGetSpecialSkill(SourceSkillId, out _)))
+        {
+            throw new InvalidOperationException(
+                $"Skill targeting modifier references missing source skill '{SourceSkillId}'.");
+        }
+    }
+}
 
 public sealed record HookAffix : AffixDefinition
 {

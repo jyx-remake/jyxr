@@ -55,6 +55,16 @@ public enum HookTiming
     BeforeRecoveryResolved
 }
 
+public enum SkillTargetingField
+{
+    [JsonStringEnumMemberName("cast_size")]
+    CastSize,
+    [JsonStringEnumMemberName("impact_size")]
+    ImpactSize
+}
+
+public readonly record struct SkillTargetingModifierKey(string? SourceSkillId, SkillTargetingField Field);
+
 public enum BattleRecoveryKind
 {
     [JsonStringEnumMemberName("hp")]
@@ -79,7 +89,6 @@ public enum TraitId
     AvoidFriendlyFire,
     Irascible,
     DoubleDamageTakenRageGain,
-    ExtendedSkillImpactSize
 }
 
 public enum BattleDamageContextField

@@ -12,6 +12,7 @@ public sealed class LegendSkillInstance(
     public SkillInstance Parent { get; } = parent;
 
     public override string Id => Definition.Id;
+    public override string SourceSkillId => Parent.SourceSkillId;
     public override string Name => Definition.Name;
     public override string Description => Parent.Description;
     public override string Icon => Parent.Icon;

@@ -1,4 +1,5 @@
 using Game.Core.Abstractions;
+using Game.Core.Affix;
 using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
@@ -209,6 +210,122 @@ public sealed class BattleRuleTests
         Assert.DoesNotContain(ally.Id, result.Value!.AffectedUnitIds);
     }
 
+    [Fact]
+    public void SkillTargetingModifierAffix_ModifiesOnlyTheConfiguredSourceSkill()
+    {
+        var modifiedSkillDefinition = TestContentFactory.CreateExternalSkill("modified", castSize: 2);
+        var otherSkillDefinition = TestContentFactory.CreateExternalSkill("other", castSize: 2);
+        var talent = new TalentDefinition
+        {
+            Id = "range_talent",
+            Name = "range_talent",
+            Affixes =
+            [
+                new SkillTargetingModifierAffix(
+                    modifiedSkillDefinition.Id,
+                    SkillTargetingField.CastSize,
+                    ModifierValue.Add(3)),
+            ],
+        };
+        var unit = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills:
+            [
+                new InitialExternalSkillEntryDefinition(modifiedSkillDefinition, 1),
+                new InitialExternalSkillEntryDefinition(otherSkillDefinition, 1),
+            ],
+            talents: [talent]);
+
+        Assert.Equal(5, BattleSkillTargeting.ResolveEffectiveCastSize(unit, unit.Character.ExternalSkills[0]));
+        Assert.Equal(2, BattleSkillTargeting.ResolveEffectiveCastSize(unit, unit.Character.ExternalSkills[1]));
+    }
+
+    [Fact]
+    public void SkillTargetingModifierAffix_AppliesToDerivedFormSkill()
+    {
+        var form = new FormSkillDefinition(
+            "source.form",
+            "source.form",
+            "",
+            null,
+            1,
+            0,
+            new SkillCostDefinition(),
+            new SkillTargetingDefinition(CastSize: 4),
+            0,
+            "",
+            "",
+            []);
+        var skillDefinition = TestContentFactory.CreateExternalSkill("source", castSize: 2, formSkills: [form]);
+        var talent = new TalentDefinition
+        {
+            Id = "range_override_talent",
+            Name = "range_override_talent",
+            Affixes =
+            [
+                new SkillTargetingModifierAffix(
+                    skillDefinition.Id,
+                    SkillTargetingField.CastSize,
+                    ModifierValue.Override(10)),
+            ],
+        };
+        var unit = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            talents: [talent]);
+        var formSkill = unit.Character.ExternalSkills.Single().GetFormSkills().Single();
+
+        Assert.Equal(skillDefinition.Id, formSkill.SourceSkillId);
+        Assert.Equal(10, BattleSkillTargeting.ResolveEffectiveCastSize(unit, formSkill));
+    }
+
+    [Fact]
+    public void GlobalSkillTargetingModifierAffix_AppliesBeforeBlindPenalty()
+    {
+        var firstSkill = TestContentFactory.CreateExternalSkill("first", impactSize: 1);
+        var secondSkill = TestContentFactory.CreateExternalSkill("second", impactSize: 3);
+        var talent = new TalentDefinition
+        {
+            Id = "global_impact_talent",
+            Name = "global_impact_talent",
+            Affixes =
+            [
+                new SkillTargetingModifierAffix(
+                    null,
+                    SkillTargetingField.ImpactSize,
+                    ModifierValue.Add(1)),
+            ],
+        };
+        var unit = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills:
+            [
+                new InitialExternalSkillEntryDefinition(firstSkill, 1),
+                new InitialExternalSkillEntryDefinition(secondSkill, 1),
+            ],
+            talents: [talent]);
+
+        Assert.Equal(2, BattleSkillTargeting.ResolveEffectiveImpactSize(unit, unit.Character.ExternalSkills[0]));
+        Assert.Equal(4, BattleSkillTargeting.ResolveEffectiveImpactSize(unit, unit.Character.ExternalSkills[1]));
+
+        var blind = new BuffDefinition
+        {
+            Id = "致盲",
+            Name = "致盲",
+            IsDebuff = true,
+        };
+        unit.ApplyBuff(new BattleBuffInstance(blind, level: 1, remainingTurns: 1, unit.Id, 0));
+
+        Assert.Equal(1, BattleSkillTargeting.ResolveEffectiveImpactSize(unit, unit.Character.ExternalSkills[0]));
+        Assert.Equal(3, BattleSkillTargeting.ResolveEffectiveImpactSize(unit, unit.Character.ExternalSkills[1]));
+    }
+
     private static BattleUnit CreateUnit(
         string id,
         int team,
@@ -216,7 +333,8 @@ public sealed class BattleRuleTests
         int maxHp = 100,
         int maxMp = 30,
         IReadOnlyDictionary<StatType, int>? stats = null,
-        IReadOnlyList<InitialExternalSkillEntryDefinition>? externalSkills = null)
+        IReadOnlyList<InitialExternalSkillEntryDefinition>? externalSkills = null,
+        IReadOnlyList<TalentDefinition>? talents = null)
     {
         var mergedStats = new Dictionary<StatType, int>
         {
@@ -228,7 +346,11 @@ public sealed class BattleRuleTests
             mergedStats[stat] = value;
         }
 
-        var definition = TestContentFactory.CreateCharacterDefinition(id, stats: mergedStats, externalSkills: externalSkills);
+        var definition = TestContentFactory.CreateCharacterDefinition(
+            id,
+            stats: mergedStats,
+            externalSkills: externalSkills,
+            talents: talents);
         var character = TestContentFactory.CreateCharacterInstance(id, definition);
         return new BattleUnit(id, character, team, position);
     }

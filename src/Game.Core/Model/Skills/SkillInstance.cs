@@ -21,6 +21,7 @@ public abstract class SkillInstance(CharacterInstance owner)
 
     public virtual double Bonus => Owner.GetSkillBonusValue(Id);
     public abstract string Id { get; }
+    public virtual string SourceSkillId => Id;
     public abstract string Name { get; }
     public virtual string Description => string.Empty;
     public virtual string Icon => string.Empty;

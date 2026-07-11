@@ -44,7 +44,7 @@ public sealed class FormSkillInstance(
 	}
 
 	public override int CurrentCooldown { get; set; }
-	public override SkillKind SkillKind => Parent.SkillKind;
+	public override SkillKind SkillKind => SkillKind.Form;
 	public override WeaponType WeaponType => Parent.WeaponType;
 
 	public override int Cooldown => Definition.Cooldown;
@@ -56,7 +56,7 @@ public sealed class FormSkillInstance(
 	public override bool IsHarmony => Parent.IsHarmony;
 	public override double Affinity => Parent.Affinity;
 
-	public string SourceSkillId => Parent.Id;
+	public override string SourceSkillId => Parent.SourceSkillId;
 
 	public string SourceSkillName => Parent.Name;
 
