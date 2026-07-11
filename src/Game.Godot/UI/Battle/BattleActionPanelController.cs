@@ -59,14 +59,6 @@ internal sealed class BattleActionPanelController(
 		};
 	}
 
-	public void Refresh()
-	{
-		RefreshSelectedSkill();
-		RefreshActions();
-		RefreshList();
-		RefreshAvatar();
-	}
-
 	public void RefreshSelectedSkill()
 	{
 		var state = getState();

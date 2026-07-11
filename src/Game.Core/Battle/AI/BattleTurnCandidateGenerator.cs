@@ -64,7 +64,11 @@ public sealed class BattleTurnCandidateGenerator
                         var impactedPositions = BattleEngine.GetImpactPositions(destination, target, skill.ImpactType, impactSize)
                             .Where(state.Grid.Contains)
                             .ToHashSet();
-                        var targets = ResolveTargetsAtPosition(state, unit, skill, impactedPositions);
+						var targets = BattleSkillTargeting.ResolveEffectiveTargets(
+							state,
+							unit,
+							skill,
+							impactedPositions);
                         if (targets.Count == 0 || targets.All(targetUnit => !state.AreEnemies(unit, targetUnit)))
                         {
                             continue;
@@ -105,20 +109,6 @@ public sealed class BattleTurnCandidateGenerator
         }
 
         return candidates;
-    }
-
-    private static IReadOnlyList<BattleUnit> ResolveTargetsAtPosition(
-        BattleState state,
-        BattleUnit source,
-        SkillInstance skill,
-        IReadOnlySet<GridPosition> impactedPositions)
-    {
-        if (impactedPositions.Count == 0)
-        {
-            return [];
-        }
-
-        return BattleSkillTargeting.ResolveEffectiveTargets(state, source, skill, impactedPositions);
     }
 
     private static int GetDistanceToNearestEnemy(BattleState state, BattleUnit unit, GridPosition destination)
