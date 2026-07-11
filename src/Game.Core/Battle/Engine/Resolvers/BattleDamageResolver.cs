@@ -47,6 +47,7 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
         SkillInstance? skill = null,
         bool isCritical = false,
         bool runBeforeDamageApplied = true,
+        bool runAfterDamageApplied = true,
         double lifestealRateBonus = 0d,
         HookTiming? eventTiming = null,
         string? detail = null)
@@ -89,7 +90,7 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
             detail: detail ?? source.Id,
             damage: new BattleDamageEvent(actualAmount, isCritical, source.Id)));
 
-        if (actualAmount > 0)
+        if (actualAmount > 0 && runAfterDamageApplied)
         {
             var takenContext = new BattleDamageTakenContext(
                 source,

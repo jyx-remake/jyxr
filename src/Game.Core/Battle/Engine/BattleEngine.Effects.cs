@@ -382,6 +382,7 @@ public sealed partial class BattleEngine
             unit,
             damage,
             runBeforeDamageApplied: false,
+            runAfterDamageApplied: false,
             detail: buff.Definition.Id);
     }
 

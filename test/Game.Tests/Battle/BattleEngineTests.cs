@@ -1113,10 +1113,38 @@ public sealed class BattleEngineTests
     public void AdvanceUntilNextAction_AppliesPoisonOnTimelineRound()
     {
         var poison = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var damageHookTalent = new TalentDefinition
+        {
+            Id = "damage_hooks",
+            Name = "damage_hooks",
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.OnDamageTaken,
+                    Effects =
+                    [
+                        new AddRageBattleEffectDefinition(
+                            new SelfBattleTargetSelectorDefinition(),
+                            Value: 2),
+                    ],
+                },
+                new HookAffix
+                {
+                    Timing = HookTiming.OnDamageDealt,
+                    Effects =
+                    [
+                        new AddRageBattleEffectDefinition(
+                            new SelfBattleTargetSelectorDefinition(),
+                            Value: 3),
+                    ],
+                },
+            ],
+        };
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0), hp: 100, stats: new Dictionary<StatType, int>
         {
             [StatType.Dingli] = 0,
-        }, actionSpeed: 1);
+        }, actionSpeed: 1, talents: [damageHookTalent]);
         hero.ApplyBuff(new BattleBuffInstance(poison, level: 2, remainingTurns: 2, "enemy", 0));
         var state = new BattleState(new BattleGrid(4, 4), [hero]);
         var engine = new BattleEngine(random: new FixedRandomService(0.5d));
@@ -1125,12 +1153,18 @@ public sealed class BattleEngineTests
 
         Assert.False(result.Success);
         Assert.Equal(48, hero.Hp);
+        Assert.Equal(0, hero.Rage);
         Assert.Equal(1, Assert.Single(hero.Buffs).RemainingTurns);
         Assert.Contains(result.Messages.OfType<BattleFact>(), battleEvent =>
             battleEvent.Kind == BattleFactKind.Damaged &&
             battleEvent.UnitId == hero.Id &&
             battleEvent.Detail == "中毒" &&
             battleEvent.Damage is { Amount: 52, IsCritical: false });
+        Assert.DoesNotContain(result.Messages, message =>
+            message is BattleTrace
+            {
+                Timing: HookTiming.OnDamageTaken or HookTiming.OnDamageDealt,
+            });
     }
 
     [Fact]
