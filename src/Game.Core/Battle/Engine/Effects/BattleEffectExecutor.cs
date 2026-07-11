@@ -130,6 +130,13 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
                 foreach (var target in targets)
                     engine.RecoveryResolver.Apply(state, source, target, BattleRecoveryKind.Mp, mp.Value);
                 break;
+            case ModifyLifestealBattleHookEffectDefinition lifesteal:
+                var dealtContext = RequireHook();
+                dealtContext.LifestealRate =
+                    (dealtContext.LifestealRate ?? 0d) +
+                    lifesteal.Factor +
+                    lifesteal.FactorPerUnitLevel * dealtContext.Unit.Character.Level;
+                break;
             case CancelHitBattleHookEffectDefinition cancel:
                 RequireHook().HitState = BattleHitState.Miss;
                 RequireHook().DamageAmount = 0;

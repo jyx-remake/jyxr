@@ -201,6 +201,7 @@ internal static class BattleEffectCapabilityPolicy
             [typeof(IDamageApplicationEffectContext)] = HookTiming.BeforeDamageApplied,
             [typeof(IDamageApplicationRuntimeContext)] = HookTiming.BeforeDamageApplied,
             [typeof(IDamageTakenEffectContext)] = HookTiming.OnDamageTaken,
+            [typeof(IDamageDealtEffectContext)] = HookTiming.OnDamageDealt,
             [typeof(IDefeatPreventionEffectContext)] = HookTiming.BeforeDefeated,
             [typeof(IRecoveryEffectContext)] = HookTiming.BeforeRecoveryResolved,
             [typeof(ISkillCostEffectContext)] = HookTiming.BeforeSkillCost,

@@ -17,6 +17,7 @@ public sealed class BattleHookContext :
     IHitConfirmedEffectContext,
     IDamageApplicationEffectContext,
     IDamageTakenEffectContext,
+    IDamageDealtEffectContext,
     IDefeatPreventionEffectContext,
     IRecoveryEffectContext,
     ISkillCostEffectContext,
@@ -78,6 +79,8 @@ public sealed class BattleHookContext :
 
     public int? IncomingDamageAmount { get; internal set; }
 
+    public double? LifestealRate { get; internal set; }
+
     BattleDamageCalculationContext IDamageCalculationEffectContext.DamageCalculation =>
         DamageCalculation ?? throw MissingCapability(nameof(IDamageCalculationEffectContext));
 
@@ -98,6 +101,14 @@ public sealed class BattleHookContext :
     int IDamageTakenEffectContext.ActualDamageAmount =>
         DamageAmount ?? throw MissingCapability(nameof(IDamageTakenEffectContext));
     bool IDamageTakenEffectContext.IsCritical => IsCritical;
+    int IDamageDealtEffectContext.ActualDamageAmount =>
+        DamageAmount ?? throw MissingCapability(nameof(IDamageDealtEffectContext));
+    bool IDamageDealtEffectContext.IsCritical => IsCritical;
+    double IDamageDealtEffectContext.LifestealRate
+    {
+        get => LifestealRate ?? throw MissingCapability(nameof(IDamageDealtEffectContext));
+        set => LifestealRate = value;
+    }
     int IDefeatPreventionEffectContext.IncomingDamageAmount =>
         IncomingDamageAmount ?? throw MissingCapability(nameof(IDefeatPreventionEffectContext));
     int IDefeatPreventionEffectContext.ActualDamageAmount =>

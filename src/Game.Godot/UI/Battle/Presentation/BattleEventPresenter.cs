@@ -74,6 +74,10 @@ internal sealed class BattleEventPresenter(
             case BattleFactKind.Healed:
                 PresentResourceChange(fact, BattleFloatTextStyle.Recovery, "+");
                 break;
+            case BattleFactKind.Lifesteal when fact.Lifesteal is { Amount: > 0 } lifesteal:
+                board.PlayFloatText(fact.UnitId, $"吸血{lifesteal.Amount}", BattleFloatTextStyle.Recovery);
+                AppendLog($"{unitName} 吸取了 {lifesteal.Amount} 点生命。");
+                break;
             case BattleFactKind.MpDamaged:
                 PresentResourceChange(fact, BattleFloatTextStyle.Mana, "-");
                 break;

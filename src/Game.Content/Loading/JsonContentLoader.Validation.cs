@@ -408,6 +408,12 @@ public sealed partial class JsonContentLoader
                 case ModifyDamageContextBattleHookEffectDefinition modifyDamageContext:
                     ValidateModifyDamageContextEffect(modifyDamageContext, $"{ownerName} battle hook '{hook.Timing}'");
                     break;
+                case ModifyLifestealBattleHookEffectDefinition modifyLifesteal:
+                    Ensure(double.IsFinite(modifyLifesteal.Factor),
+                        $"{ownerName} has battle hook '{hook.Timing}' with invalid lifesteal factor '{modifyLifesteal.Factor}'.");
+                    Ensure(double.IsFinite(modifyLifesteal.FactorPerUnitLevel),
+                        $"{ownerName} has battle hook '{hook.Timing}' with invalid lifesteal factor per unit level '{modifyLifesteal.FactorPerUnitLevel}'.");
+                    break;
                 case StrengthenContextBuffBattleHookEffectDefinition strengthenBuff:
                     Ensure(strengthenBuff.LevelDelta >= 0,
                         $"{ownerName} has battle hook '{hook.Timing}' with invalid buff level delta '{strengthenBuff.LevelDelta}'.");

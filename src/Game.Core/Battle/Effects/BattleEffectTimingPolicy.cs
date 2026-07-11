@@ -13,6 +13,7 @@ public static class BattleEffectTimingPolicy
             ModifyDamageContextBattleHookEffectDefinition => timing == HookTiming.BeforeDamageCalculation,
             ModifyMpCostBattleHookEffectDefinition => timing == HookTiming.BeforeSkillCost,
             ModifyRecoveryBattleHookEffectDefinition => timing == HookTiming.BeforeRecoveryResolved,
+            ModifyLifestealBattleHookEffectDefinition => timing == HookTiming.OnDamageDealt,
             StrengthenContextBuffBattleHookEffectDefinition => timing == HookTiming.BeforeBuffApplied,
             CancelHitBattleHookEffectDefinition or SetHitSuccessBattleHookEffectDefinition =>
                 timing == HookTiming.BeforeHitResolved,

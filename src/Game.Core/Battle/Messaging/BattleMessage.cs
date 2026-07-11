@@ -17,7 +17,8 @@ public sealed record BattleFact : BattleMessage
         BattleDamageEvent? damage = null,
         BattleRestRecovery? rest = null,
         BattleSkillExperienceEvent? skillExperience = null,
-        BattleCharacterExperienceEvent? characterExperience = null)
+        BattleCharacterExperienceEvent? characterExperience = null,
+        BattleLifestealEvent? lifesteal = null)
         : base(unitId, timing)
     {
         Kind = kind;
@@ -27,6 +28,7 @@ public sealed record BattleFact : BattleMessage
         Rest = rest;
         SkillExperience = skillExperience;
         CharacterExperience = characterExperience;
+        Lifesteal = lifesteal;
     }
 
     public BattleFactKind Kind { get; }
@@ -36,6 +38,7 @@ public sealed record BattleFact : BattleMessage
     public BattleRestRecovery? Rest { get; }
     public BattleSkillExperienceEvent? SkillExperience { get; }
     public BattleCharacterExperienceEvent? CharacterExperience { get; }
+    public BattleLifestealEvent? Lifesteal { get; }
 }
 
 public sealed record BattleCue : BattleMessage
@@ -93,6 +96,7 @@ public enum BattleFactKind
     BuffResisted,
     BuffRemoved,
     Healed,
+    Lifesteal,
     MpDamaged,
     RageChanged,
     DefeatPrevented,
@@ -140,5 +144,6 @@ public enum BattleFloatTextStyle
     Special,
 }
 public sealed record BattleDamageEvent(int Amount, bool IsCritical = false, string? SourceUnitId = null);
+public sealed record BattleLifestealEvent(int Amount);
 public sealed record BattleSkillExperienceEvent(string SkillId, string SkillName, SkillKind SkillKind, int AddedExperience, int OldLevel, int NewLevel);
 public sealed record BattleCharacterExperienceEvent(string CharacterId, string CharacterName, int AddedExperience, int OldLevel, int NewLevel);

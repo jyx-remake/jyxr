@@ -53,6 +53,7 @@ public sealed record NearbyAlliesBattleTargetSelectorDefinition(
 [JsonDerivedType(typeof(ModifyDamageContextBattleHookEffectDefinition), "modify_damage_context")]
 [JsonDerivedType(typeof(ModifyMpCostBattleHookEffectDefinition), "modify_mp_cost")]
 [JsonDerivedType(typeof(ModifyRecoveryBattleHookEffectDefinition), "modify_recovery")]
+[JsonDerivedType(typeof(ModifyLifestealBattleHookEffectDefinition), "modify_lifesteal")]
 [JsonDerivedType(typeof(StrengthenContextBuffBattleHookEffectDefinition), "strengthen_context_buff")]
 [JsonDerivedType(typeof(ExtraStrikeBattleHookEffectDefinition), "extra_strike")]
 [JsonDerivedType(typeof(CustomBattleEffectDefinition), "custom")]
@@ -122,6 +123,10 @@ public sealed record AddHpBattleEffectDefinition(
 public sealed record AddMpBattleEffectDefinition(
     BattleTargetSelectorDefinition Target,
     int Value) : BattleEffectDefinition, ITargetedBattleEffectDefinition;
+
+public sealed record ModifyLifestealBattleHookEffectDefinition(
+    double Factor,
+    double FactorPerUnitLevel = 0d) : BattleEffectDefinition;
 
 public sealed record CancelHitBattleHookEffectDefinition(
     bool SuppressHitEffects = true) : BattleEffectDefinition;

@@ -1,4 +1,5 @@
 using Game.Core.Affix;
+using Game.Core.Model;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -117,11 +118,55 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
                     context.IsCritical = takenContext.IsCritical;
                 });
             }
+
+            var lifestealRate = Math.Max(0d, takenContext.Source.GetStat(StatType.Lifesteal));
+            var dealt = engine.TriggerHooks(state, HookTiming.OnDamageDealt, takenContext.Source, context =>
+            {
+                context.Source = takenContext.Source;
+                context.Target = takenContext.Target;
+                context.Skill = takenContext.Skill;
+                context.DamageAmount = takenContext.ActualAmount;
+                context.IsCritical = takenContext.IsCritical;
+                context.LifestealRate = lifestealRate;
+            });
+
+            ApplyLifesteal(state, takenContext, dealt.LifestealRate ?? lifestealRate);
         }
 
         return new BattleDamageApplicationResult(
             applicationContext.Target,
             actualAmount,
             applicationContext.SuppressHitEffects);
+    }
+
+    private void ApplyLifesteal(BattleState state, BattleDamageTakenContext context, double rate)
+    {
+        if (context.Skill is null ||
+            !context.Source.IsAlive ||
+            context.Source.Team == context.Target.Team)
+        {
+            return;
+        }
+
+        var requestedAmount = (int)Math.Floor(context.ActualAmount * Math.Max(0d, rate));
+        if (requestedAmount <= 0)
+        {
+            return;
+        }
+
+        var actualAmount = engine.RecoveryResolver.Apply(
+            state,
+            context.Source,
+            context.Source,
+            BattleRecoveryKind.Hp,
+            requestedAmount).ActualAmount;
+        if (actualAmount > 0)
+        {
+            BattleEngine.AddMessage(state, new BattleFact(
+                BattleFactKind.Lifesteal,
+                context.Source.Id,
+                HookTiming.OnDamageDealt,
+                lifesteal: new BattleLifestealEvent(actualAmount)));
+        }
     }
 }

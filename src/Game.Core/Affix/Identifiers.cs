@@ -51,6 +51,7 @@ public enum HookTiming
     OnBuffApplied,
     OnBuffRemoved,
     OnDamageTaken,
+    OnDamageDealt,
     BeforeRecoveryResolved
 }
 
