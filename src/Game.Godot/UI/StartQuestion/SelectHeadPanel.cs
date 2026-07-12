@@ -5,14 +5,6 @@ namespace Game.Godot.UI;
 
 public partial class SelectHeadPanel : Control
 {
-	private static readonly string[] HeroHeads =
-	[
-		"头像.主角3", "头像.主角4", "头像.魔君", "头像.全冠清", "头像.李白", "头像.林平之瞎", "头像.侠客2",
-		"头像.归辛树", "头像.狄云", "头像.独孤求败", "头像.陈近南", "头像.石中玉",
-		"头像.商宝震", "头像.尹志平", "头像.流浪汉", "头像.梁发", "头像.卓一航", "头像.烟霞神龙",
-		"头像.公子1", "头像.主角", "头像.主角2",
-	];
-
 	private readonly TaskCompletionSource<string> _completion = new();
 	private SelectHeadSlot? _selectedSlot;
 	private string _selectedHead = string.Empty;
@@ -60,7 +52,7 @@ public partial class SelectHeadPanel : Control
 			child.QueueFree();
 		}
 
-		foreach (var head in HeroHeads)
+		foreach (var head in Game.Config.SelectablePortraitIds)
 		{
 			if (SelectHeadSlotScene.Instantiate() is not SelectHeadSlot slot)
 			{

@@ -86,6 +86,11 @@ public static class GameRuntimeBootstrap
 			throw new InvalidOperationException("游戏配置缺少 initialPartyCharacterIds。");
 		}
 
+		if (config.SelectablePortraitIds.Count == 0)
+		{
+			throw new InvalidOperationException("游戏配置缺少 selectablePortraitIds。");
+		}
+
 		return config;
 	}
 

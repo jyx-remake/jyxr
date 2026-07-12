@@ -39,6 +39,13 @@ public sealed class GameConfig
 	public double CanzhangDropRateInternalRate { get; init; } = 2d;
 	public MapPosition DefaultLargeMapPosition { get; init; } = new(447, 383);
 	public string InitialStorySegmentId { get; init; } = "开局答题";
+	public List<string> SelectablePortraitIds { get; init; } = [
+		"头像.主角", "头像.主角3", "头像.主角4", "头像.魔君", "头像.全冠清",
+		"头像.李白", "头像.林平之瞎", "头像.侠客2",
+		"头像.归辛树", "头像.狄云", "头像.独孤求败", "头像.陈近南", "头像.石中玉",
+		"头像.商宝震", "头像.尹志平", "头像.流浪汉", "头像.梁发", "头像.卓一航", "头像.烟霞神龙",
+		"头像.双手开碑", "头像.流星赶月", "头像.盖七省", "头像.公子1", "头像.主角2",
+	];
 
 	public List<string> RandomBattleMusics { get; init; } = [
 		"战斗音乐.云狐之战", "战斗音乐.暮云出击", "战斗音乐.山谷行进", "战斗音乐.山谷行进2",
