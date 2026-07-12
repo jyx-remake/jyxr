@@ -127,8 +127,8 @@ public static class SkillDescriptionFormatter
         }
 
         AppendLine(builder, $"覆盖类型 {FormatImpactTypeCn(skill.ImpactType)}");
-        AppendLine(builder, $"覆盖范围 {skill.ImpactSize}");
-        AppendLine(builder, $"施展范围 {skill.CastSize}");
+        AppendLine(builder, $"覆盖范围 {SkillTargetingResolver.ResolveImpactSize(skill)}");
+        AppendLine(builder, $"施展范围 {SkillTargetingResolver.ResolveCastSize(skill)}");
 
         if (skill.MpCost > 0)
         {
