@@ -70,12 +70,7 @@ public sealed partial class BattleEngine
     {
         yield return target;
 
-        var forwardX = Math.Sign(target.X - source.X);
-        var forwardY = Math.Sign(target.Y - source.Y);
-        if (forwardX == 0 && forwardY == 0)
-        {
-            yield break;
-        }
+        var (forwardX, forwardY) = ResolvePrimaryDirection(source, target);
 
         var sideX = forwardX == 0 ? 1 : 0;
         var sideY = forwardX == 0 ? 0 : 1;
@@ -93,6 +88,11 @@ public sealed partial class BattleEngine
 
     private static IEnumerable<GridPosition> ResolveCleavePositions(GridPosition source, GridPosition target)
     {
+        if (source == target)
+        {
+            target = new GridPosition(source.X + 1, source.Y);
+        }
+
         yield return target;
         var (dx, dy) = ResolvePrimaryDirection(source, target);
         if (dx != 0)
