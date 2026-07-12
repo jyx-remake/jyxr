@@ -16,9 +16,6 @@ public partial class CharacterEquipmentTab : Control
 	private CharacterEquipmentBox _weaponBox = null!;
 	private CharacterEquipmentBox _armorBox = null!;
 	private CharacterEquipmentBox _accessoryBox = null!;
-	private Label _weaponEmptyLabel = null!;
-	private Label _armorEmptyLabel = null!;
-	private Label _accessoryEmptyLabel = null!;
 
 	private CharacterInstance? _character;
 	public bool IsReadOnly { get; set; }
@@ -31,9 +28,6 @@ public partial class CharacterEquipmentTab : Control
 		_weaponBox = GetNode<CharacterEquipmentBox>("%WeaponBox");
 		_armorBox = GetNode<CharacterEquipmentBox>("%ArmorBox");
 		_accessoryBox = GetNode<CharacterEquipmentBox>("%AccessoryBox");
-		_weaponEmptyLabel = GetNode<Label>("%WeaponEmptyLabel");
-		_armorEmptyLabel = GetNode<Label>("%ArmorEmptyLabel");
-		_accessoryEmptyLabel = GetNode<Label>("%AccessoryEmptyLabel");
 
 		ConnectSlot(_weaponSlot, _weaponBox, EquipmentSlotType.Weapon);
 		ConnectSlot(_armorSlot, _armorBox, EquipmentSlotType.Armor);
@@ -55,27 +49,24 @@ public partial class CharacterEquipmentTab : Control
 			return;
 		}
 
-		SyncSlot(EquipmentSlotType.Weapon, _weaponBox, _weaponEmptyLabel);
-		SyncSlot(EquipmentSlotType.Armor, _armorBox, _armorEmptyLabel);
-		SyncSlot(EquipmentSlotType.Accessory, _accessoryBox, _accessoryEmptyLabel);
+		SyncSlot(EquipmentSlotType.Weapon, _weaponBox);
+		SyncSlot(EquipmentSlotType.Armor, _armorBox);
+		SyncSlot(EquipmentSlotType.Accessory, _accessoryBox);
 	}
 
 	private void SyncSlot(
 		EquipmentSlotType slotType,
-		CharacterEquipmentBox box,
-		Label emptyLabel)
+		CharacterEquipmentBox box)
 	{
 		var equipment = _character!.GetEquipment(slotType);
 		if (equipment is null)
 		{
 			box.Visible = false;
-			emptyLabel.Visible = true;
 			return;
 		}
 
 		box.Setup(equipment);
 		box.Visible = true;
-		emptyLabel.Visible = false;
 	}
 
 	private void ConnectSlot(JyButton slotButton, CharacterEquipmentBox equipmentBox, EquipmentSlotType slotType)

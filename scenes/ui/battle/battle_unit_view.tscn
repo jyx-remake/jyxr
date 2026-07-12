@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bhwyiutc87gtc" path="res://src/Game.Godot/UI/Battle/Widgets/BattleUnitView.cs" id="1_script"]
 [ext_resource type="AnimationLibrary" uid="uid://bbw02vxa8nxa6" path="res://assets/animation/combatant/zyjk.tres" id="3_p1k0d"]
-[ext_resource type="Texture2D" path="res://assets/art/atlas_texture/zyjk/zyjk-stand001.tres" id="4_0y46n"]
+[ext_resource type="Texture2D" path="res://assets/art/atlas_texture/zyjk/zyjk-stand009.tres" id="4_0y46n"]
 [ext_resource type="Texture2D" uid="uid://cs45878e3n7p6" path="res://assets/art/ui/battle/yinyingxiao.png" id="4_shadow"]
 [ext_resource type="Texture2D" uid="uid://ctf1yvtn7ngc1" path="res://assets/art/ui/battle/arrow.png" id="5_arrow"]
 [ext_resource type="Texture2D" uid="uid://b3pmv2oib5y05" path="res://assets/art/ui/battle/battle_duihuakuang.png" id="6_speech_bg"]
@@ -291,10 +291,12 @@ offset_right = 17.0
 offset_bottom = 215.0
 theme_override_colors/default_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/line_separation = 0
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/normal_font_size = 20
 bbcode_enabled = true
-text = "[color=yellow]圣战[/color]"
+text = "[color=yellow]圣战[/color]
+[color=red]缓速[/color]"
 fit_content = true
 scroll_active = false
 autowrap_mode = 0
@@ -308,7 +310,7 @@ scale = Vector2(1.5, 1.5)
 unique_name_in_owner = true
 texture = ExtResource("4_0y46n")
 centered = false
-offset = Vector2(-28.952295, -115.97324)
+offset = Vector2(-28.952295, -115.923874)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="AnimationSlot" unique_id=74145691]
 unique_name_in_owner = true
