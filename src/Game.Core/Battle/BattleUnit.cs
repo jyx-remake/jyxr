@@ -299,7 +299,7 @@ public sealed class BattleUnit
 
     public int GetMovePower()
     {
-        if (HasBuff(BattleContentIds.Immobilized))
+        if (HasTrait(TraitId.CannotMove))
         {
             return 0;
         }

@@ -89,6 +89,7 @@ public enum TraitId
     AvoidFriendlyFire,
     Irascible,
     DoubleDamageTakenRageGain,
+    CannotMove,
 }
 
 public enum BattleDamageContextField

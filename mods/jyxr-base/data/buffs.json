@@ -86,7 +86,13 @@
     "id": "定身",
     "name": "定身",
     "isDebuff": true,
-    "description": "无法移动。"
+    "description": "无法移动。",
+    "affixes": [
+      {
+        "type": "trait",
+        "traitId": "CannotMove"
+      }
+    ]
   },
   {
     "id": "封穴",
