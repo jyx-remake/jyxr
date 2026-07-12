@@ -6,7 +6,7 @@ using Godot;
 
 namespace Game.Godot.Story;
 
-public sealed class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeHost, IApplicationRuntimeHost, IMiniGameRuntimeHost
+public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeHost, IApplicationRuntimeHost, IMiniGameRuntimeHost
 {
 	private readonly StoryCommandBinder _binder;
 
