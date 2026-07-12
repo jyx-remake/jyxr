@@ -90,6 +90,7 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("couple_unity_attack", new CoupleUnityAttackBattleEffectHandler());
         registry.Register("couple_unity_defence", new CoupleUnityDefenceBattleEffectHandler());
         registry.Register("black_heaven_deadly_flame", new BlackHeavenDeadlyFlameBattleEffectHandler());
+        registry.Register("bagua_formation", new BaguaFormationBattleEffectHandler());
         registry.Register("careful_defense", new CarefulDefenseBattleEffectHandler());
         registry.Register("shifting_stars_reflection", new ShiftingStarsReflectionBattleEffectHandler());
         registry.Register("eternal_spring", new EternalSpringBattleEffectHandler());
