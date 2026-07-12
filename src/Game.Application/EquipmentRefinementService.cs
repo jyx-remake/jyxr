@@ -82,7 +82,7 @@ public sealed class EquipmentRefinementService
                 return StoryCommandResult.Jump(InsufficientYuanbaoStoryId);
             }
 
-            var candidates = GenerateCandidates(equipment, affixTexts);
+            var candidates = GenerateCandidates(equipment, affixGroups);
             _session.ProfileService.SpendYuanbao(1);
 
             var candidateTexts = candidates
@@ -112,35 +112,19 @@ public sealed class EquipmentRefinementService
 
     private IReadOnlyList<GeneratedEquipmentAffixRoll> GenerateCandidates(
         EquipmentInstance equipment,
-        IReadOnlyCollection<string> currentAffixTexts)
+        IReadOnlyList<EquipmentAffixGroup> currentAffixGroups)
     {
         var candidates = new List<GeneratedEquipmentAffixRoll>(CandidateCount);
         for (var candidateIndex = 0; candidateIndex < CandidateCount; candidateIndex++)
         {
-            candidates.Add(GenerateCandidate(equipment, currentAffixTexts));
+            candidates.Add(EquipmentRandomAffixGenerator.GenerateSingleRoll(
+                equipment.Definition,
+                ContentRepository,
+                State.Adventure.Round,
+                currentAffixGroups.Select(static group => group.Affixes).ToArray()));
         }
 
         return candidates;
-    }
-
-    private GeneratedEquipmentAffixRoll GenerateCandidate(
-        EquipmentInstance equipment,
-        IReadOnlyCollection<string> currentAffixTexts)
-    {
-        for (var attempt = 0; attempt < 4096; attempt++)
-        {
-            var roll = EquipmentRandomAffixGenerator.GenerateSingleRoll(
-                equipment.Definition,
-                ContentRepository,
-                State.Adventure.Round);
-            if (!currentAffixTexts.Contains(FormatAffixGroup(roll.Affixes), StringComparer.Ordinal))
-            {
-                return roll;
-            }
-        }
-
-        throw new InvalidOperationException(
-            $"Equipment '{equipment.Definition.Id}' cannot generate a refinement candidate outside its current affixes.");
     }
 
     private void ReplaceAffixGroup(

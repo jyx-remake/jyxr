@@ -86,6 +86,27 @@ public static class EquipmentRandomAffixGenerator
             contentRepository);
     }
 
+    public static GeneratedEquipmentAffixRoll GenerateSingleRoll(
+        EquipmentDefinition equipment,
+        IContentRepository contentRepository,
+        int round,
+        IReadOnlyList<IReadOnlyList<AffixDefinition>> excludedGroups)
+    {
+        ArgumentNullException.ThrowIfNull(excludedGroups);
+
+        for (var attempt = 0; attempt < 4096; attempt++)
+        {
+            var roll = GenerateSingleRoll(equipment, contentRepository, round);
+            if (excludedGroups.All(group => !Matches(group, roll, contentRepository)))
+            {
+                return roll;
+            }
+        }
+
+        throw new InvalidOperationException(
+            $"Equipment '{equipment.Id}' cannot generate a random affix outside its current affixes.");
+    }
+
     private static EquipmentRandomAffixOptionDefinition[] ResolveOptions(
         EquipmentDefinition equipment,
         IContentRepository contentRepository) =>
@@ -142,16 +163,16 @@ public static class EquipmentRandomAffixGenerator
             EquipmentRandomAffixKind.DefenceCombo => BuildDefenceComboRoll(option),
             EquipmentRandomAffixKind.RandomAttribute => BuildRandomAttributeRoll(itemLevel, round),
             EquipmentRandomAffixKind.Talent => BuildTalentRoll(option, contentRepository),
-            EquipmentRandomAffixKind.Accuracy => BuildStatRangeRoll("accuracy", StatType.Accuracy, option),
+            EquipmentRandomAffixKind.Accuracy => BuildStatRangeRoll(StatType.Accuracy, option),
             EquipmentRandomAffixKind.ExternalSkillBonus => BuildExternalSkillBonusRoll(itemLevel, round, contentRepository),
             EquipmentRandomAffixKind.InternalSkillBonus => BuildInternalSkillBonusRoll(itemLevel, round, contentRepository),
             EquipmentRandomAffixKind.FormSkillBonus => BuildFormSkillBonusRoll(itemLevel, round, contentRepository),
             EquipmentRandomAffixKind.LegendSkillBonus => BuildLegendSkillBonusRoll(itemLevel, round, contentRepository),
             EquipmentRandomAffixKind.CritChance => BuildDirectCritChanceRoll(itemLevel),
-            EquipmentRandomAffixKind.CritMult => BuildStatRangeRoll("crit_mult", StatType.CritMult, option),
-            EquipmentRandomAffixKind.Lifesteal => BuildStatRangeRoll("lifesteal", StatType.Lifesteal, option),
+            EquipmentRandomAffixKind.CritMult => BuildStatRangeRoll(StatType.CritMult, option),
+            EquipmentRandomAffixKind.Lifesteal => BuildStatRangeRoll(StatType.Lifesteal, option),
             EquipmentRandomAffixKind.Speed => BuildSpeedRoll(option),
-            EquipmentRandomAffixKind.AntiDebuff => BuildStatRangeRoll("anti_debuff", StatType.AntiDebuff, option),
+            EquipmentRandomAffixKind.AntiDebuff => BuildStatRangeRoll(StatType.AntiDebuff, option),
             EquipmentRandomAffixKind.WeaponBonus => BuildWeaponBonusRoll(option),
             _ => throw new InvalidOperationException($"Unsupported equipment random affix kind '{option.Kind}'."),
         };
@@ -163,8 +184,7 @@ public static class EquipmentRandomAffixGenerator
         var attack = Random.Shared.Next(attackMin, attackMax + 1);
         var critChance = Random.Shared.Next(1, itemLevel + 1);
 
-        return new GeneratedEquipmentAffixRoll(
-            "attack_combo",
+        return CreateRoll(
             EquipmentRandomAffixKind.AttackCombo,
             [
                 new StatModifierAffix(StatType.Attack, ModifierValue.Add(attack)),
@@ -177,8 +197,7 @@ public static class EquipmentRandomAffixGenerator
         var defence = RollRange(option, 0);
         var antiCritChance = RollRange(option, 1);
 
-        return new GeneratedEquipmentAffixRoll(
-            "defence_combo",
+        return CreateRoll(
             EquipmentRandomAffixKind.DefenceCombo,
             [
                 new StatModifierAffix(StatType.Defence, ModifierValue.Add(defence)),
@@ -192,10 +211,7 @@ public static class EquipmentRandomAffixGenerator
         var min = (int)(itemLevel * ((round + 3) / 4d)) + itemLevel;
         var max = (int)(itemLevel * ((round + 3) / 3d)) + itemLevel * 2;
         var value = Random.Shared.Next(min, max + 1);
-        var key = $"random_attribute:{stat}";
-
-        return new GeneratedEquipmentAffixRoll(
-            key,
+        return CreateRoll(
             EquipmentRandomAffixKind.RandomAttribute,
             [new StatModifierAffix(stat, ModifierValue.Add(value))]);
     }
@@ -212,8 +228,7 @@ public static class EquipmentRandomAffixGenerator
         var talentId = PickRandom(option.Pool);
         var affix = new GrantTalentAffix(talentId);
         affix.Resolve(contentRepository);
-        return new GeneratedEquipmentAffixRoll(
-            $"talent:{talentId}",
+        return CreateRoll(
             EquipmentRandomAffixKind.Talent,
             [affix]);
     }
@@ -234,8 +249,7 @@ public static class EquipmentRandomAffixGenerator
             maxFactor: 15d,
             easyTierBonusFactor: 15d);
 
-        return new GeneratedEquipmentAffixRoll(
-            $"external_skill_bonus:{skill.Id}",
+        return CreateRoll(
             EquipmentRandomAffixKind.ExternalSkillBonus,
             [new SkillBonusModifierAffix(skill.Id, ModifierValue.Add(AsRatio(value)))]);
     }
@@ -256,8 +270,7 @@ public static class EquipmentRandomAffixGenerator
             maxFactor: 10d,
             easyTierBonusFactor: 10d);
 
-        return new GeneratedEquipmentAffixRoll(
-            $"internal_skill_bonus:{skill.Id}",
+        return CreateRoll(
             EquipmentRandomAffixKind.InternalSkillBonus,
             [new SkillBonusModifierAffix(skill.Id, ModifierValue.Add(AsRatio(value)))]);
     }
@@ -280,8 +293,7 @@ public static class EquipmentRandomAffixGenerator
             maxFactor: 25d,
             easyTierBonusFactor: 15d);
 
-        return new GeneratedEquipmentAffixRoll(
-            $"form_skill_bonus:{formSkill.Id}",
+        return CreateRoll(
             EquipmentRandomAffixKind.FormSkillBonus,
             [new SkillBonusModifierAffix(formSkill.Id, ModifierValue.Add(AsRatio(value)))]);
     }
@@ -304,8 +316,7 @@ public static class EquipmentRandomAffixGenerator
             easyTierBonusFactor: 15d);
         var chance = Random.Shared.Next(0, 11);
 
-        return new GeneratedEquipmentAffixRoll(
-            $"legend_skill_bonus:{candidate.Skill.Id}",
+        return CreateRoll(
             EquipmentRandomAffixKind.LegendSkillBonus,
             [
                 new SkillBonusModifierAffix(candidate.Skill.Id, ModifierValue.Add(AsRatio(power))),
@@ -316,8 +327,7 @@ public static class EquipmentRandomAffixGenerator
     private static GeneratedEquipmentAffixRoll BuildDirectCritChanceRoll(int itemLevel)
     {
         var percent = Math.Round(Random.Shared.NextDouble() * (itemLevel - 0.5d) + 0.5d, 2);
-        return new GeneratedEquipmentAffixRoll(
-            "crit_chance",
+        return CreateRoll(
             EquipmentRandomAffixKind.CritChance,
             [new StatModifierAffix(StatType.CritChance, ModifierValue.Add(percent / 100d))]);
     }
@@ -330,8 +340,7 @@ public static class EquipmentRandomAffixGenerator
         }
 
         var value = double.Parse(PickRandom(option.Pool), CultureInfo.InvariantCulture);
-        return new GeneratedEquipmentAffixRoll(
-            "speed",
+        return CreateRoll(
             EquipmentRandomAffixKind.Speed,
             [new StatModifierAffix(StatType.Speed, ModifierValue.Add(value))]);
     }
@@ -344,14 +353,12 @@ public static class EquipmentRandomAffixGenerator
         }
 
         var value = RollRange(option, 0);
-        return new GeneratedEquipmentAffixRoll(
-            $"weapon_bonus:{option.WeaponType.Value}",
+        return CreateRoll(
             EquipmentRandomAffixKind.WeaponBonus,
             [new WeaponBonusModifierAffix(option.WeaponType.Value, ModifierValue.Add(AsRatio(value)))]);
     }
 
     private static GeneratedEquipmentAffixRoll BuildStatRangeRoll(
-        string key,
         StatType stat,
         EquipmentRandomAffixOptionDefinition option)
     {
@@ -360,11 +367,70 @@ public static class EquipmentRandomAffixGenerator
             ? AsRatio(value)
             : value;
 
-        return new GeneratedEquipmentAffixRoll(
-            key,
+        return CreateRoll(
             option.Kind,
             [new StatModifierAffix(stat, ModifierValue.Add(delta))]);
     }
+
+    private static GeneratedEquipmentAffixRoll CreateRoll(
+        EquipmentRandomAffixKind kind,
+        IReadOnlyList<AffixDefinition> affixes) =>
+        new(GetKey(kind, affixes), kind, affixes);
+
+    private static string GetKey(
+        EquipmentRandomAffixKind kind,
+        IReadOnlyList<AffixDefinition> affixes) => kind switch
+        {
+            EquipmentRandomAffixKind.AttackCombo => "attack_combo",
+            EquipmentRandomAffixKind.DefenceCombo => "defence_combo",
+            EquipmentRandomAffixKind.RandomAttribute => "random_attribute",
+            EquipmentRandomAffixKind.Talent =>
+                $"talent:{((GrantTalentAffix)affixes[0]).TalentId}",
+            EquipmentRandomAffixKind.Accuracy => "accuracy",
+            EquipmentRandomAffixKind.ExternalSkillBonus => "external_skill_bonus",
+            EquipmentRandomAffixKind.InternalSkillBonus => "internal_skill_bonus",
+            EquipmentRandomAffixKind.FormSkillBonus => "form_skill_bonus",
+            EquipmentRandomAffixKind.LegendSkillBonus => "legend_skill_bonus",
+            EquipmentRandomAffixKind.CritChance => "crit_chance",
+            EquipmentRandomAffixKind.CritMult => "crit_mult",
+            EquipmentRandomAffixKind.Lifesteal => "lifesteal",
+            EquipmentRandomAffixKind.Speed => "speed",
+            EquipmentRandomAffixKind.AntiDebuff => "anti_debuff",
+            EquipmentRandomAffixKind.WeaponBonus =>
+                $"weapon_bonus:{((WeaponBonusModifierAffix)affixes[0]).WeaponType}",
+            _ => throw new InvalidOperationException($"Unsupported equipment random affix kind '{kind}'."),
+        };
+
+    private static bool Matches(
+        IReadOnlyList<AffixDefinition> group,
+        GeneratedEquipmentAffixRoll roll,
+        IContentRepository contentRepository) => roll.Kind switch
+        {
+            EquipmentRandomAffixKind.AttackCombo => group is
+                [StatModifierAffix { Stat: StatType.Attack }, StatModifierAffix { Stat: StatType.CritChance }],
+            EquipmentRandomAffixKind.DefenceCombo => group is
+                [StatModifierAffix { Stat: StatType.Defence }, StatModifierAffix { Stat: StatType.AntiCritChance }],
+            EquipmentRandomAffixKind.RandomAttribute => group is [StatModifierAffix stat]
+                && RandomAttributeStats.Contains(stat.Stat),
+            EquipmentRandomAffixKind.Talent => group is [GrantTalentAffix talent]
+                && talent.TalentId == ((GrantTalentAffix)roll.Affixes[0]).TalentId,
+            EquipmentRandomAffixKind.ExternalSkillBonus => group is [SkillBonusModifierAffix skill]
+                && contentRepository.TryGetExternalSkill(skill.SkillId, out _),
+            EquipmentRandomAffixKind.InternalSkillBonus => group is [SkillBonusModifierAffix skill]
+                && contentRepository.TryGetInternalSkill(skill.SkillId, out _),
+            EquipmentRandomAffixKind.FormSkillBonus => group is [SkillBonusModifierAffix skill]
+                // Random equipment skill bonuses only target external, internal, or form skills.
+                // Content validation guarantees the target exists, so the remaining category is a form skill.
+                && !contentRepository.TryGetExternalSkill(skill.SkillId, out _)
+                && !contentRepository.TryGetInternalSkill(skill.SkillId, out _),
+            EquipmentRandomAffixKind.LegendSkillBonus => group is
+                [SkillBonusModifierAffix, LegendSkillChanceModifierAffix],
+            EquipmentRandomAffixKind.WeaponBonus => group is [WeaponBonusModifierAffix weapon]
+                && weapon.WeaponType == ((WeaponBonusModifierAffix)roll.Affixes[0]).WeaponType,
+            _ => group is [StatModifierAffix stat]
+                && roll.Affixes is [StatModifierAffix generated]
+                && stat.Stat == generated.Stat,
+        };
 
     private static int RollRange(EquipmentRandomAffixOptionDefinition option, int index)
     {
@@ -403,12 +469,16 @@ public static class EquipmentRandomAffixGenerator
         LegendSkillDefinition skill,
         IContentRepository contentRepository)
     {
-        if (!contentRepository.TryGetExternalSkill(skill.StartSkill, out var startSkill))
+        if (contentRepository.TryGetExternalSkill(skill.StartSkill, out var startSkill))
         {
-            return null;
+            return startSkill.Hard;
         }
 
-        return startSkill.Hard;
+        return contentRepository.GetExternalSkills()
+            .SelectMany(static externalSkill => externalSkill.FormSkills)
+            .Concat(contentRepository.GetInternalSkills().SelectMany(static internalSkill => internalSkill.FormSkills))
+            .FirstOrDefault(formSkill => string.Equals(formSkill.Id, skill.StartSkill, StringComparison.Ordinal))
+            ?.Hard;
     }
 
     private static int RollEquipmentAffixCount()
