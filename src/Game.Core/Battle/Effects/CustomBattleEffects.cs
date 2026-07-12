@@ -87,6 +87,8 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("weapon_equipment_penalty", new WeaponEquipmentPenaltyBattleEffectHandler());
         registry.Register("zhenwu_formation_attack", new ZhenwuFormationAttackBattleEffectHandler());
         registry.Register("zhenwu_formation_intercept", new ZhenwuFormationInterceptBattleEffectHandler());
+        registry.Register("couple_unity_attack", new CoupleUnityAttackBattleEffectHandler());
+        registry.Register("couple_unity_defence", new CoupleUnityDefenceBattleEffectHandler());
         registry.Register("careful_defense", new CarefulDefenseBattleEffectHandler());
         registry.Register("shifting_stars_reflection", new ShiftingStarsReflectionBattleEffectHandler());
         registry.Register("eternal_spring", new EternalSpringBattleEffectHandler());
