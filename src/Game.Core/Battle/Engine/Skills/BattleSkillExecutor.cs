@@ -29,6 +29,9 @@ internal sealed class BattleSkillExecutor(
                 case ApplyDefinedSkillEffectsStep definedEffects:
                     ExecuteDefinedEffects(state, source, targets, plan.Skill, definedEffects.Effects);
                     break;
+                case AttemptAttackRageGainStep:
+                    engine.TryGainRageFromAttack(state, source, targets);
+                    break;
                 default:
                     throw new NotSupportedException($"Unsupported skill execution step '{step.GetType().Name}'.");
             }

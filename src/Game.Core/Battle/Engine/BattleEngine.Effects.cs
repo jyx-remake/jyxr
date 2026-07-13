@@ -45,11 +45,6 @@ public sealed partial class BattleEngine
                 ApplySkillBuffs(state, source, hit.Target, skill.Buffs);
             }
         }
-
-        if (targets.Any(target => state.AreEnemies(source, target)))
-        {
-            TryGainRageFromAttack(state, source);
-        }
     }
 
     private BattleSkillHitResolution ApplySkillDamage(BattleState state, BattleUnit source, BattleUnit target, SkillInstance skill)
@@ -419,8 +414,16 @@ public sealed partial class BattleEngine
         BattleResourceResolver.AddRage(state, unit, 1, detailSource: buff.Definition.Id);
     }
 
-    private void TryGainRageFromAttack(BattleState state, BattleUnit unit)
+    internal void TryGainRageFromAttack(
+        BattleState state,
+        BattleUnit unit,
+        IReadOnlyList<BattleUnit> targets)
     {
+        if (!targets.Any(target => state.AreEnemies(unit, target)))
+        {
+            return;
+        }
+
         BattleRageGainResolver.TryGain(state, unit, _random, timing: null, detailSource: "attack");
     }
 }
