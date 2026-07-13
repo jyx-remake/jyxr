@@ -88,7 +88,7 @@ public enum TraitId
     PoisonResistance,
     AvoidFriendlyFire,
     Irascible,
-    DoubleDamageTakenRageGain,
+    DoubleCombatRageGain,
     CannotMove,
 }
 

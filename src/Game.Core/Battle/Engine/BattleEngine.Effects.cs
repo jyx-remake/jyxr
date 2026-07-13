@@ -421,17 +421,6 @@ public sealed partial class BattleEngine
 
     private void TryGainRageFromAttack(BattleState state, BattleUnit unit)
     {
-        if (!RollRageGain(unit))
-        {
-            return;
-        }
-
-        BattleResourceResolver.AddRage(state, unit, 1, detailSource: "attack");
-    }
-
-    private bool RollRageGain(BattleUnit unit)
-    {
-        var chance = 0.5d + unit.GetStat(StatType.Fuyuan) / 1000d;
-        return Probability.RollChance(_random, chance);
+        BattleRageGainResolver.TryGain(state, unit, _random, timing: null, detailSource: "attack");
     }
 }

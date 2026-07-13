@@ -152,22 +152,10 @@ internal sealed class BattleDamageResolver(BattleEngine engine)
             return;
         }
 
-        var chance = 0.5d + target.GetStat(StatType.Fuyuan) / 1000d;
-        if (target.HasTrait(TraitId.Irascible))
-        {
-            chance += 0.15d;
-        }
-
-        if (!Probability.RollChance(engine.RandomService, chance))
-        {
-            return;
-        }
-
-        var amount = target.HasTrait(TraitId.DoubleDamageTakenRageGain) ? 2 : 1;
-        BattleResourceResolver.AddRage(
+        BattleRageGainResolver.TryGain(
             state,
             target,
-            amount,
+            engine.RandomService,
             HookTiming.OnDamageTaken,
             "damaged");
     }
