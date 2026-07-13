@@ -28,6 +28,7 @@ public partial class ChestPanel : JyPanel
 	private Button _depositModeButton = null!;
 	private Button _withdrawModeButton = null!;
 	private Button _leaveButton = null!;
+	private CheckBox _quickTransferCheckBox = null!;
 	private Label _titleLabel = null!;
 	private Label _categoryLabel = null!;
 	private Label _countLabel = null!;
@@ -42,6 +43,7 @@ public partial class ChestPanel : JyPanel
 		_depositModeButton = GetNode<Button>("%DepositModeButton");
 		_withdrawModeButton = GetNode<Button>("%WithdrawModeButton");
 		_leaveButton = GetNode<Button>("%LeaveButton");
+		_quickTransferCheckBox = GetNode<CheckBox>("%QuickTransferCheckBox");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_categoryLabel = GetNode<Label>("%CategoryLabel");
 		_countLabel = GetNode<Label>("%CountLabel");
@@ -148,6 +150,18 @@ public partial class ChestPanel : JyPanel
 	{
 		var chest = Game.ChestService.Open();
 		var canTransfer = CanSelectEntry(entry, chest);
+		if (_quickTransferCheckBox.ButtonPressed)
+		{
+			if (!canTransfer)
+			{
+				UIRoot.Instance.ShowSuggestion("当前不可存取。");
+				return;
+			}
+
+			TransferEntry(entry);
+			return;
+		}
+
 		var actionLabel = _mode == ChestMode.Deposit ? "存入" : "取出";
 		UIRoot.Instance.ShowInventoryEntryDetailPanel(
 			entry,
