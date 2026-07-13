@@ -7,7 +7,6 @@ public partial class StoryDialoguePanel : Control
 {
 	private const double TypewriterCharactersPerSecond = 36d;
 	private static bool _skipMode;
-	private static bool _isHighMode;
 	private TaskCompletionSource<bool>? _completionSource;
 	private string _speaker = string.Empty;
 	private string _text = string.Empty;
@@ -66,15 +65,7 @@ public partial class StoryDialoguePanel : Control
 
 		if (@event.IsActionPressed("ui-ctrl"))
 		{
-			_isHighMode = true;
 			Complete();
-			AcceptEvent();
-			return;
-		}
-
-		if (@event.IsActionReleased("ui-ctrl"))
-		{
-			_isHighMode = false;
 			AcceptEvent();
 			return;
 		}
@@ -116,7 +107,7 @@ public partial class StoryDialoguePanel : Control
 			return;
 		}
 
-		if (_isHighMode)
+		if (Input.IsActionPressed("ui-ctrl"))
 		{
 			await ToSignal(GetTree().CreateTimer(0.1d), SceneTreeTimer.SignalName.Timeout);
 			return;

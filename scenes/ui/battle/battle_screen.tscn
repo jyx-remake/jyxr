@@ -274,32 +274,39 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.72
 offset_top = 328.0
-offset_bottom = 491.0
+offset_bottom = 507.0
 mouse_filter = 2
 texture = ExtResource("4_bottom_strip")
 expand_mode = 1
+
+[node name="BattleSelectedSkillBox" parent="BottomHud" unique_id=1885387874 instance=ExtResource("28_selected_skill_box")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.04
+anchor_right = 0.04
+offset_top = 221.0
+offset_bottom = 503.0
 
 [node name="ListScroll" type="ScrollContainer" parent="BottomHud" unique_id=60321938]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.15
 anchor_right = 0.75
-offset_top = 282.0
-offset_bottom = 501.0
+offset_top = 305.0
+offset_bottom = 502.0
 vertical_scroll_mode = 0
 
-[node name="ListContainer" type="HBoxContainer" parent="BottomHud/ListScroll" unique_id=2070798312]
+[node name="MarginContainer" type="MarginContainer" parent="BottomHud/ListScroll" unique_id=1440051364]
+layout_mode = 2
+theme_override_constants/margin_left = 38
+theme_override_constants/margin_top = 45
+theme_override_constants/margin_bottom = 60
+
+[node name="ListContainer" type="HBoxContainer" parent="BottomHud/ListScroll/MarginContainer" unique_id=2070798312]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="BattleSelectedSkillBox" parent="BottomHud" unique_id=1885387874 instance=ExtResource("28_selected_skill_box")]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 55.0
-offset_top = 194.0
-offset_right = 312.0
-offset_bottom = 476.0
+theme_override_constants/separation = 38
 
 [node name="BottomRightHud" type="Control" parent="." unique_id=66707520]
 layout_mode = 1

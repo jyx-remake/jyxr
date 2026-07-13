@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
 [ext_resource type="Script" uid="uid://bgpdvgmngujai" path="res://src/Game.Godot/UI/Character/CharacterPanel.cs" id="2_script"]
 [ext_resource type="Texture2D" uid="uid://cilt411j4qp5o" path="res://assets/art/ui/character_panel/renwuzhuangtai_dise.png" id="3_background"]
-[ext_resource type="Texture2D" uid="uid://cnpmuiricosrf" path="res://assets/art/ui/guoxiang.png" id="4_avatar"]
+[ext_resource type="Texture2D" uid="uid://si2ul6txxyik" path="res://assets/art/head/guoxiang.png" id="5_7x4sp"]
 [ext_resource type="Texture2D" uid="uid://cegwblxnksegl" path="res://assets/art/ui/character_panel/renwuzhuangtai_touxiangdise.png" id="5_avatar_background"]
 [ext_resource type="Texture2D" uid="uid://bdmh4kt0xk26e" path="res://assets/art/ui/character_panel/touxiangbiankuang.png" id="6_avatar_frame"]
 [ext_resource type="Texture2D" uid="uid://43wukauo8e1n" path="res://assets/art/ui/character_panel/renwuzhuangtai_shuxing.png" id="7_attr_button"]
@@ -17,7 +17,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/skill_tab/skill_tab.tscn" id="17_skill_tab"]
 [ext_resource type="PackedScene" path="res://scenes/ui/character_panel/biography_tab.tscn" id="18_biography_tab"]
 [ext_resource type="LabelSettings" uid="uid://bny34iuy5pp6r" path="res://assets/theme/label_character_under_avatar.tres" id="19_under_avatar"]
-[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/equipment_tab.tscn" id="20_equipment_tab"]
+[ext_resource type="PackedScene" uid="uid://b72cussamrrp0" path="res://scenes/ui/character_panel/equipment_tab.tscn" id="20_equipment_tab"]
 
 [sub_resource type="StyleBoxEmpty" id="1_empty"]
 
@@ -48,7 +48,7 @@ offset_top = 64.0
 offset_right = 611.67084
 offset_bottom = 610.67084
 scale = Vector2(0.6914581, 0.70631546)
-texture = ExtResource("4_avatar")
+texture = ExtResource("5_7x4sp")
 expand_mode = 1
 
 [node name="AvatarFrame" type="TextureRect" parent="ContentRoot/AvatarBox" index="1" unique_id=2050947383]

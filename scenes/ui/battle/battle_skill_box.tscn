@@ -10,15 +10,19 @@
 
 [sub_resource type="StyleBoxFlat" id="2_selected"]
 draw_center = false
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color(1, 0.8784314, 0.5764706, 1)
 corner_radius_top_left = 14
 corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="1_panel"]
 bg_color = Color(0, 0, 0, 1)
@@ -43,9 +47,10 @@ outline_size = 3
 outline_color = Color(0, 0, 0, 1)
 
 [node name="BattleSkillBox" type="Button" unique_id=1951422030]
-custom_minimum_size = Vector2(180, 260)
-offset_right = 180.0
-offset_bottom = 260.0
+custom_minimum_size = Vector2(140, 140)
+offset_right = 140.0
+offset_bottom = 140.0
+size_flags_vertical = 10
 mouse_filter = 1
 theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
 theme_override_styles/pressed = SubResource("2_selected")
@@ -59,10 +64,8 @@ TooltipScene = ExtResource("2_tooltip")
 
 [node name="Panel" type="Panel" parent="." unique_id=1260509028]
 layout_mode = 0
-offset_left = 37.0
-offset_top = 61.0
-offset_right = 176.74332
-offset_bottom = 200.0
+offset_right = 140.0
+offset_bottom = 140.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("1_panel")
 
@@ -102,26 +105,23 @@ stretch_mode = 5
 [node name="NameLabel" type="Label" parent="." unique_id=2144378873]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -4.0
-offset_top = -1.0
-offset_right = 35.0
-offset_bottom = 268.0
+offset_left = -31.0
+offset_top = -46.0
+offset_right = 8.0
+offset_bottom = 223.0
 text = "降龙十八掌"
 label_settings = SubResource("3_name")
 horizontal_alignment = 1
-vertical_alignment = 1
 autowrap_mode = 1
 
 [node name="FormNameLabel" type="Label" parent="." unique_id=2075600546]
 unique_name_in_owner = true
-visible = false
 layout_mode = 0
-offset_left = 38.0
-offset_top = 14.0
-offset_right = 77.0
-offset_bottom = 283.0
+offset_left = 3.0
+offset_top = -29.0
+offset_right = 42.0
+offset_bottom = 240.0
 text = "亢龙有悔"
 label_settings = SubResource("LabelSettings_h87qj")
 horizontal_alignment = 1
-vertical_alignment = 1
 autowrap_mode = 1
