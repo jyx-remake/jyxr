@@ -1,3 +1,4 @@
+using Game.Core.Definitions.Skills;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;

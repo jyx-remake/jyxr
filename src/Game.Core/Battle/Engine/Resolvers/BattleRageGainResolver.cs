@@ -1,5 +1,6 @@
 using Game.Core.Abstractions;
 using Game.Core.Affix;
+using Game.Core.Model;
 
 namespace Game.Core.Battle;
 

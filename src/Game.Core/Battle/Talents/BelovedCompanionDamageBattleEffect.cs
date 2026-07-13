@@ -38,7 +38,7 @@ internal sealed class BelovedCompanionDamageBattleEffectHandler
                 context.Unit.Character.Definition.Name,
                 parameters.BeneficiaryName,
                 StringComparison.Ordinal) ||
-            !context.State.Units.Any(unit =>
+            !context.State.GetLivingUnits().Any(unit =>
                 unit.Team == context.Unit.Team &&
                 string.Equals(
                     unit.Character.Definition.Name,
