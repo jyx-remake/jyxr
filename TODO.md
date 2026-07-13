@@ -1,5 +1,6 @@
 # TODO
 
+- ``nvliumang`（移动）、`nvpanjun`（移动）、`huangrong`（移动、受击） 的模型动画帧区域、播放顺序与偏移均由 AI 根据现有图集推断，可能不正确；后续需要结合原始动画数据或人工逐帧校验并修正。
 - 重新审视 `CharacterDefinition` 中初始技能/装备的表达方式：继续使用纯 `SkillIds` / `EquipmentIds`，还是引入定义侧条目对象来承载默认等级、开关、锻造等初始配置。
 - 技能等级上限目前已接入 `SkillMaxLevelPolicy`，由基础上限、全局档案技能精通加成、周目加成和硬上限共同计算。`maxlevel` 剧情命令当前为了复刻 legacy 行为保留了独立的高周目指令增强；后续应去掉这层 `maxlevel` 增强，只保留普通精通加成和人物技能上限的周目规则。
 - 武学书学习默认会把 `GrantExternalSkillItemUseEffectDefinition.Level` / `GrantInternalSkillItemUseEffectDefinition.Level` 作为书本上限，并与 `SkillMaxLevelPolicy` 当前上限取较小值；`GameConfig.IgnoreSkillBookLevelLimit` 可切回旧的忽略书本上限行为。后续如要支持残章进度或特殊书籍覆盖规则，需要继续细化物品效果语义。
