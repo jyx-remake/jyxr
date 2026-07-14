@@ -1,5 +1,6 @@
 using Game.Core.Model;
 using Game.Core.Model.Skills;
+using Game.Core.Definitions.Skills;
 
 namespace Game.Core.Battle;
 
@@ -13,7 +14,7 @@ public sealed class BattleTurnCandidateGenerator
         IReadOnlyList<IBattleSkillAiScorer>? skillScorers = null)
     {
         _engine = engine ?? throw new ArgumentNullException(nameof(engine));
-        _skillScorers = skillScorers ?? [new DamageSkillAiScorer()];
+        _skillScorers = skillScorers ?? [new DamageSkillAiScorer(), new SpecialSkillAiScorer()];
     }
 
     public IReadOnlyList<BattleTurnCandidate> Generate(
@@ -45,8 +46,14 @@ public sealed class BattleTurnCandidateGenerator
                         continue;
                     }
 
+                    if (skill is SpecialSkillInstance specialSkill &&
+                        specialSkill.Definition.Intent != SpecialSkillIntent.Offensive)
+                    {
+                        continue;
+                    }
+
                     var availability = _engine.EvaluateSkillAvailability(state, unit.Id, skill);
-                    if (skill is SpecialSkillInstance || !availability.IsAvailable)
+                    if (!availability.IsAvailable)
                     {
                         continue;
                     }
@@ -81,6 +88,10 @@ public sealed class BattleTurnCandidateGenerator
                             destination,
                             target,
                             targets));
+                        if (skill is SpecialSkillInstance && evaluation.EnemyDamage <= 0)
+                        {
+                            continue;
+                        }
                         candidates.Add(new BattleTurnCandidate(
                             new BattleTurnPlan(unit.Id, destination, BattleMainActionPlan.CastSkill(skill.Id, target)),
                             Score: 0d,
@@ -109,6 +120,34 @@ public sealed class BattleTurnCandidateGenerator
         }
 
         return candidates;
+    }
+
+    public BattleTurnPlan? CreateRandomSupportSpecialSkillPlan(
+        BattleState state,
+        string unitId,
+        GridPosition destination)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
+
+        var unit = state.GetUnit(unitId);
+        var skills = unit.Character.GetSpecialSkills()
+            .Where(skill =>
+                skill.IsActive &&
+                skill.Definition.Intent == SpecialSkillIntent.Support &&
+                skill.CanTargetSelf &&
+                _engine.EvaluateSkillAvailability(state, unit.Id, skill).IsAvailable)
+            .ToArray();
+        if (skills.Length == 0)
+        {
+            return null;
+        }
+
+        var skill = skills[Random.Shared.Next(skills.Length)];
+        return new BattleTurnPlan(
+            unit.Id,
+            destination,
+            BattleMainActionPlan.CastSkill(skill.Id, destination));
     }
 
     private static int GetDistanceToNearestEnemy(BattleState state, BattleUnit unit, GridPosition destination)

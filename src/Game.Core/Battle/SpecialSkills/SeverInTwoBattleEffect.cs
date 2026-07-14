@@ -17,4 +17,9 @@ public sealed class SeverInTwoBattleEffectHandler
             }
         }
     }
+
+    public override int? EstimateDamage(
+        BattleAbilityDamageEstimateContext context,
+        SeverInTwoBattleEffectParameters parameters) =>
+        context.Target.Hp / 4;
 }

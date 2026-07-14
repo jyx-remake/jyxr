@@ -200,4 +200,7 @@ public sealed record CustomAbilityBattleEffectDefinition(
         (Invocation.ExecuteAbility ?? throw new InvalidOperationException(
             $"Custom ability battle effect '{EffectId}' does not support ability execution."))(context);
     }
+
+    internal int? EstimateAbilityDamage(BattleAbilityDamageEstimateContext context) =>
+        Invocation.EstimateAbilityDamage?.Invoke(context);
 }

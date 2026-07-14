@@ -21,4 +21,13 @@ public sealed class FirearmDamageBattleEffectHandler
             context.ApplyDirectDamage(target, 200 + randomDamage, context.Skill.Id);
         }
     }
+
+    public override int? EstimateDamage(
+        BattleAbilityDamageEstimateContext context,
+        FirearmDamageBattleEffectParameters parameters)
+    {
+        var fortuneDifference = (int)Math.Abs(
+            context.Source.GetStat(StatType.Fuyuan) - context.Target.GetStat(StatType.Fuyuan));
+        return 200 + (int)(12.5d * fortuneDifference);
+    }
 }

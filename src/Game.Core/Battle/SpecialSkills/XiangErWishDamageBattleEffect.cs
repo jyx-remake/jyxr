@@ -16,4 +16,12 @@ public sealed class XiangErWishDamageBattleEffectHandler
             context.ApplyDirectDamage(target, damage, context.Skill.Id);
         }
     }
+
+    public override int? EstimateDamage(
+        BattleAbilityDamageEstimateContext context,
+        XiangErWishDamageBattleEffectParameters parameters)
+    {
+        var maximumDamage = 2000 + 100 * context.Source.Character.Level;
+        return (1000 + maximumDamage) / 2;
+    }
 }

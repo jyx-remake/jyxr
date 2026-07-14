@@ -28,4 +28,13 @@ public sealed class ShoulderThrowBattleEffectHandler
             context.ApplyDirectDamage(target, damage, context.Skill.Id);
         }
     }
+
+    public override int? EstimateDamage(
+        BattleAbilityDamageEstimateContext context,
+        ShoulderThrowBattleEffectParameters parameters)
+    {
+        var resolveDifference = Math.Abs(
+            context.Source.GetStat(StatType.Dingli) - context.Target.GetStat(StatType.Dingli));
+        return (int)(12.5d * resolveDifference);
+    }
 }

@@ -17,4 +17,9 @@ public sealed class MutualDestructionSwordBattleEffectHandler
 
         context.ApplyDirectDamage(context.Source, 1000, context.Skill.Id);
     }
+
+    public override int? EstimateDamage(
+        BattleAbilityDamageEstimateContext context,
+        MutualDestructionSwordBattleEffectParameters parameters) =>
+        1000 + (int)(context.Target.MaxHp * 0.1d);
 }

@@ -4,6 +4,8 @@ using Game.Core.Battle.Talents;
 using Game.Core.Battle.SpecialSkills;
 using Game.Core.Battle.Buffs;
 using Game.Core.Affix;
+using Game.Core.Model;
+using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
 
@@ -28,6 +30,29 @@ public abstract class CustomAbilityBattleEffectHandler<TParameters>
     }
 
     public abstract void Execute(IBattleAbilityEffectContext context, TParameters parameters);
+
+    public virtual int? EstimateDamage(
+        BattleAbilityDamageEstimateContext context,
+        TParameters parameters) => null;
+}
+
+public sealed record BattleAbilityDamageEstimateContext(
+    BattleState State,
+    BattleUnit Source,
+    BattleUnit Target,
+    SkillInstance Skill,
+    GridPosition SourcePosition)
+{
+    public bool IsCellAvailable(GridPosition position, BattleUnit movingUnit)
+    {
+        if (!State.Grid.IsWalkable(position) || position == SourcePosition)
+        {
+            return false;
+        }
+
+        var occupant = State.GetUnitAt(position, movingUnit.Id);
+        return occupant is null || ReferenceEquals(occupant, Source);
+    }
 }
 
 public sealed class CustomBattleEffectRegistry
@@ -170,7 +195,8 @@ public sealed class CustomBattleEffectRegistry
                     context as TContext ?? throw new InvalidOperationException(
                         $"Custom battle effect '{effectId}' requires capability '{typeof(TContext).Name}'."),
                     parsedParameters),
-                ExecuteAbility: null);
+                ExecuteAbility: null,
+                EstimateAbilityDamage: null);
         }
     }
 
@@ -198,7 +224,8 @@ public sealed class CustomBattleEffectRegistry
                 SupportsPreview: false,
                 SupportedTimings: new HashSet<HookTiming>(),
                 ExecuteHook: null,
-                ExecuteAbility: context => handler.Execute(context, parsedParameters));
+                ExecuteAbility: context => handler.Execute(context, parsedParameters),
+                EstimateAbilityDamage: context => handler.EstimateDamage(context, parsedParameters));
         }
     }
 }
@@ -207,7 +234,8 @@ internal sealed record CustomBattleEffectInvocation(
     bool SupportsPreview,
     IReadOnlySet<HookTiming> SupportedTimings,
     Action<BattleHookContext>? ExecuteHook,
-    Action<IBattleAbilityEffectContext>? ExecuteAbility)
+    Action<IBattleAbilityEffectContext>? ExecuteAbility,
+    Func<BattleAbilityDamageEstimateContext, int?>? EstimateAbilityDamage)
 {
     public bool SupportsAbility => ExecuteAbility is not null;
 }

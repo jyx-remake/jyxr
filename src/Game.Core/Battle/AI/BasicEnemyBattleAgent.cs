@@ -1,3 +1,5 @@
+using Game.Core.Model;
+
 namespace Game.Core.Battle;
 
 public sealed class BasicEnemyBattleAgent : IBattleAgent
@@ -22,7 +24,28 @@ public sealed class BasicEnemyBattleAgent : IBattleAgent
         var isLowHp = unit.MaxHp > 0 && (double)unit.Hp / unit.MaxHp < 0.3d;
         var restRecovery = ResolveRestRecovery(unit);
         var policy = _policyResolver.Resolve(unit.AiType);
-        var candidates = policy.GenerateCandidates(state, unit, _candidateGenerator)
+        var generatedCandidates = policy.GenerateCandidates(state, unit, _candidateGenerator);
+        if (unit.AiType != BattleAiType.RestOnly &&
+            generatedCandidates.All(candidate => candidate.Plan.MainAction.Kind != BattleMainActionKind.CastSkill) &&
+            Random.Shared.Next(2) == 0)
+        {
+            var approachCandidate = generatedCandidates
+                .Where(candidate => candidate.Plan.MainAction.Kind == BattleMainActionKind.Rest)
+                .OrderBy(candidate => candidate.DistanceToNearestEnemy)
+                .ThenBy(candidate => candidate.Plan.MoveDestination.Y)
+                .ThenBy(candidate => candidate.Plan.MoveDestination.X)
+                .FirstOrDefault();
+            if (approachCandidate is not null &&
+                _candidateGenerator.CreateRandomSupportSpecialSkillPlan(
+                    state,
+                    unit.Id,
+                    approachCandidate.Plan.MoveDestination) is { } supportPlan)
+            {
+                return supportPlan;
+            }
+        }
+
+        var candidates = generatedCandidates
             .Select(candidate => candidate with
             {
                 Score = ScoreCandidate(candidate, isLowHp, restRecovery),

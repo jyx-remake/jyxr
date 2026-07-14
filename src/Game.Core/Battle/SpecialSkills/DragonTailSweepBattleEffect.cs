@@ -40,4 +40,28 @@ public sealed class DragonTailSweepBattleEffectHandler
             context.ApplyDirectDamage(target, damage, context.Skill.Id);
         }
     }
+
+    public override int? EstimateDamage(
+        BattleAbilityDamageEstimateContext context,
+        DragonTailSweepBattleEffectParameters parameters)
+    {
+        var directionX = context.Target.Position.X - context.SourcePosition.X;
+        var directionY = context.Target.Position.Y - context.SourcePosition.Y;
+        var destination = context.Target.Position;
+        var movedCells = 0;
+
+        while (true)
+        {
+            var next = new GridPosition(destination.X + directionX, destination.Y + directionY);
+            if (!context.IsCellAvailable(next, context.Target))
+            {
+                break;
+            }
+
+            destination = next;
+            movedCells++;
+        }
+
+        return (movedCells + 1) * 300;
+    }
 }

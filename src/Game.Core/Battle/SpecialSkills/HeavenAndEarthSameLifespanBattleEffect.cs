@@ -18,4 +18,9 @@ public sealed class HeavenAndEarthSameLifespanBattleEffectHandler
 
         context.ApplyDirectDamage(context.Source, sourceHp, context.Skill.Id);
     }
+
+    public override int? EstimateDamage(
+        BattleAbilityDamageEstimateContext context,
+        HeavenAndEarthSameLifespanBattleEffectParameters parameters) =>
+        (int)(context.Source.Hp * 0.75d);
 }
