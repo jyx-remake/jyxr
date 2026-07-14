@@ -50,10 +50,16 @@ public partial class MapEntityButton : Button
 			return;
 		}
 
-		if (!GetGlobalRect().HasPoint(position))
+		if (!IsViewportPositionInside(position))
 		{
 			CloseMobileTooltip();
 		}
+	}
+
+	private bool IsViewportPositionInside(Vector2 viewportPosition)
+	{
+		var localPosition = GetGlobalTransformWithCanvas().AffineInverse() * viewportPosition;
+		return new Rect2(Vector2.Zero, Size).HasPoint(localPosition);
 	}
 
 	public void Setup((string MapId, MapLocationDefinition Location, MapEventDefinition? Event, int EventIndex) location)
@@ -164,30 +170,38 @@ public partial class MapEntityButton : Button
 	private void PositionMobileTooltip(Control content)
 	{
 		var tooltipSize = content.GetCombinedMinimumSize();
-		var viewportRect = GetViewportRect();
+		var localViewportRect = GetLocalViewportRect();
 		var offset = new Vector2((Size.X - tooltipSize.X) * 0.5f, Size.Y);
-		var globalPosition = GlobalPosition + offset;
 
-		if (globalPosition.X + tooltipSize.X > viewportRect.Size.X)
-		{
-			offset.X = viewportRect.Size.X - GlobalPosition.X - tooltipSize.X;
-		}
-
-		if (GlobalPosition.X + offset.X < 0f)
-		{
-			offset.X = -GlobalPosition.X;
-		}
-
-		if (globalPosition.Y + tooltipSize.Y > viewportRect.Size.Y)
+		if (offset.Y + tooltipSize.Y > localViewportRect.End.Y)
 		{
 			offset.Y = -tooltipSize.Y;
 		}
+
+		offset.X = ClampOverlayAxis(offset.X, tooltipSize.X, localViewportRect.Position.X, localViewportRect.End.X);
+		offset.Y = ClampOverlayAxis(offset.Y, tooltipSize.Y, localViewportRect.Position.Y, localViewportRect.End.Y);
 
 		content.Position = offset;
 		content.CustomMinimumSize = tooltipSize;
 		content.Size = tooltipSize;
 		content.ZIndex = 1000;
 		content.ZAsRelative = false;
+	}
+
+	private Rect2 GetLocalViewportRect()
+	{
+		var viewportRect = GetViewportRect();
+		var viewportToLocal = GetGlobalTransformWithCanvas().AffineInverse();
+		var firstCorner = viewportToLocal * viewportRect.Position;
+		var secondCorner = viewportToLocal * viewportRect.End;
+		return new Rect2(firstCorner, secondCorner - firstCorner).Abs();
+	}
+
+	private static float ClampOverlayAxis(float position, float length, float minimum, float maximum)
+	{
+		return length >= maximum - minimum
+			? minimum
+			: Mathf.Clamp(position, minimum, maximum - length);
 	}
 
 	private bool IsMobileTooltipArmed() =>
