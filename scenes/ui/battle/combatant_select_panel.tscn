@@ -34,7 +34,7 @@ horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=200625378]
 layout_mode = 0
-offset_left = 153.0
+offset_left = 210.0
 offset_top = 154.0
 offset_right = 1463.0
 offset_bottom = 912.0
@@ -93,9 +93,9 @@ autowrap_mode = 3
 [node name="ConfirmButton" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=476300778 instance=ExtResource("4_button")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 1469.0
+offset_left = 1463.0
 offset_top = 738.0
-offset_right = 1763.0
+offset_right = 1756.0
 offset_bottom = 836.0
 texture_normal = ExtResource("5_button_texture")
 

@@ -42,9 +42,9 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [node name="CharacterRosterAvatarButton" type="Button" unique_id=1125694871]
-custom_minimum_size = Vector2(104, 124)
+custom_minimum_size = Vector2(120, 120)
 offset_right = 104.0
-offset_bottom = 124.0
+offset_bottom = 104.0
 focus_mode = 0
 mouse_filter = 1
 theme_override_styles/normal = SubResource("1_normal")
@@ -56,10 +56,10 @@ script = ExtResource("1_script")
 [node name="Avatar" type="TextureRect" parent="." unique_id=1641224728]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 12.0
-offset_top = 8.0
-offset_right = 92.0
-offset_bottom = 88.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 116.0
+offset_bottom = 116.0
 mouse_filter = 2
 texture = ExtResource("2_avatar")
 expand_mode = 1
@@ -68,14 +68,14 @@ stretch_mode = 5
 [node name="NameLabel" type="Label" parent="." unique_id=217895231]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 4.0
-offset_top = 90.0
-offset_right = 100.0
-offset_bottom = 118.0
+offset_left = 2.0
+offset_top = 87.0
+offset_right = 118.0
+offset_bottom = 115.0
 theme_override_colors/font_color = Color(0.94, 0.88, 0.68, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 22
 text = "角色"
 horizontal_alignment = 1
 vertical_alignment = 1

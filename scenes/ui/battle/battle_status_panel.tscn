@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://c7xwca038g3px" path="res://scenes/ui/character_panel/character_panel.tscn" id="2_character_panel"]
 [ext_resource type="PackedScene" uid="uid://cw2lo46cxge44" path="res://scenes/ui/battle/battle_status_unit_button.tscn" id="3_unit_button"]
 
-[node name="BattleStatusPanel" type="Control"]
+[node name="BattleStatusPanel" type="Control" unique_id=1675857464]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,11 +15,11 @@ mouse_filter = 2
 script = ExtResource("1_script")
 UnitButtonScene = ExtResource("3_unit_button")
 
-[node name="CharacterPanel" parent="." instance=ExtResource("2_character_panel")]
+[node name="CharacterPanel" parent="." unique_id=1576019152 instance=ExtResource("2_character_panel")]
 unique_name_in_owner = true
 layout_mode = 1
 
-[node name="ContentRoot" type="Control" parent="."]
+[node name="ContentRoot" type="Control" parent="." unique_id=1926364688]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -30,15 +30,16 @@ offset_bottom = 1080.0
 grow_horizontal = 2
 mouse_filter = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot"]
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" unique_id=15129302]
 layout_mode = 0
 offset_left = 1776.0
 offset_top = 111.0
 offset_right = 1916.0
 offset_bottom = 957.0
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 
-[node name="UnitList" type="VBoxContainer" parent="ContentRoot/ScrollContainer"]
+[node name="UnitList" type="VBoxContainer" parent="ContentRoot/ScrollContainer" unique_id=523957599]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8

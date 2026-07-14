@@ -1,8 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://vfu1fhc12kvo"]
+[gd_scene format=3 uid="uid://vfu1fhc12kvo"]
 
 [ext_resource type="Script" uid="uid://whevwt0x0emg" path="res://src/Game.Godot/UI/Character/CharacterRosterPanel.cs" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://c7xwca038g3px" path="res://scenes/ui/character_panel/character_panel.tscn" id="2_character_panel"]
-[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/character_roster_avatar_button.tscn" id="3_avatar_button"]
+[ext_resource type="PackedScene" uid="uid://ctqf22byj6lmq" path="res://scenes/ui/character_panel/character_roster_avatar_button.tscn" id="3_avatar_button"]
 
 [node name="CharacterRosterPanel" type="Control" unique_id=1259299808]
 layout_mode = 3
@@ -32,11 +32,12 @@ mouse_filter = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" unique_id=292721145]
 layout_mode = 0
-offset_left = 1804.0
-offset_top = 111.0
-offset_right = 1910.0
-offset_bottom = 957.0
+offset_left = 1778.0
+offset_top = 108.0
+offset_right = 1918.0
+offset_bottom = 954.0
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 
 [node name="AvatarList" type="VBoxContainer" parent="ContentRoot/ScrollContainer" unique_id=466214444]
 unique_name_in_owner = true
