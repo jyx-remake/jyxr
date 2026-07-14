@@ -9,17 +9,16 @@ public sealed record SoulChasingBattleEffectParameters(
     IReadOnlyList<string> SpeechLines);
 
 internal sealed class SoulChasingBattleEffectHandler
-    : CustomBattleEffectHandler<SoulChasingBattleEffectParameters, IBattleEffectContext>
+    : CustomBattleEffectHandler<SoulChasingBattleEffectParameters, IHitConfirmedEffectContext>
 {
     public override IReadOnlySet<HookTiming> SupportedTimings { get; } =
         new HashSet<HookTiming> { HookTiming.OnHitConfirmed };
 
     public override void Execute(
-        IBattleEffectContext context,
+        IHitConfirmedEffectContext context,
         SoulChasingBattleEffectParameters parameters)
     {
-        if (context is not BattleHookContext hookContext ||
-            context.Source is null || context.Target is null)
+        if (context.Source is null || context.Target is null)
         {
             return;
         }
@@ -45,17 +44,12 @@ internal sealed class SoulChasingBattleEffectHandler
             context.RequestSpeech(context.Unit, speech);
         }
 
-        var resolver = hookContext.Engine.BuffResolver;
-        var definition = resolver.Resolve(parameters.BuffId);
         var existing = context.Target.TryGetBuff(parameters.BuffId);
-        resolver.Apply(
-            context.State,
-            context.Source,
+        context.ApplyBuff(
             context.Target,
-            definition,
+            parameters.BuffId,
             level: Math.Min(10, checked((existing?.Level ?? 0) + 1)),
             duration: 4,
-            detail: parameters.BuffId,
-            timing: context.Timing);
+            detail: parameters.BuffId);
     }
 }
