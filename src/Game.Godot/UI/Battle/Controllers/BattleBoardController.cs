@@ -89,6 +89,8 @@ internal sealed class BattleBoardController(
 
     public void OnHoveredCellChanged(GridPosition? position)
     {
+        if (isResolvingPresentation()) return;
+
         var next = uiState.Mode == BattleUiMode.SelectingSkillTarget ? position : null;
         if (_hoveredPosition == next) return;
         _hoveredPosition = next;
