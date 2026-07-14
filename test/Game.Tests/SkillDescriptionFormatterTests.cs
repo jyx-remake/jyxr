@@ -228,7 +228,7 @@ public sealed class SkillDescriptionFormatterTests
         Assert.Contains("[color=black]需要内功「required_internal」达到6级[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=black]需要特殊技能「凌波微步」[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=black]需要天赋「左右互搏」[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]特效：晕眩(1)[/color] [color=yellow]持续2回合[/color] [color=red]必定命中[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]特效：晕眩(1)[/color] [color=yellow]持续2回合[/color] [color=cyan]机缘命中[/color]", text, StringComparison.Ordinal);
     }
 
     [Fact]

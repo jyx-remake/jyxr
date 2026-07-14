@@ -19,6 +19,7 @@ public sealed partial class JsonContentLoader
         ValidateCharacters(repository);
         ValidateBattles(repository);
         ValidateBattleHookAffixes(repository);
+        ValidateSkillBuffs(repository);
         ValidateSkillAffixes(repository);
         ValidateSpecialSkills(repository);
         ValidateItemReferences(repository);
@@ -28,6 +29,44 @@ public sealed partial class JsonContentLoader
         ValidateWorldTriggers(repository);
         ValidateTowers(repository);
         ValidateStoryContent(repository);
+    }
+
+    private static void ValidateSkillBuffs(InMemoryContentRepository repository)
+    {
+        foreach (var skill in repository.ExternalSkills.Values)
+        {
+            ValidateSkillBuffs(skill.Buffs, $"ExternalSkill '{skill.Id}'");
+            foreach (var formSkill in skill.FormSkills)
+            {
+                ValidateSkillBuffs(formSkill.Buffs, $"FormSkill '{formSkill.Id}'");
+            }
+        }
+
+        foreach (var skill in repository.SpecialSkills.Values)
+        {
+            ValidateSkillBuffs(skill.Buffs, $"SpecialSkill '{skill.Id}'");
+        }
+
+        foreach (var skill in repository.LegendSkills)
+        {
+            ValidateSkillBuffs(skill.Buffs, $"LegendSkill '{skill.Id}'");
+        }
+    }
+
+    private static void ValidateSkillBuffs(
+        IEnumerable<SkillBuffDefinition> buffs,
+        string ownerName)
+    {
+        foreach (var buff in buffs)
+        {
+            Ensure(buff.Level >= 0, $"{ownerName} has buff '{buff.Id}' with invalid level '{buff.Level}'.");
+            Ensure(buff.Duration >= 1, $"{ownerName} has buff '{buff.Id}' with invalid duration '{buff.Duration}'.");
+            if (buff.Chance is { } chance)
+            {
+                Ensure(chance is >= 0 and <= 100,
+                    $"{ownerName} has buff '{buff.Id}' with invalid chance '{chance}'.");
+            }
+        }
     }
 
     private static void ValidateWorldTriggers(InMemoryContentRepository repository)

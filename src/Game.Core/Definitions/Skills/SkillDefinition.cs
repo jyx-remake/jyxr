@@ -49,7 +49,7 @@ public sealed record SkillBuffDefinition(
     string Id,
     int Level = 1,
     int Duration = 3,
-    int Chance = 100)
+    int? Chance = null)
 {
 
     [JsonIgnore]
@@ -59,7 +59,7 @@ public sealed record SkillBuffDefinition(
         BuffDefinition buff,
         int level = 1,
         int duration = 3,
-        int chance = 100)
+        int? chance = null)
         : this(buff.Id, level, duration, chance)
     {
         Buff = buff;

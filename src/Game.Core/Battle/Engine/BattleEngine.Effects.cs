@@ -173,7 +173,8 @@ public sealed partial class BattleEngine
     {
         foreach (var buff in buffs)
         {
-            if (!Probability.RollPercentage(_random, buff.Chance))
+            var chance = BattleSkillBuffChanceResolver.Resolve(buff, source, target);
+            if (!Probability.RollChance(_random, chance))
             {
                 continue;
             }

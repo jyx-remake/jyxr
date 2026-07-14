@@ -253,7 +253,7 @@ public sealed class BattleEngineTests
             rageCost: 2,
             cooldown: 1,
             powerBase: 10,
-            buffs: [new SkillBuffDefinition(buff, level: 2, duration: 3)],
+            buffs: [new SkillBuffDefinition(buff, level: 2, duration: 3, chance: 100)],
             impactType: SkillImpactType.Single,
             impactSize: 0,
             castSize: 3);
@@ -735,6 +735,82 @@ public sealed class BattleEngineTests
             battleEvent.Detail == "中毒");
     }
 
+    [Theory]
+    [InlineData(0.39, true)]
+    [InlineData(0.40, false)]
+    public void CastSkill_UnspecifiedDebuffChance_UsesSourceFortuneAgainstTargetComposure(
+        double roll,
+        bool expectedApplied)
+    {
+        var debuff = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            buffs: [new SkillBuffDefinition(debuff, level: 1, duration: 2)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int> { [StatType.Fuyuan] = 60 },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit(
+            "target",
+            team: 2,
+            new GridPosition(1, 0),
+            stats: new Dictionary<StatType, int> { [StatType.Dingli] = 40 });
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(roll));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state,
+            source.Id,
+            source.Character.GetExternalSkills().Single(),
+            target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(expectedApplied, target.HasBuff(debuff.Id));
+    }
+
+    [Theory]
+    [InlineData(0.19, true)]
+    [InlineData(0.20, false)]
+    public void CastSkill_UnspecifiedPositiveBuffChance_UsesSourceFortune(
+        double roll,
+        bool expectedApplied)
+    {
+        var buff = new BuffDefinition { Id = "疗伤", Name = "疗伤", IsDebuff = false };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "support",
+            buffs: [new SkillBuffDefinition(buff, level: 1, duration: 2)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int> { [StatType.Fuyuan] = 60 },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0));
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(roll));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state,
+            source.Id,
+            source.Character.GetExternalSkills().Single(),
+            target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(expectedApplied, source.HasBuff(buff.Id));
+    }
+
     [Fact]
     public void CastSkill_RecordsCriticalDamageEvent()
     {
@@ -795,7 +871,7 @@ public sealed class BattleEngineTests
             StartSkill: "strike",
             Probability: 1d,
             Conditions: [new RequiredTalentLegendConditionDefinition("heroic")],
-            Buffs: [new SkillBuffDefinition(stagger, level: 2, duration: 2)],
+            Buffs: [new SkillBuffDefinition(stagger, level: 2, duration: 2, chance: 100)],
             PowerExtra: 12d,
             RequiredLevel: 1,
             Animation: "aoyi_fx");
@@ -1455,7 +1531,7 @@ public sealed class BattleEngineTests
         var skillDefinition = TestContentFactory.CreateExternalSkill(
             "poison_strike",
             powerBase: 1,
-            buffs: [new SkillBuffDefinition(poison, level: 2, duration: 3)],
+            buffs: [new SkillBuffDefinition(poison, level: 2, duration: 3, chance: 100)],
             impactType: SkillImpactType.Single,
             impactSize: 0,
             castSize: 3);
@@ -1615,8 +1691,8 @@ public sealed class BattleEngineTests
             powerBase: 1,
             buffs:
             [
-                new SkillBuffDefinition(poison, level: 2, duration: 3),
-                new SkillBuffDefinition(recovery, level: 1, duration: 2),
+                new SkillBuffDefinition(poison, level: 2, duration: 3, chance: 100),
+                new SkillBuffDefinition(recovery, level: 1, duration: 2, chance: 100),
             ],
             impactType: SkillImpactType.Single,
             impactSize: 0,
@@ -2265,7 +2341,7 @@ public sealed class BattleEngineTests
         var skillDefinition = TestContentFactory.CreateExternalSkill(
             "strike",
             powerBase: 10,
-            buffs: [new SkillBuffDefinition(debuff, level: 1, duration: 2)],
+            buffs: [new SkillBuffDefinition(debuff, level: 1, duration: 2, chance: 100)],
             impactType: SkillImpactType.Single,
             impactSize: 0,
             castSize: 3);
@@ -2382,7 +2458,7 @@ public sealed class BattleEngineTests
         var skillDefinition = TestContentFactory.CreateExternalSkill(
             "strike",
             powerBase: 10,
-            buffs: [new SkillBuffDefinition(debuff, level: 1, duration: 2)],
+            buffs: [new SkillBuffDefinition(debuff, level: 1, duration: 2, chance: 100)],
             impactType: SkillImpactType.Single,
             impactSize: 0,
             castSize: 3);
@@ -2503,7 +2579,7 @@ public sealed class BattleEngineTests
         var skillDefinition = TestContentFactory.CreateExternalSkill(
             "strike",
             powerBase: 10,
-            buffs: [new SkillBuffDefinition(poison, level: 1, duration: 2)],
+            buffs: [new SkillBuffDefinition(poison, level: 1, duration: 2, chance: 100)],
             impactType: SkillImpactType.Single,
             impactSize: 0,
             castSize: 3);
@@ -2784,7 +2860,7 @@ public sealed class BattleEngineTests
         var skillDefinition = TestContentFactory.CreateExternalSkill(
             "strike",
             powerBase: 10,
-            buffs: [new SkillBuffDefinition(poison, level: 1, duration: 2)],
+            buffs: [new SkillBuffDefinition(poison, level: 1, duration: 2, chance: 100)],
             impactType: SkillImpactType.Single,
             impactSize: 0,
             castSize: 3);

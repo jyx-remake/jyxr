@@ -375,7 +375,11 @@ public static class SkillDescriptionFormatter
             parts.Add(Colorize("yellow", $"持续{buff.Duration}回合"));
         }
 
-        if (buff.Chance >= 100)
+        if (buff.Chance is null)
+        {
+            parts.Add(Colorize("cyan", "机缘命中"));
+        }
+        else if (buff.Chance >= 100)
         {
             parts.Add(Colorize("red", "必定命中"));
         }
