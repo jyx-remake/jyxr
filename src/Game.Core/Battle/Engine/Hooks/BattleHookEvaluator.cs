@@ -30,6 +30,11 @@ internal static class BattleHookEvaluator
             ContextUnitRoleBattleHookConditionDefinition unitRole => IsContextUnitRole(context, unitRole.Role),
             ContextUnitGenderBattleHookConditionDefinition gender => IsContextUnitGender(context, gender),
             ContextHitStateBattleHookConditionDefinition hitState => context.HitState == hitState.State,
+            ContextSkillSourceIdBattleHookConditionDefinition sourceSkill => context.Skill is not null &&
+                sourceSkill.SourceSkillIds.Any(id => string.Equals(
+                    context.Skill.SourceSkillId,
+                    id,
+                    StringComparison.Ordinal)),
             ContextSkillNameEqualsBattleHookConditionDefinition skillName => context.Skill is not null &&
                 skillName.Values.Any(value => string.Equals(context.Skill.Name, value, StringComparison.Ordinal)),
             ContextSkillNameContainsBattleHookConditionDefinition skillName => context.Skill is not null &&

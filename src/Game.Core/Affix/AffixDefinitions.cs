@@ -128,6 +128,7 @@ public sealed record TraitAffix(TraitId TraitId) : AffixDefinition;
 [JsonDerivedType(typeof(ContextUnitRoleBattleHookConditionDefinition), "context_unit_role")]
 [JsonDerivedType(typeof(ContextUnitGenderBattleHookConditionDefinition), "context_unit_gender")]
 [JsonDerivedType(typeof(ContextHitStateBattleHookConditionDefinition), "context_hit_state")]
+[JsonDerivedType(typeof(ContextSkillSourceIdBattleHookConditionDefinition), "context_skill_source_id")]
 [JsonDerivedType(typeof(ContextSkillNameEqualsBattleHookConditionDefinition), "context_skill_name_equals")]
 [JsonDerivedType(typeof(ContextSkillNameContainsBattleHookConditionDefinition), "context_skill_name_contains")]
 [JsonDerivedType(typeof(ContextSkillKindBattleHookConditionDefinition), "context_skill_kind")]
@@ -175,6 +176,9 @@ public sealed record ContextUnitGenderBattleHookConditionDefinition(
 
 public sealed record ContextHitStateBattleHookConditionDefinition(
     BattleHitState State) : BattleHookConditionDefinition;
+
+public sealed record ContextSkillSourceIdBattleHookConditionDefinition(
+    IReadOnlyList<string> SourceSkillIds) : BattleHookConditionDefinition;
 
 public sealed record ContextSkillNameEqualsBattleHookConditionDefinition(
     IReadOnlyList<string> Values) : BattleHookConditionDefinition;

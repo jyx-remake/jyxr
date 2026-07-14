@@ -362,6 +362,23 @@ public sealed partial class JsonContentLoader
                     break;
                 case ContextUnitRoleBattleHookConditionDefinition:
                     break;
+                case ContextSkillSourceIdBattleHookConditionDefinition sourceSkillCondition:
+                    Ensure(sourceSkillCondition.SourceSkillIds.Count > 0,
+                        $"{ownerName} has battle hook '{hook.Timing}' source skill condition without sourceSkillIds.");
+                    foreach (var sourceSkillId in sourceSkillCondition.SourceSkillIds)
+                    {
+                        Ensure(!string.IsNullOrWhiteSpace(sourceSkillId),
+                            $"{ownerName} has battle hook '{hook.Timing}' source skill condition with empty source skill id.");
+                        if (repository is not null)
+                        {
+                            Ensure(
+                                repository.ExternalSkills.ContainsKey(sourceSkillId) ||
+                                repository.InternalSkills.ContainsKey(sourceSkillId) ||
+                                repository.SpecialSkills.ContainsKey(sourceSkillId),
+                                $"{ownerName} has battle hook '{hook.Timing}' source skill condition referencing missing source skill '{sourceSkillId}'.");
+                        }
+                    }
+                    break;
                 case ContextSkillNameEqualsBattleHookConditionDefinition skillNameEqualsCondition:
                     Ensure(skillNameEqualsCondition.Values.Count > 0,
                         $"{ownerName} has battle hook '{hook.Timing}' skill name equals condition without values.");
