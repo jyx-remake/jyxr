@@ -78,14 +78,8 @@ public partial class LightnessTrainingScreen : Control
 			case InputEventMouseMotion:
 				MoveHeroTo(GetGlobalMousePosition());
 				break;
-			case InputEventMouseButton mouseButton when mouseButton.Pressed:
+			case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } mouseButton:
 				MoveHeroTo(mouseButton.GlobalPosition);
-				break;
-			case InputEventScreenDrag drag:
-				MoveHeroTo(drag.Position);
-				break;
-			case InputEventScreenTouch touch when touch.Pressed:
-				MoveHeroTo(touch.Position);
 				break;
 		}
 	}

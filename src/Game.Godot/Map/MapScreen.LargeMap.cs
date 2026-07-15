@@ -252,7 +252,6 @@ public partial class MapScreen
 			_largeMapTouches[screenTouch.Index] = viewportPosition;
 			if (_largeMapTouches.Count == 1)
 			{
-				_isDraggingLargeMap = !IsPointerOverLargeMapInteractive(viewportPosition);
 				return;
 			}
 
@@ -262,44 +261,37 @@ public partial class MapScreen
 			return;
 		}
 
-		var wasHandlingTouch = _isDraggingLargeMap || _largeMapTouches.Count > 1;
+		var wasPinching = _largeMapTouches.Count > 1;
 		_largeMapTouches.Remove(screenTouch.Index);
-		_isDraggingLargeMap = false;
 		_lastLargeMapPinchDistance = _largeMapTouches.Count > 1 ? GetLargeMapTouchDistance() : 0f;
 
-		if (wasHandlingTouch)
+		if (wasPinching)
 		{
+			_isDraggingLargeMap = false;
 			GetViewport().SetInputAsHandled();
 		}
 	}
 
 	private void HandleLargeMapScreenDrag(InputEventScreenDrag screenDrag, Vector2 viewportPosition)
 	{
-		if (!_largeMapTouches.TryGetValue(screenDrag.Index, out var previousPosition))
+		if (!_largeMapTouches.ContainsKey(screenDrag.Index))
 		{
 			return;
 		}
 
 		_largeMapTouches[screenDrag.Index] = viewportPosition;
-		if (_largeMapTouches.Count > 1)
-		{
-			var pinchDistance = GetLargeMapTouchDistance();
-			if (_lastLargeMapPinchDistance > 0f && pinchDistance > 0f)
-			{
-				ZoomLargeMap(pinchDistance / _lastLargeMapPinchDistance, GetLargeMapTouchCenter());
-			}
-
-			_lastLargeMapPinchDistance = pinchDistance;
-			GetViewport().SetInputAsHandled();
-			return;
-		}
-
-		if (!_isDraggingLargeMap)
+		if (_largeMapTouches.Count < 2)
 		{
 			return;
 		}
 
-		PanLargeMap(viewportPosition, previousPosition);
+		var pinchDistance = GetLargeMapTouchDistance();
+		if (_lastLargeMapPinchDistance > 0f && pinchDistance > 0f)
+		{
+			ZoomLargeMap(pinchDistance / _lastLargeMapPinchDistance, GetLargeMapTouchCenter());
+		}
+
+		_lastLargeMapPinchDistance = pinchDistance;
 		GetViewport().SetInputAsHandled();
 	}
 
@@ -330,6 +322,7 @@ public partial class MapScreen
 		if (mouseButton.Pressed)
 		{
 			_isDraggingLargeMap =
+				_largeMapTouches.Count < 2 &&
 				isInsideLargeMap &&
 				!IsPointerOverLargeMapInteractive(viewportPosition);
 			if (_isDraggingLargeMap)
@@ -350,7 +343,7 @@ public partial class MapScreen
 
 	private void HandleLargeMapMouseMotion(InputEventMouseMotion mouseMotion, Vector2 viewportPosition)
 	{
-		if (!_isDraggingLargeMap)
+		if (!_isDraggingLargeMap || _largeMapTouches.Count > 1)
 		{
 			return;
 		}

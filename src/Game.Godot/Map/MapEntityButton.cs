@@ -230,9 +230,6 @@ public partial class MapEntityButton : Button
 	{
 		switch (@event)
 		{
-			case InputEventScreenTouch { Pressed: true } screenTouch:
-				position = screenTouch.Position;
-				return true;
 			case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } mouseButton:
 				position = mouseButton.Position;
 				return true;
