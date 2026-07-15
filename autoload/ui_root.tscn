@@ -88,11 +88,6 @@ visible = false
 unique_name_in_owner = true
 visible = false
 
-[node name="HintBox" parent="ModalLayer" unique_id=463491151 instance=ExtResource("10_hint_box")]
-
-[node name="ConfirmDialog" parent="ModalLayer" unique_id=1760846137 instance=ExtResource("11_confirm_dialog")]
-unique_name_in_owner = true
-
 [node name="DetailPanelHost" type="Control" parent="ModalLayer" unique_id=100000211]
 unique_name_in_owner = true
 layout_mode = 3
@@ -105,9 +100,18 @@ mouse_filter = 2
 script = ExtResource("2_detail_host")
 DetailPanelScene = ExtResource("21_detail_panel")
 
-[node name="OverlayLayer" type="CanvasLayer" parent="." unique_id=1997746900]
+[node name="PromptLayer" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
 layer = 40
+
+[node name="HintBox" parent="PromptLayer" unique_id=463491151 instance=ExtResource("10_hint_box")]
+
+[node name="ConfirmDialog" parent="PromptLayer" unique_id=1760846137 instance=ExtResource("11_confirm_dialog")]
+unique_name_in_owner = true
+
+[node name="OverlayLayer" type="CanvasLayer" parent="." unique_id=1997746900]
+unique_name_in_owner = true
+layer = 50
 
 [node name="ToastPanel" type="Control" parent="OverlayLayer" unique_id=318086013]
 unique_name_in_owner = true
