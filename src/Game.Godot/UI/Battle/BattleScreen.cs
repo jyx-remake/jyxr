@@ -303,6 +303,12 @@ public partial class BattleScreen : Control
 		RefreshAll();
 	}
 
+	internal void ShowUnitActing()
+	{
+		_uiState.ActUnit();
+		RefreshAll();
+	}
+
 	internal Task ShowBattleEndedAsync(bool isWin) =>
 		_settlementController.CompleteAsync(isWin, _state, _battleRequest);
 

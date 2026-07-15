@@ -125,6 +125,7 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
+        _screen.ShowUnitActing();
         await _screen.PlaySkillAsync(actingUnit, skill, result);
         await ContinueAfterResolvedPlayerActionAsync();
     }
