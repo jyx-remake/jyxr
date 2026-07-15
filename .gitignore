@@ -1,36 +1,53 @@
+# .NET build and test output
 bin/
 obj/
-.vs/
 TestResults/
-*.user
-*.suo
-*.cache
-*.userosscache
-*.rsuser
-*.ncrunch*
-.agent
-.idea/
-.vscode/
-.DS_Store
-.codex-temp
 artifacts/
 coverage/
 *.coverage
 *.coveragexml
-/android/
-/export/
-*.keystore
-*.jks
-**/keystore.properties
-**/local.properties
-/assets/animation
-/assets/art
-/assets/audio
-/assets/font
-/assets/launcher_art
-/mods
-/launcher
-/userdata
+
+# IDE and editor state
+.vs/
+.idea/
+.vscode/
+*.cache
+*.ncrunch*
+*.rsuser
+*.suo
+*.user
+*.userosscache
+
+# Godot generated state
 .godot/
 .import/
 mono_crash.*.json
+
+# Android generated project and signing secrets
+/android/
+*.jks
+*.keystore
+**/keystore.properties
+**/local.properties
+
+# Export output
+/export/
+
+# Project-local content and runtime data
+/assets/animation/
+/assets/art/
+/assets/audio/
+/assets/font/
+/assets/launcher_art/
+/launcher/
+/mods/
+/userdata/
+
+# Tool and agent state
+.agent
+.codex-temp
+__pycache__/
+*.py[cod]
+
+# Operating system metadata
+.DS_Store
