@@ -22,6 +22,6 @@ internal static class BattleSkillBuffChanceResolver
         }
 
         var composure = target.GetStat(StatType.Dingli);
-        return Math.Clamp((fortune - composure * 0.5d) / 100d, 0.1d, 1d);
+        return Math.Clamp(0.3d + (fortune - composure) / 200d, 0.1d, 0.8d);
     }
 }

@@ -779,9 +779,19 @@ public sealed class BattleEngineTests
     }
 
     [Theory]
-    [InlineData(0.39, true)]
-    [InlineData(0.40, false)]
-    public void CastSkill_UnspecifiedDebuffChance_UsesSourceFortuneAgainstTargetComposure(
+    [InlineData(60, 40, 0.39, true)]
+    [InlineData(60, 40, 0.40, false)]
+    [InlineData(30, 30, 0.29, true)]
+    [InlineData(30, 30, 0.30, false)]
+    [InlineData(100, 100, 0.29, true)]
+    [InlineData(100, 100, 0.30, false)]
+    [InlineData(0, 300, 0.09, true)]
+    [InlineData(0, 300, 0.10, false)]
+    [InlineData(300, 0, 0.79, true)]
+    [InlineData(300, 0, 0.80, false)]
+    public void CastSkill_UnspecifiedDebuffChance_UsesBoundedFortuneComposureDifference(
+        int sourceFortune,
+        int targetComposure,
         double roll,
         bool expectedApplied)
     {
@@ -796,13 +806,13 @@ public sealed class BattleEngineTests
             "source",
             team: 1,
             new GridPosition(0, 0),
-            stats: new Dictionary<StatType, int> { [StatType.Fuyuan] = 60 },
+            stats: new Dictionary<StatType, int> { [StatType.Fuyuan] = sourceFortune },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var target = CreateUnit(
             "target",
             team: 2,
             new GridPosition(1, 0),
-            stats: new Dictionary<StatType, int> { [StatType.Dingli] = 40 });
+            stats: new Dictionary<StatType, int> { [StatType.Dingli] = targetComposure });
         source.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [source, target]);
         var engine = new BattleEngine(random: new FixedRandomService(roll));
