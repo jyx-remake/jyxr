@@ -151,7 +151,7 @@ public partial class BattleScreen : Control
 			_uiState.EndBattle,
 			AppendLog,
 			() => RefreshAll());
-		_boardGrid.CellPressed += _boardController.OnCellPressed;
+		_boardGrid.CellActivated += _boardController.OnCellActivated;
 		_boardGrid.HoveredCellChanged += _boardController.OnHoveredCellChanged;
 		_surrenderButton.Pressed += SurrenderBattle;
 		_speedUpButton.Pressed += _settingsController.ToggleSpeedUp;

@@ -41,7 +41,7 @@ public partial class BattleBoardView : Control
 
 	private sealed record QueuedFloatText(string Text, BattleFloatTextStyle Style);
 
-	public event Action<GridPosition>? CellPressed;
+	public event Action<GridPosition>? CellActivated;
 
 	public event Action<GridPosition?>? HoveredCellChanged;
 
@@ -347,12 +347,14 @@ public partial class BattleBoardView : Control
 			case InputEventMouseMotion motion:
 				UpdateHoveredCell(motion.Position);
 				break;
-			case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } button:
-				if (TryGetCellAt(button.Position, out var position) &&
+			case InputEventMouseButton { ButtonIndex: MouseButton.Left } button:
+				UpdateHoveredCell(button.Position);
+				if (!button.Pressed &&
+					TryGetCellAt(button.Position, out var position) &&
 					_cells.TryGetValue(position, out var cell) &&
 					cell.IsInteractive)
 				{
-					CellPressed?.Invoke(position);
+					CellActivated?.Invoke(position);
 				}
 				break;
 		}

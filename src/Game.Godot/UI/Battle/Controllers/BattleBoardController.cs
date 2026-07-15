@@ -33,6 +33,13 @@ internal sealed class BattleBoardController(
         if (uiState.Mode != BattleUiMode.SelectingSkillTarget) _hoveredPosition = null;
         var state = stateProvider();
         if (state is null) return;
+
+        RefreshGrid(state);
+        RefreshUnits(state);
+    }
+
+    private void RefreshGrid(BattleState state)
+    {
         var highlights = ResolveHighlights(state);
         var cells = presenter.CreateCells(state)
             .Select(cell => new BattleBoardCellVisual(
@@ -43,6 +50,10 @@ internal sealed class BattleBoardController(
                 HasOverlay(cell, highlights)))
             .ToArray();
         board.RenderGrid(state.Grid.Width, state.Grid.Height, CellWidth, CellHeight, 6, cells);
+    }
+
+    private void RefreshUnits(BattleState state)
+    {
         var actingUnitId = state.CurrentAction?.ActingUnitId;
         board.RenderUnits(state.Units.Select(unit => new BattleBoardUnitVisual(
             unit.Id,
@@ -65,7 +76,7 @@ internal sealed class BattleBoardController(
             .ToArray());
     }
 
-    public async void OnCellPressed(GridPosition position)
+    public async void OnCellActivated(GridPosition position)
     {
         var state = stateProvider();
         var orchestrator = orchestratorProvider();
@@ -94,7 +105,9 @@ internal sealed class BattleBoardController(
         var next = uiState.Mode == BattleUiMode.SelectingSkillTarget ? position : null;
         if (_hoveredPosition == next) return;
         _hoveredPosition = next;
-        Refresh();
+
+        var state = stateProvider();
+        if (state is not null) RefreshGrid(state);
     }
 
     private Highlights ResolveHighlights(BattleState state)
