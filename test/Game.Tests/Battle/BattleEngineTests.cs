@@ -736,6 +736,48 @@ public sealed class BattleEngineTests
     }
 
     [Theory]
+    [InlineData(2, 1)]
+    [InlineData(1, 5)]
+    public void CastSkill_DoesNotReportBuffApplied_WhenExistingBuffIsBetter(
+        int existingLevel,
+        int existingRemainingTurns)
+    {
+        var buff = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            buffs: [new SkillBuffDefinition(buff, level: 1, duration: 2, chance: 100)],
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
+        var existing = new BattleBuffInstance(
+            buff,
+            level: existingLevel,
+            remainingTurns: existingRemainingTurns,
+            enemy.Id,
+            0);
+        enemy.ApplyBuff(existing);
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
+        var engine = new BattleEngine(random: new FixedRandomService(0.25d));
+        engine.BeginAction(state, hero.Id);
+
+        var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
+
+        Assert.True(result.Success);
+        Assert.Same(existing, Assert.Single(enemy.Buffs));
+        Assert.DoesNotContain(result.Messages.OfType<BattleFact>(), battleEvent =>
+            battleEvent.Kind == BattleFactKind.BuffApplied &&
+            battleEvent.UnitId == enemy.Id &&
+            battleEvent.Detail == buff.Id);
+    }
+
+    [Theory]
     [InlineData(0.39, true)]
     [InlineData(0.40, false)]
     public void CastSkill_UnspecifiedDebuffChance_UsesSourceFortuneAgainstTargetComposure(
@@ -1122,17 +1164,63 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
-    public void ActiveBuffs_ReturnOnlyHighestLevelPerBuffDefinition()
+    public void ApplyBuff_HigherLevelReplacesExistingBuff()
     {
         var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
         hero.ApplyBuff(new BattleBuffInstance(buff, level: 1, remainingTurns: 5, "hero", 1));
-        hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 1, "hero", 2));
+        var result = hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 1, "ally", 2));
 
-        var active = hero.GetActiveBuffs();
-
-        var activeBuff = Assert.Single(active);
+        var activeBuff = Assert.Single(hero.Buffs);
+        Assert.Equal(BattleBuffApplyResult.Replaced, result);
         Assert.Equal(3, activeBuff.Level);
+        Assert.Equal(1, activeBuff.RemainingTurns);
+        Assert.Equal("ally", activeBuff.SourceUnitId);
+        Assert.Equal(2, activeBuff.AppliedAtActionSerial);
+    }
+
+    [Fact]
+    public void ApplyBuff_SameLevelKeepsLongerRemainingDuration()
+    {
+        var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
+        var existing = new BattleBuffInstance(buff, level: 3, remainingTurns: 5, "hero", 1);
+        hero.ApplyBuff(existing);
+
+        var result = hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 2, "ally", 2));
+
+        Assert.Equal(BattleBuffApplyResult.Ignored, result);
+        Assert.Same(existing, Assert.Single(hero.Buffs));
+    }
+
+    [Fact]
+    public void ApplyBuff_SameLevelRefreshesToLongerDuration()
+    {
+        var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
+        hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 2, "hero", 1));
+
+        var result = hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 5, "ally", 2));
+
+        var activeBuff = Assert.Single(hero.Buffs);
+        Assert.Equal(BattleBuffApplyResult.Replaced, result);
+        Assert.Equal(3, activeBuff.Level);
+        Assert.Equal(5, activeBuff.RemainingTurns);
+        Assert.Equal("ally", activeBuff.SourceUnitId);
+    }
+
+    [Fact]
+    public void ApplyBuff_LowerLevelDoesNotReplaceExistingBuff()
+    {
+        var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
+        var existing = new BattleBuffInstance(buff, level: 3, remainingTurns: 1, "hero", 1);
+        hero.ApplyBuff(existing);
+
+        var result = hero.ApplyBuff(new BattleBuffInstance(buff, level: 2, remainingTurns: 5, "ally", 2));
+
+        Assert.Equal(BattleBuffApplyResult.Ignored, result);
+        Assert.Same(existing, Assert.Single(hero.Buffs));
     }
 
     [Fact]

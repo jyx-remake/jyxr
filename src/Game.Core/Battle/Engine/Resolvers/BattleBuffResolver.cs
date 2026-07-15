@@ -47,7 +47,12 @@ internal sealed class BattleBuffResolver(
             return false;
         }
 
-        target.ApplyBuff(instance);
+        var applyResult = target.ApplyBuff(instance);
+        if (applyResult == BattleBuffApplyResult.Ignored)
+        {
+            return false;
+        }
+
         state.AddMessage(new BattleFact(BattleFactKind.BuffApplied, target.Id, timing, detail: detail));
         triggerHooks(state, HookTiming.OnBuffApplied, target, context =>
         {
@@ -79,14 +84,11 @@ internal sealed class BattleBuffResolver(
     {
         foreach (var removedBuff in removedBuffs)
         {
-            if (!target.HasBuff(removedBuff.Definition.Id))
-            {
-                state.AddMessage(new BattleFact(
-                    BattleFactKind.BuffRemoved,
-                    target.Id,
-                    timing,
-                    detail: removedBuff.Definition.Id));
-            }
+            state.AddMessage(new BattleFact(
+                BattleFactKind.BuffRemoved,
+                target.Id,
+                timing,
+                detail: removedBuff.Definition.Id));
 
             triggerHooks(state, HookTiming.OnBuffRemoved, target, context =>
             {

@@ -11,6 +11,7 @@ TestResults/
 .agent
 .idea/
 .vscode/
+.DS_Store
 .codex-temp
 artifacts/
 coverage/

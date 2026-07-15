@@ -216,11 +216,30 @@ public sealed class BattleUnit
         return before - Hp;
     }
 
-    public void ApplyBuff(BattleBuffInstance buff)
+    public BattleBuffApplyResult ApplyBuff(BattleBuffInstance buff)
     {
         ArgumentNullException.ThrowIfNull(buff);
+
+        var existing = _buffs.FirstOrDefault(existingBuff =>
+            string.Equals(existingBuff.Definition.Id, buff.Definition.Id, StringComparison.Ordinal));
+        if (existing is not null &&
+            !existing.IsExpired &&
+            (buff.Level < existing.Level ||
+             buff.Level == existing.Level && buff.RemainingTurns < existing.RemainingTurns))
+        {
+            return BattleBuffApplyResult.Ignored;
+        }
+
+        if (existing is not null)
+        {
+            _buffs.Remove(existing);
+        }
+
         _buffs.Add(buff);
         ClampResourcesToLimits();
+        return existing is null
+            ? BattleBuffApplyResult.Added
+            : BattleBuffApplyResult.Replaced;
     }
 
     public IReadOnlyList<BattleBuffInstance> RemoveBuffs(Func<BattleBuffInstance, bool> predicate)
@@ -246,12 +265,6 @@ public sealed class BattleUnit
     public IReadOnlyList<BattleBuffInstance> GetActiveBuffs() =>
         _buffs
             .Where(static buff => !buff.IsExpired)
-            .GroupBy(static buff => buff.Definition.Id, StringComparer.Ordinal)
-            .Select(static group => group
-                .OrderByDescending(static buff => buff.Level)
-                .ThenByDescending(static buff => buff.RemainingTurns)
-                .ThenByDescending(static buff => buff.AppliedAtActionSerial)
-                .First())
             .ToList();
 
     public double GetStat(StatType statType) =>
@@ -341,8 +354,9 @@ public sealed class BattleUnit
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(buffId);
 
-        return GetActiveBuffs()
-            .FirstOrDefault(buff => string.Equals(buff.Definition.Id, buffId, StringComparison.Ordinal));
+        return _buffs.FirstOrDefault(buff =>
+            !buff.IsExpired &&
+            string.Equals(buff.Definition.Id, buffId, StringComparison.Ordinal));
     }
 
     internal IReadOnlyList<BattleBuffInstance> RemoveExpiredBuffs()
