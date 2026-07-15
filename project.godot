@@ -57,3 +57,7 @@ ui-ctrl={
 
 locale/include_text_server_data=true
 locale/include_text_server_data.extra_pck=false
+
+[rendering]
+
+textures/vram_compression/import_etc2_astc=true

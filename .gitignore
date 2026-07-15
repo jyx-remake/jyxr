@@ -17,6 +17,12 @@ artifacts/
 coverage/
 *.coverage
 *.coveragexml
+/android/
+/export/
+*.keystore
+*.jks
+**/keystore.properties
+**/local.properties
 /assets/animation
 /assets/art
 /assets/audio
