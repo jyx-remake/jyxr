@@ -385,8 +385,7 @@ public sealed class BattleHookContext :
         BattleUnit target,
         string buffId,
         int level,
-        int duration,
-        string? detail)
+        int duration)
     {
         if (Timing != HookTiming.OnHitConfirmed)
         {
@@ -407,7 +406,6 @@ public sealed class BattleHookContext :
             Engine.BuffResolver.Resolve(buffId),
             level,
             duration,
-            detail ?? buffId,
             Timing);
     }
 

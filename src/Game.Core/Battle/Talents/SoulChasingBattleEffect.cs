@@ -49,7 +49,6 @@ internal sealed class SoulChasingBattleEffectHandler
             context.Target,
             parameters.BuffId,
             level: Math.Min(10, checked((existing?.Level ?? 0) + 1)),
-            duration: 4,
-            detail: parameters.BuffId);
+            duration: 4);
     }
 }

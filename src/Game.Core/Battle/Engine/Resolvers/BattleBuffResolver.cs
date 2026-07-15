@@ -21,7 +21,6 @@ internal sealed class BattleBuffResolver(
         BuffDefinition definition,
         int level,
         int duration,
-        string detail,
         HookTiming? timing = null)
     {
         if (definition.IsDebuff && target.HasBuff(BattleContentIds.HolyWar))
@@ -31,7 +30,7 @@ internal sealed class BattleBuffResolver(
 
         if (definition.IsDebuff && RollDebuffResistance(target))
         {
-            state.AddMessage(new BattleFact(BattleFactKind.BuffResisted, target.Id, timing, detail: detail));
+            state.AddMessage(new BattleFact(BattleFactKind.BuffResisted, target.Id, timing, detail: definition.Id));
             return false;
         }
 
@@ -47,13 +46,12 @@ internal sealed class BattleBuffResolver(
             return false;
         }
 
-        var applyResult = target.ApplyBuff(instance);
-        if (applyResult == BattleBuffApplyResult.Ignored)
+        if (!target.TryApplyBuff(instance))
         {
             return false;
         }
 
-        state.AddMessage(new BattleFact(BattleFactKind.BuffApplied, target.Id, timing, detail: detail));
+        state.AddMessage(new BattleFact(BattleFactKind.BuffApplied, target.Id, timing, detail: definition.Id));
         triggerHooks(state, HookTiming.OnBuffApplied, target, context =>
         {
             context.Source = source;
@@ -71,7 +69,11 @@ internal sealed class BattleBuffResolver(
         HookTiming? timing = null)
     {
         var removedBuffs = target.RemoveBuffs(predicate);
-        NotifyRemoved(state, source, target, removedBuffs, timing);
+        foreach (var removedBuff in removedBuffs)
+        {
+            NotifyRemoved(state, source, target, removedBuff, timing);
+        }
+
         return removedBuffs;
     }
 
@@ -79,24 +81,21 @@ internal sealed class BattleBuffResolver(
         BattleState state,
         BattleUnit source,
         BattleUnit target,
-        IReadOnlyList<BattleBuffInstance> removedBuffs,
+        BattleBuffInstance removedBuff,
         HookTiming? timing = null)
     {
-        foreach (var removedBuff in removedBuffs)
-        {
-            state.AddMessage(new BattleFact(
-                BattleFactKind.BuffRemoved,
-                target.Id,
-                timing,
-                detail: removedBuff.Definition.Id));
+        state.AddMessage(new BattleFact(
+            BattleFactKind.BuffRemoved,
+            target.Id,
+            timing,
+            detail: removedBuff.Definition.Id));
 
-            triggerHooks(state, HookTiming.OnBuffRemoved, target, context =>
-            {
-                context.Source = source;
-                context.Target = target;
-                context.Buff = removedBuff;
-            });
-        }
+        triggerHooks(state, HookTiming.OnBuffRemoved, target, context =>
+        {
+            context.Source = source;
+            context.Target = target;
+            context.Buff = removedBuff;
+        });
     }
 
     private bool RollDebuffResistance(BattleUnit target)

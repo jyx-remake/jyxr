@@ -77,7 +77,7 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
                     if (Probability.RollPercentage(hookContext?.Random ?? engine.RandomService, applyBuff.Chance))
                     {
                         engine.BuffResolver.Apply(state, source, target, engine.BuffResolver.Resolve(applyBuff), applyBuff.Level,
-                            applyBuff.Duration, applyBuff.BuffId, timing);
+                            applyBuff.Duration, timing);
                     }
                 }
                 break;

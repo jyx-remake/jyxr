@@ -216,7 +216,7 @@ public sealed class BattleUnit
         return before - Hp;
     }
 
-    public BattleBuffApplyResult ApplyBuff(BattleBuffInstance buff)
+    public bool TryApplyBuff(BattleBuffInstance buff)
     {
         ArgumentNullException.ThrowIfNull(buff);
 
@@ -227,7 +227,7 @@ public sealed class BattleUnit
             (buff.Level < existing.Level ||
              buff.Level == existing.Level && buff.RemainingTurns < existing.RemainingTurns))
         {
-            return BattleBuffApplyResult.Ignored;
+            return false;
         }
 
         if (existing is not null)
@@ -237,9 +237,7 @@ public sealed class BattleUnit
 
         _buffs.Add(buff);
         ClampResourcesToLimits();
-        return existing is null
-            ? BattleBuffApplyResult.Added
-            : BattleBuffApplyResult.Replaced;
+        return true;
     }
 
     public IReadOnlyList<BattleBuffInstance> RemoveBuffs(Func<BattleBuffInstance, bool> predicate)
@@ -254,12 +252,6 @@ public sealed class BattleUnit
         return removed
             .Where(static buff => !buff.IsExpired)
             .ToList();
-    }
-
-    public IReadOnlyList<BattleBuffInstance> RemoveBuffsById(string buffId)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(buffId);
-        return RemoveBuffs(buff => string.Equals(buff.Definition.Id, buffId, StringComparison.Ordinal));
     }
 
     public IReadOnlyList<BattleBuffInstance> GetActiveBuffs() =>

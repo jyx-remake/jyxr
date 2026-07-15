@@ -220,7 +220,7 @@ public sealed class BattleEngineTests
         };
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
 
-        hero.ApplyBuff(new BattleBuffInstance(buff, level: 1, remainingTurns: 2, sourceUnitId: hero.Id, appliedAtActionSerial: 0));
+        hero.TryApplyBuff(new BattleBuffInstance(buff, level: 1, remainingTurns: 2, sourceUnitId: hero.Id, appliedAtActionSerial: 0));
 
         Assert.True(hero.HasTrait(TraitId.IgnoreZoneOfControl));
     }
@@ -523,7 +523,7 @@ public sealed class BattleEngineTests
             hp: 80,
             mp: 25);
 
-        hero.ApplyBuff(new BattleBuffInstance(buff, level: 1, remainingTurns: 3, sourceUnitId: hero.Id, appliedAtActionSerial: 1));
+        hero.TryApplyBuff(new BattleBuffInstance(buff, level: 1, remainingTurns: 3, sourceUnitId: hero.Id, appliedAtActionSerial: 1));
         hero.RestoreHp(100);
         hero.RestoreMp(100);
 
@@ -532,7 +532,8 @@ public sealed class BattleEngineTests
         Assert.Equal(50, hero.MaxMp);
         Assert.Equal(50, hero.Mp);
 
-        hero.RemoveBuffsById(buff.Id);
+        hero.RemoveBuffs(candidate =>
+            string.Equals(candidate.Definition.Id, buff.Id, StringComparison.Ordinal));
 
         Assert.Equal(100, hero.MaxHp);
         Assert.Equal(100, hero.Hp);
@@ -761,7 +762,7 @@ public sealed class BattleEngineTests
             remainingTurns: existingRemainingTurns,
             enemy.Id,
             0);
-        enemy.ApplyBuff(existing);
+        enemy.TryApplyBuff(existing);
         hero.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
         var engine = new BattleEngine(random: new FixedRandomService(0.25d));
@@ -1168,11 +1169,11 @@ public sealed class BattleEngineTests
     {
         var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
-        hero.ApplyBuff(new BattleBuffInstance(buff, level: 1, remainingTurns: 5, "hero", 1));
-        var result = hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 1, "ally", 2));
+        hero.TryApplyBuff(new BattleBuffInstance(buff, level: 1, remainingTurns: 5, "hero", 1));
+        var result = hero.TryApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 1, "ally", 2));
 
         var activeBuff = Assert.Single(hero.Buffs);
-        Assert.Equal(BattleBuffApplyResult.Replaced, result);
+        Assert.True(result);
         Assert.Equal(3, activeBuff.Level);
         Assert.Equal(1, activeBuff.RemainingTurns);
         Assert.Equal("ally", activeBuff.SourceUnitId);
@@ -1185,11 +1186,11 @@ public sealed class BattleEngineTests
         var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
         var existing = new BattleBuffInstance(buff, level: 3, remainingTurns: 5, "hero", 1);
-        hero.ApplyBuff(existing);
+        hero.TryApplyBuff(existing);
 
-        var result = hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 2, "ally", 2));
+        var result = hero.TryApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 2, "ally", 2));
 
-        Assert.Equal(BattleBuffApplyResult.Ignored, result);
+        Assert.False(result);
         Assert.Same(existing, Assert.Single(hero.Buffs));
     }
 
@@ -1198,12 +1199,12 @@ public sealed class BattleEngineTests
     {
         var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
-        hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 2, "hero", 1));
+        hero.TryApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 2, "hero", 1));
 
-        var result = hero.ApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 5, "ally", 2));
+        var result = hero.TryApplyBuff(new BattleBuffInstance(buff, level: 3, remainingTurns: 5, "ally", 2));
 
         var activeBuff = Assert.Single(hero.Buffs);
-        Assert.Equal(BattleBuffApplyResult.Replaced, result);
+        Assert.True(result);
         Assert.Equal(3, activeBuff.Level);
         Assert.Equal(5, activeBuff.RemainingTurns);
         Assert.Equal("ally", activeBuff.SourceUnitId);
@@ -1215,11 +1216,11 @@ public sealed class BattleEngineTests
         var buff = new BuffDefinition { Id = "shield", Name = "shield", IsDebuff = false };
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
         var existing = new BattleBuffInstance(buff, level: 3, remainingTurns: 1, "hero", 1);
-        hero.ApplyBuff(existing);
+        hero.TryApplyBuff(existing);
 
-        var result = hero.ApplyBuff(new BattleBuffInstance(buff, level: 2, remainingTurns: 5, "ally", 2));
+        var result = hero.TryApplyBuff(new BattleBuffInstance(buff, level: 2, remainingTurns: 5, "ally", 2));
 
-        Assert.Equal(BattleBuffApplyResult.Ignored, result);
+        Assert.False(result);
         Assert.Same(existing, Assert.Single(hero.Buffs));
     }
 
@@ -1309,7 +1310,7 @@ public sealed class BattleEngineTests
         {
             [StatType.Dingli] = 0,
         }, actionSpeed: 1, talents: [damageHookTalent]);
-        hero.ApplyBuff(new BattleBuffInstance(poison, level: 2, remainingTurns: 2, "enemy", 0));
+        hero.TryApplyBuff(new BattleBuffInstance(poison, level: 2, remainingTurns: 2, "enemy", 0));
         var state = new BattleState(new BattleGrid(4, 4), [hero]);
         var engine = new BattleEngine(random: new FixedRandomService(0.5d));
 
@@ -1373,7 +1374,7 @@ public sealed class BattleEngineTests
         var skill = source.Character.GetExternalSkills().Single();
         var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
         var withoutBuff = calculator.CalculateSkillDamage(new BattleDamageContext(source, target, skill));
-        source.ApplyBuff(new BattleBuffInstance(attackUp, level: 1, remainingTurns: 3, source.Id, 1));
+        source.TryApplyBuff(new BattleBuffInstance(attackUp, level: 1, remainingTurns: 3, source.Id, 1));
 
         var withBuff = calculator.CalculateSkillDamage(new BattleDamageContext(source, target, skill));
 
@@ -1406,8 +1407,8 @@ public sealed class BattleEngineTests
             {
                 [StatType.Shenfa] = 101,
             });
-        hero.ApplyBuff(new BattleBuffInstance(light, level: 2, remainingTurns: 3, hero.Id, 1));
-        hero.ApplyBuff(new BattleBuffInstance(slow, level: 1, remainingTurns: 3, hero.Id, 2));
+        hero.TryApplyBuff(new BattleBuffInstance(light, level: 2, remainingTurns: 3, hero.Id, 1));
+        hero.TryApplyBuff(new BattleBuffInstance(slow, level: 1, remainingTurns: 3, hero.Id, 2));
         hero.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(8, 8), [hero]);
         var engine = new BattleEngine();
@@ -1447,7 +1448,7 @@ public sealed class BattleEngineTests
             },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
-        hero.ApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, enemy.Id, 1));
+        hero.TryApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, enemy.Id, 1));
         hero.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
         var engine = new BattleEngine(new BattleDamageCalculator(new FixedRandomService(0.5d)));
@@ -1484,7 +1485,7 @@ public sealed class BattleEngineTests
             mp: 11,
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
-        hero.ApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, enemy.Id, 1));
+        hero.TryApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, enemy.Id, 1));
         hero.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
         var engine = new BattleEngine();
@@ -1522,7 +1523,7 @@ public sealed class BattleEngineTests
             mp: 11,
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
-        hero.ApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, enemy.Id, 1));
+        hero.TryApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, enemy.Id, 1));
         var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
         var engine = new BattleEngine();
 
@@ -1598,7 +1599,7 @@ public sealed class BattleEngineTests
             new GridPosition(0, 0),
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var enemy = CreateUnit("enemy", team: 2, new GridPosition(1, 0));
-        hero.ApplyBuff(new BattleBuffInstance(randomCostBuff, level: 1, remainingTurns: 3, enemy.Id, 1));
+        hero.TryApplyBuff(new BattleBuffInstance(randomCostBuff, level: 1, remainingTurns: 3, enemy.Id, 1));
         var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
         var engine = new BattleEngine();
 
@@ -1744,7 +1745,7 @@ public sealed class BattleEngineTests
             new GridPosition(1, 0),
             maxHp: 500,
             talents: [CreateDamageContextTalent("去毒回怒", removedRageHook)]);
-        target.ApplyBuff(new BattleBuffInstance(poison, level: 1, remainingTurns: 3, source.Id, 1));
+        target.TryApplyBuff(new BattleBuffInstance(poison, level: 1, remainingTurns: 3, source.Id, 1));
         source.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [source, target]);
         var engine = new BattleEngine(
@@ -2302,7 +2303,7 @@ public sealed class BattleEngineTests
     {
         var drunkenness = CreateDrunkennessBuff(skipChance: 0.2d, rage: 6);
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0), rage: 2);
-        hero.ApplyBuff(new BattleBuffInstance(drunkenness, 1, 3, hero.Id, 0));
+        hero.TryApplyBuff(new BattleBuffInstance(drunkenness, 1, 3, hero.Id, 0));
         hero.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [hero]);
         var engine = new BattleEngine(random: new FixedRandomService(0.19d));
@@ -2326,7 +2327,7 @@ public sealed class BattleEngineTests
     {
         var drunkenness = CreateDrunkennessBuff(skipChance: 0.2d, rage: 6);
         var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0), rage: 2);
-        hero.ApplyBuff(new BattleBuffInstance(drunkenness, 1, 3, hero.Id, 0));
+        hero.TryApplyBuff(new BattleBuffInstance(drunkenness, 1, 3, hero.Id, 0));
         hero.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [hero]);
         var engine = new BattleEngine(random: new FixedRandomService(0.2d));
@@ -2767,7 +2768,7 @@ public sealed class BattleEngineTests
             },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1000);
-        source.ApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, source.Id, 0));
+        source.TryApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, source.Id, 0));
         source.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [source, target]);
         var engine = new BattleEngine(
@@ -2816,7 +2817,7 @@ public sealed class BattleEngineTests
             new GridPosition(1, 0),
             maxHp: 500,
             talents: [CreateDamageContextTalent("易容", CreateBeforeHitCancelHook())]);
-        missSource.ApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, missSource.Id, 0));
+        missSource.TryApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, missSource.Id, 0));
         missSource.ActionGauge = 100;
         var missState = new BattleState(new BattleGrid(4, 4), [missSource, missTarget]);
         var missEngine = new BattleEngine(
@@ -2843,7 +2844,7 @@ public sealed class BattleEngineTests
             },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var zeroChanceTarget = CreateUnit("zero_chance_target", team: 2, new GridPosition(1, 0), maxHp: 500);
-        zeroChanceSource.ApplyBuff(new BattleBuffInstance(extraStrike, level: 0, remainingTurns: 3, zeroChanceSource.Id, 0));
+        zeroChanceSource.TryApplyBuff(new BattleBuffInstance(extraStrike, level: 0, remainingTurns: 3, zeroChanceSource.Id, 0));
         zeroChanceSource.ActionGauge = 100;
         var zeroChanceState = new BattleState(new BattleGrid(4, 4), [zeroChanceSource, zeroChanceTarget]);
         var zeroChanceEngine = new BattleEngine(
@@ -2873,7 +2874,7 @@ public sealed class BattleEngineTests
             },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var lethalTarget = CreateUnit("lethal_target", team: 2, new GridPosition(1, 0), maxHp: 1);
-        lethalSource.ApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, lethalSource.Id, 0));
+        lethalSource.TryApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, lethalSource.Id, 0));
         lethalSource.ActionGauge = 100;
         var lethalState = new BattleState(new BattleGrid(4, 4), [lethalSource, lethalTarget]);
         var lethalEngine = new BattleEngine(
@@ -2915,7 +2916,7 @@ public sealed class BattleEngineTests
             },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1000);
-        source.ApplyBuff(new BattleBuffInstance(extraStrike, level: 5, remainingTurns: 3, source.Id, 0));
+        source.TryApplyBuff(new BattleBuffInstance(extraStrike, level: 5, remainingTurns: 3, source.Id, 0));
         source.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [source, target]);
         var engine = new BattleEngine(
@@ -2963,7 +2964,7 @@ public sealed class BattleEngineTests
             },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1000);
-        source.ApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, source.Id, 0));
+        source.TryApplyBuff(new BattleBuffInstance(extraStrike, level: 10, remainingTurns: 3, source.Id, 0));
         source.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [source, target]);
         var engine = new BattleEngine(
@@ -3004,7 +3005,7 @@ public sealed class BattleEngineTests
             },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500);
-        target.ApplyBuff(new BattleBuffInstance(
+        target.TryApplyBuff(new BattleBuffInstance(
             new BuffDefinition
             {
                 Id = "飘渺",
@@ -3054,7 +3055,7 @@ public sealed class BattleEngineTests
             },
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500);
-        target.ApplyBuff(new BattleBuffInstance(
+        target.TryApplyBuff(new BattleBuffInstance(
             new BuffDefinition
             {
                 Id = "飘渺",
@@ -3130,7 +3131,7 @@ public sealed class BattleEngineTests
                 },
             ],
         };
-        target.ApplyBuff(new BattleBuffInstance(
+        target.TryApplyBuff(new BattleBuffInstance(
             damageDeepening,
             level: 10,
             remainingTurns: 3,

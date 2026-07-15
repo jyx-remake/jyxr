@@ -56,8 +56,7 @@ public interface IHitConfirmedEffectContext : IBattleEffectContext
         BattleUnit target,
         string buffId,
         int level,
-        int duration,
-        string? detail = null);
+        int duration);
 }
 
 public interface IDamageApplicationEffectContext : IBattleEffectContext

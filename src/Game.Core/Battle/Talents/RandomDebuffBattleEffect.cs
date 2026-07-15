@@ -33,6 +33,6 @@ internal sealed class RandomDebuffBattleEffectHandler
         }
 
         var buffId = parameters.BuffIds[context.Random.Next(0, parameters.BuffIds.Count)];
-        context.ApplyBuff(context.Target, buffId, parameters.Level, parameters.Duration, buffId);
+        context.ApplyBuff(context.Target, buffId, parameters.Level, parameters.Duration);
     }
 }

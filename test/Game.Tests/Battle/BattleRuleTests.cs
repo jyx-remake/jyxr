@@ -320,7 +320,7 @@ public sealed class BattleRuleTests
             Name = "致盲",
             IsDebuff = true,
         };
-        unit.ApplyBuff(new BattleBuffInstance(blind, level: 1, remainingTurns: 1, unit.Id, 0));
+        unit.TryApplyBuff(new BattleBuffInstance(blind, level: 1, remainingTurns: 1, unit.Id, 0));
 
         Assert.Equal(1, BattleSkillTargeting.ResolveEffectiveImpactSize(unit, unit.Character.ExternalSkills[0]));
         Assert.Equal(3, BattleSkillTargeting.ResolveEffectiveImpactSize(unit, unit.Character.ExternalSkills[1]));

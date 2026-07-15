@@ -115,7 +115,7 @@ public sealed class BattleAiTests
             mp: 11,
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var player = CreateUnit("player", team: 1, new GridPosition(2, 1));
-        enemy.ApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, player.Id, 1));
+        enemy.TryApplyBuff(new BattleBuffInstance(internalInjury, level: 2, remainingTurns: 3, player.Id, 1));
         enemy.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(6, 6), [enemy, player]);
         var engine = new BattleEngine();

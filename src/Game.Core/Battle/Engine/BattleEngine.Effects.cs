@@ -180,7 +180,7 @@ public sealed partial class BattleEngine
             }
 
             var buffTarget = buff.Buff.IsDebuff ? target : source;
-            _battleBuffResolver.Apply(state, source, buffTarget, buff.Buff, buff.Level, buff.Duration, buff.Id);
+            _battleBuffResolver.Apply(state, source, buffTarget, buff.Buff, buff.Level, buff.Duration);
         }
     }
 
@@ -295,8 +295,7 @@ public sealed partial class BattleEngine
                         target,
                         definition,
                         addBuff.Level,
-                        addBuff.Duration,
-                        addBuff.BuffId);
+                        addBuff.Duration);
                     break;
                 }
             }
@@ -326,7 +325,7 @@ public sealed partial class BattleEngine
         foreach (var buff in expired)
         {
             var source = state.TryGetUnit(buff.SourceUnitId) ?? unit;
-            _battleBuffResolver.NotifyRemoved(state, source, unit, [buff]);
+            _battleBuffResolver.NotifyRemoved(state, source, unit, buff);
         }
     }
 
