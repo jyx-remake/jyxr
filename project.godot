@@ -18,7 +18,7 @@ config/name="金庸群侠传XR"
 config/description="金庸群侠传x Godot C# 重置版"
 config/version="0.1"
 run/main_scene="res://scenes/ui/mod_launcher/mod_launcher_panel.tscn"
-config/features=PackedStringArray("4.6", "C#")
+config/features=PackedStringArray("4.7", "C#")
 run/max_fps=60
 config/icon="uid://cvs3nr6ssgkoh"
 
@@ -56,3 +56,4 @@ ui-ctrl={
 [internationalization]
 
 locale/include_text_server_data=true
+locale/include_text_server_data.extra_pck=false
