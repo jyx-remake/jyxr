@@ -1,15 +1,8 @@
 [gd_scene format=3 uid="uid://jl0mhh433a7u"]
 
-[ext_resource type="Script" uid="uid://c13ybqkrsoqmm" path="res://src/Game.Godot/Map/MapEntityButton.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://bbx4exb5nu8m6" path="res://src/Game.Godot/Map/LargeMapMarker.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cs1psp77hdbsp" path="res://assets/art/ui/town/noevent.png" id="2_noevent"]
 [ext_resource type="Texture2D" uid="uid://bdpoct3im0wgd" path="res://assets/art/misc/tanhao.png" id="3_notice"]
-[ext_resource type="PackedScene" path="res://scenes/map/map_entity_tooltip.tscn" id="4_tooltip"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_normal"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pressed"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hover"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_name"]
 font_size = 25
@@ -55,17 +48,13 @@ _data = {
 &"default": SubResource("Animation_notice_bounce")
 }
 
-[node name="MapEntitySlot" type="Button" unique_id=1781355164]
+[node name="MapEntitySlot" type="Control" unique_id=1781355164]
 custom_minimum_size = Vector2(80, 80)
 offset_right = 80.0
 offset_bottom = 80.0
-theme_override_styles/normal = SubResource("StyleBoxEmpty_normal")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_pressed")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_hover")
-flat = true
+mouse_filter = 2
 script = ExtResource("1_script")
 DefaultTexture = ExtResource("2_noevent")
-TooltipScene = ExtResource("4_tooltip")
 
 [node name="Avatar" type="TextureRect" parent="." unique_id=1516912145]
 unique_name_in_owner = true

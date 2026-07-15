@@ -13,9 +13,6 @@ public partial class MapScreen : Control
 	private bool _isHandlingInteraction;
 
 	[Export]
-	public PackedScene MapEntitySlotScene { get; set; } = null!;
-
-	[Export]
 	public PackedScene MapEntityBoxScene { get; set; } = null!;
 
 	private Control _mapBigTab = null!;
@@ -26,7 +23,6 @@ public partial class MapScreen : Control
 	private HBoxContainer _mapEntityList = null!;
 	private Control _bottomBox = null!;
 	private RichTextLabel _mapDescriptionLabel = null!;
-	private TextureRect _pinAvatar = null!;
 	private MapInteractionResult? _pendingInteraction;
 	private IDisposable? _clockChangedSubscription;
 	private bool _isStoryPresentationActive;
@@ -42,7 +38,6 @@ public partial class MapScreen : Control
 		_mapEntityList = GetNode<HBoxContainer>("%MapEntityList");
 		_bottomBox = GetNode<Control>("%BottomBox");
 		_mapDescriptionLabel = GetNode<RichTextLabel>("%MapDescriptionLabel");
-		_pinAvatar = GetNode<TextureRect>("%PinAvatar");
 		_clockChangedSubscription = Game.Session.Events.Subscribe<ClockChangedEvent>(OnClockChanged);
 
 		if (_pendingInitialResult is not null)
@@ -387,7 +382,8 @@ public partial class MapScreen : Control
 		{
 			if (_mapBigTab.Visible)
 			{
-				_largeMapViewportContainer.Hide();
+				_largeMapView.Hide();
+				_largeMapView.ResetInputState();
 			}
 
 			if (_mapSmallTab.Visible)
@@ -396,9 +392,6 @@ public partial class MapScreen : Control
 				_smallMapTimeDim.Hide();
 			}
 
-			_cloud.Hide();
-			_mapEntitySlots.Hide();
-			_mapPin.Hide();
 			_mapEntityList.Hide();
 			_bottomBox.Hide();
 			_cameraButton.Hide();
@@ -407,19 +400,15 @@ public partial class MapScreen : Control
 
 		if (_mapBigTab.Visible)
 		{
-			_largeMapViewportContainer.Show();
-			_cloud.Show();
-			_mapEntitySlots.Show();
-			_mapPin.Show();
+			_largeMapView.Show();
 			_mapEntityList.Hide();
 			_bottomBox.Hide();
 			_cameraButton.Hide();
 			return;
 		}
 
-		_cloud.Hide();
-		_mapEntitySlots.Hide();
-		_mapPin.Hide();
+		_largeMapView.Hide();
+		_largeMapView.ResetInputState();
 		_smallMapBackground.Visible = _smallMapBackground.Texture is not null;
 		ApplySmallMapTimeLighting();
 		_mapEntityList.Show();
