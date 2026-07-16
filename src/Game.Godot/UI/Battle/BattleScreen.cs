@@ -277,16 +277,19 @@ public partial class BattleScreen : Control
 
 	internal void BindState(BattleState state) => _state = state;
 
-	internal Task ShowBattleEndedAsync(bool isWin) =>
-		_settlementController.CompleteAsync(isWin, _state, _battleRequest);
+	internal Task ShowBattleEndedAsync(bool isWin)
+	{
+		_settingsController.Save();
+		return _settlementController.CompleteAsync(isWin, _state, _battleRequest);
+	}
 
 	internal Task<InventoryEntry?> ShowItemPanelAsync() =>
 		_actionPanelController.ShowItemPanelAsync();
 
 	internal void ShowStatusPanel() => _actionPanelController.ShowStatusPanel();
 
-	internal void SaveAndPresentAutoBattleSetting(bool enabled) =>
-		_settingsController.SaveAndPresentAutoBattle(enabled);
+	internal void PresentAutoBattleSetting(bool enabled) =>
+		_settingsController.PresentAutoBattle(enabled);
 
 	internal void RefreshGlobalControls()
 	{
@@ -329,6 +332,7 @@ public partial class BattleScreen : Control
 
 	private void RefreshGlobalButtonAvailability(BattleInteractionState interaction)
 	{
+		_speedUpButton.Disabled = interaction.Kind == BattleFlowStateKind.BattleEnded;
 		_autoBattleButton.Disabled = interaction.Kind == BattleFlowStateKind.BattleEnded ||
 			_flowContext?.IsSurrenderRequested == true;
 	}

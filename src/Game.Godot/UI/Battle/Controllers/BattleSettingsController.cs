@@ -34,14 +34,12 @@ internal sealed class BattleSettingsController(
     {
         _speedUpEnabled = !_speedUpEnabled;
         ApplyTimeScale();
-        Save();
         RefreshButtons();
         appendLog(_speedUpEnabled ? "已开启战斗加速。" : "已关闭战斗加速。");
     }
 
-    public void SaveAndPresentAutoBattle(bool enabled)
+    public void PresentAutoBattle(bool enabled)
     {
-        Save();
         appendLog(enabled ? "已开启自动战斗。" : "已关闭自动战斗。");
         if (isInsideTree())
         {
@@ -58,10 +56,7 @@ internal sealed class BattleSettingsController(
 
     public void RestoreTimeScale() => Engine.TimeScale = _initialTimeScale;
 
-    private void ApplyTimeScale() =>
-        Engine.TimeScale = _speedUpEnabled ? _initialTimeScale * _speedMultiplier : _initialTimeScale;
-
-    private void Save()
+    public void Save()
     {
         var settings = _store.LoadOrDefault();
         _store.Save(settings with
@@ -71,4 +66,7 @@ internal sealed class BattleSettingsController(
             BattleSpeedMultiplier = _speedMultiplier,
         });
     }
+
+    private void ApplyTimeScale() =>
+        Engine.TimeScale = _speedUpEnabled ? _initialTimeScale * _speedMultiplier : _initialTimeScale;
 }

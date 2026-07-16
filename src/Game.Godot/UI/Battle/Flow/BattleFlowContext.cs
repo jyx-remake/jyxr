@@ -58,7 +58,7 @@ internal sealed class BattleFlowContext : IBattleFlowContext
 	public void ToggleAutoBattle()
 	{
 		_autoBattleEnabled = !_autoBattleEnabled;
-		_screen.SaveAndPresentAutoBattleSetting(_autoBattleEnabled);
+		_screen.PresentAutoBattleSetting(_autoBattleEnabled);
 	}
 
 	public void RequestSurrender()

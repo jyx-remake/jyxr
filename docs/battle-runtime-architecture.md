@@ -74,7 +74,7 @@ Presentation 负责与 UI 引擎无关的交互状态和展示流程；Godot 负
 - `BattleActionPanelController`：被动渲染行动按钮、技能和物品/状态面板；
 - `BattleEventPresenter`：Fact、Cue 的宿主呈现；Trace 当前保留给按需诊断，不进入玩家表现；
 - `BattleSkillPresentationController`：技能与移动演出；
-- `BattleSettingsController`：速度、自动战斗和设置；
+- `BattleSettingsController`：速度、自动战斗和设置；按钮操作立即影响本场运行态，但只在战斗结束时统一持久化；
 - `BattleSettlementController`：carryover、奖励和结束 Task。
 
 Godot 画面采用动作级提交：`RenderInteraction` 只更新高亮与操作能力，
