@@ -35,7 +35,7 @@ public sealed class BattlePresenter
 			BattleFlowStateKind.BattleEnded => "战斗结束",
 			_ => string.Empty,
 		};
-		return new BattleHeaderView(title, subtitle);
+		return new BattleHeaderView(title, subtitle, state.Tick);
 	}
 
 	public IReadOnlyList<BattleCellView> CreateCells(
@@ -186,7 +186,7 @@ public sealed class BattlePresenter
 	}
 }
 
-public sealed record BattleHeaderView(string Title, string Subtitle);
+public sealed record BattleHeaderView(string Title, string Subtitle, long TimelineTick);
 
 public sealed record BattleCellView(
 	GridPosition Position,

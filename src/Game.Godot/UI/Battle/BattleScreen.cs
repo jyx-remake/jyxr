@@ -51,6 +51,7 @@ public partial class BattleScreen : Control
 	private TextureRect _background = null!;
 	private Label _titleLabel = null!;
 	private Label _subtitleLabel = null!;
+	private Label _timelineValueLabel = null!;
 	private BaseButton _surrenderButton = null!;
 	private BaseButton _speedUpButton = null!;
 	private CanvasItem _speedUpActive = null!;
@@ -76,6 +77,7 @@ public partial class BattleScreen : Control
 		_background = GetNode<TextureRect>("%Background");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
+		_timelineValueLabel = GetNode<Label>("%TimelineValueLabel");
 		_surrenderButton = GetNode<BaseButton>("%SurrenderButton");
 		_speedUpButton = GetNode<BaseButton>("%SpeedUpButton");
 		_speedUpActive = GetNode<CanvasItem>("%SpeedUpActive");
@@ -224,6 +226,7 @@ public partial class BattleScreen : Control
 		var header = _presenter.CreateHeader(_state, interaction.Kind);
 		_titleLabel.Text = _battleDefinition?.Name ?? header.Title;
 		_subtitleLabel.Text = header.Subtitle;
+		_timelineValueLabel.Text = header.TimelineTick.ToString();
 		_boardController.RenderInteraction(interaction);
 		_actionPanelController.RefreshActions(ResolveCapabilities(interaction));
 		RefreshGlobalButtonAvailability(interaction);
@@ -244,6 +247,7 @@ public partial class BattleScreen : Control
 		var header = _presenter.CreateHeader(_state, interaction.Kind);
 		_titleLabel.Text = _battleDefinition?.Name ?? header.Title;
 		_subtitleLabel.Text = header.Subtitle;
+		_timelineValueLabel.Text = header.TimelineTick.ToString();
 		_boardController.Commit(interaction);
 		_actionPanelController.Render(interaction);
 		_eventPresenter.Refresh();

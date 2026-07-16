@@ -119,6 +119,32 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 24
 
+[node name="TimelineCaptionLabel" type="Label" parent="TopClock" unique_id=306299844]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 754.0
+offset_top = 32.0
+offset_right = 826.0
+offset_bottom = 61.0
+theme_override_colors/font_color = Color(0.98, 0.94, 0.74, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "时序："
+
+[node name="TimelineValueLabel" type="Label" parent="TopClock" unique_id=306337323]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 819.0
+offset_top = 32.0
+offset_right = 894.0
+offset_bottom = 61.0
+theme_override_colors/font_color = Color(0.98, 0.94, 0.74, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "0"
+
 [node name="SurrenderButton" type="TextureButton" parent="." unique_id=1078304102]
 unique_name_in_owner = true
 layout_mode = 1
