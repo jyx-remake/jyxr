@@ -70,6 +70,11 @@ public sealed class BattleState
         return _units.FirstOrDefault(unit => string.Equals(unit.Id, unitId, StringComparison.Ordinal));
     }
 
+    public void AddUnit(BattleUnit unit)
+    {
+        _units.Add(unit);
+    }
+
     public BattleUnit? GetUnitAt(GridPosition position, string? ignoredUnitId = null) =>
         _units.FirstOrDefault(unit =>
             unit.IsAlive &&
@@ -152,4 +157,6 @@ public sealed class BattleState
             _disposed = true;
         }
     }
+
+
 }
