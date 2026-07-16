@@ -245,4 +245,12 @@ public sealed partial class BattleEngine
         return BattleCommandResult<BattleActionResult>.Succeeded(
             new BattleActionResult([unit.Id], []), command.Messages, "Action ended.");
     }
+
+    public SpecialSkillInstance SpecialSkillResolve(SkillInstance skill)
+    {
+        var resolvedSkill = _legendSkillResolver.Resolve(_legendSkillsProvider(), skill, _random);
+        var resolvedSpecialSkill = resolvedSkill as SpecialSkillInstance;
+
+        return resolvedSpecialSkill;
+    }
 }

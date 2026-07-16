@@ -2,6 +2,7 @@ using Game.Core.Battle;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
+using Game.Application;
 using GameRoot = Game.Godot.Game;
 
 namespace Game.Godot.UI.Battle;
@@ -118,6 +119,7 @@ internal sealed class BattleFlowOrchestrator
         }
 
         var result = _engine.CastSkill(State, actingUnit.Id, skill, target);
+
         if (!result.Success)
         {
             _screen.AppendResult(result);
@@ -125,8 +127,19 @@ internal sealed class BattleFlowOrchestrator
             return;
         }
 
+
         _screen.ShowUnitActing();
         await _screen.PlaySkillAsync(actingUnit, skill, result);
+        //召唤人物
+        if (skill.SkillKind == SkillKind.Special)
+        {
+            var SpecialSkill = _engine.SpecialSkillResolve(skill);
+            //Game.Logger.Info($"召唤: {SpecialSkill.Definition.BattleCombatantId}");
+            if (SpecialSkill.Definition.BattleCombatantIds != null && result.Value !=null)
+            {
+                Game.BattleService.SpecialSkill_CreateBattleCombatant(actingUnit, State, SpecialSkill.Definition.BattleCombatantIds, result.Value.ImpactedPositions);
+            }
+        }
         await ContinueAfterResolvedPlayerActionAsync();
     }
 

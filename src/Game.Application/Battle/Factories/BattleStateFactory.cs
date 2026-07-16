@@ -235,6 +235,97 @@ internal sealed class BattleStateFactory
         };
     }
 
+    private CharacterInstance? BattleCombatantResolver(
+BattleState state,
+string CharacterId,
+EquipmentInstanceFactory tempFactory)
+    {
+        var definition = ContentRepository.GetCharacter(CharacterId);
+        return CharacterMapper.CreateInitial(
+            $"battle_{state.Units.Count + 1}_{CharacterId}",
+            definition,
+            tempFactory);
+
+    }
+    public void SpecialSkill_CreateBattleCombatant(BattleUnit actingUnit, BattleState state, List<string> characterIds, IReadOnlyList<GridPosition> ImpactedPositions)
+    {
+
+        Queue<GridPosition> queue = new Queue<GridPosition>(ImpactedPositions);
+
+        foreach (string id in characterIds)
+        {
+
+            if (queue.Count == 0)
+            {
+                Console.WriteLine($"位置不足，无法创建角色 {id}");
+                break;
+            }
+            GridPosition gridPosition = queue.Dequeue();
+
+
+            var combatant = new BattleJoinCombatant
+            {
+                CharacterId = id,
+                Team = actingUnit.Team,
+                Position = gridPosition,
+                Facing = actingUnit.Facing == BattleFacing.Left ? 0 : 1
+            };
+
+            CreateBattleCombatant(state, combatant);
+
+        }
+
+
+    }
+
+
+    //public BattleState CreateBattleCombatant2(BattleState state)
+    //{
+
+
+    //    var combatant = new BattleJoinCombatant
+    //    {
+    //        CharacterId = "小昭",
+    //        Team = 2,
+    //        Position = new GridPosition(1, 1),
+    //        Facing = 0
+    //    };
+
+    //    return CreateBattleCombatant(state, combatant);
+
+    //}
+
+
+
+    public BattleState CreateBattleCombatant(BattleState state, BattleJoinCombatant combatant)
+    {
+
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(combatant.CharacterId);
+        var tempFactory = new EquipmentInstanceFactory();
+
+        var character = BattleCombatantResolver(state, combatant.CharacterId, tempFactory);
+        var units = new List<BattleUnit>();
+
+
+        foreach (var unit in state.Units)
+        {
+            units.Add(unit);
+        }
+
+
+        state.AddUnit(CreateUnit(
+    $"participant_{state.Units.Count + 1}_{combatant.CharacterId}",
+    character,
+    combatant.Team,
+    combatant.Position,
+    combatant.Facing));
+
+        return state;
+
+    }
+
+
     private CharacterInstance? ResolvePartyCharacter(string characterId) =>
         State.Party.TryGetCharacter(characterId, out var character) ? character : null;
 

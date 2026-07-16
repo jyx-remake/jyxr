@@ -1,4 +1,5 @@
 using Game.Core.Battle;
+using Game.Core.Model;
 
 namespace Game.Application;
 
@@ -20,6 +21,13 @@ public sealed class BattleService
 
     public BattleState BuildBattleState(SpecialBattleRequest request) =>
         _stateFactory.BuildBattleState(request);
+
+
+    public void SpecialSkill_CreateBattleCombatant(BattleUnit actingUnit, BattleState state, List<string> characterIds, IReadOnlyList<GridPosition> ImpactedPositions)
+    {
+        _stateFactory.SpecialSkill_CreateBattleCombatant( actingUnit,  state,characterIds,ImpactedPositions);
+     }
+
 
     public OrdinaryBattleVictorySettlement PreviewVictorySettlement(
         BattleState state,
