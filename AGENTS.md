@@ -8,7 +8,7 @@
 
 - 这是一个基于 `.NET 10` 与 `Godot 4.6` 的 2D 半即时制战棋 RPG 内核原型。
 - 仓库根目录就是 Godot 工程根。
-- 根目录 `engine-free-rpg.csproj` 是当前唯一 Godot 宿主程序集项目，只编译 `src/Game.Godot/**/*.cs`，并引用 `Game.Content` 与 `Game.Application`。
+- 根目录 `engine-free-rpg.csproj` 是当前唯一 Godot 宿主程序集项目，只编译 `src/Game.Godot/**/*.cs`，并引用 `Game.Content`、`Game.Application` 与 `Game.Presentation`。
 - 当前重点是：
   - 角色与技能规则内核
   - 轻量 affix 投影
@@ -18,6 +18,7 @@
   - 地图进入与点位交互
   - 持久化模型
   - 应用层会话与会话事件
+  - 与 UI 引擎无关的展示流程
   - Godot 宿主层、HUD、地图、背包、商店、战斗 UI、剧情 UI、音频接线
 - 当前已接入第一版轻量战斗内核与 Godot 战斗界面；正式战场系统后续仍按 `docs/battlefield-system-design.md` 继续重建。
 
@@ -45,6 +46,9 @@
 - `src/Game.Application`
   - 应用态会话、全局档案、存读档、角色服务、背包服务、物品使用服务、商店服务、地图服务、剧情服务、剧情命令行、诊断日志抽象、会话事件。
   - 当前未提交的 MOD 改造新增 `src/Game.Application/Mods`，包含 `ProjectDataRoot`、`ModManifest`、`ModContext`、`ModRegistry`、`ModStoragePaths`、`LauncherSettingsRecord`。
+- `src/Game.Presentation`
+  - 普通 .NET 展示层，只表达与 UI 引擎无关的交互状态、UI intent、展示流程和宿主能力抽象。
+  - 当前承载战斗 GoF State 流程与 `IBattleFlowContext`，只引用 `Game.Core`，不引用 Godot。
 - `src/Game.Godot`
   - Godot 宿主适配层源码，由根目录 `engine-free-rpg.csproj` 编译。
   - 当前还包含 MOD runtime bootstrap、本地存档/档案持久化适配 `src/Game.Godot/Persistence`、主菜单、失败界面、储物箱 UI 和战斗 UI。
@@ -66,6 +70,11 @@
 - `Game.Application`
   - 负责用例级服务和应用态会话。
   - 服务显式接收 `GameSession`，业务代码通过私有转发属性访问 `State`、`ContentRepository` 或其他服务。
+- `Game.Presentation`
+  - 负责“展示什么、当前允许哪些交互、展示流程如何转换”，不负责领域规则或应用用例。
+  - 不依赖 Godot 节点、信号、资源、音频或 Tween；当前只依赖 `Game.Core`。
+  - 现有各层中纯展示用途的 Presenter、ViewModel 和文案格式化可以逐步迁入；规则计算、应用用例、序列化协议与资源路径解析不要迁入。
+  - `Game.Tests` 可以直接测试该层，不应为了展示流程测试引用 Godot 宿主项目或 `GodotSharp`。
 - `Game.Godot`
   - 薄宿主层，负责 Godot 节点、场景、资源、音频、UI 与宿主表现。
   - Godot 侧业务日志统一经 `Game.Logger` 输出；运行期代码不要直接调用 `GD.Print` / `GD.PushError`。
@@ -316,7 +325,8 @@
 - 技能当前复用角色已有技能实例，按资源消耗、冷却、射程、影响范围、伤害和 Buff 处理。
 - 战斗内物品当前支持消耗品效果，并通过 `CanUseItemOnAlly` trait 扩展队友目标。
 - `BattleEvent` 输出结构化战斗事件，Godot 战斗 UI 根据事件播放飘字与日志。
-- `src/Game.Godot/UI/Battle` 当前提供战斗界面、棋盘、单位视图、技能栏、物品面板、飘字和 UI 状态机。
+- `src/Game.Presentation/Battle` 当前提供战斗 UI intent、交互能力、状态机与各流程状态。
+- `src/Game.Godot/UI/Battle` 当前提供战斗界面、棋盘、单位视图、技能栏、物品面板、飘字、演出以及 `IBattleFlowContext` 的 Godot 适配。
 - 地图 `battle` 事件和剧情 battle 命令当前会先打开出战选择，再进入 `BattleScreen`，不再使用胜负确认弹窗模拟。
 - `assets/animation`、`assets/art/atlas`、`assets/art/atlas_texture` 保存已导入的 legacy 战斗单位/技能动画与图集资源。
 - `AssetResolver` 当前支持从 `assets/animation/combatant` 与 `assets/animation/skill` 加载角色战斗动画库和技能动画库。

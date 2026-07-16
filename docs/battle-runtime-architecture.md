@@ -5,15 +5,13 @@
 依赖固定为：
 
 ```text
-Game.Core battle runtime
-        ↓
-Game.Application battle use cases
-        ↓
-Game.Godot battle presentation
+Game.Godot battle host
+    ├── Game.Application battle use cases ──→ Game.Core battle runtime
+    └── Game.Presentation battle UI flow  ──→ Game.Core battle runtime
 ```
 
-Core 不依赖 Application 或 Godot。Application 负责根据 request 建立战斗、结算和 carryover；
-Godot 只调用命令、播放消息并维护界面状态。
+Core 不依赖 Application、Presentation 或 Godot。Application 负责根据 request 建立战斗、结算和 carryover；
+Presentation 负责与 UI 引擎无关的交互状态和展示流程；Godot 负责输入、控件、资源和演出适配。
 
 ## Core
 
@@ -57,16 +55,32 @@ Godot 只调用命令、播放消息并维护界面状态。
 
 不保留字符串/数组构建重载或测试专用公开入口。
 
+## Presentation
+
+`Game.Presentation` 是普通 .NET 程序集，只依赖 `Game.Core`。战斗流程包括：
+
+- `BattleFlowStateMachine`：串行分发标准化 UI intent、校验状态转换，并丢弃来源状态已经失效的排队输入；
+- 各 `IBattleFlowState`：负责进入/退出、允许的后继状态、当前交互能力、规则操作和后续转换；
+- `IBattleFlowContext`：声明规则命令、AI、演出、结算和视图提交所需的宿主能力。
+
+这里不引用 Godot 节点、信号、资源或 Tween。普通 .NET 测试直接引用该程序集。
+
 ## Godot
 
 `BattleScreen` 保留为场景根脚本和控制器装配点。普通类分别负责：
 
-- `BattleBoardController`：棋盘交互与目标高亮；
-- `BattleActionPanelController`：行动按钮、技能和物品/状态面板；
+- `BattleFlowContext`：实现 Presentation 定义的宿主能力，集中适配规则命令、AI、演出、结算和视图提交；
+- `BattleBoardController`：被动渲染棋盘单位与目标高亮；
+- `BattleActionPanelController`：被动渲染行动按钮、技能和物品/状态面板；
 - `BattleEventPresenter`：Fact、Cue 的宿主呈现；Trace 当前保留给按需诊断，不进入玩家表现；
 - `BattleSkillPresentationController`：技能与移动演出；
 - `BattleSettingsController`：速度、自动战斗和设置；
 - `BattleSettlementController`：carryover、奖励和结束 Task。
 
-`BattleFlowOrchestrator` 只负责命令调用、时间线循环和自动回合。胜负由 Core evaluator 输出；
-Core 的平局目前由外层按我方失败处理，投降仍是宿主强制失败。
+Godot 画面采用动作级提交：`RenderInteraction` 只更新高亮与操作能力，
+`CommitBattleStateToView` 才把规则态中的单位、血条、Buff、位置和败北状态提交到棋盘。
+技能或移动进入 `PresentingActionState` 时先清除交互高亮，规则可以即时结算；演出完成后再提交最终状态，
+避免败北单位在攻击动画结束前消失。玩家与 AI 动作共用同一演出和提交边界。
+
+胜负由 Core evaluator 输出；Core 的平局目前由外层按我方失败处理。演出期间投降会立即登记并锁定后续命令，
+但等待当前动作演出完成后再进入失败结算。

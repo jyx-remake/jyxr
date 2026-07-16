@@ -3,6 +3,7 @@ using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
+using Game.Presentation.Battle;
 using Game.Application;
 using Game.Godot.Assets;
 using Game.Godot.Audio;
@@ -29,15 +30,17 @@ public partial class BattleScreen : Control
 	public PackedScene BattleStatusPanelScene { get; set; } = null!;
 
 	private BattlePresenter _presenter = null!;
-	private readonly BattleUiStateMachine _uiState = new();
 
 	private BattleDefinition? _battleDefinition;
 	private SpecialBattleRequest? _battleRequest;
 	private BattleState? _state;
-	private BattleFlowOrchestrator? _orchestrator;
+	private BattleFlowContext? _flowContext;
+	private BattleFlowStateMachine? _flow;
+	private BattleInteractionState? _interaction;
 	private bool _isConfigured;
 	private Task _startTask = Task.CompletedTask;
-	private bool _isResolvingSkillPresentation;
+	private readonly TaskCompletionSource<bool> _flowFailure =
+		new(TaskCreationOptions.RunContinuationsAsynchronously);
 	private BattleSettlementController _settlementController = null!;
 	private BattleSettingsController _settingsController = null!;
 	private BattleEventPresenter _eventPresenter = null!;
@@ -65,6 +68,7 @@ public partial class BattleScreen : Control
 	private RichTextLabel _logLabel = null!;
 	private Control _overlayRoot = null!;
 	private int PlayerTeam => GameRoot.Config.BattlePlayerTeam;
+	internal BattlePresenter Presenter => _presenter;
 
 	public override void _Ready()
 	{
@@ -93,10 +97,7 @@ public partial class BattleScreen : Control
 			_boardGrid,
 			_overlayRoot,
 			BattleLegendOverlayScene,
-			() => _eventPresenter,
-			value => _isResolvingSkillPresentation = value,
-			() => _actionPanelController.RefreshActions(),
-			() => RefreshAll());
+			() => _eventPresenter);
 		_eventPresenter = new BattleEventPresenter(
 			_boardGrid,
 			_logLabel,
@@ -105,20 +106,15 @@ public partial class BattleScreen : Control
 		_boardController = new BattleBoardController(
 			_boardGrid,
 			_presenter,
-			_uiState,
 			PlayerTeam,
 			() => _state,
-			() => _orchestrator,
-			() => _isResolvingSkillPresentation);
+			() => _flowContext?.GetReachablePositions() ?? new Dictionary<GridPosition, int>());
 		_actionPanelController = new BattleActionPanelController(
 			_presenter,
-			_uiState,
 			PlayerTeam,
 			() => _state,
-			() => _orchestrator,
-			() => _isResolvingSkillPresentation,
-			IsAutoBattleEnabled,
-			refreshList => RefreshAll(refreshList),
+			() => _flowContext?.Engine,
+			DispatchIntent,
 			new BattleActionPanelView(
 				_selectedSkillBox,
 				_moveButton,
@@ -138,24 +134,21 @@ public partial class BattleScreen : Control
 			_boardGrid,
 			_speedUpActive,
 			_autoBattleActive,
-			() => _orchestrator,
+			() => _flowContext?.IsAutoBattleEnabled == true,
+			enabled => _flowContext?.SetAutoBattleEnabled(enabled),
 			IsInsideTree,
-			() => _isResolvingSkillPresentation,
-			() => _actionPanelController.RefreshActions(),
 			AppendLog);
 		_settlementController = new BattleSettlementController(
 			this,
 			BattleSettlementPanelScene,
 			_overlayRoot,
 			_presenter,
-			_uiState.EndBattle,
-			AppendLog,
-			() => RefreshAll());
-		_boardGrid.CellActivated += _boardController.OnCellActivated;
-		_boardGrid.HoveredCellChanged += _boardController.OnHoveredCellChanged;
-		_surrenderButton.Pressed += SurrenderBattle;
+			AppendLog);
+		_boardGrid.CellActivated += position => DispatchIntent(new BattleUiIntent.ActivateCell(position));
+		_boardGrid.HoveredCellChanged += position => DispatchIntent(new BattleUiIntent.HoverCell(position));
+		_boardGrid.BackRequested += () => DispatchIntent(new BattleUiIntent.Back());
 		_speedUpButton.Pressed += _settingsController.ToggleSpeedUp;
-		_autoBattleButton.Pressed += async () => await _settingsController.ToggleAutoBattleAsync();
+		_autoBattleButton.Pressed += () => DispatchIntent(new BattleUiIntent.ToggleAutoBattle());
 		_actionPanelController.BindButtons();
 		_settingsController.RefreshButtons();
 
@@ -171,6 +164,8 @@ public partial class BattleScreen : Control
 		try
 		{
 			await _startTask.WaitAsync(cancellationToken);
+			var completed = await Task.WhenAny(completionTask, _flowFailure.Task).WaitAsync(cancellationToken);
+			await completed;
 			return await completionTask;
 		}
 		catch
@@ -197,13 +192,13 @@ public partial class BattleScreen : Control
 
 		ApplyBattlePresentation(_battleDefinition);
 		_state = GameRoot.BattleService.BuildBattleState(_battleRequest);
-		_orchestrator = new BattleFlowOrchestrator(this, _state);
+		_flowContext = new BattleFlowContext(this, _state);
+		_flow = new BattleFlowStateMachine(_flowContext);
+		_flow.BackgroundTaskFailed += exception => _flowFailure.TrySetException(exception);
 		_settingsController.Load();
 		_eventPresenter.Clear();
 		AppendLog($"战斗开始：{_battleDefinition.Name}");
-		_uiState.WaitTimeline();
-		RefreshAll();
-		await _orchestrator.StartAsync();
+		await _flow.StartAsync();
 	}
 
 	private void ApplyBattlePresentation(BattleDefinition battle)
@@ -218,31 +213,43 @@ public partial class BattleScreen : Control
 		GameRoot.Audio.PlayBgm(GameRoot.Config.RandomBattleMusics);
 	}
 
-	internal void RefreshAll(bool refreshList = true)
+	internal void RenderInteraction(BattleInteractionState interaction)
 	{
 		if (_state is null || !IsInsideTree())
 		{
 			return;
 		}
 
-		var header = _presenter.CreateHeader(_state, _uiState.Mode);
+		_interaction = interaction;
+		var header = _presenter.CreateHeader(_state, interaction.Kind);
 		_titleLabel.Text = _battleDefinition?.Name ?? header.Title;
 		_subtitleLabel.Text = header.Subtitle;
-
-		RefreshBoard();
-		_actionPanelController.RefreshSelectedSkill();
-		_actionPanelController.RefreshActions();
-		if (refreshList)
-		{
-			_actionPanelController.RefreshList();
-		}
-
-		_actionPanelController.RefreshAvatar();
-		_eventPresenter.Refresh();
+		_boardController.RenderInteraction(interaction);
+		_actionPanelController.RefreshActions(ResolveCapabilities(interaction));
+		RefreshGlobalButtonAvailability(interaction);
 		_settingsController.RefreshButtons();
 	}
 
-	private void RefreshBoard() => _boardController.Refresh();
+	internal void BeginActionPresentation(BattleInteractionState interaction) =>
+		RenderInteraction(interaction);
+
+	internal void CommitBattleStateToView(BattleInteractionState interaction)
+	{
+		if (_state is null || !IsInsideTree())
+		{
+			return;
+		}
+
+		_interaction = interaction;
+		var header = _presenter.CreateHeader(_state, interaction.Kind);
+		_titleLabel.Text = _battleDefinition?.Name ?? header.Title;
+		_subtitleLabel.Text = header.Subtitle;
+		_boardController.Commit(interaction);
+		_actionPanelController.Render(interaction);
+		_eventPresenter.Refresh();
+		RefreshGlobalButtonAvailability(interaction);
+		_settingsController.RefreshButtons();
+	}
 
 	public void Configure(SpecialBattleRequest request)
 	{
@@ -267,55 +274,37 @@ public partial class BattleScreen : Control
 		_eventPresenter.AppendMessages(messages);
 
 	internal void AppendLog(string text) => _eventPresenter.AppendLog(text);
-	private async void SurrenderBattle()
-	{
-		if (_uiState.Mode == BattleUiMode.BattleEnded || _orchestrator is null)
-		{
-			return;
-		}
 
-		await _orchestrator.SurrenderAsync();
-		RefreshAll();
-	}
-
-	internal void BindState(BattleState state)
-	{
-		_state = state;
-		RefreshAll();
-	}
-
-	internal void ShowWaitingTimeline()
-	{
-		_uiState.WaitTimeline();
-		RefreshAll();
-	}
-
-	internal void ShowPlayerTurn(BattleUnit actingUnit)
-	{
-		_uiState.SelectMove();
-		AppendLog($"轮到 {actingUnit.Character.Name} 行动。");
-		RefreshAll();
-	}
-
-	internal void ShowPlayerPostMove(BattleUnit actingUnit)
-	{
-		_actionPanelController.SelectDefaultPostMoveMode(actingUnit);
-		RefreshAll();
-	}
-
-	internal void ShowUnitActing()
-	{
-		_uiState.ActUnit();
-		RefreshAll();
-	}
+	internal void BindState(BattleState state) => _state = state;
 
 	internal Task ShowBattleEndedAsync(bool isWin) =>
 		_settlementController.CompleteAsync(isWin, _state, _battleRequest);
+
+	internal Task<InventoryEntry?> ShowItemPanelAsync() =>
+		_actionPanelController.ShowItemPanelAsync();
+
+	internal void ShowStatusPanel() => _actionPanelController.ShowStatusPanel();
+
+	internal void SaveAndPresentAutoBattleSetting(bool enabled) =>
+		_settingsController.SaveAndPresentAutoBattle(enabled);
+
+	internal void RefreshGlobalControls()
+	{
+		if (_interaction is not null)
+		{
+			_actionPanelController.RefreshActions(ResolveCapabilities(_interaction));
+			RefreshGlobalButtonAvailability(_interaction);
+			_settingsController.RefreshButtons();
+		}
+	}
 
 	internal void ApplyActingUnitFacing(BattleUnit actingUnit) => _boardGrid.ApplyUnitFacing(actingUnit.Id, actingUnit.Facing);
 
 	internal Task PlayMoveAsync(BattleUnit actingUnit, IReadOnlyList<GridPosition> movementPath) =>
 		_skillPresentationController.PlayMoveAsync(actingUnit, movementPath);
+
+	internal Task PlayMoveRollbackAsync(BattleUnit actingUnit) =>
+		_skillPresentationController.PlayMoveRollbackAsync(actingUnit);
 
 	internal Task PlaySkillAsync(
 		BattleUnit actingUnit,
@@ -323,6 +312,45 @@ public partial class BattleScreen : Control
 		BattleCommandResult<BattleActionResult> result) =>
 		_skillPresentationController.PlaySkillAsync(actingUnit, skill, result);
 
-	private bool IsAutoBattleEnabled() => _orchestrator?.IsAutoBattleEnabled ?? false;
+	private BattleUiCapabilities ResolveCapabilities(BattleInteractionState interaction) =>
+		_flowContext?.IsSurrenderRequested == true
+			? interaction.Capabilities with
+			{
+				CanActivateBoard = false,
+				CanSelectMove = false,
+				CanSelectSkill = false,
+				CanOpenItem = false,
+				CanRest = false,
+				CanEndAction = false,
+				CanOpenStatus = false,
+				CanSurrender = false,
+			}
+			: interaction.Capabilities;
+
+	private void RefreshGlobalButtonAvailability(BattleInteractionState interaction)
+	{
+		_autoBattleButton.Disabled = interaction.Kind == BattleFlowStateKind.BattleEnded ||
+			_flowContext?.IsSurrenderRequested == true;
+	}
+
+	private void DispatchIntent(BattleUiIntent intent)
+	{
+		if (_flow is not null)
+		{
+			_ = ObserveIntentAsync(_flow.DispatchAsync(intent));
+		}
+	}
+
+	private async Task ObserveIntentAsync(Task task)
+	{
+		try
+		{
+			await task;
+		}
+		catch (Exception exception)
+		{
+			_flowFailure.TrySetException(exception);
+		}
+	}
 
 }

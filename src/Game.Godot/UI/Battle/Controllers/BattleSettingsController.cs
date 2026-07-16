@@ -7,10 +7,9 @@ internal sealed class BattleSettingsController(
     BattleBoardView board,
     CanvasItem speedUpActive,
     CanvasItem autoBattleActive,
-    Func<BattleFlowOrchestrator?> orchestratorProvider,
+    Func<bool> isAutoBattleEnabled,
+    Action<bool> setAutoBattleEnabled,
     Func<bool> isInsideTree,
-    Func<bool> isResolvingPresentation,
-    Action refreshActions,
     Action<string> appendLog)
 {
     private const int MinSpeedMultiplier = 1;
@@ -26,7 +25,7 @@ internal sealed class BattleSettingsController(
         _speedUpEnabled = settings.BattleSpeedUp;
         _speedMultiplier = Math.Clamp(settings.BattleSpeedMultiplier, MinSpeedMultiplier, MaxSpeedMultiplier);
         board.ShowBaseBoard = settings.ShowBattleBoard;
-        orchestratorProvider()?.SetAutoBattleEnabled(settings.AutoBattle);
+        setAutoBattleEnabled(settings.AutoBattle);
         ApplyTimeScale();
         RefreshButtons();
     }
@@ -40,29 +39,21 @@ internal sealed class BattleSettingsController(
         appendLog(_speedUpEnabled ? "已开启战斗加速。" : "已关闭战斗加速。");
     }
 
-    public Task ToggleAutoBattleAsync()
+    public void SaveAndPresentAutoBattle(bool enabled)
     {
-        var orchestrator = orchestratorProvider();
-        if (orchestrator is null) return Task.CompletedTask;
-
-        var enabled = !orchestrator.IsAutoBattleEnabled;
-        orchestrator.SetAutoBattleEnabled(enabled);
         Save();
         appendLog(enabled ? "已开启自动战斗。" : "已关闭自动战斗。");
         if (isInsideTree())
         {
-            refreshActions();
             RefreshButtons();
         }
-        if (enabled && !isResolvingPresentation()) _ = orchestrator.ContinueBattleFlowAsync();
-        return Task.CompletedTask;
     }
 
     public void RefreshButtons()
     {
         if (!isInsideTree()) return;
         speedUpActive.Visible = _speedUpEnabled;
-        autoBattleActive.Visible = orchestratorProvider()?.IsAutoBattleEnabled == true;
+        autoBattleActive.Visible = isAutoBattleEnabled();
     }
 
     public void RestoreTimeScale() => Engine.TimeScale = _initialTimeScale;
@@ -75,7 +66,7 @@ internal sealed class BattleSettingsController(
         var settings = _store.LoadOrDefault();
         _store.Save(settings with
         {
-            AutoBattle = orchestratorProvider()?.IsAutoBattleEnabled == true,
+            AutoBattle = isAutoBattleEnabled(),
             BattleSpeedUp = _speedUpEnabled,
             BattleSpeedMultiplier = _speedMultiplier,
         });

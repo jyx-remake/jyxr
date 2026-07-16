@@ -10,9 +10,7 @@ internal sealed class BattleSettlementController(
     PackedScene settlementPanelScene,
     Control overlayRoot,
     BattlePresenter presenter,
-    Action endUiState,
-    Action<string> appendLog,
-    Action refresh)
+    Action<string> appendLog)
 {
     private readonly TaskCompletionSource<bool> _completion =
         new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -32,7 +30,6 @@ internal sealed class BattleSettlementController(
         _isEnding = true;
         try
         {
-            endUiState();
             appendLog(isWin ? "战斗胜利。" : "战斗失败。");
 
             OrdinaryBattleVictorySettlement? settlement = null;
@@ -46,7 +43,6 @@ internal sealed class BattleSettlementController(
                 }
             }
 
-            refresh();
             await ShowPanelAsync(isWin, settlement);
             _completion.TrySetResult(isWin);
         }

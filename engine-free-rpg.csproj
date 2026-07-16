@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="src\Game.Content\Game.Content.csproj" />
     <ProjectReference Include="src\Game.Application\Game.Application.csproj" />
+    <ProjectReference Include="src\Game.Presentation\Game.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

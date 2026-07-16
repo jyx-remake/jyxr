@@ -1,4 +1,5 @@
 using Game.Core.Battle;
+using Game.Presentation.Battle;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
 using Game.Application;
@@ -14,7 +15,7 @@ public sealed class BattlePresenter
 		_playerTeam = playerTeam;
 	}
 
-	public BattleHeaderView CreateHeader(BattleState state, BattleUiMode mode)
+	internal BattleHeaderView CreateHeader(BattleState state, BattleFlowStateKind mode)
 	{
 		ArgumentNullException.ThrowIfNull(state);
 		var actingUnit = TryGetActingUnit(state);
@@ -23,14 +24,15 @@ public sealed class BattlePresenter
 			: $"行动：{actingUnit.Character.Name}";
 		var subtitle = mode switch
 		{
-			BattleUiMode.WaitingTimeline => "等待行动点推进",
-			BattleUiMode.UnitActing => "选择行动",
-			BattleUiMode.SelectingMove => "选择移动目标",
-			BattleUiMode.SelectingSkill => "选择技能",
-			BattleUiMode.SelectingSkillTarget => "选择技能目标",
-			BattleUiMode.SelectingItem => "选择物品",
-			BattleUiMode.SelectingItemTarget => "选择物品目标",
-			BattleUiMode.BattleEnded => "战斗结束",
+			BattleFlowStateKind.WaitingTimeline => "等待行动点推进",
+			BattleFlowStateKind.UnitActing => "选择行动",
+			BattleFlowStateKind.SelectingMove => "选择移动目标",
+			BattleFlowStateKind.SelectingSkillTarget => "选择技能目标",
+			BattleFlowStateKind.SelectingItem => "选择物品",
+			BattleFlowStateKind.SelectingItemTarget => "选择物品目标",
+			BattleFlowStateKind.PresentingAction => "行动中",
+			BattleFlowStateKind.AutomatedTurn => "自动行动",
+			BattleFlowStateKind.BattleEnded => "战斗结束",
 			_ => string.Empty,
 		};
 		return new BattleHeaderView(title, subtitle);

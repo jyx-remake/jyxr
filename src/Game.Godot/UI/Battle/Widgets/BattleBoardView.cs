@@ -43,6 +43,8 @@ public partial class BattleBoardView : Control
 
 	public event Action<GridPosition>? CellActivated;
 
+	public event Action? BackRequested;
+
 	public event Action<GridPosition?>? HoveredCellChanged;
 
 	public bool ShowBaseBoard
@@ -120,10 +122,8 @@ public partial class BattleBoardView : Control
 
 			if (unitView.Position.DistanceSquaredTo(targetPosition) > 1f)
 			{
-				unitView.PlayMoveLoop();
-				var tween = CreateTween();
-				tween.TweenProperty(unitView, "position", targetPosition, 0.18d);
-				tween.Finished += unitView.PlayIdle;
+				unitView.Position = targetPosition;
+				unitView.PlayIdle();
 			}
 			else
 			{
@@ -356,6 +356,10 @@ public partial class BattleBoardView : Control
 				{
 					CellActivated?.Invoke(position);
 				}
+				break;
+			case InputEventMouseButton { ButtonIndex: MouseButton.Right, Pressed: false } button:
+				UpdateHoveredCell(button.Position);
+				BackRequested?.Invoke();
 				break;
 		}
 	}

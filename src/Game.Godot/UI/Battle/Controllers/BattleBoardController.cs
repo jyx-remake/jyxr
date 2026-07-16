@@ -1,4 +1,5 @@
 using Game.Core.Battle;
+using Game.Presentation.Battle;
 using Game.Core.Affix;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
@@ -10,11 +11,9 @@ namespace Game.Godot.UI.Battle;
 internal sealed class BattleBoardController(
     BattleBoardView board,
     BattlePresenter presenter,
-    BattleUiStateMachine uiState,
     int playerTeam,
     Func<BattleState?> stateProvider,
-    Func<BattleFlowOrchestrator?> orchestratorProvider,
-    Func<bool> isResolvingPresentation)
+    Func<IReadOnlyDictionary<GridPosition, int>> reachablePositionsProvider)
 {
     private const int CellWidth = 144;
     private const int CellHeight = 144;
@@ -26,21 +25,20 @@ internal sealed class BattleBoardController(
     private static readonly Color TargetColor = new(1f, 0.95f, 0.55f, 0.8f);
     private static readonly Color PossibleImpactColor = new(0.2f, 0.2f, 0.2f, 0.5f);
     private static readonly Color ActualImpactColor = new(1f, 0.3f, 0.2f, 1f);
-    private GridPosition? _hoveredPosition;
-
-    public void Refresh()
+    public void Commit(BattleInteractionState interaction)
     {
-        if (uiState.Mode != BattleUiMode.SelectingSkillTarget) _hoveredPosition = null;
         var state = stateProvider();
         if (state is null) return;
 
-        RefreshGrid(state);
+        RenderInteraction(interaction);
         RefreshUnits(state);
     }
 
-    private void RefreshGrid(BattleState state)
+    public void RenderInteraction(BattleInteractionState interaction)
     {
-        var highlights = ResolveHighlights(state);
+        var state = stateProvider();
+        if (state is null) return;
+        var highlights = ResolveHighlights(state, interaction);
         var cells = presenter.CreateCells(state)
             .Select(cell => new BattleBoardCellVisual(
                 cell.Position,
@@ -76,56 +74,26 @@ internal sealed class BattleBoardController(
             .ToArray());
     }
 
-    public async void OnCellActivated(GridPosition position)
-    {
-        var state = stateProvider();
-        var orchestrator = orchestratorProvider();
-        if (state is null || orchestrator is null || isResolvingPresentation()) return;
-        if (BattlePresenter.TryGetActingUnit(state) is null) return;
-
-        switch (uiState.Mode)
-        {
-            case BattleUiMode.SelectingMove:
-                await orchestrator.TryMoveAsync(position);
-                break;
-            case BattleUiMode.SelectingSkillTarget when uiState.SelectedSkill is { } skill:
-                await orchestrator.TryCastSkillAsync(skill, position);
-                break;
-            case BattleUiMode.SelectingItemTarget when uiState.SelectedItem is { } item:
-                if (state.GetUnitAt(position) is { } target)
-                    await orchestrator.TryUseItemAsync(item, target.Id);
-                break;
-        }
-    }
-
-    public void OnHoveredCellChanged(GridPosition? position)
-    {
-        if (isResolvingPresentation()) return;
-
-        var next = uiState.Mode == BattleUiMode.SelectingSkillTarget ? position : null;
-        if (_hoveredPosition == next) return;
-        _hoveredPosition = next;
-
-        var state = stateProvider();
-        if (state is not null) RefreshGrid(state);
-    }
-
-    private Highlights ResolveHighlights(BattleState state)
+    private Highlights ResolveHighlights(BattleState state, BattleInteractionState interaction)
     {
         var actingUnit = BattlePresenter.TryGetActingUnit(state);
         if (actingUnit is null) return Highlights.Empty;
-        return uiState.Mode switch
+        return interaction.Kind switch
         {
-            BattleUiMode.SelectingMove => new Highlights(
-                move: (orchestratorProvider()?.GetReachablePositions().Keys ?? []).ToHashSet()),
-            BattleUiMode.SelectingSkillTarget when uiState.SelectedSkill is { } skill =>
-                ResolveSkillHighlights(state, actingUnit, skill),
-            BattleUiMode.SelectingItemTarget => new Highlights(items: ResolveItemTargets(state, actingUnit)),
+            BattleFlowStateKind.SelectingMove => new Highlights(
+                move: reachablePositionsProvider().Keys.ToHashSet()),
+            BattleFlowStateKind.SelectingSkillTarget when interaction.SelectedSkill is { } skill =>
+                ResolveSkillHighlights(state, actingUnit, skill, interaction.HoveredPosition),
+            BattleFlowStateKind.SelectingItemTarget => new Highlights(items: ResolveItemTargets(state, actingUnit)),
             _ => Highlights.Empty,
         };
     }
 
-    private Highlights ResolveSkillHighlights(BattleState state, BattleUnit unit, SkillInstance skill)
+    private static Highlights ResolveSkillHighlights(
+        BattleState state,
+        BattleUnit unit,
+        SkillInstance skill,
+        GridPosition? hoveredPosition)
     {
         var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, skill);
         var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, skill);
@@ -133,7 +101,7 @@ internal sealed class BattleBoardController(
         var possible = targets.SelectMany(target => BattleEngine.GetImpactPositions(
                 unit.Position, target, skill.ImpactType, impactSize).Where(state.Grid.Contains))
             .ToHashSet();
-        var actual = _hoveredPosition is { } hovered && targets.Contains(hovered)
+        var actual = hoveredPosition is { } hovered && targets.Contains(hovered)
             ? BattleEngine.GetImpactPositions(unit.Position, hovered, skill.ImpactType, impactSize)
                 .Where(state.Grid.Contains).ToHashSet()
             : [];

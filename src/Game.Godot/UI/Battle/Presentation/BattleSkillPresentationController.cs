@@ -15,10 +15,7 @@ internal sealed class BattleSkillPresentationController(
     BattleBoardView board,
     Control overlayRoot,
     PackedScene legendOverlayScene,
-    Func<BattleEventPresenter> eventPresenter,
-    Action<bool> setResolving,
-    Action refreshActions,
-    Action refreshAll)
+    Func<BattleEventPresenter> eventPresenter)
 {
     private const double SkillNameDelay = 0.1d;
     private const double SkillImpactDelay = 0.8d;
@@ -61,12 +58,14 @@ internal sealed class BattleSkillPresentationController(
 
     public async Task PlayMoveAsync(BattleUnit unit, IReadOnlyList<GridPosition> path)
     {
-        setResolving(true);
-        refreshActions();
-        try { await _board.PlayUnitMoveAsync(unit.Id, path, MovementMode); }
-        finally { setResolving(false); }
-        refreshAll();
+        await _board.PlayUnitMoveAsync(unit.Id, path, MovementMode);
     }
+
+	public async Task PlayMoveRollbackAsync(BattleUnit unit)
+	{
+		await _board.PlayUnitMoveAsync(unit.Id, [unit.Position], MovementMode);
+		_board.ApplyUnitFacing(unit.Id, unit.Facing);
+	}
 
     public async Task PlaySkillAsync(
         BattleUnit unit,
@@ -75,8 +74,6 @@ internal sealed class BattleSkillPresentationController(
     {
         var action = result.Value ?? throw new InvalidOperationException("Successful skill command has no action result.");
         _board.ApplyUnitFacing(unit.Id, unit.Facing);
-        setResolving(true);
-        refreshActions();
         _active = new Presentation(
             this,
             unit.Id,
@@ -91,10 +88,7 @@ internal sealed class BattleSkillPresentationController(
         finally
         {
             _active = null;
-            setResolving(false);
-            refreshActions();
         }
-        refreshAll();
     }
 
     private async Task WaitAsync(double seconds)
