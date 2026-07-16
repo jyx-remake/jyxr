@@ -77,7 +77,7 @@ public sealed class AffixFormatterTests
         Assert.Equal("技能「松风剑法」威力 +8%", AffixFormatter.FormatCn(
             new SkillBonusModifierAffix("skill_001", ModifierValue.Add(0.08)),
             repository));
-        Assert.Equal("奇门类武功威力 +3%", AffixFormatter.FormatCn(
+        Assert.Equal("奇门系技能加成 +3%", AffixFormatter.FormatCn(
             new WeaponBonusModifierAffix(WeaponType.Qimen, ModifierValue.Add(0.03)),
             repository));
         Assert.Equal("奥义「无招胜有招」触发率提高12.5%", AffixFormatter.FormatCn(
@@ -223,7 +223,7 @@ public sealed class AffixFormatterTests
 
         var externalSkill = repository.GetExternalSkill("野球拳");
         Assert.Equal(
-            "10级解锁：拳掌类武功威力 +3%",
+            "10级解锁：拳掌系技能加成 +3%",
             AffixFormatter.FormatCn(externalSkill.Affixes[1], repository));
         Assert.Equal(
             "暴击率 +15%",
