@@ -39,7 +39,7 @@
 - `src/Game.Godot`
   - Godot 宿主适配源码，由根目录 `engine-free-rpg.csproj` 编译。
   - 当前包括全局入口、MOD runtime bootstrap、MOD launcher、本地存档/档案持久化、主菜单、失败界面、地图屏幕、HUD、英雄面板、角色面板、系统面板、储物箱、战斗 UI、剧情 UI、音频和资源解析。
-- `test/Game.Tests`
+- `tests/Game.Tests`
   - 角色规则、内容加载、存读档、地图服务、剧情服务、战斗引擎、会话事件等测试。
 - `legacy_scenes`
   - 原 Godot/GDScript 参考场景，作为迁移参考，不是当前主运行路径。
