@@ -66,7 +66,11 @@ public sealed class BattleTurnCandidateGenerator
 
                     var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, skill);
                     var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, skill);
-                    foreach (var target in BattleSkillTargeting.EnumerateCastTargets(destination, castSize, state.Grid))
+                    foreach (var target in BattleSkillTargeting.EnumerateCastTargets(
+                                 destination,
+                                 castSize,
+                                 skill.CanCastAtSelf,
+                                 state.Grid))
                     {
                         var impactedPositions = BattleEngine.GetImpactPositions(destination, target, skill.ImpactType, impactSize)
                             .Where(state.Grid.Contains)
@@ -135,7 +139,7 @@ public sealed class BattleTurnCandidateGenerator
             .Where(skill =>
                 skill.IsActive &&
                 skill.Definition.Intent == SpecialSkillIntent.Support &&
-                skill.CanTargetSelf &&
+                skill.CanCastAtSelf &&
                 _engine.EvaluateSkillAvailability(state, unit.Id, skill).IsAvailable)
             .ToArray();
         if (skills.Length == 0)

@@ -53,9 +53,17 @@ public sealed partial class BattleEngine
 
         var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, resolvedSkill);
         var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, resolvedSkill);
-        if (unit.Position.ManhattanDistanceTo(target) > castSize)
+        if (!BattleSkillTargeting.CanCastAt(
+            unit.Position,
+            target,
+            castSize,
+            resolvedSkill.CanCastAtSelf,
+            state.Grid))
         {
-            return BattleCommandResult<BattleActionResult>.Failed("Target is out of cast range.", command.Messages);
+            var message = unit.Position == target && !resolvedSkill.CanCastAtSelf
+                ? "Skill cannot be cast at self."
+                : "Target is out of cast range.";
+            return BattleCommandResult<BattleActionResult>.Failed(message, command.Messages);
         }
 
         TriggerHooks(state, HookTiming.BeforeSkillCast, unit, context =>

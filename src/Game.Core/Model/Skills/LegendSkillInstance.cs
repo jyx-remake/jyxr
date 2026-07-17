@@ -35,7 +35,8 @@ public sealed class LegendSkillInstance(
     public override int MpCost => Parent.MpCost;
     public override int RageCost => Parent.RageCost;
     public override int Cooldown => 0;
-    public override bool CanTargetSelf => Parent.CanTargetSelf;
+    public override bool CanCastAtSelf => Parent.CanCastAtSelf;
+    public override bool CanImpactSelf => Parent.CanImpactSelf;
     public override int CastSize => Parent.CastSize;
     public override SkillImpactType ImpactType => Parent.ImpactType;
     public override int ImpactSize => Parent.ImpactSize;

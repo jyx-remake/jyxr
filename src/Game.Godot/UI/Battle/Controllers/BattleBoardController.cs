@@ -97,7 +97,11 @@ internal sealed class BattleBoardController(
     {
         var castSize = BattleSkillTargeting.ResolveEffectiveCastSize(unit, skill);
         var impactSize = BattleSkillTargeting.ResolveEffectiveImpactSize(unit, skill);
-        var targets = BattleSkillTargeting.EnumerateCastTargets(unit.Position, castSize, state.Grid);
+        var targets = BattleSkillTargeting.EnumerateCastTargets(
+            unit.Position,
+            castSize,
+            skill.CanCastAtSelf,
+            state.Grid);
         var possible = targets.SelectMany(target => BattleEngine.GetImpactPositions(
                 unit.Position, target, skill.ImpactType, impactSize).Where(state.Grid.Contains))
             .ToHashSet();

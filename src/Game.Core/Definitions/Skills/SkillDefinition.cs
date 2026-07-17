@@ -34,14 +34,35 @@ public sealed record SkillCostDefinition(
 }
 
 
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record SkillTargetingDefinition(
-    bool CanTargetSelf = false,
+    bool? CanCastAtSelf = null,
+    bool? CanImpactSelf = null,
     string? CastType = null,
     int? CastSize = null,
     SkillImpactType? ImpactType = null,
     int? ImpactSize = null)
 {
     public static SkillTargetingDefinition None { get; } = new();
+}
+
+public static class SkillTargetingDefaults
+{
+    public const bool CanImpactSelf = false;
+
+    public static bool CanCastAtSelf(SkillImpactType impactType) => impactType switch
+    {
+        SkillImpactType.Plus or
+        SkillImpactType.Star or
+        SkillImpactType.Square or
+        SkillImpactType.Ring or
+        SkillImpactType.X => true,
+        SkillImpactType.Single or
+        SkillImpactType.Line or
+        SkillImpactType.Fan or
+        SkillImpactType.Cleave => false,
+        _ => throw new ArgumentOutOfRangeException(nameof(impactType), impactType, null),
+    };
 }
 
 [method: JsonConstructor]

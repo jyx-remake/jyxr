@@ -48,7 +48,12 @@ public sealed class FormSkillInstance(
 	public override WeaponType WeaponType => Parent.WeaponType;
 
 	public override int Cooldown => Definition.Cooldown;
-	public override bool CanTargetSelf => Definition.Targeting?.CanTargetSelf ?? Parent.CanTargetSelf;
+	public override bool CanCastAtSelf => Definition.Targeting is { } targeting
+		? targeting.CanCastAtSelf ?? SkillTargetingDefaults.CanCastAtSelf(ImpactType)
+		: Parent.CanCastAtSelf;
+	public override bool CanImpactSelf => Definition.Targeting is { } targeting
+		? targeting.CanImpactSelf ?? SkillTargetingDefaults.CanImpactSelf
+		: Parent.CanImpactSelf;
 	public override int CastSize => Definition.Targeting?.CastSize??Parent.CastSize;
 	public override SkillImpactType ImpactType => Definition.Targeting?.ImpactType??Parent.ImpactType;
 	public override int ImpactSize => Definition.Targeting?.ImpactSize??Parent.ImpactSize;

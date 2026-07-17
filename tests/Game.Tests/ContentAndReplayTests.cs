@@ -770,7 +770,8 @@ public sealed class ContentLoadingTests
                     "rage": 0
                   },
                   "targeting": {
-                    "canTargetSelf": true,
+                    "canCastAtSelf": true,
+                    "canImpactSelf": true,
                     "castType": null,
                     "castSize": 10,
                     "impactType": "single",
@@ -840,7 +841,7 @@ public sealed class ContentLoadingTests
         Assert.Equal(1, specialSkill.Cooldown);
         Assert.Equal(200, specialSkill.Cost.Mp);
         Assert.Equal(0, specialSkill.Cost.Rage);
-        Assert.True(specialSkill.Targeting.CanTargetSelf);
+        Assert.True(specialSkill.Targeting.CanImpactSelf);
         Assert.Single(specialSkill.Buffs);
         Assert.Equal("regeneration", specialSkill.Buffs[0].Buff.Id);
     }

@@ -40,7 +40,7 @@ public static class BattleSkillTargeting
             .Where(targetUnit => targetUnit.IsAlive && impactedPositions.Contains(targetUnit.Position))
             .Where(targetUnit =>
                 !string.Equals(targetUnit.Id, source.Id, StringComparison.Ordinal) ||
-                skill.CanTargetSelf)
+                skill.CanImpactSelf)
             .Where(targetUnit => ShouldIncludeTarget(state, source, targetUnit, skill))
             .ToList();
     }
@@ -73,6 +73,7 @@ public static class BattleSkillTargeting
     public static IReadOnlySet<GridPosition> EnumerateCastTargets(
         GridPosition sourcePosition,
         int castSize,
+        bool canCastAtSelf,
         BattleGrid grid)
     {
         ArgumentNullException.ThrowIfNull(grid);
@@ -83,7 +84,7 @@ public static class BattleSkillTargeting
             for (var x = sourcePosition.X - castSize; x <= sourcePosition.X + castSize; x++)
             {
                 var position = new GridPosition(x, y);
-                if (grid.Contains(position) && sourcePosition.ManhattanDistanceTo(position) <= castSize)
+                if (CanCastAt(sourcePosition, position, castSize, canCastAtSelf, grid))
                 {
                     targets.Add(position);
                 }
@@ -91,6 +92,19 @@ public static class BattleSkillTargeting
         }
 
         return targets;
+    }
+
+    public static bool CanCastAt(
+        GridPosition sourcePosition,
+        GridPosition targetPosition,
+        int castSize,
+        bool canCastAtSelf,
+        BattleGrid grid)
+    {
+        ArgumentNullException.ThrowIfNull(grid);
+        return grid.Contains(targetPosition) &&
+               sourcePosition.ManhattanDistanceTo(targetPosition) <= castSize &&
+               (sourcePosition != targetPosition || canCastAtSelf);
     }
 
     private static int ApplyBlindPenalty(BattleUnit source, int originalSize)

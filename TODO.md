@@ -13,6 +13,8 @@
 - 败北阻止天赋也绕过了能力接口和统一 resolver：`百足之虫`、`真气护体`、`无尽斗志` 的 handler 在 `BeforeDefeated` 直接对 `BattleUnit` 调用 `RestoreHp`、`RestoreMp`、`SpendMp`、`SetRage`、`RecordAbilityUsage`。其中直接恢复会跳过 `BattleRecoveryResolver` 及 `BeforeRecoveryResolved`，直接设置怒气会跳过 `BattleResourceResolver` 的事实记录，其余资源消耗和能力使用次数也没有通过 `IDefeatPreventionEffectContext` 声明。后续应把“阻止败北所需的气血/内力恢复、内力消耗、怒气设置、能力次数读取与登记”收敛为 `IDefeatPreventionEffectContext` 的窄操作，由 context 统一委托对应 resolver 并产出结构化战斗事实；handler 不再直接修改 `BattleUnit`。同时补测试覆盖恢复修正 hook、资源变化事实、能力次数登记，以及多个败北阻止效果按优先级竞争时只提交实际生效效果的资源变化。
 - `博览群书` 当前先用现有无参数 trait 表达，并在奥义触发率计算中写死触发倍率 `+0.5`；后续如果类似规则增多，可考虑把 trait 升级为带参数规则 trait，避免规则数值长期散落在代码里。
 - 技能范围修改已迁移为 `SkillTargetingModifierAffix`，当前支持按源技能或全技能修改 `cast_size` / `impact_size`；后续如需表达拳掌、剑法等某类技能范围，应引入独立 `SkillSelectorDefinition`，至少支持源技能、`WeaponType`、技能形态和来源类别。届时应新增与 `SkillKind` 正交的 `SkillSourceKind`，让招式/奥义保留自身形态并继承父技能来源；targeting affix 在 snapshot 中应按原始顺序匹配和应用，避免全局 bucket 与指定技能 bucket 组合时弱化多个 `add` / `override` 的顺序语义。
+- `CanImpactSelf` 当前只允许施法者进入技能覆盖范围产生的主要候选目标，后续仍会经过技能阵营、难度和 `AvoidFriendlyFire` 等友伤规则过滤。未来需要明确两层规则的优先级：它究竟只表达几何覆盖资格，还是应让施法者绕过友伤过滤并保证受到技能影响。
+- `Line` / `Fan` / `Cleave` 当前在施法位置与目标位置相同时仍会把方向兜底为右侧：`Cleave` 显式改写目标格，`Line` / `Fan` 通过 `ResolvePrimaryDirection(...)` 隐式向右。未来应明确方向技能是否禁止对自身格施法；如果允许，则应按单位当前朝向解析，而不是固定向右，随后清除这些兜底逻辑。
 - 四系中文名称目前分为属性名 `拳掌 / 剑法 / 刀法 / 奇门` 与技能系名 `拳掌 / 剑 / 刀 / 奇门`；后者为复刻 legacy 的“拳掌系 / 剑系 / 刀系 / 奇门系技能加成”文案，暂在 `AffixFormatter` 内局部映射。后续应把两套语义不同的名称集中到 `FormatterTextCn` 等统一文本入口，明确区分属性名与技能系名，避免新增四系词条、筛选或 UI 文案时重复散落映射。
 - `IContentRepository` 在真实游戏中是否需要全局可访问，后续需要结合地图、事件、宿主装配再判断。
 - 当前 `Party` 是全局队伍，无队伍 id/name；如果后续支持多队伍/多编队，需要重新建模队伍集合、队伍标识与存档结构。

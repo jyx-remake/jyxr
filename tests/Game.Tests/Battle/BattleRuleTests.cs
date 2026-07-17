@@ -177,6 +177,68 @@ public sealed class BattleRuleTests
             battleEvent.UnitId == hero.Id);
     }
 
+    [Theory]
+    [InlineData(SkillImpactType.Single, false)]
+    [InlineData(SkillImpactType.Plus, true)]
+    [InlineData(SkillImpactType.Star, true)]
+    [InlineData(SkillImpactType.Line, false)]
+    [InlineData(SkillImpactType.Square, true)]
+    [InlineData(SkillImpactType.Fan, false)]
+    [InlineData(SkillImpactType.Ring, true)]
+    [InlineData(SkillImpactType.X, true)]
+    [InlineData(SkillImpactType.Cleave, false)]
+    public void SkillTargetingDefaults_ResolveSelfRules(
+        SkillImpactType impactType,
+        bool expectedCanCastAtSelf)
+    {
+        Assert.Equal(expectedCanCastAtSelf, SkillTargetingDefaults.CanCastAtSelf(impactType));
+        Assert.False(SkillTargetingDefaults.CanImpactSelf);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EnumerateCastTargets_IncludesSourceOnlyWhenAllowed(bool canCastAtSelf)
+    {
+        var source = new GridPosition(1, 1);
+
+        var targets = BattleSkillTargeting.EnumerateCastTargets(
+            source,
+            castSize: 1,
+            canCastAtSelf,
+            new BattleGrid(3, 3));
+
+        Assert.Equal(canCastAtSelf, targets.Contains(source));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ResolveEffectiveTargets_IncludesSourceOnlyWhenAllowed(bool canImpactSelf)
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "self_impact",
+            impactType: SkillImpactType.Plus,
+            canImpactSelf: canImpactSelf);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(1, 1),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var state = new BattleState(
+            new BattleGrid(3, 3),
+            [source],
+            new BattleRuleSettings { Difficulty = GameDifficulty.Hard });
+
+        var targets = BattleSkillTargeting.ResolveEffectiveTargets(
+            state,
+            source,
+            source.Character.GetExternalSkills().Single(),
+            new HashSet<GridPosition> { source.Position });
+
+        Assert.Equal(canImpactSelf, targets.Contains(source));
+    }
+
     [Fact]
     public void CastSkill_NormalDifficultyExcludesFriendlyUnits()
     {

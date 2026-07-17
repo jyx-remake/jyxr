@@ -41,7 +41,9 @@ internal static class TestContentFactory
         string audio = "",
         string animation = "",
         IReadOnlyList<ExternalSkillLevelDefinition>? levelOverrides = null,
-        IReadOnlyList<SkillAffixDefinition>? affixes = null) =>
+        IReadOnlyList<SkillAffixDefinition>? affixes = null,
+        bool? canCastAtSelf = null,
+        bool? canImpactSelf = null) =>
         new()
         {
             Id = id,
@@ -54,7 +56,12 @@ internal static class TestContentFactory
             Hard = hard,
             Cooldown = cooldown,
             Cost = new SkillCostDefinition(mpCost, rageCost),
-            Targeting = new SkillTargetingDefinition(CastSize: castSize, ImpactType: impactType, ImpactSize: impactSize),
+            Targeting = new SkillTargetingDefinition(
+                CanCastAtSelf: canCastAtSelf,
+                CanImpactSelf: canImpactSelf,
+                CastSize: castSize,
+                ImpactType: impactType,
+                ImpactSize: impactSize),
             PowerBase = powerBase,
             PowerStep = powerStep,
             Audio = audio,
