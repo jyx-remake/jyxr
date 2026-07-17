@@ -39,18 +39,27 @@ public sealed class BattlePresenter
 	}
 
 	public IReadOnlyList<BattleCellView> CreateCells(
-		BattleState state)
+		BattleState state,
+		IReadOnlyDictionary<string, GridPosition>? presentedUnitPositions = null)
 	{
 		ArgumentNullException.ThrowIfNull(state);
 
 		var actingUnitId = state.CurrentAction?.ActingUnitId;
+		var unitsByPosition = state.Units
+			.Where(static unit => unit.IsAlive)
+			.ToDictionary(
+				unit => presentedUnitPositions is not null &&
+					presentedUnitPositions.TryGetValue(unit.Id, out var presentedPosition)
+						? presentedPosition
+						: unit.Position,
+				static unit => unit);
 		var cells = new List<BattleCellView>(state.Grid.Width * state.Grid.Height);
 		for (var y = 0; y < state.Grid.Height; y++)
 		{
 			for (var x = 0; x < state.Grid.Width; x++)
 			{
 				var position = new GridPosition(x, y);
-				var unit = state.GetUnitAt(position);
+				unitsByPosition.TryGetValue(position, out var unit);
 				cells.Add(new BattleCellView(
 					position,
 					string.Empty,

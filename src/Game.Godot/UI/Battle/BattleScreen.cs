@@ -149,6 +149,7 @@ public partial class BattleScreen : Control
 		_boardGrid.CellActivated += position => DispatchIntent(new BattleUiIntent.ActivateCell(position));
 		_boardGrid.HoveredCellChanged += position => DispatchIntent(new BattleUiIntent.HoverCell(position));
 		_boardGrid.BackRequested += () => DispatchIntent(new BattleUiIntent.Back());
+		_boardGrid.UnitPresentationPositionChanged += RefreshBoardForPresentedUnitPosition;
 		_speedUpButton.Pressed += _settingsController.ToggleSpeedUp;
 		_autoBattleButton.Pressed += () => DispatchIntent(new BattleUiIntent.ToggleAutoBattle());
 		_actionPanelController.BindButtons();
@@ -346,6 +347,14 @@ public partial class BattleScreen : Control
 		if (_flow is not null)
 		{
 			_ = ObserveIntentAsync(_flow.DispatchAsync(intent));
+		}
+	}
+
+	private void RefreshBoardForPresentedUnitPosition()
+	{
+		if (_interaction is not null && _state is not null && IsInsideTree())
+		{
+			_boardController.RenderInteraction(_interaction);
 		}
 	}
 

@@ -30,8 +30,8 @@ internal sealed class BattleBoardController(
         var state = stateProvider();
         if (state is null) return;
 
-        RenderInteraction(interaction);
         RefreshUnits(state);
+        RenderInteraction(interaction);
     }
 
     public void RenderInteraction(BattleInteractionState interaction)
@@ -39,7 +39,7 @@ internal sealed class BattleBoardController(
         var state = stateProvider();
         if (state is null) return;
         var highlights = ResolveHighlights(state, interaction);
-        var cells = presenter.CreateCells(state)
+        var cells = presenter.CreateCells(state, board.PresentedUnitPositions)
             .Select(cell => new BattleBoardCellVisual(
                 cell.Position,
                 cell.Label,

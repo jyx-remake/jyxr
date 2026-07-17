@@ -26,6 +26,7 @@ public partial class BattleBoardView : Control
 
 	private readonly Dictionary<GridPosition, BattleBoardCellVisual> _cells = [];
 	private readonly Dictionary<string, BattleUnitView> _unitViews = new(StringComparer.Ordinal);
+	private readonly Dictionary<string, GridPosition> _presentedUnitPositions = new(StringComparer.Ordinal);
 	private readonly Dictionary<string, Queue<QueuedFloatText>> _queuedFloatTexts = new(StringComparer.Ordinal);
 	private readonly HashSet<string> _processingFloatTextUnits = new(StringComparer.Ordinal);
 
@@ -46,6 +47,10 @@ public partial class BattleBoardView : Control
 	public event Action? BackRequested;
 
 	public event Action<GridPosition?>? HoveredCellChanged;
+
+	public event Action? UnitPresentationPositionChanged;
+
+	public IReadOnlyDictionary<string, GridPosition> PresentedUnitPositions => _presentedUnitPositions;
 
 	public bool ShowBaseBoard
 	{
@@ -108,6 +113,7 @@ public partial class BattleBoardView : Control
 		foreach (var unit in units)
 		{
 			activeUnitIds.Add(unit.UnitId);
+			_presentedUnitPositions[unit.UnitId] = unit.Position;
 			var isExistingView = _unitViews.TryGetValue(unit.UnitId, out var unitView);
 			unitView ??= GetOrCreateUnitView(unit.UnitId);
 			unitView.Configure(unit);
@@ -140,6 +146,7 @@ public partial class BattleBoardView : Control
 
 			_queuedFloatTexts.Remove(staleUnitId);
 			_processingFloatTextUnits.Remove(staleUnitId);
+			_presentedUnitPositions.Remove(staleUnitId);
 		}
 	}
 
@@ -169,17 +176,37 @@ public partial class BattleBoardView : Control
 			if (mode == BattleMovementPresentationMode.Instant)
 			{
 				unitView.Position = targetPosition;
+				SetPresentedUnitPosition(unitId, position);
 				break;
 			}
 
-			var tween = CreateTween();
-			tween.TweenProperty(unitView, "position", targetPosition, StepMoveDurationSeconds)
-				.SetTrans(Tween.TransitionType.Linear)
-				.SetEase(Tween.EaseType.InOut);
-			await ToSignal(tween, Tween.SignalName.Finished);
+			var midpoint = unitView.Position.Lerp(targetPosition, 0.5f);
+			await TweenUnitPositionAsync(unitView, midpoint, StepMoveDurationSeconds * 0.5d);
+			SetPresentedUnitPosition(unitId, position);
+			await TweenUnitPositionAsync(unitView, targetPosition, StepMoveDurationSeconds * 0.5d);
 		}
 
 		unitView.PlayIdle();
+	}
+
+	private async Task TweenUnitPositionAsync(BattleUnitView unitView, Vector2 targetPosition, double durationSeconds)
+	{
+		var tween = CreateTween();
+		tween.TweenProperty(unitView, "position", targetPosition, durationSeconds)
+			.SetTrans(Tween.TransitionType.Linear)
+			.SetEase(Tween.EaseType.InOut);
+		await ToSignal(tween, Tween.SignalName.Finished);
+	}
+
+	private void SetPresentedUnitPosition(string unitId, GridPosition position)
+	{
+		if (_presentedUnitPositions.TryGetValue(unitId, out var current) && current == position)
+		{
+			return;
+		}
+
+		_presentedUnitPositions[unitId] = position;
+		UnitPresentationPositionChanged?.Invoke();
 	}
 
 	public void PlayAttack(string actingUnitId)
