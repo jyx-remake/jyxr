@@ -16,12 +16,14 @@ internal sealed class BattleSettingsController(
     private const int MaxSpeedMultiplier = 5;
     private readonly LocalUserSettingsStore _store = new();
     private readonly double _initialTimeScale = Engine.TimeScale;
+    private UserSettingsRecord? _loadedSettings;
     private bool _speedUpEnabled;
     private int _speedMultiplier = 2;
 
     public void Load()
     {
         var settings = _store.LoadOrDefault();
+        _loadedSettings = settings;
         _speedUpEnabled = settings.BattleSpeedUp;
         _speedMultiplier = Math.Clamp(settings.BattleSpeedMultiplier, MinSpeedMultiplier, MaxSpeedMultiplier);
         board.ShowBaseBoard = settings.ShowBattleBoard;
@@ -58,13 +60,21 @@ internal sealed class BattleSettingsController(
 
     public void Save()
     {
-        var settings = _store.LoadOrDefault();
-        _store.Save(settings with
+        var loadedSettings = _loadedSettings ??
+            throw new InvalidOperationException("Battle settings must be loaded before they can be saved.");
+        var settings = loadedSettings with
         {
             AutoBattle = isAutoBattleEnabled(),
             BattleSpeedUp = _speedUpEnabled,
             BattleSpeedMultiplier = _speedMultiplier,
-        });
+        };
+
+        if (settings == loadedSettings)
+        {
+            return;
+        }
+
+        _store.Save(settings);
     }
 
     private void ApplyTimeScale() =>
