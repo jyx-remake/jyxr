@@ -75,6 +75,7 @@ public sealed class StoryServiceTests
                     Id = "quest_token",
                     Name = "quest_token",
                     Type = ItemType.QuestItem,
+                    ConsumeOnUse = false,
                 },
             ],
             maps:
@@ -643,6 +644,7 @@ public sealed class StoryServiceTests
                     Id = "quest_token",
                     Name = "quest_token",
                     Type = ItemType.QuestItem,
+                    ConsumeOnUse = false,
                 },
             ],
             maps:
@@ -685,6 +687,7 @@ public sealed class StoryServiceTests
             Id = "quest_token",
             Name = "quest_token",
             Type = ItemType.QuestItem,
+            ConsumeOnUse = false,
         };
         var repository = TestContentFactory.CreateRepository(
             items: [token],

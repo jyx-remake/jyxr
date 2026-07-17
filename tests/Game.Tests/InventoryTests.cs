@@ -274,5 +274,6 @@ public sealed class InventoryTests
             Id = id,
             Name = id,
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
         };
 }

@@ -52,6 +52,7 @@ public sealed class SaveGameTests
             Id = "healing_potion",
             Name = "Healing Potion",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
         };
         var definition = TestContentFactory.CreateCharacterDefinition(
             "hero_knight",

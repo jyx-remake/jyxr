@@ -3606,6 +3606,7 @@ public sealed class BattleEngineTests
             Id = "mp_pill",
             Name = "mp_pill",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             UseEffects = [new AddMpItemUseEffectDefinition(10)],
         };
         var state = new BattleState(new BattleGrid(5, 5), [hero, ally]);
@@ -3633,6 +3634,7 @@ public sealed class BattleEngineTests
             Id = "rage_pill",
             Name = "rage_pill",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             UseEffects = [new AddRageItemUseEffectDefinition(10)],
         };
         var state = new BattleState(new BattleGrid(4, 4), [hero]);
@@ -3659,6 +3661,7 @@ public sealed class BattleEngineTests
             Id = "mp_pill",
             Name = "mp_pill",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             Cooldown = 2,
             UseEffects = [new AddMpItemUseEffectDefinition(1)],
         };
@@ -3690,6 +3693,7 @@ public sealed class BattleEngineTests
             Id = "mp_pill",
             Name = "mp_pill",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             Cooldown = 3,
             UseEffects = [new AddMpItemUseEffectDefinition(1)],
         };
@@ -3728,6 +3732,7 @@ public sealed class BattleEngineTests
             Id = "mp_pill",
             Name = "mp_pill",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             Cooldown = 1,
             UseEffects = [new AddMpItemUseEffectDefinition(1)],
         };
@@ -3759,6 +3764,7 @@ public sealed class BattleEngineTests
             Id = "mp_pill",
             Name = "mp_pill",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             Cooldown = 1,
             UseEffects = [new AddMpItemUseEffectDefinition(1)],
         };
@@ -3796,6 +3802,7 @@ public sealed class BattleEngineTests
             Id = "wine",
             Name = "wine",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             UseEffects = [new AddBuffItemUseEffectDefinition("醉酒", Level: 0, Duration: 3)],
         };
         var state = new BattleState(new BattleGrid(4, 4), [hero]);

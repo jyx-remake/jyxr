@@ -261,6 +261,7 @@ internal static class TestContentFactory
             Id = id,
             Name = id,
             Type = ItemType.Equipment,
+            ConsumeOnUse = false,
             Level = level,
             CanDrop = canDrop,
             SlotType = slotType,

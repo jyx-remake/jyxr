@@ -26,6 +26,7 @@ public sealed class ItemDescriptionFormatterTests
             Id = "wine",
             Name = "烧刀子",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             Description = "烈酒入喉，胆气横生。",
             Cooldown = 8,
             UseEffects =
@@ -65,6 +66,7 @@ public sealed class ItemDescriptionFormatterTests
             Id = "manual_songfeng",
             Name = "松风剑谱",
             Type = ItemType.SkillBook,
+            ConsumeOnUse = false,
             Description = "青城派入门剑谱。",
             Requirements =
             [

@@ -151,6 +151,7 @@ public sealed class SpecialBattleServiceTests
             Id = id,
             Name = id,
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             CanDrop = true,
         };
 

@@ -124,6 +124,7 @@ public sealed class CharacterResourceLimitPolicyTests
             Id = "peach",
             Name = "peach",
             Type = ItemType.Booster,
+            ConsumeOnUse = true,
             UseEffects =
             [
                 new AddMaxHpItemUseEffectDefinition(100),

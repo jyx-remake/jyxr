@@ -335,7 +335,7 @@ public sealed class ItemUseServiceTests
     }
 
     [Fact]
-    public void Use_SpecialSkillBook_LearnsAndDoesNotConsume()
+    public void Use_SpecialSkillBook_LearnsAndConsumesOne()
     {
         var skill = new SpecialSkillDefinition(
             "six_pulse",
@@ -353,7 +353,8 @@ public sealed class ItemUseServiceTests
         var book = CreateItem(
             "special_book",
             ItemType.SpecialSkillBook,
-            [new GrantSpecialSkillItemUseEffectDefinition(skill.Id)]);
+            [new GrantSpecialSkillItemUseEffectDefinition(skill.Id)],
+            consumeOnUse: true);
         var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
         var state = CreateStateWithHero(heroDefinition, out var hero);
         state.Inventory.AddItem(book);
@@ -368,7 +369,7 @@ public sealed class ItemUseServiceTests
 
         Assert.True(result.Success);
         Assert.Contains(hero.GetSpecialSkills(), learned => learned.Definition.Id == skill.Id);
-        Assert.Equal(1, entry.Quantity);
+        Assert.Empty(state.Inventory.Entries);
     }
 
     [Fact]
@@ -378,7 +379,8 @@ public sealed class ItemUseServiceTests
         var book = CreateItem(
             "talent_book",
             ItemType.TalentBook,
-            [new GrantTalentItemUseEffectDefinition(talent.Id)]);
+            [new GrantTalentItemUseEffectDefinition(talent.Id)],
+            consumeOnUse: true);
         var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
         var state = CreateStateWithHero(heroDefinition, out var hero);
         state.Inventory.AddItem(book, 2);
@@ -409,7 +411,8 @@ public sealed class ItemUseServiceTests
         var book = CreateItem(
             "talent_book",
             ItemType.TalentBook,
-            [new GrantTalentItemUseEffectDefinition(expensiveTalent.Id)]);
+            [new GrantTalentItemUseEffectDefinition(expensiveTalent.Id)],
+            consumeOnUse: true);
         var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
         var state = CreateStateWithHero(heroDefinition, out var hero);
         state.Inventory.AddItem(book);
@@ -449,7 +452,8 @@ public sealed class ItemUseServiceTests
             [
                 new AddMaxHpItemUseEffectDefinition(100),
                 new AddMaxMpItemUseEffectDefinition(50),
-            ]);
+            ],
+            consumeOnUse: true);
         var heroDefinition = TestContentFactory.CreateCharacterDefinition(
             "hero",
             new Dictionary<StatType, int>
@@ -509,12 +513,14 @@ public sealed class ItemUseServiceTests
     private static NormalItemDefinition CreateItem(
         string id,
         ItemType type,
-        IReadOnlyList<ItemUseEffectDefinition> effects) =>
+        IReadOnlyList<ItemUseEffectDefinition> effects,
+        bool consumeOnUse = false) =>
         new()
         {
             Id = id,
             Name = id,
             Type = type,
+            ConsumeOnUse = consumeOnUse,
             UseEffects = effects,
         };
 

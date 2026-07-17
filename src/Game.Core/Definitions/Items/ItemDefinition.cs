@@ -11,6 +11,7 @@ public abstract record ItemDefinition
     public required string Id { get; init; }
     public required string Name  { get; init; }
     public ItemType Type  { get; init; }
+    public required bool ConsumeOnUse { get; init; }
     public int Level { get; init; }
     public int Price { get; init; }
     public int Cooldown { get; init; }

@@ -144,7 +144,7 @@ internal sealed class BattleFlowContext : IBattleFlowContext
 			return false;
 		}
 
-		GameRoot.InventoryService.RemoveItem(item.Definition);
+		GameRoot.ItemUseService.CommitSuccessfulUse(item);
 		return true;
 	}
 

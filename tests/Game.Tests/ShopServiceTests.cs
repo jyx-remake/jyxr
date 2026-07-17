@@ -214,6 +214,7 @@ public sealed class ShopServiceTests
             Id = id,
             Name = id,
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
             Price = price,
             CanDrop = true,
         };

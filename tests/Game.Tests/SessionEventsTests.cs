@@ -101,6 +101,7 @@ public sealed class SessionEventsTests
             Id = "potion",
             Name = "potion",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
         };
         var repository = TestContentFactory.CreateRepository(
             characters: [heroDefinition, allyDefinition],
@@ -161,6 +162,7 @@ public sealed class SessionEventsTests
             Id = "potion",
             Name = "potion",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
         };
         var repository = TestContentFactory.CreateRepository(items: [potion]);
         var session = new GameSession(new GameState(), repository);

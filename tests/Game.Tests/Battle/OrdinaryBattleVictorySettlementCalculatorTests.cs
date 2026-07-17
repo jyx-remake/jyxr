@@ -533,6 +533,7 @@ public sealed class OrdinaryBattleVictorySettlementCalculatorTests
             Id = "healing_potion",
             Name = "疗伤药",
             Type = ItemType.Consumable,
+            ConsumeOnUse = true,
         };
         var equipment = TestContentFactory.CreateEquipment("青锋剑", level: 4);
         var repository = TestContentFactory.CreateRepository(

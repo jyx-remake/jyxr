@@ -260,6 +260,7 @@ public sealed class MiniGameServiceTests
                 Id = itemId,
                 Name = itemId,
                 Type = ItemType.Consumable,
+                ConsumeOnUse = true,
             })
             .ToArray();
     }

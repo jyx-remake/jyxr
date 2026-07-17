@@ -84,15 +84,25 @@ public sealed class ItemUseService
             return ItemUseResult.Failed(support.Message);
         }
 
-        return support.Kind switch
+        var result = support.Kind == ItemUseKind.Equipment
+            ? UseEquipment(entry, target)
+            : ApplyUseEffects(entry.Definition, target, support.Effects);
+
+        if (result.Success)
         {
-            ItemUseKind.Equipment => UseEquipment(entry, target),
-            ItemUseKind.SkillBook => UseSkillBook(entry, target, support.Effects),
-            ItemUseKind.SpecialSkillBook => UseSpecialSkillBook(entry, target, support.Effects),
-            ItemUseKind.TalentBook => UseTalentBook(entry, target, support.Effects),
-            ItemUseKind.Booster => UseBooster(entry, target, support.Effects),
-            _ => ItemUseResult.Failed("该物品暂不可使用。"),
-        };
+            CommitSuccessfulUse(entry);
+        }
+
+        return result;
+    }
+
+    public void CommitSuccessfulUse(InventoryEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        if (entry.Definition.ConsumeOnUse)
+        {
+            _session.InventoryService.RemoveItem(entry.Definition);
+        }
     }
 
     private ItemUseResult UseEquipment(InventoryEntry entry, CharacterInstance target)
@@ -112,11 +122,12 @@ public sealed class ItemUseService
         }
     }
 
-    private ItemUseResult UseSkillBook(
-        InventoryEntry entry,
+    private ItemUseResult ApplyUseEffects(
+        ItemDefinition item,
         CharacterInstance target,
         IReadOnlyList<ItemUseEffectDefinition> effects)
     {
+        var resourceStatsChanged = false;
         foreach (var effect in effects)
         {
             switch (effect)
@@ -137,62 +148,34 @@ public sealed class ItemUseService
                         ResolveInternalSkillBookMaxLevel(internalSkill));
                     break;
                 }
-            }
-        }
-
-        return ItemUseResult.Succeeded("");
-    }
-
-    private ItemUseResult UseSpecialSkillBook(
-        InventoryEntry entry,
-        CharacterInstance target,
-        IReadOnlyList<ItemUseEffectDefinition> effects)
-    {
-        foreach (var effect in effects.OfType<GrantSpecialSkillItemUseEffectDefinition>())
-        {
-            _session.CharacterService.LearnSpecialSkill(target, effect.SkillId);
-        }
-
-        return ItemUseResult.Succeeded("");
-    }
-
-    private ItemUseResult UseTalentBook(
-        InventoryEntry entry,
-        CharacterInstance target,
-        IReadOnlyList<ItemUseEffectDefinition> effects)
-    {
-        foreach (var effect in effects.OfType<GrantTalentItemUseEffectDefinition>())
-        {
-            _session.CharacterService.LearnTalent(target, effect.TalentId);
-        }
-
-        _session.InventoryService.RemoveItem(entry.Definition);
-        return ItemUseResult.Succeeded("");
-    }
-
-    private ItemUseResult UseBooster(
-        InventoryEntry entry,
-        CharacterInstance target,
-        IReadOnlyList<ItemUseEffectDefinition> effects)
-    {
-        foreach (var effect in effects)
-        {
-            switch (effect)
-            {
+                case GrantSpecialSkillItemUseEffectDefinition specialSkill:
+                    _session.CharacterService.LearnSpecialSkill(target, specialSkill.SkillId);
+                    break;
+                case GrantTalentItemUseEffectDefinition talent:
+                    _session.CharacterService.LearnTalent(target, talent.TalentId);
+                    break;
                 case AddMaxHpItemUseEffectDefinition maxHp:
                     target.AddBaseStat(StatType.MaxHp, maxHp.Value);
+                    resourceStatsChanged = true;
                     break;
                 case AddMaxMpItemUseEffectDefinition maxMp:
                     target.AddBaseStat(StatType.MaxMp, maxMp.Value);
+                    resourceStatsChanged = true;
                     break;
+                default:
+                    throw new InvalidOperationException(
+                        $"Unsupported out-of-battle item effect: {effect.GetType().Name}");
             }
         }
 
-        CharacterResourceLimitPolicy.ClampBaseResourceStats(target);
-        target.ClampBattleResources();
-        _session.InventoryService.RemoveItem(entry.Definition);
-        _session.Events.Publish(new CharacterChangedEvent(target.Id));
-        return ItemUseResult.Succeeded($"【{target.Name}】使用【{entry.Definition.Name}】");
+        if (resourceStatsChanged)
+        {
+            CharacterResourceLimitPolicy.ClampBaseResourceStats(target);
+            target.ClampBattleResources();
+            _session.Events.Publish(new CharacterChangedEvent(target.Id));
+        }
+
+        return ItemUseResult.Succeeded($"【{target.Name}】使用【{item.Name}】");
     }
 
     private static ItemUseSupport ResolveSupport(InventoryEntry entry)
