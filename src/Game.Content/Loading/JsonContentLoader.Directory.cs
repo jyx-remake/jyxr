@@ -24,6 +24,7 @@ public sealed partial class JsonContentLoader
     private const string StoryDirectoryName = "story";
     private const string StoryFilePattern = "*.story.json";
     private const string ItemsFileName = "items.json";
+    private const string ItemTagsFileName = "item-tags.json";
     private const string EquipmentRandomAffixTablesFileName = "equipment-random-affixes.json";
     private const string BuffsFileName = "buffs.json";
     private const string TalentsFileName = "talents.json";
@@ -53,6 +54,7 @@ public sealed partial class JsonContentLoader
             SpecialSkills = LoadRequiredList<SpecialSkillDefinition>(directoryPath, SpecialSkillsFileName),
             StoryScripts = LoadStoryScripts(directoryPath),
             Items = LoadRequiredList<ItemDefinition>(directoryPath, ItemsFileName),
+            ItemTags = LoadRequiredList<ItemTagDefinition>(directoryPath, ItemTagsFileName),
             EquipmentRandomAffixTables = LoadRequiredList<EquipmentRandomAffixTableDefinition>(directoryPath, EquipmentRandomAffixTablesFileName),
             Buffs = LoadRequiredList<BuffDefinition>(directoryPath, BuffsFileName),
             Talents = LoadRequiredList<TalentDefinition>(directoryPath, TalentsFileName),

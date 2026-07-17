@@ -16,6 +16,9 @@ public interface IContentRepository
     bool TryGetCharacter(string id, [NotNullWhen(true)] out CharacterDefinition? definition);
     IReadOnlyCollection<CharacterDefinition> GetCharacters();
     IReadOnlyCollection<ItemDefinition> GetItems();
+    IReadOnlyCollection<ItemTagDefinition> GetItemTags();
+    ItemTagDefinition GetItemTag(string id);
+    bool TryGetItemTag(string id, [NotNullWhen(true)] out ItemTagDefinition? definition);
     ExternalSkillDefinition GetExternalSkill(string id);
     bool TryGetExternalSkill(string id, [NotNullWhen(true)] out ExternalSkillDefinition? definition);
     IReadOnlyCollection<ExternalSkillDefinition> GetExternalSkills();

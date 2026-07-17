@@ -31,6 +31,31 @@ public sealed partial class JsonContentLoader
         ValidateStoryContent(repository);
     }
 
+    private static void ValidateItemTags(InMemoryContentRepository repository)
+    {
+        foreach (var tag in repository.ItemTags.Values)
+        {
+            Ensure(!string.IsNullOrWhiteSpace(tag.Id), "ItemTag definition has empty id.");
+            Ensure(!string.IsNullOrWhiteSpace(tag.Name), $"ItemTag '{tag.Id}' has empty name.");
+            Ensure(tag.Order >= 0, $"ItemTag '{tag.Id}' has invalid order '{tag.Order}'.");
+        }
+
+        foreach (var item in repository.Items.Values)
+        {
+            var itemTagIds = item.TagIds;
+            Ensure(itemTagIds is not null, $"Item '{item.Id}' has null item tag ids.");
+
+            var tagIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var tagId in itemTagIds!)
+            {
+                Ensure(!string.IsNullOrWhiteSpace(tagId), $"Item '{item.Id}' has an empty item tag id.");
+                Ensure(tagIds.Add(tagId), $"Item '{item.Id}' references item tag '{tagId}' more than once.");
+                Ensure(repository.ItemTags.ContainsKey(tagId),
+                    $"Item '{item.Id}' references missing item tag '{tagId}'.");
+            }
+        }
+    }
+
     private static void ValidateSkillBuffs(InMemoryContentRepository repository)
     {
         foreach (var skill in repository.ExternalSkills.Values)

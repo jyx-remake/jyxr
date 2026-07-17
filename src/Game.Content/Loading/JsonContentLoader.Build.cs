@@ -28,12 +28,16 @@ public sealed partial class JsonContentLoader
             StoryScripts = new Dictionary<string, StoryScript>(package.StoryScripts, StringComparer.Ordinal),
             StorySegments = BuildStorySegments(package.StoryScripts),
             Items = BuildItems(package),
+            ItemTags = IndexById(package.ItemTags, "ItemTag"),
             EquipmentRandomAffixTables = package.EquipmentRandomAffixTables.ToList(),
             Buffs = IndexById(package.Buffs, "Buff"),
             Talents = IndexById(package.Talents, "Talent"),
             Equipments = IndexById(package.Items.OfType<EquipmentDefinition>(), "Equipment"),
             Towers = IndexById(package.Towers, "Tower"),
         };
+
+        ValidateItemTags(repository);
+        ResolveItemTags(repository);
 
         ResolveAffixes(repository);
 
@@ -63,6 +67,14 @@ public sealed partial class JsonContentLoader
         }
 
         return repository;
+    }
+
+    private static void ResolveItemTags(InMemoryContentRepository repository)
+    {
+        foreach (var item in repository.Items.Values)
+        {
+            item.ResolveTags(repository);
+        }
     }
 
     private static void ResolveAffixes(InMemoryContentRepository repository)

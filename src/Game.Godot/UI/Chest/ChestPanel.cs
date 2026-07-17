@@ -1,5 +1,7 @@
 using Game.Application;
+using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Presentation.Items;
 using Godot;
 
 namespace Game.Godot.UI;
@@ -8,34 +10,29 @@ public partial class ChestPanel : JyPanel
 {
 	[Export]
 	public PackedScene ItemBoxScene { get; set; } = null!;
+	[Export]
+	public PackedScene TagButtonScene { get; set; } = null!;
 
-	private static readonly ChestCategory[] Categories =
-	[
-		new("All", "全部", null),
-		new("Equipment", "装备", ItemType.Equipment),
-		new("Consumable", "消耗品", ItemType.Consumable),
-		new("SkillBook", "武学书", ItemType.SkillBook),
-		new("SpecialSkillBook", "绝技书", ItemType.SpecialSkillBook),
-		new("TalentBook", "天赋书", ItemType.TalentBook),
-		new("Booster", "强化道具", ItemType.Booster),
-		new("Utility", "功能道具", ItemType.Utility),
-	];
+	private static readonly IReadOnlyList<ItemCategoryOption> Categories = ItemCatalogPresentation.Categories
+		.Where(category => category.ItemType != ItemType.QuestItem)
+		.ToList();
 
 	private readonly Dictionary<string, Button> _buttonsByCategoryKey = [];
 	private ChestMode _mode = ChestMode.Deposit;
-	private ChestCategory _selectedCategory = Categories[0];
+	private ItemCategoryOption _selectedCategory = Categories[0];
+	private string? _selectedTagId;
 
 	private Button _depositModeButton = null!;
 	private Button _withdrawModeButton = null!;
 	private Button _leaveButton = null!;
 	private CheckBox _quickTransferCheckBox = null!;
 	private Label _titleLabel = null!;
-	private Label _categoryLabel = null!;
 	private Label _countLabel = null!;
 	private Label _promptLabel = null!;
 	private Label _capacityLabel = null!;
 	private GridContainer _gridContainer = null!;
 	private Label _emptyLabel = null!;
+	private HFlowContainer _tagButtons = null!;
 
 	public override void _Ready()
 	{
@@ -45,19 +42,14 @@ public partial class ChestPanel : JyPanel
 		_leaveButton = GetNode<Button>("%LeaveButton");
 		_quickTransferCheckBox = GetNode<CheckBox>("%QuickTransferCheckBox");
 		_titleLabel = GetNode<Label>("%TitleLabel");
-		_categoryLabel = GetNode<Label>("%CategoryLabel");
 		_countLabel = GetNode<Label>("%CountLabel");
 		_promptLabel = GetNode<Label>("%PromptLabel");
 		_capacityLabel = GetNode<Label>("%CapacityLabel");
 		_gridContainer = GetNode<GridContainer>("%GridContainer");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
+		_tagButtons = GetNode<HFlowContainer>("%TagButtons");
 
-		foreach (var category in Categories)
-		{
-			var button = GetNode<Button>($"%{category.Key}Button");
-			_buttonsByCategoryKey.Add(category.Key, button);
-			button.Pressed += () => SelectCategory(category);
-		}
+		InitializeCategoryButtons();
 
 		_depositModeButton.Pressed += () => SelectMode(ChestMode.Deposit);
 		_withdrawModeButton.Pressed += () => SelectMode(ChestMode.Withdraw);
@@ -72,26 +64,53 @@ public partial class ChestPanel : JyPanel
 		Refresh();
 	}
 
-	private void SelectCategory(ChestCategory category)
+	private void SelectCategory(ItemCategoryOption category)
 	{
 		_selectedCategory = category;
+		_selectedTagId = null;
 		Refresh();
+	}
+
+	private void InitializeCategoryButtons()
+	{
+		var container = GetNode<VBoxContainer>("ContentRoot/CategoryButtons");
+		var template = container.GetChildren().OfType<Button>().First();
+		foreach (var child in container.GetChildren())
+		{
+			container.RemoveChild(child);
+			child.QueueFree();
+		}
+
+		foreach (var category in Categories)
+		{
+			var button = (Button)template.Duplicate();
+			button.Name = $"{category.Key}Button";
+			button.UniqueNameInOwner = false;
+			button.Text = category.DisplayName;
+			button.CustomMinimumSize = new Vector2(200, category.ItemType is null ? 62 : 56);
+			button.AddThemeFontSizeOverride("font_size", category.ItemType is null ? 42 : 30);
+			button.Pressed += () => SelectCategory(category);
+			container.AddChild(button);
+			_buttonsByCategoryKey.Add(category.Key, button);
+		}
 	}
 
 	private void Refresh()
 	{
 		ClearGrid();
 		UpdateModeButtons();
-		UpdateCategoryButtons();
 
 		var chest = Game.ChestService.Open();
-		var entries = GetEntriesForCurrentMode()
+		var sourceEntries = GetEntriesForCurrentMode();
+		var tags = ResolveAvailableTags(sourceEntries.Select(entry => entry.Definition));
+		UpdateCategoryButtons();
+		UpdateTagButtons(tags);
+		var entries = sourceEntries
 			.Where(EntryMatchesSelectedCategory)
 			.OrderBy(entry => entry.EntryNumber)
 			.ToList();
 
 		_titleLabel.Text = "储物箱";
-		_categoryLabel.Text = _selectedCategory.DisplayName;
 		_countLabel.Text = $"{entries.Count} 项";
 		_promptLabel.Text = _mode == ChestMode.Deposit
 			? "请问您存入什么物品？"
@@ -117,7 +136,56 @@ public partial class ChestPanel : JyPanel
 			: Game.State.Chest.Inventory.Entries;
 
 	private bool EntryMatchesSelectedCategory(InventoryEntry entry) =>
-		_selectedCategory.ItemType is null || entry.Definition.Type == _selectedCategory.ItemType.Value;
+		ItemCatalogPresentation.Matches(entry.Definition, _selectedCategory.ItemType, _selectedTagId);
+
+	private IReadOnlyList<ItemTagDefinition> ResolveAvailableTags(IEnumerable<ItemDefinition> items)
+	{
+		var tags = ItemCatalogPresentation.GetAvailableTags(items, _selectedCategory.ItemType);
+		if (_selectedTagId is not null && !tags.Any(tag => tag.Id == _selectedTagId))
+		{
+			_selectedTagId = null;
+		}
+		return tags;
+	}
+
+	private void UpdateTagButtons(IReadOnlyList<ItemTagDefinition> tags)
+	{
+		ClearChildren(_tagButtons);
+		if (_selectedCategory.ItemType is null)
+		{
+			return;
+		}
+
+		foreach (var tag in tags)
+		{
+			AddTagButton(tag.Id, tag.Name);
+		}
+	}
+
+	private void AddTagButton(string? tagId, string displayName)
+	{
+		if (TagButtonScene is null)
+		{
+			throw new InvalidOperationException("TagButtonScene is not assigned.");
+		}
+
+		var instance = TagButtonScene.Instantiate();
+		if (instance is not InventoryTagButton button)
+		{
+			instance.QueueFree();
+			throw new InvalidOperationException("Tag button scene root must be InventoryTagButton.");
+		}
+
+		button.Configure(
+			displayName,
+			string.Equals(_selectedTagId, tagId, StringComparison.Ordinal),
+			() =>
+			{
+				_selectedTagId = tagId;
+				Refresh();
+			});
+		_tagButtons.AddChild(button);
+	}
 
 	private bool CanSelectEntry(InventoryEntry entry, ChestView chest)
 	{
@@ -213,7 +281,7 @@ public partial class ChestPanel : JyPanel
 		{
 			var button = _buttonsByCategoryKey[category.Key];
 			var isSelected = category.Key == _selectedCategory.Key;
-			button.Disabled = isSelected;
+			button.Disabled = isSelected && _selectedTagId is null;
 			button.Modulate = isSelected
 				? new Color(1.0f, 0.92f, 0.68f)
 				: Colors.White;
@@ -222,8 +290,14 @@ public partial class ChestPanel : JyPanel
 
 	private void ClearGrid()
 	{
-		foreach (var child in _gridContainer.GetChildren())
+		ClearChildren(_gridContainer);
+	}
+
+	private static void ClearChildren(Node parent)
+	{
+		foreach (var child in parent.GetChildren())
 		{
+			parent.RemoveChild(child);
 			child.QueueFree();
 		}
 	}
@@ -234,5 +308,4 @@ public partial class ChestPanel : JyPanel
 		Withdraw,
 	}
 
-	private sealed record ChestCategory(string Key, string DisplayName, ItemType? ItemType);
 }

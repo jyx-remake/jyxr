@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://h5ua5325v82x"]
+
+[ext_resource type="Texture2D" uid="uid://ccowan043v5kt" path="res://assets/theme/art/ju_button/jh_btn_normal.png" id="1_7hiic"]
+[ext_resource type="Texture2D" uid="uid://dus3ekk0suwn5" path="res://assets/theme/art/ju_button/jh_btn_Press.png" id="2_pkmg6"]
+[ext_resource type="Script" uid="uid://c0njaroqlfpou" path="res://src/Game.Godot/UI/Inventory/InventoryTagButton.cs" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://b5ghrcm8s6mr3" path="res://assets/theme/art/ju_button/jh_btn_hover.png" id="3_domex"]
+[ext_resource type="Texture2D" uid="uid://bv05hh3snjnqb" path="res://assets/theme/art/ju_button/jh_btn_disable.png" id="4_dhejp"]
+
+[sub_resource type="StyleBoxTexture" id="1_button_normal"]
+texture = ExtResource("1_7hiic")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_b6q3s"]
+texture = ExtResource("2_pkmg6")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_koync"]
+texture = ExtResource("3_domex")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ovq5r"]
+texture = ExtResource("4_dhejp")
+
+[node name="InventoryTagButton" type="Button" unique_id=310553258]
+custom_minimum_size = Vector2(218, 60)
+offset_right = 218.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 0.5019608)
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_b6q3s")
+theme_override_styles/hover = SubResource("StyleBoxTexture_koync")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_ovq5r")
+text = "全部"
+script = ExtResource("2_script")

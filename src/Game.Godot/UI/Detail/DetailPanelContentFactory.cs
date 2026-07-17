@@ -4,6 +4,7 @@ using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
 using Game.Godot.Assets;
+using Game.Presentation.Items;
 using Godot;
 
 namespace Game.Godot.UI;
@@ -45,7 +46,7 @@ public static class DetailPanelContentFactory
 		var item = product.Item;
 		return new DetailPanelContent(
 			product.DisplayName,
-			FormatItemType(item.Type),
+			ItemCatalogPresentation.FormatCategory(item),
 			AssetResolver.LoadTextureResource(product.Picture),
 			ItemDescriptionFormatter.FormatBbCodeCn(item, Game.ContentRepository),
 			ResolveItemTitleColor(item),
@@ -60,7 +61,7 @@ public static class DetailPanelContentFactory
 
 		return new DetailPanelContent(
 			item.Name,
-			FormatItemType(item.Type),
+			ItemCatalogPresentation.FormatCategory(item),
 			AssetResolver.LoadTextureResource(item.Picture),
 			ItemDescriptionFormatter.FormatBbCodeCn(item, Game.ContentRepository),
 			ResolveItemTitleColor(item),
@@ -75,7 +76,7 @@ public static class DetailPanelContentFactory
 
 		return new DetailPanelContent(
 			equipment.Definition.Name,
-			FormatItemType(equipment.Definition.Type),
+			ItemCatalogPresentation.FormatCategory(equipment.Definition),
 			AssetResolver.LoadTextureResource(equipment.Definition.Picture),
 			ItemDescriptionFormatter.FormatBbCodeCn(equipment, Game.ContentRepository),
 			ResolveEquipmentTitleColor(equipment),
@@ -114,20 +115,6 @@ public static class DetailPanelContentFactory
 			FormSkillInstance => Colors.Red,
 			LegendSkillInstance => Colors.Orange,
 			_ => Colors.White,
-		};
-
-	private static string FormatItemType(ItemType itemType) =>
-		itemType switch
-		{
-			ItemType.Equipment => "装备",
-			ItemType.Consumable => "消耗品",
-			ItemType.SkillBook => "武学书",
-			ItemType.SpecialSkillBook => "绝技书",
-			ItemType.TalentBook => "天赋书",
-			ItemType.QuestItem => "剧情物品",
-			ItemType.Booster => "强化道具",
-			ItemType.Utility => "功能道具",
-			_ => "物品",
 		};
 
 	private static Color ResolveItemTitleColor(ItemDefinition item) =>

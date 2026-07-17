@@ -6,13 +6,21 @@
 [ext_resource type="Texture2D" uid="uid://cguhj5812a2hr" path="res://assets/art/map/shop.jpg" id="4_shop_bg"]
 [ext_resource type="Texture2D" uid="uid://csplcrelb0rev" path="res://assets/art/ui/shopkeeper.png" id="5_keeper"]
 [ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="6_filter_button"]
+[ext_resource type="PackedScene" uid="uid://h5ua5325v82x" path="res://scenes/ui/inventory_panel/inventory_tag_button.tscn" id="7_tag_button"]
 
 [sub_resource type="StyleBoxTexture" id="1_button_normal"]
 texture = ExtResource("6_filter_button")
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1gnn5"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ws1b3"]
+bg_color = Color(0.11764706, 0.11764706, 0.11764706, 0.5882353)
+
 [node name="ChestPanel" unique_id=1790012345 instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
 ItemBoxScene = ExtResource("3_item_box")
+TagButtonScene = ExtResource("7_tag_button")
 
 [node name="Background" parent="." index="1" unique_id=2084013287]
 anchors_preset = 15
@@ -103,7 +111,21 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 38
 text = "离开"
 
-[node name="CategoryButtons" type="VBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="4" unique_id=100000109]
+[node name="CountLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="4" unique_id=100000121]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 46)
+layout_mode = 0
+offset_left = 415.0
+offset_top = 155.0
+offset_right = 575.0
+offset_bottom = 201.0
+theme_override_colors/font_color = Color(0.92941177, 0.8784314, 0.7019608, 1)
+theme_override_font_sizes/font_size = 26
+text = "0 项"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CategoryButtons" type="VBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="5" unique_id=100000109]
 layout_mode = 0
 offset_left = 384.0
 offset_top = 204.0
@@ -199,67 +221,56 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "功能道具"
 
-[node name="GoodsPanel" type="Panel" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="5" unique_id=100000118]
+[node name="GoodsPanel" type="Panel" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="6" unique_id=100000118]
 layout_mode = 0
 offset_left = 610.0
-offset_top = 174.0
+offset_top = 135.0
 offset_right = 1742.0
 offset_bottom = 900.0
 mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1gnn5")
 
-[node name="Header" type="HBoxContainer" parent="ContentRoot/GoodsPanel" index="0" unique_id=100000119]
-layout_mode = 0
-offset_left = 33.0
-offset_top = 6.0
-offset_right = 1089.0
-offset_bottom = 52.0
-theme_override_constants/separation = 20
+[node name="GoodsLayout" type="VBoxContainer" parent="ContentRoot/GoodsPanel" index="0" unique_id=84247450]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="CategoryLabel" type="Label" parent="ContentRoot/GoodsPanel/Header" index="0" unique_id=100000120]
+[node name="TagButtons" type="HFlowContainer" parent="ContentRoot/GoodsPanel/GoodsLayout" index="0" unique_id=497160849]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 46)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92941177, 0.8784314, 0.7019608, 1)
-theme_override_font_sizes/font_size = 32
-text = "全部"
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 
-[node name="CountLabel" type="Label" parent="ContentRoot/GoodsPanel/Header" index="1" unique_id=100000121]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 46)
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot/GoodsPanel/GoodsLayout" index="1" unique_id=100000122]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92941177, 0.8784314, 0.7019608, 1)
-theme_override_font_sizes/font_size = 26
-text = "0 项"
-vertical_alignment = 1
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ws1b3")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot/GoodsPanel" index="1" unique_id=100000122]
-layout_mode = 0
-offset_left = 34.0
-offset_top = 69.0
-offset_right = 1100.0
-offset_bottom = 685.0
-
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/GoodsPanel/ScrollContainer" index="0" unique_id=100000123]
+[node name="GridContainer" type="GridContainer" parent="ContentRoot/GoodsPanel/GoodsLayout/ScrollContainer" index="0" unique_id=100000123]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 24
 theme_override_constants/v_separation = 30
 columns = 5
 
-[node name="EmptyLabel" type="Label" parent="ContentRoot/GoodsPanel" index="2" unique_id=100000124]
+[node name="EmptyLabel" type="Label" parent="ContentRoot/GoodsPanel" index="1" unique_id=100000124]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
 offset_left = 160.0
-offset_top = 278.0
+offset_top = 368.0
 offset_right = 960.0
-offset_bottom = 338.0
+offset_bottom = 428.0
 theme_override_colors/font_color = Color(0.34, 0.23, 0.12, 1)
 theme_override_font_sizes/font_size = 32
 text = "当前分类下没有物品。"
 horizontal_alignment = 1
 
-[node name="PromptLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="6" unique_id=100000125]
+[node name="PromptLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="7" unique_id=100000125]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 462.0
@@ -272,7 +283,7 @@ theme_override_constants/outline_size = 7
 theme_override_font_sizes/font_size = 46
 text = "请问您存入什么物品？"
 
-[node name="CapacityLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="7" unique_id=100000126]
+[node name="CapacityLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="8" unique_id=100000126]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1300.0

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Game.Core.Abstractions;
 using Game.Core.Model;
 
 namespace Game.Core.Definitions;
@@ -18,8 +19,17 @@ public abstract record ItemDefinition
     public bool CanDrop { get; init; }
     public string Description { get; init; } = "";
     public string Picture { get; init; } = "";
+    public IReadOnlyList<string> TagIds { get; init; } = [];
+    [JsonIgnore]
+    public IReadOnlyList<ItemTagDefinition> Tags { get; private set; } = [];
     public IReadOnlyList<ItemRequirementDefinition> Requirements { get; init; } = [];
     public IReadOnlyList<ItemUseEffectDefinition> UseEffects { get; init; } = [];
+
+    public void ResolveTags(IContentRepository contentRepository)
+    {
+        ArgumentNullException.ThrowIfNull(contentRepository);
+        Tags = TagIds.Select(contentRepository.GetItemTag).ToList();
+    }
 }
 
 public sealed record NormalItemDefinition : ItemDefinition;

@@ -23,6 +23,7 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public required Dictionary<string, StoryScript> StoryScripts { get; init; }
 	public required Dictionary<string, StorySegmentEntry> StorySegments { get; init; }
 	public required Dictionary<string, ItemDefinition> Items { get; init; }
+	public Dictionary<string, ItemTagDefinition> ItemTags { get; init; } = new(StringComparer.Ordinal);
 	public required List<EquipmentRandomAffixTableDefinition> EquipmentRandomAffixTables { get; init; }
 	public required Dictionary<string, BuffDefinition> Buffs { get; init; }
 	public required Dictionary<string, TalentDefinition> Talents { get; init; }
@@ -40,6 +41,10 @@ public sealed class InMemoryContentRepository : IContentRepository
 		Characters.TryGetValue(id, out definition);
 	public IReadOnlyCollection<CharacterDefinition> GetCharacters() => Characters.Values;
 	public IReadOnlyCollection<ItemDefinition> GetItems() => Items.Values;
+	public IReadOnlyCollection<ItemTagDefinition> GetItemTags() => ItemTags.Values;
+	public ItemTagDefinition GetItemTag(string id) => ItemTags[id];
+	public bool TryGetItemTag(string id, [NotNullWhen(true)] out ItemTagDefinition? definition) =>
+		ItemTags.TryGetValue(id, out definition);
 
 	public ExternalSkillDefinition GetExternalSkill(string id) => ExternalSkills[id];
 	public bool TryGetExternalSkill(string id, [NotNullWhen(true)] out ExternalSkillDefinition? definition) =>
