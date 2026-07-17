@@ -41,7 +41,7 @@ public partial class AutoSaveCoordinator : Node
 
 		try
 		{
-			_saveStore.SaveCurrentSessionToAutoSave();
+			_saveStore.SaveCurrentSession(LocalSaveId.Auto);
 			Game.Logger.Info($"Auto save completed: {reason}.");
 			return true;
 		}

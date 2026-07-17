@@ -17,10 +17,44 @@ public enum LocalSaveReadFailureReason
 	SaveVersionMismatch,
 }
 
+public enum LocalSaveKind
+{
+	Auto,
+	Quick,
+	Manual,
+}
+
+public sealed record LocalSaveId
+{
+	private LocalSaveId(LocalSaveKind kind, int slotIndex)
+	{
+		Kind = kind;
+		SlotIndex = slotIndex;
+	}
+
+	public static LocalSaveId Auto { get; } = new(LocalSaveKind.Auto, 0);
+	public static LocalSaveId Quick { get; } = new(LocalSaveKind.Quick, 0);
+
+	public LocalSaveKind Kind { get; }
+	public int SlotIndex { get; }
+	public string Title => Kind switch
+	{
+		LocalSaveKind.Auto => "自动存档",
+		LocalSaveKind.Quick => "快速存档",
+		LocalSaveKind.Manual => $"存档{SlotIndex}",
+		_ => throw new ArgumentOutOfRangeException(nameof(Kind), Kind, "Unsupported save kind."),
+	};
+
+	public static LocalSaveId Manual(int slotIndex)
+	{
+		LocalSaveStore.ValidateSlotIndex(slotIndex);
+		return new LocalSaveId(LocalSaveKind.Manual, slotIndex);
+	}
+}
+
 public sealed class LocalSaveStore
 {
 	public const int SlotCount = 20;
-	public const int AutoSaveSlotIndex = 0;
 	private readonly ModStoragePaths? _storagePaths;
 
 	public LocalSaveStore(ModStoragePaths? storagePaths = null)
@@ -28,14 +62,8 @@ public sealed class LocalSaveStore
 		_storagePaths = storagePaths;
 	}
 
-	public string SaveCurrentSession(int slotIndex)
-	{
-		ValidateSlotIndex(slotIndex);
-		return SaveCurrentSession(ResolveSavePath(slotIndex), $"slot {slotIndex}");
-	}
-
-	public string SaveCurrentSessionToAutoSave() =>
-		SaveCurrentSession(ResolveAutoSavePath(), "autosave");
+	public string SaveCurrentSession(LocalSaveId saveId) =>
+		SaveCurrentSession(ResolveSavePath(saveId), GetLogName(saveId));
 
 	private static string SaveCurrentSession(string savePath, string logName)
 	{
@@ -58,90 +86,52 @@ public sealed class LocalSaveStore
 		return absolutePath;
 	}
 
-	public bool TryLoad(int slotIndex, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
+	public bool TryLoad(LocalSaveId saveId, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
 	{
-		var absolutePath = ResolveAbsolutePath(slotIndex);
-		if (!TryReadEnvelope(slotIndex, out envelope, out failureReason))
-		{
-			return false;
-		}
-
-		Game.Logger.Info($"Loaded slot {slotIndex} from '{absolutePath}'.");
-		return true;
-	}
-
-	public bool TryLoadAutoSave(out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
-	{
-		var absolutePath = ResolveAutoSavePath();
+		var absolutePath = ResolveSavePath(saveId);
 		if (!TryReadEnvelope(absolutePath, out envelope, out failureReason))
 		{
 			return false;
 		}
 
-		Game.Logger.Info($"Loaded autosave from '{absolutePath}'.");
+		Game.Logger.Info($"Loaded {GetLogName(saveId)} from '{absolutePath}'.");
 		return true;
 	}
 
-	public bool DeleteSave(int slotIndex)
+	public bool Delete(LocalSaveId saveId)
 	{
-		ValidateSlotIndex(slotIndex);
-		var absolutePath = ResolveAbsolutePath(slotIndex);
+		var absolutePath = ResolveSavePath(saveId);
 		if (!File.Exists(absolutePath))
 		{
 			return false;
 		}
 
 		File.Delete(absolutePath);
-		Game.Logger.Info($"Deleted slot {slotIndex} at '{absolutePath}'.");
+		Game.Logger.Info($"Deleted {GetLogName(saveId)} at '{absolutePath}'.");
 		return true;
 	}
 
-	public bool HasSave(int slotIndex)
+	public bool Exists(LocalSaveId saveId)
 	{
-		ValidateSlotIndex(slotIndex);
-		var absolutePath = ResolveAbsolutePath(slotIndex);
-		return File.Exists(absolutePath);
+		return File.Exists(ResolveSavePath(saveId));
 	}
 
-	public IReadOnlyList<LocalSaveSlotSummary> GetSlotSummaries() =>
-		Enumerable.Range(1, SlotCount)
-			.Select(GetSlotSummary)
-			.ToList();
-
-	public LocalSaveSlotSummary GetSlotSummary(int slotIndex)
+	public LocalSaveSummary GetSummary(LocalSaveId saveId)
 	{
-		if (!HasSave(slotIndex))
+		if (!Exists(saveId))
 		{
-			return new LocalSaveSlotSummary(slotIndex);
+			return new LocalSaveSummary(saveId);
 		}
 
-		if (!TryReadEnvelope(slotIndex, out var envelope, out var failureReason) || envelope is null)
+		if (!TryReadEnvelope(ResolveSavePath(saveId), out var envelope, out var failureReason) || envelope is null)
 		{
-			return new LocalSaveSlotSummary(slotIndex, HasSave: true, FailureReason: failureReason);
+			return new LocalSaveSummary(saveId, HasSave: true, FailureReason: failureReason);
 		}
 
-		return BuildSummary(slotIndex, envelope);
+		return BuildSummary(saveId, envelope);
 	}
 
-	public LocalSaveSlotSummary GetAutoSaveSummary()
-	{
-		if (!File.Exists(ResolveAutoSavePath()))
-		{
-			return new LocalSaveSlotSummary(AutoSaveSlotIndex, Title: "自动存档");
-		}
-
-		if (!TryReadEnvelope(ResolveAutoSavePath(), out var envelope, out var failureReason) || envelope is null)
-		{
-			return new LocalSaveSlotSummary(AutoSaveSlotIndex, HasSave: true, Title: "自动存档", FailureReason: failureReason);
-		}
-
-		return BuildSummary(AutoSaveSlotIndex, envelope) with
-		{
-			Title = "自动存档",
-		};
-	}
-
-	private static LocalSaveSlotSummary BuildSummary(int slotIndex, LocalSaveEnvelope envelope)
+	private static LocalSaveSummary BuildSummary(LocalSaveId saveId, LocalSaveEnvelope envelope)
 	{
 		var saveGame = envelope.SaveGame;
 		var leaderId = saveGame.Party.MemberIds.FirstOrDefault();
@@ -150,8 +140,8 @@ public sealed class LocalSaveStore
 			: saveGame.Characters.FirstOrDefault(character => string.Equals(character.Id, leaderId, StringComparison.Ordinal))
 			  ?? saveGame.Characters.FirstOrDefault();
 
-		return new LocalSaveSlotSummary(
-			slotIndex,
+		return new LocalSaveSummary(
+			saveId,
 			HasSave: true,
 			LeaderName: leader?.Name,
 			LeaderPortrait: leader?.Portrait,
@@ -163,7 +153,7 @@ public sealed class LocalSaveStore
 			SavedAtUtc: envelope.SavedAtUtc);
 	}
 
-	private static void ValidateSlotIndex(int slotIndex)
+	internal static void ValidateSlotIndex(int slotIndex)
 	{
 		if (slotIndex < 1 || slotIndex > SlotCount)
 		{
@@ -171,20 +161,23 @@ public sealed class LocalSaveStore
 		}
 	}
 
-	private string ResolveSavePath(int slotIndex) =>
-		StoragePaths.GetSaveSlotPath(slotIndex);
+	private string ResolveSavePath(LocalSaveId saveId) => saveId.Kind switch
+	{
+		LocalSaveKind.Auto => StoragePaths.AutoSavePath,
+		LocalSaveKind.Quick => StoragePaths.QuickSavePath,
+		LocalSaveKind.Manual => StoragePaths.GetSaveSlotPath(saveId.SlotIndex),
+		_ => throw new ArgumentOutOfRangeException(nameof(saveId), saveId, "Unsupported save kind."),
+	};
 
-	private string ResolveAbsolutePath(int slotIndex) => ResolveSavePath(slotIndex);
-
-	private string ResolveAutoSavePath() => StoragePaths.AutoSavePath;
+	private static string GetLogName(LocalSaveId saveId) => saveId.Kind switch
+	{
+		LocalSaveKind.Auto => "autosave",
+		LocalSaveKind.Quick => "quicksave",
+		LocalSaveKind.Manual => $"slot {saveId.SlotIndex}",
+		_ => throw new ArgumentOutOfRangeException(nameof(saveId), saveId, "Unsupported save kind."),
+	};
 
 	private ModStoragePaths StoragePaths => _storagePaths ?? Game.ActiveMod.StoragePaths;
-
-	private bool TryReadEnvelope(int slotIndex, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
-	{
-		ValidateSlotIndex(slotIndex);
-		return TryReadEnvelope(ResolveSavePath(slotIndex), out envelope, out failureReason);
-	}
 
 	private static bool TryReadEnvelope(string savePath, out LocalSaveEnvelope? envelope, out LocalSaveReadFailureReason failureReason)
 	{
@@ -240,10 +233,9 @@ public sealed class LocalSaveStore
 	}
 }
 
-public sealed record LocalSaveSlotSummary(
-	int SlotIndex,
+public sealed record LocalSaveSummary(
+	LocalSaveId SaveId,
 	bool HasSave = false,
-	string? Title = null,
 	string? LeaderName = null,
 	string? LeaderPortrait = null,
 	int PartyMemberCount = 0,

@@ -21,8 +21,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 	private Label _titleLabel = null!;
 	private Label _subtitleLabel = null!;
 	private CheckBox _skipConfirmationCheckBox = null!;
-	private IReadOnlyList<SaveSlotCard> _slotCards = [];
-	private SaveSlotCard? _autoSaveCard;
+	private IReadOnlyDictionary<LocalSaveId, SaveSlotCard> _saveCards = new Dictionary<LocalSaveId, SaveSlotCard>();
 
 	public void Configure(SaveSlotPanelMode mode) => _mode = mode;
 
@@ -35,8 +34,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		_skipConfirmationCheckBox = GetNode<CheckBox>("%SkipConfirmationCheckBox");
 		_slotsGrid = GetNode<GridContainer>("%SlotsGrid");
 		_slotCardScene = GD.Load<PackedScene>("res://scenes/ui/system_panel/save_slot_card.tscn");
-		_slotCards = CreateSlotCards();
-		CreateAutoSaveCardIfNeeded();
+		_saveCards = CreateSaveCards();
 
 		ApplyModeText();
 		RefreshSlots();
@@ -58,7 +56,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 				return;
 			case SaveSlotPanelMode.Delete:
 				_titleLabel.Text = "选择删除存档";
-				_subtitleLabel.Text = "选择一个槽位删除其存档数据。";
+				_subtitleLabel.Text = "选择存档删除其数据。";
 				_skipConfirmationCheckBox.Show();
 				return;
 			default:
@@ -68,43 +66,38 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private void RefreshSlots()
 	{
-		if (_autoSaveCard is not null)
+		foreach (var (saveId, card) in _saveCards)
 		{
-			_autoSaveCard.Configure(_saveStore.GetAutoSaveSummary(), _mode);
-		}
-
-		foreach (var summary in _saveStore.GetSlotSummaries())
-		{
-			_slotCards[summary.SlotIndex - 1].Configure(summary, _mode);
+			card.Configure(_saveStore.GetSummary(saveId), _mode);
 		}
 	}
 
-	private IReadOnlyList<SaveSlotCard> CreateSlotCards()
+	private IReadOnlyDictionary<LocalSaveId, SaveSlotCard> CreateSaveCards()
 	{
-		var cards = new List<SaveSlotCard>(LocalSaveStore.SlotCount);
-		for (var slotIndex = 1; slotIndex <= LocalSaveStore.SlotCount; slotIndex++)
+		var cards = new Dictionary<LocalSaveId, SaveSlotCard>();
+		foreach (var saveId in GetVisibleSaveIds())
 		{
 			var card = CreateSlotCard();
-			var capturedSlotIndex = slotIndex;
-			card.Pressed += () => OnSlotPressed(capturedSlotIndex);
+			card.Pressed += () => OnSaveCardPressed(saveId);
 			_slotsGrid.AddChild(card);
-			cards.Add(card);
+			cards.Add(saveId, card);
 		}
 
 		return cards;
 	}
 
-	private void CreateAutoSaveCardIfNeeded()
+	private IEnumerable<LocalSaveId> GetVisibleSaveIds()
 	{
-		if (_mode != SaveSlotPanelMode.Load)
+		if (_mode != SaveSlotPanelMode.Save)
 		{
-			return;
+			yield return LocalSaveId.Auto;
+			yield return LocalSaveId.Quick;
 		}
 
-		_autoSaveCard = CreateSlotCard();
-		_autoSaveCard.Pressed += () => LoadFromAutoSave();
-		_slotsGrid.AddChild(_autoSaveCard);
-		_slotsGrid.MoveChild(_autoSaveCard, 0);
+		for (var slotIndex = 1; slotIndex <= LocalSaveStore.SlotCount; slotIndex++)
+		{
+			yield return LocalSaveId.Manual(slotIndex);
+		}
 	}
 
 	private SaveSlotCard CreateSlotCard()
@@ -119,98 +112,85 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		throw new InvalidOperationException("Save slot card scene root must be SaveSlotCard.");
 	}
 
-	private async void OnSlotPressed(int slotIndex)
+	private async void OnSaveCardPressed(LocalSaveId saveId)
 	{
 		try
 		{
 			if (_mode == SaveSlotPanelMode.Save)
 			{
-				await SaveToSlotAsync(slotIndex);
+				await SaveAsync(saveId);
 				return;
 			}
 
 			if (_mode == SaveSlotPanelMode.Delete)
 			{
-				await DeleteSlotAsync(slotIndex);
+				await DeleteAsync(saveId);
 				return;
 			}
 
-			LoadFromSlot(slotIndex);
+			Load(saveId);
 		}
 		catch (Exception exception)
 		{
-			Game.Logger.Error($"Save slot action failed: mode={_mode}, slot={slotIndex}", exception);
+			Game.Logger.Error($"Save action failed: mode={_mode}, save={saveId}", exception);
 			UIRoot.Instance.ShowSuggestion(exception.Message);
 		}
 	}
 
-	private void LoadFromAutoSave()
+	private async Task SaveAsync(LocalSaveId saveId)
 	{
-		if (!_saveStore.TryLoadAutoSave(out var envelope, out var failureReason) || envelope is null)
+		if (_saveStore.Exists(saveId) && !ShouldSkipConfirmation())
 		{
-			UIRoot.Instance.ShowSuggestion(BuildLoadFailureText(LocalSaveStore.AutoSaveSlotIndex, failureReason));
-			RefreshSlots();
-			return;
-		}
-
-		Game.LoadSave(envelope.SaveGame);
-		CompleteLoad("已读取自动存档");
-	}
-
-	private async Task SaveToSlotAsync(int slotIndex)
-	{
-		if (_saveStore.HasSave(slotIndex) && !ShouldSkipConfirmation())
-		{
-			var confirmed = await UIRoot.Instance.ShowConfirmAsync(BuildOverwriteConfirmationText(slotIndex));
+			var confirmed = await UIRoot.Instance.ShowConfirmAsync($"{saveId.Title}已有进度，确认覆盖吗？");
 			if (!confirmed)
 			{
 				return;
 			}
 		}
 
-		_saveStore.SaveCurrentSession(slotIndex);
-		UIRoot.Instance.ShowToast($"已写入存档{slotIndex}");
+		_saveStore.SaveCurrentSession(saveId);
+		UIRoot.Instance.ShowToast($"已写入{saveId.Title}");
 		UIRoot.Instance.CloseMainPanel();
 	}
 
-	private async Task DeleteSlotAsync(int slotIndex)
+	private async Task DeleteAsync(LocalSaveId saveId)
 	{
-		if (!_saveStore.HasSave(slotIndex))
+		if (!_saveStore.Exists(saveId))
 		{
 			return;
 		}
 
 		if (!ShouldSkipConfirmation())
 		{
-			var confirmed = await UIRoot.Instance.ShowConfirmAsync(BuildDeleteConfirmationText(slotIndex));
+			var confirmed = await UIRoot.Instance.ShowConfirmAsync($"确认删除{saveId.Title}吗？");
 			if (!confirmed)
 			{
 				return;
 			}
 		}
 
-		if (!_saveStore.DeleteSave(slotIndex))
+		if (!_saveStore.Delete(saveId))
 		{
-			UIRoot.Instance.ShowSuggestion($"存档{slotIndex}不存在。");
+			UIRoot.Instance.ShowSuggestion($"{saveId.Title}不存在。");
 			RefreshSlots();
 			return;
 		}
 
-		UIRoot.Instance.ShowToast($"已删除存档{slotIndex}");
+		UIRoot.Instance.ShowToast($"已删除{saveId.Title}");
 		RefreshSlots();
 	}
 
-	private void LoadFromSlot(int slotIndex)
+	private void Load(LocalSaveId saveId)
 	{
-		if (!_saveStore.TryLoad(slotIndex, out var envelope, out var failureReason) || envelope is null)
+		if (!_saveStore.TryLoad(saveId, out var envelope, out var failureReason) || envelope is null)
 		{
-			UIRoot.Instance.ShowSuggestion(BuildLoadFailureText(slotIndex, failureReason));
+			UIRoot.Instance.ShowSuggestion(BuildLoadFailureText(saveId, failureReason));
 			RefreshSlots();
 			return;
 		}
 
 		Game.LoadSave(envelope.SaveGame);
-		CompleteLoad($"已读取存档{slotIndex}");
+		CompleteLoad($"已读取{saveId.Title}");
 	}
 
 	private void CompleteLoad(string toastText)
@@ -233,27 +213,12 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private bool ShouldSkipConfirmation() => _skipConfirmationCheckBox.ButtonPressed;
 
-	private string BuildOverwriteConfirmationText(int slotIndex)
+	private static string BuildLoadFailureText(LocalSaveId saveId, LocalSaveReadFailureReason failureReason) => failureReason switch
 	{
-		return $"存档{slotIndex}已有进度，确认覆盖吗？";
-	}
-
-	private string BuildDeleteConfirmationText(int slotIndex)
-	{
-		return $"确认删除存档{slotIndex}吗？";
-	}
-
-	private static string BuildLoadFailureText(int slotIndex, LocalSaveReadFailureReason failureReason) => failureReason switch
-	{
-		LocalSaveReadFailureReason.MissingFile when slotIndex == LocalSaveStore.AutoSaveSlotIndex => "自动存档不存在。",
-		LocalSaveReadFailureReason.MissingFile => $"存档{slotIndex}不存在。",
+		LocalSaveReadFailureReason.MissingFile => $"{saveId.Title}不存在。",
 		LocalSaveReadFailureReason.EnvelopeVersionMismatch or LocalSaveReadFailureReason.SaveVersionMismatch
-			when slotIndex == LocalSaveStore.AutoSaveSlotIndex => "自动存档版本不兼容，无法读取。",
-		LocalSaveReadFailureReason.EnvelopeVersionMismatch or LocalSaveReadFailureReason.SaveVersionMismatch
-			=> $"存档{slotIndex}版本不兼容，无法读取。",
-		LocalSaveReadFailureReason.InvalidFormat when slotIndex == LocalSaveStore.AutoSaveSlotIndex => "自动存档解析失败，无法读取。",
-		LocalSaveReadFailureReason.InvalidFormat => $"存档{slotIndex}解析失败，无法读取。",
-		_ when slotIndex == LocalSaveStore.AutoSaveSlotIndex => "自动存档无法读取。",
-		_ => $"存档{slotIndex}无法读取。",
+			=> $"{saveId.Title}版本不兼容，无法读取。",
+		LocalSaveReadFailureReason.InvalidFormat => $"{saveId.Title}解析失败，无法读取。",
+		_ => $"{saveId.Title}无法读取。",
 	};
 }

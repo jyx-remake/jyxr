@@ -109,6 +109,7 @@ public sealed class ModSystemTests
         Assert.NotEqual(alpha.ProfilePath, beta.ProfilePath);
         Assert.NotEqual(alpha.SettingsPath, beta.SettingsPath);
         Assert.EndsWith(Path.Combine("userdata", "alpha", "saves", "save-slot-1.json"), alpha.GetSaveSlotPath(1));
+        Assert.EndsWith(Path.Combine("userdata", "alpha", "saves", "quicksave.json"), alpha.QuickSavePath);
     }
 
     [Fact]

@@ -20,8 +20,6 @@ public partial class SaveSlotCard : Button
 	private Label _hintLabel = null!;
 	private TextureRect _portrait = null!;
 
-	public int SlotIndex { get; private set; }
-
 	public override void _Ready()
 	{
 		_titleLabel = GetNode<Label>("%TitleLabel");
@@ -36,9 +34,8 @@ public partial class SaveSlotCard : Button
 		_portrait = GetNode<TextureRect>("%Portrait");
 	}
 
-	public void Configure(LocalSaveSlotSummary summary, SaveSlotPanelMode mode)
+	public void Configure(LocalSaveSummary summary, SaveSlotPanelMode mode)
 	{
-		SlotIndex = summary.SlotIndex;
 		Disabled = mode switch
 		{
 			SaveSlotPanelMode.Save => false,
@@ -49,7 +46,7 @@ public partial class SaveSlotCard : Button
 		Modulate = Disabled
 			? new Color(1f, 1f, 1f, 0.55f)
 			: Colors.White;
-		_titleLabel.Text = summary.Title ?? $"存档{summary.SlotIndex}";
+		_titleLabel.Text = summary.SaveId.Title;
 
 		if (!summary.HasSave)
 		{
