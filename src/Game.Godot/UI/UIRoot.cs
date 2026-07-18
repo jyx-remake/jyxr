@@ -186,6 +186,9 @@ public partial class UIRoot : Control
 
 	public void ResetPresentationAfterLoad()
 	{
+		CloseMainPanel();
+		_detailPanelHost.Close();
+
 		var currentMapId = Game.State.Location.CurrentMapId;
 		if (!string.IsNullOrWhiteSpace(currentMapId))
 		{

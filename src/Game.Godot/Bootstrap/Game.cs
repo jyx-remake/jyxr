@@ -2,7 +2,6 @@ using Game.Application;
 using Game.Application.Mods;
 using Game.Core.Abstractions;
 using Game.Core.Model;
-using Game.Core.Persistence;
 using Game.Godot.Audio;
 using Godot;
 
@@ -118,12 +117,6 @@ public static class Game
 		_activeMod = activeMod;
 		_diagnosticLogger = diagnosticLogger ?? NullDiagnosticLogger.Instance;
 		_diagnosticLogger.Info($"Game initialized with mod '{activeMod.ModId}'.");
-	}
-
-	public static void LoadSave(SaveGame saveGame)
-	{
-		EnsureInitialized();
-		SaveGameService.LoadSave(saveGame);
 	}
 
 	private static void EnsureInitialized()

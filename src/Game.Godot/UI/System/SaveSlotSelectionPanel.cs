@@ -189,15 +189,13 @@ public partial class SaveSlotSelectionPanel : JyPanel
 			return;
 		}
 
-		Game.LoadSave(envelope.SaveGame);
+		GameFlow.LoadSave(envelope.SaveGame);
 		CompleteLoad($"已读取{saveId.Title}");
 	}
 
 	private void CompleteLoad(string toastText)
 	{
-		UIRoot.Instance.ResetPresentationAfterLoad();
 		UIRoot.Instance.ShowToast(toastText);
-		UIRoot.Instance.CloseMainPanel();
 	}
 
 	private bool ShouldSkipConfirmation() => _skipConfirmationCheckBox.ButtonPressed;

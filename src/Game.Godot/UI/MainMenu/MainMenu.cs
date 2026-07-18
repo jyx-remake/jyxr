@@ -62,19 +62,9 @@ public partial class MainMenu : Control
 		}
 	}
 
-	private async void OnLoadPressed()
+	private void OnLoadPressed()
 	{
-		var panel = UIRoot.Instance.ShowSaveSlotSelectionPanel(SaveSlotPanelMode.Load);
-		await ToSignal(panel, Node.SignalName.TreeExited);
-
-		if (string.IsNullOrWhiteSpace(Game.State.Location.CurrentMapId))
-		{
-			return;
-		}
-
-		Hide();
-		UIRoot.Instance.SetHudSuppressed(false);
-		UIRoot.Instance.ShowHud();
+		UIRoot.Instance.ShowSaveSlotSelectionPanel(SaveSlotPanelMode.Load);
 	}
 
 	private async void OnMusicPressed()

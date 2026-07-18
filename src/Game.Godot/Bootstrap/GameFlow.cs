@@ -1,4 +1,5 @@
 using Game.Application;
+using Game.Core.Persistence;
 using Game.Godot.Story;
 using Game.Godot.UI;
 using Godot;
@@ -8,6 +9,8 @@ namespace Game.Godot;
 public static class GameFlow
 {
 	public const string MainMenuScenePath = "res://scenes/main_menu/main_menu.tscn";
+	public static bool IsMainMenuActive =>
+		Engine.GetMainLoop() is SceneTree { CurrentScene: MainMenu { Visible: true } };
 
 	public static async Task StartNewGameAsync(CancellationToken cancellationToken = default)
 	{
@@ -19,6 +22,27 @@ public static class GameFlow
 	{
 		Game.SessionFlowService.StartNextRound();
 		await StartOpeningStoryAsync(cancellationToken);
+	}
+
+	public static void LoadSave(SaveGame saveGame)
+	{
+		ArgumentNullException.ThrowIfNull(saveGame);
+
+		Game.SaveGameService.LoadSave(saveGame);
+		UIRoot.Instance.ResetPresentationAfterLoad();
+
+		if (string.IsNullOrWhiteSpace(Game.State.Location.CurrentMapId))
+		{
+			return;
+		}
+
+		if (Engine.GetMainLoop() is SceneTree { CurrentScene: MainMenu mainMenu })
+		{
+			mainMenu.Hide();
+		}
+
+		UIRoot.Instance.SetHudSuppressed(false);
+		UIRoot.Instance.ShowHud();
 	}
 
 	public static void ReturnToMainMenu()

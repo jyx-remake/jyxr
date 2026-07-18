@@ -20,7 +20,7 @@ public partial class QuickSaveCoordinator : Node
 		}
 
 		GetViewport().SetInputAsHandled();
-		if (!CanUseQuickSave())
+		if (!CanUseQuickSaveOrLoad())
 		{
 			return;
 		}
@@ -34,9 +34,10 @@ public partial class QuickSaveCoordinator : Node
 		Load();
 	}
 
-	private static bool CanUseQuickSave() =>
+	private static bool CanUseQuickSaveOrLoad() =>
 		Game.IsInitialized &&
 		Game.IsDesktopPlatform &&
+		!GameFlow.IsMainMenuActive &&
 		!UIRoot.Instance.IsStoryPresentationActive &&
 		!UIRoot.Instance.IsBattleActive;
 
@@ -62,8 +63,7 @@ public partial class QuickSaveCoordinator : Node
 				return;
 			}
 
-			Game.LoadSave(envelope.SaveGame);
-			UIRoot.Instance.ResetPresentationAfterLoad();
+			GameFlow.LoadSave(envelope.SaveGame);
 			UIRoot.Instance.ShowToast("已读取快速存档");
 		}
 		catch (Exception exception)
