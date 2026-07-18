@@ -66,7 +66,7 @@ public partial class BattleScreen : Control
 	private BaseButton _endButton = null!;
 	private TextureRect _avatar = null!;
 	private HBoxContainer _listContainer = null!;
-	private RichTextLabel _logLabel = null!;
+	private BattleLogDrawer _logDrawer = null!;
 	private Control _overlayRoot = null!;
 	private int PlayerTeam => GameRoot.Config.BattlePlayerTeam;
 	internal BattlePresenter Presenter => _presenter;
@@ -92,7 +92,7 @@ public partial class BattleScreen : Control
 		_endButton = GetNode<BaseButton>("%EndButton");
 		_avatar = GetNode<TextureRect>("%Avatar");
 		_listContainer = GetNode<HBoxContainer>("%ListContainer");
-		_logLabel = GetNode<RichTextLabel>("%LogLabel");
+		_logDrawer = GetNode<BattleLogDrawer>("%BattleLogDrawer");
 		_overlayRoot = GetNode<Control>("%OverlayRoot");
 		_skillPresentationController = new BattleSkillPresentationController(
 			this,
@@ -102,7 +102,7 @@ public partial class BattleScreen : Control
 			() => _eventPresenter);
 		_eventPresenter = new BattleEventPresenter(
 			_boardGrid,
-			_logLabel,
+			_logDrawer,
 			() => _state,
 			_skillPresentationController.Schedule);
 		_boardController = new BattleBoardController(
@@ -251,7 +251,6 @@ public partial class BattleScreen : Control
 		_timelineValueLabel.Text = header.TimelineTick.ToString();
 		_boardController.Commit(interaction);
 		_actionPanelController.Render(interaction);
-		_eventPresenter.Refresh();
 		RefreshGlobalButtonAvailability(interaction);
 		_settingsController.RefreshButtons();
 	}

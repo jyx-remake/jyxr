@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://cr8b5xtf5q13e"]
+
+[ext_resource type="Script" uid="uid://di4aiftwvkcym" path="res://src/Game.Godot/UI/Battle/Widgets/BattleLogDrawer.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dysmu1w6egklc" path="res://assets/art/ui/battle/battle_zhandoujilukuang.png" id="2_background"]
+[ext_resource type="Texture2D" uid="uid://bb5ik3dmfcc6l" path="res://assets/art/ui/battle/battle_zhandoujilubiaoqian.png" id="3_tag"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pj1rm"]
+bg_color = Color(0.078431375, 0.078431375, 0.078431375, 0.39215687)
+
+[node name="BattleLogDrawer" type="Control" unique_id=1415013512]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 416.0
+offset_bottom = 686.0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="DrawerBody" type="Panel" parent="." unique_id=613192407]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pj1rm")
+
+[node name="Background" type="TextureRect" parent="DrawerBody" unique_id=240530889]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -20.199999
+offset_top = 3.0
+offset_right = 477.8
+offset_bottom = 753.0
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="LogPadding" type="MarginContainer" parent="DrawerBody" unique_id=1743147838]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="LogLabel" type="RichTextLabel" parent="DrawerBody/LogPadding" unique_id=1715761700]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 470)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.94, 0.93, 0.88, 1)
+theme_override_font_sizes/normal_font_size = 20
+
+[node name="BattleLogTag" type="TextureButton" parent="." unique_id=1860645352]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 377.0
+offset_top = -65.0
+offset_right = 454.0
+offset_bottom = 302.0
+tooltip_text = "战斗记录"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("3_tag")
+ignore_texture_size = true
+stretch_mode = 4

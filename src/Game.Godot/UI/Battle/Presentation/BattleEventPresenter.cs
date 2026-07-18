@@ -1,23 +1,19 @@
 using Game.Core.Battle;
 using Game.Core.Model.Skills;
 using Game.Godot.Audio;
-using Godot;
 using GameRoot = Game.Godot.Game;
 
 namespace Game.Godot.UI.Battle;
 
 internal sealed class BattleEventPresenter(
     BattleBoardView board,
-    RichTextLabel logLabel,
+    BattleLogDrawer logDrawer,
     Func<BattleState?> stateProvider,
     Func<BattleMessage, bool> schedule)
 {
     private const string RestSfxId = "音效.休息";
-    private readonly List<string> _logLines = [];
 
-    public void Clear() { _logLines.Clear(); RefreshLog(); }
-
-    public void Refresh() => RefreshLog();
+    public void Clear() => logDrawer.Clear();
 
     public void AppendResult(BattleCommandResult<BattleActionResult> result)
     {
@@ -124,10 +120,7 @@ internal sealed class BattleEventPresenter(
 
     public void AppendLog(string text)
     {
-        if (string.IsNullOrWhiteSpace(text)) return;
-        _logLines.Add(text);
-        if (_logLines.Count > 12) _logLines.RemoveAt(0);
-        if (logLabel.IsNodeReady()) RefreshLog();
+        logDrawer.Append(text);
     }
 
     private void PresentDamage(BattleFact fact, string unitName)
@@ -162,11 +155,6 @@ internal sealed class BattleEventPresenter(
             AppendLog($"{unitName}回复内力{mp}");
         }
         if (hp > 0 || mp > 0) AudioManager.Instance.PlaySfx(RestSfxId);
-    }
-
-    private void RefreshLog()
-    {
-        logLabel.Text = string.Join('\n', _logLines);
     }
 
     private static BattleFloatTextStyle ResolveSkillStyle(BattleSkillCastInfo skill) =>

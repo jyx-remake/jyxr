@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://cx575i6rso56w" path="res://assets/art/ui/battle/battle_shuimodi.png" id="4_bottom_strip"]
 [ext_resource type="Texture2D" uid="uid://dy2gt4wfmhyr" path="res://assets/art/ui/battle/battle_touxiangkuang.png" id="5_avatar_frame"]
 [ext_resource type="Texture2D" uid="uid://cvcu58vmb6qvl" path="res://assets/art/ui/battle/battle_shijianxianzhi.png" id="6_clock"]
-[ext_resource type="Texture2D" uid="uid://bb5ik3dmfcc6l" path="res://assets/art/ui/battle/battle_zhandoujilubiaoqian.png" id="7_log_tag"]
 [ext_resource type="Texture2D" uid="uid://dhyu83ur01mx" path="res://assets/art/ui/battle/battle_yidong-tubiao.png" id="9_move_btn"]
 [ext_resource type="Texture2D" uid="uid://cx2jrb06xy61h" path="res://assets/art/ui/battle/battle_yidong.png" id="10_move_word"]
 [ext_resource type="Texture2D" uid="uid://bjm0ql2rhmq6q" path="res://assets/art/ui/battle/battle_wupin-tubiao.png" id="11_item_btn"]
@@ -27,13 +26,7 @@
 [ext_resource type="PackedScene" uid="uid://dtbij03bvh027" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
 [ext_resource type="PackedScene" uid="uid://cnfci8vqthgqc" path="res://scenes/ui/battle/battle_selected_skill_box.tscn" id="28_selected_skill_box"]
 [ext_resource type="PackedScene" uid="uid://bucx4fp6bcml8" path="res://scenes/ui/battle/battle_status_panel.tscn" id="29_status_panel"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
-bg_color = Color(0, 0, 0, 0.72)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+[ext_resource type="PackedScene" uid="uid://cr8b5xtf5q13e" path="res://scenes/ui/battle/battle_log_drawer.tscn" id="30_log_drawer"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
 bg_color = Color(0.18, 0.14, 0.1, 0.92)
@@ -219,41 +212,6 @@ texture = ExtResource("23_speed_active")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BattleLogTag" type="TextureRect" parent="." unique_id=1046574722]
-visible = false
-layout_mode = 0
-offset_left = -44.0
-offset_top = 200.0
-offset_right = 122.0
-offset_bottom = 659.0
-mouse_filter = 2
-texture = ExtResource("7_log_tag")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="LogPanel" type="PanelContainer" parent="." unique_id=1677156711]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.01
-anchor_right = 0.12
-offset_top = 244.0
-offset_bottom = 748.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_overlay")
-
-[node name="LogPadding" type="MarginContainer" parent="LogPanel" unique_id=1810979141]
-layout_mode = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 14
-
-[node name="LogLabel" type="RichTextLabel" parent="LogPanel/LogPadding" unique_id=1613561611]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 470)
-layout_mode = 2
-theme_override_colors/default_color = Color(0.94, 0.93, 0.88, 1)
-theme_override_font_sizes/normal_font_size = 20
-
 [node name="ContentRoot" type="Control" parent="." unique_id=1435293204]
 layout_mode = 1
 anchors_preset = 5
@@ -272,6 +230,14 @@ offset_left = 237.0
 offset_top = 242.0
 offset_right = 237.0
 offset_bottom = 242.0
+
+[node name="BattleLogDrawer" parent="." unique_id=1851036359 instance=ExtResource("30_log_drawer")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -1.0
+offset_top = 163.0
+offset_right = 415.0
+offset_bottom = 849.0
 
 [node name="BottomHud" type="Control" parent="." unique_id=2050466151]
 layout_mode = 1
