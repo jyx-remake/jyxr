@@ -64,7 +64,7 @@ public partial class BattleScreen : Control
 	private BaseButton _itemButton = null!;
 	private BaseButton _restButton = null!;
 	private BaseButton _endButton = null!;
-	private TextureRect _avatar = null!;
+	private BattleActionDrawer _actionDrawer = null!;
 	private HBoxContainer _listContainer = null!;
 	private BattleLogDrawer _logDrawer = null!;
 	private Control _overlayRoot = null!;
@@ -85,12 +85,12 @@ public partial class BattleScreen : Control
 		_autoBattleActive = GetNode<CanvasItem>("%AutoBattleActive");
 		_boardGrid = GetNode<BattleBoardView>("%BoardGrid");
 		_selectedSkillBox = GetNode<BattleSelectedSkillBox>("%BattleSelectedSkillBox");
-		_moveButton = GetNode<BaseButton>("%MoveButton");
-		_statusButton = GetNode<BaseButton>("%StatusButton");
-		_itemButton = GetNode<BaseButton>("%ItemButton");
-		_restButton = GetNode<BaseButton>("%RestButton");
-		_endButton = GetNode<BaseButton>("%EndButton");
-		_avatar = GetNode<TextureRect>("%Avatar");
+		_actionDrawer = GetNode<BattleActionDrawer>("%BattleActionDrawer");
+		_moveButton = _actionDrawer.MoveButton;
+		_statusButton = _actionDrawer.StatusButton;
+		_itemButton = _actionDrawer.ItemButton;
+		_restButton = _actionDrawer.RestButton;
+		_endButton = _actionDrawer.EndButton;
 		_listContainer = GetNode<HBoxContainer>("%ListContainer");
 		_logDrawer = GetNode<BattleLogDrawer>("%BattleLogDrawer");
 		_overlayRoot = GetNode<Control>("%OverlayRoot");
@@ -125,7 +125,7 @@ public partial class BattleScreen : Control
 				_restButton,
 				_endButton,
 				_surrenderButton,
-				_avatar,
+				_actionDrawer,
 				_listContainer,
 				_overlayRoot),
 			new BattleActionPanelScenes(

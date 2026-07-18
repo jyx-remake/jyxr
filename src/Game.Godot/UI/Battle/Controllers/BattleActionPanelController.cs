@@ -16,7 +16,7 @@ internal sealed record BattleActionPanelView(
 	BaseButton RestButton,
 	BaseButton EndButton,
 	BaseButton SurrenderButton,
-	TextureRect Avatar,
+	BattleActionDrawer ActionDrawer,
 	HBoxContainer ListContainer,
 	Control OverlayRoot);
 
@@ -160,7 +160,8 @@ internal sealed class BattleActionPanelController(
 	{
 		var state = getState();
 		var actingUnit = state is null ? null : BattlePresenter.TryGetActingUnit(state);
-		view.Avatar.Texture = actingUnit is null ? null : AssetResolver.LoadCharacterPortrait(actingUnit.Character);
+		view.ActionDrawer.SetAvatar(
+			actingUnit is null ? null : AssetResolver.LoadCharacterPortrait(actingUnit.Character));
 	}
 
 	private SkillInstance? ResolvePreviewSkill(BattleUnit? actingUnit, SkillInstance? selectedSkill)

@@ -4,16 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://5n52fg3sl8bk" path="res://assets/art/battle_bg/zhulin.jpg" id="2_bg"]
 [ext_resource type="Texture2D" uid="uid://beuwbdagaqxxq" path="res://assets/art/ui/battle/battle_actionBarBg.png" id="3_action_bg"]
 [ext_resource type="Texture2D" uid="uid://cx575i6rso56w" path="res://assets/art/ui/battle/battle_shuimodi.png" id="4_bottom_strip"]
-[ext_resource type="Texture2D" uid="uid://dy2gt4wfmhyr" path="res://assets/art/ui/battle/battle_touxiangkuang.png" id="5_avatar_frame"]
 [ext_resource type="Texture2D" uid="uid://cvcu58vmb6qvl" path="res://assets/art/ui/battle/battle_shijianxianzhi.png" id="6_clock"]
-[ext_resource type="Texture2D" uid="uid://dhyu83ur01mx" path="res://assets/art/ui/battle/battle_yidong-tubiao.png" id="9_move_btn"]
-[ext_resource type="Texture2D" uid="uid://cx2jrb06xy61h" path="res://assets/art/ui/battle/battle_yidong.png" id="10_move_word"]
-[ext_resource type="Texture2D" uid="uid://bjm0ql2rhmq6q" path="res://assets/art/ui/battle/battle_wupin-tubiao.png" id="11_item_btn"]
-[ext_resource type="Texture2D" uid="uid://bdw6xourk6852" path="res://assets/art/ui/battle/battle_wupin.png" id="12_item_word"]
-[ext_resource type="Texture2D" uid="uid://c4ngqcvo4kjm7" path="res://assets/art/ui/battle/battle_xiuxi-tubiao.png" id="13_rest_btn"]
-[ext_resource type="Texture2D" uid="uid://b3h356h4xfurf" path="res://assets/art/ui/battle/battle_xiuxi.png" id="14_rest_word"]
-[ext_resource type="Texture2D" uid="uid://u5msb8uqcflv" path="res://assets/art/ui/battle/battle_zhuangtai-tubiao.png" id="15_skill_btn"]
-[ext_resource type="Texture2D" uid="uid://dm6cedvudfbhe" path="res://assets/art/ui/battle/battle_zhuangtai.png" id="16_skill_word"]
 [ext_resource type="PackedScene" uid="uid://cstdi8n6cph7k" path="res://scenes/ui/battle/battle_skill_box.tscn" id="18_skill_box"]
 [ext_resource type="PackedScene" uid="uid://d1qdddofh12io" path="res://scenes/ui/battle/battle_board_view.tscn" id="19_board_view"]
 [ext_resource type="PackedScene" uid="uid://oei4u3648ovq" path="res://scenes/ui/battle/battle_item_panel.tscn" id="20_item_panel"]
@@ -27,18 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://cnfci8vqthgqc" path="res://scenes/ui/battle/battle_selected_skill_box.tscn" id="28_selected_skill_box"]
 [ext_resource type="PackedScene" uid="uid://bucx4fp6bcml8" path="res://scenes/ui/battle/battle_status_panel.tscn" id="29_status_panel"]
 [ext_resource type="PackedScene" uid="uid://cr8b5xtf5q13e" path="res://scenes/ui/battle/battle_log_drawer.tscn" id="30_log_drawer"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
-bg_color = Color(0.18, 0.14, 0.1, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.9, 0.8, 0.55, 0.45)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_action_drawer.tscn" id="31_action_drawer"]
 
 [node name="BattleScreen" type="Control" unique_id=96008142]
 layout_mode = 3
@@ -264,8 +244,8 @@ expand_mode = 1
 [node name="BottomStrip" type="TextureRect" parent="BottomHud" unique_id=1312754331]
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 0.72
-offset_top = 328.0
+anchor_right = 1.0
+offset_top = 250.0
 offset_bottom = 507.0
 mouse_filter = 2
 texture = ExtResource("4_bottom_strip")
@@ -300,141 +280,10 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 38
 
-[node name="BottomRightHud" type="Control" parent="." unique_id=66707520]
+[node name="BattleActionDrawer" parent="." unique_id=617508197 instance=ExtResource("31_action_drawer")]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 0
-grow_vertical = 0
-
-[node name="Avatar" type="TextureRect" parent="BottomRightHud" unique_id=912225212]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = -322.0
-offset_top = -253.0
-offset_right = -165.0
-offset_bottom = -86.04547
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="AvatarFrame" type="TextureRect" parent="BottomRightHud" unique_id=55353986]
-layout_mode = 0
-offset_left = -337.0
-offset_top = -241.0
-offset_right = -138.7583
-offset_bottom = -77.0
-mouse_filter = 2
-texture = ExtResource("5_avatar_frame")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="EndButton" type="Button" parent="BottomRightHud" unique_id=890715130]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(132, 56)
-layout_mode = 0
-offset_left = -213.0
-offset_top = -561.0
-offset_right = -11.0
-offset_bottom = -499.0
-theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("StyleBoxFlat_action")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
-theme_override_styles/hover = SubResource("StyleBoxFlat_action")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
-text = "结束"
-
-[node name="StatusButton" type="TextureButton" parent="BottomRightHud" unique_id=250363507]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = -325.0
-offset_top = -395.0
-offset_right = -148.0
-offset_bottom = -235.0
-texture_normal = ExtResource("15_skill_btn")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="StatusWord" type="TextureRect" parent="BottomRightHud/StatusButton" unique_id=1217349101]
-layout_mode = 0
-offset_left = 33.0
-offset_top = 11.0
-offset_right = 133.0
-offset_bottom = 81.0
-mouse_filter = 2
-texture = ExtResource("16_skill_word")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="ItemButton" type="TextureButton" parent="BottomRightHud" unique_id=984075596]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = -196.0
-offset_top = -317.0
-offset_right = -19.0
-offset_bottom = -157.0
-texture_normal = ExtResource("11_item_btn")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="ItemWord" type="TextureRect" parent="BottomRightHud/ItemButton" unique_id=1820730931]
-layout_mode = 0
-offset_left = 37.0
-offset_top = 14.0
-offset_right = 137.0
-offset_bottom = 84.0
-mouse_filter = 2
-texture = ExtResource("12_item_word")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="RestButton" type="TextureButton" parent="BottomRightHud" unique_id=861883801]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = -191.0
-offset_top = -162.0
-offset_right = -14.0
-offset_bottom = -2.0
-texture_normal = ExtResource("13_rest_btn")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="RestWord" type="TextureRect" parent="BottomRightHud/RestButton" unique_id=1311330508]
-layout_mode = 0
-offset_left = 44.0
-offset_top = 22.0
-offset_right = 144.0
-offset_bottom = 92.0
-mouse_filter = 2
-texture = ExtResource("14_rest_word")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="MoveButton" type="TextureButton" parent="BottomRightHud" unique_id=1408921671]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = -458.0
-offset_top = -161.0
-offset_right = -281.0
-offset_bottom = -1.0
-texture_normal = ExtResource("9_move_btn")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="MoveWord" type="TextureRect" parent="BottomRightHud/MoveButton" unique_id=336048975]
-layout_mode = 0
-offset_left = 35.0
-offset_top = 16.0
-offset_right = 135.0
-offset_bottom = 86.0
-mouse_filter = 2
-texture = ExtResource("10_move_word")
-expand_mode = 1
-stretch_mode = 5
+ActionBarBackgroundPath = NodePath("../BottomHud/ActionBarBg")
 
 [node name="OverlayRoot" type="Control" parent="." unique_id=2009935606]
 unique_name_in_owner = true

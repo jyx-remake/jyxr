@@ -1,0 +1,180 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Battle/Widgets/BattleActionDrawer.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dy2gt4wfmhyr" path="res://assets/art/ui/battle/battle_touxiangkuang.png" id="2_avatar_frame"]
+[ext_resource type="Texture2D" uid="uid://u5msb8uqcflv" path="res://assets/art/ui/battle/battle_zhuangtai-tubiao.png" id="3_status_button"]
+[ext_resource type="Texture2D" uid="uid://dm6cedvudfbhe" path="res://assets/art/ui/battle/battle_zhuangtai.png" id="4_status_word"]
+[ext_resource type="Texture2D" uid="uid://bjm0ql2rhmq6q" path="res://assets/art/ui/battle/battle_wupin-tubiao.png" id="5_item_button"]
+[ext_resource type="Texture2D" uid="uid://bdw6xourk6852" path="res://assets/art/ui/battle/battle_wupin.png" id="6_item_word"]
+[ext_resource type="Texture2D" uid="uid://c4ngqcvo4kjm7" path="res://assets/art/ui/battle/battle_xiuxi-tubiao.png" id="7_rest_button"]
+[ext_resource type="Texture2D" uid="uid://b3h356h4xfurf" path="res://assets/art/ui/battle/battle_xiuxi.png" id="8_rest_word"]
+[ext_resource type="Texture2D" uid="uid://dhyu83ur01mx" path="res://assets/art/ui/battle/battle_yidong-tubiao.png" id="9_move_button"]
+[ext_resource type="Texture2D" uid="uid://cx2jrb06xy61h" path="res://assets/art/ui/battle/battle_yidong.png" id="10_move_word"]
+[ext_resource type="Shader" path="res://assets/shader/hexagon_mask.gdshader" id="11_avatar_mask"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
+bg_color = Color(0.18, 0.14, 0.1, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.8, 0.55, 0.45)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_avatar_mask"]
+shader = ExtResource("11_avatar_mask")
+shader_parameter/top_y = 0.176
+shader_parameter/middle_y = 0.559
+shader_parameter/bottom_y = 0.943
+shader_parameter/top_left_x = 0.279
+shader_parameter/top_right_x = 0.797
+shader_parameter/middle_left_x = 0.039
+shader_parameter/middle_right_x = 1.039
+
+[node name="BattleActionDrawer" type="Control"]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Avatar" type="TextureButton" parent="."]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_avatar_mask")
+layout_mode = 0
+offset_left = -322.0
+offset_top = -253.0
+offset_right = -165.0
+offset_bottom = -86.04547
+mouse_default_cursor_shape = 2
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AvatarFrame" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -337.0
+offset_top = -241.0
+offset_right = -138.7583
+offset_bottom = -77.0
+mouse_filter = 2
+texture = ExtResource("2_avatar_frame")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ActionButtons" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+mouse_filter = 2
+
+[node name="EndButton" type="Button" parent="ActionButtons"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(132, 56)
+layout_mode = 0
+offset_left = -213.0
+offset_top = -561.0
+offset_right = -11.0
+offset_bottom = -499.0
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
+text = "结束"
+
+[node name="StatusButton" type="TextureButton" parent="ActionButtons"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -325.0
+offset_top = -395.0
+offset_right = -148.0
+offset_bottom = -235.0
+texture_normal = ExtResource("3_status_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="StatusWord" type="TextureRect" parent="ActionButtons/StatusButton"]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 11.0
+offset_right = 133.0
+offset_bottom = 81.0
+mouse_filter = 2
+texture = ExtResource("4_status_word")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemButton" type="TextureButton" parent="ActionButtons"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -196.0
+offset_top = -317.0
+offset_right = -19.0
+offset_bottom = -157.0
+texture_normal = ExtResource("5_item_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ItemWord" type="TextureRect" parent="ActionButtons/ItemButton"]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 14.0
+offset_right = 137.0
+offset_bottom = 84.0
+mouse_filter = 2
+texture = ExtResource("6_item_word")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RestButton" type="TextureButton" parent="ActionButtons"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -191.0
+offset_top = -162.0
+offset_right = -14.0
+offset_bottom = -2.0
+texture_normal = ExtResource("7_rest_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="RestWord" type="TextureRect" parent="ActionButtons/RestButton"]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 22.0
+offset_right = 144.0
+offset_bottom = 92.0
+mouse_filter = 2
+texture = ExtResource("8_rest_word")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MoveButton" type="TextureButton" parent="ActionButtons"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -458.0
+offset_top = -161.0
+offset_right = -281.0
+offset_bottom = -1.0
+texture_normal = ExtResource("9_move_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MoveWord" type="TextureRect" parent="ActionButtons/MoveButton"]
+layout_mode = 0
+offset_left = 35.0
+offset_top = 16.0
+offset_right = 135.0
+offset_bottom = 86.0
+mouse_filter = 2
+texture = ExtResource("10_move_word")
+expand_mode = 1
+stretch_mode = 5
