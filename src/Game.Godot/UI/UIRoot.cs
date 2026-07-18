@@ -81,6 +81,7 @@ public partial class UIRoot : Control
 	public CanvasLayer BattleLayer { get; private set; } = null!;
 	public CanvasLayer ModalLayer { get; private set; } = null!;
 	public CanvasLayer OverlayLayer { get; private set; } = null!;
+	public bool IsBattleActive => BattleLayer.GetChildCount() > 0;
 	private HudPanel? _hud;
 	private StoryDialoguePanel _storyDialoguePanel = null!;
 	private StoryChoicePanel _storyChoicePanel = null!;
@@ -181,6 +182,17 @@ public partial class UIRoot : Control
 	public void RefreshHud()
 	{
 		_hud?.Refresh();
+	}
+
+	public void ResetPresentationAfterLoad()
+	{
+		var currentMapId = Game.State.Location.CurrentMapId;
+		if (!string.IsNullOrWhiteSpace(currentMapId))
+		{
+			World.Instance.RefreshCurrentMap();
+		}
+
+		RefreshHud();
 	}
 
 	public void BindSessionEvents(GameSession session)
@@ -631,7 +643,11 @@ public partial class UIRoot : Control
 		ShowToast($"【{characterName}】升到{sessionEvent.NewLevel}级");
 	}
 
-	private void OnSaveLoaded(SaveLoadedEvent _) => RefreshHud();
+	private void OnSaveLoaded(SaveLoadedEvent _)
+	{
+		_detailPanelHost.Close();
+		RefreshHud();
+	}
 
 	private void OnAchievementUnlocked(AchievementUnlockedEvent sessionEvent)
 	{

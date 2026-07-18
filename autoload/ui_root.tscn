@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b26rtcod4xv7t" path="res://src/Game.Godot/UI/UIRoot.cs" id="1_ui_root"]
 [ext_resource type="Script" path="res://src/Game.Godot/UI/Detail/DetailPanelHost.cs" id="2_detail_host"]
+[ext_resource type="Script" path="res://src/Game.Godot/Persistence/QuickSaveCoordinator.cs" id="2_quick_save"]
 [ext_resource type="PackedScene" uid="uid://jon61teprdc7" path="res://scenes/ui/party_panel/party_panel.tscn" id="2_party_panel"]
 [ext_resource type="PackedScene" path="res://scenes/ui/character_panel/character_roster_panel.tscn" id="3_i0hgf"]
 [ext_resource type="PackedScene" uid="uid://beqsxw0hmqwm" path="res://scenes/ui/story/story_dialogue_panel.tscn" id="4_story_dialogue"]
@@ -60,6 +61,9 @@ SelectHeadPanelScene = ExtResource("16_select_head")
 RollStatsPanelScene = ExtResource("17_roll_stats")
 GameOverScreenScene = ExtResource("18_gameover")
 GameFinScreenScene = ExtResource("19_gamefin")
+
+[node name="QuickSaveCoordinator" type="Node" parent="."]
+script = ExtResource("2_quick_save")
 
 [node name="HudLayer" type="CanvasLayer" parent="." unique_id=1159616672]
 unique_name_in_owner = true

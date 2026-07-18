@@ -1,3 +1,4 @@
+using Game.Application;
 using Game.Core.Model;
 using Godot;
 
@@ -14,6 +15,7 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 	private GridContainer _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private IReadOnlyList<EquipmentInstanceInventoryEntry> _entries = [];
+	private IDisposable? _saveLoadedSubscription;
 
 	public override void _Ready()
 	{
@@ -21,6 +23,7 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 		_gridContainer = GetNode<GridContainer>("%GridContainer");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		ClosePanelRequested += () => _selectionCompletion.TrySetResult(null);
+		_saveLoadedSubscription = Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => QueueFree());
 		Refresh();
 	}
 
@@ -48,6 +51,8 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 
 	public override void _ExitTree()
 	{
+		_saveLoadedSubscription?.Dispose();
+		_saveLoadedSubscription = null;
 		base._ExitTree();
 		if (!_selectionCompletion.Task.IsCompleted)
 		{

@@ -33,6 +33,7 @@ public partial class CharacterRosterPanel : Control
 		_characterPanel.ClosePanelRequested += QueueFree;
 		_subscriptions.Add(Game.Session.Events.Subscribe<PartyChangedEvent>(_ => Render()));
 		_subscriptions.Add(Game.Session.Events.Subscribe<CharacterChangedEvent>(_ => Render()));
+		_subscriptions.Add(Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => Render()));
 
 		if (!string.IsNullOrWhiteSpace(CharacterId))
 		{

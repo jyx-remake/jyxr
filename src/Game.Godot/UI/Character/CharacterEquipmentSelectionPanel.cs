@@ -17,6 +17,7 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 
 	private string _characterId = string.Empty;
 	private EquipmentSlotType _slotType;
+	private IDisposable? _saveLoadedSubscription;
 
 	public override void _Ready()
 	{
@@ -25,7 +26,15 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_hintLabel = GetNode<Label>("%HintLabel");
+		_saveLoadedSubscription = Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => QueueFree());
 		Refresh();
+	}
+
+	public override void _ExitTree()
+	{
+		_saveLoadedSubscription?.Dispose();
+		_saveLoadedSubscription = null;
+		base._ExitTree();
 	}
 
 	public void Configure(string characterId, EquipmentSlotType slotType)

@@ -33,6 +33,7 @@ public partial class ChestPanel : JyPanel
 	private GridContainer _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private HFlowContainer _tagButtons = null!;
+	private IDisposable? _saveLoadedSubscription;
 
 	public override void _Ready()
 	{
@@ -54,8 +55,16 @@ public partial class ChestPanel : JyPanel
 		_depositModeButton.Pressed += () => SelectMode(ChestMode.Deposit);
 		_withdrawModeButton.Pressed += () => SelectMode(ChestMode.Withdraw);
 		_leaveButton.Pressed += QueueFree;
+		_saveLoadedSubscription = Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => QueueFree());
 
 		Refresh();
+	}
+
+	public override void _ExitTree()
+	{
+		_saveLoadedSubscription?.Dispose();
+		_saveLoadedSubscription = null;
+		base._ExitTree();
 	}
 
 	private void SelectMode(ChestMode mode)

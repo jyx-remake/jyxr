@@ -14,6 +14,7 @@ public partial class ItemTargetSelectionPanel : JyPanel
 	private Label _itemLabel = null!;
 	private Label _hintLabel = null!;
 	private InventoryEntry? _entry;
+	private IDisposable? _saveLoadedSubscription;
 
 	public override void _Ready()
 	{
@@ -21,7 +22,15 @@ public partial class ItemTargetSelectionPanel : JyPanel
 		_gridContainer = GetNode<GridContainer>("%GridContainer");
 		_itemLabel = GetNode<Label>("%ItemLabel");
 		_hintLabel = GetNode<Label>("%HintLabel");
+		_saveLoadedSubscription = Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => QueueFree());
 		Refresh();
+	}
+
+	public override void _ExitTree()
+	{
+		_saveLoadedSubscription?.Dispose();
+		_saveLoadedSubscription = null;
+		base._ExitTree();
 	}
 
 	public void Configure(InventoryEntry entry)

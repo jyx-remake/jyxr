@@ -11,13 +11,22 @@ public partial class JournalPanel : JyPanel
 
     private VBoxContainer _entryContainer = null!;
     private Label _emptyLabel = null!;
+    private IDisposable? _saveLoadedSubscription;
 
     public override void _Ready()
     {
         base._Ready();
         _entryContainer = GetNode<VBoxContainer>("%EntryContainer");
         _emptyLabel = GetNode<Label>("%EmptyLabel");
+        _saveLoadedSubscription = Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => Refresh());
         Refresh();
+    }
+
+    public override void _ExitTree()
+    {
+        _saveLoadedSubscription?.Dispose();
+        _saveLoadedSubscription = null;
+        base._ExitTree();
     }
 
     private void Refresh()

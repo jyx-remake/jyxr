@@ -37,6 +37,7 @@ public partial class ShopPanel : JyPanel
 	private Label _silverLabel = null!;
 	private Label _goldLabel = null!;
 	private HFlowContainer _tagButtons = null!;
+	private IDisposable? _saveLoadedSubscription;
 
 	public override void _Ready()
 	{
@@ -61,11 +62,19 @@ public partial class ShopPanel : JyPanel
 		_buyModeButton.Pressed += () => SelectMode(ShopMode.Buy);
 		_sellModeButton.Pressed += () => SelectMode(ShopMode.Sell);
 		_leaveButton.Pressed += QueueFree;
+		_saveLoadedSubscription = Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => QueueFree());
 
 		if (!string.IsNullOrWhiteSpace(_shopId))
 		{
 			LoadShop();
 		}
+	}
+
+	public override void _ExitTree()
+	{
+		_saveLoadedSubscription?.Dispose();
+		_saveLoadedSubscription = null;
+		base._ExitTree();
 	}
 
 	public void Configure(string shopId)

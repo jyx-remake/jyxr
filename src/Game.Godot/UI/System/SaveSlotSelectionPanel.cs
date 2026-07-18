@@ -195,20 +195,9 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private void CompleteLoad(string toastText)
 	{
-		ReloadCurrentMap();
+		UIRoot.Instance.ResetPresentationAfterLoad();
 		UIRoot.Instance.ShowToast(toastText);
 		UIRoot.Instance.CloseMainPanel();
-	}
-
-	private static void ReloadCurrentMap()
-	{
-		var currentMapId = Game.State.Location.CurrentMapId;
-		if (!string.IsNullOrWhiteSpace(currentMapId))
-		{
-			World.Instance.RefreshCurrentMap();
-		}
-
-		UIRoot.Instance.RefreshHud();
 	}
 
 	private bool ShouldSkipConfirmation() => _skipConfirmationCheckBox.ButtonPressed;
