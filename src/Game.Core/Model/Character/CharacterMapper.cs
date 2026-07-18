@@ -23,6 +23,7 @@ public static class CharacterMapper
             Model = definition.Model,
             GrowTemplateId = definition.GrowTemplate
         };
+        character.SetGender(definition.Gender);
         character.SetLevel(definition.Level);
         EnsureMinimumExperienceForCurrentLevel(character);
         CopyStats(definition.Stats, character.BaseStats);
@@ -72,6 +73,7 @@ public static class CharacterMapper
             Model = record.Model,
             GrowTemplateId = record.GrowTemplateId,
         };
+        character.SetGender(record.Gender ?? character.Definition.Gender);
         character.SetAiType(record.AiType);
         
         character.SetLevel(record.Level);
@@ -140,6 +142,7 @@ public static class CharacterMapper
             character.EquippedItems.ToDictionary(
                 entry => entry.Key,
                 entry => EquipmentMapper.ToRecord(entry.Value)),
+            character.Gender,
             character.AiType);
 
     private static void CopyStats(IReadOnlyDictionary<StatType, int> source, Dictionary<StatType, int> target)

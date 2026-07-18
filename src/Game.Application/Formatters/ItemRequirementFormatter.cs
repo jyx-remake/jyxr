@@ -16,6 +16,8 @@ public static class ItemRequirementFormatter
                 $"{FormatterTextCn.GetStatNameCn(statRequirement.StatId)} >= {statRequirement.Value}",
             TalentItemRequirementDefinition talentRequirement =>
                 $"需要天赋「{FormatterTextCn.ResolveTalentName(talentRequirement.TalentId, contentRepository)}」",
+            GenderItemRequirementDefinition genderRequirement =>
+                $"性别仅限{string.Join("、", genderRequirement.Genders.Select(FormatterTextCn.GetGenderNameCn))}",
             _ => throw new NotSupportedException($"Unsupported item requirement type '{requirement.GetType().Name}'.")
         };
     }

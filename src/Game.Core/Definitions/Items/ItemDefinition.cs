@@ -37,6 +37,7 @@ public sealed record NormalItemDefinition : ItemDefinition;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(StatItemRequirementDefinition), "stat")]
 [JsonDerivedType(typeof(TalentItemRequirementDefinition), "talent")]
+[JsonDerivedType(typeof(GenderItemRequirementDefinition), "gender")]
 public abstract record ItemRequirementDefinition;
 
 public sealed record StatItemRequirementDefinition(
@@ -45,6 +46,9 @@ public sealed record StatItemRequirementDefinition(
 
 public sealed record TalentItemRequirementDefinition(
     string TalentId) : ItemRequirementDefinition;
+
+public sealed record GenderItemRequirementDefinition(
+    IReadOnlyList<CharacterGender> Genders) : ItemRequirementDefinition;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(AddBuffItemUseEffectDefinition), "add_buff")]
@@ -60,6 +64,8 @@ public sealed record TalentItemRequirementDefinition(
 [JsonDerivedType(typeof(GrantInternalSkillItemUseEffectDefinition), "internal_skill")]
 [JsonDerivedType(typeof(GrantSpecialSkillItemUseEffectDefinition), "special_skill")]
 [JsonDerivedType(typeof(GrantTalentItemUseEffectDefinition), "grant_talent")]
+[JsonDerivedType(typeof(SetGenderItemUseEffectDefinition), "set_gender")]
+[JsonDerivedType(typeof(ReduceMaxResourceRatioItemUseEffectDefinition), "reduce_max_resource_ratio")]
 public abstract record ItemUseEffectDefinition;
 
 public sealed record AddBuffItemUseEffectDefinition(
@@ -105,3 +111,10 @@ public sealed record GrantSpecialSkillItemUseEffectDefinition(
 
 public sealed record GrantTalentItemUseEffectDefinition(
     string TalentId) : ItemUseEffectDefinition;
+
+public sealed record SetGenderItemUseEffectDefinition(
+    CharacterGender Gender) : ItemUseEffectDefinition;
+
+public sealed record ReduceMaxResourceRatioItemUseEffectDefinition(
+    StatType StatId,
+    double Ratio) : ItemUseEffectDefinition;

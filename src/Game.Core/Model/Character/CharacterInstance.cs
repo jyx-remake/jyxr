@@ -15,6 +15,7 @@ public sealed class CharacterInstance
     public string? Portrait { get; set; }
     public string? Model { get; set; }
     public string? GrowTemplateId { get; set; }
+    public CharacterGender Gender { get; private set; } = CharacterGender.Neutral;
 
     public int Level { get; private set; } = 1;
     public int Experience { get; private set; }
@@ -67,6 +68,16 @@ public sealed class CharacterInstance
         AiType = aiType;
     }
 
+    public void SetGender(CharacterGender gender)
+    {
+        if (!Enum.IsDefined(gender))
+        {
+            throw new ArgumentOutOfRangeException(nameof(gender), gender, null);
+        }
+
+        Gender = gender;
+    }
+
     public void AllocateStat(StatType statType, int points)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(points);
@@ -95,6 +106,37 @@ public sealed class CharacterInstance
         }
 
         BaseStats[statType] = value;
+    }
+
+    public int ReduceBaseResourceStat(StatType statType, double ratio)
+    {
+        if (statType is not (StatType.MaxHp or StatType.MaxMp))
+        {
+            throw new ArgumentOutOfRangeException(nameof(statType), statType, "Only maximum resource stats can be reduced proportionally.");
+        }
+        if (!double.IsFinite(ratio) || ratio <= 0d || ratio >= 1d)
+        {
+            throw new ArgumentOutOfRangeException(nameof(ratio), ratio, "Resource reduction ratio must be between zero and one.");
+        }
+
+        var loss = (int)(GetBaseStat(statType) * ratio);
+        if (loss == 0)
+        {
+            return 0;
+        }
+
+        AddBaseStat(statType, -loss);
+        if (statType == StatType.MaxHp && CurrentHp is not null)
+        {
+            CurrentHp = Math.Max(0, CurrentHp.Value - loss);
+        }
+        else if (statType == StatType.MaxMp && CurrentMp is not null)
+        {
+            CurrentMp = Math.Max(0, CurrentMp.Value - loss);
+        }
+
+        ClampBattleResources();
+        return loss;
     }
 
     public void SetExternalSkillState(ExternalSkillDefinition definition, int level, int exp, bool active)

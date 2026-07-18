@@ -252,7 +252,7 @@ internal sealed class ProceduralBattleCharacterFactory
     {
         var availableIds = candidateIds
             .Where(candidateId => !character.HasTalent(candidateId))
-            .Where(candidateId => IsTalentAllowedForGender(candidateId, character.Definition.Gender))
+            .Where(candidateId => IsTalentAllowedForGender(candidateId, character.Gender))
             .ToArray();
         if (availableIds.Length == 0)
         {

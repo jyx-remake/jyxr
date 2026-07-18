@@ -42,4 +42,5 @@ public sealed record CharacterRecord(
     IReadOnlyList<ExternalSkillRecord> ExternalSkills,
     IReadOnlyList<InternalSkillRecord> InternalSkills,
     IReadOnlyDictionary<EquipmentSlotType, EquipmentRecord> EquippedItems,
+    CharacterGender? Gender = null,
     BattleAiType AiType = BattleAiType.Basic);

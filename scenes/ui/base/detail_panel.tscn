@@ -82,11 +82,11 @@ layout_mode = 0
 offset_left = 229.0
 offset_top = 626.0
 offset_right = 669.0
-offset_bottom = 701.0
+offset_bottom = 753.0
 text = "类型"
 label_settings = SubResource("4_category_settings")
 horizontal_alignment = 1
-vertical_alignment = 1
+autowrap_mode = 3
 
 [node name="ContentPanel" type="Panel" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=100000207]
 layout_mode = 0

@@ -738,6 +738,15 @@ public sealed partial class JsonContentLoader
 
                     case StatItemRequirementDefinition:
                         break;
+
+                    case GenderItemRequirementDefinition genderRequirement:
+                        Ensure(genderRequirement.Genders is { Count: > 0 },
+                            $"Item '{item.Id}' gender requirement has no allowed genders.");
+                        Ensure(genderRequirement.Genders!.All(Enum.IsDefined),
+                            $"Item '{item.Id}' gender requirement contains an invalid gender.");
+                        Ensure(genderRequirement.Genders.Distinct().Count() == genderRequirement.Genders.Count,
+                            $"Item '{item.Id}' gender requirement contains duplicate genders.");
+                        break;
                 }
             }
 
@@ -773,10 +782,40 @@ public sealed partial class JsonContentLoader
                         Ensure(!string.IsNullOrWhiteSpace(talent.TalentId), $"Item '{item.Id}' grant_talent effect is missing talentId.");
                         Ensure(talentIds.Contains(talent.TalentId), $"Item '{item.Id}' references missing talent '{talent.TalentId}'.");
                         break;
+
+                    case SetGenderItemUseEffectDefinition setGender:
+                        Ensure(Enum.IsDefined(setGender.Gender),
+                            $"Item '{item.Id}' set_gender effect has invalid gender '{setGender.Gender}'.");
+                        break;
+
+                    case ReduceMaxResourceRatioItemUseEffectDefinition reduction:
+                        Ensure(reduction.StatId is StatType.MaxHp or StatType.MaxMp,
+                            $"Item '{item.Id}' reduce_max_resource_ratio effect has unsupported stat '{reduction.StatId}'.");
+                        Ensure(double.IsFinite(reduction.Ratio) && reduction.Ratio > 0d && reduction.Ratio < 1d,
+                            $"Item '{item.Id}' reduce_max_resource_ratio effect has invalid ratio '{reduction.Ratio}'.");
+                        break;
                 }
+            }
+
+            if (item is not EquipmentDefinition &&
+                item.Type is not (ItemType.Consumable or ItemType.QuestItem) &&
+                item.UseEffects is { Count: > 0 })
+            {
+                Ensure(item.UseEffects.All(IsSupportedOutOfBattleItemEffect),
+                    $"Item '{item.Id}' contains an item effect that is not supported outside battle.");
             }
         }
     }
+
+    private static bool IsSupportedOutOfBattleItemEffect(ItemUseEffectDefinition effect) =>
+        effect is GrantExternalSkillItemUseEffectDefinition or
+            GrantInternalSkillItemUseEffectDefinition or
+            GrantSpecialSkillItemUseEffectDefinition or
+            GrantTalentItemUseEffectDefinition or
+            AddMaxHpItemUseEffectDefinition or
+            AddMaxMpItemUseEffectDefinition or
+            SetGenderItemUseEffectDefinition or
+            ReduceMaxResourceRatioItemUseEffectDefinition;
 
     private static void ValidateShops(InMemoryContentRepository repository)
     {

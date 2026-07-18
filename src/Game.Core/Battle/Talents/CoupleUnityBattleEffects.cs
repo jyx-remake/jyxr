@@ -80,7 +80,7 @@ internal static class CoupleUnityBattleEffect
 
     public static BattleUnit? FindLivingPartner(IBattleEffectContext context, string talentId)
     {
-        var partnerGender = context.Unit.Character.Definition.Gender switch
+        var partnerGender = context.Unit.Character.Gender switch
         {
             CharacterGender.Male => CharacterGender.Female,
             CharacterGender.Female => CharacterGender.Male,
@@ -94,7 +94,7 @@ internal static class CoupleUnityBattleEffect
         return context.State.GetLivingUnits().FirstOrDefault(unit =>
             unit.Team == context.Unit.Team &&
             unit.Id != context.Unit.Id &&
-            unit.Character.Definition.Gender == partnerGender &&
+            unit.Character.Gender == partnerGender &&
             unit.Character.HasEffectiveTalent(talentId));
     }
 

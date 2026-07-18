@@ -32,6 +32,10 @@ public static class ItemUseEffectFormatter
             GrantSpecialSkillItemUseEffectDefinition specialSkill =>
                 $"学会特殊技能「{FormatterTextCn.ResolveSpecialSkillName(specialSkill.SkillId, contentRepository)}」",
             GrantTalentItemUseEffectDefinition talent => FormatGrantTalentCn(talent, contentRepository),
+            SetGenderItemUseEffectDefinition setGender =>
+                $"性别变为{FormatterTextCn.GetGenderNameCn(setGender.Gender)}",
+            ReduceMaxResourceRatioItemUseEffectDefinition reduction =>
+                $"{FormatterTextCn.GetStatNameCn(reduction.StatId)}减少 {FormatterTextCn.FormatPercent(reduction.Ratio)}",
             _ => throw new NotSupportedException($"Unsupported item use effect type '{useEffect.GetType().Name}'.")
         };
     }

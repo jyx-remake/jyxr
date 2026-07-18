@@ -1,6 +1,7 @@
 using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Character;
+using Game.Application.Formatters;
 
 namespace Game.Application;
 
@@ -52,7 +53,9 @@ public sealed class ItemUseService
             return ItemUseTargetCandidate.Disabled(character.Id, requirementFailure);
         }
 
-        var specificFailure = ValidateSpecificTarget(support.Kind, support.Effects, entry, character);
+        var specificFailure = support.Kind == ItemUseKind.Effects
+            ? ValidateEffectTargets(support.Effects, character)
+            : null;
         if (specificFailure is not null)
         {
             return ItemUseTargetCandidate.Disabled(character.Id, specificFailure);
@@ -128,31 +131,29 @@ public sealed class ItemUseService
         IReadOnlyList<ItemUseEffectDefinition> effects)
     {
         var resourceStatsChanged = false;
+        var resultDetails = new List<string>();
         foreach (var effect in effects)
         {
             switch (effect)
             {
                 case GrantExternalSkillItemUseEffectDefinition externalSkill:
-                {
-                    _session.CharacterService.StudyExternalSkillFromBook(
-                        target,
-                        externalSkill.SkillId,
-                        ResolveExternalSkillBookMaxLevel(externalSkill));
+                    target.SetExternalSkillState(
+                        _session.ContentRepository.GetExternalSkill(externalSkill.SkillId),
+                        ResolveExternalSkillBookMaxLevel(externalSkill),
+                        0,
+                        true);
                     break;
-                }
                 case GrantInternalSkillItemUseEffectDefinition internalSkill:
-                {
-                    _session.CharacterService.StudyInternalSkillFromBook(
-                        target,
-                        internalSkill.SkillId,
-                        ResolveInternalSkillBookMaxLevel(internalSkill));
+                    target.SetInternalSkillState(
+                        _session.ContentRepository.GetInternalSkill(internalSkill.SkillId),
+                        ResolveInternalSkillBookMaxLevel(internalSkill),
+                        0);
                     break;
-                }
                 case GrantSpecialSkillItemUseEffectDefinition specialSkill:
-                    _session.CharacterService.LearnSpecialSkill(target, specialSkill.SkillId);
+                    target.LearnSpecialSkill(_session.ContentRepository.GetSpecialSkill(specialSkill.SkillId));
                     break;
                 case GrantTalentItemUseEffectDefinition talent:
-                    _session.CharacterService.LearnTalent(target, talent.TalentId);
+                    target.LearnTalent(_session.ContentRepository.GetTalent(talent.TalentId));
                     break;
                 case AddMaxHpItemUseEffectDefinition maxHp:
                     target.AddBaseStat(StatType.MaxHp, maxHp.Value);
@@ -162,6 +163,17 @@ public sealed class ItemUseService
                     target.AddBaseStat(StatType.MaxMp, maxMp.Value);
                     resourceStatsChanged = true;
                     break;
+                case SetGenderItemUseEffectDefinition setGender:
+                    target.SetGender(setGender.Gender);
+                    resultDetails.Add($"{target.Name}已经变成了{FormatterTextCn.GetGenderNameCn(setGender.Gender)}");
+                    break;
+                case ReduceMaxResourceRatioItemUseEffectDefinition reduction:
+                {
+                    var loss = target.ReduceBaseResourceStat(reduction.StatId, reduction.Ratio);
+                    resultDetails.Add($"{FormatStatName(reduction.StatId)} -{loss}");
+                    resourceStatsChanged = true;
+                    break;
+                }
                 default:
                     throw new InvalidOperationException(
                         $"Unsupported out-of-battle item effect: {effect.GetType().Name}");
@@ -172,10 +184,13 @@ public sealed class ItemUseService
         {
             CharacterResourceLimitPolicy.ClampBaseResourceStats(target);
             target.ClampBattleResources();
-            _session.Events.Publish(new CharacterChangedEvent(target.Id));
         }
 
-        return ItemUseResult.Succeeded($"【{target.Name}】使用【{item.Name}】");
+        _session.Events.Publish(new CharacterChangedEvent(target.Id));
+        var message = $"【{target.Name}】使用【{item.Name}】";
+        return ItemUseResult.Succeeded(resultDetails.Count == 0
+            ? message
+            : $"{message}：{string.Join("，", resultDetails)}");
     }
 
     private static ItemUseSupport ResolveSupport(InventoryEntry entry)
@@ -186,40 +201,35 @@ public sealed class ItemUseService
             return ItemUseSupport.Supported(ItemUseKind.Equipment, "请选择装备目标。", item.UseEffects);
         }
 
-        return item.Type switch
+        if (item.Type == ItemType.Consumable)
         {
-            ItemType.Consumable => ItemUseSupport.Unsupported("消耗品使用尚未接入。"),
-            ItemType.Utility => ItemUseSupport.Unsupported("该道具暂无可用效果。"),
-            ItemType.QuestItem => ItemUseSupport.Unsupported("剧情物品暂不可主动使用。"),
-            ItemType.SkillBook => ResolveSkillBookSupport(item),
-            ItemType.SpecialSkillBook => item.UseEffects.OfType<GrantSpecialSkillItemUseEffectDefinition>().Any()
-                ? ItemUseSupport.Supported(ItemUseKind.SpecialSkillBook, "请选择研习目标。", item.UseEffects)
-                : ItemUseSupport.Unsupported("该绝技书没有可用学习效果。"),
-            ItemType.TalentBook => item.UseEffects.OfType<GrantTalentItemUseEffectDefinition>().Any()
-                ? ItemUseSupport.Supported(ItemUseKind.TalentBook, "请选择研习目标。", item.UseEffects)
-                : ItemUseSupport.Unsupported("该天赋书没有可用学习效果。"),
-            ItemType.Booster => IsSupportedBooster(item)
-                ? ItemUseSupport.Supported(ItemUseKind.Booster, "请选择使用目标。", item.UseEffects)
-                : ItemUseSupport.Unsupported("该强化道具暂无可用效果。"),
-            _ => ItemUseSupport.Unsupported("该物品暂不可使用。"),
-        };
+            return ItemUseSupport.Unsupported("消耗品只能在战斗中使用。");
+        }
+        if (item.Type == ItemType.QuestItem)
+        {
+            return ItemUseSupport.Unsupported("剧情物品暂不可主动使用。");
+        }
+        if (item.UseEffects.Count == 0)
+        {
+            return ItemUseSupport.Unsupported("该物品没有可用效果。");
+        }
+        if (!item.UseEffects.All(IsSupportedOutOfBattleEffect))
+        {
+            return ItemUseSupport.Unsupported("该物品包含尚未接入的场外效果。");
+        }
+
+        return ItemUseSupport.Supported(ItemUseKind.Effects, "请选择使用目标。", item.UseEffects);
     }
 
-    private static ItemUseSupport ResolveSkillBookSupport(ItemDefinition item)
-    {
-        var hasSkillEffect = item.UseEffects.Any(effect =>
-            effect is GrantExternalSkillItemUseEffectDefinition ||
-            effect is GrantInternalSkillItemUseEffectDefinition);
-        return hasSkillEffect
-            ? ItemUseSupport.Supported(ItemUseKind.SkillBook, "请选择研习目标。", item.UseEffects)
-            : ItemUseSupport.Unsupported("该武学书没有可用学习效果。");
-    }
-
-    private static bool IsSupportedBooster(ItemDefinition item) =>
-        item.UseEffects.Count > 0 &&
-        item.UseEffects.All(effect =>
-            effect is AddMaxHpItemUseEffectDefinition ||
-            effect is AddMaxMpItemUseEffectDefinition);
+    private static bool IsSupportedOutOfBattleEffect(ItemUseEffectDefinition effect) =>
+        effect is GrantExternalSkillItemUseEffectDefinition or
+            GrantInternalSkillItemUseEffectDefinition or
+            GrantSpecialSkillItemUseEffectDefinition or
+            GrantTalentItemUseEffectDefinition or
+            AddMaxHpItemUseEffectDefinition or
+            AddMaxMpItemUseEffectDefinition or
+            SetGenderItemUseEffectDefinition or
+            ReduceMaxResourceRatioItemUseEffectDefinition;
 
     private string? ValidateRequirements(ItemDefinition item, CharacterInstance target)
     {
@@ -239,6 +249,12 @@ public sealed class ItemUseService
                         return $"需要天赋「{talent.TalentId}」";
                     }
                     break;
+                case GenderItemRequirementDefinition gender:
+                    if (!gender.Genders.Contains(target.Gender))
+                    {
+                        return $"仅限{string.Join("、", gender.Genders.Select(FormatterTextCn.GetGenderNameCn))}使用";
+                    }
+                    break;
             }
         }
 
@@ -254,25 +270,16 @@ public sealed class ItemUseService
                 $"Unsupported item requirement stat source: {Config.ItemRequirementStatSource}"),
         };
 
-    private string? ValidateSpecificTarget(
-        ItemUseKind kind,
-        IReadOnlyList<ItemUseEffectDefinition> effects,
-        InventoryEntry entry,
-        CharacterInstance target) =>
-        kind switch
-        {
-            ItemUseKind.Equipment => null,
-            ItemUseKind.SkillBook => ValidateSkillBookTarget(effects, target),
-            ItemUseKind.SpecialSkillBook => ValidateSpecialSkillTarget(effects, target),
-            ItemUseKind.TalentBook => ValidateTalentBookTarget(effects, target),
-            ItemUseKind.Booster => null,
-            _ => "该物品暂不可使用。",
-        };
-
-    private string? ValidateSkillBookTarget(
+    private string? ValidateEffectTargets(
         IReadOnlyList<ItemUseEffectDefinition> effects,
         CharacterInstance target)
     {
+        var newExternalSkillIds = new HashSet<string>(StringComparer.Ordinal);
+        var newInternalSkillIds = new HashSet<string>(StringComparer.Ordinal);
+        var specialSkillIds = new HashSet<string>(StringComparer.Ordinal);
+        var talentIds = new HashSet<string>(StringComparer.Ordinal);
+        var requiredTalentPoints = 0;
+
         foreach (var effect in effects)
         {
             switch (effect)
@@ -286,10 +293,9 @@ public sealed class ItemUseService
                         return "该外功已达上限";
                     }
 
-                    if (currentLevel is null &&
-                        target.GetExternalSkills().Count >= Config.MaxExternalSkillCount)
+                    if (currentLevel is null && !newExternalSkillIds.Add(externalSkill.SkillId))
                     {
-                        return "外功数量已达上限";
+                        return "物品包含重复的外功学习效果";
                     }
                     break;
                 }
@@ -302,13 +308,53 @@ public sealed class ItemUseService
                         return "该内功已达上限";
                     }
 
-                    if (currentLevel is null &&
-                        target.GetInternalSkills().Count >= Config.MaxInternalSkillCount)
+                    if (currentLevel is null && !newInternalSkillIds.Add(internalSkill.SkillId))
                     {
-                        return "内功数量已达上限";
+                        return "物品包含重复的内功学习效果";
                     }
                     break;
                 }
+                case GrantSpecialSkillItemUseEffectDefinition specialSkill:
+                    if (!specialSkillIds.Add(specialSkill.SkillId))
+                    {
+                        return "物品包含重复的特技学习效果";
+                    }
+                    if (target.GetSpecialSkills().Any(skill =>
+                            string.Equals(skill.Definition.Id, specialSkill.SkillId, StringComparison.Ordinal)))
+                    {
+                        return "已领悟该绝技";
+                    }
+                    break;
+                case GrantTalentItemUseEffectDefinition talent:
+                    if (!talentIds.Add(talent.TalentId))
+                    {
+                        return "物品包含重复的天赋学习效果";
+                    }
+                    if (target.HasTalent(talent.TalentId))
+                    {
+                        return "已习得该天赋";
+                    }
+                    requiredTalentPoints = checked(
+                        requiredTalentPoints + _session.ContentRepository.GetTalent(talent.TalentId).Point);
+                    break;
+            }
+        }
+
+        if (target.GetExternalSkills().Count + newExternalSkillIds.Count > Config.MaxExternalSkillCount)
+        {
+            return "外功数量已达上限";
+        }
+        if (target.GetInternalSkills().Count + newInternalSkillIds.Count > Config.MaxInternalSkillCount)
+        {
+            return "内功数量已达上限";
+        }
+        if (requiredTalentPoints > 0)
+        {
+            var spentPoints = _session.CharacterService.GetSpentTalentPoints(target);
+            var capacity = _session.CharacterService.GetTalentPointCapacity(target);
+            if (spentPoints + requiredTalentPoints > capacity)
+            {
+                return $"武学常识不足，需要{requiredTalentPoints}";
             }
         }
 
@@ -331,58 +377,12 @@ public sealed class ItemUseService
         return Math.Min(bookLevel.Value, currentMaxLevel);
     }
 
-    private static string? ValidateSpecialSkillTarget(
-        IReadOnlyList<ItemUseEffectDefinition> effects,
-        CharacterInstance target)
-    {
-        foreach (var effect in effects.OfType<GrantSpecialSkillItemUseEffectDefinition>())
-        {
-            if (target.GetSpecialSkills().Any(skill => string.Equals(skill.Definition.Id, effect.SkillId, StringComparison.Ordinal)))
-            {
-                return "已领悟该绝技";
-            }
-        }
-
-        return null;
-    }
-
-    private string? ValidateTalentBookTarget(
-        IReadOnlyList<ItemUseEffectDefinition> effects,
-        CharacterInstance target)
-    {
-        var requiredPoints = 0;
-        foreach (var effect in effects.OfType<GrantTalentItemUseEffectDefinition>())
-        {
-            if (target.HasTalent(effect.TalentId))
-            {
-                return "已习得该天赋";
-            }
-
-            requiredPoints = checked(requiredPoints + _session.ContentRepository.GetTalent(effect.TalentId).Point);
-        }
-
-        if (requiredPoints > 0)
-        {
-            var spentPoints = _session.CharacterService.GetSpentTalentPoints(target);
-            var capacity = _session.CharacterService.GetTalentPointCapacity(target);
-            if (spentPoints + requiredPoints > capacity)
-            {
-                return $"武学常识不足，需要{requiredPoints}";
-            }
-        }
-
-        return null;
-    }
-
     private static string FormatStatName(StatType statType) => StatCatalog.GetDisplayNameCn(statType);
 
     private enum ItemUseKind
     {
         Equipment,
-        SkillBook,
-        SpecialSkillBook,
-        TalentBook,
-        Booster,
+        Effects,
     }
 
     private sealed record ItemUseSupport(

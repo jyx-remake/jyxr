@@ -94,7 +94,7 @@ public partial class CombatantSelectCard : Button
 			_avatar.Texture = portrait;
 		}
 
-		_maleLogo.Visible = _character.Definition.Gender == CharacterGender.Male;
-		_femaleLogo.Visible = _character.Definition.Gender == CharacterGender.Female;
+		_maleLogo.Visible = _character.Gender == CharacterGender.Male;
+		_femaleLogo.Visible = _character.Gender == CharacterGender.Female;
 	}
 }

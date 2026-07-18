@@ -94,7 +94,7 @@ internal static class BattleHookEvaluator
             BattleHookContextUnitRole.Target => context.Target,
             _ => throw new ArgumentOutOfRangeException(nameof(condition.Role), condition.Role, null),
         };
-        return unit is not null && condition.Genders.Contains(unit.Character.Definition.Gender);
+        return unit is not null && condition.Genders.Contains(unit.Character.Gender);
     }
 
     private static bool IsContextUnitHpRatio(

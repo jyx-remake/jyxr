@@ -78,7 +78,7 @@ internal sealed class BattleSkillPresentationController(
             this,
             unit.Id,
             unit.Character.Name,
-            unit.Character.Definition.Gender,
+            unit.Character.Gender,
             AssetResolver.LoadCharacterPortrait(unit.Character),
             action.SkillCast ?? BattleSkillCastInfo.Create(skill, skill),
             action.ImpactedPositions);

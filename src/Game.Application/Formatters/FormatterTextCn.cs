@@ -59,6 +59,17 @@ internal static class FormatterTextCn
 
     public static string GetStatNameCn(StatType statType) => StatCatalog.GetDisplayNameCn(statType);
 
+    public static string GetGenderNameCn(CharacterGender gender) =>
+        gender switch
+        {
+            CharacterGender.Male => "男性",
+            CharacterGender.Female => "女性",
+            CharacterGender.Neutral => "中性",
+            CharacterGender.Animal => "动物",
+            CharacterGender.Eunuch => "太监",
+            _ => throw new ArgumentOutOfRangeException(nameof(gender), gender, null)
+        };
+
     public static string GetWeaponTypeNameCn(WeaponType weaponType) =>
         weaponType switch
         {
