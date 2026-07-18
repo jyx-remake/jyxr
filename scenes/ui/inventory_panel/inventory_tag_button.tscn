@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://h5ua5325v82x"]
 
-[ext_resource type="Texture2D" uid="uid://ccowan043v5kt" path="res://assets/theme/art/ju_button/jh_btn_normal.png" id="1_7hiic"]
-[ext_resource type="Texture2D" uid="uid://dus3ekk0suwn5" path="res://assets/theme/art/ju_button/jh_btn_Press.png" id="2_pkmg6"]
+[ext_resource type="Texture2D" uid="uid://ccowan043v5kt" path="res://assets/art/ui/jh_button/jh_btn_normal.png" id="1_7hiic"]
+[ext_resource type="Texture2D" uid="uid://dus3ekk0suwn5" path="res://assets/art/ui/jh_button/jh_btn_Press.png" id="2_pkmg6"]
 [ext_resource type="Script" uid="uid://c0njaroqlfpou" path="res://src/Game.Godot/UI/Inventory/InventoryTagButton.cs" id="2_script"]
-[ext_resource type="Texture2D" uid="uid://b5ghrcm8s6mr3" path="res://assets/theme/art/ju_button/jh_btn_hover.png" id="3_domex"]
-[ext_resource type="Texture2D" uid="uid://bv05hh3snjnqb" path="res://assets/theme/art/ju_button/jh_btn_disable.png" id="4_dhejp"]
+[ext_resource type="Texture2D" uid="uid://b5ghrcm8s6mr3" path="res://assets/art/ui/jh_button/jh_btn_hover.png" id="3_domex"]
+[ext_resource type="Texture2D" uid="uid://bv05hh3snjnqb" path="res://assets/art/ui/jh_button/jh_btn_disable.png" id="4_dhejp"]
 
 [sub_resource type="StyleBoxTexture" id="1_button_normal"]
 texture = ExtResource("1_7hiic")

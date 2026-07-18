@@ -186,7 +186,7 @@ theme_override_styles/normal = SubResource("1_button_normal")
 theme_override_styles/pressed = SubResource("1_button_normal")
 theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
-text = "绝技书"
+text = "特技书"
 
 [node name="TalentBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="5" unique_id=100000115]
 unique_name_in_owner = true
