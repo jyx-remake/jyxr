@@ -69,6 +69,7 @@ internal sealed class StoryScriptJsonParser(JsonElement root)
 
     private ChoiceStep ParseChoiceStep(JsonElement element)
     {
+        var style = ParseChoiceStyle(element);
         var promptElement = GetRequiredProperty(element, "prompt");
         EnsureObject(promptElement, "choice.prompt");
         var prompt = new ChoicePrompt(
@@ -116,7 +117,27 @@ internal sealed class StoryScriptJsonParser(JsonElement root)
             throw new StoryRuntimeException("choice.groups must contain at least one group.");
         }
 
-        return new ChoiceStep(prompt, groups);
+        return new ChoiceStep(prompt, groups, style);
+    }
+
+    private static ChoiceStyle ParseChoiceStyle(JsonElement element)
+    {
+        if (!TryGetProperty(element, "style", out var styleElement))
+        {
+            return ChoiceStyle.Regular;
+        }
+
+        if (styleElement.ValueKind != JsonValueKind.String)
+        {
+            throw new StoryRuntimeException("choice.style must be a string.");
+        }
+
+        return styleElement.GetString() switch
+        {
+            "regular" => ChoiceStyle.Regular,
+            "bold" => ChoiceStyle.Bold,
+            var style => throw new StoryRuntimeException($"Unsupported choice style '{style}'."),
+        };
     }
 
     private BattleStep ParseBattleStep(JsonElement element)

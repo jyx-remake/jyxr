@@ -49,6 +49,7 @@ public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattle
 			choice.PromptSpeaker,
 			choice.PromptText,
 			choice.Options.Select(static option => option.Text).ToArray(),
+			choice.Style,
 			cancellationToken);
 		return choice.Options[visibleIndex].Index;
 	}

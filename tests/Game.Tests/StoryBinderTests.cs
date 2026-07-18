@@ -107,11 +107,61 @@ public sealed class StoryBinderTests
         var choice = Assert.IsType<ChoiceStep>(Assert.Single(script.Segments[0].Steps));
 
         Assert.Equal(StoryScript.CurrentVersion, script.Version);
+        Assert.Equal(ChoiceStyle.Regular, choice.Style);
         Assert.Null(choice.Groups[0].When);
         Assert.Equal("离开", Assert.Single(choice.Groups[0].Options).Text);
         var predicate = Assert.IsType<PredicateExprNode>(choice.Groups[1].When);
         Assert.Equal("shop_open", predicate.Name);
         Assert.Equal(["购买", "出售"], choice.Groups[1].Options.Select(static option => option.Text).ToArray());
+    }
+
+    [Fact]
+    public void StoryScriptJson_ParsesChoiceStyle()
+    {
+        const string json = """
+        {
+          "version": 2,
+          "segments": [{
+            "name": "start",
+            "steps": [{
+              "kind": "choice",
+              "style": "bold",
+              "prompt": { "speaker": "", "text": "选择" },
+              "groups": [{
+                "options": [{ "text": "确认", "steps": [] }]
+              }]
+            }]
+          }]
+        }
+        """;
+
+        var script = StoryScriptJson.Parse(json);
+        var choice = Assert.IsType<ChoiceStep>(Assert.Single(script.Segments[0].Steps));
+
+        Assert.Equal(ChoiceStyle.Bold, choice.Style);
+    }
+
+    [Fact]
+    public void StoryScriptJson_RejectsUnknownChoiceStyle()
+    {
+        const string json = """
+        {
+          "version": 2,
+          "segments": [{
+            "name": "start",
+            "steps": [{
+              "kind": "choice",
+              "style": "unknown",
+              "prompt": { "speaker": "", "text": "选择" },
+              "groups": [{
+                "options": [{ "text": "确认", "steps": [] }]
+              }]
+            }]
+          }]
+        }
+        """;
+
+        Assert.Throws<StoryRuntimeException>(() => StoryScriptJson.Parse(json));
     }
 
     [Theory]

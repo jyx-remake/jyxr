@@ -1199,7 +1199,8 @@ public sealed class StoryServiceTests
                                                 new ChoiceOption("$MALE$，出发。", []),
                                                 new ChoiceOption("再等等。", []),
                                             ]),
-                                    ]),
+                                    ],
+                                    ChoiceStyle.Bold),
                             ]),
                     ]),
             ]);
@@ -1229,6 +1230,7 @@ public sealed class StoryServiceTests
         Assert.Equal("要和赵灵儿一起行动吗？", choice.PromptText);
         Assert.Equal("张无忌，出发。", choice.Options[0].Text);
         Assert.Equal("再等等。", choice.Options[1].Text);
+        Assert.Equal(ChoiceStyle.Bold, choice.Style);
     }
 
     [Fact]

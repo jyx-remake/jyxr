@@ -6,7 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://jon61teprdc7" path="res://scenes/ui/party_panel/party_panel.tscn" id="2_party_panel"]
 [ext_resource type="PackedScene" path="res://scenes/ui/character_panel/character_roster_panel.tscn" id="3_i0hgf"]
 [ext_resource type="PackedScene" uid="uid://beqsxw0hmqwm" path="res://scenes/ui/story/story_dialogue_panel.tscn" id="4_story_dialogue"]
-[ext_resource type="PackedScene" uid="uid://0gybacdn8xd4" path="res://scenes/ui/story/story_choice_panel.tscn" id="5_story_choice"]
+[ext_resource type="PackedScene" uid="uid://0gybacdn8xd4" path="res://scenes/ui/story/story_regular_choice_panel.tscn" id="5_story_choice"]
+[ext_resource type="PackedScene" uid="uid://dyyqo1cn7w3rm" path="res://scenes/ui/story/story_bold_choice_panel.tscn" id="5_story_choice_bold"]
 [ext_resource type="PackedScene" uid="uid://bnk146v0yfw02" path="res://scenes/ui/hud/hud.tscn" id="6_hud"]
 [ext_resource type="PackedScene" uid="uid://cup3ph7k7eg4o" path="res://scenes/ui/journal/journal_panel.tscn" id="7_journal"]
 [ext_resource type="PackedScene" uid="uid://bdvws2ugdkk6a" path="res://scenes/ui/hero_panel/hero_panel.tscn" id="8_hero_panel"]
@@ -88,7 +89,11 @@ layer = 30
 unique_name_in_owner = true
 visible = false
 
-[node name="StoryChoicePanel" parent="ModalLayer" unique_id=353291670 instance=ExtResource("5_story_choice")]
+[node name="StoryRegularChoicePanel" parent="ModalLayer" unique_id=353291670 instance=ExtResource("5_story_choice")]
+unique_name_in_owner = true
+visible = false
+
+[node name="StoryBoldChoicePanel" parent="ModalLayer" unique_id=353291671 instance=ExtResource("5_story_choice_bold")]
 unique_name_in_owner = true
 visible = false
 

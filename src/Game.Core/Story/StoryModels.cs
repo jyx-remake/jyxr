@@ -42,7 +42,14 @@ public sealed record ReturnStep : Step;
 
 public sealed record ChoiceStep(
     ChoicePrompt Prompt,
-    IReadOnlyList<ChoiceGroup> Groups) : Step;
+    IReadOnlyList<ChoiceGroup> Groups,
+    ChoiceStyle Style = ChoiceStyle.Regular) : Step;
+
+public enum ChoiceStyle
+{
+    Regular,
+    Bold,
+}
 
 public sealed record ChoicePrompt(
     string Speaker,

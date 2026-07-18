@@ -42,7 +42,8 @@ internal sealed partial class StoryRuntimeSession
         var context = new ChoiceContext(
             choice.Prompt.Speaker,
             choice.Prompt.Text,
-            optionViews);
+            optionViews,
+            choice.Style);
 
         yield return StepResult.FromEvent(new ChoiceOfferedEvent(context));
 

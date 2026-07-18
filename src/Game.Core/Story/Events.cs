@@ -39,7 +39,8 @@ public sealed record DialogueContext(
 public sealed record ChoiceContext(
     string PromptSpeaker,
     string PromptText,
-    IReadOnlyList<ChoiceOptionView> Options);
+    IReadOnlyList<ChoiceOptionView> Options,
+    ChoiceStyle Style = ChoiceStyle.Regular);
 
 /// <param name="Index">Opaque source option index that the host must return when this option is selected.</param>
 /// <param name="Text">Option text presented to the player.</param>

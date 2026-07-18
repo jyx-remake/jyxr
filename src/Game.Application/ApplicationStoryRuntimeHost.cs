@@ -61,7 +61,8 @@ internal sealed class ApplicationStoryRuntimeHost : IRuntimeHost
             _textInterpolator.Interpolate(choice.PromptText),
             choice.Options
                 .Select(option => new ChoiceOptionView(option.Index, _textInterpolator.Interpolate(option.Text)))
-                .ToArray());
+                .ToArray(),
+            choice.Style);
 
         return _externalHost.ChooseOptionAsync(interpolatedChoice, cancellationToken);
     }

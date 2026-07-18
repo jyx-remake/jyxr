@@ -2,6 +2,7 @@ using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
+using Game.Core.Story;
 using Godot;
 using Game.Godot.Map;
 using Game.Godot.Persistence;
@@ -84,7 +85,8 @@ public partial class UIRoot : Control
 	public bool IsBattleActive => BattleLayer.GetChildCount() > 0;
 	private HudPanel? _hud;
 	private StoryDialoguePanel _storyDialoguePanel = null!;
-	private StoryChoicePanel _storyChoicePanel = null!;
+	private StoryChoicePanel _regularStoryChoicePanel = null!;
+	private StoryChoicePanel _boldStoryChoicePanel = null!;
 	private ToastPanel _toastPanel = null!;
 	private HintBox _hintBox = null!;
 	private ConfirmDialog _confirmDialog = null!;
@@ -107,7 +109,8 @@ public partial class UIRoot : Control
 		OverlayLayer = GetNode<CanvasLayer>("%OverlayLayer");
 		_hud = GetNodeOrNull<HudPanel>("%Hud");
 		_storyDialoguePanel = GetNode<StoryDialoguePanel>("%StoryDialoguePanel");
-		_storyChoicePanel = GetNode<StoryChoicePanel>("%StoryChoicePanel");
+		_regularStoryChoicePanel = GetNode<StoryChoicePanel>("%StoryRegularChoicePanel");
+		_boldStoryChoicePanel = GetNode<StoryChoicePanel>("%StoryBoldChoicePanel");
 		_toastPanel = GetNode<ToastPanel>("%ToastPanel");
 		_hintBox = GetNode<HintBox>("%HintBox");
 		_confirmDialog = GetNode<ConfirmDialog>("%ConfirmDialog");
@@ -474,6 +477,7 @@ public partial class UIRoot : Control
 		string? speaker,
 		string prompt,
 		IReadOnlyList<string> options,
+		ChoiceStyle style = ChoiceStyle.Regular,
 		CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(options);
@@ -483,8 +487,10 @@ public partial class UIRoot : Control
 		}
 
 		_storyDialoguePanel.HidePanel();
+		_regularStoryChoicePanel.HidePanel();
+		_boldStoryChoicePanel.HidePanel();
 
-		var dialog = _storyChoicePanel;
+		var dialog = GetStoryChoicePanel(style);
 		dialog.Configure(speaker, prompt, options);
 
 		try
@@ -602,6 +608,13 @@ public partial class UIRoot : Control
 			_mainPanel = null;
 		}
 	}
+
+	private StoryChoicePanel GetStoryChoicePanel(ChoiceStyle style) => style switch
+	{
+		ChoiceStyle.Regular => _regularStoryChoicePanel,
+		ChoiceStyle.Bold => _boldStoryChoicePanel,
+		_ => throw new ArgumentOutOfRangeException(nameof(style), style, "Unsupported story choice style."),
+	};
 
 	private async Task HideDialogueWhenIdleAsync(StoryDialoguePanel dialog, int version)
 	{

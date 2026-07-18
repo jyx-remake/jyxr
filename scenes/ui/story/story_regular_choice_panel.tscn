@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dwrn78qbdoypl" path="res://src/Game.Godot/UI/Story/StoryChoicePanel.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://jsmmfitkrv5x" path="res://assets/art/misc/dikuang2.png" id="2_background"]
 [ext_resource type="PackedScene" uid="uid://cveba3f8kxvxc" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="3_avatar"]
-[ext_resource type="PackedScene" uid="uid://brogwssf7afge" path="res://scenes/ui/story/story_choice_button.tscn" id="4_choice_button"]
+[ext_resource type="PackedScene" uid="uid://brogwssf7afge" path="res://scenes/ui/story/story_regular_choice_button.tscn" id="4_choice_button"]
 
 [node name="StoryChoicePanel" type="Control" unique_id=829352189]
 layout_mode = 3
