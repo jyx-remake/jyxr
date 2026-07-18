@@ -72,7 +72,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "装备"
 
-[node name="ConsumableButton" type="Button" parent="ContentRoot/CategoryButtons" index="2" unique_id=928559347]
+[node name="SkillBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="2" unique_id=1461878243]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 70)
 layout_mode = 2
@@ -81,20 +81,9 @@ theme_override_styles/normal = SubResource("1_button_normal")
 theme_override_styles/pressed = SubResource("1_button_normal")
 theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
-text = "消耗品"
+text = "秘籍"
 
-[node name="SkillBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="3" unique_id=1461878243]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 70)
-layout_mode = 2
-theme_override_font_sizes/font_size = 40
-theme_override_styles/normal = SubResource("1_button_normal")
-theme_override_styles/pressed = SubResource("1_button_normal")
-theme_override_styles/hover = SubResource("1_button_normal")
-theme_override_styles/disabled = SubResource("1_button_normal")
-text = "武学书"
-
-[node name="SpecialSkillBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="4" unique_id=1857978193]
+[node name="SpecialSkillBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="3" unique_id=1857978193]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 70)
 layout_mode = 2
@@ -105,7 +94,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "特技书"
 
-[node name="TalentBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="5" unique_id=287492235]
+[node name="TalentBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="4" unique_id=287492235]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 70)
 layout_mode = 2
@@ -116,7 +105,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "天赋书"
 
-[node name="QuestItemButton" type="Button" parent="ContentRoot/CategoryButtons" index="6" unique_id=1969709279]
+[node name="ConsumableButton" type="Button" parent="ContentRoot/CategoryButtons" index="5" unique_id=928559347]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 70)
 layout_mode = 2
@@ -125,9 +114,9 @@ theme_override_styles/normal = SubResource("1_button_normal")
 theme_override_styles/pressed = SubResource("1_button_normal")
 theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
-text = "剧情物品"
+text = "消耗品"
 
-[node name="BoosterButton" type="Button" parent="ContentRoot/CategoryButtons" index="7" unique_id=1795686840]
+[node name="BoosterButton" type="Button" parent="ContentRoot/CategoryButtons" index="6" unique_id=1795686840]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 70)
 layout_mode = 2
@@ -138,7 +127,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "强化道具"
 
-[node name="UtilityButton" type="Button" parent="ContentRoot/CategoryButtons" index="8" unique_id=466495616]
+[node name="UtilityButton" type="Button" parent="ContentRoot/CategoryButtons" index="7" unique_id=466495616]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 70)
 layout_mode = 2
@@ -148,6 +137,17 @@ theme_override_styles/pressed = SubResource("1_button_normal")
 theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "功能道具"
+
+[node name="QuestItemButton" type="Button" parent="ContentRoot/CategoryButtons" index="8" unique_id=1969709279]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "剧情物品"
 
 [node name="GoodsLayout" type="VBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=1830877956]
 layout_mode = 0

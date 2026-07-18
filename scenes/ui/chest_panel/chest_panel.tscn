@@ -155,7 +155,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "装备"
 
-[node name="ConsumableButton" type="Button" parent="ContentRoot/CategoryButtons" index="2" unique_id=100000112]
+[node name="SkillBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="2" unique_id=100000113]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -164,20 +164,9 @@ theme_override_styles/normal = SubResource("1_button_normal")
 theme_override_styles/pressed = SubResource("1_button_normal")
 theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
-text = "消耗品"
+text = "秘籍"
 
-[node name="SkillBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="3" unique_id=100000113]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 62)
-layout_mode = 2
-theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("1_button_normal")
-theme_override_styles/pressed = SubResource("1_button_normal")
-theme_override_styles/hover = SubResource("1_button_normal")
-theme_override_styles/disabled = SubResource("1_button_normal")
-text = "武学书"
-
-[node name="SpecialSkillBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="4" unique_id=100000114]
+[node name="SpecialSkillBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="3" unique_id=100000114]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -188,7 +177,7 @@ theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "特技书"
 
-[node name="TalentBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="5" unique_id=100000115]
+[node name="TalentBookButton" type="Button" parent="ContentRoot/CategoryButtons" index="4" unique_id=100000115]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 62)
 layout_mode = 2
@@ -198,6 +187,17 @@ theme_override_styles/pressed = SubResource("1_button_normal")
 theme_override_styles/hover = SubResource("1_button_normal")
 theme_override_styles/disabled = SubResource("1_button_normal")
 text = "天赋书"
+
+[node name="ConsumableButton" type="Button" parent="ContentRoot/CategoryButtons" index="5" unique_id=100000112]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("1_button_normal")
+theme_override_styles/pressed = SubResource("1_button_normal")
+theme_override_styles/hover = SubResource("1_button_normal")
+theme_override_styles/disabled = SubResource("1_button_normal")
+text = "消耗品"
 
 [node name="BoosterButton" type="Button" parent="ContentRoot/CategoryButtons" index="6" unique_id=100000116]
 unique_name_in_owner = true

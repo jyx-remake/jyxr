@@ -11,13 +11,13 @@ public static class ItemCatalogPresentation
     [
         new("All", "全部", null),
         new("Equipment", "装备", ItemType.Equipment),
-        new("Consumable", "消耗品", ItemType.Consumable),
-        new("SkillBook", "武学书", ItemType.SkillBook),
+        new("SkillBook", "秘籍", ItemType.SkillBook),
         new("SpecialSkillBook", "特技书", ItemType.SpecialSkillBook),
         new("TalentBook", "天赋书", ItemType.TalentBook),
-        new("QuestItem", "剧情物品", ItemType.QuestItem),
+        new("Consumable", "消耗品", ItemType.Consumable),
         new("Booster", "强化道具", ItemType.Booster),
         new("Utility", "功能道具", ItemType.Utility),
+        new("QuestItem", "剧情物品", ItemType.QuestItem),
     ];
 
     public static IReadOnlyList<ItemTagDefinition> GetAvailableTags(
