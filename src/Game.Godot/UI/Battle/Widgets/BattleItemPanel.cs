@@ -95,6 +95,19 @@ public partial class BattleItemPanel : JyPanel
 
 	private void OnEntrySelected(InventoryEntry entry)
 	{
+		var action = new DetailPanelAction(
+			"使用",
+			IsEnabled: true,
+			() =>
+			{
+				CompleteSelection(entry);
+				return Task.CompletedTask;
+			});
+		UIRoot.Instance.ShowInventoryEntryDetailPanel(entry, action);
+	}
+
+	private void CompleteSelection(InventoryEntry entry)
+	{
 		if (_selectionCompletion.TrySetResult(entry))
 		{
 			QueueFree();
