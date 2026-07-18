@@ -43,8 +43,8 @@ public sealed class ItemDescriptionFormatterTests
 
         Assert.Contains("[color=white]烈酒入喉，胆气横生。[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=yellow]使用效果：[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]怒气 +2[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]附加状态「醉酒」（等级 0，持续 3 回合）[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇怒气 +2[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇附加状态「醉酒」（等级 0，持续 3 回合）[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=black]冷却 8 回合[/color]", text, StringComparison.Ordinal);
     }
 
@@ -89,8 +89,8 @@ public sealed class ItemDescriptionFormatterTests
         Assert.Contains("[color=red]使用要求：[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=red]剑法 >= 30[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=red]需要天赋「战意高昂」[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]学会外功「松风剑法」（10级）[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]获得天赋「战意高昂」\n越战越勇，攻击力提高。[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇学会外功「松风剑法」（10级）[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇获得天赋「战意高昂」\n　越战越勇，攻击力提高。[/color]", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -128,8 +128,27 @@ public sealed class ItemDescriptionFormatterTests
         Assert.Contains("[color=red]剑法 >= 25[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=red]身法 >= 20[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=yellow]装备词条：[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]◇ 攻击力 +40，暴击率 +2%[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]◇ 天赋「剑系装备」\n  使用剑法以外的武功，有伤害减益。[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇攻击力 +40，暴击率 +2%[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇天赋「剑系装备」\n　使用剑法以外的武功，有伤害减益。[/color]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ItemDescriptionFormatter_FormatsEquipmentUseEffectsWithNormalAffixPrefix()
+    {
+        var equipment = TestContentFactory.CreateEquipment("healing_charm", EquipmentSlotType.Accessory) with
+        {
+            Name = "回春玉佩",
+            UseEffects =
+            [
+                new AddHpItemUseEffectDefinition(120),
+            ]
+        };
+        var repository = TestContentFactory.CreateRepository(equipment: [equipment]);
+
+        var text = ItemDescriptionFormatter.FormatBbCodeCn(equipment, repository);
+
+        Assert.Contains("[color=yellow]使用效果：[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇恢复气血 120[/color]", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -176,10 +195,10 @@ public sealed class ItemDescriptionFormatterTests
         var text = ItemDescriptionFormatter.FormatBbCodeCn(instance, fullRepository);
 
         Assert.Contains("[color=yellow]装备词条：[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]◇ 防御力 +18[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇防御力 +18[/color]", text, StringComparison.Ordinal);
         Assert.Contains("[color=green]附加词条：[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=green]◆ 奥义「鬼影迷踪」威力 +12%，触发率 +5%[/color]", text, StringComparison.Ordinal);
-        Assert.Contains("[color=green]◆ 天赋「ghost_step」\n  行动如鬼魅。[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=green]◆奥义「鬼影迷踪」威力 +12%，触发率 +5%[/color]", text, StringComparison.Ordinal);
+        Assert.Contains("[color=green]◆天赋「ghost_step」\n　行动如鬼魅。[/color]", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -190,12 +209,12 @@ public sealed class ItemDescriptionFormatterTests
         var herb = repository.GetItem("止血草");
         var herbText = ItemDescriptionFormatter.FormatBbCodeCn(herb, repository);
         Assert.Contains("[color=white]常见的草药，有止血之功效[/color]", herbText, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]恢复气血 360[/color]", herbText, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇恢复气血 360[/color]", herbText, StringComparison.Ordinal);
 
         var woodenBlade = repository.GetEquipment("木刀");
         var equipmentText = ItemDescriptionFormatter.FormatBbCodeCn(woodenBlade, repository);
         Assert.Contains("[color=yellow]装备词条：[/color]", equipmentText, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]◇ 攻击力 +8，暴击率 +1%[/color]", equipmentText, StringComparison.Ordinal);
-        Assert.Contains("[color=yellow]◇ 天赋「刀系装备」\n  使用刀法以外的武功，有伤害减益。[/color]", equipmentText, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇攻击力 +8，暴击率 +1%[/color]", equipmentText, StringComparison.Ordinal);
+        Assert.Contains("[color=yellow]◇天赋「刀系装备」\n　使用刀法以外的武功，有伤害减益。[/color]", equipmentText, StringComparison.Ordinal);
     }
 }

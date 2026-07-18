@@ -7,6 +7,10 @@ namespace Game.Application.Formatters;
 
 public static class ItemDescriptionFormatter
 {
+    private const string NormalLinePrefix = "◇";
+    private const string ExtraLinePrefix = "◆";
+    private const string ContinuationIndent = "　";
+
     public static string FormatBbCodeCn(ItemDefinition item, IContentRepository contentRepository)
     {
         ArgumentNullException.ThrowIfNull(item);
@@ -32,7 +36,7 @@ public static class ItemDescriptionFormatter
         var builder = new StringBuilder();
         AppendDescription(builder, item.Description);
         AppendSection(builder, "使用要求：", ItemRequirementFormatter.FormatLinesCn(item.Requirements, contentRepository), "red");
-        AppendSection(builder, "使用效果：", ItemUseEffectFormatter.FormatLinesCn(item.UseEffects, contentRepository), "yellow");
+        AppendPrefixedSection(builder, "使用效果：", ItemUseEffectFormatter.FormatLinesCn(item.UseEffects, contentRepository), "yellow", NormalLinePrefix);
         AppendCooldown(builder, item.Cooldown);
         return builder.ToString().TrimEnd('\n');
     }
@@ -45,9 +49,9 @@ public static class ItemDescriptionFormatter
         var builder = new StringBuilder();
         AppendDescription(builder, equipment.Description);
         AppendSection(builder, "装备要求：", ItemRequirementFormatter.FormatLinesCn(equipment.Requirements, contentRepository), "red");
-        AppendSection(builder, "使用效果：", ItemUseEffectFormatter.FormatLinesCn(equipment.UseEffects, contentRepository), "yellow");
-        AppendPrefixedSection(builder, "装备词条：", AffixFormatter.FormatEquipmentLinesCn(equipment.Affixes, contentRepository), "yellow", "◇ ");
-        AppendPrefixedSection(builder, "附加词条：", AffixFormatter.FormatEquipmentLinesCn(extraAffixes, contentRepository), "green", "◆ ");
+        AppendPrefixedSection(builder, "使用效果：", ItemUseEffectFormatter.FormatLinesCn(equipment.UseEffects, contentRepository), "yellow", NormalLinePrefix);
+        AppendPrefixedSection(builder, "装备词条：", AffixFormatter.FormatEquipmentLinesCn(equipment.Affixes, contentRepository), "yellow", NormalLinePrefix);
+        AppendPrefixedSection(builder, "附加词条：", AffixFormatter.FormatEquipmentLinesCn(extraAffixes, contentRepository), "green", ExtraLinePrefix);
         AppendCooldown(builder, equipment.Cooldown);
         return builder.ToString().TrimEnd('\n');
     }
@@ -124,7 +128,7 @@ public static class ItemDescriptionFormatter
         for (var index = 1; index < parts.Length; index++)
         {
             builder.Append('\n');
-            builder.Append("  ");
+            builder.Append(ContinuationIndent);
             builder.Append(parts[index]);
         }
 
