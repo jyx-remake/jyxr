@@ -30,7 +30,13 @@ internal sealed class ZhenlongqijuBattleFactory(GameSession session)
         if (Enumerable.Range(0, level).Any(_ => Random.Shared.NextDouble() < 0.3d))
         {
             var equipment = PickConfiguredEquipment();
-            drops.Add(new OrdinaryBattleEquipmentRewardDrop(equipment, GenerateFixedRolls(equipment, 4)));
+            drops.Add(new OrdinaryBattleEquipmentRewardDrop(
+                equipment,
+                EquipmentRandomAffixGenerator.GenerateRolls(
+                    equipment,
+                    Content,
+                    State.Adventure.Round,
+                    4)));
         }
 
         return drops;
@@ -93,7 +99,10 @@ internal sealed class ZhenlongqijuBattleFactory(GameSession session)
         foreach (var slot in new[] { EquipmentSlotType.Weapon, EquipmentSlotType.Armor, EquipmentSlotType.Accessory })
         {
             var equipment = PickConfiguredEquipment(slot);
-            var affixes = GenerateFixedRolls(equipment, 4).SelectMany(static roll => roll.Affixes).ToArray();
+            var affixes = EquipmentRandomAffixGenerator
+                .GenerateRolls(equipment, Content, State.Adventure.Round, 4)
+                .SelectMany(static roll => roll.Affixes)
+                .ToArray();
             character.AddEquipmentInstance(equipmentFactory.Create(equipment, affixes));
         }
     }
@@ -139,23 +148,6 @@ internal sealed class ZhenlongqijuBattleFactory(GameSession session)
             ? equipment
             : throw new InvalidOperationException(
                 $"Zhenlongqiju enemy equipment '{equipment.Id}' must be a {slot} equipment definition.");
-    }
-
-    private IReadOnlyList<GeneratedEquipmentAffixRoll> GenerateFixedRolls(EquipmentDefinition equipment, int count)
-    {
-        var rolls = new List<GeneratedEquipmentAffixRoll>(count);
-        var keys = new HashSet<string>(StringComparer.Ordinal);
-        for (var index = 0; index < count; index++)
-        {
-            for (var attempt = 0; attempt < 1024; attempt++)
-            {
-                var roll = EquipmentRandomAffixGenerator.GenerateSingleRoll(equipment, Content, State.Adventure.Round);
-                if (!keys.Add(roll.Key)) continue;
-                rolls.Add(roll);
-                break;
-            }
-        }
-        return rolls;
     }
 
     private static string RequireId(string id) =>

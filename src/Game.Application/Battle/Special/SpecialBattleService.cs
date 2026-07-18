@@ -365,8 +365,8 @@ public sealed class SpecialBattleService
         var item = _session.ContentRepository.GetItem(itemId);
         if (item is EquipmentDefinition equipment)
         {
-            var extraAffixes = OrdinaryBattleLootGenerator
-                .GenerateEquipmentRolls(equipment, _session.ContentRepository, State.Adventure.Round)
+            var extraAffixes = EquipmentRandomAffixGenerator
+                .GenerateRolls(equipment, _session.ContentRepository, State.Adventure.Round, 4)
                 .SelectMany(static roll => roll.Affixes)
                 .ToArray();
             _session.InventoryService.AddEquipmentInstance(equipment, extraAffixes);

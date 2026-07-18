@@ -29,17 +29,30 @@ public static class EquipmentRandomAffixGenerator
         IContentRepository contentRepository,
         int round)
     {
+        return GenerateRolls(
+            equipment,
+            contentRepository,
+            round,
+            RollEquipmentAffixCount());
+    }
+
+    public static IReadOnlyList<GeneratedEquipmentAffixRoll> GenerateRolls(
+        EquipmentDefinition equipment,
+        IContentRepository contentRepository,
+        int round,
+        int rollCount)
+    {
         ArgumentNullException.ThrowIfNull(equipment);
         ArgumentNullException.ThrowIfNull(contentRepository);
         ArgumentOutOfRangeException.ThrowIfLessThan(round, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(rollCount);
 
         var options = ResolveOptions(equipment, contentRepository);
-        if (options.Length == 0)
+        if (options.Length == 0 || rollCount == 0)
         {
             return [];
         }
 
-        var rollCount = RollEquipmentAffixCount();
         var rolls = new List<GeneratedEquipmentAffixRoll>(rollCount);
         var keys = new HashSet<string>(StringComparer.Ordinal);
         var totalWeight = options.Sum(option => option.Weight);

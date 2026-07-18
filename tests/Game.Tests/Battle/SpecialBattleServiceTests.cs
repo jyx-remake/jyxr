@@ -50,7 +50,7 @@ public sealed class SpecialBattleServiceTests
         var session = CreateSession(
             tower,
             [reward],
-            [CreateRandomAffixTable()]);
+            [CreateFourRandomAffixTable()]);
         var host = new TowerRuntimeHost(
             [["hero"]],
             [true]);
@@ -59,8 +59,27 @@ public sealed class SpecialBattleServiceTests
 
         var entry = Assert.Single(session.State.Inventory.Entries.OfType<EquipmentInstanceInventoryEntry>());
         Assert.Equal(reward.Id, entry.Equipment.Definition.Id);
-        Assert.NotEmpty(entry.Equipment.ExtraAffixes);
+        Assert.Equal(4, EquipmentAffixGroups.Count(entry.Equipment.ExtraAffixes));
         Assert.Empty(session.State.Inventory.Entries.OfType<StackInventoryEntry>());
+    }
+
+    [Fact]
+    public async Task TowerEquipmentRewardsUseFewerAffixesWhenUniqueOptionsAreInsufficient()
+    {
+        var reward = TestContentFactory.CreateEquipment("rare_sword");
+        var tower = CreateSingleStageTower(reward.Id);
+        var session = CreateSession(
+            tower,
+            [reward],
+            [CreateSingleRandomAffixTable()]);
+        var host = new TowerRuntimeHost(
+            [["hero"]],
+            [true]);
+
+        await session.SpecialBattleService.RunTowerAsync(host);
+
+        var entry = Assert.Single(session.State.Inventory.Entries.OfType<EquipmentInstanceInventoryEntry>());
+        Assert.Equal(1, EquipmentAffixGroups.Count(entry.Equipment.ExtraAffixes));
     }
 
     private static GameSession CreateSession(
@@ -155,7 +174,41 @@ public sealed class SpecialBattleServiceTests
             CanDrop = true,
         };
 
-    private static EquipmentRandomAffixTableDefinition CreateRandomAffixTable() =>
+    private static EquipmentRandomAffixTableDefinition CreateFourRandomAffixTable() =>
+        new()
+        {
+            MinItemLevel = 1,
+            MaxItemLevel = 99,
+            Options =
+            [
+                new EquipmentRandomAffixOptionDefinition
+                {
+                    Kind = EquipmentRandomAffixKind.Accuracy,
+                    Weight = 1,
+                    Ranges = [new EquipmentRandomAffixRangeDefinition(1, 1)],
+                },
+                new EquipmentRandomAffixOptionDefinition
+                {
+                    Kind = EquipmentRandomAffixKind.CritMult,
+                    Weight = 1,
+                    Ranges = [new EquipmentRandomAffixRangeDefinition(1, 1)],
+                },
+                new EquipmentRandomAffixOptionDefinition
+                {
+                    Kind = EquipmentRandomAffixKind.Lifesteal,
+                    Weight = 1,
+                    Ranges = [new EquipmentRandomAffixRangeDefinition(1, 1)],
+                },
+                new EquipmentRandomAffixOptionDefinition
+                {
+                    Kind = EquipmentRandomAffixKind.AntiDebuff,
+                    Weight = 1,
+                    Ranges = [new EquipmentRandomAffixRangeDefinition(1, 1)],
+                },
+            ],
+        };
+
+    private static EquipmentRandomAffixTableDefinition CreateSingleRandomAffixTable() =>
         new()
         {
             MinItemLevel = 1,
