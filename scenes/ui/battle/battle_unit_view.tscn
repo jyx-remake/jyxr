@@ -134,6 +134,7 @@ scale = Vector2(0.35, 0.35)
 texture = ExtResource("4_shadow")
 
 [node name="Overlay" type="Control" parent="." unique_id=1644808179]
+z_index = 1
 layout_mode = 3
 anchors_preset = 0
 offset_left = -61.0
