@@ -81,8 +81,22 @@ public sealed class BattleState
             unit.Position == position &&
             !string.Equals(unit.Id, ignoredUnitId, StringComparison.Ordinal));
 
+
     public bool IsOccupied(GridPosition position, string? ignoredUnitId = null) =>
         GetUnitAt(position, ignoredUnitId) is not null;
+
+
+    public GridPosition? FindNearestEmptyPosition(GridPosition center, int maxRadius)
+    {
+        foreach (var pos in BattleEngine.EnumerateSquareSpiral(center, maxRadius))
+        {
+            if (pos != center && Grid.IsWalkable(pos) && !IsOccupied(pos))
+            {
+                return pos;
+            }
+        }
+        return null;
+    }
 
     public bool AreEnemies(BattleUnit first, BattleUnit second) => first.Team != second.Team;
 

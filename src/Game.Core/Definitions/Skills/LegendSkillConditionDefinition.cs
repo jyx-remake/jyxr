@@ -10,15 +10,15 @@ namespace Game.Core.Definitions.Skills;
 public abstract record LegendSkillConditionDefinition;
 
 public sealed record RequiredExternalSkillLevelLegendConditionDefinition(
-    string TargetId,
-    int Level) : LegendSkillConditionDefinition;
+	string TargetId,
+	int Level) : LegendSkillConditionDefinition;
 
 public sealed record RequiredInternalSkillLevelLegendConditionDefinition(
-    string TargetId,
-    int Level) : LegendSkillConditionDefinition;
+	string TargetId,
+	int Level) : LegendSkillConditionDefinition;
 
 public sealed record RequiredSpecialSkillLegendConditionDefinition(
-    string TargetId) : LegendSkillConditionDefinition;
+	string TargetId) : LegendSkillConditionDefinition;
 
 public sealed record RequiredTalentLegendConditionDefinition(
-    string TargetId) : LegendSkillConditionDefinition;
+	string TargetId) : LegendSkillConditionDefinition;

@@ -4,7 +4,7 @@ namespace Game.Core.Battle;
 
 public interface IBattleSkillAiScorer
 {
-    bool CanScore(SkillInstance skill);
+	bool CanScore(SkillInstance skill);
 
-    BattleSkillAiEvaluation Score(BattleSkillAiContext context);
+	BattleSkillAiEvaluation Score(BattleSkillAiContext context);
 }

@@ -119,6 +119,13 @@ internal sealed class BattleEventPresenter(
             case BattleFactKind.DefeatPrevented:
                 AppendLog($"{unitName} 的天赋【{ResolveTalentName(fact.Detail)}】发动，避免了被击败。");
                 break;
+            case BattleFactKind.Summoned:
+                ArgumentNullException.ThrowIfNull(fact.BattleJoinCombatant);
+                foreach (var battleJoinCombatant in fact.BattleJoinCombatant) { 
+                  AppendLog($"{unitName} 招呼 {battleJoinCombatant.CharacterId} ,坐标 {battleJoinCombatant.Position.X},{battleJoinCombatant.Position.Y}");
+                }
+              
+                break;
         }
     }
 

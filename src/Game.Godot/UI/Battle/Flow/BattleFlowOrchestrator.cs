@@ -28,7 +28,9 @@ internal sealed class BattleFlowOrchestrator
                 GameRoot.ContentRepository.GetGrowTemplate(
                     character.GrowTemplateId ?? CharacterExperienceProgression.DefaultGrowTemplateId),
             characterMaxLevelResolver: _ => GameRoot.Config.MaxLevel,
-            battleExperienceEligibilityResolver: unit => unit.Team == PlayerTeam);
+            battleExperienceEligibilityResolver: unit => unit.Team == PlayerTeam,
+            stateFactory: Game.BattleService.stateFactory
+            );
         _battleAgent = new BasicEnemyBattleAgent(
             new BattleTurnCandidateGenerator(_engine),
             new BattleAiPolicyResolver(GameRoot.SkillMaxLevelPolicy.GetMaxLevel));
@@ -130,16 +132,6 @@ internal sealed class BattleFlowOrchestrator
 
         _screen.ShowUnitActing();
         await _screen.PlaySkillAsync(actingUnit, skill, result);
-        //召唤人物
-        if (skill.SkillKind == SkillKind.Special)
-        {
-            var SpecialSkill = _engine.SpecialSkillResolve(skill);
-            //Game.Logger.Info($"召唤: {SpecialSkill.Definition.BattleCombatantId}");
-            if (SpecialSkill.Definition.BattleCombatantIds != null && result.Value !=null)
-            {
-                Game.BattleService.SpecialSkill_CreateBattleCombatant(actingUnit, State, SpecialSkill.Definition.BattleCombatantIds, result.Value.ImpactedPositions);
-            }
-        }
         await ContinueAfterResolvedPlayerActionAsync();
     }
 

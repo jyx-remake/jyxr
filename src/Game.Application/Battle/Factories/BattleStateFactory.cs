@@ -1,12 +1,13 @@
 using Game.Core.Abstractions;
 using Game.Core.Battle;
 using Game.Core.Definitions;
+using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 
 namespace Game.Application;
 
-internal sealed class BattleStateFactory
+internal sealed class BattleStateFactory : IBattleStateFactory
 {
     private const int GridWidth = 11;
     private const int GridHeight = 4;
@@ -242,23 +243,23 @@ EquipmentInstanceFactory tempFactory)
     {
         var definition = ContentRepository.GetCharacter(CharacterId);
         return CharacterMapper.CreateInitial(
-            $"battle_{state.Units.Count + 1}_{CharacterId}",
+            $"battle_{state.Units.Count+1}_{CharacterId}",
             definition,
             tempFactory);
 
     }
-    public void SpecialSkill_CreateBattleCombatant(BattleUnit actingUnit, BattleState state, List<string> characterIds, IReadOnlyList<GridPosition> ImpactedPositions)
+    public IReadOnlyList<BattleJoinCombatant> SpawnCombatant(BattleUnit actingUnit, BattleState state, List<string> characterIds, IReadOnlyList<GridPosition> ImpactedPositions)
     {
 
         Queue<GridPosition> queue = new Queue<GridPosition>(ImpactedPositions);
-
+        List<BattleJoinCombatant> SaveImpactedPositions = new List<BattleJoinCombatant>();
         foreach (string id in characterIds)
         {
 
             if (queue.Count == 0)
             {
-                Console.WriteLine($"位置不足，无法创建角色 {id}");
-                break;
+
+                queue.Enqueue(actingUnit.Position);
             }
             GridPosition gridPosition = queue.Dequeue();
 
@@ -267,37 +268,22 @@ EquipmentInstanceFactory tempFactory)
             {
                 CharacterId = id,
                 Team = actingUnit.Team,
-                Position = gridPosition,
+                Position = state.IsOccupied(gridPosition) is false? gridPosition : state.FindNearestEmptyPosition(gridPosition, 8)?? gridPosition,
                 Facing = actingUnit.Facing == BattleFacing.Left ? 0 : 1
             };
 
+            SaveImpactedPositions.Add(combatant);
             CreateBattleCombatant(state, combatant);
 
         }
-
+        return SaveImpactedPositions;
 
     }
 
 
-    //public BattleState CreateBattleCombatant2(BattleState state)
-    //{
 
 
-    //    var combatant = new BattleJoinCombatant
-    //    {
-    //        CharacterId = "小昭",
-    //        Team = 2,
-    //        Position = new GridPosition(1, 1),
-    //        Facing = 0
-    //    };
-
-    //    return CreateBattleCombatant(state, combatant);
-
-    //}
-
-
-
-    public BattleState CreateBattleCombatant(BattleState state, BattleJoinCombatant combatant)
+    public void CreateBattleCombatant(BattleState state, BattleJoinCombatant combatant)
     {
 
         ArgumentNullException.ThrowIfNull(state);
@@ -305,23 +291,13 @@ EquipmentInstanceFactory tempFactory)
         var tempFactory = new EquipmentInstanceFactory();
 
         var character = BattleCombatantResolver(state, combatant.CharacterId, tempFactory);
-        var units = new List<BattleUnit>();
-
-
-        foreach (var unit in state.Units)
-        {
-            units.Add(unit);
-        }
-
-
+        ArgumentNullException.ThrowIfNull(character);
         state.AddUnit(CreateUnit(
-    $"participant_{state.Units.Count + 1}_{combatant.CharacterId}",
-    character,
-    combatant.Team,
-    combatant.Position,
-    combatant.Facing));
-
-        return state;
+        $"participant_{state.Units.Count+1}_{combatant.CharacterId}",
+        character,
+        combatant.Team,
+        combatant.Position,
+        combatant.Facing));
 
     }
 

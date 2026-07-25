@@ -1,3 +1,4 @@
+using Game.Core.Model;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -10,7 +11,9 @@ internal sealed class BattleSkillExecutor(
         BattleState state,
         BattleUnit source,
         IReadOnlyList<BattleUnit> targets,
-        BattleSkillExecutionPlan plan)
+        BattleSkillExecutionPlan plan,
+        IReadOnlyList<GridPosition> impactedPositions
+        )
     {
         foreach (var step in plan.Steps)
         {
@@ -27,7 +30,7 @@ internal sealed class BattleSkillExecutor(
                     }
                     break;
                 case ApplyDefinedSkillEffectsStep definedEffects:
-                    ExecuteDefinedEffects(state, source, targets, plan.Skill, definedEffects.Effects);
+                    ExecuteDefinedEffects(state, source, targets, plan.Skill, definedEffects.Effects, impactedPositions);
                     break;
                 case AttemptAttackRageGainStep:
                     engine.TryGainRageFromAttack(state, source, targets);
@@ -43,13 +46,14 @@ internal sealed class BattleSkillExecutor(
         BattleUnit source,
         IReadOnlyList<BattleUnit> targets,
         SkillInstance skill,
-        IReadOnlyList<BattleEffectDefinition>? effects)
+        IReadOnlyList<BattleEffectDefinition>? effects,
+        IReadOnlyList<GridPosition> impactedPositions)
     {
         if (effects is null) return;
         foreach (var effect in effects)
         {
             using var effectScope = state.EnterEffect($"skill:{effect.GetType().Name}");
-            effectExecutor.ExecuteAbility(state, source, targets, effect, skill);
+            effectExecutor.ExecuteAbility(state, source, targets, effect, skill, impactedPositions);
         }
     }
 }

@@ -31,7 +31,7 @@ public sealed partial class BattleEngine
     private readonly LegendSkillResolver _legendSkillResolver;
     private readonly Func<IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
     private readonly IRandomService _random;
-
+    private readonly IBattleStateFactory _stateFactory;
     public BattleEngine(
         BattleDamageCalculator? damageCalculator = null,
         BattleHookExecutor? hookExecutor = null,
@@ -42,7 +42,9 @@ public sealed partial class BattleEngine
         Func<SkillInstance, int>? skillMaxLevelResolver = null,
         Func<CharacterInstance, GrowTemplateDefinition>? characterGrowTemplateResolver = null,
         Func<CharacterInstance, int>? characterMaxLevelResolver = null,
-        Func<BattleUnit, bool>? battleExperienceEligibilityResolver = null)
+        Func<BattleUnit, bool>? battleExperienceEligibilityResolver = null,
+        IBattleStateFactory? stateFactory=null
+        )
     {
         _damageCalculator = damageCalculator ?? new BattleDamageCalculator();
         _damageResolver = new BattleDamageResolver(this);
@@ -53,6 +55,10 @@ public sealed partial class BattleEngine
         _legendSkillResolver = legendSkillResolver ?? new LegendSkillResolver();
         _legendSkillsProvider = legendSkillsProvider ?? EmptyLegendSkillProvider;
         _random = random ?? SharedRandomService.Instance;
+
+        _stateFactory = stateFactory ?? throw new ArgumentNullException(nameof(stateFactory));
+
+
         _hookRunner = new BattleHookRunner(this, _hookExecutor, _random);
         _battleBuffResolver = new BattleBuffResolver(
             (state, timing, unit, configure) => TriggerHooks(state, timing, unit, configure),
@@ -65,8 +71,9 @@ public sealed partial class BattleEngine
             battleExperienceEligibilityResolver ?? DefaultBattleExperienceEligibilityResolver);
         _recoveryResolver = new BattleRecoveryResolver(
             (state, timing, unit, configure) => TriggerHooks(state, timing, unit, configure));
-    }
 
+    }
+    internal IBattleStateFactory StateFactory => _stateFactory;
     internal BattleRecoveryResolver RecoveryResolver => _recoveryResolver;
 
     internal BattleBuffResolver BuffResolver => _battleBuffResolver;

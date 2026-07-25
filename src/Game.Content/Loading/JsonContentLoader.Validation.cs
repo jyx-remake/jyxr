@@ -608,6 +608,7 @@ public sealed partial class JsonContentLoader
                 ValidateBattleTargetSelector(addMp.Target!, ownerName, null);
                 break;
             case CancelHitBattleHookEffectDefinition:
+            case SummonCombatantBattleHookEffectDefinition:
             case SetHitSuccessBattleHookEffectDefinition:
                 break;
             case ExtraStrikeBattleHookEffectDefinition extraStrike:

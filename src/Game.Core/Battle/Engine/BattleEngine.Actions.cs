@@ -85,11 +85,14 @@ public sealed partial class BattleEngine
             detail: resolvedSkill.Id,
             skillCast: skillCastInfo);
         AddMessage(state, battleEvent);
+
         _skillExecutor.Execute(
             state,
             unit,
             targets,
-            BattleSkillExecutionPlanFactory.Create(resolvedSkill));
+            BattleSkillExecutionPlanFactory.Create(resolvedSkill),
+             impactedPositions.OrderBy(static position => position.Y).ThenBy(static position => position.X).ToList()
+            );
         TriggerHooks(state, HookTiming.AfterSkillCast, unit, context =>
         {
             context.Source = unit;
@@ -250,7 +253,7 @@ public sealed partial class BattleEngine
     {
         var resolvedSkill = _legendSkillResolver.Resolve(_legendSkillsProvider(), skill, _random);
         var resolvedSpecialSkill = resolvedSkill as SpecialSkillInstance;
-
+        ArgumentNullException.ThrowIfNull(resolvedSpecialSkill);
         return resolvedSpecialSkill;
     }
 }
