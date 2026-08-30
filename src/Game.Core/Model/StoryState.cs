@@ -7,11 +7,14 @@ public sealed class StoryState
 {
     private readonly Dictionary<string, ExpressionValue> _variables = new(StringComparer.Ordinal);
     private readonly HashSet<string> _completedStoryIds = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, StoryCompletionRecord> _completionProgress = new(StringComparer.Ordinal);
     private readonly Dictionary<string, StoryTimeKeyState> _timeKeys = new(StringComparer.Ordinal);
 
     public IReadOnlyDictionary<string, ExpressionValue> Variables => _variables;
 
     public IReadOnlyCollection<string> CompletedStoryIds => _completedStoryIds;
+
+    public IReadOnlyDictionary<string, StoryCompletionRecord> CompletionProgress => _completionProgress;
 
     public IReadOnlyDictionary<string, StoryTimeKeyState> TimeKeys => _timeKeys;
 
@@ -36,6 +39,20 @@ public sealed class StoryState
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(storyId);
             state._completedStoryIds.Add(storyId);
+        }
+
+        foreach (var progress in record.CompletionProgress ?? [])
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(progress.StoryId);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(progress.Count);
+            ArgumentOutOfRangeException.ThrowIfNegative(progress.LastCompletedTotalDays);
+            state._completedStoryIds.Add(progress.StoryId);
+            state._completionProgress[progress.StoryId] = progress;
+        }
+
+        foreach (var storyId in state._completedStoryIds)
+        {
+            state._completionProgress.TryAdd(storyId, new StoryCompletionRecord(storyId, 1, 0));
         }
 
         foreach (var timeKeyRecord in record.TimeKeys ?? [])
@@ -118,10 +135,30 @@ public sealed class StoryState
         return _completedStoryIds.Contains(storyId);
     }
 
-    public void MarkCompleted(string storyId)
+    public void MarkCompleted(string storyId, ClockState? clock = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(storyId);
         _completedStoryIds.Add(storyId);
+        var previous = _completionProgress.GetValueOrDefault(storyId);
+        _completionProgress[storyId] = new StoryCompletionRecord(
+            storyId,
+            checked((previous?.Count ?? 0) + 1),
+            clock?.TotalDays ?? previous?.LastCompletedTotalDays ?? 0);
+    }
+
+    public int GetCompletionCount(string storyId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(storyId);
+        return _completionProgress.GetValueOrDefault(storyId)?.Count ?? 0;
+    }
+
+    public int GetDaysSinceLastCompletion(string storyId, ClockState currentClock)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(storyId);
+        ArgumentNullException.ThrowIfNull(currentClock);
+        return _completionProgress.TryGetValue(storyId, out var progress)
+            ? Math.Max(0, currentClock.TotalDays - progress.LastCompletedTotalDays)
+            : -1;
     }
 
     public void SetLastStory(string? storyId)
@@ -144,6 +181,9 @@ public sealed class StoryState
             _timeKeys.Values
                 .OrderBy(static timeKey => timeKey.Key, StringComparer.Ordinal)
                 .Select(static timeKey => timeKey.ToRecord())
+                .ToArray(),
+            _completionProgress.Values
+                .OrderBy(static progress => progress.StoryId, StringComparer.Ordinal)
                 .ToArray());
 }
 

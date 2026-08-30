@@ -39,6 +39,32 @@ internal sealed class InventoryCurrencyStoryCommands
         _session.InventoryService.AddItem(itemIds[_session.RandomService.Next(0, itemIds.Count)], quantity);
     }
 
+    [StoryCommand("add_random_item_options")]
+    public void AddRandomItemOptions(IReadOnlyList<string> options)
+    {
+        if (options.Count == 0)
+            throw new InvalidOperationException("add_random_item_options requires at least one item option.");
+
+        var parsed = options.Select(ParseRandomItemOption).ToArray();
+        foreach (var option in parsed) _session.ContentRepository.GetItem(option.ItemId);
+        var selected = parsed[_session.RandomService.Next(0, parsed.Length)];
+        _session.InventoryService.AddItem(selected.ItemId, selected.Quantity);
+    }
+
+    private static (string ItemId, int Quantity) ParseRandomItemOption(string option)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(option);
+        var separator = option.LastIndexOf('#');
+        if (separator <= 0 || separator >= option.Length - 1 ||
+            !int.TryParse(option[(separator + 1)..], out var quantity) || quantity <= 0)
+        {
+            throw new InvalidOperationException(
+                $"Random item option '{option}' must use the form item-id#positive-quantity.");
+        }
+
+        return (option[..separator], quantity);
+    }
+
     [StoryCommand("change_silver", "get_money")]
     public void ChangeSilver(int delta)
     {
@@ -61,6 +87,30 @@ internal sealed class AdventureStoryCommands
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(days);
         _session.State.Clock.AdvanceDays(days);
         _session.Events.Publish(new ClockChangedEvent());
+    }
+
+    [StoryCommand("advance_time_slots", "cost_hour")]
+    public void AdvanceTimeSlots(int timeSlots)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(timeSlots);
+        _session.State.Clock.AdvanceTimeSlots(timeSlots);
+        _session.Events.Publish(new ClockChangedEvent());
+    }
+
+    [StoryCommand("advance_to_time_slot", "to_chinesetime")]
+    public void AdvanceToTimeSlot(string choices)
+    {
+        var candidates = ParseTimeSlotChoices(choices);
+        var target = candidates[_session.RandomService.Next(0, candidates.Count)];
+        _session.State.Clock.AdvanceToTimeSlot(target);
+        _session.Events.Publish(new ClockChangedEvent());
+    }
+
+    [StoryCommand("show_cloud")]
+    public void ShowCloud(bool visible)
+    {
+        _session.State.Adventure.SetCloudVisible(visible);
+        _session.Events.Publish(new AdventureStateChangedEvent());
     }
 
     [StoryCommand("set_round")]
@@ -119,6 +169,40 @@ internal sealed class AdventureStoryCommands
         _session.State.Adventure.SetRank(rank);
         _session.Events.Publish(new AdventureStateChangedEvent());
     }
+
+    private static IReadOnlyList<TimeSlot> ParseTimeSlotChoices(string choices)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(choices);
+        if (string.Equals(choices.Trim(), "random", StringComparison.OrdinalIgnoreCase))
+        {
+            return Enum.GetValues<TimeSlot>();
+        }
+
+        var candidates = choices
+            .Where(static character => !char.IsWhiteSpace(character) && character is not ',' and not '，' and not '|' and not '#')
+            .Select(ParseChineseTimeSlot)
+            .ToArray();
+        return candidates.Length > 0
+            ? candidates
+            : throw new InvalidOperationException($"No valid time slot was provided in '{choices}'.");
+    }
+
+    private static TimeSlot ParseChineseTimeSlot(char value) => value switch
+    {
+        '子' => TimeSlot.Zi,
+        '丑' => TimeSlot.Chou,
+        '寅' => TimeSlot.Yin,
+        '卯' => TimeSlot.Mao,
+        '辰' => TimeSlot.Chen,
+        '巳' => TimeSlot.Si,
+        '午' => TimeSlot.Wu,
+        '未' => TimeSlot.Wei,
+        '申' => TimeSlot.Shen,
+        '酉' => TimeSlot.You,
+        '戌' => TimeSlot.Xu,
+        '亥' => TimeSlot.Hai,
+        _ => throw new InvalidOperationException($"Unknown Chinese time slot '{value}'."),
+    };
 }
 
 internal sealed class StoryStateCommands
@@ -182,6 +266,10 @@ internal sealed class CharacterGrowthStoryCommands
 {
     private readonly GameSession _session;
     public CharacterGrowthStoryCommands(GameSession session) => _session = session;
+
+    [StoryCommand("set_character_name")]
+    public void SetCharacterName(string characterId, string name) =>
+        _session.CharacterService.RenameCharacter(characterId, name);
 
     [StoryCommand("change_stat")]
     public void ChangeStat(string characterId, string stat, int delta) =>

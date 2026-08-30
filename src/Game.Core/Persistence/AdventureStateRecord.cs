@@ -9,4 +9,5 @@ public sealed record AdventureStateRecord(
     int Morality,
     IReadOnlyDictionary<string, int>? FavorabilityByTarget,
     double Rank,
-    bool NoRegret = false);
+    bool NoRegret = false,
+    bool CloudVisible = true);

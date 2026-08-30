@@ -38,10 +38,11 @@ public sealed class GameSession
         ContentRepository = contentRepository;
         DiagnosticLogger = logger ?? NullDiagnosticLogger.Instance;
         RandomService = randomService ?? SharedRandomService.Instance;
+        TimeProvider = timeProvider ?? global::System.TimeProvider.System;
         GameExpressionSymbols.ValidateDynamicVariables(initialState, StoryExecutionContext.Empty);
         SkillMaxLevelPolicy = new SkillMaxLevelPolicy(this);
         CharacterResourceLimitPolicy = new CharacterResourceLimitPolicy(this);
-        PlayTimeService = new PlayTimeService(this, timeProvider);
+        PlayTimeService = new PlayTimeService(this, TimeProvider);
         SaveGameService = new SaveGameService(this, DiagnosticLogger);
         ProfileService = new ProfileService(this, DiagnosticLogger);
         SessionFlowService = new SessionFlowService(this);
@@ -69,6 +70,7 @@ public sealed class GameSession
     public GameSettings Settings { get; }
     public IContentRepository ContentRepository { get; }
     public IRandomService RandomService { get; }
+    public TimeProvider TimeProvider { get; }
     internal IDiagnosticLogger DiagnosticLogger { get; }
     public SkillMaxLevelPolicy SkillMaxLevelPolicy { get; }
     public CharacterResourceLimitPolicy CharacterResourceLimitPolicy { get; }

@@ -35,4 +35,16 @@ public sealed class ClockFormatterTests
 
         Assert.Equal("江湖十年十二月三十日 亥时", ClockFormatter.FormatDateTimeCn(clock));
     }
+
+    [Fact]
+    public void Clock_AdvancesForwardToRequestedTimeSlot()
+    {
+        var clock = new ClockState();
+
+        Assert.Equal(8, clock.AdvanceToTimeSlot(TimeSlot.Zi));
+        Assert.Equal(2, clock.Day);
+        Assert.Equal(TimeSlot.Zi, clock.TimeSlot);
+        Assert.Equal(0, clock.AdvanceToTimeSlot(TimeSlot.Zi));
+        Assert.Equal(2, clock.Day);
+    }
 }

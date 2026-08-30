@@ -51,7 +51,7 @@ public sealed class StoryService
         {
             if (storyEvent is SegmentCompletedEvent completed)
             {
-                executionState.Story.MarkCompleted(completed.SegmentId);
+                executionState.Story.MarkCompleted(completed.SegmentId, executionState.Clock);
                 executionState.Story.SetLastStory(completed.SegmentId);
             }
             yield return storyEvent;

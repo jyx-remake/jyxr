@@ -513,15 +513,19 @@ public sealed class SaveGameTests
         var definition = TestContentFactory.CreateCharacterDefinition("hero_knight");
         var character = TestContentFactory.CreateCharacterInstance("char_001", definition);
         var story = new StoryState();
+        var clock = new ClockState();
         story.SetVariable("hero_name", ExpressionValue.FromString("张无忌"));
         story.SetVariable("met_nanxian", ExpressionValue.FromBoolean(true));
         story.SetVariable("boss_level", ExpressionValue.FromNumber(12));
         story.SetVariable("reward_pool", ExpressionValue.FromList([ExpressionValue.FromString("小还丹"), ExpressionValue.FromString("大还丹")]));
         story.SetVariable("是否拜师", ExpressionValue.FromBoolean(true));
-        story.MarkCompleted("新手村_南贤开场");
-        story.MarkCompleted("新手村_南贤");
+        clock.AdvanceDays(3);
+        story.MarkCompleted("新手村_南贤开场", clock);
+        story.MarkCompleted("新手村_南贤", clock);
+        clock.AdvanceDays(5);
+        story.MarkCompleted("新手村_南贤", clock);
+        clock.AdvanceDays(2);
         story.SetLastStory("新手村_南贤");
-        var clock = new ClockState();
         story.SetTimeKey("襄阳急报", clock, 5, "襄阳_超时");
 
         var saveGame = SaveGame.Create(
@@ -545,6 +549,8 @@ public sealed class SaveGameTests
         var restoredStory = roundTripped!.RestoreStoryState();
         Assert.True(restoredStory.IsStoryCompleted("新手村_南贤开场"));
         Assert.True(restoredStory.IsStoryCompleted("新手村_南贤"));
+        Assert.Equal(2, restoredStory.GetCompletionCount("新手村_南贤"));
+        Assert.Equal(2, restoredStory.GetDaysSinceLastCompletion("新手村_南贤", clock));
         Assert.Equal("新手村_南贤", restoredStory.LastStoryId);
         Assert.True(restoredStory.TryGetVariable("hero_name", out var heroName));
         Assert.Equal(ExpressionValueKind.String, heroName.Kind);
@@ -562,7 +568,7 @@ public sealed class SaveGameTests
         Assert.Equal("襄阳急报", timeKey.Key);
         Assert.Equal(5, timeKey.LimitDays);
         Assert.Equal("襄阳_超时", timeKey.TargetStoryId);
-        Assert.Equal(6, timeKey.DeadlineAt.Day);
+        Assert.Equal(16, timeKey.DeadlineAt.Day);
     }
 
     [Fact]

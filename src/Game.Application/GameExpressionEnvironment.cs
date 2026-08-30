@@ -9,7 +9,7 @@ public static class GameExpressionSymbols
     public static IReadOnlySet<string> BuiltInVariables { get; } = new HashSet<string>(StringComparer.Ordinal)
     {
         "silver", "yuanbao", "round", "difficulty", "sect", "morality", "daode", "rank", "elapsed_days",
-        "current_map", "current_time_slot", "friend_count",
+        "current_map", "current_time_slot", "current_date", "system_date", "friend_count", "achievement_count", "kill_count",
     };
 
     public static void ValidateDynamicVariables(GameState state, StoryExecutionContext context)
@@ -61,7 +61,12 @@ internal sealed class GameExpressionVariableResolver : IExpressionVariableResolv
             "elapsed_days" => ExpressionValue.FromNumber(state.Clock.TotalDays),
             "current_map" => ExpressionValue.FromString(state.Location.CurrentMapId ?? string.Empty),
             "current_time_slot" => ExpressionValue.FromString(state.Clock.TimeSlot.ToChineseBranch()),
+            "current_date" => ExpressionValue.FromNumber(
+                checked(state.Clock.Year * 10000 + state.Clock.Month * 100 + state.Clock.Day)),
+            "system_date" => ExpressionValue.FromNumber(ToDateKey(_session.TimeProvider.GetLocalNow())),
             "friend_count" => ExpressionValue.FromNumber(state.Party.Members.Count),
+            "achievement_count" => ExpressionValue.FromNumber(_session.Profile.UnlockedAchievementIds.Count),
+            "kill_count" => ExpressionValue.FromNumber(_session.Profile.KillCount),
             _ => default,
         };
 
@@ -69,6 +74,9 @@ internal sealed class GameExpressionVariableResolver : IExpressionVariableResolv
             || _context.Variables.TryGetValue(name, out value)
             || state.Story.TryGetVariable(name, out value);
     }
+
+    private static int ToDateKey(DateTimeOffset value) =>
+        checked(value.Year * 10000 + value.Month * 100 + value.Day);
 }
 
 public sealed class GameExpressionEnvironment
@@ -153,6 +161,13 @@ internal sealed class StoryQueryFunctions
 
     [ExpressionFunction("has_time_key")]
     public bool HasTimeKey(string key) => _session.State.Story.HasTimeKey(key);
+
+    [ExpressionFunction("story_completion_count")]
+    public int StoryCompletionCount(string id) => _session.State.Story.GetCompletionCount(id);
+
+    [ExpressionFunction("story_elapsed_days")]
+    public int StoryElapsedDays(string id) =>
+        _session.State.Story.GetDaysSinceLastCompletion(id, _session.State.Clock);
 
     [ExpressionFunction("zhoumu_greater_than")]
     public bool RoundGreaterThan(int round) => _session.State.Adventure.Round > round;
@@ -240,10 +255,34 @@ internal sealed class PartyCharacterQueryFunctions
         return character.GetExternalSkillLevel(skillId) ?? character.GetInternalSkillLevel(skillId) ?? 0;
     }
 
+    [ExpressionFunction("character_gender")]
+    public string CharacterGender(string characterId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(characterId);
+        if (_session.State.Party.TryGetCharacter(characterId, out var character) && character is not null)
+        {
+            return ToGenderId(character.Gender);
+        }
+
+        return _session.ContentRepository.TryGetCharacter(characterId, out var definition)
+            ? ToGenderId(definition.Gender)
+            : throw new InvalidOperationException($"Character '{characterId}' does not exist.");
+    }
+
     private CharacterInstance GetActiveCharacter(string characterId) =>
         _session.State.Party.GetActiveMembers()
             .FirstOrDefault(character => string.Equals(character.Id, characterId, StringComparison.Ordinal))
         ?? throw new InvalidOperationException($"Character '{characterId}' is not in the active party.");
+
+    private static string ToGenderId(Game.Core.Model.CharacterGender gender) => gender switch
+    {
+        Game.Core.Model.CharacterGender.Male => "male",
+        Game.Core.Model.CharacterGender.Female => "female",
+        Game.Core.Model.CharacterGender.Neutral => "neutral",
+        Game.Core.Model.CharacterGender.Animal => "animal",
+        Game.Core.Model.CharacterGender.Eunuch => "eunuch",
+        _ => throw new ArgumentOutOfRangeException(nameof(gender), gender, null),
+    };
 }
 
 internal sealed class RandomQueryFunctions

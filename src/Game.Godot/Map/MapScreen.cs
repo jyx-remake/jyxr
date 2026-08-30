@@ -25,6 +25,7 @@ public partial class MapScreen : Control
 	private RichTextLabel _mapDescriptionLabel = null!;
 	private MapInteractionResult? _pendingInteraction;
 	private IDisposable? _clockChangedSubscription;
+	private IDisposable? _adventureStateChangedSubscription;
 	private bool _isStoryPresentationActive;
 
 	public override void _Ready()
@@ -42,6 +43,7 @@ public partial class MapScreen : Control
 		_bottomBox = GetNode<Control>("%BottomBox");
 		_mapDescriptionLabel = GetNode<RichTextLabel>("%MapDescriptionLabel");
 		_clockChangedSubscription = Game.Session.Events.Subscribe<ClockChangedEvent>(OnClockChanged);
+		_adventureStateChangedSubscription = Game.Session.Events.Subscribe<AdventureStateChangedEvent>(OnAdventureStateChanged);
 		_smallMapLocationScroll.ScrollStarted += _locationTooltipLayer.Dismiss;
 
 		if (_pendingInitialResult is not null)
@@ -58,6 +60,8 @@ public partial class MapScreen : Control
 		_locationTooltipLayer.Dismiss();
 		_clockChangedSubscription?.Dispose();
 		_clockChangedSubscription = null;
+		_adventureStateChangedSubscription?.Dispose();
+		_adventureStateChangedSubscription = null;
 	}
 
 	private void OnClockChanged(ClockChangedEvent _)
@@ -73,6 +77,8 @@ public partial class MapScreen : Control
 			ApplySmallMapTimeLighting();
 		}
 	}
+
+	private void OnAdventureStateChanged(AdventureStateChangedEvent _) => ApplyLargeMapCloudVisibility();
 
 	public void SetStoryPresentationActive(bool active)
 	{

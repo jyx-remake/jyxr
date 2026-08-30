@@ -51,6 +51,18 @@ public sealed class ClockState
         AdvanceDays(elapsedDays);
     }
 
+    public int AdvanceToTimeSlot(TimeSlot target)
+    {
+        if (!Enum.IsDefined(target))
+        {
+            throw new ArgumentOutOfRangeException(nameof(target));
+        }
+
+        var elapsedSlots = ((int)target - (int)TimeSlot + TimeSlotsPerDay) % TimeSlotsPerDay;
+        AdvanceTimeSlots(elapsedSlots);
+        return elapsedSlots;
+    }
+
     public void AdvanceDays(int amount)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(amount);

@@ -17,6 +17,7 @@ public partial class LargeMapMarker : Control
 	public Texture2D? DefaultTexture { get; set; }
 
 	private TextureRect _avatar = null!;
+	private LargeMapOutline _outline = null!;
 	private Control _visual = null!;
 	private OverflowTextureRect _overflowAvatar = null!;
 	private Label _nameLabel = null!;
@@ -29,6 +30,7 @@ public partial class LargeMapMarker : Control
 	public override void _Ready()
 	{
 		_visual = GetNode<Control>("%Visual");
+		_outline = GetNode<LargeMapOutline>("%Outline");
 		_avatar = GetNode<TextureRect>("%Avatar");
 		_overflowAvatar = GetNode<OverflowTextureRect>("%OverflowAvatar");
 		_nameLabel = GetNode<Label>("%NameLabel");
@@ -85,12 +87,14 @@ public partial class LargeMapMarker : Control
 			_notice.Position = avatar.UseCompactTownSize
 				? new Vector2(visualSize.X - 21f, -11f)
 				: DefaultNoticePosition;
+			ApplyOutlineLayout(avatar.Texture, avatar.UseOverflow);
 			return;
 		}
 
 		var textureSize = avatar.Texture.GetSize();
 		if (textureSize.X <= 0f || textureSize.Y <= 0f)
 		{
+			ApplyOutlineLayout(null, false);
 			return;
 		}
 
@@ -107,5 +111,13 @@ public partial class LargeMapMarker : Control
 			textureSize.Y + 8f);
 		_nameLabel.Size = DefaultNameSize;
 		_notice.Position = new Vector2(textureSize.X - 21f, -11f);
+		ApplyOutlineLayout(avatar.Texture, avatar.UseOverflow);
+	}
+
+	private void ApplyOutlineLayout(Texture2D? texture, bool useOverflow)
+	{
+		_outline.Texture = texture;
+		_outline.UseAspectCover = useOverflow;
+		_outline.Visible = texture is not null;
 	}
 }

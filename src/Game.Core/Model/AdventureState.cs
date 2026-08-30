@@ -16,6 +16,8 @@ public sealed class AdventureState
 
     public bool NoRegret { get; private set; }
 
+    public bool CloudVisible { get; private set; } = true;
+
     public string? SectId { get; private set; }
 
     public int Morality { get; private set; } = 50;
@@ -40,6 +42,7 @@ public sealed class AdventureState
             Round = record.Round,
             Difficulty = record.Difficulty,
             NoRegret = record.NoRegret,
+            CloudVisible = record.CloudVisible,
             SectId = string.IsNullOrWhiteSpace(record.SectId) ? null : record.SectId,
             Morality = record.Morality,
             Rank = record.Rank,
@@ -70,6 +73,8 @@ public sealed class AdventureState
     }
 
     public void SetNoRegret(bool enabled) => NoRegret = enabled;
+
+    public void SetCloudVisible(bool visible) => CloudVisible = visible;
 
     public void SetSect(string? sectId) =>
         SectId = string.IsNullOrWhiteSpace(sectId)
@@ -125,7 +130,8 @@ public sealed class AdventureState
                 .OrderBy(static pair => pair.Key, StringComparer.Ordinal)
                 .ToDictionary(static pair => pair.Key, static pair => pair.Value, StringComparer.Ordinal),
             Rank,
-            NoRegret);
+            NoRegret,
+            CloudVisible);
 
     private static string NormalizeFavorabilityTarget(string targetId)
     {

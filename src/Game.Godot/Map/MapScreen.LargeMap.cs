@@ -6,6 +6,7 @@ namespace Game.Godot.Map;
 public partial class MapScreen
 {
 	private LargeMapView _largeMapView = null!;
+	private TextureRect _largeMapCloud = null!;
 	private MapEnterResult? _currentLargeMapResult;
 	private bool _isDeferringLargeMapTimeLighting;
 	private bool _hasDeferredLargeMapTimeLighting;
@@ -13,6 +14,7 @@ public partial class MapScreen
 	private void InitializeLargeMapNodes()
 	{
 		_largeMapView = GetNode<LargeMapView>("%LargeMapView");
+		_largeMapCloud = GetNode<TextureRect>("%Cloud");
 		_largeMapView.LocationPressed += _locationTooltipLayer.Request;
 		_largeMapView.GestureStarted += _locationTooltipLayer.Dismiss;
 	}
@@ -21,7 +23,16 @@ public partial class MapScreen
 	{
 		_currentLargeMapResult = result;
 		_largeMapView.ShowMap(result);
+		ApplyLargeMapCloudVisibility();
 		ApplyLargeMapTimeLighting();
+	}
+
+	private void ApplyLargeMapCloudVisibility()
+	{
+		if (GodotObject.IsInstanceValid(_largeMapCloud))
+		{
+			_largeMapCloud.Visible = Game.State.Adventure.CloudVisible;
+		}
 	}
 
 	private void ApplyLargeMapTimeLighting()

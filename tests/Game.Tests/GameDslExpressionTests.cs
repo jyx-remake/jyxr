@@ -20,6 +20,51 @@ public sealed class GameDslExpressionTests
     }
 
     [Fact]
+    public void XmjhCalendarProfileAndCompletionValuesAreResolvable()
+    {
+        var state = new GameState();
+        state.Clock.AdvanceDays(9);
+        state.Story.MarkCompleted("循环剧情", state.Clock);
+        state.Clock.AdvanceDays(4);
+        state.Story.MarkCompleted("循环剧情", state.Clock);
+        state.Clock.AdvanceDays(2);
+        var profile = new GameProfile();
+        profile.UnlockAchievement("称号一");
+        profile.UnlockAchievement("称号二");
+        profile.AddKills(12);
+        var session = new GameSession(
+            state,
+            TestContentFactory.CreateRepository(),
+            initialProfile: profile,
+            timeProvider: new FixedTimeProvider(new DateTimeOffset(2026, 8, 30, 12, 0, 0, TimeSpan.FromHours(8))));
+        var expression = new ExpressionParser().ParseExpression(
+            "current_date == 10116 and system_date == 20260830 and achievement_count == 2 and kill_count == 12 " +
+            "and story_completion_count('循环剧情') == 2 and story_elapsed_days('循环剧情') == 2");
+
+        Assert.True(new ExpressionEvaluator().EvaluateBoolean(
+            expression,
+            new GameExpressionEnvironment(session).Create(),
+            "test"));
+    }
+
+    [Fact]
+    public void CharacterGenderReadsPartyOrContentDefinition()
+    {
+        var heroine = TestContentFactory.CreateCharacterDefinition("女侠", gender: CharacterGender.Female);
+        var animal = TestContentFactory.CreateCharacterDefinition("灵兽", gender: CharacterGender.Animal);
+        var state = new GameState();
+        state.Party.AddMember(TestContentFactory.CreateCharacterInstance("女侠", heroine));
+        var session = new GameSession(state, TestContentFactory.CreateRepository(characters: [heroine, animal]));
+        var expression = new ExpressionParser().ParseExpression(
+            "character_gender('女侠') == 'female' and character_gender('灵兽') == 'animal'");
+
+        Assert.True(new ExpressionEvaluator().EvaluateBoolean(
+            expression,
+            new GameExpressionEnvironment(session).Create(),
+            "test"));
+    }
+
+    [Fact]
     public void ChanceUsesInjectedRandomAndShortCircuitControlsConsumption()
     {
         var random = new RecordingRandom(.25);
@@ -106,5 +151,15 @@ public sealed class GameDslExpressionTests
         public int DoubleCalls { get; private set; }
         public double NextDouble() { DoubleCalls++; return nextDouble; }
         public int Next(int minInclusive, int maxExclusive) => minInclusive;
+    }
+
+    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => now.ToUniversalTime();
+        public override TimeZoneInfo LocalTimeZone { get; } = TimeZoneInfo.CreateCustomTimeZone(
+            "test-cn",
+            TimeSpan.FromHours(8),
+            "test-cn",
+            "test-cn");
     }
 }

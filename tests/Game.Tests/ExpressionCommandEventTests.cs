@@ -26,6 +26,63 @@ public sealed class ExpressionCommandEventTests
     }
 
     [Fact]
+    public async Task XmjhClockAndCloudCommandsMutatePersistentStateAndPublishEvents()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var clockChanges = 0;
+        var adventureChanges = 0;
+        using var clockSubscription = session.Events.Subscribe<ClockChangedEvent>(_ => clockChanges++);
+        using var adventureSubscription = session.Events.Subscribe<AdventureStateChangedEvent>(_ => adventureChanges++);
+        var parser = new ExpressionParser();
+
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("advance_time_slots(2)"));
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("advance_to_time_slot('子')"));
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("show_cloud(false)"));
+
+        Assert.Equal(TimeSlot.Zi, session.State.Clock.TimeSlot);
+        Assert.Equal(2, session.State.Clock.Day);
+        Assert.False(session.State.Adventure.CloudVisible);
+        Assert.Equal(2, clockChanges);
+        Assert.Equal(1, adventureChanges);
+        Assert.False(session.State.Adventure.ToRecord().CloudVisible);
+    }
+
+    [Fact]
+    public async Task SetCharacterNameRenamesExistingPartyMember()
+    {
+        var definition = TestContentFactory.CreateCharacterDefinition("孩子");
+        var state = new GameState();
+        state.Party.AddMember(TestContentFactory.CreateCharacterInstance("孩子", definition));
+        var session = new GameSession(state, TestContentFactory.CreateRepository(characters: [definition]));
+        var characterChanges = 0;
+        using var subscription = session.Events.Subscribe<CharacterChangedEvent>(_ => characterChanges++);
+
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(
+            new ExpressionParser().ParseCall("set_character_name('孩子', '平安')"));
+
+        Assert.Equal("平安", state.Party.GetMember("孩子").Name);
+        Assert.Equal(1, characterChanges);
+    }
+
+    [Fact]
+    public async Task RandomItemOptionsPreservePerCandidateQuantity()
+    {
+        var first = new NormalItemDefinition { Id = "first", Name = "first", Type = ItemType.Utility, ConsumeOnUse = false };
+        var second = new NormalItemDefinition { Id = "second", Name = "second", Type = ItemType.Utility, ConsumeOnUse = false };
+        var random = new SelectingRandom(1);
+        var session = new GameSession(
+            new GameState(),
+            TestContentFactory.CreateRepository(items: [first, second]),
+            randomService: random);
+
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(
+            new ExpressionParser().ParseCall("add_random_item_options(['first#1', 'second#2'])"));
+
+        Assert.Equal(2, session.State.Inventory.GetStack(second).Quantity);
+        Assert.Equal((0, 2), random.LastRange);
+    }
+
+    [Fact]
     public async Task SetRound_RecordsOnlyHigherReachedRound()
     {
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
@@ -240,6 +297,7 @@ public sealed class ExpressionCommandEventTests
     [InlineData("remove_item('item', 0)")]
     [InlineData("add_random_item([], 0)")]
     [InlineData("advance_days(0)")]
+    [InlineData("advance_time_slots(0)")]
     [InlineData("set_round(0)")]
     [InlineData("set_time_key('key', 0, 'story')")]
     [InlineData("scale_stats('hero', -0.01)")]

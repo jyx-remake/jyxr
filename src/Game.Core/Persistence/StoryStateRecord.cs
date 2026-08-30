@@ -7,7 +7,13 @@ public sealed record StoryStateRecord(
     IReadOnlyDictionary<string, StoryVariableRecord> Variables,
     IReadOnlyList<string> CompletedStoryIds,
     string? LastStoryId,
-    IReadOnlyList<StoryTimeKeyRecord>? TimeKeys = null);
+    IReadOnlyList<StoryTimeKeyRecord>? TimeKeys = null,
+    IReadOnlyList<StoryCompletionRecord>? CompletionProgress = null);
+
+public sealed record StoryCompletionRecord(
+    string StoryId,
+    int Count,
+    int LastCompletedTotalDays);
 
 public sealed record StoryTimeKeyRecord(
     string Key,
