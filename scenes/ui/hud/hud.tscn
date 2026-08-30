@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://co16la5kihi6o" path="res://assets/art/misc/story/daoju.png" id="10_backpack"]
 [ext_resource type="Texture2D" uid="uid://bpbr4s8fsji6r" path="res://assets/art/misc/story/rizhi.png" id="11_log"]
 [ext_resource type="Texture2D" uid="uid://cc7yi6jgcfwde" path="res://assets/art/misc/story/zhuangtai.png" id="12_team"]
+[ext_resource type="BitMap" uid="uid://bove0n4ighy11" path="res://scenes/ui/hud/system_button_click_mask.svg" id="13_system_click_mask"]
 
 [node name="Hud" type="Control" unique_id=1846363281]
 layout_mode = 3
@@ -186,23 +187,6 @@ offset_right = 456.02295
 offset_bottom = 467.8806
 texture = ExtResource("7_menu_frame")
 
-[node name="SystemButton" parent="BottomRight/MenueButtonGroup" unique_id=2079598957 instance=ExtResource("9_button")]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -214.41748
-offset_top = -187.27637
-offset_right = 477.58252
-offset_bottom = 496.72363
-grow_horizontal = 0
-grow_vertical = 0
-tooltip_text = "系统"
-texture_normal = ExtResource("8_system")
-
 [node name="BackpackButton" parent="BottomRight/MenueButtonGroup" unique_id=708079883 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
@@ -232,3 +216,21 @@ offset_right = 422.85278
 offset_bottom = -100.977936
 tooltip_text = "队伍"
 texture_normal = ExtResource("12_team")
+
+[node name="SystemButton" parent="BottomRight/MenueButtonGroup" unique_id=2079598957 instance=ExtResource("9_button")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -214.41699
+offset_top = -187.27661
+offset_right = 477.583
+offset_bottom = 496.7234
+grow_horizontal = 0
+grow_vertical = 0
+tooltip_text = "系统"
+texture_normal = ExtResource("8_system")
+texture_click_mask = ExtResource("13_system_click_mask")

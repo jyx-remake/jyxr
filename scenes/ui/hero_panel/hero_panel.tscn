@@ -123,10 +123,11 @@ offset_top = 264.0
 offset_right = 1691.0
 offset_bottom = 913.0
 theme = SubResource("Theme_dr12l")
-current_tab = 0
+current_tab = 1
 tabs_visible = false
 
 [node name="AdventureTab" type="Control" parent="ContentRoot/HeroTabContainer" index="1" unique_id=1308277667]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -190,7 +191,6 @@ text = "[center][font_size=34][color=#f0ebe3]生涯留痕[/color][/font_size]
 fit_content = true
 
 [node name="AchievementTab" type="Control" parent="ContentRoot/HeroTabContainer" index="2" unique_id=728918971]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
@@ -221,7 +221,7 @@ layout_mode = 0
 offset_left = 401.0
 offset_top = 19.0
 offset_right = 1450.0
-offset_bottom = 646.0
+offset_bottom = 636.0
 bbcode_enabled = true
 
 [node name="PreviewCheckBox" type="CheckBox" parent="ContentRoot/HeroTabContainer/AchievementTab" index="3" unique_id=1439308183]

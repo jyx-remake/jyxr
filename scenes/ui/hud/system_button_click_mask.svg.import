@@ -1,0 +1,16 @@
+[remap]
+
+importer="bitmap"
+type="BitMap"
+uid="uid://bove0n4ighy11"
+path="res://.godot/imported/system_button_click_mask.svg-37823567070c71ac78c0552ca05caff1.res"
+
+[deps]
+
+source_file="res://scenes/ui/hud/system_button_click_mask.svg"
+dest_files=["res://.godot/imported/system_button_click_mask.svg-37823567070c71ac78c0552ca05caff1.res"]
+
+[params]
+
+create_from=1
+threshold=0.5
