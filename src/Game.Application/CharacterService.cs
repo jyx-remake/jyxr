@@ -47,6 +47,13 @@ public sealed class CharacterService
         PublishCharacterChanged(character);
     }
 
+    public void SetCharacterGender(string characterId, CharacterGender gender)
+    {
+        var character = GetPartyMember(characterId);
+        character.SetGender(gender);
+        PublishCharacterChanged(character);
+    }
+
     public void SetGrowTemplate(string characterId, string growTemplateId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(growTemplateId);
@@ -64,6 +71,13 @@ public sealed class CharacterService
         }
 
         character.SetAiType(aiType);
+        PublishCharacterChanged(character);
+    }
+
+    public void SetPersonality(string characterId, int personality, int? secondaryPersonality = null)
+    {
+        var character = GetPartyMember(characterId);
+        character.SetPersonality(personality, secondaryPersonality);
         PublishCharacterChanged(character);
     }
 
@@ -204,6 +218,7 @@ public sealed class CharacterService
             case LearnableKind.Internal: GrantInternalSkill(character, targetId, level); break;
             case LearnableKind.Special: LearnSpecialSkill(character, targetId); break;
             case LearnableKind.Talent: LearnTalent(character, targetId); break;
+            case LearnableKind.Title: LearnTitle(character, targetId); break;
         }
     }
 
@@ -224,6 +239,15 @@ public sealed class CharacterService
 
     public void LearnTalent(string characterId, string talentId) =>
         LearnTalent(GetPartyMember(characterId), talentId);
+
+    public void LearnTitle(string characterId, string titleId) =>
+        LearnTitle(GetPartyMember(characterId), titleId);
+
+    public void EquipTitle(string characterId, string? titleId)
+    {
+        var character = GetPartyMember(characterId);
+        if (character.EquipTitle(titleId)) PublishCharacterChanged(character);
+    }
 
     public void GrantExternalSkill(CharacterInstance character, string skillId, int level = 1)
     {
@@ -317,6 +341,16 @@ public sealed class CharacterService
         }
     }
 
+    public void LearnTitle(CharacterInstance character, string titleId)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+        var title = ContentRepository.GetCharacterTitle(titleId);
+        if (character.AddTitle(title))
+        {
+            PublishToastAndCharacterChanged(character, $"{character.Name} 获得称号【{title.Name}】", ToastTone.Important);
+        }
+    }
+
     public int GetTalentPointCapacity(CharacterInstance character)
     {
         ArgumentNullException.ThrowIfNull(character);
@@ -350,6 +384,7 @@ public sealed class CharacterService
             case LearnableKind.Internal: RemoveInternalSkill(character, targetId); break;
             case LearnableKind.Special: RemoveSpecialSkill(character, targetId); break;
             case LearnableKind.Talent: RemoveTalent(character, targetId); break;
+            case LearnableKind.Title: RemoveTitle(character, targetId); break;
         }
     }
 
@@ -364,6 +399,9 @@ public sealed class CharacterService
 
     public void RemoveTalent(string characterId, string talentId) =>
         RemoveTalent(GetPartyMember(characterId), talentId);
+
+    public void RemoveTitle(string characterId, string titleId) =>
+        RemoveTitle(GetPartyMember(characterId), titleId);
 
     public void RemoveExternalSkill(CharacterInstance character, string skillId)
     {
@@ -391,6 +429,14 @@ public sealed class CharacterService
         if (!character.RemoveTalent(talentId)) return;
 
         PublishToastAndCharacterChanged(character, $"{character.Name} 移除天赋【{talentId}】");
+    }
+
+    public void RemoveTitle(CharacterInstance character, string titleId)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+        ContentRepository.GetCharacterTitle(titleId);
+        if (!character.RemoveTitle(titleId)) return;
+        PublishToastAndCharacterChanged(character, $"{character.Name} 移除称号【{titleId}】");
     }
 
     public void RemoveSpecialSkill(CharacterInstance character, string specialSkillId)
@@ -542,6 +588,7 @@ public sealed class CharacterService
         if (ContentRepository.TryGetInternalSkill(targetId, out _)) return LearnableKind.Internal;
         if (ContentRepository.TryGetSpecialSkill(targetId, out _)) return LearnableKind.Special;
         if (ContentRepository.TryGetTalent(targetId, out _)) return LearnableKind.Talent;
+        if (ContentRepository.TryGetCharacterTitle(targetId, out _)) return LearnableKind.Title;
         throw new InvalidOperationException($"Command '{commandName}' references unknown skill or talent '{targetId}'.");
     }
 
@@ -558,5 +605,6 @@ public sealed class CharacterService
         Internal,
         Special,
         Talent,
+        Title,
     }
 }

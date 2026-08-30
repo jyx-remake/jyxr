@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ccv8pp0tiortu" path="res://src/Game.Godot/UI/Story/StoryDialoguePanel.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://d4ck8mcd45xfr" path="res://assets/art/misc/dialogue_frame.png" id="2_frame"]
 [ext_resource type="PackedScene" uid="uid://cveba3f8kxvxc" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="3_avatar"]
+[ext_resource type="Script" path="res://src/Game.Godot/UI/Base/AutoFitRichTextLabel.cs" id="4_autofit"]
 
 [node name="StoryDialoguePanel" type="Control" unique_id=415902696]
 layout_mode = 3
@@ -67,6 +68,7 @@ text = "说话人"
 
 [node name="ContentLabel" type="RichTextLabel" parent="ContentRoot" unique_id=1748108074]
 unique_name_in_owner = true
+script = ExtResource("4_autofit")
 layout_mode = 0
 offset_left = 559.0
 offset_top = 777.0
@@ -75,6 +77,10 @@ offset_bottom = 971.50244
 scale = Vector2(1.1825043, 1.1825043)
 mouse_filter = 2
 bbcode_enabled = true
+MaximumFontSize = 38
+MinimumFontSize = 18
+scroll_active = false
+autowrap_mode = 2
 text = "对话内容"
 
 [node name="SkipButton" type="Button" parent="ContentRoot" unique_id=54483169]

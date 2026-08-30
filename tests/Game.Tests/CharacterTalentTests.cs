@@ -9,6 +9,33 @@ namespace Game.Tests;
 public sealed class CharacterTalentTests
 {
     [Fact]
+    public void CreateInitial_TreatsLegacyNegativeMaxMpSentinelAsZero()
+    {
+        var definition = TestContentFactory.CreateCharacterDefinition(
+            "training_dummy",
+            new Dictionary<StatType, int>
+            {
+                [StatType.MaxHp] = 100,
+                [StatType.MaxMp] = -10000,
+            });
+
+        var character = TestContentFactory.CreateCharacterInstance("dummy_001", definition);
+
+        Assert.Equal(100, character.GetBaseStat(StatType.MaxHp));
+        Assert.Equal(0, character.GetBaseStat(StatType.MaxMp));
+    }
+
+    [Fact]
+    public void CreateInitial_NormalizesLegacyZeroLevelToOne()
+    {
+        var definition = TestContentFactory.CreateCharacterDefinition("legacy_npc", level: 0);
+
+        var character = TestContentFactory.CreateCharacterInstance("npc_001", definition);
+
+        Assert.Equal(1, character.Level);
+    }
+
+    [Fact]
     public void CreateInitial_IgnoresDefinedWuxueStat()
     {
         var definition = TestContentFactory.CreateCharacterDefinition(

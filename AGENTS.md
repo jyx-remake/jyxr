@@ -6,7 +6,7 @@
 
 ## 当前项目定位
 
-- 这是一个基于 `.NET 10` 与 `Godot 4.7.1` 的 2D 半即时制战棋 RPG 内核原型。
+- 这是一个基于 `.NET 10` 与 `Godot 4.7.2` 的 2D 半即时制战棋 RPG 内核原型。
 - 仓库根目录就是 Godot 工程根。
 - 根目录 `engine-free-rpg.csproj` 是当前唯一 Godot 宿主程序集项目，只编译 `src/Game.Godot/**/*.cs`，并引用 `Game.Content`、`Game.Application` 与 `Game.Presentation`。
 - 当前重点是：

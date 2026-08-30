@@ -8,6 +8,7 @@ public partial class SelectHeadPanel : Control
 	private readonly TaskCompletionSource<string> _completion = new();
 	private SelectHeadSlot? _selectedSlot;
 	private string _selectedHead = string.Empty;
+	private IReadOnlyList<string>? _portraitIds;
 	private GridContainer _headContainer = null!;
 	private TextureButton _ackButton = null!;
 
@@ -22,8 +23,16 @@ public partial class SelectHeadPanel : Control
 		FillHeads();
 	}
 
-	public async Task<string> AwaitHeadAsync(CancellationToken cancellationToken = default)
+	public async Task<string> AwaitHeadAsync(
+		IReadOnlyList<string>? portraitIds = null,
+		CancellationToken cancellationToken = default)
 	{
+		if (portraitIds is not null)
+		{
+			_portraitIds = portraitIds;
+			FillHeads();
+		}
+
 		using var registration = cancellationToken.CanBeCanceled
 			? cancellationToken.Register(() =>
 			{
@@ -52,7 +61,7 @@ public partial class SelectHeadPanel : Control
 			child.QueueFree();
 		}
 
-		foreach (var head in Game.Config.SelectablePortraitIds)
+		foreach (var head in _portraitIds ?? Game.Config.SelectablePortraitIds)
 		{
 			if (SelectHeadSlotScene.Instantiate() is not SelectHeadSlot slot)
 			{

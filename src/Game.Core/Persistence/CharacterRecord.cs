@@ -26,6 +26,8 @@ public sealed record EquipmentRecord(
     string EquipmentDefinitionId,
     IReadOnlyList<AffixDefinition> ExtraAffixes);
 
+public sealed record CharacterTitleRecord(string CharacterTitleDefinitionId, bool Equipped);
+
 public sealed record CharacterRecord(
     string Id,
     string DefinitionId,
@@ -43,4 +45,7 @@ public sealed record CharacterRecord(
     IReadOnlyList<InternalSkillRecord> InternalSkills,
     IReadOnlyDictionary<EquipmentSlotType, EquipmentRecord> EquippedItems,
     CharacterGender? Gender = null,
-    BattleAiType AiType = BattleAiType.Basic);
+    BattleAiType AiType = BattleAiType.Basic,
+    IReadOnlyList<CharacterTitleRecord>? Titles = null,
+    int Personality = 0,
+    int SecondaryPersonality = 0);

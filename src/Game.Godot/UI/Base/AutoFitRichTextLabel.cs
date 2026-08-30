@@ -41,7 +41,10 @@ public partial class AutoFitRichTextLabel : RichTextLabel
 		Threaded = false;
 		BbcodeEnabled = true;
 		FitContent = false;
-		AutowrapMode = TextServer.AutowrapMode.Off;
+		// Dialogue and choice text must remain inside the panel without exposing
+		// a scrollbar. Word wrapping lets the binary-fit pass reduce the font
+		// size based on the actual number of rendered lines.
+		AutowrapMode = TextServer.AutowrapMode.WordSmart;
 		ScrollActive = false;
 		ClipContents = true;
 

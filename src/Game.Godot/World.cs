@@ -74,9 +74,28 @@ public partial class World : Control
 	public MapScreen RefreshCurrentMap() =>
 		ShowMap(Game.State.Location.CurrentMapId);
 
+	/// <summary>
+	/// Removes the active gameplay map while the game is on a non-gameplay screen
+	/// (for example, the main menu).  Keeping the map node alive would also keep
+	/// its presentation layers, such as the scrolling cloud overlay, rendering
+	/// over the menu.
+	/// </summary>
+	public void ClearCurrentScene()
+	{
+		if (CurrentScene is not null && GodotObject.IsInstanceValid(CurrentScene))
+		{
+			// Hide immediately; QueueFree is deferred until the idle frame and
+			// should not produce a single-frame visual leak during a transition.
+			CurrentScene.Hide();
+			CurrentScene.QueueFree();
+		}
+
+		CurrentScene = null;
+	}
+
 	private void ReplaceCurrentScene(Control scene)
 	{
-		CurrentScene?.QueueFree();
+		ClearCurrentScene();
 		CurrentScene = scene;
 		AddChild(scene);
 

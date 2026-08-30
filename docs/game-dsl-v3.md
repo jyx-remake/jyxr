@@ -274,7 +274,12 @@ remove_external('主角', '野球拳')
 | `map(id, location_id?)` | 进入地图；大地图可指定已有地点作为落点。 | `set_map`、`tutorial` |
 | `shop(id)` | 打开商店并等待关闭。 | — |
 | `chest()` | 打开储物箱并等待关闭。 | `xiangzi` |
-| `battle(id)` | 选择出战角色并进入战斗。 | — |
+| `battle(id)` | 选择出战角色并进入战斗；地图事件也可传入旧版 `id#次数#强化等级`，参数会被兼容解析。 | — |
+
+从旧版 XML 转换的战斗段可能带有 `#次数#强化等级` 后缀。转换器会将
+它们写入 Story v3 battle step 的 `totalBattles`、`battleLevel` 字段，
+并使用去掉后缀的 `battleId` 查找战斗定义；因此不会再把
+`战斗名#1#3` 误判为缺失战斗。
 | `music(...track_ids)` | 播放单曲或非空 BGM 池。 | — |
 | `sound(id)` | 播放音效。 | `effect` |
 | `background(id)` | 设置世界背景。 | — |

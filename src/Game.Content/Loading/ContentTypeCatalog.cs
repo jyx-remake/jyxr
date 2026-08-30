@@ -53,6 +53,7 @@ internal static class ContentTypeCatalog
             ContentTypeSpec.FromFile("equipmentRandomAffixTable", "randomAffixTables", "random-affix-tables.json"),
             ContentTypeSpec.FromFile("buff", "buffs", "buffs.json"),
             ContentTypeSpec.FromFile("talent", "talents", "talents.json"),
+            ContentTypeSpec.FromFile("characterTitle", "characterTitles", "character-titles.json"),
             ContentTypeSpec.FromFile("tower", "towers", "towers.json"),
         ];
 

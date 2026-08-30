@@ -13,9 +13,17 @@ public static class ItemRequirementFormatter
         return requirement switch
         {
             StatItemRequirementDefinition statRequirement =>
-                $"{FormatterTextCn.GetStatNameCn(statRequirement.StatId)} >= {statRequirement.Value}",
+                statRequirement.Negated
+                    ? $"{FormatterTextCn.GetStatNameCn(statRequirement.StatId)} < {statRequirement.Value}"
+                    : $"{FormatterTextCn.GetStatNameCn(statRequirement.StatId)} >= {statRequirement.Value}",
+            LevelItemRequirementDefinition levelRequirement =>
+                $"等级 >= {levelRequirement.Value}",
             TalentItemRequirementDefinition talentRequirement =>
                 $"需要天赋「{FormatterTextCn.ResolveTalentName(talentRequirement.TalentId, contentRepository)}」",
+            NotTalentItemRequirementDefinition notTalentRequirement =>
+                $"不能拥有天赋「{FormatterTextCn.ResolveTalentName(notTalentRequirement.TalentId, contentRepository)}」",
+            RoleKeyItemRequirementDefinition roleKeyRequirement =>
+                $"仅限角色「{roleKeyRequirement.CharacterId}」使用",
             GenderItemRequirementDefinition genderRequirement =>
                 $"性别仅限{string.Join("、", genderRequirement.Genders.Select(FormatterTextCn.GetGenderNameCn))}",
             _ => throw new NotSupportedException($"Unsupported item requirement type '{requirement.GetType().Name}'.")

@@ -23,6 +23,12 @@ internal sealed class BattleBuffResolver(
         int duration,
         HookTiming? timing = null)
     {
+        if (definition.Id == BattleContentIds.Poison && target.HasTrait(TraitId.PoisonImmunity))
+        {
+            state.AddMessage(new BattleFact(BattleFactKind.BuffResisted, target.Id, timing, detail: definition.Id));
+            return false;
+        }
+
         if (definition.IsDebuff && target.HasBuff(BattleContentIds.HolyWar))
         {
             return false;

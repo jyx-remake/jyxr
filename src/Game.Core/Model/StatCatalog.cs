@@ -49,6 +49,16 @@ public static class StatCatalog
             .Select(static definition => definition.StatType)
             .ToArray();
 
+    // The four weapon proficiencies are the subset used by XMJH's original
+    // rollrole.lua (+10 rolls only target these four entries).
+    public static IReadOnlyList<StatType> WeaponStats { get; } =
+    [
+        StatType.Quanzhang,
+        StatType.Jianfa,
+        StatType.Daofa,
+        StatType.Qimen,
+    ];
+
     public static IReadOnlyList<StatType> MinusMaxPointsStats { get; } =
     [
         StatType.MaxHp,

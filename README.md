@@ -8,7 +8,7 @@
 
 ## 项目概述
 
-基于 `.NET 10` 与 `Godot 4.7.1` 的 2D 半即时制战棋 RPG 内核原型。
+基于 `.NET 10` 与 `Godot 4.7.2` 的 2D 半即时制战棋 RPG 内核原型。
 
 仓库根目录就是 Godot 工程根，根目录下的 `engine-free-rpg.csproj` 是当前唯一的 Godot 宿主程序集项目；与 UI 引擎无关的展示流程位于普通 .NET 程序集 `Game.Presentation`。
 
@@ -376,7 +376,11 @@ Godot 侧当前主要由 `UIRoot`、HUD、角色面板、英雄面板、储物�
 ```powershell
 dotnet test engine-free-rpg.sln
 dotnet build engine-free-rpg.csproj
+# 从 XMJH/lua/rollrole.lua 重新生成开局答题（默认读取仓库相邻的 XMJH 目录）
+py -3 jyx-legacy-data/scripts/xmjh_rollrole_to_story.py
 ```
+
+XMJH 的开局答题运行入口是 `mods/xmjh/data/stories/starting-quiz.story.json` 的 `开局答题` 段；该文件由上面的转换器生成，不要直接手改生成结果。资源解析会先查活动 MOD 的 PCK（`Heads`、`Items`、`Maps`、`Audios`、`UI`、`Movies` 等目录），再回退到内置 `assets`。
 
 ## 参考文档
 

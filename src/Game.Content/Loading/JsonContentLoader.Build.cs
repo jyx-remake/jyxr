@@ -33,6 +33,7 @@ public sealed partial class JsonContentLoader
             EquipmentRandomAffixTables = package.RandomAffixTables.ToList(),
             Buffs = IndexById(package.Buffs, "Buff"),
             Talents = IndexById(package.Talents, "Talent"),
+            CharacterTitles = IndexById(package.CharacterTitles, "CharacterTitle"),
             Equipments = IndexById(package.Items.OfType<EquipmentDefinition>(), "Equipment"),
             Towers = IndexById(package.Towers, "Tower"),
         };
@@ -68,6 +69,14 @@ public sealed partial class JsonContentLoader
         foreach (var definition in repository.Characters.Values)
         {
             definition.Resolve(repository);
+        }
+
+        foreach (var definition in repository.CharacterTitles.Values)
+        {
+            foreach (var affix in definition.Affixes)
+            {
+                affix.Resolve(repository);
+            }
         }
 
         foreach (var definition in repository.LegendSkills)

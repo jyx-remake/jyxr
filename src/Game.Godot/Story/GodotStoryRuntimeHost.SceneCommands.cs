@@ -53,6 +53,13 @@ public sealed partial class GodotStoryRuntimeHost
 		return ValueTask.CompletedTask;
 	}
 
+	[StoryCommand("set_location")]
+	private ValueTask ExecuteSetLocationAsync(string mapId, string locationId)
+	{
+		Game.MapService.SetLocation(mapId, locationId);
+		return ValueTask.CompletedTask;
+	}
+
 	[StoryCommand("shop")]
 	private ValueTask ExecuteShopAsync(string shopId, CancellationToken cancellationToken) =>
 		new(UIRoot.Instance.ShowShopPanelAsync(shopId, cancellationToken));
@@ -62,16 +69,58 @@ public sealed partial class GodotStoryRuntimeHost
 		new(UIRoot.Instance.ShowChestPanelAsync(cancellationToken));
 
 	[StoryCommand("battle")]
-	private async ValueTask ExecuteBattleAsync(string battleId, CancellationToken cancellationToken)
+	private async ValueTask ExecuteBattleAsync(string packedBattleId, CancellationToken cancellationToken)
 	{
+		var (battleId, totalBattles, battleLevel) = ParseLegacyBattleReference(packedBattleId);
 		var selected = await UIRoot.Instance.ShowCombatantSelectPanelAsync(battleId, cancellationToken);
-		var isWin = await UIRoot.Instance.ShowBattleScreenAsync(
-			new OrdinaryBattleRequest(battleId, selected.ToArray()),
-			cancellationToken);
-		if (!isWin)
+		for (var index = 0; index < totalBattles; index++)
 		{
-			GameFlow.GameOver();
+			var isWin = await UIRoot.Instance.ShowBattleScreenAsync(
+				new OrdinaryBattleRequest(battleId, selected.ToArray(), battleLevel),
+				cancellationToken);
+			if (!isWin)
+			{
+				GameFlow.GameOver();
+				return;
+			}
 		}
+	}
+
+	private static (string BattleId, int TotalBattles, int BattleLevel) ParseLegacyBattleReference(string packedBattleId)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(packedBattleId);
+		var parts = packedBattleId.Split('#');
+		var battleId = parts[0].Trim();
+		if (battleId.Length == 0)
+		{
+			throw new InvalidOperationException("Battle command requires a battle id.");
+		}
+		if (parts.Length > 3)
+		{
+			throw new InvalidOperationException("Battle command accepts at most totalBattles and battleLevel legacy parameters.");
+		}
+
+		var totalBattles = 1;
+		if (parts.Length > 1 && !string.IsNullOrWhiteSpace(parts[1]))
+		{
+			if (!int.TryParse(parts[1].Trim(), out var parsedTotalBattles))
+			{
+				throw new InvalidOperationException($"Invalid legacy battle count: '{parts[1]}'.");
+			}
+			totalBattles = Math.Max(1, parsedTotalBattles);
+		}
+
+		var battleLevel = 0;
+		if (parts.Length > 2 && !string.IsNullOrWhiteSpace(parts[2]))
+		{
+			if (!int.TryParse(parts[2].Trim(), out var parsedBattleLevel))
+			{
+				throw new InvalidOperationException($"Invalid legacy battle level: '{parts[2]}'.");
+			}
+			battleLevel = parsedBattleLevel is > 0 and <= 1000 ? parsedBattleLevel : 0;
+		}
+
+		return (battleId, totalBattles, battleLevel);
 	}
 
 	[StoryCommand("background")]

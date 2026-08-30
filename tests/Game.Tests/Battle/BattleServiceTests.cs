@@ -34,6 +34,48 @@ public sealed class BattleServiceTests
     }
 
     [Fact]
+    public void BuildBattleState_EnforcesRequiredAndExcludedCharacterIds()
+    {
+        var battle = CreateFixedPlayerBattle() with
+        {
+            RequiredCharacterIds = ["shadow"],
+            ExcludedCharacterIds = ["enemy"],
+        };
+        var session = CreateSession(battle);
+
+        Assert.Throws<InvalidOperationException>(() =>
+            session.BattleService.BuildBattleState(new OrdinaryBattleRequest("fixed_player", [])));
+        Assert.Throws<InvalidOperationException>(() =>
+            session.BattleService.BuildBattleState(new OrdinaryBattleRequest("fixed_player", ["shadow", "enemy"])));
+        var state = session.BattleService.BuildBattleState(
+            new OrdinaryBattleRequest("fixed_player", ["shadow"]));
+        Assert.Contains(state.Units, unit => unit.Team == 1);
+    }
+
+    [Fact]
+    public void BuildBattleState_UsesConfiguredThirteenByFiveGrid()
+    {
+        var battle = CreateFixedPlayerBattle() with
+        {
+            Participants =
+            [
+                CreateParticipant(team: 1, x: 12, y: 4, characterId: "shadow"),
+                CreateParticipant(team: 2, x: 11, y: 4, characterId: "enemy"),
+            ],
+        };
+        var session = CreateSession(battle, new GameConfig
+        {
+            BattleGridWidth = 13,
+            BattleGridHeight = 5,
+        });
+
+        var state = session.BattleService.BuildBattleState(new OrdinaryBattleRequest("fixed_player", []));
+        Assert.Equal(13, state.Grid.Width);
+        Assert.Equal(5, state.Grid.Height);
+        Assert.Contains(state.Units, unit => unit.Position == new GridPosition(12, 4));
+    }
+
+    [Fact]
     public void RecordDefeatedEnemies_CountsOnlyDefeatedNonPlayerUnitsAndPublishesOnce()
     {
         var session = CreateSession(CreateKillStatsBattle());

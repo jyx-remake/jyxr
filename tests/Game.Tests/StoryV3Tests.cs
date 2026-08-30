@@ -30,6 +30,21 @@ public sealed class StoryV3Tests
     }
 
     [Fact]
+    public void JsonParser_PreservesLegacyBattleOptionsSeparatelyFromCatalogId()
+    {
+        var script = StoryScriptJson.Parse("""
+        {"version":3,"segments":[{"name":"start","steps":[
+          {"kind":"battle","battleId":"legacy_battle","totalBattles":2,"battleLevel":5,"outcomes":{}}
+        ]}]}
+        """, "legacy-battle-options");
+
+        var battle = Assert.IsType<BattleStep>(Assert.Single(script.Segments[0].Steps));
+        Assert.Equal("legacy_battle", battle.BattleId);
+        Assert.Equal(2, battle.TotalBattles);
+        Assert.Equal(5, battle.BattleLevel);
+    }
+
+    [Fact]
     public void JsonParser_JsonObjectEntrypointIncludesSourceNameInExpressionErrors()
     {
         var root = JsonNode.Parse("""
@@ -163,6 +178,30 @@ public sealed class StoryV3Tests
         await session.StoryService.ExecuteAsync("item", context);
         Assert.Single(session.State.Journal.Entries);
         await Assert.ThrowsAsync<ExpressionEvaluationException>(() => session.StoryService.ExecuteAsync("item"));
+    }
+
+    [Fact]
+    public async Task Runtime_SkipsCommandFailuresAfterHostNotification()
+    {
+        var script = StoryScriptJson.Parse("""
+        {"version":3,"segments":[{"name":"start","steps":[
+          {"kind":"command","call":"legacy_upgrade('x')"},
+          {"kind":"dialogue","speaker":"主角","text":"继续"}
+        ]}]}
+        """);
+        var host = new RecordingHost { ContinueOnCommandFailure = true };
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]), host);
+
+        var events = new List<StoryEvent>();
+        await foreach (var storyEvent in session.StoryService.RunAsync("start"))
+        {
+            events.Add(storyEvent);
+        }
+
+        Assert.Equal(["legacy_upgrade"], host.CommandFailures.Select(static failure => failure.Name));
+        Assert.Contains("继续", host.DialogueTexts);
+        Assert.Single(events.OfType<CommandFailedEvent>());
+        Assert.True(session.State.Story.IsStoryCompleted("start"));
     }
 
     [Fact]
@@ -457,6 +496,8 @@ public sealed class StoryV3Tests
         public int SelectedOptionIndex { get; init; }
         public BattleOutcome BattleOutcome { get; init; } = BattleOutcome.Win;
         public bool GameOverInvoked { get; private set; }
+        public bool ContinueOnCommandFailure { get; init; }
+        public List<(string Name, string Message)> CommandFailures { get; } = [];
         public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) { DialogueTexts.Add(dialogue.Text); return ValueTask.CompletedTask; }
         public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken)
         {
@@ -465,6 +506,11 @@ public sealed class StoryV3Tests
         }
         public ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken) => ValueTask.FromResult(BattleOutcome);
         public ValueTask GameOverAsync(CancellationToken cancellationToken) { GameOverInvoked = true; return ValueTask.CompletedTask; }
+        public ValueTask CommandFailedAsync(string commandName, string message, CancellationToken cancellationToken)
+        {
+            CommandFailures.Add((commandName, message));
+            return ValueTask.CompletedTask;
+        }
     }
 
     private sealed class StateReplacingHost(GameState replacementState) : IRuntimeHost

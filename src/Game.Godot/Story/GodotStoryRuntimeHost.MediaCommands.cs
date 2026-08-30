@@ -14,8 +14,18 @@ public sealed partial class GodotStoryRuntimeHost
 			throw new InvalidOperationException("Command 'music' requires at least one argument.");
 		}
 
-		if (trackIds.Length == 1) Game.Audio.PlayBgm(trackIds[0]);
-		else Game.Audio.PlayBgm(trackIds);
+		// XMJH often appends a numeric fade/transition argument (for example
+		// music('音乐.风之海逗趣', '1')). It is not a second track.
+		var tracks = trackIds
+			.Where(static id => !double.TryParse(id, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _))
+			.ToArray();
+		if (tracks.Length == 0)
+		{
+			return ValueTask.CompletedTask;
+		}
+
+		if (tracks.Length == 1) Game.Audio.PlayBgm(tracks[0]);
+		else Game.Audio.PlayBgm(tracks);
 		return ValueTask.CompletedTask;
 	}
 
@@ -36,7 +46,7 @@ public sealed partial class GodotStoryRuntimeHost
 		await UIRoot.Instance.ShowVideoAsync(stream, cancellationToken);
 	}
 
-	[StoryCommand("suggest")]
+	[StoryCommand("suggest", "suggest2")]
 	private ValueTask ExecuteSuggestAsync(string text, CancellationToken cancellationToken) =>
 		new(UIRoot.Instance.ShowSuggestionAsync(text, cancellationToken));
 

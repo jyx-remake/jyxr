@@ -36,6 +36,7 @@ public sealed partial class JsonContentLoader
         ValidateResources(repository);
         ValidateMediaReferences(repository);
         ValidateCharacters(repository);
+        ValidateCharacterTitles(repository);
         ValidateBattles(repository);
         ValidateBattleHookAffixes(repository);
         ValidateScopedBattleEffects(repository);
@@ -50,6 +51,20 @@ public sealed partial class JsonContentLoader
         ValidateMaps(repository);
         ValidateTowers(repository);
         ValidateStoryContent(repository);
+    }
+
+    private static void ValidateCharacterTitles(InMemoryContentRepository repository)
+    {
+        foreach (var title in repository.CharacterTitles.Values)
+        {
+            Ensure(!string.IsNullOrWhiteSpace(title.Id), "CharacterTitle definition has empty id.");
+            Ensure(!string.IsNullOrWhiteSpace(title.Name), $"CharacterTitle '{title.Id}' has empty name.");
+            Ensure(title.Affixes is not null, $"CharacterTitle '{title.Id}' has null affixes.");
+            foreach (var affix in title.Affixes)
+            {
+                Ensure(affix is not null, $"CharacterTitle '{title.Id}' contains a null affix.");
+            }
+        }
     }
 
     private static void ValidateMaps(InMemoryContentRepository repository)
@@ -67,10 +82,17 @@ public sealed partial class JsonContentLoader
             {
                 Ensure(double.IsFinite(map.TravelSpeed) && map.TravelSpeed > 0d,
                     $"Large map '{map.Id}' must have a positive finite travelSpeed.");
-                Ensure(!string.IsNullOrWhiteSpace(map.DefaultLocation),
-                    $"Large map '{map.Id}' must define defaultLocation.");
-                Ensure(locationsById.ContainsKey(map.DefaultLocation!),
-                    $"Large map '{map.Id}' defaultLocation '{map.DefaultLocation}' does not reference one of its locations.");
+                // A few legacy maps are background-only variants (for example
+                // the night view of the Forbidden City) and intentionally have
+                // no map units. They still use the large-map renderer, but do
+                // not have a meaningful landing location.
+                if (map.Locations.Count > 0)
+                {
+                    Ensure(!string.IsNullOrWhiteSpace(map.DefaultLocation),
+                        $"Large map '{map.Id}' must define defaultLocation.");
+                    Ensure(locationsById.ContainsKey(map.DefaultLocation!),
+                        $"Large map '{map.Id}' defaultLocation '{map.DefaultLocation}' does not reference one of its locations.");
+                }
             }
             else
             {
@@ -164,6 +186,7 @@ public sealed partial class JsonContentLoader
 
         foreach (var battle in repository.Battles.Values)
         {
+            ValidateBattleCharacterLists(battle, repository);
             ValidateRequiredMediaReference(battle.Background, MediaAssetKind.Texture,
                 $"Battle '{battle.Id}' background", repository);
             ValidateOptionalMediaReference(battle.Music, MediaAssetKind.Audio,
@@ -209,6 +232,25 @@ public sealed partial class JsonContentLoader
                 $"Sect '{sect.Id}' portrait", repository);
             ValidateOptionalMediaReference(sect.Background, MediaAssetKind.Texture,
                 $"Sect '{sect.Id}' background", repository);
+        }
+    }
+
+    private static void ValidateBattleCharacterLists(BattleDefinition battle, InMemoryContentRepository repository)
+    {
+        var required = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var id in battle.RequiredCharacterIds)
+        {
+            Ensure(!string.IsNullOrWhiteSpace(id), $"Battle '{battle.Id}' has an empty required character id.");
+            Ensure(required.Add(id), $"Battle '{battle.Id}' repeats required character '{id}'.");
+            Ensure(repository.Characters.ContainsKey(id) || repository.Characters.Values.Any(c => c.Name == id),
+                $"Battle '{battle.Id}' references missing required character '{id}'.");
+        }
+        var excluded = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var id in battle.ExcludedCharacterIds)
+        {
+            Ensure(!string.IsNullOrWhiteSpace(id), $"Battle '{battle.Id}' has an empty excluded character id.");
+            Ensure(excluded.Add(id), $"Battle '{battle.Id}' repeats excluded character '{id}'.");
+            Ensure(!required.Contains(id), $"Battle '{battle.Id}' cannot both require and exclude character '{id}'.");
         }
     }
 
@@ -572,8 +614,8 @@ public sealed partial class JsonContentLoader
         ISet<GridPosition> occupiedPositions,
         string ownerName)
     {
-        Ensure(position.X >= 0 && position.X < 11 && position.Y >= 0 && position.Y < 4,
-            $"{ownerName} position ({position.X}, {position.Y}) exceeds battle grid size 11x4.");
+        Ensure(position.X >= 0 && position.X < 13 && position.Y >= 0 && position.Y < 5,
+            $"{ownerName} position ({position.X}, {position.Y}) exceeds supported battle grid size 13x5.");
         Ensure(occupiedPositions.Add(position),
             $"{ownerName} position ({position.X}, {position.Y}) overlaps another participant.");
     }
@@ -585,8 +627,6 @@ public sealed partial class JsonContentLoader
             foreach (var affix in skill.Affixes)
             {
                 ValidateSkillAffix(affix, $"ExternalSkill '{skill.Id}'", repository);
-                Ensure(!affix.RequiresEquippedInternalSkill,
-                    $"ExternalSkill '{skill.Id}' skill affix cannot require equipped internal skill.");
             }
         }
 
@@ -606,6 +646,15 @@ public sealed partial class JsonContentLoader
     {
         Ensure(affix.MinimumLevel >= 1, $"{ownerName} has skill affix with invalid minimum level '{affix.MinimumLevel}'.");
         Ensure(affix.Effect is not null, $"{ownerName} has skill affix without effect.");
+        // The legacy XMJH data uses this gate on one external-skill talent
+        // grant.  Keep the general schema guard for arbitrary external
+        // effects, while allowing that explicitly representable legacy form.
+        if (ownerName.StartsWith("ExternalSkill ", StringComparison.Ordinal) &&
+            affix.RequiresEquippedInternalSkill)
+        {
+            Ensure(affix.Effect is GrantTalentAffix,
+                $"{ownerName} cannot require an equipped internal skill for this effect type.");
+        }
         Ensure(affix.Effect is not BuffLevelStatModifierAffix,
             $"{ownerName} cannot contain a buff-level modifier.");
         ValidateBattleHookAffix(affix.Effect!, ownerName, repository);
@@ -1100,6 +1149,11 @@ public sealed partial class JsonContentLoader
                     case StatItemRequirementDefinition:
                         break;
 
+                    case LevelItemRequirementDefinition levelRequirement:
+                        Ensure(levelRequirement.Value >= 0,
+                            $"Item '{item.Id}' level requirement has invalid value '{levelRequirement.Value}'.");
+                        break;
+
                     case GenderItemRequirementDefinition genderRequirement:
                         Ensure(genderRequirement.Genders is { Count: > 0 },
                             $"Item '{item.Id}' gender requirement has no allowed genders.");
@@ -1531,7 +1585,9 @@ public sealed partial class JsonContentLoader
         var (assetKind, argumentIndexes) = call.Root.Name switch
         {
             "background" => (MediaAssetKind.Texture, Enumerable.Range(0, Math.Min(1, call.Root.Arguments.Count))),
-            "music" => (MediaAssetKind.Audio, Enumerable.Range(0, call.Root.Arguments.Count)),
+            // Legacy music calls may include a numeric transition/fade value
+            // after the track id. Only the first argument is a resource id.
+            "music" => (MediaAssetKind.Audio, Enumerable.Range(0, Math.Min(1, call.Root.Arguments.Count))),
             "sound" or "effect" => (MediaAssetKind.Audio, Enumerable.Range(0, Math.Min(1, call.Root.Arguments.Count))),
             "video" or "movie" => (MediaAssetKind.Video, Enumerable.Range(0, Math.Min(1, call.Root.Arguments.Count))),
             "set_portrait" or "head" when call.Root.Arguments.Count > 1 =>

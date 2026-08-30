@@ -11,6 +11,8 @@ void vertex() {
 void fragment() {
 	float period = max(scroll_period_seconds, 1.0);
 	float phase = mod(TIME, period) / period;
-	vec4 cloud_color = texture(TEXTURE, UV + vec2(phase, 0.0));
+	// Sampling from the opposite side makes the cloud pattern move visually
+	// from left to right. (UV + phase would move the sampled pattern left.)
+	vec4 cloud_color = texture(TEXTURE, UV - vec2(phase, 0.0));
 	COLOR = cloud_color * vertex_color;
 }

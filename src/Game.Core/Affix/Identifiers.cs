@@ -8,6 +8,7 @@ public enum ProviderKind
     ExternalSkill,
     InternalSkill,
     Talent,
+    CharacterTitle,
     Buff,
     ScopedEffect,
     Other
@@ -88,6 +89,7 @@ public enum TraitId
     IncreaseInternalSkillYangAffinity,
     MindEye,
     PoisonResistance,
+    PoisonImmunity,
     AvoidFriendlyFire,
     Irascible,
     DoubleCombatRageGain,

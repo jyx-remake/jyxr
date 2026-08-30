@@ -1,5 +1,7 @@
 using Game.Application;
+using Game.Expressions;
 using Game.Godot.UI;
+using System.Globalization;
 
 namespace Game.Godot.Story;
 
@@ -18,6 +20,19 @@ public sealed partial class GodotStoryRuntimeHost
 	[StoryCommand("fade")]
 	private ValueTask ExecuteFadeAsync(string mode, double duration = 0.5d, CancellationToken cancellationToken = default) =>
 		new(UIRoot.Instance.VisualEffects.FadeAsync(mode, duration, cancellationToken));
+
+	[StoryCommand("fadein")]
+	private async ValueTask ExecuteFadeInAsync(
+		string backgroundId,
+		ExpressionValue duration = default,
+		CancellationToken cancellationToken = default)
+	{
+		World.Instance.SetBackground(backgroundId);
+		await UIRoot.Instance.VisualEffects.FadeAsync(
+			"in",
+			ResolveFadeInDuration(duration),
+			cancellationToken);
+	}
 
 	[StoryCommand("flash")]
 	private ValueTask ExecuteFlashAsync(string preset = "white", double duration = 0.25d, double strength = 1d, CancellationToken cancellationToken = default) =>
@@ -66,5 +81,36 @@ public sealed partial class GodotStoryRuntimeHost
 			throw new ArgumentOutOfRangeException(nameof(amplitude), "Command 'shake' amplitude must be finite and non-negative.");
 		if (!double.IsFinite(duration) || duration < 0d)
 			throw new ArgumentOutOfRangeException(nameof(duration), "Command 'shake' duration must be finite and non-negative.");
+	}
+
+	private static double ResolveFadeInDuration(ExpressionValue value)
+	{
+		// Legacy FADEIN serializes its duration as a quoted string (and some
+		// scripts omit it entirely), while hand-authored v3 stories may use a
+		// numeric literal. Accept both forms at this compatibility boundary.
+		if (value == default)
+		{
+			return 1d;
+		}
+
+		var duration = value.Kind switch
+		{
+			ExpressionValueKind.Number => value.AsNumber("Command 'fadein' duration"),
+			ExpressionValueKind.String => double.TryParse(
+				value.AsString("Command 'fadein' duration"),
+				NumberStyles.Float,
+				CultureInfo.InvariantCulture,
+				out var parsed)
+				? parsed
+				: throw new InvalidOperationException("Command 'fadein' duration must be a finite number."),
+			_ => throw new InvalidOperationException("Command 'fadein' duration must be a finite number."),
+		};
+
+		if (!double.IsFinite(duration) || duration < 0d)
+		{
+			throw new ArgumentOutOfRangeException(nameof(value), "Command 'fadein' duration must be finite and non-negative.");
+		}
+
+		return duration;
 	}
 }

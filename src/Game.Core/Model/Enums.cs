@@ -60,6 +60,8 @@ public enum EquipmentSlotType
     Armor,
     [JsonStringEnumMemberName("accessory")]
     Accessory,
+    [JsonStringEnumMemberName("book")]
+    Book,
 }
 
 public enum StatType

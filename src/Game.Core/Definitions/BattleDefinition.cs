@@ -16,6 +16,8 @@ public sealed record BattleDefinition
 
     public IReadOnlyList<string> RequiredCharacterIds { get; init; } = [];
 
+    public IReadOnlyList<string> ExcludedCharacterIds { get; init; } = [];
+
     public IReadOnlyList<BattleParticipantDefinition> Participants { get; init; } = [];
 
     public IReadOnlyList<BattleRandomParticipantDefinition> RandomParticipants { get; init; } = [];

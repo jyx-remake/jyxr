@@ -595,7 +595,8 @@ public sealed record BattleBoardUnitVisual(
 	int Rage,
 	int ActionGauge,
 	Texture2D? PortraitTexture,
-	IReadOnlyList<BattleBoardBuffVisual> Buffs);
+	IReadOnlyList<BattleBoardBuffVisual> Buffs,
+	string? EquippedTitleName = null);
 
 public sealed record BattleBoardBuffVisual(
 	string Name,

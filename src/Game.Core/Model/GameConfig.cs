@@ -28,6 +28,8 @@ public sealed class GameConfig
 	public int MaxHpMpPerRound { get; init; } = 1000;
 	public int MaxLevel { get; init; } = 30;
 	public int BattlePlayerTeam { get; init; } = 1;
+	public int BattleGridWidth { get; init; } = 11;
+	public int BattleGridHeight { get; init; } = 4;
 	public double BattleGoldDropChance { get; init; } = 0.005d;
 	public double OrdinaryBattleDropChance { get; init; } = 0.1d;
 	public double HardModeCanzhangDropRate { get; init; } = 0.015d;

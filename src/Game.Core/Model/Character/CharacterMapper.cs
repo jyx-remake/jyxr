@@ -24,7 +24,10 @@ public static class CharacterMapper
             GrowTemplateId = definition.GrowTemplate
         };
         character.SetGender(definition.Gender);
-        character.SetLevel(definition.Level);
+        // A handful of legacy NPC records use level=0 to mean "unleveled".
+        // Runtime characters still require the normal level-1 invariant, so
+        // normalize that sentinel at the mapping boundary.
+        character.SetLevel(Math.Max(1, definition.Level));
         EnsureMinimumExperienceForCurrentLevel(character);
         CopyStats(definition.Stats, character.BaseStats);
 
@@ -50,6 +53,12 @@ public static class CharacterMapper
 
         character.UnlockedTalents.AddRange(definition.Talents);
         character.SpecialSkills.AddRange(definition.SpecialSkills.Select(skill => new SpecialSkillInstance(skill, character, true)));
+        var initialTitles = definition.InitialTitles ?? [];
+        EnsureSingleEquippedTitle(initialTitles.Count(title => title.Equipped));
+        foreach (var title in initialTitles)
+        {
+            character.AddTitle(title.Title, title.Equipped);
+        }
         foreach (var equipmentDefinition in definition.Equipments)
         {
             character.AddEquipmentInstance(equipmentInstanceFactory.Create(equipmentDefinition));
@@ -75,6 +84,7 @@ public static class CharacterMapper
         };
         character.SetGender(record.Gender ?? character.Definition.Gender);
         character.SetAiType(record.AiType);
+        character.SetPersonality(record.Personality, record.SecondaryPersonality);
         
         character.SetLevel(record.Level);
         character.GrantExperience(record.Experience);
@@ -119,6 +129,16 @@ public static class CharacterMapper
             character.AddEquipmentInstance(EquipmentMapper.FromRecord(equipment.Value, contentRepository));
         }
 
+        if ((record.Titles ?? []).Count(title => title.Equipped) > 1)
+        {
+            throw new InvalidOperationException("A character can equip only one title.");
+        }
+
+        foreach (var title in record.Titles ?? [])
+        {
+            character.AddTitle(contentRepository.GetCharacterTitle(title.CharacterTitleDefinitionId), title.Equipped);
+        }
+
         character.RebuildSnapshot();
         return character;
     }
@@ -143,7 +163,10 @@ public static class CharacterMapper
                 entry => entry.Key,
                 entry => EquipmentMapper.ToRecord(entry.Value)),
             character.Gender,
-            character.AiType);
+            character.AiType,
+            character.Titles.Select(title => new CharacterTitleRecord(title.Id, title.Equipped)).ToList(),
+            character.Personality,
+            character.SecondaryPersonality);
 
     private static void CopyStats(IReadOnlyDictionary<StatType, int> source, Dictionary<StatType, int> target)
     {
@@ -153,6 +176,15 @@ public static class CharacterMapper
         foreach (var entry in source)
         {
             if (entry.Key == StatType.Wuxue)
+            {
+                continue;
+            }
+
+            // The legacy XMJH role table uses maxmp=-10000 as a sentinel for
+            // a character with no usable internal-energy pool (training dummies).
+            // It must not make the whole battle fail to construct; treat it as
+            // the same zero-valued stat that the original client exposes.
+            if (entry.Value < 0 && entry.Key == StatType.MaxMp)
             {
                 continue;
             }
@@ -174,6 +206,14 @@ public static class CharacterMapper
         if (equippedCount > 1)
         {
             throw new InvalidOperationException("A character can equip only one internal skill.");
+        }
+    }
+
+    private static void EnsureSingleEquippedTitle(int equippedCount)
+    {
+        if (equippedCount > 1)
+        {
+            throw new InvalidOperationException("A character can equip only one title.");
         }
     }
 

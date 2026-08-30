@@ -275,15 +275,38 @@ public sealed class ItemUseService
             switch (requirement)
             {
                 case StatItemRequirementDefinition stat:
-                    if (ResolveRequirementStatValue(target, stat.StatId) < stat.Value)
+                    var statValue = ResolveRequirementStatValue(target, stat.StatId, stat.Source);
+                    if ((!stat.Negated && statValue < stat.Value) ||
+                        (stat.Negated && statValue >= stat.Value))
                     {
-                        return $"需要{FormatStatName(stat.StatId)}达到{stat.Value}";
+                        return stat.Negated
+                            ? $"{FormatStatName(stat.StatId)}需低于{stat.Value}"
+                            : $"需要{FormatStatName(stat.StatId)}达到{stat.Value}";
+                    }
+                    break;
+                case LevelItemRequirementDefinition level:
+                    if (target.Level < level.Value)
+                    {
+                        return $"等级需达到{level.Value}";
                     }
                     break;
                 case TalentItemRequirementDefinition talent:
                     if (!target.HasEffectiveTalent(talent.TalentId))
                     {
                         return $"需要天赋「{talent.TalentId}」";
+                    }
+                    break;
+                case NotTalentItemRequirementDefinition notTalent:
+                    if (target.HasEffectiveTalent(notTalent.TalentId))
+                    {
+                        return $"不能拥有天赋「{notTalent.TalentId}」";
+                    }
+                    break;
+                case RoleKeyItemRequirementDefinition roleKey:
+                    if (!string.Equals(target.Id, roleKey.CharacterId, StringComparison.Ordinal) &&
+                        !string.Equals(target.Definition.Name, roleKey.CharacterId, StringComparison.Ordinal))
+                    {
+                        return $"仅限角色「{roleKey.CharacterId}」使用";
                     }
                     break;
                 case GenderItemRequirementDefinition gender:
@@ -298,8 +321,11 @@ public sealed class ItemUseService
         return null;
     }
 
-    private double ResolveRequirementStatValue(CharacterInstance target, StatType statType) =>
-        Config.ItemRequirementStatSource switch
+    private double ResolveRequirementStatValue(
+        CharacterInstance target,
+        StatType statType,
+        ItemRequirementStatSource? source = null) =>
+        (source ?? Config.ItemRequirementStatSource) switch
         {
             ItemRequirementStatSource.Final => target.GetStat(statType),
             ItemRequirementStatSource.Base => target.GetBaseStat(statType),

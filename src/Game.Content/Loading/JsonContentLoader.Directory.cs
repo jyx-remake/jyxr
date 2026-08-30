@@ -36,7 +36,10 @@ public sealed partial class JsonContentLoader
     private static JsonArray LoadDefinitionArray(string directoryPath, ContentTypeSpec spec, bool required)
     {
         var definitions = new JsonArray();
-        foreach (var entry in DefinitionSourceReader.Read(directoryPath, spec, required))
+        // Character titles were introduced after the base schema; keep them optional
+        // so existing mods and save fixtures remain loadable with an empty set.
+        var sourceRequired = required && !string.Equals(spec.Kind, "characterTitle", StringComparison.Ordinal);
+        foreach (var entry in DefinitionSourceReader.Read(directoryPath, spec, sourceRequired))
         {
             definitions.Add(entry.Definition);
         }

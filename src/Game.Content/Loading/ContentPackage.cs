@@ -26,5 +26,6 @@ public sealed class ContentPackage
     public List<EquipmentRandomAffixTableDefinition> RandomAffixTables { get; init; } = [];
     public List<BuffDefinition> Buffs { get; init; } = [];
     public List<TalentDefinition> Talents { get; init; } = [];
+    public List<CharacterTitleDefinition> CharacterTitles { get; init; } = [];
     public List<TowerDefinition> Towers { get; init; } = [];
 }

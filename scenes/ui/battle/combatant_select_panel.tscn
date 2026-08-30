@@ -79,7 +79,6 @@ text = "已选择0人"
 
 [node name="WarningLabel" type="Label" parent="ContentRoot/SidePanel" index="2" unique_id=78567775]
 unique_name_in_owner = true
-visible = false
 layout_mode = 0
 offset_left = 28.0
 offset_top = 204.0

@@ -11,7 +11,8 @@ public abstract record SpecialBattleRequest(
 
 public sealed record OrdinaryBattleRequest(
     string BattleId,
-    IReadOnlyList<string> SelectedCharacterIds)
+    IReadOnlyList<string> SelectedCharacterIds,
+    int BattleLevel = 0)
     : SpecialBattleRequest(BattleId, SelectedCharacterIds);
 
 public sealed record ArenaBattleRequest(

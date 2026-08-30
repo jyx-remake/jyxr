@@ -8,8 +8,16 @@ namespace Game.Application;
 
 internal sealed class BattleStateFactory
 {
-    private const int GridWidth = 11;
-    private const int GridHeight = 4;
+    // A couple of the legacy battle tables refer to dynamically named sect
+    // champions that are not present in roles.xml.  Keep their intended
+    // presentation by resolving to the closest canonical champion definition.
+    private static readonly IReadOnlyDictionary<string, string> LegacyCharacterAliases =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["日月首席"] = "吸星首席",
+            ["武当首席9"] = "武当首席",
+        };
+
     private readonly GameSession _session;
     private readonly ProceduralBattleCharacterFactory _characterFactory;
     private readonly ZhenlongqijuBattleFactory _zhenlongqijuFactory;
@@ -39,7 +47,7 @@ internal sealed class BattleStateFactory
         var battle = ContentRepository.GetBattle(request.BattleId);
         return request switch
         {
-            OrdinaryBattleRequest ordinary => BuildBattleState(battle, ordinary.SelectedCharacterIds),
+            OrdinaryBattleRequest ordinary => BuildBattleState(battle, ordinary.SelectedCharacterIds, ordinary.BattleLevel),
             ArenaBattleRequest arena => BuildArenaBattleState(battle, arena.SelectedCharacterIds, arena.HardLevel),
             ZhenlongqijuBattleRequest zhenlongqiju => BuildZhenlongqijuBattleState(
                 battle,
@@ -93,10 +101,26 @@ internal sealed class BattleStateFactory
             CreateBattleRuleSettings(battleDifficulty, enableRoundEnemyAttackDefenceScaling: false));
     }
 
-    private BattleState BuildBattleState(BattleDefinition battle, IReadOnlyList<string> selectedCharacterIds)
+    private BattleState BuildBattleState(
+        BattleDefinition battle,
+        IReadOnlyList<string> selectedCharacterIds,
+        int battleLevel = 0)
     {
         ArgumentNullException.ThrowIfNull(battle);
         ArgumentNullException.ThrowIfNull(selectedCharacterIds);
+        ArgumentOutOfRangeException.ThrowIfNegative(battleLevel);
+
+        var selectedSet = selectedCharacterIds.ToHashSet(StringComparer.Ordinal);
+        foreach (var requiredId in battle.RequiredCharacterIds.Where(id => !string.IsNullOrWhiteSpace(id)))
+        {
+            if (!selectedSet.Contains(requiredId))
+                throw new InvalidOperationException($"Battle '{battle.Id}' requires character '{requiredId}' to be selected.");
+        }
+        foreach (var excludedId in battle.ExcludedCharacterIds.Where(id => !string.IsNullOrWhiteSpace(id)))
+        {
+            if (selectedSet.Contains(excludedId))
+                throw new InvalidOperationException($"Battle '{battle.Id}' forbids character '{excludedId}' from being selected.");
+        }
 
         var battleDifficulty = State.Adventure.Difficulty;
         return BuildBattleStateCore(
@@ -106,7 +130,17 @@ internal sealed class BattleStateFactory
                 ResolveParticipantCharacter(participant, index, slotCharacters, tempFactory, battleDifficulty),
             (participant, index, tempFactory) =>
                 _characterFactory.CreateRandomParticipantCharacter(participant, index, tempFactory, battleDifficulty),
-            (character, _) => _characterFactory.ApplyNpcRoundPowerUp(character),
+            (character, equipmentFactory) =>
+            {
+                if (battleLevel > 0)
+                {
+                    _zhenlongqijuFactory.PowerUpEnemy(character, battleLevel, equipmentFactory);
+                }
+                else
+                {
+                    _characterFactory.ApplyNpcRoundPowerUp(character);
+                }
+            },
             CreateBattleRuleSettings(battleDifficulty, enableRoundEnemyAttackDefenceScaling: true));
     }
 
@@ -163,7 +197,7 @@ internal sealed class BattleStateFactory
                 participant.Facing));
         }
 
-        var state = new BattleState(new BattleGrid(GridWidth, GridHeight), units, ruleSettings);
+        var state = new BattleState(new BattleGrid(Config.BattleGridWidth, Config.BattleGridHeight), units, ruleSettings);
         if (!state.Units.Any(unit => unit.Team == PlayerTeam))
         {
             throw new InvalidOperationException($"Battle '{battle.Id}' must contain at least one player team unit.");
@@ -187,11 +221,32 @@ internal sealed class BattleStateFactory
                 return partyCharacter;
             }
 
-            var definition = ContentRepository.GetCharacter(participant.CharacterId);
+            var requestedCharacterId = participant.CharacterId;
+            var resolvedCharacterId = LegacyCharacterAliases.TryGetValue(
+                requestedCharacterId,
+                out var alias)
+                ? alias
+                : requestedCharacterId;
+            if (!ContentRepository.TryGetCharacter(resolvedCharacterId, out var definition))
+            {
+                // Battle XML occasionally contains a one-off NPC key without
+                // a matching role record.  Use the ordinary low-tier NPC as a
+                // safe runtime shell instead of aborting the whole battle;
+                // retain the legacy key as the displayed name and log it for
+                // later asset/content cleanup.
+                _session.DiagnosticLogger.Warning(
+                    $"Battle participant character '{requestedCharacterId}' is not defined; using fallback NPC data.");
+                definition = ContentRepository.GetCharacter("小混混");
+                resolvedCharacterId = definition.Id;
+            }
             var character = CharacterMapper.CreateInitial(
                 $"battle_{index}_{definition.Id}",
                 definition,
                 tempFactory);
+            if (!string.Equals(requestedCharacterId, resolvedCharacterId, StringComparison.Ordinal))
+            {
+                character.Name = requestedCharacterId;
+            }
             if (participant.Team != PlayerTeam)
             {
                 _characterFactory.ApplyDifficultyRandomTalents(character, battleDifficulty);

@@ -22,6 +22,7 @@ public partial class BattleUnitView : Node2D
 	private AnimationLibrary? _animationLibrary;
 	private Control _tooltipHitArea = null!;
 	private Label _nameLabel = null!;
+	private Label _titleLabel = null!;
 	private RichTextLabel _buffListLabel = null!;
 	private ProgressBar _hpBar = null!;
 	private ProgressBar _mpBar = null!;
@@ -44,6 +45,7 @@ public partial class BattleUnitView : Node2D
 		_stateMachine = _animationTree.Get("parameters/playback").As<AnimationNodeStateMachinePlayback>();
 		_tooltipHitArea = GetNode<Control>("%TooltipHitArea");
 		_nameLabel = GetNode<Label>("%NameLabel");
+		_titleLabel = GetNode<Label>("%TitleLabel");
 		_buffListLabel = GetNode<RichTextLabel>("%BuffListLabel");
 		_hpBar = GetNode<ProgressBar>("%HpBar");
 		_mpBar = GetNode<ProgressBar>("%MpBar");
@@ -66,6 +68,8 @@ public partial class BattleUnitView : Node2D
 
 		_nameLabel.Text = unit.Name;
 		_nameLabel.SelfModulate = unit.IsPlayerUnit ? Colors.White : EnemyNameColor;
+		_titleLabel.Text = unit.EquippedTitleName ?? string.Empty;
+		_titleLabel.Visible = !string.IsNullOrWhiteSpace(unit.EquippedTitleName);
 		UpdateBar(_hpBar, unit.Hp, unit.MaxHp, unit.IsPlayerUnit ? PlayerBarColor : EnemyBarColor);
 		UpdateBar(_mpBar, unit.Mp, unit.MaxMp, ManaBarColor);
 		UpdateBar(_gaugeBar, unit.ActionGauge, 100, GaugeBarColor);

@@ -1,4 +1,5 @@
 using Game.Godot.Assets;
+using Game.Godot.UI;
 using Godot;
 
 namespace Game.Godot.UI.Story;
@@ -12,7 +13,7 @@ public partial class StoryDialoguePanel : Control
 	private string _text = string.Empty;
 	private AvatarBox _avatarBox = null!;
 	private Label _speakerLabel = null!;
-	private RichTextLabel _contentLabel = null!;
+	private AutoFitRichTextLabel _contentLabel = null!;
 	private Button _skipButton = null!;
 	private bool _isTyping;
 	private double _typewriterProgress;
@@ -24,7 +25,7 @@ public partial class StoryDialoguePanel : Control
 	{
 		_avatarBox = GetNode<AvatarBox>("%AvatarBox");
 		_speakerLabel = GetNode<Label>("%SpeakerLabel");
-		_contentLabel = GetNode<RichTextLabel>("%ContentLabel");
+		_contentLabel = GetNode<AutoFitRichTextLabel>("%ContentLabel");
 		_skipButton = GetNode<Button>("%SkipButton");
 
 		_skipButton.ButtonDown += OnSkipButtonDown;
@@ -131,7 +132,7 @@ public partial class StoryDialoguePanel : Control
 		_avatarBox.SetAvatarTexture(portrait);
 		_speakerLabel.Visible = hasSpeaker;
 		_speakerLabel.Text = displayName;
-		_contentLabel.Text = _text;
+		_contentLabel.SetContent(_text);
 		_skipButton.Text = "跳过";
 
 		if (_completionSource is null || _text.Length == 0)

@@ -164,24 +164,39 @@ internal sealed partial class StoryRuntimeSession(
                 yield break;
             case CommandStep command:
             {
-                var args = _expressionEvaluator.EvaluateArguments(command.Call, host.ExpressionEnvironment);
-                StoryCommandResult result;
+                IReadOnlyList<ExpressionValue> args = [];
+                StoryCommandResult? result = null;
+                string? failureMessage = null;
                 try
                 {
+                    args = _expressionEvaluator.EvaluateArguments(command.Call, host.ExpressionEnvironment);
                     result = await host.Commands.InvokeAsync(command.Call.Root.Name, args, ct);
                 }
-                catch (ExpressionException exception)
+                catch (Exception exception) when (
+                    host.ContinueOnCommandFailure &&
+                    (exception is not OperationCanceledException || !ct.IsCancellationRequested))
                 {
-                    throw ExpressionException.WithLocation(
-                        exception,
-                        command.Call.SourceName,
-                        command.Call.Root.Span);
+                    var contextual = exception is ExpressionException expressionException
+                        ? ExpressionException.WithLocation(
+                            expressionException,
+                            command.Call.SourceName,
+                            command.Call.Root.Span)
+                        : exception;
+                    failureMessage = contextual.Message;
                 }
-                yield return StepResult.FromEvent(new CommandExecutedEvent(command.Call.Root.Name, args));
-                if (result.JumpTarget is not null)
+
+                if (failureMessage is not null)
                 {
-                    yield return StepResult.FromEvent(new JumpEvent(result.JumpTarget));
-                    yield return StepResult.Jump(result.JumpTarget);
+                    await host.CommandFailedAsync(command.Call.Root.Name, failureMessage, ct);
+                    yield return StepResult.FromEvent(new CommandFailedEvent(command.Call.Root.Name, failureMessage));
+                    yield break;
+                }
+
+                yield return StepResult.FromEvent(new CommandExecutedEvent(command.Call.Root.Name, args));
+                if (result is { } commandResult && commandResult.JumpTarget is not null)
+                {
+                    yield return StepResult.FromEvent(new JumpEvent(commandResult.JumpTarget));
+                    yield return StepResult.Jump(commandResult.JumpTarget);
                 }
 
                 yield break;

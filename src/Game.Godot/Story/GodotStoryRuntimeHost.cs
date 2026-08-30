@@ -7,6 +7,8 @@ namespace Game.Godot.Story;
 
 public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattleRuntimeHost, IApplicationRuntimeHost, IMiniGameRuntimeHost
 {
+	public bool ContinueOnCommandFailure => true;
+
 	public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) =>
 		new(UIRoot.Instance.ShowDialogueAsync(dialogue.Speaker, dialogue.Text, cancellationToken));
 
@@ -25,10 +27,22 @@ public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattle
 	{
 		ArgumentNullException.ThrowIfNull(battle);
 		var selectedCharacterIds = await UIRoot.Instance.ShowCombatantSelectPanelAsync(battle.BattleId, cancellationToken);
-		var isWin = await UIRoot.Instance.ShowBattleScreenAsync(
-			new OrdinaryBattleRequest(battle.BattleId, selectedCharacterIds.ToArray()),
-			cancellationToken);
-		return isWin ? BattleOutcome.Win : BattleOutcome.Lose;
+		var totalBattles = Math.Max(1, battle.TotalBattles);
+		for (var index = 0; index < totalBattles; index++)
+		{
+			var isWin = await UIRoot.Instance.ShowBattleScreenAsync(
+				new OrdinaryBattleRequest(
+					battle.BattleId,
+					selectedCharacterIds.ToArray(),
+					battle.BattleLevel),
+				cancellationToken);
+			if (!isWin)
+			{
+				return BattleOutcome.Lose;
+			}
+		}
+
+		return BattleOutcome.Win;
 	}
 
 	public async ValueTask<EquipmentInstanceInventoryEntry?> SelectRefinementEquipmentAsync(
@@ -69,4 +83,17 @@ public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattle
 	public ValueTask PlayEffectAsync(string effectId, CancellationToken cancellationToken) => ExecuteEffectAsync(effectId);
 
 	public ValueTask GameOverAsync(CancellationToken cancellationToken) => ExecuteGameOverAsync();
+
+	public async ValueTask CommandFailedAsync(
+		string commandName,
+		string message,
+		CancellationToken cancellationToken)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(commandName);
+		ArgumentException.ThrowIfNullOrWhiteSpace(message);
+		await UIRoot.Instance.ShowConfirmAsync(
+			$"剧情指令“{commandName}”暂未适配，已跳过。\n\n{message}",
+			ConfirmDialogTone.Warning,
+			cancellationToken);
+	}
 }

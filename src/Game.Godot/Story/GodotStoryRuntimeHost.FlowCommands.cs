@@ -1,10 +1,44 @@
 using Game.Application;
+using Game.Core.Model;
 using Game.Godot.UI;
 
 namespace Game.Godot.Story;
 
 public sealed partial class GodotStoryRuntimeHost
 {
+	[StoryCommand("set_gender")]
+	private ValueTask ExecuteGenderAsync(string characterId, string gender)
+	{
+		var parsed = gender.Trim().ToLowerInvariant() switch
+		{
+			"male" or "男性" => CharacterGender.Male,
+			"female" or "女性" => CharacterGender.Female,
+			"neutral" or "中性" => CharacterGender.Neutral,
+			"animal" or "动物" => CharacterGender.Animal,
+			"eunuch" or "太监" => CharacterGender.Eunuch,
+			_ => throw new InvalidOperationException($"Unknown character gender '{gender}'."),
+		};
+
+		Game.CharacterService.SetCharacterGender(characterId, parsed);
+		return ValueTask.CompletedTask;
+	}
+
+	[StoryCommand("set_personality")]
+	private ValueTask ExecutePersonalityAsync(string characterId, int personality)
+	{
+		Game.CharacterService.SetPersonality(characterId, personality);
+		return ValueTask.CompletedTask;
+	}
+
+	[StoryCommand("set_personality_random")]
+	private ValueTask ExecuteRandomPersonalityAsync(string characterId)
+	{
+		Game.CharacterService.SetPersonality(
+			characterId,
+			Game.Session.RandomService.Next(1, 5));
+		return ValueTask.CompletedTask;
+	}
+
 	[StoryCommand("set_portrait", "head")]
 	private ValueTask ExecuteHeadAsync(string characterId, string portraitId)
 	{

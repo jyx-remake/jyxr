@@ -24,6 +24,10 @@ public sealed class CharacterInstance
     public int? CurrentMp { get; private set; }
     public int CurrentRage { get; private set; }
     public BattleAiType AiType { get; private set; } = BattleAiType.Basic;
+    // Legacy XMJH stores the hero's main/secondary personality as 1..4.
+    // Zero means that no personality has been selected yet.
+    public int Personality { get; private set; }
+    public int SecondaryPersonality { get; private set; }
 
     public CharacterProjection Projection { get; private set; } = CharacterProjection.Empty;
     public IReadOnlySet<TalentDefinition> EffectiveTalents => Projection.EffectiveTalents;
@@ -35,6 +39,7 @@ public sealed class CharacterInstance
     public List<SpecialSkillInstance> SpecialSkills { get; } = [];
     public List<ExternalSkillInstance> ExternalSkills { get; } = [];
     public List<InternalSkillInstance> InternalSkills { get; } = [];
+    public List<CharacterTitleInstance> Titles { get; } = [];
     public string? EquippedInternalSkillId { get; private set; }
     public Dictionary<EquipmentSlotType, EquipmentInstance> EquippedItems { get; } = [];
 
@@ -65,6 +70,23 @@ public sealed class CharacterInstance
     public void SetAiType(BattleAiType aiType)
     {
         AiType = aiType;
+    }
+
+    public void SetPersonality(int personality, int? secondaryPersonality = null)
+    {
+        if (personality is < 0 or > 4)
+        {
+            throw new ArgumentOutOfRangeException(nameof(personality), personality, "Personality must be 0..4.");
+        }
+
+        var secondary = secondaryPersonality ?? personality;
+        if (secondary is < 0 or > 4)
+        {
+            throw new ArgumentOutOfRangeException(nameof(secondaryPersonality), secondary, "Personality must be 0..4.");
+        }
+
+        Personality = personality;
+        SecondaryPersonality = secondary;
     }
 
     public void SetGender(CharacterGender gender)
@@ -341,6 +363,47 @@ public sealed class CharacterInstance
         return true;
     }
 
+    public bool AddTitle(CharacterTitleDefinition title, bool equipped = false)
+    {
+        ArgumentNullException.ThrowIfNull(title);
+        if (Titles.Any(existing => string.Equals(existing.Id, title.Id, StringComparison.Ordinal))) return false;
+        if (equipped)
+        {
+            foreach (var existing in Titles) existing.SetEquipped(false);
+        }
+        Titles.Add(new CharacterTitleInstance(title, equipped));
+        RebuildSnapshot();
+        return true;
+    }
+
+    public bool EquipTitle(string? titleId)
+    {
+        if (titleId is null)
+        {
+            var changed = Titles.Any(title => title.Equipped);
+            foreach (var title in Titles) title.SetEquipped(false);
+            if (changed) RebuildSnapshot();
+            return changed;
+        }
+
+        var selected = Titles.FirstOrDefault(title => string.Equals(title.Id, titleId, StringComparison.Ordinal))
+            ?? throw new InvalidOperationException($"Character title '{titleId}' is not owned.");
+        var changedSelection = !selected.Equipped || Titles.Any(title => title.Equipped && !ReferenceEquals(title, selected));
+        foreach (var title in Titles) title.SetEquipped(ReferenceEquals(title, selected));
+        if (changedSelection) RebuildSnapshot();
+        return changedSelection;
+    }
+
+    public bool RemoveTitle(string titleId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(titleId);
+        var index = Titles.FindIndex(title => string.Equals(title.Id, titleId, StringComparison.Ordinal));
+        if (index < 0) return false;
+        Titles.RemoveAt(index);
+        RebuildSnapshot();
+        return true;
+    }
+
     public bool RemoveTalent(string talentId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(talentId);
@@ -459,7 +522,11 @@ public sealed class CharacterInstance
             affixes.AddRange(AffixResolver.ResolveSkillAffixes(
                 skill.Definition.Affixes,
                 skill.Level,
-                false,
+                // Legacy external-skill affixes may be gated on whether the
+                // character has an equipped internal skill. This is a
+                // character-level condition, not ownership of the external
+                // skill itself.
+                EquippedInternalSkillId is not null,
                 ProviderKind.ExternalSkill,
                 skill.Definition.Id));
         }
@@ -472,6 +539,12 @@ public sealed class CharacterInstance
                 skill.IsEquipped,
                 ProviderKind.InternalSkill,
                 skill.Definition.Id));
+        }
+
+        foreach (var title in Titles.Where(title => title.Equipped))
+        {
+            affixes.AddRange(AffixResolver.ResolveProviderAffixes(
+                title.Definition, ProviderKind.CharacterTitle, title.Definition.Id));
         }
 
         return affixes;

@@ -20,7 +20,8 @@ public sealed record CharacterDefinition(
     CharacterGender Gender = CharacterGender.Neutral,
     string? GrowTemplate = null,
     bool ArenaEnabled = false,
-    IReadOnlyList<string>? SpecialSkillIds = null)
+    IReadOnlyList<string>? SpecialSkillIds = null,
+    IReadOnlyList<InitialCharacterTitleEntryDefinition>? InitialTitles = null)
 {
     [JsonIgnore]
     public IReadOnlyList<TalentDefinition> Talents { get; private set; } = [];
@@ -54,6 +55,10 @@ public sealed record CharacterDefinition(
         Talents = TalentIds.Select(contentRepository.GetTalent).ToList();
         Equipments = EquipmentIds.Select(contentRepository.GetEquipment).ToList();
         SpecialSkills = (SpecialSkillIds ?? []).Select(contentRepository.GetSpecialSkill).ToList();
+        foreach (var title in InitialTitles ?? [])
+        {
+            title.Resolve(contentRepository);
+        }
         IsResolved = true;
     }
 }

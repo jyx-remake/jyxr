@@ -154,6 +154,9 @@ internal sealed class StoryQueryFunctions
     [ExpressionFunction("has_time_key")]
     public bool HasTimeKey(string key) => _session.State.Story.HasTimeKey(key);
 
+    [ExpressionFunction("zhoumu_greater_than")]
+    public bool RoundGreaterThan(int round) => _session.State.Adventure.Round > round;
+
     [ExpressionFunction("has_var")]
     public bool HasVariable(string name) => _session.State.Story.TryGetVariable(name, out _);
 
@@ -165,6 +168,53 @@ internal sealed class StoryQueryFunctions
 
         return value.AsBoolean($"Story flag '{name}'");
     }
+
+    [ExpressionFunction("has_achievement", "have_nick")]
+    public bool HasAchievement(string id) => _session.Profile.IsAchievementUnlocked(id);
+
+    [ExpressionFunction("is_zhujue_head")]
+    public bool IsMainCharacterPortrait(string portraitId)
+    {
+        if (!_session.State.Party.TryGetCharacter(Party.HeroCharacterId, out var hero) || hero is null)
+        {
+            return false;
+        }
+
+        return string.Equals(hero.Portrait, portraitId, StringComparison.Ordinal);
+    }
+
+    [ExpressionFunction("is_zhujue_name")]
+    public bool IsMainCharacterName(string name)
+    {
+        return _session.State.Party.TryGetCharacter(Party.HeroCharacterId, out var hero) &&
+            hero is not null &&
+            string.Equals(hero.Name, name, StringComparison.Ordinal);
+    }
+
+    [ExpressionFunction("has_talent")]
+    public bool HasTalent(string characterId, string talentId) =>
+        GetActiveCharacter(characterId).UnlockedTalents.Any(talent =>
+            string.Equals(talent.Id, talentId, StringComparison.Ordinal));
+
+    [ExpressionFunction("has_title")]
+    public bool HasTitle(string characterId, string titleId) =>
+        GetActiveCharacter(characterId).Titles.Any(title =>
+            string.Equals(title.Id, titleId, StringComparison.Ordinal));
+
+    [ExpressionFunction("has_skill")]
+    public bool HasSkill(string characterId, string skillId)
+    {
+        var character = GetActiveCharacter(characterId);
+        return character.ExternalSkills.Any(skill => string.Equals(skill.Definition.Id, skillId, StringComparison.Ordinal))
+            || character.InternalSkills.Any(skill => string.Equals(skill.Definition.Id, skillId, StringComparison.Ordinal))
+            || character.SpecialSkills.Any(skill => string.Equals(skill.Definition.Id, skillId, StringComparison.Ordinal));
+    }
+
+    private CharacterInstance GetActiveCharacter(string characterId) =>
+        _session.State.Party.GetActiveMembers()
+            .FirstOrDefault(character => string.Equals(character.Id, characterId, StringComparison.Ordinal)
+                || string.Equals(character.Name, characterId, StringComparison.Ordinal))
+        ?? throw new InvalidOperationException($"Character '{characterId}' is not in the active party.");
 }
 
 internal sealed class PartyCharacterQueryFunctions

@@ -167,8 +167,9 @@ public static class MediaReferenceResolver
                 return $"Texture path cannot start with reserved segment '{firstSegment}'.";
             case MediaAssetKind.Audio when !firstSegment.Equals("audio", StringComparison.Ordinal):
                 return "Audio path must start with 'audio/'.";
-            case MediaAssetKind.Video when !firstSegment.Equals("video", StringComparison.Ordinal):
-                return "Video path must start with 'video/'.";
+            case MediaAssetKind.Video when !firstSegment.Equals("video", StringComparison.OrdinalIgnoreCase) &&
+                                             !firstSegment.Equals("MV", StringComparison.OrdinalIgnoreCase):
+                return "Video path must start with 'video/' or legacy 'MV/'.";
         }
 
         var extension = Path.GetExtension(segments[^1]);

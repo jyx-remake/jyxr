@@ -51,6 +51,7 @@ public static class GameFlow
 	public static void ReturnToMainMenu()
 	{
 		World.Instance.PlayTime.StopGameplay();
+		World.Instance.ClearCurrentScene();
 		UIRoot.Instance.ClosePanel();
 		UIRoot.Instance.SetHudSuppressed(true);
 		UIRoot.Instance.SetStoryPresentationActive(false);

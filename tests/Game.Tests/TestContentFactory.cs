@@ -160,7 +160,8 @@ internal static class TestContentFactory
         IEnumerable<ShopDefinition>? shops = null,
         IEnumerable<BattleDefinition>? battles = null,
         IEnumerable<TowerDefinition>? towers = null,
-        IEnumerable<ScopedBattleEffectDefinition>? scopedBattleEffects = null) =>
+        IEnumerable<ScopedBattleEffectDefinition>? scopedBattleEffects = null,
+        IEnumerable<CharacterTitleDefinition>? characterTitles = null) =>
         CreateRepositoryInternal(
             characters,
             externalSkills,
@@ -180,7 +181,8 @@ internal static class TestContentFactory
             shops,
             battles,
             towers,
-            scopedBattleEffects);
+            scopedBattleEffects,
+            characterTitles);
 
     private static InMemoryContentRepository CreateRepositoryInternal(
         IEnumerable<CharacterDefinition>? characters,
@@ -201,7 +203,8 @@ internal static class TestContentFactory
         IEnumerable<ShopDefinition>? shops,
         IEnumerable<BattleDefinition>? battles,
         IEnumerable<TowerDefinition>? towers,
-        IEnumerable<ScopedBattleEffectDefinition>? scopedBattleEffects)
+        IEnumerable<ScopedBattleEffectDefinition>? scopedBattleEffects,
+        IEnumerable<CharacterTitleDefinition>? characterTitles)
     {
         var storyScriptMap = (storyScripts ?? [])
             .Select((script, index) => (Key: $"story_{index}", Script: script))
@@ -240,6 +243,7 @@ internal static class TestContentFactory
             EquipmentRandomAffixTables = (equipmentRandomAffixTables ?? []).ToList(),
             Buffs = (buffs ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Talents = (talents ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
+            CharacterTitles = (characterTitles ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Equipments = (equipment ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
             Towers = (towers ?? []).ToDictionary(definition => definition.Id, StringComparer.Ordinal),
         };

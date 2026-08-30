@@ -36,16 +36,30 @@ public sealed record NormalItemDefinition : ItemDefinition;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(StatItemRequirementDefinition), "stat")]
+[JsonDerivedType(typeof(LevelItemRequirementDefinition), "level")]
 [JsonDerivedType(typeof(TalentItemRequirementDefinition), "talent")]
+[JsonDerivedType(typeof(NotTalentItemRequirementDefinition), "not_talent")]
+[JsonDerivedType(typeof(RoleKeyItemRequirementDefinition), "role_key")]
 [JsonDerivedType(typeof(GenderItemRequirementDefinition), "gender")]
 public abstract record ItemRequirementDefinition;
 
 public sealed record StatItemRequirementDefinition(
     StatType StatId,
+    int Value,
+    ItemRequirementStatSource? Source = null,
+    bool Negated = false) : ItemRequirementDefinition;
+
+public sealed record LevelItemRequirementDefinition(
     int Value) : ItemRequirementDefinition;
 
 public sealed record TalentItemRequirementDefinition(
     string TalentId) : ItemRequirementDefinition;
+
+public sealed record NotTalentItemRequirementDefinition(
+    string TalentId) : ItemRequirementDefinition;
+
+public sealed record RoleKeyItemRequirementDefinition(
+    string CharacterId) : ItemRequirementDefinition;
 
 public sealed record GenderItemRequirementDefinition(
     IReadOnlyList<CharacterGender> Genders) : ItemRequirementDefinition;

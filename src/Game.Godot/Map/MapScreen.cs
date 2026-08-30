@@ -215,7 +215,20 @@ public partial class MapScreen : Control
 			return false;
 		}
 
-		await Game.StoryService.CommandDispatcher.ExecuteCallAsync(result.Command);
+		try
+		{
+			await Game.StoryService.CommandDispatcher.ExecuteCallAsync(result.Command);
+		}
+		catch (Exception exception) when (exception is not OperationCanceledException)
+		{
+			// Map actions use the command dispatcher directly (rather than the
+			// story session), so apply the same compatibility policy here: tell the
+			// player what was skipped and keep the map usable.
+			await Game.StoryService.Host.CommandFailedAsync(
+				result.Command.Root.Name,
+				exception.Message,
+				CancellationToken.None);
+		}
 		Game.MapService.CompleteInteraction(result);
 
 		if (GodotObject.IsInstanceValid(World.Instance) && World.Instance.CurrentScene is MapScreen)

@@ -134,7 +134,11 @@ internal sealed partial class StoryRuntimeSession
         BattleStep battle,
         [EnumeratorCancellation] CancellationToken ct)
     {
-        var context = new BattleContext(battle.BattleId, battle.Outcomes.Keys.ToArray());
+        var context = new BattleContext(
+            battle.BattleId,
+            battle.Outcomes.Keys.ToArray(),
+            battle.TotalBattles,
+            battle.BattleLevel);
         yield return StepResult.FromEvent(new BattleStartedEvent(context));
 
         var selectedOutcome = await host.ResolveBattleAsync(context, ct);

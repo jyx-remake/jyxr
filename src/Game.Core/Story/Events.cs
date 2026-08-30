@@ -15,6 +15,10 @@ public sealed record CommandExecutedEvent(
     string Name,
     IReadOnlyList<ExpressionValue> Args) : StoryEvent;
 
+public sealed record CommandFailedEvent(
+    string Name,
+    string Message) : StoryEvent;
+
 public sealed record VariableAssignedEvent(
     string Name,
     ExpressionValue Value) : StoryEvent;
@@ -57,4 +61,6 @@ public sealed record ChoiceOptionView(
 
 public sealed record BattleContext(
     string BattleId,
-    IReadOnlyList<BattleOutcome> AvailableOutcomes);
+    IReadOnlyList<BattleOutcome> AvailableOutcomes,
+    int TotalBattles = 1,
+    int BattleLevel = 0);

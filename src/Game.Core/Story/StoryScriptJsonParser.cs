@@ -194,6 +194,16 @@ internal sealed class StoryScriptJsonParser(JsonNode? root, string sourceName = 
     private BattleStep ParseBattleStep(JsonObject element)
     {
         var battleId = GetRequiredString(element, "battleId");
+        var totalBattles = GetOptionalInt32(element, "totalBattles", 1);
+        var battleLevel = GetOptionalInt32(element, "battleLevel", 0);
+        if (totalBattles < 1)
+        {
+            throw new StoryRuntimeException("Property 'totalBattles' must be at least 1.");
+        }
+        if (battleLevel < 0 || battleLevel > 1000)
+        {
+            throw new StoryRuntimeException("Property 'battleLevel' must be between 0 and 1000.");
+        }
         var outcomesElement = EnsureObject(GetRequiredProperty(element, "outcomes"), "battle.outcomes");
         var outcomes = new Dictionary<BattleOutcome, IReadOnlyList<Step>>();
         foreach (var property in outcomesElement)
@@ -201,7 +211,7 @@ internal sealed class StoryScriptJsonParser(JsonNode? root, string sourceName = 
             outcomes.Add(ParseBattleOutcome(property.Key), ParseSteps(property.Value, $"battle.outcomes.{property.Key}"));
         }
 
-        return new BattleStep(battleId, outcomes);
+        return new BattleStep(battleId, outcomes, totalBattles, battleLevel);
     }
 
     private BranchStep ParseBranchStep(JsonObject element)
@@ -301,6 +311,21 @@ internal sealed class StoryScriptJsonParser(JsonNode? root, string sourceName = 
         }
 
         return result;
+    }
+
+    private static int GetOptionalInt32(JsonObject element, string name, int defaultValue)
+    {
+        if (!TryGetProperty(element, name, out var value) || value is null)
+        {
+            return defaultValue;
+        }
+
+        if (value is JsonValue jsonValue && jsonValue.TryGetValue<int>(out var result))
+        {
+            return result;
+        }
+
+        throw new StoryRuntimeException($"Property '{name}' must be an integer.");
     }
 
     private static JsonObject EnsureObject(JsonNode? node, string path)

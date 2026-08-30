@@ -79,7 +79,8 @@ internal static class ModContentLoader
     {
         foreach (var spec in ContentTypeCatalog.All)
         {
-            foreach (var entry in DefinitionSourceReader.Read(input.DataDirectoryPath, spec, input.Required))
+            var sourceRequired = input.Required && !string.Equals(spec.Kind, "characterTitle", StringComparison.Ordinal);
+            foreach (var entry in DefinitionSourceReader.Read(input.DataDirectoryPath, spec, sourceRequired))
             {
                 var id = GetRequiredString(entry.Definition, "id", entry.FilePath);
                 catalog.AddDefinition(
@@ -738,6 +739,8 @@ internal static class ModContentLoader
             "Game config is missing selectablePortraitIds.");
         JsonContentLoader.Ensure(config.EquipmentRandomAffixCountWeights.Count > 0,
             "Game config is missing equipmentRandomAffixCountWeights.");
+        JsonContentLoader.Ensure(config.BattleGridWidth >= 1 && config.BattleGridHeight >= 1,
+            "Game config battle grid dimensions must be positive.");
         var counts = new HashSet<int>();
         var totalWeight = 0;
         foreach (var entry in config.EquipmentRandomAffixCountWeights)

@@ -31,10 +31,22 @@ tracks/0/path = NodePath("Notice:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.2),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.18, 0.36, 0.54, 0.72, 0.9, 1.08),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(186, -23), Vector2(174, 16)]
+"values": [Vector2(186, -23), Vector2(184, -23), Vector2(188, -23), Vector2(185, -23), Vector2(187, -23), Vector2(185.5, -23), Vector2(186, -23)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Notice:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.18, 0.36, 0.54, 0.72, 0.9, 1.08),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, -0.03, 0.03, -0.02, 0.02, -0.01, 0.0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_notice"]

@@ -7,6 +7,9 @@ namespace Game.Godot.Map;
 internal static class MapEntityPresentation
 {
 	private const string OverflowResourceTag = "map-marker-overflow";
+	private const string NativeTownPrefix = "town.native.";
+	private const string CityTownPrefix = "town.city.";
+	private const string TownPrefix = "town.";
 
 	public static string ResolveLocationName(MapLocationDefinition location) =>
 		location.Name ?? AssetResolver.ResolveCharacterName(location.Id);
@@ -16,32 +19,48 @@ internal static class MapEntityPresentation
 		MapLocationDefinition location,
 		MapEventDefinition? mapEvent)
 	{
-		if (mapEvent is null)
-		{
-			if (location.NoEventImage is null)
-			{
-				return new MapEntityAvatarPresentation(defaultTexture, false);
-			}
-
-			var texture = AssetResolver.LoadTexture(location.NoEventImage);
-			return texture is null
-				? new MapEntityAvatarPresentation(defaultTexture, false)
-				: new MapEntityAvatarPresentation(texture, HasOverflowTag(location.NoEventImage));
-		}
-
-		var image = mapEvent.Image ?? location.Picture;
+		var image = mapEvent is null
+			? location.NoEventImage
+			: mapEvent.Image ?? location.Picture;
 		if (image is not null)
 		{
 			var texture = AssetResolver.LoadTexture(image);
-			return texture is null
-				? new MapEntityAvatarPresentation(defaultTexture, false)
-				: new MapEntityAvatarPresentation(texture, HasOverflowTag(image));
+			if (texture is not null)
+			{
+				return new MapEntityAvatarPresentation(
+					texture,
+					HasOverflowTag(image),
+					UsesNativeSize(image),
+					UsesCompactTownSize(image));
+			}
 		}
 
 		var portraitReference = AssetResolver.ResolveCharacterPortraitReferenceByCharacterId(location.Id);
+		var portrait = AssetResolver.LoadTexture(portraitReference);
+		if (portrait is not null)
+		{
+			return new MapEntityAvatarPresentation(portrait, false, false, false);
+		}
+
 		return new MapEntityAvatarPresentation(
-			AssetResolver.LoadTexture(portraitReference) ?? defaultTexture,
-			false);
+			defaultTexture,
+			false,
+			false,
+			true);
+	}
+
+	private static bool UsesNativeSize(string resourceId)
+	{
+		var normalized = resourceId.Trim();
+		return normalized.StartsWith(NativeTownPrefix, StringComparison.OrdinalIgnoreCase) ||
+			normalized.StartsWith(CityTownPrefix, StringComparison.OrdinalIgnoreCase);
+	}
+
+	private static bool UsesCompactTownSize(string resourceId)
+	{
+		var normalized = resourceId.Trim();
+		return normalized.StartsWith(TownPrefix, StringComparison.OrdinalIgnoreCase) &&
+			!UsesNativeSize(normalized);
 	}
 
 	private static bool HasOverflowTag(string resourceId)
@@ -85,4 +104,8 @@ internal static class MapEntityPresentation
 	}
 }
 
-internal readonly record struct MapEntityAvatarPresentation(Texture2D? Texture, bool UseOverflow);
+internal readonly record struct MapEntityAvatarPresentation(
+	Texture2D? Texture,
+	bool UseOverflow,
+	bool UseNativeSize,
+	bool UseCompactTownSize);

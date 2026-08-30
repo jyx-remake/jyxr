@@ -24,6 +24,10 @@ public partial class MainMenu : Control
 		_startButton = GetNode<TextureButton>("%StartButton");
 		_loadButton = GetNode<TextureButton>("%LoadButton");
 		_musicButton = GetNode<TextureButton>("%MusicButton");
+		// Main menu is a non-gameplay screen.  Clear any map left by a previous
+		// session/return transition so map-only overlays (notably the cloud layer)
+		// cannot bleed through the menu.
+		World.Instance.ClearCurrentScene();
 
 		_startButton.Pressed += OnStartPressed;
 		_loadButton.Pressed += OnLoadPressed;

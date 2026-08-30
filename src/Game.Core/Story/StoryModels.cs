@@ -81,7 +81,9 @@ public sealed record ChoiceOption(
 
 public sealed record BattleStep(
     string BattleId,
-    IReadOnlyDictionary<BattleOutcome, IReadOnlyList<Step>> Outcomes) : Step;
+    IReadOnlyDictionary<BattleOutcome, IReadOnlyList<Step>> Outcomes,
+    int TotalBattles = 1,
+    int BattleLevel = 0) : Step;
 
 public sealed record BranchStep(
     IReadOnlyList<BranchCase> Cases,

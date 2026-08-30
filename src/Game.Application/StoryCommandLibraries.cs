@@ -315,6 +315,14 @@ internal sealed class PartyLearningStoryCommands
     public void LearnTalent(string characterId, string talentId) =>
         _session.CharacterService.LearnTalent(characterId, talentId);
 
+    [StoryCommand("learn_title")]
+    public void LearnTitle(string characterId, string titleId) =>
+        _session.CharacterService.LearnTitle(characterId, titleId);
+
+    [StoryCommand("equip_title")]
+    public void EquipTitle(string characterId, string titleId) =>
+        _session.CharacterService.EquipTitle(characterId, titleId);
+
     [StoryCommand("remove_external")]
     public void RemoveExternal(string characterId, string skillId) =>
         _session.CharacterService.RemoveExternalSkill(characterId, skillId);
@@ -334,6 +342,10 @@ internal sealed class PartyLearningStoryCommands
     [StoryCommand("remove_talent")]
     public void RemoveTalent(string characterId, string talentId) =>
         _session.CharacterService.RemoveTalent(characterId, talentId);
+
+    [StoryCommand("remove_title")]
+    public void RemoveTitle(string characterId, string titleId) =>
+        _session.CharacterService.RemoveTitle(characterId, titleId);
 
     [StoryCommand("unlock_achievement", "nick")]
     public void UnlockAchievement(string achievementId)

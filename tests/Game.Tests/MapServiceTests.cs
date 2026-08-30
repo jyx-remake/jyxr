@@ -51,6 +51,24 @@ public sealed class MapServiceTests
     }
 
     [Fact]
+    public void SetLocation_RecordsLargeMapPositionWithoutChangingCurrentMap()
+    {
+        var worldMap = CreateMap(
+            "world",
+            MapKind.Large,
+            CreateLocation("start", position: new MapPosition(12, 34)),
+            CreateLocation("island", position: new MapPosition(56, 78)));
+        var state = new GameState();
+        state.Location.ChangeMap("inn");
+        var session = new GameSession(state, TestContentFactory.CreateRepository(maps: [worldMap]));
+
+        session.MapService.SetLocation("world", "island");
+
+        Assert.Equal("inn", state.Location.CurrentMapId);
+        Assert.Equal(new MapPosition(56, 78), state.Location.GetLargeMapPosition("world"));
+    }
+
+    [Fact]
     public void EnterMap_MultipleLargeMapsRememberPositionsIndependently()
     {
         var world = CreateMap(

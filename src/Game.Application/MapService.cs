@@ -28,6 +28,26 @@ public sealed class MapService
         return EnterMapCore(mapId, locationId);
     }
 
+    /// <summary>
+    /// Records the remembered position on a large map without changing the
+    /// currently displayed map.  Legacy story scripts use this to prepare a
+    /// destination before entering a small scene.
+    /// </summary>
+    public void SetLocation(string mapId, string locationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(mapId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(locationId);
+
+        var map = ContentRepository.GetMap(mapId);
+        if (map.Kind != MapKind.Large)
+        {
+            throw new InvalidOperationException(
+                $"Map '{map.Id}' is not a large map and cannot store a location.");
+        }
+
+        State.Location.SetLargeMapPosition(map.Id, ResolveLocationPosition(map, locationId));
+    }
+
     private MapEnterResult EnterMapCore(string mapId, string? locationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(mapId);
@@ -74,6 +94,11 @@ public sealed class MapService
     {
         if (string.IsNullOrWhiteSpace(map.DefaultLocation))
         {
+            if (map.Locations.Count == 0)
+            {
+                return MapPosition.Zero;
+            }
+
             throw new InvalidOperationException($"Large map '{map.Id}' does not define a default location.");
         }
 

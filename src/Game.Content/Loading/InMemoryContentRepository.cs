@@ -28,6 +28,7 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public required List<EquipmentRandomAffixTableDefinition> EquipmentRandomAffixTables { get; init; }
 	public required Dictionary<string, BuffDefinition> Buffs { get; init; }
 	public required Dictionary<string, TalentDefinition> Talents { get; init; }
+	public Dictionary<string, CharacterTitleDefinition> CharacterTitles { get; init; } = new(StringComparer.Ordinal);
 	public required Dictionary<string, EquipmentDefinition> Equipments { get; init; }
 	public required List<LegendSkillDefinition> LegendSkills { get; init; }
 	public required Dictionary<string, TowerDefinition> Towers { get; init; }
@@ -110,6 +111,10 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public TalentDefinition GetTalent(string id) => Talents[id];
 	public bool TryGetTalent(string id, [NotNullWhen(true)] out TalentDefinition? definition) =>
 		Talents.TryGetValue(id, out definition);
+	public CharacterTitleDefinition GetCharacterTitle(string id) => CharacterTitles[id];
+	public bool TryGetCharacterTitle(string id, [NotNullWhen(true)] out CharacterTitleDefinition? definition) =>
+		CharacterTitles.TryGetValue(id, out definition);
+	public IReadOnlyCollection<CharacterTitleDefinition> GetCharacterTitles() => CharacterTitles.Values;
 
 	public EquipmentDefinition GetEquipment(string id) => Equipments[id];
 	public bool TryGetEquipment(string id, [NotNullWhen(true)] out EquipmentDefinition? definition) =>

@@ -30,6 +30,7 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
     }
 
     public bool IsExecutionActive => ReferenceEquals(_session.State, _executionState);
+    public bool ContinueOnCommandFailure => _externalHost.ContinueOnCommandFailure;
 
     public ExpressionEnvironment ExpressionEnvironment { get; }
     public AsyncExpressionCallRegistry<StoryCommandResult> Commands { get; }
@@ -67,4 +68,10 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
         _externalHost.PlayEffectAsync(effectId, cancellationToken);
 
     public ValueTask GameOverAsync(CancellationToken cancellationToken) => _externalHost.GameOverAsync(cancellationToken);
+
+    public ValueTask CommandFailedAsync(
+        string commandName,
+        string message,
+        CancellationToken cancellationToken) =>
+        _externalHost.CommandFailedAsync(commandName, message, cancellationToken);
 }

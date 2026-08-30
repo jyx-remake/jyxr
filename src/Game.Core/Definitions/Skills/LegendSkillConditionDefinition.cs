@@ -7,6 +7,7 @@ namespace Game.Core.Definitions.Skills;
 [JsonDerivedType(typeof(RequiredInternalSkillLevelLegendConditionDefinition), "internal_skill")]
 [JsonDerivedType(typeof(RequiredSpecialSkillLegendConditionDefinition), "special_skill")]
 [JsonDerivedType(typeof(RequiredTalentLegendConditionDefinition), "talent")]
+[JsonDerivedType(typeof(RequiredTitleLegendConditionDefinition), "title")]
 public abstract record LegendSkillConditionDefinition;
 
 public sealed record RequiredExternalSkillLevelLegendConditionDefinition(
@@ -21,4 +22,10 @@ public sealed record RequiredSpecialSkillLegendConditionDefinition(
     string TargetId) : LegendSkillConditionDefinition;
 
 public sealed record RequiredTalentLegendConditionDefinition(
-    string TargetId) : LegendSkillConditionDefinition;
+    string TargetId,
+    int? Level = null,
+    bool Negated = false) : LegendSkillConditionDefinition;
+
+public sealed record RequiredTitleLegendConditionDefinition(
+    string TargetId,
+    int? Level = null) : LegendSkillConditionDefinition;

@@ -7,6 +7,7 @@ public partial class RollStatsPanel : Control
 {
 	private readonly TaskCompletionSource _completion = new();
 	private string _characterId = string.Empty;
+	private string _rollMode = string.Empty;
 	private Dictionary<StatType, int> _originStats = [];
 	private CharacterPanel _characterPanel = null!;
 	private TextureButton _rollButton = null!;
@@ -22,9 +23,13 @@ public partial class RollStatsPanel : Control
 		_characterPanel.GetNode<Control>("%CloseButton").Hide();
 	}
 
-	public async Task AwaitRollAsync(string characterId, CancellationToken cancellationToken = default)
+	public async Task AwaitRollAsync(
+		string characterId,
+		string rollMode = "default",
+		CancellationToken cancellationToken = default)
 	{
 		_characterId = characterId;
+		_rollMode = rollMode?.Trim() ?? string.Empty;
 		var character = Game.State.Party.GetMember(characterId);
 		_originStats = character.BaseStats.ToDictionary();
 		_characterPanel.CharacterId = characterId;
@@ -67,9 +72,12 @@ public partial class RollStatsPanel : Control
 		Game.CharacterService.ReplaceBaseStats(_characterId, stats);
 	}
 
-	private static void AddRandomStat(Dictionary<StatType, int> stats, int value)
+	private void AddRandomStat(Dictionary<StatType, int> stats, int value)
 	{
-		var stat = StatCatalog.TenDimensionStats[Random.Shared.Next(StatCatalog.TenDimensionStats.Count)];
+		var pool = string.Equals(_rollMode, "xmjh", StringComparison.OrdinalIgnoreCase)
+			? StatCatalog.WeaponStats
+			: StatCatalog.TenDimensionStats;
+		var stat = pool[Game.Session.RandomService.Next(0, pool.Count)];
 		stats[stat] = stats.GetValueOrDefault(stat) + value;
 	}
 

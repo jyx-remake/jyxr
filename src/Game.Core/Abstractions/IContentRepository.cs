@@ -53,6 +53,9 @@ public interface IContentRepository
     bool TryGetBuff(string id, [NotNullWhen(true)] out BuffDefinition? definition);
     TalentDefinition GetTalent(string id);
     bool TryGetTalent(string id, [NotNullWhen(true)] out TalentDefinition? definition);
+    CharacterTitleDefinition GetCharacterTitle(string id);
+    bool TryGetCharacterTitle(string id, [NotNullWhen(true)] out CharacterTitleDefinition? definition);
+    IReadOnlyCollection<CharacterTitleDefinition> GetCharacterTitles();
     EquipmentDefinition GetEquipment(string id);
     bool TryGetEquipment(string id, [NotNullWhen(true)] out EquipmentDefinition? definition);
     IReadOnlyList<EquipmentRandomAffixTableDefinition> GetEquipmentRandomAffixTables();

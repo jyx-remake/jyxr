@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Text;
 using Game.Application;
 using Game.Core.Definitions;
+using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Presentation.Hero;
 using Godot;
 
@@ -115,11 +117,14 @@ public partial class HeroPanel : JyPanel
 	private void RenderAdventure()
 	{
 		var adventure = Game.State.Adventure;
+		var heroName = Game.State.Party.TryGetMember(Party.HeroCharacterId, out var hero)
+			? hero.Name
+			: Party.HeroCharacterId;
 		var noRegretTag = adventure.NoRegret
 			? " [color=#c58aa7]【无悔】[/color]"
 			: string.Empty;
 		var builder = new StringBuilder(
-			"[center][font_size=34][color=#f0ebe3]本周目历练[/color][/font_size]\n[table=5]");
+			$"[center][font_size=34][color=#f0ebe3]本周目历练[/color][/font_size]\n[font_size=30][color=#b0f9f9]{heroName}基本信息[/color][/font_size]\n[table=4]");
 		AppendAdventureStat(builder, "门派", ResolveSectName(), "#fbf8f1");
 		AppendAdventureStat(builder, "道德", adventure.Morality.ToString(CultureInfo.InvariantCulture), "#fbf8f1");
 		AppendAdventureStat(
@@ -133,6 +138,20 @@ public partial class HeroPanel : JyPanel
 			"血内上限",
 			Game.CharacterResourceLimitPolicy.GetMaxHpMp().ToString(CultureInfo.InvariantCulture),
 			"#fbf8f1");
+		AppendAdventureStat(
+			builder,
+			"箱子",
+			$"{Game.State.Chest.GetStoredItemCount()}/{Game.ChestService.GetCapacity()}",
+			"#fbf8f1");
+		AppendAdventureStat(builder, "声望", FormatNumber(adventure.Rank), "#fbf8f1");
+		AppendAdventureStat(builder, "性格", ResolvePersonality(hero), "#fbf8f1");
+		AppendAdventureStat(builder, "等级上限", Game.Config.MaxLevel.ToString(CultureInfo.InvariantCulture), "#fbf8f1");
+		AppendAdventureStat(builder, "属性上限", Game.Config.MaxAttribute.ToString(CultureInfo.InvariantCulture), "#fbf8f1");
+		AppendAdventureStat(builder, "武学掉落", ResolveSkillDropTier(adventure.Round), "#fbf8f1");
+		AppendAdventureStat(builder, "结义", ResolveBrotherhood(adventure), "#fbf8f1");
+		builder.Append("[/table]\n[table=2]");
+		AppendAdventureStat(builder, "内功等级上限", ResolveSkillLevelCap(Game.Config.BaseInternalSkillMaxLevel, adventure.Round).ToString(CultureInfo.InvariantCulture), "#fbf8f1");
+		AppendAdventureStat(builder, "外功等级上限", ResolveSkillLevelCap(Game.Config.BaseExternalSkillMaxLevel, adventure.Round).ToString(CultureInfo.InvariantCulture), "#fbf8f1");
 		builder.Append("[/table]\n[font_size=32][color=#f0ebe3]人物好感[/color][/font_size]\n");
 		AppendFavorabilityGrid(builder);
 		builder.Append("[/center]");
@@ -301,5 +320,42 @@ public partial class HeroPanel : JyPanel
 		return achievement.Id.StartsWith(prefix, StringComparison.Ordinal)
 			? achievement.Id[prefix.Length..]
 			: achievement.Id;
+	}
+
+	private static string FormatNumber(double value) =>
+		value.ToString("0.##", CultureInfo.InvariantCulture);
+
+	private static string ResolvePersonality(CharacterInstance? hero) => hero?.Personality switch
+	{
+		1 => "功利",
+		2 => "古怪",
+		3 => "正直",
+		4 => "豁达",
+		_ => "无",
+	};
+
+	private static string ResolveSkillDropTier(int round) => round switch
+	{
+		>= 4 => "天阶",
+		3 => "地阶",
+		2 => "玄阶",
+		_ => "黄阶",
+	};
+
+	private static int ResolveSkillLevelCap(int baseLevel, int round)
+	{
+		var roundBonus = Math.Max(0, (round - 1) / Math.Max(1, Game.Config.RoundsPerMaxSkillLevelIncrease));
+		return Math.Min(Game.Config.AbsoluteSkillMaxLevel, baseLevel + roundBonus);
+	}
+
+	private static string ResolveBrotherhood(AdventureState adventure)
+	{
+		var names = new[]
+		{
+			"无", "黄蓉", "岳灵珊", "周芷若", "李文秀", "小龙女", "小昭", "侍剑",
+			"郭襄", "穆念慈", "王语嫣", "萧中慧", "袁紫衣", "霍青桐", "香香公主",
+		};
+		var value = adventure.GetFavorability("结义");
+		return value is >= 51 and <= 64 ? names[value - 50] : names[0];
 	}
 }

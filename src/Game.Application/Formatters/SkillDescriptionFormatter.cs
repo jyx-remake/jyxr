@@ -406,7 +406,15 @@ public static class SkillDescriptionFormatter
             RequiredSpecialSkillLegendConditionDefinition specialSkill =>
                 $"需要特殊技能「{ResolveSpecialSkillName(specialSkill.TargetId, contentRepository)}」",
             RequiredTalentLegendConditionDefinition talent =>
-                $"需要天赋「{ResolveTalentName(talent.TargetId, contentRepository)}」",
+                talent.Level is null
+                    ? talent.Negated
+                        ? $"不可拥有天赋「{ResolveTalentName(talent.TargetId, contentRepository)}」"
+                        : $"需要天赋「{ResolveTalentName(talent.TargetId, contentRepository)}」"
+                    : $"需要天赋「{ResolveTalentName(talent.TargetId, contentRepository)}」达到{talent.Level}级（暂不满足）",
+            RequiredTitleLegendConditionDefinition title =>
+                title.Level is null
+                    ? $"需要称号「{ResolveTitleName(title.TargetId, contentRepository)}」"
+                    : $"需要称号「{ResolveTitleName(title.TargetId, contentRepository)}」达到{title.Level}级（暂不满足）",
             _ => throw new NotSupportedException($"Unsupported legend condition type '{condition.GetType().Name}'.")
         };
 
@@ -428,6 +436,11 @@ public static class SkillDescriptionFormatter
     private static string ResolveTalentName(string id, IContentRepository contentRepository)
         => contentRepository.TryGetTalent(id, out var talent)
             ? talent.Name
+            : id;
+
+    private static string ResolveTitleName(string id, IContentRepository contentRepository)
+        => contentRepository.TryGetCharacterTitle(id, out var title)
+            ? title.Name
             : id;
 
     private static string FormatImpactTypeCn(SkillImpactType impactType) =>

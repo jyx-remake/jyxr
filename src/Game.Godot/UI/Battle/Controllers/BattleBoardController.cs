@@ -15,8 +15,11 @@ internal sealed class BattleBoardController(
     Func<BattleState?> stateProvider,
     Func<IReadOnlyDictionary<GridPosition, int>> reachablePositionsProvider)
 {
-    private const int CellWidth = 144;
-    private const int CellHeight = 144;
+	private const int CellGap = 4;
+	private const float BoardRightHudReserve = 460f;
+	private const float BoardBottomHudReserve = 390f;
+	private const float FallbackBoardWidth = 1450f;
+	private const float FallbackBoardHeight = 650f;
     private static readonly Color DefaultCellColor = new(0.2f, 0.2f, 0.2f, 0.2f);
     private static readonly Color MoveColor = new(0.2f, 0.6f, 1f, 0.35f);
     private static readonly Color ActingColor = new(1f, 1f, 0.2f, 0.5f);
@@ -47,8 +50,24 @@ internal sealed class BattleBoardController(
                 CanClick(cell.Position, highlights),
                 HasOverlay(cell, highlights)))
             .ToArray();
-        board.RenderGrid(state.Grid.Width, state.Grid.Height, CellWidth, CellHeight, 6, cells);
+        var (cellWidth, cellHeight) = ResolveCellSize(state.Grid.Width, state.Grid.Height);
+        board.RenderGrid(state.Grid.Width, state.Grid.Height, cellWidth, cellHeight, CellGap, cells);
     }
+
+	private (int Width, int Height) ResolveCellSize(int gridWidth, int gridHeight)
+	{
+		var viewport = board.GetViewportRect().Size;
+		var availableWidth = viewport.X > 0f
+			? MathF.Max(720f, viewport.X - BoardRightHudReserve)
+			: FallbackBoardWidth;
+		var availableHeight = viewport.Y > 0f
+			? MathF.Max(420f, viewport.Y - BoardBottomHudReserve)
+			: FallbackBoardHeight;
+		var width = (availableWidth - CellGap * Math.Max(0, gridWidth - 1)) / gridWidth;
+		var height = (availableHeight - CellGap * Math.Max(0, gridHeight - 1)) / gridHeight;
+		var cell = Math.Max(72f, MathF.Floor(MathF.Min(width, height)));
+		return ((int)cell, (int)cell);
+	}
 
     private void RefreshUnits(BattleState state)
     {
@@ -70,7 +89,8 @@ internal sealed class BattleBoardController(
             (int)Math.Round(unit.ActionGauge, MidpointRounding.AwayFromZero),
             AssetResolver.LoadTexture(unit.Character.Portrait),
             unit.ActiveBuffs.Select(static buff => new BattleBoardBuffVisual(
-                buff.Definition.Name, buff.Definition.IsDebuff, buff.Level, buff.RemainingTurns)).ToArray()))
+                buff.Definition.Name, buff.Definition.IsDebuff, buff.Level, buff.RemainingTurns)).ToArray(),
+            unit.Character.Titles.FirstOrDefault(static title => title.Equipped)?.Definition.Name))
             .ToArray());
     }
 

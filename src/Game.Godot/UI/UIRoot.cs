@@ -443,7 +443,12 @@ public partial class UIRoot : Control
 		return await panel.AwaitNameAsync(characterId, defaultName, cancellationToken);
 	}
 
-	public async Task<string> ShowSelectHeadPanelAsync(CancellationToken cancellationToken = default)
+	public Task<string> ShowSelectHeadPanelAsync(CancellationToken cancellationToken = default) =>
+		ShowSelectHeadPanelAsync(null, cancellationToken);
+
+	public async Task<string> ShowSelectHeadPanelAsync(
+		IReadOnlyList<string>? portraitIds,
+		CancellationToken cancellationToken = default)
 	{
 		if (SelectHeadPanelScene.Instantiate() is not SelectHeadPanel panel)
 		{
@@ -451,10 +456,13 @@ public partial class UIRoot : Control
 		}
 
 		ModalLayer.AddChild(panel);
-		return await panel.AwaitHeadAsync(cancellationToken);
+		return await panel.AwaitHeadAsync(portraitIds, cancellationToken);
 	}
 
-	public async Task ShowRollStatsPanelAsync(string characterId, CancellationToken cancellationToken = default)
+	public async Task ShowRollStatsPanelAsync(
+		string characterId,
+		string rollMode = "default",
+		CancellationToken cancellationToken = default)
 	{
 		if (RollStatsPanelScene.Instantiate() is not RollStatsPanel panel)
 		{
@@ -462,7 +470,7 @@ public partial class UIRoot : Control
 		}
 
 		ModalLayer.AddChild(panel);
-		await panel.AwaitRollAsync(characterId, cancellationToken);
+		await panel.AwaitRollAsync(characterId, rollMode, cancellationToken);
 	}
 
 	public void CloseMainPanel()

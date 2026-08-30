@@ -202,6 +202,18 @@ horizontal_alignment = 1
 vertical_alignment = 1
 clip_text = true
 
+[node name="TitleLabel" type="Label" parent="Overlay" unique_id=1407938242]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = -12.0
+offset_right = 120.0
+offset_bottom = 12.0
+text = "称号"
+label_settings = SubResource("1_name_label")
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
 [node name="SpeechBubble" type="Control" parent="Overlay" unique_id=1427702365]
 unique_name_in_owner = true
 visible = false
@@ -305,7 +317,7 @@ horizontal_alignment = 2
 
 [node name="AnimationSlot" type="Node2D" parent="." unique_id=1248584231]
 texture_filter = 1
-scale = Vector2(1.5, 1.5)
+scale = Vector2(1, 1)
 
 [node name="Sprite" type="Sprite2D" parent="AnimationSlot" unique_id=2115115971]
 unique_name_in_owner = true
