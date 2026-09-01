@@ -3,7 +3,8 @@ using Game.Core.Affix;
 namespace Game.Core.Battle.Talents;
 
 public sealed record BlackHeavenDeadlyFlameBattleEffectParameters(
-    [property: NonNegative] double CurrentHpFactor = 0.25d);
+    [property: NonNegative] double CurrentHpFactor = 0.25d,
+    [property: NonNegative] double MaxHpFactor = 0d);
 
 internal sealed class BlackHeavenDeadlyFlameBattleEffectHandler
     : CustomBattleEffectHandler<BlackHeavenDeadlyFlameBattleEffectParameters, IDamageCalculationEffectContext>
@@ -21,7 +22,9 @@ internal sealed class BlackHeavenDeadlyFlameBattleEffectHandler
             return;
         }
 
-        var additionalDamage = (int)(target.Hp * parameters.CurrentHpFactor);
+        var additionalDamage = (int)(
+            target.Hp * parameters.CurrentHpFactor +
+            target.MaxHp * parameters.MaxHpFactor);
         context.DamageCalculation.AddModifier(
             BattleDamageContextField.FinalDamage,
             ModifierOp.PostAdd,

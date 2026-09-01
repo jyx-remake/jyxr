@@ -1741,6 +1741,74 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void BeginAction_ContextUnitBuffConditionSupportsPresentAndMissingBranches()
+    {
+        var fistSeal = new BuffDefinition { Id = "拳掌封印", Name = "拳掌封印", IsDebuff = true };
+        var generalSeal = new BuffDefinition { Id = "诸般封印", Name = "诸般封印", IsDebuff = true };
+        var fallback = new HookAffix
+        {
+            Timing = HookTiming.BeforeActionStart,
+            Conditions =
+            [
+                new ContextUnitBuffBattleHookConditionDefinition(fistSeal.Id, Present: false),
+                new ContextUnitBuffBattleHookConditionDefinition(generalSeal.Id),
+                new ChanceBattleHookConditionDefinition(0.15d),
+            ],
+            Effects =
+            [
+                new RemoveBuffBattleEffectDefinition(
+                    new SelfBattleUnitSelectorDefinition(),
+                    generalSeal.Id),
+            ],
+        };
+        var primary = new HookAffix
+        {
+            Timing = HookTiming.BeforeActionStart,
+            Conditions =
+            [
+                new ContextUnitBuffBattleHookConditionDefinition(fistSeal.Id),
+                new ChanceBattleHookConditionDefinition(0.5d),
+            ],
+            Effects =
+            [
+                new RemoveBuffBattleEffectDefinition(
+                    new SelfBattleUnitSelectorDefinition(),
+                    fistSeal.Id),
+            ],
+        };
+        var talent = new TalentDefinition
+        {
+            Id = "易筋降龙",
+            Name = "易筋降龙",
+            Affixes = [fallback, primary],
+        };
+        var both = CreateUnit("both", team: 1, new GridPosition(0, 0), talents: [talent]);
+        both.TryApplyBuff(new BattleBuffInstance(fistSeal, 1, 2, both.Id, 1));
+        both.TryApplyBuff(new BattleBuffInstance(generalSeal, 1, 2, both.Id, 1));
+        both.ActionGauge = 100;
+        var generalOnly = CreateUnit("general", team: 1, new GridPosition(1, 0), talents: [talent]);
+        generalOnly.TryApplyBuff(new BattleBuffInstance(generalSeal, 1, 2, generalOnly.Id, 1));
+        generalOnly.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [both, generalOnly]);
+        var engine = new BattleEngine(
+            random: new FixedRandomService(0.1d),
+            buffResolver: id => id switch
+            {
+                "拳掌封印" => fistSeal,
+                "诸般封印" => generalSeal,
+                _ => throw new KeyNotFoundException(id),
+            });
+
+        engine.BeginAction(state, both.Id);
+        engine.EndAction(state, both.Id);
+        engine.BeginAction(state, generalOnly.Id);
+
+        Assert.False(both.HasBuff(fistSeal.Id));
+        Assert.True(both.HasBuff(generalSeal.Id));
+        Assert.False(generalOnly.HasBuff(generalSeal.Id));
+    }
+
+    [Fact]
     public void CastSkill_HookRemovedBuffRunsOnBuffRemovedLifecycle()
     {
         var poison = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
@@ -2317,11 +2385,14 @@ public sealed class BattleEngineTests
             externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
         var endless = CreateDefeatPreventionTalent(
             "无尽斗志", "endless_fighting_spirit", priority: 100,
-            """{"abilityId":"无尽斗志","guaranteedFirstTalentId":"我就是神","chance":0.1}""");
+            """{"abilityId":"无尽斗志","guaranteedFirstTalentId":"我就是神","chance":0.1,"usageId":"battle_revive"}""");
+        var reincarnation = CreateDefeatPreventionTalent(
+            "天道轮回", "endless_fighting_spirit", priority: 50,
+            """{"abilityId":"天道轮回","guaranteedFirstTalentId":"天道轮回","chance":0,"usageId":"battle_revive"}""");
         var god = new TalentDefinition { Id = "我就是神", Name = "我就是神" };
         var target = CreateUnit(
             "target", team: 2, new GridPosition(1, 0), maxHp: 1, maxMp: 30,
-            talents: [endless, god]);
+            talents: [endless, god, reincarnation]);
         source.ActionGauge = 100;
         var state = new BattleState(new BattleGrid(4, 4), [source, target]);
         var engine = new BattleEngine(
@@ -2336,7 +2407,7 @@ public sealed class BattleEngineTests
         Assert.Equal(target.MaxHp, target.Hp);
         Assert.Equal(target.MaxMp, target.Mp);
         Assert.Equal(BattleUnit.MaxRage, target.Rage);
-        Assert.Equal(1, target.GetAbilityUsageCount("无尽斗志"));
+        Assert.Equal(1, target.GetAbilityUsageCount("battle_revive"));
 
         engine.EndAction(state, source.Id);
         target.TakeDamage(target.MaxHp - 1);
@@ -2347,7 +2418,371 @@ public sealed class BattleEngineTests
 
         Assert.True(second.Success);
         Assert.False(target.IsAlive);
-        Assert.Equal(1, target.GetAbilityUsageCount("无尽斗志"));
+        Assert.Equal(1, target.GetAbilityUsageCount("battle_revive"));
+    }
+
+    [Fact]
+    public void CastSkill_BlackHeavenAshAddsTenPercentTargetMaximumHpDamage()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 10, cooldown: 0,
+            impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        using var parameters = JsonDocument.Parse(
+            """{"currentHpFactor":0,"maxHpFactor":0.1}""");
+        var effect = new CustomBattleEffectDefinition(
+            "black_heaven_deadly_flame",
+            parameters.RootElement.Clone());
+        var talent = CreateDamageContextTalent(
+            "黑天灰烬",
+            new HookAffix
+            {
+                Timing = HookTiming.BeforeDamageCalculation,
+                Conditions = [new ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole.Source)],
+                Effects = [effect],
+            });
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            talents: [talent]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 1000);
+        var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
+        var baseDamage = calculator.CalculateSkillDamage(
+            new BattleDamageContext(source, target, source.Character.GetExternalSkills().Single())).Amount;
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(calculator, random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(1000 - baseDamage - 100, target.Hp);
+    }
+
+    [Fact]
+    public void BeginAction_WaterWayRestoresFortyPercentOfMissingMp()
+    {
+        using var parameters = JsonDocument.Parse(
+            """{"missingMpFactor":0.4,"floatTextPrefix":"水之道+"}""");
+        var effect = new CustomBattleEffectDefinition("restore_missing_mp", parameters.RootElement.Clone());
+        var talent = CreateDamageContextTalent(
+            "水之道",
+            new HookAffix
+            {
+                Timing = HookTiming.BeforeActionStart,
+                Effects = [effect],
+            });
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var unit = CreateUnit(
+            "unit", team: 1, new GridPosition(0, 0), maxMp: 100, mp: 20,
+            talents: [talent]);
+        unit.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [unit]);
+        var engine = new BattleEngine();
+
+        var result = engine.BeginAction(state, unit.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(52, unit.Mp);
+        Assert.Contains(result.Messages, message =>
+            message is BattleCue
+            {
+                Kind: BattleCueKind.FloatTextRequested,
+                UnitId: "unit",
+                FloatText: { Text: "水之道+32" },
+            });
+    }
+
+    [Fact]
+    public void CastSkill_BeastNatureUsesEnhancedRageBonusWithMainCharacterBeastTamer()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 10, cooldown: 0,
+            impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        using var parameters = JsonDocument.Parse(
+            """{"bonusPerRage":0.02,"enhancedBonusPerRage":0.04,"allyTalentId":"御兽","allyCharacterId":"主角"}""");
+        var effect = new CustomBattleEffectDefinition("rage_damage", parameters.RootElement.Clone());
+        var beastNature = CreateDamageContextTalent(
+            "野兽本性",
+            new HookAffix
+            {
+                Timing = HookTiming.BeforeDamageCalculation,
+                Conditions = [new ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole.Source)],
+                Effects = [effect],
+            });
+        var beastTamer = new TalentDefinition { Id = "御兽", Name = "御兽" };
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [beastNature, beastTamer]));
+        var source = CreateUnit(
+            "beast", team: 1, new GridPosition(0, 0), rage: 5,
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            talents: [beastNature]);
+        var hero = CreateUnit("主角", team: 1, new GridPosition(0, 1), talents: [beastTamer]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 5000);
+        var calculator = new BattleDamageCalculator(new FixedRandomService(0.5d));
+        var baseDamage = calculator.CalculateSkillDamage(
+            new BattleDamageContext(source, target, source.Character.GetExternalSkills().Single())).Amount;
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, hero, target]);
+        var engine = new BattleEngine(calculator, random: new FixedRandomService(0.5d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        var actualDamage = 5000 - target.Hp;
+        Assert.InRange(actualDamage / (double)baseDamage, 1.19d, 1.22d);
+    }
+
+    [Fact]
+    public void CastSkill_MaximumHpDamageCapLimitsLargeHitToConfiguredRatio()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 100, cooldown: 0,
+            impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        using var parameters = JsonDocument.Parse(
+            """{"maximumHpFactor":0.3,"floatText":"见招拆招"}""");
+        var effect = new CustomBattleEffectDefinition(
+            "maximum_hp_damage_cap", parameters.RootElement.Clone());
+        var talent = new TalentDefinition
+        {
+            Id = "见招拆招",
+            Name = "见招拆招",
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeDamageApplied,
+                    Effects = [effect],
+                },
+            ],
+        };
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit(
+            "target", team: 2, new GridPosition(1, 0), maxHp: 1000, talents: [talent]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(700, target.Hp);
+        Assert.Contains(result.Messages, message =>
+            message is BattleCue
+            {
+                Kind: BattleCueKind.FloatTextRequested,
+                UnitId: "target",
+                FloatText: { Text: "见招拆招" },
+            });
+    }
+
+    [Fact]
+    public void Rest_ResourceBasedRecoveryAddsMaximumResourcePercentages()
+    {
+        using var parameters = JsonDocument.Parse(
+            """{"maximumHpFactor":0.1,"maximumMpFactor":0.1}""");
+        var effect = new CustomBattleEffectDefinition(
+            "resource_based_recovery", parameters.RootElement.Clone());
+        var talent = new TalentDefinition
+        {
+            Id = "摸鱼状态",
+            Name = "摸鱼状态",
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeRecoveryResolved,
+                    Effects = [effect],
+                },
+            ],
+        };
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var unit = CreateUnit(
+            "unit", team: 1, new GridPosition(0, 0),
+            maxHp: 1000, maxMp: 500, hp: 100, mp: 50, talents: [talent]);
+        unit.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [unit]);
+        var random = new FixedRandomService(0d);
+        var baseRecovery = BattleRestCalculator.Roll(unit, random);
+        var engine = new BattleEngine(random: random);
+        engine.BeginAction(state, unit.Id);
+
+        var result = engine.Rest(state, unit.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(100 + baseRecovery.Hp + 100, unit.Hp);
+        Assert.Equal(50 + baseRecovery.Mp + 50, unit.Mp);
+    }
+
+    [Fact]
+    public void CastSkill_DamageDealtRecoveryRestoresHpAndMpFromActualDamage()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 10, cooldown: 0,
+            impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        using var parameters = JsonDocument.Parse(
+            """{"hpFactor":0.1,"mpFactor":0.1,"detail":"贼不走空"}""");
+        var effect = new CustomBattleEffectDefinition(
+            "damage_dealt_recovery", parameters.RootElement.Clone());
+        var talent = CreateDamageContextTalent(
+            "贼不走空",
+            new HookAffix
+            {
+                Timing = HookTiming.OnDamageDealt,
+                Conditions = [new DamagePositiveBattleHookConditionDefinition()],
+                Effects = [effect],
+            });
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0),
+            maxHp: 1000, maxMp: 500, hp: 100, mp: 50,
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            talents: [talent]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 5000);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        var damage = 5000 - target.Hp;
+        var recovery = (int)Math.Floor(damage * 0.1d);
+        Assert.Equal(100 + recovery, source.Hp);
+        Assert.Equal(50 + recovery, source.Mp);
+    }
+
+    [Fact]
+    public void CastSkill_FractionalResourceShiftTransfersTargetRage()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 1, cooldown: 0,
+            impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        using var parameters = JsonDocument.Parse(
+            """{"factor":0.5,"resource":"rage","transferToSource":true,"detail":"浑水摸鱼"}""");
+        var effect = new CustomBattleEffectDefinition(
+            "fractional_resource_shift", parameters.RootElement.Clone());
+        var talent = CreateDamageContextTalent(
+            "浑水摸鱼",
+            new HookAffix
+            {
+                Timing = HookTiming.OnHitConfirmed,
+                Effects = [effect],
+            });
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0), rage: 1,
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            talents: [talent]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), rage: 8);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Contains(result.Messages, message =>
+            message is BattleFact
+            {
+                Kind: BattleFactKind.RageChanged,
+                UnitId: "target",
+                Detail: "浑水摸鱼:-3",
+            });
+        Assert.Contains(result.Messages, message =>
+            message is BattleFact
+            {
+                Kind: BattleFactKind.RageChanged,
+                UnitId: "source",
+                Detail: "浑水摸鱼:3",
+            });
+    }
+
+    [Fact]
+    public void CastSkill_DefeatRecoveryRestoresHpAppliesBuffsAndSharesUsageCounter()
+    {
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike", powerBase: 100, cooldown: 0,
+            impactType: SkillImpactType.Single, impactSize: 0, castSize: 3);
+        var warSpirit = new BuffDefinition { Id = "天罡战气", Name = "天罡战气", IsDebuff = false };
+        var superArmor = new BuffDefinition { Id = "霸体", Name = "霸体", IsDebuff = false };
+        using var parameters = JsonDocument.Parse(
+            """{"abilityId":"否极泰来","maximumHpFactor":0.2,"usageLimit":2,"usageId":"battle_revive","buffs":[{"buffId":"天罡战气","level":3,"duration":3},{"buffId":"霸体","level":2,"duration":2}]}""");
+        var effect = new CustomBattleEffectDefinition(
+            "defeat_recovery", parameters.RootElement.Clone());
+        var talent = CreateDamageContextTalent(
+            "否极泰来",
+            new HookAffix
+            {
+                Timing = HookTiming.BeforeDefeated,
+                Effects = [effect],
+            });
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var source = CreateUnit(
+            "source", team: 1, new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit(
+            "target", team: 2, new GridPosition(1, 0), maxHp: 100, hp: 1,
+            talents: [talent]);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var buffs = new Dictionary<string, BuffDefinition>(StringComparer.Ordinal)
+        {
+            [warSpirit.Id] = warSpirit,
+            [superArmor.Id] = superArmor,
+        };
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            buffResolver: id => buffs[id],
+            random: new FixedRandomService(0d));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(20, target.Hp);
+        Assert.Equal(1, target.GetAbilityUsageCount("battle_revive"));
+        Assert.Collection(
+            target.Buffs.OrderBy(buff => buff.Definition.Id, StringComparer.Ordinal),
+            buff => Assert.Equal("天罡战气", buff.Definition.Id),
+            buff => Assert.Equal("霸体", buff.Definition.Id));
     }
 
     [Fact]

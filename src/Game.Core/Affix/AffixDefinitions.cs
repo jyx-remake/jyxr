@@ -128,6 +128,7 @@ public sealed record TraitAffix(TraitId TraitId) : AffixDefinition;
 [JsonDerivedType(typeof(ContextBuffIdBattleHookConditionDefinition), "context_buff_id")]
 [JsonDerivedType(typeof(ContextBuffNegativeBattleHookConditionDefinition), "context_buff_negative")]
 [JsonDerivedType(typeof(ContextUnitHpRatioBattleHookConditionDefinition), "context_unit_hp_ratio")]
+[JsonDerivedType(typeof(ContextUnitBuffBattleHookConditionDefinition), "context_unit_buff")]
 [JsonDerivedType(typeof(ContextUnitEffectiveTalentBattleHookConditionDefinition), "context_unit_effective_talent")]
 [JsonDerivedType(typeof(ContextUnitEquippedInternalSkillBattleHookConditionDefinition), "context_unit_equipped_internal_skill")]
 [JsonDerivedType(typeof(ContextUnitRelationBattleHookConditionDefinition), "context_unit_relation")]
@@ -163,6 +164,11 @@ public sealed record ContextUnitHpRatioBattleHookConditionDefinition(
 
     public double? MaxExclusive { get; init; }
 }
+
+public sealed record ContextUnitBuffBattleHookConditionDefinition(
+    string BuffId,
+    BattleHookContextUnitRole? Role = null,
+    bool Present = true) : BattleHookConditionDefinition;
 
 public sealed record ContextUnitEffectiveTalentBattleHookConditionDefinition(
     IReadOnlyList<string> TalentIds) : BattleHookConditionDefinition;

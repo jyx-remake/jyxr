@@ -797,6 +797,15 @@ public sealed partial class JsonContentLoader
                     }
 
                     break;
+                case ContextUnitBuffBattleHookConditionDefinition unitBuffCondition:
+                    Ensure(!string.IsNullOrWhiteSpace(unitBuffCondition.BuffId),
+                        $"{ownerName} has battle hook '{hook.Timing}' unit buff condition with empty buff id.");
+                    if (repository is not null)
+                    {
+                        Ensure(repository.Buffs.ContainsKey(unitBuffCondition.BuffId),
+                            $"{ownerName} has battle hook '{hook.Timing}' unit buff condition referencing missing buff '{unitBuffCondition.BuffId}'.");
+                    }
+                    break;
                 case ContextUnitEffectiveTalentBattleHookConditionDefinition talentCondition:
                     Ensure(talentCondition.TalentIds.Count > 0,
                         $"{ownerName} has battle hook '{hook.Timing}' effective talent condition without talentIds.");

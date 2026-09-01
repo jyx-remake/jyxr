@@ -59,6 +59,8 @@ public interface IHitConfirmedEffectContext : IBattleEffectContext
         string buffId,
         int level,
         int duration);
+    int AddRage(BattleUnit target, int value, string? detail = null);
+    double AddActionGauge(BattleUnit target, int value);
 }
 
 public interface IDamageApplicationEffectContext : IBattleEffectContext
@@ -87,6 +89,8 @@ public interface IDamageDealtEffectContext : IBattleEffectContext
     int ActualDamageAmount { get; }
     bool IsCritical { get; }
     double LifestealRate { get; set; }
+    int ApplyHpRecovery(BattleUnit target, int amount, string? detail = null);
+    int ApplyMpRecovery(BattleUnit target, int amount, string? detail = null);
 }
 
 public interface IDefeatPreventionEffectContext : IBattleEffectContext
@@ -95,6 +99,8 @@ public interface IDefeatPreventionEffectContext : IBattleEffectContext
     int ActualDamageAmount { get; }
     bool IsCritical { get; }
     bool IsDefeatPrevented { get; }
+    int ApplyHpRecovery(BattleUnit target, int amount, string? detail = null);
+    bool ApplyBuff(BattleUnit target, string buffId, int level, int duration);
     void PreventDefeat(string abilityId);
 }
 
@@ -122,6 +128,7 @@ public interface IActionStartEffectContext : IBattleEffectContext
     void SkipCurrentAction(string? reason = null);
     int SetRage(int value, string? detail = null);
     int ApplyHpRecovery(BattleUnit target, int amount, string? detail = null);
+    int ApplyMpRecovery(BattleUnit target, int amount, string? detail = null);
 }
 
 public interface IActionReadinessEffectContext : IBattleEffectContext

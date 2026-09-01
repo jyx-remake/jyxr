@@ -115,6 +115,7 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("couple_unity_attack", new CoupleUnityAttackBattleEffectHandler());
         registry.Register("couple_unity_defence", new CoupleUnityDefenceBattleEffectHandler());
         registry.Register("black_heaven_deadly_flame", new BlackHeavenDeadlyFlameBattleEffectHandler());
+        registry.Register("restore_missing_mp", new RestoreMissingMpBattleEffectHandler());
         registry.Register("bagua_formation", new BaguaFormationBattleEffectHandler());
         registry.Register("team_count_attack_bonus", new TeamCountAttackBonusHandler());
         registry.Register(
@@ -157,6 +158,12 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("beloved_companion_damage", new BelovedCompanionDamageBattleEffectHandler());
         registry.Register("low_health_target_damage", new LowHealthTargetDamageBattleEffectHandler());
         registry.Register("rage_damage", new RageDamageBattleEffectHandler());
+        registry.Register("maximum_hp_damage_cap", new MaximumHpDamageCapBattleEffectHandler());
+        registry.Register("resource_based_recovery", new ResourceBasedRecoveryBattleEffectHandler());
+        registry.Register("random_hit_buff", new RandomHitBuffBattleEffectHandler());
+        registry.Register("damage_dealt_recovery", new DamageDealtRecoveryBattleEffectHandler());
+        registry.Register("fractional_resource_shift", new FractionalResourceShiftBattleEffectHandler());
+        registry.Register("defeat_recovery", new DefeatRecoveryBattleEffectHandler());
         registry.Register("poisoned_target_level_damage", new PoisonedTargetLevelDamageBattleEffectHandler());
         registry.Register("reset_skill_cooldowns", new ResetSkillCooldownsBattleEffectHandler());
         registry.Register("random_debuff", new RandomDebuffBattleEffectHandler());

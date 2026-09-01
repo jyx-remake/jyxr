@@ -84,7 +84,8 @@ public sealed record EndlessFightingSpiritBattleEffectParameters(
     [property: NotWhiteSpace] string GuaranteedFirstTalentId,
     [property: Probability] double Chance,
     string? FloatText = null,
-    string? Speech = null);
+    string? Speech = null,
+    string? UsageId = null);
 
 public sealed class EndlessFightingSpiritBattleEffectHandler
     : CustomBattleEffectHandler<EndlessFightingSpiritBattleEffectParameters, IDefeatPreventionEffectContext>
@@ -96,7 +97,10 @@ public sealed class EndlessFightingSpiritBattleEffectHandler
         IDefeatPreventionEffectContext context,
         EndlessFightingSpiritBattleEffectParameters parameters)
     {
-        var guaranteed = context.Unit.GetAbilityUsageCount(parameters.AbilityId) == 0 &&
+        var usageId = string.IsNullOrWhiteSpace(parameters.UsageId)
+            ? parameters.AbilityId
+            : parameters.UsageId;
+        var guaranteed = context.Unit.GetAbilityUsageCount(usageId) == 0 &&
             context.Unit.Character.HasEffectiveTalent(parameters.GuaranteedFirstTalentId);
         if (!guaranteed && !Probability.RollChance(context.Random, parameters.Chance))
         {
@@ -106,7 +110,7 @@ public sealed class EndlessFightingSpiritBattleEffectHandler
         context.Unit.RestoreHp(context.Unit.MaxHp);
         context.Unit.RestoreMp(context.Unit.MaxMp);
         context.Unit.SetRage(BattleUnit.MaxRage);
-        context.Unit.RecordAbilityUsage(parameters.AbilityId);
+        context.Unit.RecordAbilityUsage(usageId);
         SurviveAtOneHpBattleEffectHandler.Complete(
             context,
             parameters.AbilityId,
