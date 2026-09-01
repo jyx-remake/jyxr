@@ -26,6 +26,7 @@ public sealed class BattleHookContext :
     IBuffApplicationEffectContext,
     IActionReadinessEffectContext,
     IActionStartEffectContext,
+    IPeriodicBuffEffectContext,
     IDamageApplicationRuntimeContext
 {
     internal BattleHookContext(
@@ -400,6 +401,21 @@ public sealed class BattleHookContext :
         string? detail) => RestoreHp(target, amount, detail);
 
     int IActionStartEffectContext.ApplyMpRecovery(
+        BattleUnit target,
+        int amount,
+        string? detail) => RestoreMp(target, amount, detail);
+
+    int IPeriodicBuffEffectContext.ApplyHpRecovery(
+        BattleUnit target,
+        int amount,
+        string? detail) => RestoreHp(target, amount, detail);
+
+    int IPeriodicBuffEffectContext.ApplyDirectDamage(
+        BattleUnit target,
+        int amount,
+        string? detail) => Damage(target, amount, detail);
+
+    int IPeriodicBuffEffectContext.ApplyMpRecovery(
         BattleUnit target,
         int amount,
         string? detail) => RestoreMp(target, amount, detail);

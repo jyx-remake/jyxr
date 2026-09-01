@@ -321,17 +321,17 @@ public sealed partial class BattleEngine
             }
 
             ApplyPeriodicBuffEffect(state, unit, buff);
-            buff.ConsumeRound();
-            if (buff.IsExpired)
-            {
-                unit.InvalidateLocalBattleProjection();
-            }
             TriggerHooks(state, HookTiming.AfterBuffRound, unit, context =>
             {
                 context.Source = state.TryGetUnit(buff.SourceUnitId) ?? unit;
                 context.Target = unit;
                 context.Buff = buff;
             });
+            buff.ConsumeRound();
+            if (buff.IsExpired)
+            {
+                unit.InvalidateLocalBattleProjection();
+            }
         }
 
         var expired = unit.RemoveExpiredBuffs();

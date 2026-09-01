@@ -1345,7 +1345,7 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
-    public void AdvanceUntilNextAction_DoesNotRunHookFromBuffThatJustExpired()
+    public void AdvanceUntilNextAction_RunsFinalPeriodicHookBeforeBuffExpires()
     {
         var buff = new BuffDefinition
         {
@@ -1369,10 +1369,105 @@ public sealed class BattleEngineTests
         var result = new BattleEngine().AdvanceUntilNextAction(state, maxTicks: 50);
 
         Assert.False(result.Success);
-        Assert.Equal(0, hero.Rage);
+        Assert.Equal(1, hero.Rage);
         Assert.Empty(hero.Buffs);
-        Assert.DoesNotContain(result.Messages, message =>
+        Assert.Contains(result.Messages, message =>
             message is BattleTrace { Timing: HookTiming.AfterBuffRound });
+    }
+
+    [Fact]
+    public void AdvanceUntilNextAction_PeriodicBuffRecoveryUsesCurrentMpAndOnlyItsOwnTimeline()
+    {
+        using var parameters = JsonDocument.Parse(
+            """{"currentMpFactorPerBuffLevel":0.02,"detail":"纳气"}""");
+        var recoveryEffect = new CustomBattleEffectDefinition(
+            "periodic_buff_resource_recovery",
+            parameters.RootElement.Clone());
+        var naqi = new BuffDefinition
+        {
+            Id = "纳气",
+            Name = "纳气",
+            IsDebuff = false,
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.AfterBuffRound,
+                    Effects = [recoveryEffect],
+                },
+            ],
+        };
+        var other = new BuffDefinition
+        {
+            Id = "其他周期效果",
+            Name = "其他周期效果",
+            IsDebuff = false,
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.AfterBuffRound,
+                    Effects = [new AddRageBattleEffectDefinition(new SelfBattleUnitSelectorDefinition(), 1)],
+                },
+            ],
+        };
+        recoveryEffect.Resolve(TestContentFactory.CreateRepository(buffs: [naqi, other]));
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            maxMp: 200,
+            mp: 100,
+            actionSpeed: 1);
+        hero.TryApplyBuff(new BattleBuffInstance(naqi, level: 3, remainingTurns: 2, hero.Id, 0));
+        hero.TryApplyBuff(new BattleBuffInstance(other, level: 1, remainingTurns: 2, hero.Id, 1));
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+
+        var result = new BattleEngine().AdvanceUntilNextAction(state, maxTicks: 50);
+
+        Assert.False(result.Success);
+        Assert.Equal(106, hero.Mp);
+        Assert.Equal(1, hero.Rage);
+        Assert.All(hero.Buffs, buff => Assert.Equal(1, buff.RemainingTurns));
+    }
+
+    [Fact]
+    public void AdvanceUntilNextAction_PeriodicBuffDamageUsesLevelAndRemainingTurns()
+    {
+        using var parameters = JsonDocument.Parse(
+            """{"currentHpFactor":0.005,"multiplyByRemainingTurns":true,"minimumRemainingHp":1,"detail":"诅咒"}""");
+        var damageEffect = new CustomBattleEffectDefinition(
+            "periodic_buff_damage",
+            parameters.RootElement.Clone());
+        var curse = new BuffDefinition
+        {
+            Id = "诅咒",
+            Name = "诅咒",
+            IsDebuff = true,
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.AfterBuffRound,
+                    Effects = [damageEffect],
+                },
+            ],
+        };
+        damageEffect.Resolve(TestContentFactory.CreateRepository(buffs: [curse]));
+        var hero = CreateUnit(
+            "hero",
+            team: 1,
+            new GridPosition(0, 0),
+            hp: 100,
+            actionSpeed: 1);
+        hero.TryApplyBuff(new BattleBuffInstance(curse, level: 2, remainingTurns: 3, hero.Id, 0));
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+
+        var result = new BattleEngine().AdvanceUntilNextAction(state, maxTicks: 50);
+
+        Assert.False(result.Success);
+        Assert.Equal(97, hero.Hp);
+        Assert.Equal(2, Assert.Single(hero.Buffs).RemainingTurns);
     }
 
     [Fact]
@@ -2675,6 +2770,42 @@ public sealed class BattleEngineTests
         Assert.True(result.Success);
         Assert.Equal(100 + baseRecovery.Hp + 50, unit.Hp);
         Assert.Equal(50 + baseRecovery.Mp + 25, unit.Mp);
+    }
+
+    [Fact]
+    public void BeginAction_ZagenPreventsMovementAndRestoresFivePercentMaximumHp()
+    {
+        using var parameters = JsonDocument.Parse(
+            """{"maximumHpFactor":0.05,"detail":"扎根"}""");
+        var effect = new CustomBattleEffectDefinition(
+            "action_start_resource_recovery", parameters.RootElement.Clone());
+        var talent = new TalentDefinition
+        {
+            Id = "扎根",
+            Name = "扎根",
+            Affixes =
+            [
+                new TraitAffix(TraitId.CannotMove),
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeActionStart,
+                    Effects = [effect],
+                },
+            ],
+        };
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var unit = CreateUnit(
+            "unit", team: 1, new GridPosition(0, 0),
+            maxHp: 1000, hp: 100, talents: [talent]);
+        unit.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [unit]);
+        var engine = new BattleEngine(random: new FixedRandomService(0d));
+
+        var result = engine.BeginAction(state, unit.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(0, unit.MovePower);
+        Assert.Equal(150, unit.Hp);
     }
 
     [Fact]

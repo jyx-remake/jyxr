@@ -28,6 +28,7 @@ internal sealed class BattleHookRunner(
 
         var entries = state.ProjectionResolver.GetHooks(unit, timing)
             .Where(entry => MatchesFilter(entry.Hook))
+            .Where(entry => MatchesPeriodicBuff(entry, context.Buff, timing))
             .ToList();
 
         RunHooks(
@@ -44,6 +45,16 @@ internal sealed class BattleHookRunner(
         return context;
 
         bool MatchesFilter(HookAffix hook) => hookFilter is null || hookFilter(hook);
+
+        static bool MatchesPeriodicBuff(
+            ActiveHookEntry entry,
+            BattleBuffInstance? eventBuff,
+            HookTiming currentTiming) =>
+            currentTiming != HookTiming.AfterBuffRound ||
+            eventBuff is null ||
+            entry.Origin is not BuffAffixOrigin origin ||
+            string.Equals(origin.BuffId, eventBuff.Definition.Id, StringComparison.Ordinal) &&
+            origin.AppliedAtActionSerial == eventBuff.AppliedAtActionSerial;
     }
 
     private void RunHooks(

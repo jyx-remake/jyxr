@@ -135,3 +135,10 @@ public interface IActionReadinessEffectContext : IBattleEffectContext
 {
     int RemoveNegativeBuffs();
 }
+
+public interface IPeriodicBuffEffectContext : IBattleEffectContext
+{
+    int ApplyDirectDamage(BattleUnit target, int amount, string? detail = null);
+    int ApplyHpRecovery(BattleUnit target, int amount, string? detail = null);
+    int ApplyMpRecovery(BattleUnit target, int amount, string? detail = null);
+}

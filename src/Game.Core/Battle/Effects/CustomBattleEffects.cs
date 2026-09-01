@@ -160,6 +160,9 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("rage_damage", new RageDamageBattleEffectHandler());
         registry.Register("maximum_hp_damage_cap", new MaximumHpDamageCapBattleEffectHandler());
         registry.Register("resource_based_recovery", new ResourceBasedRecoveryBattleEffectHandler());
+        registry.Register("action_start_resource_recovery", new ActionStartResourceRecoveryBattleEffectHandler());
+        registry.Register("periodic_buff_resource_recovery", new PeriodicBuffResourceRecoveryBattleEffectHandler());
+        registry.Register("periodic_buff_damage", new PeriodicBuffDamageBattleEffectHandler());
         registry.Register("random_hit_buff", new RandomHitBuffBattleEffectHandler());
         registry.Register("damage_dealt_recovery", new DamageDealtRecoveryBattleEffectHandler());
         registry.Register("fractional_resource_shift", new FractionalResourceShiftBattleEffectHandler());
@@ -277,6 +280,7 @@ internal static class BattleEffectCapabilityPolicy
             [typeof(IBuffApplicationEffectContext)] = HookTiming.BeforeBuffApplied,
             [typeof(IActionStartEffectContext)] = HookTiming.BeforeActionStart,
             [typeof(IActionReadinessEffectContext)] = HookTiming.BeforeActionReadiness,
+            [typeof(IPeriodicBuffEffectContext)] = HookTiming.AfterBuffRound,
         };
 
     public static bool Supports<TContext>(HookTiming timing)
