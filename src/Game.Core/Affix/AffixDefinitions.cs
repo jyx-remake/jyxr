@@ -148,7 +148,10 @@ public sealed record ChanceBattleHookConditionDefinition(double Value) : BattleH
 public sealed record UnitLevelChanceBattleHookConditionDefinition(
     double BaseValue,
     double ValuePerLevel,
-    double MaxValue = 1d) : BattleHookConditionDefinition;
+    double MaxValue = 1d) : BattleHookConditionDefinition
+{
+    public BattleHookContextUnitRole? Role { get; init; }
+}
 
 public sealed record DamagePositiveBattleHookConditionDefinition : BattleHookConditionDefinition;
 
@@ -196,7 +199,8 @@ public sealed record ContextSkillNameEqualsBattleHookConditionDefinition(
     IReadOnlyList<string> Values) : BattleHookConditionDefinition;
 
 public sealed record ContextSkillNameContainsBattleHookConditionDefinition(
-    IReadOnlyList<string> Values) : BattleHookConditionDefinition;
+    IReadOnlyList<string> Values,
+    bool Negate = false) : BattleHookConditionDefinition;
 
 public sealed record ContextSkillKindBattleHookConditionDefinition(
     IReadOnlyList<SkillKind> Kinds) : BattleHookConditionDefinition;

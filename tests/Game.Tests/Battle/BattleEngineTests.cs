@@ -2640,6 +2640,44 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void Rest_ResourceBasedRecoverySupportsLevelScaledBatchParameters()
+    {
+        using var parameters = JsonDocument.Parse(
+            """{"maximumHpFactorPerUnitLevel":0.005,"maximumMpFactorPerUnitLevel":0.005}""");
+        var effect = new CustomBattleEffectDefinition(
+            "resource_based_recovery", parameters.RootElement.Clone());
+        var talent = new TalentDefinition
+        {
+            Id = "等级恢复",
+            Name = "等级恢复",
+            Affixes =
+            [
+                new HookAffix
+                {
+                    Timing = HookTiming.BeforeRecoveryResolved,
+                    Effects = [effect],
+                },
+            ],
+        };
+        effect.Resolve(TestContentFactory.CreateRepository(talents: [talent]));
+        var unit = CreateUnit(
+            "unit", team: 1, new GridPosition(0, 0),
+            maxHp: 1000, maxMp: 500, hp: 100, mp: 50, talents: [talent], level: 10);
+        unit.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [unit]);
+        var random = new FixedRandomService(0d);
+        var baseRecovery = BattleRestCalculator.Roll(unit, random);
+        var engine = new BattleEngine(random: random);
+        engine.BeginAction(state, unit.Id);
+
+        var result = engine.Rest(state, unit.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(100 + baseRecovery.Hp + 50, unit.Hp);
+        Assert.Equal(50 + baseRecovery.Mp + 25, unit.Mp);
+    }
+
+    [Fact]
     public void CastSkill_DamageDealtRecoveryRestoresHpAndMpFromActualDamage()
     {
         var skillDefinition = TestContentFactory.CreateExternalSkill(
@@ -3283,6 +3321,138 @@ public sealed class BattleEngineTests
 
         Assert.True(missResult.Success);
         Assert.Empty(missTarget.Buffs);
+    }
+
+    [Fact]
+    public void CastSkill_NameContainsNegationKeepsSpecificAndFallbackHooksExclusive()
+    {
+        var immobilized = new BuffDefinition { Id = "定身", Name = "定身", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "葵花点穴手",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var talent = CreateDamageContextTalent(
+            "一动不动",
+            new HookAffix
+            {
+                Timing = HookTiming.OnHitConfirmed,
+                Conditions = [new ContextSkillNameContainsBattleHookConditionDefinition(["葵花点穴手"], Negate: true)],
+                Effects =
+                [
+                    new ApplyBuffBattleEffectDefinition(
+                        new TargetBattleUnitSelectorDefinition(), immobilized.Id, Level: 2, Duration: 2, Chance: 100),
+                ],
+            });
+        talent = talent with
+        {
+            Affixes =
+            [
+                .. talent.Affixes,
+                new HookAffix
+                {
+                    Timing = HookTiming.OnHitConfirmed,
+                    Conditions = [new ContextSkillNameContainsBattleHookConditionDefinition(["葵花点穴手"])],
+                    Effects =
+                    [
+                        new ApplyBuffBattleEffectDefinition(
+                            new TargetBattleUnitSelectorDefinition(), immobilized.Id, Level: 4, Duration: 4, Chance: 100),
+                    ],
+                },
+            ],
+        };
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents: [talent],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.1d),
+            buffResolver: buffId => string.Equals(buffId, immobilized.Id, StringComparison.Ordinal)
+                ? immobilized
+                : throw new InvalidOperationException($"Unexpected buff '{buffId}'."));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        var applied = Assert.Single(target.Buffs);
+        Assert.Equal(immobilized.Id, applied.Definition.Id);
+        Assert.Equal(4, applied.Level);
+        Assert.Equal(4, applied.RemainingTurns);
+        Assert.Single(result.Messages.OfType<BattleFact>().Where(message => message.Kind == BattleFactKind.BuffApplied));
+    }
+
+    [Fact]
+    public void CastSkill_UnitLevelChanceCanUseTargetLevel()
+    {
+        var blind = new BuffDefinition { Id = "致盲", Name = "致盲", IsDebuff = true };
+        var skillDefinition = TestContentFactory.CreateExternalSkill(
+            "strike",
+            powerBase: 10,
+            impactType: SkillImpactType.Single,
+            impactSize: 0,
+            castSize: 3);
+        var talent = CreateDamageContextTalent(
+            "三才",
+            new HookAffix
+            {
+                Timing = HookTiming.OnHitConfirmed,
+                Conditions =
+                [
+                    new ContextUnitRoleBattleHookConditionDefinition(BattleHookContextUnitRole.Source),
+                    new UnitLevelChanceBattleHookConditionDefinition(0d, 0.01d)
+                    {
+                        Role = BattleHookContextUnitRole.Target,
+                    },
+                ],
+                Effects =
+                [
+                    new ApplyBuffBattleEffectDefinition(
+                        new TargetBattleUnitSelectorDefinition(), blind.Id, Level: 3, Duration: 3, Chance: 100),
+                ],
+            });
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            stats: new Dictionary<StatType, int>
+            {
+                [StatType.Quanzhang] = 100,
+                [StatType.Bili] = 120,
+            },
+            talents: [talent],
+            externalSkills: [new InitialExternalSkillEntryDefinition(skillDefinition, 1)],
+            level: 1);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500, level: 100);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+        var engine = new BattleEngine(
+            new BattleDamageCalculator(new FixedRandomService(0.5d)),
+            random: new FixedRandomService(0.5d),
+            buffResolver: buffId => string.Equals(buffId, blind.Id, StringComparison.Ordinal)
+                ? blind
+                : throw new InvalidOperationException($"Unexpected buff '{buffId}'."));
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(state, source.Id, source.Character.GetExternalSkills().Single(), target.Position);
+
+        Assert.True(result.Success);
+        var applied = Assert.Single(target.Buffs);
+        Assert.Equal(blind.Id, applied.Definition.Id);
+        Assert.Equal(3, applied.Level);
+        Assert.Equal(3, applied.RemainingTurns);
     }
 
     [Fact]

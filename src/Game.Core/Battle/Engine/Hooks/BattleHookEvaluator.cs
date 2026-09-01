@@ -8,12 +8,7 @@ internal static class BattleHookEvaluator
         condition switch
         {
             ChanceBattleHookConditionDefinition chance => Probability.RollChance(context.Random, chance.Value),
-            UnitLevelChanceBattleHookConditionDefinition chance => Probability.RollChance(
-                context.Random,
-                Math.Clamp(
-                    chance.BaseValue + chance.ValuePerLevel * context.Unit.Character.Level,
-                    0d,
-                    chance.MaxValue)),
+            UnitLevelChanceBattleHookConditionDefinition chance => EvaluateUnitLevelChance(context, chance),
             DamagePositiveBattleHookConditionDefinition => context.DamageAmount is > 0,
             ContextBuffIdBattleHookConditionDefinition buffId => context.Buff is not null &&
                 string.Equals(context.Buff.Definition.Id, buffId.BuffId, StringComparison.Ordinal),
@@ -39,7 +34,7 @@ internal static class BattleHookEvaluator
             ContextSkillNameEqualsBattleHookConditionDefinition skillName => context.Skill is not null &&
                 skillName.Values.Any(value => string.Equals(context.Skill.Name, value, StringComparison.Ordinal)),
             ContextSkillNameContainsBattleHookConditionDefinition skillName => context.Skill is not null &&
-                skillName.Values.Any(value => context.Skill.Name.Contains(value, StringComparison.Ordinal)),
+                skillName.Values.Any(value => context.Skill.Name.Contains(value, StringComparison.Ordinal)) != skillName.Negate,
             ContextSkillKindBattleHookConditionDefinition skillKind => context.Skill is not null &&
                 skillKind.Kinds.Contains(context.Skill.SkillKind),
             ContextSkillWeaponTypeBattleHookConditionDefinition skillWeaponType => context.Skill is not null &&
@@ -52,6 +47,25 @@ internal static class BattleHookEvaluator
         unit.Character.GetInternalSkills()
             .FirstOrDefault(static skill => skill.IsEquipped)
             ?.Definition.Id;
+
+    private static bool EvaluateUnitLevelChance(
+        BattleHookContext context,
+        UnitLevelChanceBattleHookConditionDefinition condition)
+    {
+        var unit = condition.Role switch
+        {
+            null => context.Unit,
+            BattleHookContextUnitRole.Source => context.Source,
+            BattleHookContextUnitRole.Target => context.Target,
+            _ => throw new ArgumentOutOfRangeException(nameof(condition.Role), condition.Role, null),
+        };
+        return unit is not null && Probability.RollChance(
+            context.Random,
+            Math.Clamp(
+                condition.BaseValue + condition.ValuePerLevel * unit.Character.Level,
+                0d,
+                condition.MaxValue));
+    }
 
     private static bool IsContextUnitRole(BattleHookContext context, BattleHookContextUnitRole role) =>
         role switch
