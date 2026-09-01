@@ -91,8 +91,8 @@ public static class GameFlow
 		var storyId = Game.Config.InitialStorySegmentId;
 		try
 		{
-			var completed = await StoryRunHelper.RunAsync(storyId, cancellationToken);
-			if (completed)
+			var result = await StoryRunHelper.RunAsync(storyId, cancellationToken);
+			if (result.SegmentCompleted)
 			{
 				Game.Session.Events.Publish(new AutoSaveRequestedEvent($"story '{storyId}' completed"));
 			}

@@ -47,10 +47,10 @@ color = Color(0, 0, 0, 0.32)
 
 [node name="Shopkeeper" type="TextureRect" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=100000103]
 layout_mode = 0
-offset_left = 66.0
-offset_top = 180.0
-offset_right = 445.0
-offset_bottom = 880.0
+offset_left = 4.0
+offset_top = 561.0
+offset_right = 383.0
+offset_bottom = 1261.0
 mouse_filter = 2
 texture = ExtResource("5_keeper")
 expand_mode = 1
@@ -59,10 +59,10 @@ stretch_mode = 5
 [node name="TitleLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=100000104]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 480.0
-offset_top = 54.0
-offset_right = 722.0
-offset_bottom = 114.0
+offset_left = 308.0
+offset_top = 29.0
+offset_right = 550.0
+offset_bottom = 89.0
 theme_override_colors/font_color = Color(0.93, 0.88, 0.7, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
@@ -72,10 +72,10 @@ text = "储物箱"
 [node name="QuickTransferCheckBox" type="CheckBox" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=100000127]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 105.0
-offset_top = 55.0
-offset_right = 355.0
-offset_bottom = 155.0
+offset_left = 43.0
+offset_top = 11.0
+offset_right = 293.0
+offset_bottom = 111.0
 theme_override_colors/font_color = Color(0.82, 0.95, 0.05, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
@@ -84,11 +84,12 @@ text = "快速存取"
 
 [node name="ModeButtons" type="HBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=100000105]
 layout_mode = 0
-offset_left = 834.0
-offset_top = 60.0
-offset_right = 1606.0
-offset_bottom = 128.0
+offset_left = 372.0
+offset_top = 105.0
+offset_right = 1144.0
+offset_bottom = 173.0
 theme_override_constants/separation = 36
+accessibility_region = true
 
 [node name="DepositModeButton" type="Button" parent="ContentRoot/ModeButtons" index="0" unique_id=100000106]
 unique_name_in_owner = true
@@ -115,10 +116,10 @@ text = "离开"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 46)
 layout_mode = 0
-offset_left = 415.0
-offset_top = 155.0
-offset_right = 575.0
-offset_bottom = 201.0
+offset_left = 73.0
+offset_top = 95.0
+offset_right = 233.0
+offset_bottom = 141.0
 theme_override_colors/font_color = Color(0.92941177, 0.8784314, 0.7019608, 1)
 theme_override_font_sizes/font_size = 26
 text = "0 项"
@@ -127,10 +128,10 @@ vertical_alignment = 1
 
 [node name="CategoryButtons" type="VBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="5" unique_id=100000109]
 layout_mode = 0
-offset_left = 384.0
-offset_top = 204.0
-offset_right = 584.0
-offset_bottom = 932.0
+offset_left = 172.0
+offset_top = 193.0
+offset_right = 372.0
+offset_bottom = 921.0
 theme_override_constants/separation = 8
 
 [node name="AllButton" type="Button" parent="ContentRoot/CategoryButtons" index="0" unique_id=100000110]
@@ -223,10 +224,10 @@ text = "功能道具"
 
 [node name="GoodsPanel" type="Panel" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="6" unique_id=100000118]
 layout_mode = 0
-offset_left = 610.0
-offset_top = 135.0
-offset_right = 1742.0
-offset_bottom = 900.0
+offset_left = 407.0
+offset_top = 209.0
+offset_right = 1907.0
+offset_bottom = 989.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1gnn5")
 
@@ -235,6 +236,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = -1.0
+offset_bottom = -1.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -253,9 +256,11 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_ws1b3")
 [node name="GridContainer" type="GridContainer" parent="ContentRoot/GoodsPanel/GoodsLayout/ScrollContainer" index="0" unique_id=100000123]
 unique_name_in_owner = true
 layout_mode = 2
+offset_transform_enabled = true
+offset_transform_position = Vector2(48, 30)
 theme_override_constants/h_separation = 24
 theme_override_constants/v_separation = 30
-columns = 5
+columns = 7
 
 [node name="EmptyLabel" type="Label" parent="ContentRoot/GoodsPanel" index="1" unique_id=100000124]
 unique_name_in_owner = true
@@ -273,10 +278,10 @@ horizontal_alignment = 1
 [node name="PromptLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="7" unique_id=100000125]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 462.0
-offset_top = 932.0
-offset_right = 1244.0
-offset_bottom = 1004.0
+offset_left = 22.0
+offset_top = 1002.0
+offset_right = 804.0
+offset_bottom = 1074.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 7
@@ -286,10 +291,10 @@ text = "请问您存入什么物品？"
 [node name="CapacityLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="8" unique_id=100000126]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 1300.0
-offset_top = 940.0
-offset_right = 1764.0
-offset_bottom = 1002.0
+offset_left = 1430.0
+offset_top = 1000.0
+offset_right = 1894.0
+offset_bottom = 1062.0
 theme_override_colors/font_color = Color(1, 0.95, 0.1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6

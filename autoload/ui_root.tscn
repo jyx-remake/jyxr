@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://qq8i1hc2ns12"]
 
 [ext_resource type="Script" uid="uid://b26rtcod4xv7t" path="res://src/Game.Godot/UI/UIRoot.cs" id="1_ui_root"]
-[ext_resource type="Script" path="res://src/Game.Godot/UI/Detail/DetailPanelHost.cs" id="2_detail_host"]
-[ext_resource type="Script" path="res://src/Game.Godot/Persistence/QuickSaveCoordinator.cs" id="2_quick_save"]
+[ext_resource type="Script" uid="uid://bsnldkfdi8swo" path="res://src/Game.Godot/UI/Detail/DetailPanelHost.cs" id="2_detail_host"]
 [ext_resource type="PackedScene" uid="uid://jon61teprdc7" path="res://scenes/ui/party_panel/party_panel.tscn" id="2_party_panel"]
-[ext_resource type="PackedScene" path="res://scenes/ui/character_panel/character_roster_panel.tscn" id="3_i0hgf"]
+[ext_resource type="Script" uid="uid://dew2ypb6qid4o" path="res://src/Game.Godot/Persistence/QuickSaveCoordinator.cs" id="2_quick_save"]
+[ext_resource type="PackedScene" uid="uid://vfu1fhc12kvo" path="res://scenes/ui/character_panel/character_roster_panel.tscn" id="3_i0hgf"]
 [ext_resource type="PackedScene" uid="uid://beqsxw0hmqwm" path="res://scenes/ui/story/story_dialogue_panel.tscn" id="4_story_dialogue"]
 [ext_resource type="PackedScene" uid="uid://cg6ljvde1okgt" path="res://scenes/ui/story/story_intertitle_panel.tscn" id="4_story_intertitle"]
 [ext_resource type="PackedScene" uid="uid://0gybacdn8xd4" path="res://scenes/ui/story/story_regular_choice_panel.tscn" id="5_story_choice"]
@@ -12,12 +12,12 @@
 [ext_resource type="PackedScene" uid="uid://bnk146v0yfw02" path="res://scenes/ui/hud/hud.tscn" id="6_hud"]
 [ext_resource type="PackedScene" uid="uid://cup3ph7k7eg4o" path="res://scenes/ui/journal/journal_panel.tscn" id="7_journal"]
 [ext_resource type="PackedScene" uid="uid://bdvws2ugdkk6a" path="res://scenes/ui/hero_panel/hero_panel.tscn" id="8_hero_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/console/console_panel.tscn" id="9_console_panel"]
 [ext_resource type="PackedScene" uid="uid://sdtyoj35nitl" path="res://scenes/ui/system_panel/system_panel.tscn" id="9_system_panel"]
 [ext_resource type="PackedScene" path="res://scenes/ui/toast/toast_panel.tscn" id="9_toast_panel"]
-[ext_resource type="PackedScene" path="res://scenes/ui/console/console_panel.tscn" id="9_console_panel"]
-[ext_resource type="Shader" uid="uid://bkkv5qham5ddy" path="res://assets/shader/story_screen_filter.gdshader" id="10_story_filter"]
 [ext_resource type="PackedScene" uid="uid://cxqxd285b6u0o" path="res://scenes/ui/hint/hint_box.tscn" id="10_hint_box"]
 [ext_resource type="PackedScene" uid="uid://brltgo8b2opqk" path="res://scenes/ui/save_load/save_slot_selection_panel.tscn" id="10_save_slots"]
+[ext_resource type="Shader" uid="uid://bkkv5qham5ddy" path="res://assets/shader/story_screen_filter.gdshader" id="10_story_filter"]
 [ext_resource type="PackedScene" uid="uid://b4kveik4eci2d" path="res://scenes/ui/base/confirm_dialog.tscn" id="11_confirm_dialog"]
 [ext_resource type="PackedScene" uid="uid://bs35w4y4foane" path="res://scenes/ui/inventory_panel/inventory_panel.tscn" id="12_inventory_panel"]
 [ext_resource type="PackedScene" uid="uid://cpw5uh28ivr5j" path="res://scenes/ui/chest_panel/chest_panel.tscn" id="13_chest_panel"]
@@ -32,13 +32,20 @@
 [ext_resource type="PackedScene" uid="uid://di28xqh0osmwk" path="res://scenes/ui/battle/battle_screen.tscn" id="20_battle_screen"]
 [ext_resource type="PackedScene" uid="uid://52n8a1s5b8e0" path="res://scenes/ui/base/detail_panel.tscn" id="21_detail_panel"]
 [ext_resource type="PackedScene" uid="uid://bqpi5b5jp7vof" path="res://scenes/ui/equipment_refinement/refinement_equipment_selection_panel.tscn" id="22_refinement_equipment"]
-[ext_resource type="PackedScene" path="res://scenes/ui/minigame/lightness_training_screen.tscn" id="23_lightness_training"]
-[ext_resource type="PackedScene" path="res://scenes/ui/minigame/strength_training_screen.tscn" id="24_strength_training"]
+[ext_resource type="PackedScene" uid="uid://dpdj5h0prmm2d" path="res://scenes/ui/minigame/lightness_training_screen.tscn" id="23_lightness_training"]
+[ext_resource type="PackedScene" uid="uid://chmb657ktjrbe" path="res://scenes/ui/minigame/strength_training_screen.tscn" id="24_strength_training"]
 [ext_resource type="Script" uid="uid://564a0r68gkg3" path="res://src/Game.Godot/UI/StoryVisualEffects.cs" id="25_story_effects"]
 [ext_resource type="PackedScene" path="res://scenes/ui/story/story_video_player.tscn" id="26_story_video"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_story_filter"]
 shader = ExtResource("10_story_filter")
+shader_parameter/distortion_preset = 0
+shader_parameter/distortion_strength = 0.0
+shader_parameter/preset = 0
+shader_parameter/strength = 0.0
+shader_parameter/tint_color = Color(1, 1, 1, 1)
+shader_parameter/tint_strength = 0.0
+shader_parameter/screen_offset = Vector2(0, 0)
 
 [node name="UIRoot" type="Control" unique_id=684934628]
 layout_mode = 3
@@ -71,7 +78,7 @@ RollStatsPanelScene = ExtResource("17_roll_stats")
 GameOverScreenScene = ExtResource("18_gameover")
 GameFinScreenScene = ExtResource("19_gamefin")
 
-[node name="QuickSaveCoordinator" type="Node" parent="."]
+[node name="QuickSaveCoordinator" type="Node" parent="." unique_id=1600670489]
 script = ExtResource("2_quick_save")
 
 [node name="HudLayer" type="CanvasLayer" parent="." unique_id=1159616672]
@@ -117,7 +124,7 @@ mouse_filter = 2
 script = ExtResource("2_detail_host")
 DetailPanelScene = ExtResource("21_detail_panel")
 
-[node name="PromptLayer" type="CanvasLayer" parent="."]
+[node name="PromptLayer" type="CanvasLayer" parent="." unique_id=1664575527]
 unique_name_in_owner = true
 layer = 40
 
@@ -133,11 +140,11 @@ layer = 50
 [node name="ToastPanel" parent="OverlayLayer" unique_id=318086013 instance=ExtResource("9_toast_panel")]
 unique_name_in_owner = true
 
-[node name="VisualEffectsLayer" type="CanvasLayer" parent="."]
+[node name="VisualEffectsLayer" type="CanvasLayer" parent="." unique_id=1127394060]
 unique_name_in_owner = true
 layer = 60
 
-[node name="StoryVisualEffects" type="Control" parent="VisualEffectsLayer"]
+[node name="StoryVisualEffects" type="Control" parent="VisualEffectsLayer" unique_id=860820433]
 unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
@@ -148,7 +155,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("25_story_effects")
 
-[node name="FilterRect" type="ColorRect" parent="VisualEffectsLayer/StoryVisualEffects"]
+[node name="FilterRect" type="ColorRect" parent="VisualEffectsLayer/StoryVisualEffects" unique_id=958943277]
 unique_name_in_owner = true
 visible = false
 material = SubResource("ShaderMaterial_story_filter")
@@ -160,7 +167,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="FlashRect" type="ColorRect" parent="VisualEffectsLayer/StoryVisualEffects"]
+[node name="FlashRect" type="ColorRect" parent="VisualEffectsLayer/StoryVisualEffects" unique_id=1748108366]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -172,7 +179,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0)
 
-[node name="FadeRect" type="ColorRect" parent="VisualEffectsLayer/StoryVisualEffects"]
+[node name="FadeRect" type="ColorRect" parent="VisualEffectsLayer/StoryVisualEffects" unique_id=1242473190]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -184,12 +191,12 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
-[node name="StoryIntertitlePanel" parent="VisualEffectsLayer" instance=ExtResource("4_story_intertitle")]
+[node name="StoryIntertitlePanel" parent="VisualEffectsLayer" unique_id=814743653 instance=ExtResource("4_story_intertitle")]
 unique_name_in_owner = true
 
-[node name="VideoLayer" type="CanvasLayer" parent="."]
+[node name="VideoLayer" type="CanvasLayer" parent="." unique_id=354884997]
 unique_name_in_owner = true
 layer = 55
 
-[node name="StoryVideoPlayer" parent="VideoLayer" instance=ExtResource("26_story_video")]
+[node name="StoryVideoPlayer" parent="VideoLayer" unique_id=164733861 instance=ExtResource("26_story_video")]
 unique_name_in_owner = true

@@ -58,6 +58,7 @@ public partial class MapScreen : Control
 	public override void _ExitTree()
 	{
 		_locationTooltipLayer.Dismiss();
+		ReleaseLargeMapNodes();
 		_clockChangedSubscription?.Dispose();
 		_clockChangedSubscription = null;
 		_adventureStateChangedSubscription?.Dispose();
@@ -324,8 +325,24 @@ public partial class MapScreen : Control
 		{
 			if (_mapBigTab.Visible)
 			{
-				_largeMapView.Hide();
+				// Keep the large map on screen while a story plays. Large-map
+				// events are triggered from the map itself, so the dialogue is
+				// expected to run against the zoom/pan the player is using.
+				// Hiding it would reveal World.Background, which paints the same
+				// map picture stretched to fill the screen - visually identical
+				// to snapping back to the minimum zoom. Only a story-provided
+				// backdrop (`background` command) takes the screen over.
+				if (HasForeignStoryBackdrop)
+				{
+					_largeMapView.Hide();
+				}
+				else
+				{
+					_largeMapView.Show();
+				}
+
 				_largeMapView.ResetInputState();
+				_largeMapView.SetInteractionEnabled(false);
 			}
 
 			if (_mapSmallTab.Visible)
@@ -339,6 +356,8 @@ public partial class MapScreen : Control
 			_cameraButton.Hide();
 			return;
 		}
+
+		_largeMapView.SetInteractionEnabled(true);
 
 		if (_mapBigTab.Visible)
 		{

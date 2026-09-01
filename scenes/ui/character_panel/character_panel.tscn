@@ -22,8 +22,14 @@
 [ext_resource type="Texture2D" uid="uid://b455tm6x5ju26" path="res://assets/art/ui/character_panel/summary_icons/health.png" id="22_health_icon"]
 [ext_resource type="Texture2D" uid="uid://c8fslfgjyi5ec" path="res://assets/art/ui/character_panel/summary_icons/qi.png" id="23_qi_icon"]
 [ext_resource type="Texture2D" uid="uid://c48mt60shr3f6" path="res://assets/art/ui/character_panel/summary_icons/experience.png" id="24_experience_icon"]
+[ext_resource type="Texture2D" uid="uid://4allowhfbyga" path="res://assets/art/misc/btn_cross.png" id="25_2v5sn"]
 [ext_resource type="Texture2D" uid="uid://dbu0tl2gb2by8" path="res://assets/art/ui/character_panel/summary_icons/attack.png" id="25_attack_icon"]
 [ext_resource type="Texture2D" uid="uid://kas7qwqxlvmc" path="res://assets/art/ui/character_panel/summary_icons/defense.png" id="26_defense_icon"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_hf86k"]
+font_size = 70
+outline_size = 20
+outline_color = Color(0.110077165, 0.1101845, 0.07741476, 1)
 
 [sub_resource type="StyleBoxEmpty" id="1_empty"]
 
@@ -35,6 +41,11 @@ texture = ExtResource("3_background")
 
 [node name="AvatarBox" type="Control" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1151911410]
 anchors_preset = 0
+offset_left = -147.0
+offset_top = -89.000015
+offset_right = -147.0
+offset_bottom = -89.000015
+scale = Vector2(1.3, 1.3)
 
 [node name="ClipBackground" type="TextureRect" parent="ContentRoot/AvatarBox" index="0" unique_id=219727967]
 clip_children = 2
@@ -70,21 +81,24 @@ expand_mode = 1
 [node name="Labels" type="Control" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=686035826]
 anchors_preset = 0
 offset_left = 224.0
-offset_top = 520.0
+offset_top = 535.0
 offset_right = 520.0
-offset_bottom = 860.0
+offset_bottom = 875.0
 
 [node name="NameLabel" type="Label" parent="ContentRoot/Labels" index="0" unique_id=998987688]
 unique_name_in_owner = true
+custom_maximum_size = Vector2(0, -1)
 layout_mode = 0
-offset_left = -38.0
-offset_top = -88.0
-offset_right = 192.0
-offset_bottom = -12.0
+offset_left = 97.0
+offset_top = -103.0
+offset_right = 97.0
+offset_bottom = -20.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 52
-text = "角色"
+text = "主角"
+label_settings = SubResource("LabelSettings_hf86k")
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Stats" type="HBoxContainer" parent="ContentRoot/Labels" index="1" unique_id=1878933587]
 layout_mode = 0
@@ -357,10 +371,10 @@ stretch_mode = 0
 [node name="TabContainer" type="TabContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=1891201305]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 536.0
-offset_top = 380.0
-offset_right = 1708.0
-offset_bottom = 900.0
+offset_left = 554.0
+offset_top = 382.0
+offset_right = 1726.0
+offset_bottom = 902.0
 theme_override_styles/panel = SubResource("1_empty")
 current_tab = 0
 tabs_visible = false
@@ -406,5 +420,10 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="CloseButton" parent="." index="3" unique_id=962603895]
+offset_left = 671.0
+offset_top = -531.0
+offset_right = 871.0
+offset_bottom = -331.0
+texture_normal = ExtResource("25_2v5sn")
 PressOffset = Vector2(2, 2)
 PressColor = Color(0.8, 0.8, 0.8, 1)

@@ -158,7 +158,7 @@ internal sealed partial class StoryRuntimeSession(
         switch (step)
         {
             case DialogueStep dialogue:
-                var context = new DialogueContext(dialogue.Speaker, dialogue.Text);
+                var context = new DialogueContext(dialogue.Speaker, dialogue.Text, dialogue.Portrait);
                 yield return StepResult.FromEvent(new DialogueReadyEvent(context));
                 await host.DialogueAsync(context, ct);
                 yield break;
@@ -193,6 +193,12 @@ internal sealed partial class StoryRuntimeSession(
                 }
 
                 yield return StepResult.FromEvent(new CommandExecutedEvent(command.Call.Root.Name, args));
+                if (result is { TerminatesStory: true })
+                {
+                    yield return StepResult.FromEvent(new StoryTerminatedEvent());
+                    yield return StepResult.Terminate();
+                    yield break;
+                }
                 if (result is { } commandResult && commandResult.JumpTarget is not null)
                 {
                     yield return StepResult.FromEvent(new JumpEvent(commandResult.JumpTarget));

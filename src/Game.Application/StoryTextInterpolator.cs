@@ -4,12 +4,17 @@ using Game.Core.Model.Character;
 
 namespace Game.Application;
 
-internal sealed class StoryTextInterpolator
+public sealed class StoryTextInterpolator
 {
     private const string HeroVariableName = "MALE";
     private const string FemaleVariableName = "FEMALE";
     private const string ZhenlongLevelVariableName = "ZHENLONG_LEVEL";
-    private static readonly Regex PlaceholderPattern = new(@"\$([A-Z_][A-Z0-9_]*)\$", RegexOptions.Compiled);
+    // Keep this in step with ExpressionSymbol: built-ins use upper-case Latin,
+    // while native DSL variables may use lower-case Latin or Han identifiers.
+    // Built-in placeholders are resolved first and unknown names stay verbatim.
+    private static readonly Regex PlaceholderPattern = new(
+        @"\$([A-Za-z_\u3007\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF][A-Za-z0-9_\u3007\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]*)\$",
+        RegexOptions.Compiled);
 
     private readonly GameSession _session;
 
@@ -53,9 +58,20 @@ internal sealed class StoryTextInterpolator
                 value = (_session.Profile.ZhenlongqijuLevel + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
                 return true;
             default:
-                value = string.Empty;
-                return false;
+                return TryResolveStoryVariable(variableName, out value);
         }
+    }
+
+    private bool TryResolveStoryVariable(string variableName, out string value)
+    {
+        if (_session.State.Story.TryGetVariable(variableName, out var variable))
+        {
+            value = variable.ToString();
+            return true;
+        }
+
+        value = string.Empty;
+        return false;
     }
 
     private bool TryResolveCharacterName(string characterId, out string value)

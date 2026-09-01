@@ -10,7 +10,7 @@ public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattle
 	public bool ContinueOnCommandFailure => true;
 
 	public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) =>
-		new(UIRoot.Instance.ShowDialogueAsync(dialogue.Speaker, dialogue.Text, cancellationToken));
+		new(UIRoot.Instance.ShowDialogueAsync(dialogue.Speaker, dialogue.Text, dialogue.Portrait, cancellationToken));
 
 	public async ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken)
 	{
@@ -82,7 +82,8 @@ public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattle
 
 	public ValueTask PlayEffectAsync(string effectId, CancellationToken cancellationToken) => ExecuteEffectAsync(effectId);
 
-	public ValueTask GameOverAsync(CancellationToken cancellationToken) => ExecuteGameOverAsync();
+	public async ValueTask GameOverAsync(CancellationToken cancellationToken) =>
+		await ExecuteGameOverAsync();
 
 	public async ValueTask CommandFailedAsync(
 		string commandName,

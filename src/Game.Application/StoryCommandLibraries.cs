@@ -1,6 +1,7 @@
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Core.Story;
+using Game.Core.Definitions;
 
 namespace Game.Application;
 
@@ -10,24 +11,72 @@ internal sealed class InventoryCurrencyStoryCommands
     public InventoryCurrencyStoryCommands(GameSession session) => _session = session;
 
     [StoryCommand("change_item", "item")]
-    public void ChangeItem(string itemId, int delta = 1)
+    public void ChangeItem(string itemId, int delta = 1, bool showToast = true)
     {
+        var item = ResolveItem(itemId);
         if (delta > 0)
         {
-            _session.InventoryService.AddItem(itemId, delta);
+            _session.InventoryService.AddItem(item, delta, showToast);
         }
         else if (delta < 0)
         {
             ArgumentOutOfRangeException.ThrowIfEqual(delta, int.MinValue);
-            _session.InventoryService.RemoveItem(itemId, -delta);
+            _session.InventoryService.RemoveItem(item, -delta);
+            if (showToast)
+            {
+                var quantity = -delta;
+                var quantitySuffix = quantity > 1 ? $" x{quantity}" : string.Empty;
+                _session.Events.Publish(new ToastRequestedEvent($"失去物品【{item.Name}】{quantitySuffix}"));
+            }
         }
     }
 
     [StoryCommand("remove_item", "cost_item")]
-    public void RemoveItem(string itemId, int quantity = 1)
+    public void RemoveItem(string itemId, int quantity = 1, bool showToast = true)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
-        ChangeItem(itemId, -quantity);
+        var item = ResolveItem(itemId, out var isLegacyNumericAlias);
+        if (isLegacyNumericAlias && !_session.State.Inventory.ContainsStack(item, quantity))
+        {
+            // Saves created while the base questionnaire was accidentally
+            // published never received the shared vote token.  Consuming a
+            // branch-suffixed alias from such a save is already satisfied;
+            // do not turn that former publishing bug into a permanent crash.
+            return;
+        }
+        ChangeItem(itemId, -quantity, showToast);
+    }
+
+    private ItemDefinition ResolveItem(string itemId) => ResolveItem(itemId, out _);
+
+    private ItemDefinition ResolveItem(string itemId, out bool isLegacyNumericAlias)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(itemId);
+        isLegacyNumericAlias = false;
+        if (_session.ContentRepository.TryGetItem(itemId, out var item))
+        {
+            return item;
+        }
+
+        // A few legacy XMJH branches suffix the shared token name with the
+        // random branch number (for example 队友表决令3), although rollrole.lua
+        // only creates the base item 队友表决令. Preserve that legacy intent by
+        // resolving a numeric suffix only when the base item is an actual
+        // definition; genuinely unknown item ids still fail normally.
+        var baseEnd = itemId.Length;
+        while (baseEnd > 0 && char.IsDigit(itemId[baseEnd - 1]))
+        {
+            baseEnd--;
+        }
+
+        if (baseEnd > 0 && baseEnd < itemId.Length &&
+            _session.ContentRepository.TryGetItem(itemId[..baseEnd], out item))
+        {
+            isLegacyNumericAlias = true;
+            return item;
+        }
+
+        return _session.ContentRepository.GetItem(itemId);
     }
 
     [StoryCommand("add_random_item", "item_random")]
@@ -228,6 +277,35 @@ internal sealed class StoryStateCommands
 
     [StoryCommand("clear_flag")]
     public void ClearFlag(string name) => _variableMutations.Delete(name, "clear_flag");
+
+    [StoryCommand("change_story_number")]
+    public void ChangeStoryNumber(string name, double delta)
+    {
+        var current = _session.State.Story.TryGetVariable(name, out var value)
+            ? value.AsNumber($"Story variable '{name}'")
+            : 0;
+        // Legacy XMJH used favorability as a non-negative counter. Its first
+        // write often subtracts 50/100 only to cancel the old implicit value
+        // of 50. Story numbers start at zero, so preserve the observable
+        // counter semantics by keeping this compatibility mutation at zero.
+        // Authors who need signed values can still use native DSL assignment.
+        _variableMutations.Assign(name, ExpressionValue.FromNumber(Math.Max(0, current + delta)));
+    }
+
+    [StoryCommand("list_story_numbers")]
+    public void ListStoryNumbers()
+    {
+        var entries = _session.State.Story.Variables
+            .Where(static entry => entry.Value.Kind == ExpressionValueKind.Number)
+            .OrderBy(static entry => entry.Key, StringComparer.Ordinal)
+            .Select(static entry => $"{entry.Key}={entry.Value.AsNumber(entry.Key).ToString(System.Globalization.CultureInfo.InvariantCulture)}")
+            .ToArray();
+        var summary = entries.Length == 0
+            ? "剧情数值变量：暂无"
+            : $"剧情数值变量（共{entries.Length}个）：{string.Join("，", entries)}";
+        _session.State.Journal.Append(_session.State.Clock, summary);
+        _session.Events.Publish(new JournalChangedEvent());
+    }
 
     [StoryCommand("set_time_key")]
     public void SetTimeKey(string key, int days, string storyId = "")

@@ -19,6 +19,7 @@ MapScreenScene = ExtResource("2_map_screen")
 
 [node name="Background" type="TextureRect" parent="." unique_id=147190001]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -36,6 +37,6 @@ script = ExtResource("3_timed_story")
 unique_name_in_owner = true
 script = ExtResource("4_auto_save")
 
-[node name="PlayTimeCoordinator" type="Node" parent="."]
+[node name="PlayTimeCoordinator" type="Node" parent="." unique_id=941404200]
 unique_name_in_owner = true
 script = ExtResource("5_play_time")

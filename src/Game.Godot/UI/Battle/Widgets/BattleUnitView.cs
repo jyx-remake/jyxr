@@ -6,6 +6,7 @@ namespace Game.Godot.UI.Battle;
 public partial class BattleUnitView : Node2D
 {
 	private static readonly StringName LibraryKey = new(string.Empty);
+	private static readonly StringName HideSystemShadowMetadata = new("hide_system_shadow");
 
 	private static readonly Color PlayerBarColor = new(0.78f, 0.18f, 0.18f, 1f);
 	private static readonly Color EnemyBarColor = new(0.6f, 0.12f, 0.12f, 1f);
@@ -15,7 +16,9 @@ public partial class BattleUnitView : Node2D
 	private static readonly Color EnemyNameColor = Colors.Red;
 
 	private Sprite2D _sprite = null!;
+	private Sprite2D _shadow = null!;
 	private Sprite2D _activeArrow = null!;
+	private Node2D _animationSlot = null!;
 	private AnimationPlayer _animationPlayer = null!;
 	private AnimationTree _animationTree = null!;
 	private AnimationNodeStateMachinePlayback _stateMachine = null!;
@@ -39,7 +42,9 @@ public partial class BattleUnitView : Node2D
 	public override void _Ready()
 	{
 		_sprite = GetNode<Sprite2D>("%Sprite");
+		_shadow = GetNode<Sprite2D>("%Shadow");
 		_activeArrow = GetNode<Sprite2D>("%ActiveArrow");
+		_animationSlot = GetNode<Node2D>("%AnimationSlot");
 		_animationPlayer = GetNode<AnimationPlayer>("%AnimationPlayer");
 		_animationTree = GetNode<AnimationTree>("%AnimationTree");
 		_stateMachine = _animationTree.Get("parameters/playback").As<AnimationNodeStateMachinePlayback>();
@@ -64,6 +69,7 @@ public partial class BattleUnitView : Node2D
 		UnitId = unit.UnitId;
 		SetAnimationSet(unit.AnimationLibrary);
 		SetFacing(unit.Facing);
+		_shadow.Visible = !HidesSystemShadow(unit.AnimationLibrary);
 		_portraitTexture = unit.PortraitTexture;
 
 		_nameLabel.Text = unit.Name;
@@ -126,7 +132,9 @@ public partial class BattleUnitView : Node2D
 
 	private void SetAnimationSet(AnimationLibrary? animationLibrary)
 	{
-		if (ReferenceEquals(_animationLibrary, animationLibrary) ||
+		var playerHasRuntimeLibrary = _animationPlayer.HasAnimationLibrary(LibraryKey);
+		if ((ReferenceEquals(_animationLibrary, animationLibrary) &&
+			(animationLibrary is not null || !playerHasRuntimeLibrary)) ||
 			(_animationLibrary is not null &&
 				animationLibrary is not null &&
 				_animationLibrary.ResourcePath == animationLibrary.ResourcePath))
@@ -144,6 +152,12 @@ public partial class BattleUnitView : Node2D
 		{
 			_animationPlayer.AddAnimationLibrary(LibraryKey, animationLibrary);
 		}
+		else
+		{
+			// The scene carries a character only as an editor preview.  Never leave
+			// that texture visible when the requested runtime model is unresolved.
+			_sprite.Texture = null;
+		}
 
 		_animationTree.Active = animationLibrary is not null;
 		PlayIdle();
@@ -151,8 +165,15 @@ public partial class BattleUnitView : Node2D
 
 	private void SetFacing(BattleFacing facing)
 	{
-		_sprite.Scale = new Vector2(facing == BattleFacing.Right ? 1f : -1f, 1f);
+		// Animation libraries own Sprite.scale for their per-model scale. Facing
+		// lives on the parent so repeated animation evaluation cannot overwrite it.
+		_animationSlot.Scale = new Vector2(facing == BattleFacing.Right ? 1f : -1f, 1f);
 	}
+
+	private static bool HidesSystemShadow(AnimationLibrary? animationLibrary) =>
+		animationLibrary is not null &&
+		animationLibrary.HasMeta(HideSystemShadowMetadata) &&
+		animationLibrary.GetMeta(HideSystemShadowMetadata).AsBool();
 
 	private void TravelAnimation(string animationName)
 	{

@@ -15,7 +15,8 @@ public abstract record Step;
 
 public sealed record DialogueStep(
     string Speaker,
-    string Text) : Step;
+    string Text,
+    string? Portrait = null) : Step;
 
 public sealed record CommandStep(
     ParsedCall Call) : Step;
@@ -27,14 +28,15 @@ public sealed record SetVariableStep(
 public sealed record DeleteVariableStep(
     string Target) : Step;
 
-public readonly record struct StoryCommandResult(string? JumpTarget)
+public readonly record struct StoryCommandResult(string? JumpTarget, bool TerminatesStory = false)
 {
-    public static StoryCommandResult None { get; } = new(null);
+    public static StoryCommandResult None { get; } = new(null, false);
+    public static StoryCommandResult Terminate { get; } = new(null, true);
 
     public static StoryCommandResult Jump(string target)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(target);
-        return new StoryCommandResult(target);
+        return new StoryCommandResult(target, false);
     }
 }
 

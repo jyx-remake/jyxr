@@ -140,6 +140,76 @@ public sealed class ExpressionCommandEventTests
     }
 
     [Fact]
+    public async Task StoryNumberCommandsUsePersistentVariablesWithZeroDefault()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var dispatcher = session.StoryService.CommandDispatcher;
+        var evaluator = new ExpressionEvaluator();
+        var parser = new ExpressionParser();
+        var environment = new GameExpressionEnvironment(session).Create();
+
+        Assert.Equal(0, evaluator.Evaluate(
+            parser.ParseExpression("story_number('xmjh_caiyao')"),
+            environment).AsNumber("test"));
+
+        // Legacy pseudo-favorability counters commonly begin with -50/-100
+        // to cancel the old implicit default of 50. The new counter defaults
+        // to zero and must not become negative during that reset.
+        await dispatcher.ExecuteCallAsync(parser.ParseCall(
+            "change_story_number('xmjh_caiyao', -50)"));
+        Assert.Equal(0, evaluator.Evaluate(
+            parser.ParseExpression("story_number('xmjh_caiyao')"),
+            environment).AsNumber("test"));
+
+        await dispatcher.ExecuteCallAsync(parser.ParseCall(
+            "change_story_number('xmjh_caiyao', 1)"));
+        await dispatcher.ExecuteCallAsync(parser.ParseCall(
+            "change_story_number('xmjh_caiyao', 2)"));
+
+        Assert.Equal(3, evaluator.Evaluate(
+            parser.ParseExpression("story_number('xmjh_caiyao')"),
+            environment).AsNumber("test"));
+        Assert.Equal(3, session.State.Story.Variables["xmjh_caiyao"].AsNumber("test"));
+    }
+
+    [Fact]
+    public async Task ListStoryNumbersWritesJournalSummaryOfNumericVariables()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var dispatcher = session.StoryService.CommandDispatcher;
+        var parser = new ExpressionParser();
+
+        await dispatcher.ExecuteCallAsync(parser.ParseCall("change_story_number('xmjh_caiyao', 2)"));
+        await dispatcher.ExecuteCallAsync(parser.ParseCall("set_flag('quest_done')"));
+        await dispatcher.ExecuteCallAsync(parser.ParseCall("list_story_numbers()"));
+
+        var entry = Assert.Single(session.State.Journal.Entries);
+        Assert.Contains("共1个", entry.Text);
+        Assert.Contains("xmjh_caiyao=2", entry.Text);
+        Assert.DoesNotContain("quest_done", entry.Text);
+
+        await dispatcher.ExecuteCallAsync(parser.ParseCall("change_story_number('xmjh_lsjz', 5)"));
+        await dispatcher.ExecuteCallAsync(parser.ParseCall("list_story_numbers()"));
+
+        Assert.Equal(2, session.State.Journal.Entries.Count);
+        Assert.Contains("共2个", session.State.Journal.Entries[^1].Text);
+        Assert.Contains("xmjh_lsjz=5", session.State.Journal.Entries[^1].Text);
+    }
+
+    [Fact]
+    public void StoryTextInterpolatorResolvesStoryVariablesInPlaceholders()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        session.State.Story.SetVariable("xmjh_caiyao", ExpressionValue.FromNumber(3));
+        session.State.Story.SetVariable("采药次数", ExpressionValue.FromNumber(4));
+        var interpolator = new StoryTextInterpolator(session);
+
+        Assert.Equal("你已采药3次。", interpolator.Interpolate("你已采药$xmjh_caiyao$次。"));
+        Assert.Equal("本轮采药4次。", interpolator.Interpolate("本轮采药$采药次数$次。"));
+        Assert.Equal("采药$missing_value$次。", interpolator.Interpolate("采药$missing_value$次。"));
+    }
+
+    [Fact]
     public async Task MissingVariableFlagAndTimeKeyClearWithWarningsWithoutStoppingExecution()
     {
         var logger = new CollectingDiagnosticLogger();
@@ -237,13 +307,40 @@ public sealed class ExpressionCommandEventTests
     }
 
     [Fact]
-    public async Task ChangeItemUsesSignedDeltaAndRemoveItemRequiresPositiveQuantity()
+    public async Task ItemCommandsSupportVisibleAndSilentInventoryChanges()
     {
         var item = new NormalItemDefinition { Id = "pill", Name = "pill", Type = ItemType.Utility, ConsumeOnUse = false };
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(items: [item]));
+        var acquisitions = new List<ItemAcquiredEvent>();
+        var toasts = new List<ToastRequestedEvent>();
+        using var acquisitionSubscription = session.Events.Subscribe<ItemAcquiredEvent>(acquisitions.Add);
+        using var toastSubscription = session.Events.Subscribe<ToastRequestedEvent>(toasts.Add);
+        var parser = new ExpressionParser();
+
         await session.StoryService.CommandDispatcher.ExecuteCommandAsync("change_item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(3)]);
         await session.StoryService.CommandDispatcher.ExecuteCommandAsync("item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(-1)]);
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("change_item('pill', 1, false)"));
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("remove_item('pill', 1, false)"));
+
         Assert.True(session.State.Inventory.ContainsStack(item, 2));
+        Assert.Single(acquisitions);
+        Assert.Equal(3, acquisitions[0].Quantity);
+        var removalToast = Assert.Single(toasts);
+        Assert.Equal("失去物品【pill】", removalToast.Message);
+
+        // Legacy XMJH uses branch-suffixed aliases such as 队友表决令3 for
+        // the single shared item 队友表决令. The runtime should resolve the
+        // numeric suffix when the base definition exists.
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(
+            parser.ParseCall("change_item('pill', 1, false)"));
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(
+            parser.ParseCall("remove_item('pill3', 1, false)"));
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(
+            parser.ParseCall("remove_item('pill', 2, false)"));
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(
+            parser.ParseCall("remove_item('pill4', 1, false)"));
+        Assert.False(session.State.Inventory.ContainsStack(item));
+
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
             await session.StoryService.CommandDispatcher.ExecuteCommandAsync("remove_item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(-1)]));
     }

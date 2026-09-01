@@ -122,8 +122,8 @@ public partial class TimedStoryCoordinator : Node
 
 		try
 		{
-			var completed = await StoryRunHelper.RunAsync(storyId);
-			if (!completed)
+			var result = await StoryRunHelper.RunAsync(storyId);
+			if (!result.SegmentCompleted)
 			{
 				return;
 			}

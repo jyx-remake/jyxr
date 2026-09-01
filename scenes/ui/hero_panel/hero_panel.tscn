@@ -14,6 +14,8 @@
 
 [sub_resource type="LabelSettings" id="LabelSettings_tab_title"]
 font_size = 60
+outline_size = 16
+outline_color = Color(0.23031491, 0.23031494, 0.23031494, 1)
 
 [sub_resource type="Theme" id="Theme_dr12l"]
 Label/constants/line_spacing = 10

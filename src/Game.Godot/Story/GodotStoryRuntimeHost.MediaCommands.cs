@@ -46,9 +46,20 @@ public sealed partial class GodotStoryRuntimeHost
 		await UIRoot.Instance.ShowVideoAsync(stream, cancellationToken);
 	}
 
-	[StoryCommand("suggest", "suggest2")]
-	private ValueTask ExecuteSuggestAsync(string text, CancellationToken cancellationToken) =>
-		new(UIRoot.Instance.ShowSuggestionAsync(text, cancellationToken));
+	[StoryCommand("suggest")]
+	private ValueTask ExecuteSuggestAsync(
+		string text,
+		string title = "提示",
+		CancellationToken cancellationToken = default) =>
+		new(UIRoot.Instance.ShowSuggestionAsync(text, title, cancellationToken: cancellationToken));
+
+	[StoryCommand("suggest2")]
+	private ValueTask ExecuteSuggest2Async(
+		string text,
+		string title = "提示",
+		string acknowledgeText = "确认",
+		CancellationToken cancellationToken = default) =>
+		new(UIRoot.Instance.ShowSuggestionAsync(text, title, acknowledgeText, cancellationToken));
 
 	[StoryCommand("toast")]
 	private ValueTask ExecuteToastAsync(bool enabled)

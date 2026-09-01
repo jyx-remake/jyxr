@@ -14,7 +14,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="金庸群侠传XR"
+config/name="金庸群侠传XR.侠说"
 config/description="金庸群侠传x Godot C# 重置版"
 config/version="0.9.2"
 run/main_scene="res://scenes/ui/mod_launcher/mod_launcher_panel.tscn"

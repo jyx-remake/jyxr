@@ -50,7 +50,11 @@ internal sealed class LargeMapTransform
 
 		if (ViewportSize.X <= 0f || ViewportSize.Y <= 0f)
 		{
-			Reset(viewportSize);
+			// The view was configured before the Control got a real size (for
+			// example a map built in the same frame the world was added). Carry
+			// the configured zoom over instead of falling back to the Reset
+			// default, which is the minimum zoom.
+			Reset(viewportSize, Zoom);
 			return;
 		}
 

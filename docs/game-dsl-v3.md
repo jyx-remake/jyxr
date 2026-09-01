@@ -24,6 +24,11 @@ not story_completed('星宿派_毒物林3胜利') and chance(0.1)
 
 DSL 字符串优先使用单引号，提高 json 可读性。
 
+对白 JSON 的 `speaker` 是显示名，`portrait` 是可选的直接头像资源。例如魔改版 XML
+`头像.女主1,女子#正文` 会转换为
+`{"kind":"dialogue","speaker":"女子","portrait":"头像.女主1","text":"正文"}`；未提供
+`portrait` 时仍按 `speaker` 从角色表解析姓名与头像。
+
 地图与世界触发使用 `action` 和可选 `when`，天关使用可选 `when`。省略 `when` 等价于 `true`。
 
 ### 剧情选项条件
@@ -118,6 +123,7 @@ current_time_slot !in ['子', '丑']
 | --- | --- | --- |
 | `item_count(item_id)` | Number | 背包中的物品数量；未知物品 id 记录 Warning 并返回 `0`。 |
 | `favorability(character_id='女主')` | Number | 指定关系目标的好感；别名 `haogan`。 |
+| `story_number(name, default_value=0)` | Number | 读取可存档数值型剧情变量；不存在时返回给定默认值。适合采药、卷宗、声望等非角色计数器。 |
 | `character_level(character_id)` | Number | 活动队伍角色等级。 |
 | `character_stat(character_id, stat)` | Number | 活动队伍角色基础属性。 |
 | `skill_level(character_id, skill_id)` | Number | 外功或内功等级；角色未学会时为 `0`。 |
@@ -163,8 +169,8 @@ del quest_stage
 
 | 调用 | 说明 | 别名 |
 | --- | --- | --- |
-| `change_item(item_id, delta=1)` | 按正负数量调整物品。 | `item` |
-| `remove_item(item_id, quantity=1)` | 移除正数数量的物品，数量不足时报错。 | `cost_item` |
+| `change_item(item_id, delta=1, show_toast=true)` | 按正负数量调整物品；默认显示获得/失去物品 toast。 | `item` |
+| `remove_item(item_id, quantity=1, show_toast=true)` | 移除正数数量的物品，数量不足时报错；默认显示失去物品 toast。 | `cost_item` |
 | `add_random_item(item_ids, quantity=1)` | 从非空字符串列表随机选择一种并添加。 | `item_random` |
 | `change_silver(delta)` | 按正负值调整银两。 | `get_money` |
 | `change_yuanbao(delta)` | 按正负值调整元宝。 | `yuanbao` |
@@ -173,6 +179,8 @@ del quest_stage
 change_item('小还丹', 5)
 change_item('小还丹', -2)
 remove_item('剧情信物')
+change_item('剧情信物', 1, false)
+remove_item('剧情信物', 1, false)
 add_random_item(['小还丹', '大还丹'], 1)
 change_silver(-500)
 ```
@@ -205,12 +213,16 @@ change_favorability('女主', 5)
 | `journal(text)` | 写入带当前时间快照的江湖日志。 | `log` |
 | `set_flag(name)` | 写入 Boolean flag。 | — |
 | `clear_flag(name)` | 删除 flag；不存在时记录 Warning 并正常返回。 | — |
+| `change_story_number(name, delta)` | 调整非负剧情计数器；不存在时从 `0` 开始，结果最低为 `0`。 | — |
+| `list_story_numbers()` | 把当前存档全部数值型剧情变量及总数写入江湖日志，供作者全局核查。 | — |
 | `set_time_key(key, days, story_id='')` | 创建限时剧情 key；省略 story id 时到期仅移除 key。 | — |
 | `clear_time_key(key)` | 删除限时剧情 key；不存在时记录 Warning 并正常返回。 | — |
 | `world_triggers(enabled)` | 开启或阻塞世界触发。 | — |
 
 ```text
 journal('踏入江湖。')
+change_story_number('xmjh_caiyao', 1)
+list_story_numbers()
 set_time_key('夜探', 3, '夜探失败')
 world_triggers(false)
 ```
@@ -284,10 +296,11 @@ remove_external('主角', '野球拳')
 | `sound(id)` | 播放音效。 | `effect` |
 | `background(id)` | 设置世界背景。 | — |
 | `video(id)` | 播放 `.ogv` 剧情视频并等待结束。 | `movie` |
-| `suggest(text)` | 显示并等待剧情提示。 | — |
+| `suggest(text, title='提示')` | 显示并等待剧情提示，可自定义标题。 | — |
+| `suggest2(text, title='提示', acknowledge_text='确认')` | 显示并等待剧情提示，可同时自定义标题和确认按钮。 | — |
 | `toast(enabled)` | 开启或抑制 toast。 | — |
 
-每个地图事件必须声明在所属地点内唯一且稳定的 `id`。`once` 事件在 command 成功后按 `mapId + locationId + eventId` 记录完成状态，因此调整事件数组顺序不会改变存档语义。地图 action 可调用当前会话注册的任意 StoryCommand，不限于场景指令；世界触发会在派发一次性 command 前记录完成状态，防止换图递归触发。
+每个地图事件必须声明在所属地点内唯一且稳定的 `id`。`once` 事件在 command 成功后按 `mapId + locationId + eventId` 记录触发次数，因此调整事件数组顺序不会改变存档语义。省略 `repeatLimit` 时只允许成功执行 1 次；`repeatLimit: -1` 表示不限次数（仍保留 once 标记供地图感叹号等表现使用）；正整数 N 表示最多成功执行 N 次。事件自身的 `when` 每次都会重新判断，所以无限事件仍会在条件不满足时停止出现。地图 action 可调用当前会话注册的任意 StoryCommand，不限于场景指令；世界触发会在派发一次性 command 前记录完成状态，防止换图递归触发。
 
 ```json
 {
@@ -295,6 +308,13 @@ remove_external('主角', '野球拳')
   "action": "story('笑傲江湖_黑木崖岳父')",
   "repeatMode": "once"
 }
+```
+
+旧版 XML 的 `repeat="once,-1"` 与 `repeat="once,N"` 会分别转换为：
+
+```json
+{ "repeatMode": "once", "repeatLimit": -1 }
+{ "repeatMode": "once", "repeatLimit": 3 }
 ```
 
 ```text

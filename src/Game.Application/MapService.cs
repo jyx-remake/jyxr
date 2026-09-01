@@ -2,6 +2,7 @@ using Game.Core.Abstractions;
 using Game.Core;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Expressions;
 
 namespace Game.Application;
 
@@ -138,7 +139,7 @@ public sealed class MapService
             ConsumedTimeSlots = consumedTimeSlots,
             Movement = movement.Result,
             OriginatingState = State,
-            MapEventCompletionKey = location.Event.RepeatMode == RepeatMode.Once
+            MapEventOccurrenceKey = location.Event.RepeatMode == RepeatMode.Once
                 ? new MapEventKey(location.MapId, location.Location.Id, location.Event.Id)
                 : null,
         };
@@ -177,8 +178,7 @@ public sealed class MapService
     {
         foreach (var mapEvent in location.Events)
         {
-            if (mapEvent.RepeatMode == RepeatMode.Once &&
-                IsOnceEventCompleted(mapId, location.Id, mapEvent.Id))
+            if (HasReachedRepeatLimit(mapId, location.Id, mapEvent))
             {
                 continue;
             }
@@ -241,14 +241,43 @@ public sealed class MapService
     {
         ArgumentNullException.ThrowIfNull(interaction);
         if (ReferenceEquals(interaction.OriginatingState, State) &&
-            interaction.MapEventCompletionKey is { } eventKey)
+            interaction.MapEventOccurrenceKey is { } eventKey)
         {
-            State.MapEventProgress.MarkCompleted(eventKey.MapId, eventKey.LocationId, eventKey.EventId);
+            State.MapEventProgress.RecordOccurrence(eventKey.MapId, eventKey.LocationId, eventKey.EventId);
         }
     }
 
-    private bool IsOnceEventCompleted(string mapId, string locationId, string eventId) =>
-        State.MapEventProgress.IsCompleted(mapId, locationId, eventId);
+    private bool HasReachedRepeatLimit(
+        string mapId,
+        string locationId,
+        MapEventDefinition mapEvent)
+    {
+        if (mapEvent.RepeatMode != RepeatMode.Once || mapEvent.RepeatLimit == -1)
+        {
+            return false;
+        }
+
+        var limit = mapEvent.RepeatLimit ?? 1;
+        var occurrenceCount = TryGetRepeatedStoryId(mapEvent, out var storyId)
+            ? State.Story.GetCompletionCount(storyId)
+            : State.MapEventProgress.GetOccurrenceCount(mapId, locationId, mapEvent.Id);
+        return occurrenceCount >= limit;
+    }
+
+    private static bool TryGetRepeatedStoryId(MapEventDefinition mapEvent, out string storyId)
+    {
+        storyId = string.Empty;
+        if (!string.Equals(mapEvent.Action.Root.Name, "story", StringComparison.Ordinal) ||
+            mapEvent.Action.Root.Arguments.Count != 1 ||
+            mapEvent.Action.Root.Arguments[0] is not LiteralExpressionSyntax literal ||
+            literal.Value.Kind != ExpressionValueKind.String)
+        {
+            return false;
+        }
+
+        storyId = literal.Value.AsString("map story repeat target");
+        return !string.IsNullOrWhiteSpace(storyId);
+    }
 
 }
 
@@ -268,7 +297,7 @@ public sealed record MapInteractionResult
     public MapMovementResult? Movement { get; init; }
     public string? Message { get; init; }
     internal GameState? OriginatingState { get; init; }
-    internal MapEventKey? MapEventCompletionKey { get; init; }
+    internal MapEventKey? MapEventOccurrenceKey { get; init; }
 }
 
 public sealed record MapMovementResult(

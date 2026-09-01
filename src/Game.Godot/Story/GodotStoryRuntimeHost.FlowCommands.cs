@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Core.Model;
+using Game.Core.Story;
 using Game.Godot.UI;
 
 namespace Game.Godot.Story;
@@ -75,10 +76,10 @@ public sealed partial class GodotStoryRuntimeHost
 	}
 
 	[StoryCommand("game_over", "gameover")]
-	private ValueTask ExecuteGameOverAsync()
+	private ValueTask<StoryCommandResult> ExecuteGameOverAsync()
 	{
 		GameFlow.GameOver();
-		return ValueTask.CompletedTask;
+		return ValueTask.FromResult(StoryCommandResult.Terminate);
 	}
 
 	[StoryCommand("game_complete", "gamefin")]

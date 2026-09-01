@@ -18,6 +18,20 @@ public partial class World : Control
 
 	public Control? CurrentScene { get; private set; }
 
+	/// <summary>
+	/// Raised whenever the shared world backdrop changes. Both the map screen
+	/// (which paints the current map picture) and the story runtime (the
+	/// `background` command) write through <see cref="SetBackground"/>, so
+	/// subscribers can tell a story-provided backdrop apart from the map's own.
+	/// </summary>
+	public event Action<string?>? BackdropChanged;
+
+	/// <summary>
+	/// Resource id of the backdrop currently shown behind every scene, or null
+	/// when no backdrop is set.
+	/// </summary>
+	public string? CurrentBackdropId { get; private set; }
+
 	public AutoSaveCoordinator AutoSave { get; private set; } = null!;
 	public PlayTimeCoordinator PlayTime { get; private set; } = null!;
 
@@ -55,10 +69,21 @@ public partial class World : Control
 	{
 		_background.Texture = AssetResolver.LoadTexture(resourceId);
 		_background.Visible = _background.Texture is not null;
+		CurrentBackdropId = _background.Texture is null ? null : resourceId;
+		BackdropChanged?.Invoke(CurrentBackdropId);
 	}
 
 	private MapScreen ShowMap(MapEnterResult result)
 	{
+		// Every map (re)build funnels through here. The map screen is replaced
+		// from scratch, so flush any large-map zoom change that the delayed
+		// save timer has not persisted yet; otherwise the replacement view
+		// restores a stale zoom (e.g. the minimum) right after a story event.
+		if (CurrentScene is MapScreen currentMapScreen)
+		{
+			currentMapScreen.FlushLargeMapZoom();
+		}
+
 		var instance = MapScreenScene.Instantiate();
 		if (instance is not MapScreen mapScreen)
 		{

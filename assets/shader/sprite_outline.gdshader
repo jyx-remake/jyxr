@@ -2,17 +2,21 @@ shader_type canvas_item;
 render_mode unshaded;
 
 uniform vec4 outline_color : source_color = vec4(0.0, 0.0, 0.0, 0.55);
-uniform float outline_width_px : hint_range(0.5, 4.0, 0.1) = 2.0;
+// 描边宽度（纹理像素 / texel）。缩放时描边与图标等比缩放，视觉粗细恒定。
+// 典型值：2 ~ 5 texels。旧版 screen-pixel 模式已移除（缩小描边粗、放大描边细的问题）。
+uniform float outline_width_texels : hint_range(0.5, 12.0, 0.5) = 3.0;
 uniform float alpha_threshold : hint_range(0.0, 1.0, 0.01) = 0.01;
 
-const int OUTLINE_SAMPLES = 16;
+const int OUTLINE_SAMPLES = 32;
 
 varying vec4 canvas_modulate;
 
 void vertex() {
 	canvas_modulate = COLOR;
 
-	float geometry_margin_px = ceil(outline_width_px) + 1.0;
+	// 顶点扩展：固定屏幕像素余量，仅确保描边区域被渲染到。
+	// 实际描边粗细由 fragment 阶段的纹理相对宽度控制，不受此值影响。
+	float geometry_margin_px = 6.0;
 	vec2 canvas_direction = sign(UV - vec2(0.5));
 	mat4 local_to_canvas_transform = CANVAS_MATRIX * MODEL_MATRIX;
 	mat2 local_to_canvas = mat2(
@@ -30,25 +34,26 @@ float uv_bounds_mask(vec2 uv) {
 }
 
 void fragment() {
-	float geometry_margin_px = ceil(outline_width_px) + 1.0;
-	vec2 uv_per_screen_pixel = vec2(
-		length(vec2(dFdx(UV.x), dFdy(UV.x))),
-		length(vec2(dFdx(UV.y), dFdy(UV.y)))
-	);
-	vec2 uv_inset = geometry_margin_px * uv_per_screen_pixel;
-	vec2 source_uv = (UV - uv_inset) / (vec2(1.0) - 2.0 * uv_inset);
+	// ── 纹理像素 → UV 空间（缩放不变的核心）──
+	// TEXTURE_PIXEL_SIZE 是 Godot 内置 uniform：每个 texel 占多少 UV 单位。
+	// 例如 128×128 纹理 → texel_size ≈ (0.0078, 0.0078)
+	vec2 texel_size = TEXTURE_PIXEL_SIZE;
+	float texel_scale = max(texel_size.x, texel_size.y); // 取长边保证非方形图标也够宽
+
+	float outline_uv_radius = outline_width_texels * texel_scale;
+	float geometry_uv_margin = 6.0 * texel_scale;
+
+	vec2 source_uv = (UV - vec2(geometry_uv_margin)) / (vec2(1.0) - 2.0 * vec2(geometry_uv_margin));
 
 	vec4 base = texture(TEXTURE, clamp(source_uv, vec2(0.0), vec2(1.0))) *
 		uv_bounds_mask(source_uv);
-	vec2 source_uv_dx = dFdx(source_uv);
-	vec2 source_uv_dy = dFdy(source_uv);
 	float dilated_alpha = base.a;
 
+	// ── 在纯 UV 空间中做方向采样（不再依赖 dFdx/dFdy 做屏幕→UV 转换）──
 	for (int i = 0; i < OUTLINE_SAMPLES; i++) {
 		float angle = TAU * float(i) / float(OUTLINE_SAMPLES);
 		vec2 direction = vec2(cos(angle), sin(angle));
-		vec2 sample_uv = source_uv +
-			(source_uv_dx * direction.x + source_uv_dy * direction.y) * outline_width_px;
+		vec2 sample_uv = source_uv + direction * outline_uv_radius;
 		float sample_alpha = texture(
 			TEXTURE,
 			clamp(sample_uv, vec2(0.0), vec2(1.0))

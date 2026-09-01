@@ -8,6 +8,8 @@ public sealed record SegmentStartedEvent(
 public sealed record SegmentCompletedEvent(
     string SegmentId) : StoryEvent;
 
+public sealed record StoryTerminatedEvent : StoryEvent;
+
 public sealed record DialogueReadyEvent(
     DialogueContext Dialogue) : StoryEvent;
 
@@ -45,7 +47,8 @@ public sealed record JumpEvent(
 
 public sealed record DialogueContext(
     string Speaker,
-    string Text);
+    string Text,
+    string? Portrait = null);
 
 public sealed record ChoiceContext(
     string PromptSpeaker,

@@ -49,7 +49,10 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
 
     public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) =>
         _externalHost.DialogueAsync(
-            new DialogueContext(_textInterpolator.Interpolate(dialogue.Speaker), _textInterpolator.Interpolate(dialogue.Text)),
+            new DialogueContext(
+                _textInterpolator.Interpolate(dialogue.Speaker),
+                _textInterpolator.Interpolate(dialogue.Text),
+                dialogue.Portrait is null ? null : _textInterpolator.Interpolate(dialogue.Portrait)),
             cancellationToken);
 
     public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken) =>

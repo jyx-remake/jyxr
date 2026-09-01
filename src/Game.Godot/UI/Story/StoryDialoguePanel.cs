@@ -11,6 +11,7 @@ public partial class StoryDialoguePanel : Control
 	private TaskCompletionSource<bool>? _completionSource;
 	private string _speaker = string.Empty;
 	private string _text = string.Empty;
+	private string? _portrait;
 	private AvatarBox _avatarBox = null!;
 	private Label _speakerLabel = null!;
 	private AutoFitRichTextLabel _contentLabel = null!;
@@ -81,10 +82,11 @@ public partial class StoryDialoguePanel : Control
 		}
 	}
 
-	public void Configure(string? speaker, string? text)
+	public void Configure(string? speaker, string? text, string? portrait = null)
 	{
 		_speaker = speaker?.Trim() ?? string.Empty;
 		_text = text ?? string.Empty;
+		_portrait = string.IsNullOrWhiteSpace(portrait) ? null : portrait.Trim();
 		_completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
 		PresentationVersion += 1;
 
@@ -125,7 +127,7 @@ public partial class StoryDialoguePanel : Control
 			return;
 		}
 
-		var (displayName, portrait) = AssetResolver.ResolveSpeakerPresentation(_speaker);
+		var (displayName, portrait) = AssetResolver.ResolveSpeakerPresentation(_speaker, _portrait);
 		var hasSpeaker = !string.IsNullOrWhiteSpace(displayName);
 
 		_avatarBox.Visible = portrait is not null;

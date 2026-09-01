@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Core.Model;
+using Game.Core.Story;
 using Game.Godot.UI;
 
 namespace Game.Godot.Story;
@@ -7,7 +8,7 @@ namespace Game.Godot.Story;
 public sealed partial class GodotStoryRuntimeHost
 {
 	[StoryCommand("story")]
-	private async ValueTask ExecuteStoryAsync(string storyId, CancellationToken cancellationToken)
+	private async ValueTask<StoryCommandResult> ExecuteStoryAsync(string storyId, CancellationToken cancellationToken)
 	{
 		var wasStoryPresentationActive = UIRoot.Instance.IsStoryPresentationActive;
 		if (!wasStoryPresentationActive)
@@ -18,11 +19,16 @@ public sealed partial class GodotStoryRuntimeHost
 		try
 		{
 			var executionState = Game.State;
-			if (!await StoryRunHelper.RunAsync(storyId, cancellationToken) &&
+			var result = await StoryRunHelper.RunAsync(storyId, cancellationToken);
+			if (!result.WasHandled &&
 				ReferenceEquals(executionState, Game.State))
 			{
 				throw new InvalidOperationException($"Story command '{storyId}' did not complete a segment.");
 			}
+
+			return result.Terminated
+				? StoryCommandResult.Terminate
+				: StoryCommandResult.None;
 		}
 		finally
 		{
@@ -31,6 +37,15 @@ public sealed partial class GodotStoryRuntimeHost
 				UIRoot.Instance.SetStoryPresentationActive(false);
 			}
 		}
+	}
+
+	[StoryCommand("story_by_hero_name")]
+	private ValueTask<StoryCommandResult> ExecuteStoryByHeroNameAsync(
+		string prefix = "豪名_",
+		CancellationToken cancellationToken = default)
+	{
+		var hero = Game.State.Party.GetMember(Party.HeroCharacterId);
+		return ExecuteStoryAsync($"{prefix}{hero.Name}", cancellationToken);
 	}
 
 	[StoryCommand("map", "set_map", "tutorial")]

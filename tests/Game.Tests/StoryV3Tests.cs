@@ -9,6 +9,23 @@ namespace Game.Tests;
 public sealed class StoryV3Tests
 {
     [Fact]
+    public void JsonParser_PreservesDirectDialoguePortraitOverride()
+    {
+        var script = StoryScriptJson.Parse("""
+        {"version":3,"segments":[{"name":"start","steps":[
+          {"kind":"dialogue","speaker":"女子","portrait":"头像.女主1","text":"公子难道忘了吗？"},
+          {"kind":"dialogue","speaker":"主角","text":"没有。"}
+        ]}]}
+        """, "direct-dialogue-portrait");
+
+        var first = Assert.IsType<DialogueStep>(script.Segments[0].Steps[0]);
+        Assert.Equal("女子", first.Speaker);
+        Assert.Equal("头像.女主1", first.Portrait);
+        var second = Assert.IsType<DialogueStep>(script.Segments[0].Steps[1]);
+        Assert.Null(second.Portrait);
+    }
+
+    [Fact]
     public void JsonParser_JsonObjectAndStringEntrypointsProduceEquivalentIr()
     {
         const string json = """
@@ -202,6 +219,29 @@ public sealed class StoryV3Tests
         Assert.Contains("继续", host.DialogueTexts);
         Assert.Single(events.OfType<CommandFailedEvent>());
         Assert.True(session.State.Story.IsStoryCompleted("start"));
+    }
+
+    [Fact]
+    public async Task Runtime_TerminatingCommandStopsStoryWithoutMarkingSegmentCompleted()
+    {
+        var script = StoryScriptJson.Parse("""
+        {"version":3,"segments":[{"name":"start","steps":[
+          {"kind":"command","call":"terminate_story()"},
+          {"kind":"dialogue","speaker":"主角","text":"不应继续"}
+        ]}]}
+        """);
+        var host = new RecordingHost();
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]), host);
+
+        var events = new List<StoryEvent>();
+        await foreach (var storyEvent in session.StoryService.RunAsync("start"))
+        {
+            events.Add(storyEvent);
+        }
+
+        Assert.Empty(host.DialogueTexts);
+        Assert.False(session.State.Story.IsStoryCompleted("start"));
+        Assert.Single(events.OfType<StoryTerminatedEvent>());
     }
 
     [Fact]
@@ -483,10 +523,15 @@ public sealed class StoryV3Tests
         var host = new RecordingHost { BattleOutcome = outcome };
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]), host);
 
-        await session.StoryService.ExecuteAsync("start");
+        var events = new List<StoryEvent>();
+        await foreach (var storyEvent in session.StoryService.RunAsync("start"))
+        {
+            events.Add(storyEvent);
+        }
 
         Assert.Equal(expectedGameOver, host.GameOverInvoked);
         Assert.Equal(expectedContinuation, host.DialogueTexts.Contains("继续"));
+        Assert.Equal(expectedGameOver, events.OfType<StoryTerminatedEvent>().Count() == 1);
     }
 
     private sealed class RecordingHost : IRuntimeHost
@@ -498,6 +543,8 @@ public sealed class StoryV3Tests
         public bool GameOverInvoked { get; private set; }
         public bool ContinueOnCommandFailure { get; init; }
         public List<(string Name, string Message)> CommandFailures { get; } = [];
+        [StoryCommand("terminate_story")]
+        public StoryCommandResult TerminateStory() => StoryCommandResult.Terminate;
         public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) { DialogueTexts.Add(dialogue.Text); return ValueTask.CompletedTask; }
         public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken)
         {

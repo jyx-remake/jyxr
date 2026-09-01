@@ -55,6 +55,12 @@ public sealed record MapEventDefinition
 
     public RepeatMode RepeatMode { get; init; } = RepeatMode.Infinite;
 
+    /// <summary>
+    /// Maximum number of successful interactions for a once-marked event.
+    /// Null means the traditional single occurrence; -1 means unlimited.
+    /// </summary>
+    public int? RepeatLimit { get; init; }
+
     public string? Image { get; init; }
 
     public string? Description { get; init; }

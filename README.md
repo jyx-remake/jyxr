@@ -244,6 +244,7 @@
 - `StoryCommandLineService`
   - 支持把一行文本解析成剧情命令并直接执行。
   - 当前由系统面板内置控制台接入，方便在预览环境里触发内建命令或宿主命令。
+  - `list_story_numbers()` 会把当前存档中所有数值型剧情变量、变量总数和具体值写入江湖日志，便于作者全局核查特殊计数器。
 - 正式 story JSON 中对白应使用 `kind == "dialogue"`；旧 `dialog` 命令不作为应用层内建命令承载普通对白。
 - 开局问卷的难度选择会通过 `set_game_mode` 写入 `AdventureState.Difficulty`。
 - `StoryCommandDispatcher`
@@ -252,9 +253,13 @@
   - `log` 会把日志条目追加到 `GameState.Journal`。
   - `set_time_key key limitDays [targetStoryId]` 会登记限时剧情 key；严格超过天数后移除，存在目标剧情时才触发跳转；`clear_time_key key` 会取消登记。
   - `input_name` 打开宿主改名 UI；如果目标角色不在 `Party` 名册中，会创建角色实例并放入 `Reserves` 后再改名。
+  - `change_item` / `remove_item` 的第三参数控制物品 toast；普通剧情默认显示，旧版 `获得物品` / `减少物品` 转换时显式传 `false`，保持其无弹窗语义。
+  - 兼容旧 XMJH 分支后缀物品名：若 `队友表决令3` 这类名称没有独立定义但去掉数字后缀的基础物品存在，会按基础物品执行；真正不存在的物品仍会报告错误。
 - `StoryTextInterpolator`
-  - 当前在应用层对白/选项进入宿主前处理 `$MALE$` 与 `$FEMALE$`。
-  - 只解析主角和女主显示名，优先查 `Party` 全名册，其次查角色 definition；未知占位符保持原文本。
+  - 当前在应用层对白/选项进入宿主前处理 `$MALE$`、`$FEMALE$`、`$ZHENLONG_LEVEL$` 和存档剧情变量。
+  - 主角和女主显示名优先查 `Party` 全名册，其次查角色 definition；未知占位符保持原文本。
+  - 数值变量可直接写入对白，例如 `你已采药$xmjh_caiyao$次。`；DSL 原生支持的汉字变量也可写成 `$采药次数$`。
+  - `change_story_number('xmjh_caiyao', 1)` 用于迁移旧版借好感度保存的非负计数器；不存在时从 0 开始，减少时最低保持 0。需要负数时使用 DSL 原生变量赋值/加减。
 - `StoryTimeKeyExpirationService`
   - 根据当前 `ClockState` 检查已严格超过期限的 story time key。
   - 到期后移除 key、发布 `StoryStateChangedEvent`，并仅为非空目标返回要执行的 story id。
@@ -265,6 +270,7 @@
 - `GodotStoryRuntimeHost`
   - 负责剧情等待式 UI 和宿主表现命令。
   - 当前支持对话、选项、音乐、音效、背景、全屏视频、提示、toast 开关、震屏、头像/模型、门派选择、命名、头像选择、roll 点、`map` 场景动作、`shop` 商店面板、出战选择、战斗界面、返回主菜单、重开、下一周目和 game over。
+  - `suggest(text, title)` 与 `suggest2(text, title, acknowledgeText)` 可复用同一提示框并覆盖标题/确认按钮；`story_by_hero_name('豪名_')` 按当前主角名进入对应豪名剧情段。
 
 ## Godot 宿主
 
@@ -378,9 +384,11 @@ dotnet test engine-free-rpg.sln
 dotnet build engine-free-rpg.csproj
 # 从 XMJH/lua/rollrole.lua 重新生成开局答题（默认读取仓库相邻的 XMJH 目录）
 py -3 jyx-legacy-data/scripts/xmjh_rollrole_to_story.py
+# 完整转换、编译、隔离并发布到游戏实际读取的 XMJH MOD 目录
+py -3 jyx-legacy-data/scripts/xmjh_convert.py --runtime-data mods/xmjh/data
 ```
 
-XMJH 的开局答题运行入口是 `mods/xmjh/data/stories/starting-quiz.story.json` 的 `开局答题` 段；该文件由上面的转换器生成，不要直接手改生成结果。资源解析会先查活动 MOD 的 PCK（`Heads`、`Items`、`Maps`、`Audios`、`UI`、`Movies` 等目录），再回退到内置 `assets`。
+`jyx-legacy-data/json` 下的内容是中间产物，游戏不会直接读取；改完转换规则后必须运行带 `--runtime-data` 的完整命令刷新 `mods/xmjh/data`。XMJH 的开局答题运行入口是 `mods/xmjh/data/stories/starting-quiz.story.json` 的 `开局答题` 段；该文件由上面的转换器生成，不要直接手改生成结果。资源解析会先查活动 MOD 的 PCK（`Heads`、`Items`、`Maps`、`Audios`、`UI`、`Movies` 等目录），再回退到内置 `assets`。
 
 ## 参考文档
 

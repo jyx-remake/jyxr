@@ -6,11 +6,19 @@
 [ext_resource type="Shader" uid="uid://c7brj7umavgfi" path="res://assets/shader/sprite_outline.gdshader" id="3_oa2wd"]
 [ext_resource type="Script" uid="uid://duhttbdfcpoxq" path="res://src/Game.Godot/UI/Base/OverflowTextureRect.cs" id="4_overflow"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_i7uqr"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_native"]
+resource_local_to_scene = true
 shader = ExtResource("3_oa2wd")
-shader_parameter/outline_color = Color(0, 0, 0, 0.55)
-shader_parameter/outline_width_px = 2.0
-shader_parameter/alpha_threshold = 0.01
+shader_parameter/outline_color = Color(0, 0, 0, 0.7058824)
+shader_parameter/outline_width_texels = 2.0
+shader_parameter/alpha_threshold = 0.01999999955296
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_i7uqr"]
+resource_local_to_scene = true
+shader = ExtResource("3_oa2wd")
+shader_parameter/outline_color = Color(0, 0, 0, 0.7411765)
+shader_parameter/outline_width_texels = 7.0
+shader_parameter/alpha_threshold = 0.20999999530608
 
 [sub_resource type="LabelSettings" id="LabelSettings_name"]
 font_size = 25
@@ -61,6 +69,7 @@ anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1_script")
 DefaultTexture = ExtResource("2_noevent")
+NativeOutlineMaterial = SubResource("ShaderMaterial_native")
 
 [node name="Visual" type="Control" parent="." unique_id=1959128841]
 unique_name_in_owner = true

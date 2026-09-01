@@ -154,6 +154,7 @@ internal sealed partial class StoryRuntimeSession
             {
                 await host.GameOverAsync(ct);
                 yield return StepResult.FromEvent(new BattleResolvedEvent(context, selectedOutcome));
+                yield return StepResult.FromEvent(new StoryTerminatedEvent());
                 yield return StepResult.Terminate();
                 yield break;
             }

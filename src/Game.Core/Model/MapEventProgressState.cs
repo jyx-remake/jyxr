@@ -4,9 +4,9 @@ namespace Game.Core.Model;
 
 public sealed class MapEventProgressState
 {
-    private readonly HashSet<MapEventKey> _completedEvents = [];
+    private readonly Dictionary<MapEventKey, int> _occurrences = [];
 
-    public IReadOnlyCollection<MapEventKey> CompletedEvents => _completedEvents;
+    public IReadOnlyCollection<MapEventKey> CompletedEvents => _occurrences.Keys;
 
     public static MapEventProgressState Restore(MapEventProgressRecord record)
     {
@@ -15,10 +15,24 @@ public sealed class MapEventProgressState
         var state = new MapEventProgressState();
         foreach (var completedEvent in record.CompletedEvents ?? [])
         {
-            state._completedEvents.Add(CreateKey(
+            state._occurrences.TryAdd(CreateKey(
                 completedEvent.MapId,
                 completedEvent.LocationId,
-                completedEvent.EventId));
+                completedEvent.EventId), 1);
+        }
+
+        foreach (var occurrence in record.Occurrences ?? [])
+        {
+            if (occurrence.Count <= 0)
+            {
+                throw new InvalidDataException(
+                    $"Map event occurrence count must be positive, but was {occurrence.Count}.");
+            }
+
+            state._occurrences[CreateKey(
+                occurrence.MapId,
+                occurrence.LocationId,
+                occurrence.EventId)] = occurrence.Count;
         }
 
         return state;
@@ -26,16 +40,28 @@ public sealed class MapEventProgressState
 
     public bool IsCompleted(string mapId, string locationId, string eventId)
     {
-        return _completedEvents.Contains(CreateKey(mapId, locationId, eventId));
+        return GetOccurrenceCount(mapId, locationId, eventId) > 0;
     }
 
     public void MarkCompleted(string mapId, string locationId, string eventId)
     {
-        _completedEvents.Add(CreateKey(mapId, locationId, eventId));
+        _occurrences.TryAdd(CreateKey(mapId, locationId, eventId), 1);
+    }
+
+    public int GetOccurrenceCount(string mapId, string locationId, string eventId) =>
+        _occurrences.GetValueOrDefault(CreateKey(mapId, locationId, eventId));
+
+    public int RecordOccurrence(string mapId, string locationId, string eventId)
+    {
+        var key = CreateKey(mapId, locationId, eventId);
+        var current = _occurrences.GetValueOrDefault(key);
+        var next = current == int.MaxValue ? int.MaxValue : current + 1;
+        _occurrences[key] = next;
+        return next;
     }
 
     public MapEventProgressRecord ToRecord() =>
-        new(_completedEvents
+        new(_occurrences.Keys
             .OrderBy(static key => key.MapId, StringComparer.Ordinal)
             .ThenBy(static key => key.LocationId, StringComparer.Ordinal)
             .ThenBy(static key => key.EventId, StringComparer.Ordinal)
@@ -43,7 +69,18 @@ public sealed class MapEventProgressState
                 key.MapId,
                 key.LocationId,
                 key.EventId))
-            .ToArray());
+            .ToArray(),
+            _occurrences
+                .Where(static pair => pair.Value > 1)
+                .OrderBy(static pair => pair.Key.MapId, StringComparer.Ordinal)
+                .ThenBy(static pair => pair.Key.LocationId, StringComparer.Ordinal)
+                .ThenBy(static pair => pair.Key.EventId, StringComparer.Ordinal)
+                .Select(static pair => new MapEventOccurrenceRecord(
+                    pair.Key.MapId,
+                    pair.Key.LocationId,
+                    pair.Key.EventId,
+                    pair.Value))
+                .ToArray());
 
     private static MapEventKey CreateKey(string mapId, string locationId, string eventId)
     {

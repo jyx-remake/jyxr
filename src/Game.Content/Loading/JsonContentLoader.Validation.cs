@@ -60,6 +60,11 @@ public sealed partial class JsonContentLoader
             Ensure(!string.IsNullOrWhiteSpace(title.Id), "CharacterTitle definition has empty id.");
             Ensure(!string.IsNullOrWhiteSpace(title.Name), $"CharacterTitle '{title.Id}' has empty name.");
             Ensure(title.Affixes is not null, $"CharacterTitle '{title.Id}' has null affixes.");
+            if (title.Affixes is null)
+            {
+                continue;
+            }
+
             foreach (var affix in title.Affixes)
             {
                 Ensure(affix is not null, $"CharacterTitle '{title.Id}' contains a null affix.");
@@ -131,6 +136,10 @@ public sealed partial class JsonContentLoader
                     Ensure(!string.IsNullOrWhiteSpace(mapEvent.Id), $"{owner} has an event with an empty id.");
                     Ensure(eventIds.Add(mapEvent.Id),
                         $"{owner} contains duplicate event id '{mapEvent.Id}'.");
+                    Ensure(mapEvent.RepeatLimit is null || mapEvent.RepeatMode == RepeatMode.Once,
+                        $"{owner} event '{mapEvent.Id}' defines repeatLimit without repeatMode 'once'.");
+                    Ensure(mapEvent.RepeatLimit is null || mapEvent.RepeatLimit == -1 || mapEvent.RepeatLimit > 0,
+                        $"{owner} event '{mapEvent.Id}' repeatLimit must be -1 or a positive integer.");
                 }
             }
         }

@@ -28,7 +28,8 @@ script = ExtResource("1_hud_script")
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 90.0
+offset_top = -1.0
+offset_bottom = 89.0
 grow_horizontal = 2
 
 [node name="ShadowPanel" type="Panel" parent="TopBar" unique_id=35497544]
@@ -55,14 +56,19 @@ expand_mode = 1
 layout_mode = 1
 anchor_left = 0.092
 anchor_right = 0.092
+offset_left = -109.99999
+offset_top = 2.999999
+offset_right = -109.99999
+offset_bottom = 2.999999
+scale = Vector2(0.4, 0.4)
 
 [node name="HeroButton" parent="TopBar/HeroWidget" unique_id=75376425 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -152.0
-offset_top = 17.0
-offset_right = 149.0
-offset_bottom = 314.0
+offset_left = 228.0
+offset_top = 14.500004
+offset_right = 529.0
+offset_bottom = 311.5
 tooltip_text = "玩家数据"
 
 [node name="HeroBox" parent="TopBar/HeroWidget/HeroButton" unique_id=1235880245 instance=ExtResource("5_avatar_box")]
@@ -77,6 +83,7 @@ mouse_filter = 2
 
 [node name="RunInfo" type="TextureRect" parent="TopBar/HeroWidget" unique_id=1712729508]
 unique_name_in_owner = true
+visible = false
 layout_mode = 0
 offset_left = 60.0
 offset_top = 224.0
@@ -168,6 +175,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 13.0
+offset_right = 14.0
+offset_bottom = 13.0
 grow_horizontal = 0
 grow_vertical = 0
 
@@ -220,17 +231,15 @@ texture_normal = ExtResource("12_team")
 [node name="SystemButton" parent="BottomRight/MenueButtonGroup" unique_id=2079598957 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -214.41699
 offset_top = -187.27661
 offset_right = 477.583
 offset_bottom = 496.7234
-grow_horizontal = 0
-grow_vertical = 0
+grow_horizontal = 2
+grow_vertical = 2
 tooltip_text = "系统"
 texture_normal = ExtResource("8_system")
 texture_click_mask = ExtResource("13_system_click_mask")

@@ -175,6 +175,14 @@ internal sealed class StoryQueryFunctions
     [ExpressionFunction("has_var")]
     public bool HasVariable(string name) => _session.State.Story.TryGetVariable(name, out _);
 
+    [ExpressionFunction("story_number")]
+    public double StoryNumber(string name, double defaultValue = 0)
+    {
+        return _session.State.Story.TryGetVariable(name, out var value)
+            ? value.AsNumber($"Story variable '{name}'")
+            : defaultValue;
+    }
+
     [ExpressionFunction("has_flag")]
     public bool HasFlag(string name)
     {

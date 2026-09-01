@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="4_filter_button"]
 [ext_resource type="PackedScene" uid="uid://dnacvsxreo2hx" path="res://scenes/ui/inventory_panel/item_target_selection_panel.tscn" id="5_target_panel"]
 [ext_resource type="PackedScene" uid="uid://h5ua5325v82x" path="res://scenes/ui/inventory_panel/inventory_tag_button.tscn" id="6_tag_button"]
+[ext_resource type="Texture2D" uid="uid://4allowhfbyga" path="res://assets/art/misc/btn_cross.png" id="7_nn4jn"]
 
 [sub_resource type="StyleBoxTexture" id="1_button_normal"]
 texture = ExtResource("4_filter_button")
@@ -188,5 +189,10 @@ text = "当前分类下没有物品。"
 horizontal_alignment = 1
 
 [node name="CloseButton" parent="." index="3" unique_id=962603895]
+offset_left = 677.0
+offset_top = -507.0
+offset_right = 877.0
+offset_bottom = -307.0
+texture_normal = ExtResource("7_nn4jn")
 PressOffset = Vector2(2, 2)
 PressColor = Color(0.8, 0.8, 0.8, 1)

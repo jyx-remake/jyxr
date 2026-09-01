@@ -454,6 +454,8 @@ public sealed class SaveGameTests
         var mapEventProgress = new MapEventProgressState();
         mapEventProgress.MarkCompleted("world", "village", "intro");
         mapEventProgress.MarkCompleted("world", "sect_gate", "1");
+        mapEventProgress.RecordOccurrence("unknown_room", "mirror", "1");
+        mapEventProgress.RecordOccurrence("unknown_room", "mirror", "1");
 
         var saveGame = SaveGame.Create(
             new AdventureState(),
@@ -478,6 +480,7 @@ public sealed class SaveGameTests
         Assert.True(restoredProgress.IsCompleted("world", "village", "intro"));
         Assert.True(restoredProgress.IsCompleted("world", "sect_gate", "1"));
         Assert.False(restoredProgress.IsCompleted("world", "unknown", "0"));
+        Assert.Equal(2, restoredProgress.GetOccurrenceCount("unknown_room", "mirror", "1"));
     }
 
     [Fact]

@@ -42,6 +42,7 @@ public partial class LargeMapView : Control
 	private LargeMapMarker? _touchPressedMarker;
 	private LargeMapMarker? _tooltipMarker;
 	private bool _interactionEnabled = true;
+	private bool _inputSuppressed;
 
 	[Export]
 	public PackedScene MarkerScene { get; set; } = null!;
@@ -70,6 +71,9 @@ public partial class LargeMapView : Control
 		{
 			OneShot = true,
 			WaitTime = ZoomSaveDelaySeconds,
+			// 与 PlayTimeCoordinator 一致：剧情或 Mod 指令可能暂停整棵树，
+			// 用 Always 保证缩放保存定时器不会因此停摆，避免缩放变化丢失。
+			ProcessMode = ProcessModeEnum.Always,
 		};
 		_zoomSaveTimer.Timeout += PersistZoom;
 		AddChild(_zoomSaveTimer);
@@ -94,7 +98,7 @@ public partial class LargeMapView : Control
 
 	public override void _GuiInput(InputEvent @event)
 	{
-		if (!_interactionEnabled)
+		if (!_interactionEnabled || _inputSuppressed)
 		{
 			return;
 		}
@@ -210,6 +214,22 @@ public partial class LargeMapView : Control
 		}
 	}
 
+	/// <summary>
+	/// Enables or disables gesture/click handling. Kept separate from the
+	/// transient lock used by the hero movement animation so the two never
+	/// re-enable each other. The map stays visible while a story is presenting,
+	/// so its input must be suppressed instead of relying on being hidden.
+	/// </summary>
+	public void SetInteractionEnabled(bool enabled)
+	{
+		if (!enabled)
+		{
+			ResetInputState();
+		}
+
+		_inputSuppressed = !enabled;
+	}
+
 	public void ResetInputState()
 	{
 		_mousePressed = false;
@@ -268,7 +288,10 @@ public partial class LargeMapView : Control
 			if (child is LargeMapMarker marker)
 			{
 				marker.Position = _transform.Project(marker.LogicalPosition);
+				// marker 自身只按 markerScale 缩放（不影响 label/notice 字号）
+				// IconScaleFactor 在 SetIconScale 中仅作用于 Avatar/OverflowAvatar
 				marker.Scale = markerScale;
+				marker.SetIconScale(markerScale);
 			}
 		}
 
@@ -284,6 +307,7 @@ public partial class LargeMapView : Control
 	private void ApplyHeroLayout(Vector2 markerScale)
 	{
 		_heroPin.Position = _transform.Project(_heroLogicalPosition);
+		// 主角头像跟随 markerScale 一起缩放，保持相对底图比例恒定。
 		_heroPin.Scale = markerScale;
 	}
 
@@ -315,6 +339,22 @@ public partial class LargeMapView : Control
 		{
 			Game.Logger.Error("Failed to save large-map zoom.", exception);
 		}
+	}
+
+	/// <summary>
+	/// Immediately persists a pending zoom change instead of waiting for the
+	/// delayed save timer. Called before the view is rebuilt so the replacement
+	/// map restores the zoom the player currently sees.
+	/// </summary>
+	public void FlushPendingZoomSave()
+	{
+		if (_zoomSaveTimer.TimeLeft <= 0d)
+		{
+			return;
+		}
+
+		_zoomSaveTimer.Stop();
+		PersistZoom();
 	}
 
 	private bool HandleMouseButton(InputEventMouseButton mouseButton)

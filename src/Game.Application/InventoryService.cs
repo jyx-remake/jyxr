@@ -21,16 +21,19 @@ public sealed class InventoryService
 
     private EquipmentInstanceFactory EquipmentInstanceFactory => State.EquipmentInstanceFactory;
 
-    public StackInventoryEntry AddItem(string itemId, int quantity = 1) =>
-        AddItem(_session.ContentRepository.GetItem(itemId), quantity);
+    public StackInventoryEntry AddItem(string itemId, int quantity = 1, bool notifyAcquisition = true) =>
+        AddItem(_session.ContentRepository.GetItem(itemId), quantity, notifyAcquisition);
 
-    public StackInventoryEntry AddItem(ItemDefinition item, int quantity = 1)
+    public StackInventoryEntry AddItem(ItemDefinition item, int quantity = 1, bool notifyAcquisition = true)
     {
         ArgumentNullException.ThrowIfNull(item);
 
         var entry = Inventory.AddItem(item, quantity);
         _session.Events.Publish(new InventoryChangedEvent());
-        _session.Events.Publish(new ItemAcquiredEvent(item.Id, item.Name, quantity));
+        if (notifyAcquisition)
+        {
+            _session.Events.Publish(new ItemAcquiredEvent(item.Id, item.Name, quantity));
+        }
         return entry;
     }
 

@@ -118,14 +118,21 @@ public partial class XmjhAnimationLibrarySmoke : SceneTree
 			}
 		}
 
-		if (AssetResolver.LoadCombatantAnimation("baihu") is null)
+		var representativeCombatant = ResourceLoader.Load<AnimationLibrary>(
+			$"{RootPath}/combatant/baihu.tres");
+		if (representativeCombatant is null)
 		{
-			errors.Add("AssetResolver could not load representative combatant animation: baihu");
+			errors.Add("Could not load representative combatant animation: baihu");
+		}
+		else if (!representativeCombatant.HasMeta("hide_system_shadow") ||
+			!representativeCombatant.GetMeta("hide_system_shadow").AsBool())
+		{
+			errors.Add("Representative combatant animation did not preserve shadow=true metadata: baihu");
 		}
 
-		if (AssetResolver.LoadSkillAnimation("jn1") is null)
+		if (ResourceLoader.Load<AnimationLibrary>($"{RootPath}/skill/jn1.tres") is null)
 		{
-			errors.Add("AssetResolver could not load representative skill animation: jn1");
+			errors.Add("Could not load representative skill animation: jn1");
 		}
 
 		GD.Print($"XMJH_ANIMATION_SMOKE libraries={libraryCount} animations={animationCount} tracks={trackCount} keys={keyCount} errors={errors.Count}");

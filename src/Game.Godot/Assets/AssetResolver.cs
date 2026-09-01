@@ -11,7 +11,6 @@ public static class AssetResolver
 {
 	private const string AssetsDirectoryPath = "res://assets";
 	private const string AnimationDirectoryPath = "res://assets/animation";
-	private const string XmjhAnimationDirectoryPath = "res://mods/xmjh/resources/converted/AnimationLibraries";
 	private static readonly IReadOnlyDictionary<string, string> LegacyResourceDirectories =
 		new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 		{
@@ -97,25 +96,27 @@ public static class AssetResolver
 		return characterId;
 	}
 
-	public static (string DisplayName, Texture2D? Portrait) ResolveSpeakerPresentation(string? speaker)
+	public static (string DisplayName, Texture2D? Portrait) ResolveSpeakerPresentation(
+		string? speaker,
+		string? portraitOverride = null)
 	{
 		var normalizedSpeaker = speaker?.Trim() ?? string.Empty;
 		if (string.IsNullOrWhiteSpace(normalizedSpeaker))
 		{
-			return (string.Empty, null);
+			return (string.Empty, LoadTexture(portraitOverride));
 		}
 
 		if (Game.PartyService.TryFindAllMember(normalizedSpeaker, out var character))
 		{
-			return (character.Name, LoadTexture(character.Portrait));
+			return (character.Name, LoadTexture(portraitOverride ?? character.Portrait));
 		}
 
 		if (TryGetCharacterByIdOrName(normalizedSpeaker, out var definition))
 		{
-			return (definition.Name, LoadTexture(definition.Portrait));
+			return (definition.Name, LoadTexture(portraitOverride ?? definition.Portrait));
 		}
 
-		return (normalizedSpeaker, null);
+		return (normalizedSpeaker, LoadTexture(portraitOverride));
 	}
 
 	private static T? LoadMedia<T>(
@@ -218,11 +219,9 @@ public static class AssetResolver
 		var normalizedResourceId = resourceId.Trim();
 		var resourcePath = normalizedResourceId.StartsWith("res://", StringComparison.Ordinal)
 			? ResolveAnimationPath(normalizedResourceId)
-			: new[]
-			{
-				ResolveAnimationPath($"{AnimationDirectoryPath}/{category}/{normalizedResourceId}"),
-				ResolveAnimationPath($"{XmjhAnimationDirectoryPath}/{category}/{normalizedResourceId}"),
-			}.FirstOrDefault(static path => path is not null);
+			: GetCandidateAnimationPaths(normalizedResourceId, category)
+				.Select(ResolveAnimationPath)
+				.FirstOrDefault(static path => path is not null);
 		if (resourcePath is null)
 		{
 			Game.Logger.Warning($"AnimationLibrary resource does not exist: {normalizedResourceId}");
@@ -230,6 +229,24 @@ public static class AssetResolver
 		}
 
 		return ResourceLoader.Load<AnimationLibrary>(resourcePath);
+	}
+
+	private static IEnumerable<string> GetCandidateAnimationPaths(string resourceId, string category)
+	{
+		// Animation libraries obey the same override direction as media assets:
+		// the last addon wins, then the primary mod, and built-in engine assets
+		// are only a fallback.  A standalone game mod can therefore package its
+		// complete animation closure without a hard-coded dependency on XMJH or
+		// jyxr-base.
+		if (Game.IsInitialized)
+		{
+			foreach (var mod in Game.ActiveModLoadout.ModsInLoadOrder.Reverse())
+			{
+				yield return $"res://mods/{mod.ModId}/resources/converted/AnimationLibraries/{category}/{resourceId}";
+			}
+		}
+
+		yield return $"{AnimationDirectoryPath}/{category}/{resourceId}";
 	}
 
 	private static bool TryGetCharacterById(string characterId, out CharacterDefinition definition)

@@ -243,7 +243,7 @@ public sealed class MapServiceTests
                 ],
                 hideWhenNoEvent: true));
         var state = new GameState();
-        state.MapEventProgress.MarkCompleted("world", "village", WorldVillageEventId);
+        state.Story.MarkCompleted("story_intro");
         var session = new GameSession(state, TestContentFactory.CreateRepository(maps: [worldMap]));
 
         Assert.Empty(session.MapService.EnterMap("world").Locations);
@@ -395,7 +395,7 @@ public sealed class MapServiceTests
     }
 
     [Fact]
-    public void EnterMap_StoryCompletionDoesNotReplaceMapEventIdentity()
+    public void EnterMap_OnceStoryEventUsesGlobalStoryCompletion()
     {
         var worldMap = CreateMap(
             "world",
@@ -420,11 +420,11 @@ public sealed class MapServiceTests
 
         var enterResult = session.MapService.EnterMap("world");
 
-        Assert.NotNull(enterResult.Locations.Single().Event);
+        Assert.Null(enterResult.Locations.Single().Event);
     }
 
     [Fact]
-    public void EnterMap_OnceEvent_WhenMapEventProgressCompleted_DoesNotTrigger()
+    public void EnterMap_OnceStoryEventIgnoresPerLocationMapProgress()
     {
         var worldMap = CreateMap(
             "world",
@@ -449,7 +449,107 @@ public sealed class MapServiceTests
 
         var location = session.MapService.EnterMap("world").Locations.Single();
 
-        Assert.Null(location.Event);
+        Assert.NotNull(location.Event);
+    }
+
+    [Fact]
+    public void EnterMap_OnceStorySharedByMultipleLocationsDisappearsGloballyAfterCompletion()
+    {
+        var sharedStory = Call("story('家剧情')");
+        var map = CreateMap(
+            "家",
+            MapKind.Small,
+            CreateLocation("软体二代", events: [new MapEventDefinition
+            {
+                Id = "1",
+                Action = sharedStory,
+                RepeatMode = RepeatMode.Once,
+            }]),
+            CreateLocation("南贤二代", events: [new MapEventDefinition
+            {
+                Id = "1",
+                Action = sharedStory,
+                RepeatMode = RepeatMode.Once,
+            }]),
+            CreateLocation("北丑二代", events: [new MapEventDefinition
+            {
+                Id = "1",
+                Action = sharedStory,
+                RepeatMode = RepeatMode.Once,
+            }]));
+        var state = new GameState();
+        var session = new GameSession(state, TestContentFactory.CreateRepository(maps: [map]));
+
+        Assert.Equal(3, session.MapService.EnterMap("家").Locations.Count);
+
+        state.Story.MarkCompleted("家剧情");
+
+        Assert.Empty(session.MapService.EnterMap("家").Locations);
+    }
+
+    [Fact]
+    public void EnterMap_UnlimitedOnceEvent_RemainsAvailableWhileConditionMatches()
+    {
+        var mapEvent = new MapEventDefinition
+        {
+            Id = "mirror",
+            Action = Call("story('mirror_story')"),
+            When = Expr("!story_completed('mirror_finish')"),
+            RepeatMode = RepeatMode.Once,
+            RepeatLimit = -1,
+        };
+        var map = CreateMap(
+            "unknown_room",
+            MapKind.Small,
+            CreateLocation("mirror", events: [mapEvent]));
+        var session = new GameSession(
+            new GameState(),
+            TestContentFactory.CreateRepository(maps: [map]));
+
+        for (var occurrence = 1; occurrence <= 3; occurrence++)
+        {
+            var location = Assert.Single(session.MapService.EnterMap("unknown_room").Locations);
+            Assert.Equal("mirror", location.Event!.Id);
+            var interaction = session.MapService.InteractWithLocation(location);
+            session.MapService.CompleteInteraction(interaction);
+            Assert.Equal(
+                occurrence,
+                session.State.MapEventProgress.GetOccurrenceCount("unknown_room", "mirror", "mirror"));
+        }
+
+        Assert.NotNull(Assert.Single(session.MapService.EnterMap("unknown_room").Locations).Event);
+        session.State.Story.MarkCompleted("mirror_finish");
+        Assert.Empty(session.MapService.EnterMap("unknown_room").Locations);
+    }
+
+    [Fact]
+    public void EnterMap_FiniteOnceEvent_StopsAfterConfiguredOccurrenceLimit()
+    {
+        var mapEvent = new MapEventDefinition
+        {
+            Id = "three_visits",
+            Action = Call("story('visit_story')"),
+            RepeatMode = RepeatMode.Once,
+            RepeatLimit = 3,
+        };
+        var map = CreateMap(
+            "town",
+            MapKind.Small,
+            CreateLocation("visitor", events: [mapEvent]));
+        var session = new GameSession(
+            new GameState(),
+            TestContentFactory.CreateRepository(maps: [map]));
+
+        for (var occurrence = 1; occurrence <= 3; occurrence++)
+        {
+            var interaction = session.MapService.InteractWithLocation(
+                Assert.Single(session.MapService.EnterMap("town").Locations));
+            session.State.Story.MarkCompleted("visit_story");
+            session.MapService.CompleteInteraction(interaction);
+        }
+
+        Assert.Equal(3, session.State.MapEventProgress.GetOccurrenceCount("town", "visitor", "three_visits"));
+        Assert.Empty(session.MapService.EnterMap("town").Locations);
     }
 
     [Fact]
@@ -465,7 +565,7 @@ public sealed class MapServiceTests
                     new MapEventDefinition
                     {
                         Id = "intro",
-                        Action = Call("story('smith_intro')"),
+                        Action = Call("change_silver(1)"),
                         RepeatMode = RepeatMode.Once,
                     },
                 ]),
@@ -476,7 +576,7 @@ public sealed class MapServiceTests
                     new MapEventDefinition
                     {
                         Id = "intro",
-                        Action = Call("story('inn_intro')"),
+                        Action = Call("change_silver(1)"),
                         RepeatMode = RepeatMode.Once,
                     },
                 ]));

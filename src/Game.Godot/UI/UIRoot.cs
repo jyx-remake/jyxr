@@ -497,10 +497,14 @@ public partial class UIRoot : Control
 
 	public void ClosePanel() => CloseMainPanel();
 
-	public async Task ShowDialogueAsync(string speaker, string text, CancellationToken cancellationToken = default)
+	public async Task ShowDialogueAsync(
+		string speaker,
+		string text,
+		string? portrait = null,
+		CancellationToken cancellationToken = default)
 	{
 		var dialog = _storyDialoguePanel;
-		dialog.Configure(speaker, text);
+		dialog.Configure(speaker, text, portrait);
 		var version = dialog.PresentationVersion;
 
 		try
@@ -574,6 +578,13 @@ public partial class UIRoot : Control
 
 	public Task ShowSuggestionAsync(string text, CancellationToken cancellationToken = default) =>
 		_hintBox.ShowHintAsync(text, cancellationToken);
+
+	public Task ShowSuggestionAsync(
+		string text,
+		string title,
+		string acknowledgeText = "确认",
+		CancellationToken cancellationToken = default) =>
+		_hintBox.ShowHintAsync(text, title, acknowledgeText, cancellationToken);
 
 	public Task<bool> ShowConfirmAsync(
 		string text,

@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://r13aulsyfgvg" path="res://src/Game.Godot/UI/Journal/JournalPanel.cs" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://bbbfr2yrgntxf" path="res://scenes/ui/journal/journal_entry.tscn" id="3_entry"]
+[ext_resource type="Texture2D" uid="uid://4allowhfbyga" path="res://assets/art/misc/btn_cross.png" id="4_1330j"]
 
 [node name="JournalPanel" unique_id=1645991545 instance=ExtResource("1_base")]
 script = ExtResource("2_script")
@@ -44,3 +45,10 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 36
 text = "当前还没有江湖日志。"
 horizontal_alignment = 1
+
+[node name="CloseButton" parent="." index="3" unique_id=962603895]
+offset_left = 684.0
+offset_top = -518.0
+offset_right = 884.0
+offset_bottom = -318.0
+texture_normal = ExtResource("4_1330j")

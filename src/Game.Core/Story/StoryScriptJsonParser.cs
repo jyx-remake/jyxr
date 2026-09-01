@@ -39,7 +39,10 @@ internal sealed class StoryScriptJsonParser(JsonNode? root, string sourceName = 
         var kind = GetRequiredString(element, "kind");
         return kind switch
         {
-            "dialogue" => new DialogueStep(GetRequiredString(element, "speaker"), GetRequiredString(element, "text")),
+            "dialogue" => new DialogueStep(
+                GetRequiredString(element, "speaker"),
+                GetRequiredString(element, "text"),
+                GetOptionalString(element, "portrait")),
             "command" => ParseCommandStep(element),
             "set" => ParseSetVariableStep(element),
             "delete" => new DeleteVariableStep(ParseVariableName(element, "target")),
@@ -311,6 +314,21 @@ internal sealed class StoryScriptJsonParser(JsonNode? root, string sourceName = 
         }
 
         return result;
+    }
+
+    private static string? GetOptionalString(JsonObject element, string name)
+    {
+        if (!TryGetProperty(element, name, out var value) || value is null)
+        {
+            return null;
+        }
+
+        if (!TryGetString(value, out var result))
+        {
+            throw new StoryRuntimeException($"Property '{name}' must be a string.");
+        }
+
+        return string.IsNullOrWhiteSpace(result) ? null : result;
     }
 
     private static int GetOptionalInt32(JsonObject element, string name, int defaultValue)
