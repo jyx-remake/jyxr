@@ -33,6 +33,19 @@ public sealed class SessionFlowService
         _session.ProfileService.RecordRoundReached(State.Adventure.Round);
     }
 
+    public void RestartCurrentRound()
+    {
+        _session.PlayTimeService.Stop();
+        var currentRound = State.Adventure.Round;
+        var carriedChest = State.Chest.Clone(ContentRepository);
+        ReplaceState(_newGameStateFactory.Create(
+            Config.InitialPartyCharacterIds,
+            currentRound,
+            carriedChest));
+        _session.PlayTimeService.ResetInterval();
+        _session.ProfileService.RecordRoundReached(currentRound);
+    }
+
     public void StartNextRound()
     {
         _session.PlayTimeService.Checkpoint();

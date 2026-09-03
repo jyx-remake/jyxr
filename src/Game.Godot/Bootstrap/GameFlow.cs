@@ -19,6 +19,13 @@ public static class GameFlow
 		await StartOpeningStoryAsync(cancellationToken);
 	}
 
+	public static async Task RestartCurrentRoundAsync(CancellationToken cancellationToken = default)
+	{
+		Game.SessionFlowService.RestartCurrentRound();
+		World.Instance.PlayTime.StartGameplay();
+		await StartOpeningStoryAsync(cancellationToken);
+	}
+
 	public static async Task StartNextRoundAsync(CancellationToken cancellationToken = default)
 	{
 		Game.SessionFlowService.StartNextRound();

@@ -65,7 +65,7 @@ public sealed partial class GodotStoryRuntimeHost
 	private async ValueTask ExecuteRestartAsync(CancellationToken cancellationToken)
 	{
 		Game.ProfileService.RecordCompletion(Game.State.Adventure.Round);
-		await GameFlow.StartNewGameAsync(cancellationToken);
+		await GameFlow.RestartCurrentRoundAsync(cancellationToken);
 	}
 
 	[StoryCommand("next_round", "nextzhoumu")]
