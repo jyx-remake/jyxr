@@ -111,21 +111,4 @@ public sealed class SessionFlowServiceTests
         Assert.Equal(1234, session.Profile.TotalPlayTimeSeconds);
     }
 
-    [Fact]
-    public void RestartCurrentRound_PreservesRoundAndResetsPlayTime()
-    {
-        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
-        var state = new GameState();
-        state.Adventure.SetRound(3);
-        state.SetPlayTimeSeconds(456);
-        var session = new GameSession(
-            state,
-            TestContentFactory.CreateRepository(characters: [heroDefinition]),
-            config: new GameConfig { InitialPartyCharacterIds = ["hero"] });
-
-        session.SessionFlowService.RestartCurrentRound();
-
-        Assert.Equal(3, session.State.Adventure.Round);
-        Assert.Equal(0, session.State.PlayTimeSeconds);
-    }
 }

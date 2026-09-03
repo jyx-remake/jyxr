@@ -35,33 +35,29 @@ public sealed class SessionFlowService
 
     public void RestartCurrentRound()
     {
-        _session.PlayTimeService.Stop();
-        var currentRound = State.Adventure.Round;
-        var carriedChest = State.Chest.Clone(ContentRepository);
-        ReplaceState(_newGameStateFactory.Create(
-            Config.InitialPartyCharacterIds,
-            currentRound,
-            carriedChest));
-        _session.PlayTimeService.ResetInterval();
-        _session.ProfileService.RecordRoundReached(currentRound);
+        StartRound(State.Adventure.Round);
     }
 
     public void StartNextRound()
     {
+        StartRound(checked(State.Adventure.Round + 1));
+    }
+
+    private void StartRound(int round)
+    {
         _session.PlayTimeService.Checkpoint();
-        var nextRound = checked(State.Adventure.Round + 1);
         var lastTrialCount = State.SpecialBattle.TrialCompletedCharacterIds.Count;
         var carriedChest = State.Chest.Clone(ContentRepository);
         var nextState = _newGameStateFactory.Create(
             Config.InitialPartyCharacterIds,
-            nextRound,
+            round,
             carriedChest);
         nextState.Currency.AddSilver(NextRoundInitialSilver);
         nextState.SetPlayTimeSeconds(State.PlayTimeSeconds);
         nextState.Story.SetVariable("last_trial_count", ExpressionValue.FromNumber(lastTrialCount));
 
         ReplaceState(nextState);
-        _session.ProfileService.RecordRoundReached(nextRound);
+        _session.ProfileService.RecordRoundReached(round);
     }
 
     private void ReplaceState(GameState state)
