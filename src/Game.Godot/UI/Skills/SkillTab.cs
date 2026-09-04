@@ -69,10 +69,29 @@ public partial class SkillTab : Control
 			throw new InvalidOperationException("SkillBox scene root must be SkillBox.");
 		}
 
-		skillBox.Setup(skill, isInteractive: !IsReadOnly);
+		skillBox.Setup(skill, isInteractive: !IsReadOnly, isEquipmentGranted: IsEquipmentGranted(skill));
 		skillBox.ToggleRequested += OnSkillBoxToggleRequested;
 		skillBox.DetailRequested += OnSkillBoxDetailRequested;
 		return skillBox;
+	}
+
+	private bool IsEquipmentGranted(SkillInstance skill)
+	{
+		if (_character is null)
+		{
+			return false;
+		}
+
+		return skill switch
+		{
+			ExternalSkillInstance externalSkill => _character.IsEquipmentGrantedSkill(
+				SkillKind.External, externalSkill.Id),
+			SpecialSkillInstance specialSkill => _character.IsEquipmentGrantedSkill(
+				SkillKind.Special, specialSkill.Id),
+			FormSkillInstance formSkill when formSkill.Parent is ExternalSkillInstance parent => _character.IsEquipmentGrantedSkill(
+				SkillKind.External, parent.Id),
+			_ => false,
+		};
 	}
 
 	private void OnSkillBoxToggleRequested(SkillInstance skill)

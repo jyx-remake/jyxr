@@ -28,6 +28,8 @@ public sealed record EquipmentRecord(
 
 public sealed record CharacterTitleRecord(string CharacterTitleDefinitionId, bool Equipped);
 
+public sealed record EquipmentGrantedSkillRecord(string Kind, string SkillId, bool CreatedByGrant);
+
 public sealed record CharacterRecord(
     string Id,
     string DefinitionId,
@@ -48,4 +50,6 @@ public sealed record CharacterRecord(
     BattleAiType AiType = BattleAiType.Basic,
     IReadOnlyList<CharacterTitleRecord>? Titles = null,
     int Personality = 0,
-    int SecondaryPersonality = 0);
+    int SecondaryPersonality = 0,
+    CharacterLeaveState LeaveState = CharacterLeaveState.None,
+    IReadOnlyDictionary<string, IReadOnlyList<EquipmentGrantedSkillRecord>>? EquipmentGrantedSkills = null);

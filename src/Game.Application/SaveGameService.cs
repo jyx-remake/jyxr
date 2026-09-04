@@ -80,8 +80,9 @@ public sealed class SaveGameService
 		state.SetSpecialBattle(specialBattle);
 		state.SetMiniGame(miniGame);
 		state.SetPlayTimeSeconds(saveGame.PlayTimeSeconds);
-		_session.ReplaceState(state);
-		_session.PlayTimeService.ResetInterval();
+        _session.ReplaceState(state);
+        _session.InventoryService.RestoreEquipmentGrantedSkills();
+        _session.PlayTimeService.ResetInterval();
 		_session.ProfileService.RecordRoundReached(adventure.Round);
 		_session.Events.Publish(new SaveLoadedEvent());
 		_logger.Info($"Loaded save game with {characters.Count} character(s).");

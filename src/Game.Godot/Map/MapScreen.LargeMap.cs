@@ -1,4 +1,5 @@
 using Game.Application;
+using Game.Godot.UI;
 using Godot;
 
 namespace Game.Godot.Map;
@@ -6,20 +7,62 @@ namespace Game.Godot.Map;
 public partial class MapScreen
 {
 	private LargeMapView _largeMapView = null!;
+	private Control _largeMapSafeArea = null!;
 	private TextureRect _largeMapCloud = null!;
 	private MapEnterResult? _currentLargeMapResult;
 	private bool _isDeferringLargeMapTimeLighting;
 	private bool _hasDeferredLargeMapTimeLighting;
 	private string? _worldBackdropId;
 
+	/// <summary>
+	/// When enabled, the safe area's offsets are overwritten from the HUD's
+	/// measured insets on every layout pass. When disabled (default), the
+	/// safe-area node's editor-set offsets are used as-is so the region can
+	/// be adjusted by hand.
+	/// </summary>
+	[Export]
+	public bool SafeAreaFollowHud { get; set; }
+
 	private void InitializeLargeMapNodes()
 	{
 		_largeMapView = GetNode<LargeMapView>("%LargeMapView");
+		_largeMapSafeArea = GetNode<Control>("%LargeMapSafeArea");
 		_largeMapCloud = GetNode<TextureRect>("%Cloud");
 		_largeMapView.LocationPressed += _locationTooltipLayer.Request;
 		_largeMapView.GestureStarted += _locationTooltipLayer.Dismiss;
 		_worldBackdropId = World.Instance.CurrentBackdropId;
 		World.Instance.BackdropChanged += OnWorldBackdropChanged;
+		// Keep the map viewport inside the HUD's safe area (below the top bar
+		// frame, above the bottom bar frame). Re-measured on every resize so
+		// HUD tweaks follow automatically.
+		Resized += UpdateLargeMapSafeArea;
+		CallDeferred(nameof(UpdateLargeMapSafeArea));
+	}
+
+	/// <summary>
+	/// With <see cref="SafeAreaFollowHud"/> enabled, shrinks the safe area to
+	/// the band between the HUD's top bar frame and bottom bar frame. The
+	/// transform clamps pan/zoom against this viewport, so with
+	/// <c>clip_contents</c> on, map content can never render under the HUD
+	/// strips and no black edges can appear (the map always covers the
+	/// viewport at the minimum zoom). Disable it to adjust the region by hand
+	/// in the scene editor.
+	/// </summary>
+	private void UpdateLargeMapSafeArea()
+	{
+		if (_isLargeMapSafeAreaExpanded || !SafeAreaFollowHud || !IsInsideTree())
+		{
+			return;
+		}
+
+		var hud = UIRoot.Instance.Hud;
+		if (hud is null || !GodotObject.IsInstanceValid(hud))
+		{
+			return;
+		}
+
+		_largeMapSafeArea.OffsetTop = hud.TopSafeInset;
+		_largeMapSafeArea.OffsetBottom = -hud.BottomSafeInset;
 	}
 
 	private void ReleaseLargeMapNodes()
@@ -50,6 +93,7 @@ public partial class MapScreen
 	private void FillLargeMap(MapEnterResult result)
 	{
 		_currentLargeMapResult = result;
+		UpdateLargeMapSafeArea();
 		_largeMapView.ShowMap(result);
 		ApplyLargeMapCloudVisibility();
 		ApplyLargeMapTimeLighting();

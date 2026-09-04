@@ -4801,6 +4801,35 @@ public sealed class BattleEngineTests
         Assert.Equal(10, remaining.RemainingTurns);
     }
 
+    [Fact]
+    public void UseItem_ClearBuffsStripsEveryStatusOnTarget()
+    {
+        var poison = new BuffDefinition { Id = "中毒", Name = "中毒", IsDebuff = true };
+        var rageUp = new BuffDefinition { Id = "狂暴", Name = "狂暴", IsDebuff = false };
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0));
+        hero.TryApplyBuff(new BattleBuffInstance(poison, level: 3, remainingTurns: 9, "enemy", 1));
+        hero.TryApplyBuff(new BattleBuffInstance(rageUp, level: 2, remainingTurns: 5, "ally", 1));
+        hero.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [hero]);
+        var engine = new BattleEngine();
+        engine.BeginAction(state, hero.Id);
+        var item = new NormalItemDefinition
+        {
+            Id = "气定神闲丹",
+            Name = "气定神闲丹",
+            Type = ItemType.Consumable,
+            ConsumeOnUse = true,
+            UseEffects = [new ClearBuffsItemUseEffectDefinition()],
+        };
+
+        var result = engine.UseItem(state, hero.Id, item, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Empty(hero.Buffs);
+        Assert.Equal(2, result.Messages.OfType<BattleFact>().Count(fact =>
+            fact.Kind == BattleFactKind.BuffRemoved && fact.UnitId == hero.Id));
+    }
+
     private static NormalItemDefinition CreateDetoxifyItem(
         int levelReduction,
         int durationReduction,

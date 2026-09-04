@@ -58,9 +58,30 @@ public static class AssetResolver
 			return definition.Portrait;
 		}
 
-		return NavigationPortraits.TryGetValue(normalized, out var navigationPortrait)
-			? navigationPortrait
-			: null;
+		if (NavigationPortraits.TryGetValue(normalized, out var navigationPortrait))
+		{
+			return navigationPortrait;
+		}
+
+		// Duplicate map units disambiguate a repeated name with a "~N"
+		// occurrence suffix (for example 剑侍 -> 剑侍~2).  Resolve the base
+		// name so a repeating character still resolves its own portrait.
+		var baseId = StripMapUnitNameSuffix(normalized);
+		if (!string.Equals(baseId, normalized, StringComparison.Ordinal))
+		{
+			if (TryGetCharacterById(baseId, out definition) &&
+				!string.IsNullOrWhiteSpace(definition.Portrait))
+			{
+				return definition.Portrait;
+			}
+
+			if (NavigationPortraits.TryGetValue(baseId, out navigationPortrait))
+			{
+				return navigationPortrait;
+			}
+		}
+
+		return null;
 	}
 
 	public static string? ResolveCharacterModelId(CharacterInstance character)
@@ -83,17 +104,39 @@ public static class AssetResolver
 
 	public static string ResolveCharacterName(string characterId)
 	{
+		if (TryResolveCharacterNameFromId(characterId, out var resolvedName))
+		{
+			return resolvedName;
+		}
+
+		// Duplicate map units disambiguate a repeated name with a "~N"
+		// occurrence suffix (for example 剑侍 -> 剑侍~2).  Fall back to the
+		// base name so a repeating character shows its real display name.
+		var baseId = StripMapUnitNameSuffix(characterId);
+		if (TryResolveCharacterNameFromId(baseId, out resolvedName))
+		{
+			return resolvedName;
+		}
+
+		return baseId;
+	}
+
+	private static bool TryResolveCharacterNameFromId(string characterId, out string resolvedName)
+	{
 		if (Game.PartyService.TryFindAllMember(characterId, out var character))
 		{
-			return character.Name;
+			resolvedName = character.Name;
+			return true;
 		}
 
 		if (Game.ContentRepository.TryGetCharacter(characterId, out var definition))
 		{
-			return definition.Name;
+			resolvedName = definition.Name;
+			return true;
 		}
 
-		return characterId;
+		resolvedName = characterId;
+		return false;
 	}
 
 	public static (string DisplayName, Texture2D? Portrait) ResolveSpeakerPresentation(
@@ -259,6 +302,29 @@ public static class AssetResolver
 
 		definition = null!;
 		return false;
+	}
+
+	private static string StripMapUnitNameSuffix(string name)
+	{
+		var value = name.Trim();
+		if (value.Length == 0)
+		{
+			return value;
+		}
+
+		var lastTilde = value.LastIndexOf('~');
+		if (lastTilde < 0 || lastTilde + 1 >= value.Length)
+		{
+			return value;
+		}
+
+		var suffix = value[(lastTilde + 1)..];
+		if (suffix.Length == 0 || !suffix.All(static c => c is >= '0' and <= '9'))
+		{
+			return value;
+		}
+
+		return value[..lastTilde];
 	}
 
 	private static bool TryGetCharacterByIdOrName(string idOrName, out CharacterDefinition definition)

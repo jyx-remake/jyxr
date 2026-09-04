@@ -1,3 +1,4 @@
+using Game.Application;
 using Game.Core.Affix;
 using Game.Core.Battle;
 using Game.Core.Definitions;
@@ -10,6 +11,54 @@ namespace Game.Tests;
 
 public sealed class CharacterTests
 {
+    [Fact]
+    public void ChangeStat_MaxResourceFloorClampsLikeLegacyUpgrade()
+    {
+        // Legacy UPGRADE.MAXHP/MAXMP floors the resulting maximum at 100 and
+        // never fails, no matter how large the penalty is (天龙主角受伤 reduces
+        // both caps by 5000 in one go).
+        var definition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = new Game.Core.Model.GameState();
+        var hero = TestContentFactory.CreateCharacterInstance("hero", definition, state.EquipmentInstanceFactory);
+        state.Party.AddMember(hero);
+        var repository = TestContentFactory.CreateRepository(characters: [definition]);
+        var session = new GameSession(state, repository);
+
+        session.CharacterService.AddBaseStat("hero", "maxmp", -5000);
+        session.CharacterService.AddBaseStat("hero", "maxhp", -5000);
+
+        Assert.Equal(CharacterResourceLimitPolicy.MinHpMp, hero.GetBaseStat(StatType.MaxMp));
+        Assert.Equal(CharacterResourceLimitPolicy.MinHpMp, hero.GetBaseStat(StatType.MaxHp));
+        Assert.Equal(CharacterResourceLimitPolicy.MinHpMp, hero.CurrentMp);
+        Assert.Equal(CharacterResourceLimitPolicy.MinHpMp, hero.CurrentHp);
+    }
+
+    [Fact]
+    public void AddBaseStat_NonResourceStatNegativeDeltaStillThrows()
+    {
+        var definition = TestContentFactory.CreateCharacterDefinition("hero");
+        var hero = TestContentFactory.CreateCharacterInstance("hero", definition);
+
+        Assert.Throws<InvalidOperationException>(() => hero.AddBaseStat(StatType.Bili, -9999));
+    }
+
+    [Fact]
+    public void ChangeStat_MaxResourceClampsToRoundScaledCapAndSyncsCurrent()
+    {
+        var definition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = new Game.Core.Model.GameState();
+        var hero = TestContentFactory.CreateCharacterInstance("hero", definition, state.EquipmentInstanceFactory);
+        state.Party.AddMember(hero);
+        var repository = TestContentFactory.CreateRepository(characters: [definition]);
+        var session = new GameSession(state, repository);
+
+        session.CharacterService.AddBaseStat("hero", "maxhp", 999999);
+
+        var expectedCap = new CharacterResourceLimitPolicy(session.Config, state.Adventure.Round).GetMaxHpMp();
+        Assert.Equal(expectedCap, hero.GetBaseStat(StatType.MaxHp));
+        Assert.Equal(expectedCap, hero.CurrentHp);
+    }
+
     [Fact]
     public void CreateInitial_BuildsPersistentCharacterFromDefinition()
     {

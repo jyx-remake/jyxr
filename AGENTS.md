@@ -401,6 +401,7 @@
   - `grant_exp` / `get_exp`
   - `levelup`
   - `join`
+  - `jump_random`
   - `follow`
   - `leave`
   - `leave_follow`
@@ -627,7 +628,7 @@
 - 持久化层后续可能要补 `MapStateRecord`、`InteractableRecord`、`StoryFlagRecord`。
 - 当前 DTO 与 runtime definition 存在较多重复字段，后续应收缩 DTO 噪音。
 - 全局档案目前只覆盖称号和简单累计统计，更完整的 meta progression 还未建模。
-- 战斗外背包已接入装备、武学书、绝技书、天赋书、属性/资源调整和剧情触发类道具；消耗品只在战斗中使用，普通剧情物品仍不可主动使用。
+- 战斗外背包已接入装备、武学书、绝技书、天赋书、属性/资源调整、剧情触发道具（run_story）、称号授予、换头像、随机开箱与 rolekey 自动锁定目标（跳过人物选择）；消耗品只在战斗中使用，无效果的剧情物品不可主动使用；legacy 暗器（type 14）尚未适配战斗伤害模型。
 
 ## 当前工作区习惯
 

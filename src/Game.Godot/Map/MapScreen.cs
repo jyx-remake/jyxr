@@ -1,4 +1,4 @@
-using Game.Application;
+﻿using Game.Application;
 using Game.Core.Definitions;
 using Game.Godot.Assets;
 using Godot;
@@ -18,8 +18,8 @@ public partial class MapScreen : Control
 	private Control _cameraButton = null!;
 	private TextureRect _smallMapBackground = null!;
 	private ColorRect _smallMapTimeDim = null!;
-	private HBoxContainer _mapEntityList = null!;
-	private ScrollContainer _smallMapLocationScroll = null!;
+	private Control _smallMapLocationArea = null!;
+	private GridContainer _mapEntityList = null!;
 	private MapLocationTooltipLayer _locationTooltipLayer = null!;
 	private Control _bottomBox = null!;
 	private RichTextLabel _mapDescriptionLabel = null!;
@@ -38,13 +38,13 @@ public partial class MapScreen : Control
 		_smallMapBackground = GetNode<TextureRect>("%SmallMapBackground");
 		_smallMapTimeDim = GetNode<ColorRect>("%SmallMapTimeDim");
 		_cameraButton = GetNode<Control>("%CameraButton");
-		_smallMapLocationScroll = GetNode<ScrollContainer>("%SmallMapLocationScroll");
-		_mapEntityList = GetNode<HBoxContainer>("%MapEntityList");
+		_smallMapLocationArea = GetNode<Control>("%SmallMapLocationArea");
+		_mapEntityList = GetNode<GridContainer>("%MapEntityList");
 		_bottomBox = GetNode<Control>("%BottomBox");
 		_mapDescriptionLabel = GetNode<RichTextLabel>("%MapDescriptionLabel");
 		_clockChangedSubscription = Game.Session.Events.Subscribe<ClockChangedEvent>(OnClockChanged);
 		_adventureStateChangedSubscription = Game.Session.Events.Subscribe<AdventureStateChangedEvent>(OnAdventureStateChanged);
-		_smallMapLocationScroll.ScrollStarted += _locationTooltipLayer.Dismiss;
+		GetViewport().SizeChanged += OnViewportSizeChanged;
 
 		if (_pendingInitialResult is not null)
 		{
@@ -59,6 +59,7 @@ public partial class MapScreen : Control
 	{
 		_locationTooltipLayer.Dismiss();
 		ReleaseLargeMapNodes();
+		GetViewport().SizeChanged -= OnViewportSizeChanged;
 		_clockChangedSubscription?.Dispose();
 		_clockChangedSubscription = null;
 		_adventureStateChangedSubscription?.Dispose();
@@ -135,9 +136,96 @@ public partial class MapScreen : Control
 		SetSmallMapBackground(result.Map.Picture);
 		ClearChildren(_mapEntityList);
 
+		_mapEntityList.Columns = SmallMapLocationLayout.ResolveColumns(result.Locations.Count);
 		foreach (var location in result.Locations)
 		{
 			_mapEntityList.AddChild(CreateEntityButton(MapEntityBoxScene, location));
+		}
+
+		CallDeferred(nameof(FitSmallMapLocations));
+	}
+
+	/// <summary>
+	/// Fits every location node on screen like the legacy small map: no
+	/// scrolling, the whole grid is uniformly scaled to the strip area and
+	/// kept centered.
+	/// </summary>
+	private void FitSmallMapLocations()
+	{
+		if (!IsInsideTree())
+		{
+			return;
+		}
+
+		ApplyFit(_mapEntityList, _smallMapLocationArea.Size, GetViewportRect().Size);
+	}
+
+	internal static void ApplyFit(GridContainer grid, Vector2 areaSize, Vector2 viewportSize)
+	{
+		ArgumentNullException.ThrowIfNull(grid);
+
+		var liveChildCount = 0;
+		foreach (var child in grid.GetChildren())
+		{
+			if (!child.IsQueuedForDeletion())
+			{
+				liveChildCount++;
+			}
+		}
+
+		if (liveChildCount == 0)
+		{
+			return;
+		}
+
+		var columns = Math.Max(1, grid.Columns);
+		var rows = SmallMapLocationLayout.ResolveRows(liveChildCount, columns);
+		var cellSize = ResolveGridCellSize(grid);
+		var separation = new Vector2(
+			grid.GetThemeConstant("h_separation"),
+			grid.GetThemeConstant("v_separation"));
+		var gridSize = SmallMapLocationLayout.ResolveGridSize(columns, rows, cellSize, separation);
+		var available = new Vector2(Math.Max(1f, areaSize.X - 80f), Math.Max(1f, areaSize.Y - 48f));
+		var scale = Math.Min(
+			Math.Min(1f, viewportSize.X / SmallMapLocationLayout.DesignWidth),
+			SmallMapLocationLayout.ResolveScale(available, gridSize));
+
+		// Flow left to right, vertically centered: anchor left, center the
+		// block on the strip middle, scale about the left-middle pivot so
+		// the left edge never moves.
+		grid.AnchorLeft = 0f;
+		grid.AnchorTop = 0.5f;
+		grid.AnchorRight = 0f;
+		grid.AnchorBottom = 0.5f;
+		grid.OffsetLeft = 40f;
+		grid.OffsetTop = -gridSize.Y / 2f;
+		grid.OffsetRight = 40f + gridSize.X;
+		grid.OffsetBottom = gridSize.Y / 2f;
+		grid.PivotOffset = new Vector2(0f, gridSize.Y / 2f);
+		grid.Scale = new Vector2(scale, scale);
+	}
+
+	private static Vector2 ResolveGridCellSize(GridContainer grid)
+	{
+		var cellSize = new Vector2(256f, 256f);
+		foreach (var child in grid.GetChildren())
+		{
+			if (child is Control control && !child.IsQueuedForDeletion())
+			{
+				var minimum = control.GetCombinedMinimumSize();
+				cellSize.X = Math.Max(cellSize.X, minimum.X);
+				cellSize.Y = Math.Max(cellSize.Y, minimum.Y);
+			}
+		}
+
+		return cellSize;
+	}
+
+	private void OnViewportSizeChanged()
+	{
+		if (_mapSmallTab.Visible)
+		{
+			CallDeferred(nameof(FitSmallMapLocations));
 		}
 	}
 
@@ -314,6 +402,7 @@ public partial class MapScreen : Control
 	{
 		foreach (var child in node.GetChildren())
 		{
+			node.RemoveChild(child);
 			child.QueueFree();
 		}
 	}
@@ -351,9 +440,10 @@ public partial class MapScreen : Control
 				_smallMapTimeDim.Hide();
 			}
 
-			_smallMapLocationScroll.Hide();
+			_smallMapLocationArea.Hide();
 			_bottomBox.Hide();
 			_cameraButton.Hide();
+			ApplyLargeMapSafeAreaForStoryPresentation();
 			return;
 		}
 
@@ -362,9 +452,10 @@ public partial class MapScreen : Control
 		if (_mapBigTab.Visible)
 		{
 			_largeMapView.Show();
-			_smallMapLocationScroll.Hide();
+			_smallMapLocationArea.Hide();
 			_bottomBox.Hide();
 			_cameraButton.Hide();
+			ApplyLargeMapSafeAreaForStoryPresentation();
 			return;
 		}
 
@@ -372,8 +463,45 @@ public partial class MapScreen : Control
 		_largeMapView.ResetInputState();
 		_smallMapBackground.Visible = _smallMapBackground.Texture is not null;
 		ApplySmallMapTimeLighting();
-		_smallMapLocationScroll.Show();
+		_smallMapLocationArea.Show();
 		_bottomBox.Show();
 		//_cameraButton.Show();
+		ApplyLargeMapSafeAreaForStoryPresentation();
+	}
+
+	private bool _isLargeMapSafeAreaExpanded;
+	private float _safeAreaSavedTop;
+	private float _safeAreaSavedBottom;
+
+	/// <summary>
+	/// While a story plays with the HUD hidden, the map bands outside the safe
+	/// area are exposed - and the World backdrop showing there is a stretched
+	/// copy of the map picture that does not line up with the safe area's
+	/// cover-fit art (穿帮). Expand the safe area to the full screen for the
+	/// duration of the story so the map art stays continuous, then restore the
+	/// player's safe area afterwards.
+	/// </summary>
+	private void ApplyLargeMapSafeAreaForStoryPresentation()
+	{
+		if (_largeMapSafeArea is null || !GodotObject.IsInstanceValid(_largeMapSafeArea))
+		{
+			return;
+		}
+
+		var expand = _isStoryPresentationActive && _mapBigTab.Visible && !HasForeignStoryBackdrop;
+		if (expand && !_isLargeMapSafeAreaExpanded)
+		{
+			_safeAreaSavedTop = _largeMapSafeArea.OffsetTop;
+			_safeAreaSavedBottom = _largeMapSafeArea.OffsetBottom;
+			_largeMapSafeArea.OffsetTop = 0;
+			_largeMapSafeArea.OffsetBottom = 0;
+			_isLargeMapSafeAreaExpanded = true;
+		}
+		else if (!expand && _isLargeMapSafeAreaExpanded)
+		{
+			_largeMapSafeArea.OffsetTop = _safeAreaSavedTop;
+			_largeMapSafeArea.OffsetBottom = _safeAreaSavedBottom;
+			_isLargeMapSafeAreaExpanded = false;
+		}
 	}
 }

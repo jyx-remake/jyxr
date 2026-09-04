@@ -15,6 +15,8 @@ public partial class World : Control
 	public PackedScene MapScreenScene { get; set; } = null!;
 
 	private TextureRect _background = null!;
+	private Tween? _backdropAlphaTween;
+	private TaskCompletionSource? _backdropAlphaCompletion;
 
 	public Control? CurrentScene { get; private set; }
 
@@ -43,6 +45,11 @@ public partial class World : Control
 		Instance = this;
 	}
 
+	public override void _ExitTree()
+	{
+		CancelBackdropAlphaTween();
+	}
+
 	public MapScreen ShowMap(string mapId)
 	{
 		var result = Game.MapService.EnterMap(mapId);
@@ -65,12 +72,103 @@ public partial class World : Control
 		Game.Logger.Info($"Story animation requested: {animationId}");
 	}
 
-	public void SetBackground(string? resourceId)
+	public void SetBackground(string? resourceId) => SetBackground(resourceId, 1f);
+
+	/// <summary>
+	/// Replaces the shared backdrop and immediately applies <paramref name="alpha"/>.
+	/// The legacy engine treats the background image's own alpha as state: the
+	/// map paints it fully opaque while story backdrops carry the ambient
+	/// time-of-day opacity, so every caller states the alpha it means.
+	/// </summary>
+	public void SetBackground(string? resourceId, float alpha)
 	{
+		CancelBackdropAlphaTween();
 		_background.Texture = AssetResolver.LoadTexture(resourceId);
 		_background.Visible = _background.Texture is not null;
+		SetBackdropAlpha(_background.Texture is null ? 1f : alpha);
 		CurrentBackdropId = _background.Texture is null ? null : resourceId;
 		BackdropChanged?.Invoke(CurrentBackdropId);
+	}
+
+	public float BackdropAlpha => _background.Modulate.A;
+
+	/// <summary>
+	/// Tweens the shared backdrop's alpha over <paramref name="duration"/> seconds.
+	/// Backs the story <c>fadein</c> command, mirroring the legacy
+	/// <c>fadeinoutCoroutine</c>, which fades the background image itself instead
+	/// of a full-screen overlay.
+	/// </summary>
+	public Task FadeBackdropAlphaAsync(float targetAlpha, double duration, CancellationToken cancellationToken)
+	{
+		ArgumentOutOfRangeException.ThrowIfNegative(duration);
+		if (!double.IsFinite(duration))
+		{
+			throw new ArgumentOutOfRangeException(nameof(duration), "Backdrop fade duration must be finite.");
+		}
+
+		cancellationToken.ThrowIfCancellationRequested();
+		CancelBackdropAlphaTween();
+		if (duration == 0d)
+		{
+			SetBackdropAlpha(targetAlpha);
+			return Task.CompletedTask;
+		}
+
+		var tween = CreateTween();
+		var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		_backdropAlphaTween = tween;
+		_backdropAlphaCompletion = completion;
+
+		void OnFinished()
+		{
+			if (ReferenceEquals(_backdropAlphaTween, tween))
+			{
+				_backdropAlphaTween = null;
+				_backdropAlphaCompletion = null;
+			}
+
+			completion.TrySetResult();
+		}
+
+		tween.Finished += OnFinished;
+		tween.TweenMethod(Callable.From<float>(SetBackdropAlpha), _background.Modulate.A, targetAlpha, duration);
+		return AwaitBackdropAlphaTweenAsync(tween, completion, OnFinished, cancellationToken);
+	}
+
+	private static async Task AwaitBackdropAlphaTweenAsync(
+		Tween tween,
+		TaskCompletionSource completion,
+		Action finishedHandler,
+		CancellationToken cancellationToken)
+	{
+		using var registration = cancellationToken.Register(() =>
+		{
+			tween.Kill();
+			completion.TrySetCanceled(cancellationToken);
+		});
+
+		try
+		{
+			await completion.Task;
+		}
+		finally
+		{
+			tween.Finished -= finishedHandler;
+		}
+	}
+
+	private void CancelBackdropAlphaTween()
+	{
+		_backdropAlphaTween?.Kill();
+		_backdropAlphaTween = null;
+		_backdropAlphaCompletion?.TrySetCanceled();
+		_backdropAlphaCompletion = null;
+	}
+
+	private void SetBackdropAlpha(float alpha)
+	{
+		var modulate = _background.Modulate;
+		_background.Modulate = new Color(modulate.R, modulate.G, modulate.B, alpha);
 	}
 
 	private MapScreen ShowMap(MapEnterResult result)

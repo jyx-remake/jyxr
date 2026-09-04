@@ -1,3 +1,4 @@
+using Game.Application;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Godot;
@@ -34,8 +35,16 @@ public partial class CharacterAttributeTab : Control
 	private Label _pointLabel = null!;
 	private Control _assignStatWidget = null!;
 	private JyButton _assignStatCloseButton = null!;
+	private JyButton _leaveButton = null!;
 	private string _characterId = string.Empty;
 	private bool _isReadOnly;
+	private bool _isLeaveInProgress;
+
+	/// <summary>
+	/// Raised after the displayed character was kicked from the party, so the
+	/// hosting panel can switch to another character.
+	/// </summary>
+	public event Action<string>? CharacterKicked;
 
 	public bool IsReadOnly
 	{
@@ -56,9 +65,11 @@ public partial class CharacterAttributeTab : Control
 		_pointLabel = GetNode<Label>("%PointLabel");
 		_assignStatWidget = GetNode<Control>("%AssignStatWidget");
 		_assignStatCloseButton = GetNode<JyButton>("%CloseButton");
+		_leaveButton = GetNode<JyButton>("%LeaveButton");
 
 		_addPointButton.Pressed += OnAddPointButtonPressed;
 		_assignStatCloseButton.Pressed += HideAssignStatWidget;
+		_leaveButton.Pressed += OnLeaveButtonPressed;
 
 		foreach (var (buttonName, statType) in AssignableStats)
 		{
@@ -81,6 +92,10 @@ public partial class CharacterAttributeTab : Control
 		{
 			HideAssignStatWidget();
 		}
+
+		// The hero can never be kicked (legacy ButtonLidui guards 主角 too).
+		_leaveButton.Visible = !IsReadOnly &&
+			!string.Equals(character.Id, Party.HeroCharacterId, StringComparison.Ordinal);
 
 		foreach (var (statType, nodeName) in DisplayedStats)
 		{
@@ -119,5 +134,43 @@ public partial class CharacterAttributeTab : Control
 	private void HideAssignStatWidget()
 	{
 		_assignStatWidget.Hide();
+	}
+
+	private async void OnLeaveButtonPressed()
+	{
+		if (_isLeaveInProgress || IsReadOnly || string.IsNullOrWhiteSpace(_characterId))
+		{
+			return;
+		}
+
+		var character = Game.State.Party.TryGetMember(_characterId, out var member) ? member : null;
+		if (character is null)
+		{
+			return;
+		}
+
+		_isLeaveInProgress = true;
+		try
+		{
+			var confirmed = await UIRoot.Instance.ShowConfirmAsync(
+				$"确认让【{character.Name}】离队吗？离队后可随时将其召回队伍。",
+				ConfirmDialogTone.Warning);
+			if (!confirmed)
+			{
+				return;
+			}
+
+			Game.PartyService.Kick(_characterId);
+			CharacterKicked?.Invoke(_characterId);
+		}
+		catch (Exception exception)
+		{
+			Game.Logger.Error("Kicking party member failed.", exception);
+			UIRoot.Instance.ShowSuggestion(exception.Message);
+		}
+		finally
+		{
+			_isLeaveInProgress = false;
+		}
 	}
 }

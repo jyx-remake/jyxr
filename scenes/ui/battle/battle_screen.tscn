@@ -63,18 +63,17 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -960.0
-offset_right = 960.0
-offset_bottom = 1080.0
+offset_right = -960.0
 grow_horizontal = 2
 mouse_filter = 2
 
 [node name="BoardGrid" parent="ContentRoot" unique_id=843775524 instance=ExtResource("19_board_view")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 237.0
-offset_top = 242.0
-offset_right = 237.0
-offset_bottom = 242.0
+offset_left = 221.0
+offset_top = 359.0
+offset_right = 221.0
+offset_bottom = 359.0
 
 [node name="BattleUiRoot" type="Control" parent="." unique_id=1422596367]
 z_index = 30
@@ -181,7 +180,6 @@ stretch_mode = 5
 
 [node name="AutoBattleActive" type="TextureRect" parent="BattleUiRoot/AutoBattleButton" unique_id=743190248]
 unique_name_in_owner = true
-visible = false
 layout_mode = 0
 offset_left = 18.0
 offset_top = 20.0
@@ -255,7 +253,9 @@ expand_mode = 1
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
+offset_left = -3.0
 offset_top = 250.0
+offset_right = -3.0
 offset_bottom = 507.0
 mouse_filter = 2
 texture = ExtResource("4_bottom_strip")
@@ -267,16 +267,20 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.04
 anchor_right = 0.04
-offset_top = 221.0
-offset_bottom = 503.0
+offset_left = -79.0
+offset_top = 240.0
+offset_right = 178.0
+offset_bottom = 522.0
 
 [node name="ListScroll" type="ScrollContainer" parent="BattleUiRoot/BottomHud" unique_id=60321938]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.15
 anchor_right = 0.75
-offset_top = 305.0
-offset_bottom = 502.0
+offset_left = -44.0
+offset_top = 318.0
+offset_right = -44.0
+offset_bottom = 515.0
 vertical_scroll_mode = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="BattleUiRoot/BottomHud/ListScroll" unique_id=1440051364]
@@ -293,6 +297,8 @@ theme_override_constants/separation = 38
 [node name="BattleActionDrawer" parent="BattleUiRoot" unique_id=617508197 instance=ExtResource("31_action_drawer")]
 unique_name_in_owner = true
 layout_mode = 1
+offset_left = 2.0
+offset_right = 2.0
 ActionBarBackgroundPath = NodePath("../BottomHud/ActionBarBg")
 
 [node name="OverlayRoot" type="Control" parent="BattleUiRoot" unique_id=2009935606]

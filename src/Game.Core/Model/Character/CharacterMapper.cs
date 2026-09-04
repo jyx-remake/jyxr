@@ -85,6 +85,7 @@ public static class CharacterMapper
         character.SetGender(record.Gender ?? character.Definition.Gender);
         character.SetAiType(record.AiType);
         character.SetPersonality(record.Personality, record.SecondaryPersonality);
+        character.SetLeaveState(record.LeaveState);
         
         character.SetLevel(record.Level);
         character.GrantExperience(record.Experience);
@@ -129,6 +130,30 @@ public static class CharacterMapper
             character.AddEquipmentInstance(EquipmentMapper.FromRecord(equipment.Value, contentRepository));
         }
 
+        foreach (var provenance in record.EquipmentGrantedSkills ?? new Dictionary<string, IReadOnlyList<EquipmentGrantedSkillRecord>>())
+        {
+            var keys = new List<CharacterInstance.EquipmentGrantedSkillKey>();
+            foreach (var entry in provenance.Value)
+            {
+                var kind = string.Equals(entry.Kind, "special", StringComparison.OrdinalIgnoreCase)
+                    ? SkillKind.Special
+                    : string.Equals(entry.Kind, "external", StringComparison.OrdinalIgnoreCase)
+                        ? SkillKind.External
+                        : (SkillKind?)null;
+                if (kind is null)
+                {
+                    continue;
+                }
+
+                keys.Add(new CharacterInstance.EquipmentGrantedSkillKey(kind.Value, entry.SkillId, entry.CreatedByGrant));
+            }
+
+            if (keys.Count > 0)
+            {
+                character.EquipmentGrantedSkills[provenance.Key] = keys;
+            }
+        }
+
         if ((record.Titles ?? []).Count(title => title.Equipped) > 1)
         {
             throw new InvalidOperationException("A character can equip only one title.");
@@ -166,7 +191,15 @@ public static class CharacterMapper
             character.AiType,
             character.Titles.Select(title => new CharacterTitleRecord(title.Id, title.Equipped)).ToList(),
             character.Personality,
-            character.SecondaryPersonality);
+            character.SecondaryPersonality,
+            character.LeaveState,
+            character.EquipmentGrantedSkills.ToDictionary(
+                entry => entry.Key,
+                entry => (IReadOnlyList<EquipmentGrantedSkillRecord>)entry.Value.Select(key =>
+                    new EquipmentGrantedSkillRecord(
+                        key.Kind == SkillKind.Special ? "special" : "external",
+                        key.SkillId,
+                        key.CreatedByGrant)).ToList()));
 
     private static void CopyStats(IReadOnlyDictionary<StatType, int> source, Dictionary<StatType, int> target)
     {

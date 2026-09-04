@@ -94,7 +94,10 @@ public sealed class AdventureState
     public void ChangeFavorability(string targetId, int delta)
     {
         targetId = NormalizeFavorabilityTarget(targetId);
-        _favorabilityByTarget[targetId] = checked(GetFavorability(targetId) + delta);
+        // Legacy addHaogan clamps the shared favorability store at zero: XMJH
+        // authors rely on large negative deltas (for example -50, -100) to
+        // reset a counter back to zero instead of letting it go negative.
+        _favorabilityByTarget[targetId] = Math.Max(0, checked(GetFavorability(targetId) + delta));
     }
 
     private void SetFavorability(string targetId, int value)

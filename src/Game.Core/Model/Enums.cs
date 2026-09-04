@@ -16,6 +16,24 @@ public enum CharacterGender
     Eunuch,
 }
 
+/// <summary>
+/// How a character currently sits outside the active party. Mirrors the
+/// legacy pools: 临时离队 (Temp, recallable through join temp), 永久离队
+/// (Permanent, story-driven and not recallable) and 主动踢出 (Kicked, the
+/// party-panel kick, recallable through the future召回 UI).
+/// </summary>
+public enum CharacterLeaveState
+{
+    [JsonStringEnumMemberName("none")]
+    None,
+    [JsonStringEnumMemberName("temp")]
+    Temp,
+    [JsonStringEnumMemberName("permanent")]
+    Permanent,
+    [JsonStringEnumMemberName("kicked")]
+    Kicked,
+}
+
 public enum WeaponType
 {
     [JsonStringEnumMemberName("quanzhang")]

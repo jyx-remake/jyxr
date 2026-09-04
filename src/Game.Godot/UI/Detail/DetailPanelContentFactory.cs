@@ -2,6 +2,7 @@ using Game.Application.Formatters;
 using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 using Game.Godot.Assets;
 using Game.Presentation.Items;
@@ -21,6 +22,21 @@ public static class DetailPanelContentFactory
 			ResolveSkillIcon(skill),
 			SkillDescriptionFormatter.FormatBbCodeCn(skill, Game.ContentRepository, Game.SkillMaxLevelPolicy),
 			ResolveSkillTitleColor(skill),
+			action);
+	}
+
+	public static DetailPanelContent CreateTitle(
+		CharacterTitleInstance title,
+		DetailPanelAction? action = null)
+	{
+		ArgumentNullException.ThrowIfNull(title);
+
+		return new DetailPanelContent(
+			title.Definition.Name,
+			"人物称号",
+			AssetResolver.LoadTexture(title.Definition.Icon),
+			TitleDescriptionFormatter.FormatBbCodeCn(title.Definition, Game.ContentRepository),
+			Colors.Magenta,
 			action);
 	}
 

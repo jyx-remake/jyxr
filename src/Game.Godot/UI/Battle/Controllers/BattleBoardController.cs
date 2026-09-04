@@ -2,6 +2,7 @@ using Game.Core.Battle;
 using Game.Presentation.Battle;
 using Game.Core.Affix;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 using Game.Godot.Assets;
 using Godot;
@@ -90,8 +91,17 @@ internal sealed class BattleBoardController(
             AssetResolver.LoadTexture(unit.Character.Portrait),
             unit.ActiveBuffs.Select(static buff => new BattleBoardBuffVisual(
                 buff.Definition.Name, buff.Definition.IsDebuff, buff.Level, buff.RemainingTurns)).ToArray(),
-            unit.Character.Titles.FirstOrDefault(static title => title.Equipped)?.Definition.Name))
+            unit.Character.Titles.FirstOrDefault(static title => title.Equipped)?.Definition.Name,
+            ResolveRoleEffect(unit.Character)))
             .ToArray());
+    }
+
+    private static BattleRoleEffectVisual? ResolveRoleEffect(CharacterInstance character)
+    {
+        var aura = RoleEffectResolver.Resolve(character);
+        return aura is null
+            ? null
+            : new BattleRoleEffectVisual(aura.AnimationId, aura.Transparency, aura.Order);
     }
 
     private Highlights ResolveHighlights(BattleState state, BattleInteractionState interaction)

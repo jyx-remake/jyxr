@@ -20,4 +20,20 @@ internal static class MapTimeLighting
 
 		return 1f - LightOpacities[index];
 	}
+
+	/// <summary>
+	/// Ambient opacity of a lit backdrop for the time slot. This is the legacy
+	/// <c>timeOpacity[hour / 2]</c> table: story backdrops are tinted toward
+	/// black at night by lowering the backdrop image's own alpha.
+	/// </summary>
+	public static float GetAmbientOpacity(TimeSlot timeSlot)
+	{
+		var index = (int)timeSlot;
+		if (index < 0 || index >= LightOpacities.Length)
+		{
+			throw new ArgumentOutOfRangeException(nameof(timeSlot), timeSlot, "Unsupported time slot.");
+		}
+
+		return LightOpacities[index];
+	}
 }

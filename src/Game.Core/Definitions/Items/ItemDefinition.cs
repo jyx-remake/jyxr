@@ -24,6 +24,11 @@ public abstract record ItemDefinition
     public IReadOnlyList<ItemTagDefinition> Tags { get; private set; } = [];
     public IReadOnlyList<ItemRequirementDefinition> Requirements { get; init; } = [];
     public IReadOnlyList<ItemUseEffectDefinition> UseEffects { get; init; } = [];
+    /// <summary>
+    /// Legacy <c>box</c> override: false means never stashable (box -1),
+    /// true means always stashable (box 1), null defers to <see cref="Type"/>.
+    /// </summary>
+    public bool? AllowChestStorage { get; init; }
 
     public void ResolveTags(IContentRepository contentRepository)
     {
@@ -77,7 +82,11 @@ public sealed record GenderItemRequirementDefinition(
 [JsonDerivedType(typeof(GrantInternalSkillItemUseEffectDefinition), "internal_skill")]
 [JsonDerivedType(typeof(GrantSpecialSkillItemUseEffectDefinition), "special_skill")]
 [JsonDerivedType(typeof(GrantTalentItemUseEffectDefinition), "grant_talent")]
+[JsonDerivedType(typeof(GrantTitleItemUseEffectDefinition), "grant_title")]
 [JsonDerivedType(typeof(SetGenderItemUseEffectDefinition), "set_gender")]
+[JsonDerivedType(typeof(SetPortraitItemUseEffectDefinition), "set_portrait")]
+[JsonDerivedType(typeof(ClearBuffsItemUseEffectDefinition), "clear_buffs")]
+[JsonDerivedType(typeof(RandomItemItemUseEffectDefinition), "random_item")]
 [JsonDerivedType(typeof(ReduceMaxResourceRatioItemUseEffectDefinition), "reduce_max_resource_ratio")]
 [JsonDerivedType(typeof(RunStoryItemUseEffectDefinition), "run_story")]
 public abstract record ItemUseEffectDefinition;
@@ -123,12 +132,28 @@ public sealed record GrantSpecialSkillItemUseEffectDefinition(
 public sealed record GrantTalentItemUseEffectDefinition(
     string TalentId) : ItemUseEffectDefinition;
 
+public sealed record GrantTitleItemUseEffectDefinition(
+    string TitleId) : ItemUseEffectDefinition;
+
 public sealed record SetGenderItemUseEffectDefinition(
     CharacterGender Gender) : ItemUseEffectDefinition;
+
+public sealed record SetPortraitItemUseEffectDefinition(
+    string PictureId) : ItemUseEffectDefinition;
+
+public sealed record ClearBuffsItemUseEffectDefinition : ItemUseEffectDefinition;
+
+public sealed record RandomItemEntry(
+    string ItemId,
+    int Quantity);
+
+public sealed record RandomItemItemUseEffectDefinition(
+    IReadOnlyList<RandomItemEntry> Items) : ItemUseEffectDefinition;
 
 public sealed record ReduceMaxResourceRatioItemUseEffectDefinition(
     StatType StatId,
     double Ratio) : ItemUseEffectDefinition;
 
 public sealed record RunStoryItemUseEffectDefinition(
-    string StoryId) : ItemUseEffectDefinition;
+    string StoryId,
+    bool KeepItem = false) : ItemUseEffectDefinition;

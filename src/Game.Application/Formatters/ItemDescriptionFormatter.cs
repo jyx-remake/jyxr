@@ -52,8 +52,43 @@ public static class ItemDescriptionFormatter
         AppendPrefixedSection(builder, "使用效果：", ItemUseEffectFormatter.FormatLinesCn(equipment.UseEffects, contentRepository), "yellow", NormalLinePrefix);
         AppendPrefixedSection(builder, "装备词条：", AffixFormatter.FormatEquipmentLinesCn(equipment.Affixes, contentRepository), "yellow", NormalLinePrefix);
         AppendPrefixedSection(builder, "附加词条：", AffixFormatter.FormatEquipmentLinesCn(extraAffixes, contentRepository), "green", ExtraLinePrefix);
+        AppendGrantedSkills(builder, equipment, contentRepository);
         AppendCooldown(builder, equipment.Cooldown);
         return builder.ToString().TrimEnd('\n');
+    }
+
+    private static void AppendGrantedSkills(
+        StringBuilder builder,
+        EquipmentDefinition equipment,
+        IContentRepository contentRepository)
+    {
+        var skillLines = new List<string>();
+        foreach (var granted in equipment.GrantedSkills)
+        {
+            var name = contentRepository.TryGetExternalSkill(granted.SkillId, out var skill)
+                ? skill.Name
+                : granted.SkillId;
+            skillLines.Add($"+{name}（{granted.Level}级）");
+        }
+
+        var specialLines = new List<string>();
+        foreach (var granted in equipment.GrantedSpecialSkills)
+        {
+            if (!contentRepository.TryGetSpecialSkill(granted.SkillId, out var skill))
+            {
+                specialLines.Add($"+{granted.SkillId}");
+                continue;
+            }
+
+            specialLines.Add($"+{skill.Name}");
+            if (!string.IsNullOrWhiteSpace(skill.Description))
+            {
+                specialLines.Add(skill.Description.Trim());
+            }
+        }
+
+        AppendPrefixedSection(builder, "携带技能：", skillLines, "#6495ED", NormalLinePrefix);
+        AppendPrefixedSection(builder, "特殊技能：", specialLines, "#6495ED", NormalLinePrefix);
     }
 
     private static void AppendDescription(StringBuilder builder, string description)

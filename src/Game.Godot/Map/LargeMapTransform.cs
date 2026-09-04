@@ -24,9 +24,23 @@ internal sealed class LargeMapTransform
 	public float Zoom { get; private set; } = 1f;
 	public Vector2 Translation { get; private set; }
 
-	public Vector2 BaseScale => new(
-		ViewportSize.X > 0f ? ViewportSize.X / _logicalSize.X : 1f,
-		ViewportSize.Y > 0f ? ViewportSize.Y / _logicalSize.Y : 1f);
+	/// <summary>
+	/// Uniform "cover" scale: at zoom 1 the map fills the viewport completely
+	/// (no black edges) without aspect distortion. With a viewport whose
+	/// aspect differs from the logical canvas — for example the safe band
+	/// between the HUD strips — the overflowing axis is cropped and stays
+	/// reachable through panning.
+	/// </summary>
+	public Vector2 BaseScale
+	{
+		get
+		{
+			var sx = ViewportSize.X > 0f ? ViewportSize.X / _logicalSize.X : 1f;
+			var sy = ViewportSize.Y > 0f ? ViewportSize.Y / _logicalSize.Y : 1f;
+			var cover = MathF.Max(sx, sy);
+			return new Vector2(cover, cover);
+		}
+	}
 
 	public Vector2 SurfaceScale => BaseScale * Zoom;
 

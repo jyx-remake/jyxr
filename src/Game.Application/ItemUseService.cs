@@ -112,7 +112,13 @@ public sealed class ItemUseService
 
         if (support.Effects is [RunStoryItemUseEffectDefinition runStory])
         {
-            CommitSuccessfulUse(entry);
+            // Legacy story#id#true payloads keep the item (the phone-style
+            // reusable props); without the flag the use consumes it first.
+            if (!runStory.KeepItem)
+            {
+                CommitSuccessfulUse(entry);
+            }
+
             var storyService = _session.StoryService;
             var context = new StoryExecutionContext(new Dictionary<string, ExpressionValue>(StringComparer.Ordinal)
             {
@@ -193,6 +199,20 @@ public sealed class ItemUseService
                 case GrantTalentItemUseEffectDefinition talent:
                     target.LearnTalent(_session.ContentRepository.GetTalent(talent.TalentId));
                     break;
+                case GrantTitleItemUseEffectDefinition title:
+                    _session.CharacterService.LearnTitle(target, title.TitleId);
+                    break;
+                case SetPortraitItemUseEffectDefinition setPortrait:
+                    target.Portrait = setPortrait.PictureId;
+                    resultDetails.Add($"{target.Name}改变了头像");
+                    break;
+                case RandomItemItemUseEffectDefinition randomItem:
+                {
+                    var selected = randomItem.Items[_session.RandomService.Next(0, randomItem.Items.Count)];
+                    _session.InventoryService.AddItem(selected.ItemId, selected.Quantity);
+                    resultDetails.Add($"获得了【{selected.ItemId}】×{selected.Quantity}");
+                    break;
+                }
                 case AddStatsItemUseEffectDefinition addStats:
                     foreach (var (statType, value) in addStats.Values)
                     {
@@ -242,12 +262,11 @@ public sealed class ItemUseService
         {
             return ItemUseSupport.Unsupported("消耗品只能在战斗中使用。");
         }
-        if (item.Type == ItemType.QuestItem)
-        {
-            return ItemUseSupport.Unsupported("剧情物品暂不可主动使用。");
-        }
         if (item.UseEffects.Count == 0)
         {
+            // Quest items without effects stay inert; quest items WITH effects
+            // are legacy-usable props (宝箱/称号/头像/剧情道具), so usability is
+            // decided by the effects themselves instead of the legacy type.
             return ItemUseSupport.Unsupported("该物品没有可用效果。");
         }
         if (!item.UseEffects.All(IsSupportedOutOfBattleEffect))
@@ -263,10 +282,45 @@ public sealed class ItemUseService
             GrantInternalSkillItemUseEffectDefinition or
             GrantSpecialSkillItemUseEffectDefinition or
             GrantTalentItemUseEffectDefinition or
+            GrantTitleItemUseEffectDefinition or
+            SetPortraitItemUseEffectDefinition or
+            RandomItemItemUseEffectDefinition or
             AddStatsItemUseEffectDefinition or
             SetGenderItemUseEffectDefinition or
             ReduceMaxResourceRatioItemUseEffectDefinition or
             RunStoryItemUseEffectDefinition;
+
+    /// <summary>
+    /// Resolves the character an item is pinned to, letting the host skip
+    /// target selection. Two cases auto-resolve: a <c>role_key</c> requirement
+    /// names the only allowed user (legacy <c>require rolekey</c>), and an
+    /// inventory-level effect (<c>random_item</c>) grants to the shared
+    /// inventory instead of a character. Returns null when selection should
+    /// proceed normally.
+    /// </summary>
+    public string? ResolveAutoTargetCharacterId(InventoryEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        var item = entry.Definition;
+
+        if (item.UseEffects is [RandomItemItemUseEffectDefinition])
+        {
+            return State.Party.Members.FirstOrDefault()?.Id;
+        }
+
+        var roleKey = item.Requirements
+            .OfType<RoleKeyItemRequirementDefinition>()
+            .FirstOrDefault();
+        if (roleKey is null)
+        {
+            return null;
+        }
+
+        return State.Party.Members
+            .FirstOrDefault(member => member.Id == roleKey.CharacterId ||
+                string.Equals(member.Definition.Name, roleKey.CharacterId, StringComparison.Ordinal))
+            ?.Id;
+    }
 
     private string? ValidateRequirements(ItemDefinition item, CharacterInstance target)
     {
@@ -343,6 +397,7 @@ public sealed class ItemUseService
         var newInternalSkillCount = 0;
         var specialSkillIds = new HashSet<string>(StringComparer.Ordinal);
         var talentIds = new HashSet<string>(StringComparer.Ordinal);
+        var titleIds = new HashSet<string>(StringComparer.Ordinal);
         var simulatedBaseStats = new Dictionary<StatType, long>();
         var applicableEffects = new List<ItemUseEffectDefinition>();
         var skippedEffects = new List<ItemUseEffectDefinition>();
@@ -421,6 +476,19 @@ public sealed class ItemUseService
                     }
                     requiredTalentPoints = checked(
                         requiredTalentPoints + _session.ContentRepository.GetTalent(talent.TalentId).Point);
+                    applicableEffects.Add(effect);
+                    break;
+                case GrantTitleItemUseEffectDefinition title:
+                    if (!titleIds.Add(title.TitleId))
+                    {
+                        return EffectTargetAnalysis.Failed("物品包含重复的称号授予效果");
+                    }
+                    if (target.Titles.Any(owned =>
+                            string.Equals(owned.Id, title.TitleId, StringComparison.Ordinal)))
+                    {
+                        skippedEffects.Add(effect);
+                        break;
+                    }
                     applicableEffects.Add(effect);
                     break;
                 case AddStatsItemUseEffectDefinition addStats:

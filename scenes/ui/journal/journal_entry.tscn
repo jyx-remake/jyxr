@@ -2,13 +2,16 @@
 
 [ext_resource type="Script" uid="uid://bdvxixwjg0btl" path="res://src/Game.Godot/UI/Journal/JournalEntryLabel.cs" id="1_script"]
 
-[node name="JournalEntryLabel" type="Label" unique_id=448500108]
+[node name="JournalEntryLabel" type="RichTextLabel" unique_id=448500108]
 custom_minimum_size = Vector2(0, 42)
 offset_right = 1.0
 offset_bottom = 31.0
 size_flags_horizontal = 3
 mouse_filter = 1
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
 autowrap_mode = 3
+fit_content = true
+scroll_active = false
 script = ExtResource("1_script")

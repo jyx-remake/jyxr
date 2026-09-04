@@ -55,11 +55,16 @@ public partial class CharacterPanel : JyPanel
 	private CharacterTalentTab _talentTab = null!;
 	private CharacterBiographyTab _biographyTab = null!;
 	private CharacterEquipmentTab _equipmentTab = null!;
+	private CharacterTitleTab _titleTab = null!;
 	private JyButton _attrButton = null!;
 	private JyButton _equipButton = null!;
 	private JyButton _talentButton = null!;
 	private JyButton _skillButton = null!;
 	private JyButton _biographyButton = null!;
+	private JyButton _titleButton = null!;
+	private Label _titleLabel = null!;
+	private int _titleReturnTab;
+	private const int TitleTabIndex = 5;
 	private readonly List<IDisposable> _subscriptions = [];
 
 	public override void _Ready()
@@ -80,20 +85,27 @@ public partial class CharacterPanel : JyPanel
 		_talentTab = GetNode<CharacterTalentTab>("%TalentTab");
 		_biographyTab = GetNode<CharacterBiographyTab>("%BiographyTab");
 		_equipmentTab = GetNode<CharacterEquipmentTab>("%EquipmentTab");
+		_titleTab = GetNode<CharacterTitleTab>("%TitleTab");
 		_attrButton = GetNode<JyButton>("%AttrButton");
 		_equipButton = GetNode<JyButton>("%EquipButton");
 		_talentButton = GetNode<JyButton>("%TalentButton");
 		_skillButton = GetNode<JyButton>("%SkillButton");
 		_biographyButton = GetNode<JyButton>("%BiographyButton");
+		_titleButton = GetNode<JyButton>("%TitleButton");
+		_titleLabel = GetNode<Label>("%TitleLabel");
 		_attrButton.Pressed += () => ShowTab(0);
 		_equipButton.Pressed += () => ShowTab(1);
 		_skillButton.Pressed += () => ShowTab(2);
 		_talentButton.Pressed += () => ShowTab(3);
 		_biographyButton.Pressed += () => ShowTab(4);
+		_titleButton.Pressed += ToggleTitleTab;
+		_attributeTab.CharacterKicked += OnAttributeTabCharacterKicked;
 		_skillTab.SkillToggleRequested += OnSkillToggleRequested;
 		_skillTab.SkillDetailRequested += OnSkillDetailRequested;
+		_titleTab.TitleDetailRequested += OnTitleDetailRequested;
 		_battleAiOptionButton.ItemSelected += OnBattleAiSelected;
 		_subscriptions.Add(Game.Session.Events.Subscribe<CharacterChangedEvent>(OnCharacterChanged));
+		_subscriptions.Add(Game.Session.Events.Subscribe<PartyChangedEvent>(OnPartyChanged));
 
 		OptionButtonBinder.PopulateEnum(_battleAiOptionButton, BattleAiOptions);
 
@@ -164,11 +176,19 @@ public partial class CharacterPanel : JyPanel
 		_attributeTab.IsReadOnly = isReadOnly;
 		_equipmentTab.IsReadOnly = isReadOnly;
 		_skillTab.IsReadOnly = isReadOnly;
+		_titleTab.IsReadOnly = isReadOnly;
 		_attributeTab.Setup(character);
 		_equipmentTab.Setup(character);
 		_skillTab.Setup(character);
 		_talentTab.Setup(character);
 		_biographyTab.Setup(character);
+		_titleTab.Setup(character);
+
+		// The title button is only available to companions that own at least
+		// one title; the label below it shows the currently equipped title.
+		var equippedTitle = character.Titles.FirstOrDefault(title => title.Equipped);
+		_titleLabel.Text = equippedTitle?.Definition.Name ?? string.Empty;
+		_titleButton.Visible = character.Titles.Count > 0 && !isReadOnly;
 		ShowTab(_tabContainer.CurrentTab);
 	}
 
@@ -209,6 +229,9 @@ public partial class CharacterPanel : JyPanel
 		UIRoot.Instance.ShowSkillDetailPanel(skill, action);
 	}
 
+	private void OnTitleDetailRequested(CharacterTitleInstance title) =>
+		UIRoot.Instance.ShowTitleDetailPanel(title);
+
 	private void OnBattleAiSelected(long index)
 	{
 		if (_mode == CharacterPanelMode.ReadOnly)
@@ -234,6 +257,68 @@ public partial class CharacterPanel : JyPanel
 		}
 
 		Render();
+	}
+
+	/// <summary>
+	/// After a kick, the displayed character is no longer an active party
+	/// member. Switch to the hero so the panel keeps showing a valid roster
+	/// target instead of throwing on the stale id.
+	/// </summary>
+	private void OnAttributeTabCharacterKicked(string characterId) => SwitchToHeroIfCurrent(characterId);
+
+	private void OnPartyChanged(PartyChangedEvent partyChangedEvent)
+	{
+		if (!IsInsideTree() || _mode == CharacterPanelMode.ReadOnly || string.IsNullOrWhiteSpace(CharacterId))
+		{
+			return;
+		}
+
+		if (!Game.State.Party.TryGetMember(CharacterId, out _))
+		{
+			SwitchToHero();
+		}
+	}
+
+	private void SwitchToHeroIfCurrent(string characterId)
+	{
+		if (!string.Equals(CharacterId, characterId, StringComparison.Ordinal))
+		{
+			return;
+		}
+
+		SwitchToHero();
+	}
+
+	private void SwitchToHero()
+	{
+		if (!Game.State.Party.TryGetMember(Party.HeroCharacterId, out _))
+		{
+			return;
+		}
+
+		_characterId = Party.HeroCharacterId;
+		_character = null;
+		_battleUnit = null;
+		Render();
+	}
+
+	private void ShowTitleSelectionPanel() => ToggleTitleTab();
+
+	/// <summary>
+	/// The title button toggles the in-panel title page (legacy
+	/// ButtonTitle behavior): first press switches the status area to the
+	/// title tab, pressing again returns to the previously shown tab.
+	/// </summary>
+	private void ToggleTitleTab()
+	{
+		if (_tabContainer.CurrentTab == TitleTabIndex)
+		{
+			ShowTab(_titleReturnTab);
+			return;
+		}
+
+		_titleReturnTab = _tabContainer.CurrentTab;
+		ShowTab(TitleTabIndex);
 	}
 
 	private CharacterInstance? ResolveCharacter()

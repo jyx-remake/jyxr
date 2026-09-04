@@ -43,6 +43,23 @@ public sealed class CharacterTitleTests
     }
 
     [Fact]
+    public void SingleTitleCanBeCheckedAndUnchecked()
+    {
+        var character = TestContentFactory.CreateCharacterInstance(
+            "char_001", TestContentFactory.CreateCharacterDefinition("hero"));
+        var only = new CharacterTitleDefinition { Id = "only", Name = "Only" };
+
+        Assert.True(character.AddTitle(only));
+        Assert.False(character.Titles[0].Equipped);
+        Assert.True(character.EquipTitle("only"));
+        Assert.True(character.Titles[0].Equipped);
+        Assert.True(character.EquipTitle(null));
+        Assert.False(character.Titles[0].Equipped);
+        Assert.True(character.EquipTitle("only"));
+        Assert.True(character.Titles[0].Equipped);
+    }
+
+    [Fact]
     public void InitialCharacterTitlesAreResolvedAndEquipped()
     {
         var title = new CharacterTitleDefinition { Id = "initial", Name = "Initial" };

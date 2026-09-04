@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Expressions;
+using Game.Godot.Map;
 using Game.Godot.UI;
 using System.Globalization;
 
@@ -25,13 +26,23 @@ public sealed partial class GodotStoryRuntimeHost
 	private async ValueTask ExecuteFadeInAsync(
 		string backgroundId,
 		ExpressionValue duration = default,
+		ExpressionValue fullAlpha = default,
 		CancellationToken cancellationToken = default)
 	{
-		World.Instance.SetBackground(backgroundId);
-		await UIRoot.Instance.VisualEffects.FadeAsync(
-			"in",
-			ResolveFadeInDuration(duration),
-			cancellationToken);
+		// Legacy FADEIN swaps the backdrop in at alpha 0 and tweens the image's
+		// own alpha up to the ambient time-of-day opacity (full alpha when the
+		// optional third argument is present), so the scene cuts to black and
+		// the new backdrop fades in. Clearing the black overlay in parallel
+		// keeps a preceding `fade out` from swallowing the effect.
+		World.Instance.SetBackground(ResolveBackdropCandidate(backgroundId), 0f);
+		var fadeDuration = ResolveLegacyFadeSeconds(duration);
+		var targetAlpha = fullAlpha == default
+			? MapTimeLighting.GetAmbientOpacity(Game.State.Clock.TimeSlot)
+			: 1f;
+		var backdropFade = World.Instance.FadeBackdropAlphaAsync(targetAlpha, fadeDuration, cancellationToken);
+		var overlayFade = UIRoot.Instance.VisualEffects.FadeAsync("in", fadeDuration, cancellationToken);
+		await backdropFade;
+		await overlayFade;
 	}
 
 	[StoryCommand("flash")]
@@ -83,34 +94,50 @@ public sealed partial class GodotStoryRuntimeHost
 			throw new ArgumentOutOfRangeException(nameof(duration), "Command 'shake' duration must be finite and non-negative.");
 	}
 
-	private static double ResolveFadeInDuration(ExpressionValue value)
+	private const double LegacyFadeMinSeconds = 0.2d;
+	private const double LegacyFadeMaxSeconds = 600d;
+
+	private static string ResolveBackdropCandidate(string backgroundId)
+	{
+		// Legacy backdrop commands accept a '|'-separated candidate list and
+		// pick one entry at random (used for variant scene art).
+		var candidates = backgroundId.Split('|', StringSplitOptions.RemoveEmptyEntries);
+		if (candidates.Length == 0)
+		{
+			return backgroundId;
+		}
+
+		return candidates.Length == 1
+			? candidates[0]
+			: candidates[Random.Shared.Next(candidates.Length)];
+	}
+
+	private static double ResolveLegacyFadeSeconds(ExpressionValue value)
 	{
 		// Legacy FADEIN serializes its duration as a quoted string (and some
 		// scripts omit it entirely), while hand-authored v3 stories may use a
-		// numeric literal. Accept both forms at this compatibility boundary.
-		if (value == default)
-		{
-			return 1d;
-		}
-
-		var duration = value.Kind switch
-		{
-			ExpressionValueKind.Number => value.AsNumber("Command 'fadein' duration"),
-			ExpressionValueKind.String => double.TryParse(
-				value.AsString("Command 'fadein' duration"),
-				NumberStyles.Float,
-				CultureInfo.InvariantCulture,
-				out var parsed)
-				? parsed
-				: throw new InvalidOperationException("Command 'fadein' duration must be a finite number."),
-			_ => throw new InvalidOperationException("Command 'fadein' duration must be a finite number."),
-		};
+		// numeric literal. Accept both forms at this compatibility boundary,
+		// then apply the legacy clamp: 0.2s minimum, 600s maximum, 0.2s default.
+		var duration = value == default
+			? LegacyFadeMinSeconds
+			: value.Kind switch
+			{
+				ExpressionValueKind.Number => value.AsNumber("Command 'fadein' duration"),
+				ExpressionValueKind.String => double.TryParse(
+					value.AsString("Command 'fadein' duration"),
+					NumberStyles.Float,
+					CultureInfo.InvariantCulture,
+					out var parsed)
+					? parsed
+					: throw new InvalidOperationException("Command 'fadein' duration must be a finite number."),
+				_ => throw new InvalidOperationException("Command 'fadein' duration must be a finite number."),
+			};
 
 		if (!double.IsFinite(duration) || duration < 0d)
 		{
 			throw new ArgumentOutOfRangeException(nameof(value), "Command 'fadein' duration must be finite and non-negative.");
 		}
 
-		return duration;
+		return Math.Clamp(duration, LegacyFadeMinSeconds, LegacyFadeMaxSeconds);
 	}
 }

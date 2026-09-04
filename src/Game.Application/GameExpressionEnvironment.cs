@@ -10,6 +10,7 @@ public static class GameExpressionSymbols
     {
         "silver", "yuanbao", "round", "difficulty", "sect", "morality", "daode", "rank", "elapsed_days",
         "current_map", "current_time_slot", "current_date", "system_date", "friend_count", "achievement_count", "kill_count",
+        "性别1", "性别2", "性别3",
     };
 
     public static void ValidateDynamicVariables(GameState state, StoryExecutionContext context)
@@ -48,6 +49,12 @@ internal sealed class GameExpressionVariableResolver : IExpressionVariableResolv
     public bool TryResolve(string name, out ExpressionValue value)
     {
         var state = _session.State;
+        if (StoryGenderAlias.TryResolve(name, ResolveHeroGender(), out var genderAlias))
+        {
+            value = ExpressionValue.FromString(genderAlias);
+            return true;
+        }
+
         value = name switch
         {
             "silver" => ExpressionValue.FromNumber(state.Currency.Silver),
@@ -74,6 +81,11 @@ internal sealed class GameExpressionVariableResolver : IExpressionVariableResolv
             || _context.Variables.TryGetValue(name, out value)
             || state.Story.TryGetVariable(name, out value);
     }
+
+    private CharacterGender ResolveHeroGender() =>
+        _session.State.Party.TryGetCharacter(Party.HeroCharacterId, out var hero) && hero is not null
+            ? hero.Gender
+            : CharacterGender.Male;
 
     private static int ToDateKey(DateTimeOffset value) =>
         checked(value.Year * 10000 + value.Month * 100 + value.Day);
@@ -248,6 +260,9 @@ internal sealed class PartyCharacterQueryFunctions
     [ExpressionFunction("in_team", "active_party_contains")]
     public bool ActivePartyContains(string characterId) =>
         _session.PartyService.ContainsActiveMemberId(characterId);
+
+    [ExpressionFunction("friend_count", "friendcount")]
+    public int FriendCount() => _session.State.Party.Members.Count;
 
     [ExpressionFunction("character_level")]
     public int CharacterLevel(string characterId) => GetActiveCharacter(characterId).Level;

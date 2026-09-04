@@ -18,20 +18,20 @@ script = ExtResource("1_anahy")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1199421531]
 layout_mode = 0
-offset_left = -365.0
-offset_top = -365.0
-offset_right = 365.0
-offset_bottom = 365.0
+offset_left = -406.0
+offset_top = -410.0
+offset_right = 388.0
+offset_bottom = 379.0
 texture = ExtResource("1_j1r3i")
 
 [node name="Avatar" type="TextureRect" parent="." unique_id=854740600]
 unique_name_in_owner = true
 material = SubResource("ShaderMaterial_d7dln")
 layout_mode = 0
-offset_left = -358.0
-offset_top = -358.0
-offset_right = 154.0
-offset_bottom = 154.0
+offset_left = -358.00003
+offset_top = -359.00003
+offset_right = 149.14282
+offset_bottom = 145.99997
 scale = Vector2(1.4, 1.4)
 texture = ExtResource("4_i7gls")
 expand_mode = 1

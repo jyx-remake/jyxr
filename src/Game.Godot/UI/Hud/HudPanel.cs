@@ -22,6 +22,18 @@ public partial class HudPanel : Control
 	private JyButton _logButton = null!;
 	private JyButton _systemButton = null!;
 
+	/// <summary>
+	/// Distance from the viewport top to the bottom edge of the top bar frame.
+	/// Map views shrink their viewport to start below this line.
+	/// </summary>
+	public float TopSafeInset { get; private set; }
+
+	/// <summary>
+	/// Distance from the viewport bottom to the top edge of the bottom bar
+	/// frame. Map views shrink their viewport to end above this line.
+	/// </summary>
+	public float BottomSafeInset { get; private set; }
+
 	public override void _Ready()
 	{
 		_mapLabel = GetNode<Label>("%MapLabel");
@@ -41,6 +53,30 @@ public partial class HudPanel : Control
 		_backpackButton.Pressed += () => UIRoot.Instance.ShowInventoryPanel();
 		_logButton.Pressed += () => UIRoot.Instance.ShowGameLogPanel();
 		_systemButton.Pressed += () => UIRoot.Instance.ShowSystemPanel();
+
+		// Node rects are only final after the layout pass; re-measure whenever
+		// the HUD (or the window) changes size so map views can follow.
+		Resized += () => CallDeferred(MethodName.RefreshSafeInsets);
+		CallDeferred(MethodName.RefreshSafeInsets);
+	}
+
+	private void RefreshSafeInsets()
+	{
+		if (!IsInsideTree())
+		{
+			return;
+		}
+
+		var frame = GetNodeOrNull<Control>("TopBar/Frame");
+		var frame2 = GetNodeOrNull<Control>("BottomRight/Frame2");
+		if (frame is null || frame2 is null)
+		{
+			return;
+		}
+
+		var viewportHeight = GetViewportRect().Size.Y;
+		TopSafeInset = frame.GetGlobalRect().End.Y;
+		BottomSafeInset = float.Max(0f, viewportHeight - frame2.GetGlobalRect().Position.Y);
 	}
 
 	public void Refresh()

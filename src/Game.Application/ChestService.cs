@@ -108,6 +108,11 @@ public sealed class ChestService
     public bool CanStore(ItemDefinition item)
     {
         ArgumentNullException.ThrowIfNull(item);
+        if (item.AllowChestStorage is bool allowed)
+        {
+            return allowed;
+        }
+
         return item.Type != ItemType.QuestItem;
     }
 

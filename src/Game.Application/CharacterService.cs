@@ -107,14 +107,30 @@ public sealed class CharacterService
     {
         var character = GetPartyMember(characterId);
         var statType = StatCatalog.Parse(statName);
+        var previousValue = character.GetBaseStat(statType);
+        if (CharacterResourceLimitPolicy.IsBaseResourceStat(statType))
+        {
+            // Legacy UPGRADE.MAXHP/MAXMP: the resulting maximum is clamped
+            // into [100, round-scaled cap] and the current resource follows
+            // the new cap (an injury story drains current HP/MP along with
+            // it; a growth story refills it).
+            var target = Math.Clamp(
+                checked(previousValue + value),
+                CharacterResourceLimitPolicy.MinHpMp,
+                CharacterResourceLimitPolicy.GetMaxHpMp());
+            value = checked(target - previousValue);
+        }
+
         character.AddBaseStat(statType, value);
         if (CharacterResourceLimitPolicy.IsBaseResourceStat(statType))
         {
             CharacterResourceLimitPolicy.ClampBaseResourceStat(character, statType);
+            character.SetCurrentResourceToCap(statType);
             character.ClampBattleResources();
         }
 
-        PublishToastAndCharacterChanged(character, $"{character.Name} {statName} {value:+0;-0;0}");
+        var appliedDelta = character.GetBaseStat(statType) - previousValue;
+        PublishToastAndCharacterChanged(character, $"{character.Name} {statName} {appliedDelta:+0;-0;0}");
     }
 
     public void ScaleStats(string characterId, double ratio)

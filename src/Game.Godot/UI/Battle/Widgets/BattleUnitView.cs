@@ -1,4 +1,5 @@
 using Game.Core.Battle;
+using Game.Godot.Assets;
 using Godot;
 
 namespace Game.Godot.UI.Battle;
@@ -36,6 +37,8 @@ public partial class BattleUnitView : Node2D
 	private Label _speechLabel = null!;
 	private Texture2D? _portraitTexture;
 	private ulong _speechSerial;
+	private Node2D? _auraRoot;
+	private string? _auraAnimationId;
 
 	public string UnitId { get; private set; } = string.Empty;
 
@@ -85,6 +88,7 @@ public partial class BattleUnitView : Node2D
 		_activeArrow.Visible = unit.IsActing;
 		Visible = unit.IsAlive;
 		Modulate = Colors.White;
+		SetRoleEffect(unit.RoleEffect);
 	}
 
 	public async void ShowSpeech(string text)
@@ -168,6 +172,93 @@ public partial class BattleUnitView : Node2D
 		// Animation libraries own Sprite.scale for their per-model scale. Facing
 		// lives on the parent so repeated animation evaluation cannot overwrite it.
 		_animationSlot.Scale = new Vector2(facing == BattleFacing.Right ? 1f : -1f, 1f);
+	}
+
+	/// <summary>
+	/// Attaches the character's battle aura visual (legacy role_effect): a
+	/// looping animation sprite parented to the unit. Missing animation
+	/// assets resolve to no aura instead of an error.
+	/// </summary>
+	private void SetRoleEffect(BattleRoleEffectVisual? aura)
+	{
+		if (aura is null)
+		{
+			ClearRoleEffect();
+			return;
+		}
+
+		if (string.Equals(_auraAnimationId, aura.AnimationId, StringComparison.Ordinal) &&
+			_auraRoot is not null && GodotObject.IsInstanceValid(_auraRoot))
+		{
+			return;
+		}
+
+		ClearRoleEffect();
+		var library = AssetResolver.LoadSkillAnimation(aura.AnimationId);
+		var animationName = GetLoopableAnimationName(library);
+		if (library is null || animationName.IsEmpty)
+		{
+			return;
+		}
+
+		var looped = (AnimationLibrary)library.Duplicate(true);
+		var animation = looped.GetAnimation(animationName);
+		if (animation is Animation loopAnimation)
+		{
+			loopAnimation.LoopMode = Animation.LoopModeEnum.Linear;
+		}
+
+		var alpha = aura.Transparency is < 0.001 or > 0.999 ? 0.999f : (float)aura.Transparency;
+		// Parent under the animation slot (same space as the body sprite) so
+		// the effect lands on the character instead of the view origin.
+		_auraRoot = new Node2D { Name = "AuraRoot" };
+		var sprite = new Sprite2D
+		{
+			Name = "Sprite",
+			// Converted skill libraries bake Unity-pivot offsets for an
+			// uncentered Sprite2D (same as the body sprite and
+			// BattleSkillView). Centered rendering would shift the aura by
+			// half the texture size.
+			Centered = false,
+			Modulate = new Color(1f, 1f, 1f, alpha),
+			ZIndex = aura.Order >= 1 ? 1 : 0,
+		};
+		var player = new AnimationPlayer { Name = "AuraPlayer" };
+		_auraRoot.AddChild(sprite);
+		_auraRoot.AddChild(player);
+		_animationSlot.AddChild(_auraRoot);
+		player.AddAnimationLibrary(LibraryKey, looped);
+		player.Play(animationName);
+		_auraAnimationId = aura.AnimationId;
+	}
+
+	private void ClearRoleEffect()
+	{
+		_auraAnimationId = null;
+		if (_auraRoot is not null)
+		{
+			if (GodotObject.IsInstanceValid(_auraRoot))
+			{
+				_auraRoot.QueueFree();
+			}
+
+			_auraRoot = null;
+		}
+	}
+
+	private static StringName GetLoopableAnimationName(AnimationLibrary? library)
+	{
+		if (library is null)
+		{
+			return new StringName();
+		}
+
+		foreach (var animationName in library.GetAnimationList())
+		{
+			return animationName;
+		}
+
+		return new StringName();
 	}
 
 	private static bool HidesSystemShadow(AnimationLibrary? animationLibrary) =>

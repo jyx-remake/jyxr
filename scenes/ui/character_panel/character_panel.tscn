@@ -16,7 +16,9 @@
 [ext_resource type="PackedScene" uid="uid://bcmomxyksiwp8" path="res://scenes/ui/character_panel/talent_tab.tscn" id="16_talent_tab"]
 [ext_resource type="PackedScene" path="res://scenes/ui/skill_tab/skill_tab.tscn" id="17_skill_tab"]
 [ext_resource type="PackedScene" path="res://scenes/ui/character_panel/biography_tab.tscn" id="18_biography_tab"]
+[ext_resource type="PackedScene" uid="uid://0mfyin62rsay" path="res://scenes/ui/character_panel/title_tab.tscn" id="19_title_tab"]
 [ext_resource type="LabelSettings" uid="uid://bny34iuy5pp6r" path="res://assets/theme/label_character_under_avatar.tres" id="19_under_avatar"]
+[ext_resource type="Texture2D" uid="uid://cfqspeuocaipb" path="res://assets/art/ui/character_panel/title_plaque.png" id="20_7xx2v"]
 [ext_resource type="PackedScene" uid="uid://b72cussamrrp0" path="res://scenes/ui/character_panel/equipment_tab.tscn" id="20_equipment_tab"]
 [ext_resource type="Texture2D" uid="uid://ce7mvuckybxqc" path="res://assets/art/ui/character_panel/summary_icons/level.png" id="21_level_icon"]
 [ext_resource type="Texture2D" uid="uid://b455tm6x5ju26" path="res://assets/art/ui/character_panel/summary_icons/health.png" id="22_health_icon"]
@@ -30,6 +32,14 @@
 font_size = 70
 outline_size = 20
 outline_color = Color(0.110077165, 0.1101845, 0.07741476, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hhaex"]
+font_size = 40
+outline_size = 10
+outline_color = Color(0.15265131, 0.052729197, 1.2032688e-08, 1)
+stacked_shadow_count = 1
+stacked_shadow_0/offset = Vector2(3, 3)
+stacked_shadow_0/color = Color(0.3854892, 0.12924883, 0.017508378, 1)
 
 [sub_resource type="StyleBoxEmpty" id="1_empty"]
 
@@ -70,10 +80,10 @@ expand_mode = 1
 
 [node name="AvatarFrame" type="TextureRect" parent="ContentRoot/AvatarBox" index="1" unique_id=2050947383]
 layout_mode = 0
-offset_left = 88.0
-offset_top = 10.0
+offset_left = 88.00001
+offset_top = 10.769234
 offset_right = 588.5491
-offset_bottom = 513.7993
+offset_bottom = 514.56854
 scale = Vector2(1.0947978, 1.0947978)
 texture = ExtResource("6_avatar_frame")
 expand_mode = 1
@@ -81,18 +91,18 @@ expand_mode = 1
 [node name="Labels" type="Control" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=686035826]
 anchors_preset = 0
 offset_left = 224.0
-offset_top = 535.0
+offset_top = 533.0
 offset_right = 520.0
-offset_bottom = 875.0
+offset_bottom = 873.0
 
 [node name="NameLabel" type="Label" parent="ContentRoot/Labels" index="0" unique_id=998987688]
 unique_name_in_owner = true
 custom_maximum_size = Vector2(0, -1)
 layout_mode = 0
-offset_left = 97.0
-offset_top = -103.0
-offset_right = 97.0
-offset_bottom = -20.0
+offset_left = 100.0
+offset_top = -145.0
+offset_right = 100.0
+offset_bottom = -62.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 52
 text = "主角"
@@ -368,19 +378,42 @@ offset_bottom = 316.0
 texture_normal = ExtResource("11_biography_button")
 stretch_mode = 0
 
+[node name="TitleButton" parent="ContentRoot/Buttons" index="5" unique_id=1774622667 instance=ExtResource("12_button")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 175.0
+offset_top = 461.0
+offset_right = 463.0
+offset_bottom = 533.0
+texture_normal = ExtResource("20_7xx2v")
+stretch_mode = 0
+
+[node name="TitleLabel" type="Label" parent="ContentRoot/Buttons/TitleButton" index="0" unique_id=1967339433]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 36.0
+offset_top = 11.0
+offset_right = 257.0
+offset_bottom = 64.0
+text = "吾道不咕"
+label_settings = SubResource("LabelSettings_hhaex")
+horizontal_alignment = 1
+
 [node name="TabContainer" type="TabContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=1891201305]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 554.0
+offset_left = 567.0
 offset_top = 382.0
-offset_right = 1726.0
+offset_right = 1739.0
 offset_bottom = 902.0
 theme_override_styles/panel = SubResource("1_empty")
-current_tab = 0
+current_tab = 3
 tabs_visible = false
 
 [node name="AttributeTab" parent="ContentRoot/TabContainer" index="1" unique_id=1934449746 instance=ExtResource("15_attribute_tab")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -398,7 +431,6 @@ metadata/_tab_index = 2
 
 [node name="TalentTab" parent="ContentRoot/TabContainer" index="4" unique_id=80760765 instance=ExtResource("16_talent_tab")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 
@@ -407,6 +439,12 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 metadata/_tab_index = 4
+
+[node name="TitleTab" parent="ContentRoot/TabContainer" index="6" unique_id=2143392002 instance=ExtResource("19_title_tab")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 5
 
 [node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="4" unique_id=1343441799]
 layout_mode = 0

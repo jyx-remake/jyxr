@@ -25,6 +25,7 @@ public interface IAffixProvider
 [JsonDerivedType(typeof(SkillTargetingModifierAffix), "skill_targeting_modifier")]
 [JsonDerivedType(typeof(HookAffix), "hook")]
 [JsonDerivedType(typeof(TraitAffix), "trait")]
+[JsonDerivedType(typeof(RoleEffectAffix), "role_effect")]
 public abstract record AffixDefinition
 {
     [JsonIgnore]
@@ -120,6 +121,16 @@ public sealed record HookAffix : AffixDefinition
 }
 
 public sealed record TraitAffix(TraitId TraitId) : AffixDefinition;
+
+/// <summary>
+/// Battle aura visual (legacy role_effect trigger): a looping animation
+/// attached to the unit, e.g. title 独咕求败's 剑气/gh_jq.
+/// </summary>
+public sealed record RoleEffectAffix(
+    string Label,
+    string AnimationId,
+    double Transparency = 1d,
+    int Order = 0) : AffixDefinition;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(ChanceBattleHookConditionDefinition), "chance")]

@@ -20,6 +20,28 @@ public sealed class GameDslExpressionTests
     }
 
     [Fact]
+    public void FriendCountCountsMembersWithoutFollowers()
+    {
+        var state = new GameState();
+        state.Party.AddMember(TestContentFactory.CreateCharacterInstance(
+            "hero", TestContentFactory.CreateCharacterDefinition("hero")));
+        state.Party.AddMember(TestContentFactory.CreateCharacterInstance(
+            "ally", TestContentFactory.CreateCharacterDefinition("ally")));
+        state.Party.AddFollower(TestContentFactory.CreateCharacterInstance(
+            "follower", TestContentFactory.CreateCharacterDefinition("follower")));
+        var session = new GameSession(state, TestContentFactory.CreateRepository());
+        var environment = new GameExpressionEnvironment(session).Create();
+        var evaluator = new ExpressionEvaluator();
+
+        Assert.True(evaluator.EvaluateBoolean(
+            new ExpressionParser().ParseExpression("friend_count() >= 2"), environment, "test"));
+        Assert.False(evaluator.EvaluateBoolean(
+            new ExpressionParser().ParseExpression("friend_count() >= 3"), environment, "test"));
+        Assert.True(evaluator.EvaluateBoolean(
+            new ExpressionParser().ParseExpression("friendcount() >= 2"), environment, "test"));
+    }
+
+    [Fact]
     public void XmjhCalendarProfileAndCompletionValuesAreResolvable()
     {
         var state = new GameState();

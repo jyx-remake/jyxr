@@ -272,6 +272,19 @@ internal sealed class StoryStateCommands
         _session.Events.Publish(new JournalChangedEvent());
     }
 
+    [StoryCommand("jump_random")]
+    public StoryCommandResult JumpRandom(IReadOnlyList<string> segmentIds)
+    {
+        if (segmentIds.Count == 0)
+            throw new ArgumentException("jump_random requires at least one candidate.", nameof(segmentIds));
+
+        foreach (var segmentId in segmentIds)
+            _session.ContentRepository.GetStorySegment(segmentId);
+
+        var selectedSegmentId = segmentIds[_session.RandomService.Next(0, segmentIds.Count)];
+        return StoryCommandResult.Jump(selectedSegmentId);
+    }
+
     [StoryCommand("set_flag")]
     public void SetFlag(string name) => _variableMutations.Assign(name, ExpressionValue.FromBoolean(true));
 
@@ -432,8 +445,16 @@ internal sealed class PartyLearningStoryCommands
     public PartyLearningStoryCommands(GameSession session) => _session = session;
 
     [StoryCommand("join")]
-    public void Join(string characterId, string? definitionId = null) =>
-        _session.PartyService.Join(characterId, definitionId);
+    public void Join(string characterId, string? modeOrDefinitionId = null)
+    {
+        if (string.Equals(modeOrDefinitionId, "temp", StringComparison.Ordinal))
+        {
+            _session.PartyService.JoinTemp(characterId);
+            return;
+        }
+
+        _session.PartyService.Join(characterId, modeOrDefinitionId);
+    }
 
     [StoryCommand("join_random")]
     public void JoinRandom(IReadOnlyList<string> characterIds)
@@ -453,7 +474,19 @@ internal sealed class PartyLearningStoryCommands
         _session.PartyService.Follow(characterId, definitionId);
 
     [StoryCommand("leave")]
-    public void Leave(string characterId) => _session.PartyService.Leave(characterId);
+    public void Leave(string characterId, string? mode = null)
+    {
+        // Legacy LEAVE_TEMP semantics (permanent removal with equipment drop)
+        // collapse into the default: a plain leave is not recallable through
+        // join; only the temp form stays recallable.
+        if (string.Equals(mode, "temp", StringComparison.Ordinal))
+        {
+            _session.PartyService.LeaveTemp(characterId);
+            return;
+        }
+
+        _session.PartyService.LeavePermanent(characterId);
+    }
 
     [StoryCommand("leave_follower", "leave_follow")]
     public void LeaveFollower(string characterId) => _session.PartyService.LeaveFollow(characterId);

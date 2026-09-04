@@ -39,19 +39,96 @@ public sealed class PartyService
         ArgumentException.ThrowIfNullOrWhiteSpace(resolvedDefinitionId);
         _session.ContentRepository.GetCharacter(resolvedDefinitionId);
 
-        if (State.Party.ContainsMember(characterId))
+            if (State.Party.TryGetCharacter(characterId, out var existing))
+            {
+                // Legacy parity: permanently-left and kicked characters cannot be
+                // brought back through the plain join command.
+                if (existing.LeaveState is CharacterLeaveState.Permanent or CharacterLeaveState.Kicked)
+                {
+                    _session.DiagnosticLogger.Info($"Join skipped: '{characterId}' has permanently left or was kicked.");
+                    return;
+                }
+
+                if (State.Party.MoveToMembers(characterId))
+                {
+                    existing.ClearLeaveState();
+                    _session.Events.Publish(new PartyChangedEvent());
+                }
+
+                return;
+            }
+
+        State.Party.AddMember(CreateInitialCharacter(characterId, resolvedDefinitionId));
+        _session.Events.Publish(new PartyChangedEvent());
+    }
+
+    /// <summary>
+    /// Recalls a temporarily-left character back into the active party
+    /// (legacy TEMP_JOIN). Only characters left through
+    /// <c>leave(character, 'temp')</c> can be recalled this way.
+    /// </summary>
+    public void JoinTemp(string characterId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(characterId);
+
+        if (!State.Party.TryGetCharacter(characterId, out var character) ||
+            character.LeaveState != CharacterLeaveState.Temp)
         {
+            _session.DiagnosticLogger.Info($"JoinTemp skipped: '{characterId}' is not temporarily left.");
             return;
         }
 
         if (State.Party.MoveToMembers(characterId))
         {
+            character.ClearLeaveState();
             _session.Events.Publish(new PartyChangedEvent());
+        }
+    }
+
+    /// <summary>
+    /// Player-initiated kick (the party UI leave button, legacy
+    /// ButtonLidui = AddManualTemp + JOIN_TEMP): the character leaves the
+    /// active party and can only be brought back through the recall UI.
+    /// </summary>
+    public void Kick(string characterId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(characterId);
+
+        if (string.Equals(characterId, Party.HeroCharacterId, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("The hero cannot be kicked from the party.");
+        }
+
+        if (!State.Party.TryGetMember(characterId, out var character))
+        {
             return;
         }
 
-        State.Party.AddMember(CreateInitialCharacter(characterId, resolvedDefinitionId));
+        MoveToReserves(character);
+        character.SetLeaveState(CharacterLeaveState.Kicked);
         _session.Events.Publish(new PartyChangedEvent());
+    }
+
+    /// <summary>
+    /// Recalls a kicked character back into the active party (the recall UI;
+    /// legacy REJOIN_MENU/rejoin). Only kicked characters can be recalled.
+    /// </summary>
+    public void RecallKicked(string characterId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(characterId);
+
+        if (!State.Party.TryGetCharacter(characterId, out var character) ||
+            character.LeaveState != CharacterLeaveState.Kicked)
+        {
+            _session.DiagnosticLogger.Info($"RecallKicked skipped: '{characterId}' is not kicked.");
+            return;
+        }
+
+        if (State.Party.MoveToMembers(characterId))
+        {
+            character.ClearLeaveState();
+            _session.Events.Publish(new PartyChangedEvent());
+        }
     }
 
     public void Follow(string characterId, string? definitionId = null)
@@ -75,6 +152,10 @@ public sealed class PartyService
         State.Party.AddFollower(CreateInitialCharacter(characterId, resolvedDefinitionId));
     }
 
+    /// <summary>
+    /// Plain leave: moves the character to the reserves without recording a
+    /// leave state (UI-driven roster changes; not blocked by the join guard).
+    /// </summary>
     public void Leave(string characterId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(characterId);
@@ -85,6 +166,33 @@ public sealed class PartyService
         }
 
         MoveToReserves(character);
+        _session.Events.Publish(new PartyChangedEvent());
+    }
+
+    /// <summary>
+    /// Permanent leave (legacy LEAVE_TEMP semantics minus the equipment
+    /// drop): the character leaves the active party and cannot be brought
+    /// back by the plain join command.
+    /// </summary>
+    public void LeavePermanent(string characterId) => LeaveCore(characterId, CharacterLeaveState.Permanent);
+
+    /// <summary>
+    /// Temporary leave (legacy JOIN_TEMP semantics): the character leaves the
+    /// active party but stays recallable through join temp.
+    /// </summary>
+    public void LeaveTemp(string characterId) => LeaveCore(characterId, CharacterLeaveState.Temp);
+
+    private void LeaveCore(string characterId, CharacterLeaveState state)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(characterId);
+
+        if (!State.Party.TryGetMember(characterId, out var character))
+        {
+            return;
+        }
+
+        MoveToReserves(character);
+        character.SetLeaveState(state);
         _session.Events.Publish(new PartyChangedEvent());
     }
 

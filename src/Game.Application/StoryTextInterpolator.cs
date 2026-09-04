@@ -16,6 +16,14 @@ public sealed class StoryTextInterpolator
         @"\$([A-Za-z_\u3007\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF][A-Za-z0-9_\u3007\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]*)\$",
         RegexOptions.Compiled);
 
+    // Legacy authoring wraps gender aliases in doubled dollars ($$性别1$$);
+    // they must be resolved before the single-dollar pass, otherwise the
+    // single-dollar pattern would match the inner $性别1$ and leave the outer
+    // dollars around the resolved text.
+    private static readonly Regex DoubledGenderAliasPattern = new(
+        @"\$\$(性别[123])\$\$",
+        RegexOptions.Compiled);
+
     private readonly GameSession _session;
 
     public StoryTextInterpolator(GameSession session)
@@ -35,8 +43,19 @@ public sealed class StoryTextInterpolator
             return text;
         }
 
+        text = DoubledGenderAliasPattern.Replace(text, match => ResolveGenderAlias(match.Groups[1].Value));
         return PlaceholderPattern.Replace(text, ReplacePlaceholder);
     }
+
+    private string ResolveGenderAlias(string variableName) =>
+        StoryGenderAlias.TryResolve(variableName, ResolveHeroGender(), out var value)
+            ? value
+            : string.Empty;
+
+    private CharacterGender ResolveHeroGender() =>
+        State.Party.TryGetCharacter(Party.HeroCharacterId, out var hero) && hero is not null
+            ? hero.Gender
+            : CharacterGender.Male;
 
     private string ReplacePlaceholder(Match match)
     {
@@ -57,6 +76,10 @@ public sealed class StoryTextInterpolator
             case ZhenlongLevelVariableName:
                 value = (_session.Profile.ZhenlongqijuLevel + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
                 return true;
+            case "性别1":
+            case "性别2":
+            case "性别3":
+                return StoryGenderAlias.TryResolve(variableName, ResolveHeroGender(), out value);
             default:
                 return TryResolveStoryVariable(variableName, out value);
         }

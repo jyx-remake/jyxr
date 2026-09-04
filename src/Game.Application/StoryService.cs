@@ -35,6 +35,7 @@ public sealed class StoryService
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(storyId);
+        storyId = ResolveStoryReference(storyId);
         var executionState = _session.State;
         var entry = _session.ContentRepository.GetStorySegment(storyId);
         var executionContext = context ?? StoryExecutionContext.Empty;
@@ -56,5 +57,31 @@ public sealed class StoryService
             }
             yield return storyEvent;
         }
+    }
+
+    /// <summary>
+    /// Legacy story references occasionally contain a pipe-separated list
+    /// meaning "run one of these at random" (legacy MapUI.LoadStory). An
+    /// exact segment id always wins; otherwise one trimmed candidate is
+    /// picked through the session random service.
+    /// </summary>
+    private string ResolveStoryReference(string storyId)
+    {
+        if (!storyId.Contains('|') || _session.ContentRepository.TryGetStorySegment(storyId, out _))
+        {
+            return storyId;
+        }
+
+        var candidates = storyId
+            .Split('|')
+            .Select(candidate => candidate.Trim())
+            .Where(candidate => candidate.Length > 0)
+            .ToList();
+        if (candidates.Count == 0)
+        {
+            return storyId;
+        }
+
+        return candidates[_session.RandomService.Next(0, candidates.Count)];
     }
 }

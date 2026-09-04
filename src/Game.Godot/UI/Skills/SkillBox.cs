@@ -23,6 +23,7 @@ public partial class SkillBox : Button
 	private SkillInstance? _skill;
 	private bool _isInteractive;
 	private bool _showToggleButton = true;
+	private bool _isEquipmentGranted;
 
 	public override void _Ready()
 	{
@@ -37,12 +38,13 @@ public partial class SkillBox : Button
 		Refresh();
 	}
 
-	public void Setup(SkillInstance skill, bool isInteractive, bool showToggleButton = true)
+	public void Setup(SkillInstance skill, bool isInteractive, bool showToggleButton = true, bool isEquipmentGranted = false)
 	{
 		ArgumentNullException.ThrowIfNull(skill);
 		_skill = skill;
 		_isInteractive = isInteractive;
 		_showToggleButton = showToggleButton;
+		_isEquipmentGranted = isEquipmentGranted;
 		TooltipText = skill.Name;
 		Refresh();
 	}
@@ -79,7 +81,7 @@ public partial class SkillBox : Button
 
 		if (_skill is FormSkillInstance formSkill)
 		{
-			var showFormToggle = _showToggleButton && ShouldShowFormToggle(formSkill);
+			var showFormToggle = _showToggleButton && !_isEquipmentGranted && ShouldShowFormToggle(formSkill);
 			_activeButton.Visible = showFormToggle;
 			_activeButton.Disabled = !showFormToggle || !_isInteractive || !CanToggle(formSkill);
 			_checkMark.Visible = showFormToggle && formSkill.IsEnabled;
@@ -92,7 +94,7 @@ public partial class SkillBox : Button
 			return;
 		}
 
-		_activeButton.Visible = _showToggleButton;
+		_activeButton.Visible = _showToggleButton && !_isEquipmentGranted;
 		_activeButton.Disabled = !_showToggleButton || !_isInteractive || !CanToggle(_skill);
 		_checkMark.Visible = _showToggleButton && _skill.IsActive;
 		_avatar.Texture = ResolveTexture(_skill) ?? _avatar.Texture;
@@ -106,15 +108,23 @@ public partial class SkillBox : Button
 
 	private void OnPressed()
 	{
-		if (_skill is not null)
+		if (_skill is null)
 		{
-			DetailRequested?.Invoke(_skill);
+			return;
 		}
+
+		if (_isEquipmentGranted)
+		{
+			UIRoot.Instance.ShowToast("该技能为装备携带技能，无法编辑。");
+			return;
+		}
+
+		DetailRequested?.Invoke(_skill);
 	}
 
 	private void OnActiveButtonPressed()
 	{
-		if (_skill is null || !_isInteractive || !CanToggle(_skill))
+		if (_skill is null || !_isInteractive || _isEquipmentGranted || !CanToggle(_skill))
 		{
 			return;
 		}

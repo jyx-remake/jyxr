@@ -16,6 +16,14 @@ public partial class InventoryPanel : JyPanel
 	[Export]
 	public PackedScene TagButtonScene { get; set; } = null!;
 
+	/// <summary>
+	/// Fires instead of the detail panel while pick mode is active
+	/// (gift selection reuses the backpack UI).
+	/// </summary>
+	public event Action<InventoryEntry>? EntryPicked;
+
+	public bool IsPickMode { get; private set; }
+
 	private static readonly IReadOnlyList<ItemCategoryOption> Categories = ItemCatalogPresentation.Categories;
 
 	private readonly List<IDisposable> _subscriptions = [];
@@ -178,8 +186,16 @@ public partial class InventoryPanel : JyPanel
 		return itemBox;
 	}
 
+	public void ConfigurePickMode() => IsPickMode = true;
+
 	private void OnEntrySelected(InventoryEntry entry)
 	{
+		if (IsPickMode)
+		{
+			EntryPicked?.Invoke(entry);
+			return;
+		}
+
 		var analysis = Game.ItemUseService.Analyze(entry);
 		var action = new DetailPanelAction(
 			analysis.IsSupported ? ResolveEntryActionLabel(entry) : "不可使用",
@@ -194,6 +210,16 @@ public partial class InventoryPanel : JyPanel
 
 	private void ShowTargetSelectionPanel(InventoryEntry entry)
 	{
+		// Items pinned to one character (legacy require rolekey) and
+		// inventory-level effects (随机开箱) skip target selection entirely
+		// and apply directly.
+		var autoTargetId = Game.ItemUseService.ResolveAutoTargetCharacterId(entry);
+		if (autoTargetId is not null)
+		{
+			_ = InventoryItemUseFlow.UseAsync(entry, autoTargetId, onStoryStarted: () => UIRoot.Instance.CloseMainPanel());
+			return;
+		}
+
 		if (ItemTargetSelectionPanelScene is null)
 		{
 			throw new InvalidOperationException("ItemTargetSelectionPanelScene is not assigned.");

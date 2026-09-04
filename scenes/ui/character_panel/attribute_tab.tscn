@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="15_button"]
 [ext_resource type="Texture2D" uid="uid://io7wtm55j24j" path="res://assets/art/ui/character_stat/shuxingfenpei.png" id="16_qq1ga"]
 [ext_resource type="Texture2D" uid="uid://rp0frp5p0jig" path="res://assets/art/misc/cross.png" id="17_tjgo3"]
+[ext_resource type="Texture2D" uid="uid://d2uwp6pqpglg3" path="res://assets/art/ui/character_stat/lidui.png" id="18_ovudt"]
 
 [node name="AttributeTab" type="Control" unique_id=478578747]
 layout_mode = 3
@@ -487,3 +488,12 @@ offset_bottom = 95.0
 texture_normal = ExtResource("17_tjgo3")
 PressOffset = null
 PressColor = null
+
+[node name="LeaveButton" parent="." unique_id=1274025943 instance=ExtResource("15_button")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1068.0
+offset_top = 449.0
+offset_right = 1132.0
+offset_bottom = 513.0
+texture_normal = ExtResource("18_ovudt")

@@ -38,10 +38,10 @@ TooltipScene = ExtResource("3_tooltip")
 
 [node name="SelectedSkillIconPanel" type="Panel" parent="." unique_id=156823160]
 layout_mode = 0
-offset_left = 39.0
-offset_top = 66.0
-offset_right = 179.0
-offset_bottom = 205.0
+offset_left = 50.0
+offset_top = 80.0
+offset_right = 190.0
+offset_bottom = 219.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_skill_icon")
 
@@ -66,10 +66,10 @@ stretch_mode = 4
 [node name="SelectedSkillNameLabel" type="Label" parent="." unique_id=457406035]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -3.0
-offset_top = -1.0
-offset_right = 36.0
-offset_bottom = 268.0
+offset_left = 7.0
+offset_top = -21.0
+offset_right = 46.0
+offset_bottom = 248.0
 text = "未选中技能"
 label_settings = SubResource("LabelSettings_legacy_skill")
 horizontal_alignment = 1

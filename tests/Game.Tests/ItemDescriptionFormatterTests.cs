@@ -192,6 +192,40 @@ public sealed class ItemDescriptionFormatterTests
     }
 
     [Fact]
+    public void ItemDescriptionFormatter_FormatsEquipmentGrantedSkills()
+    {
+        var equipment = TestContentFactory.CreateEquipment("huoqiang", EquipmentSlotType.Weapon) with
+        {
+            GrantedSkills = [new EquipmentGrantedSkillDefinition("baijia_jianfa", 20)],
+            GrantedSpecialSkills = [new EquipmentGrantedSpecialSkillDefinition("huoqiang_teji")],
+        };
+        var repository = TestContentFactory.CreateRepository(
+            equipment: [equipment],
+            externalSkills: [TestContentFactory.CreateExternalSkill("baijia_jianfa")],
+            specialSkills: [new SpecialSkillDefinition(
+                "huoqiang_teji",
+                "火枪",
+                "开枪射击。",
+                SpecialSkillIntent.Offensive,
+                "",
+                0,
+                new SkillCostDefinition(0, 0),
+                new SkillTargetingDefinition(),
+                "",
+                "",
+                null,
+                [])]);
+
+        var text = ItemDescriptionFormatter.FormatBbCodeCn(equipment, repository);
+
+        Assert.Contains("携带技能：", text, StringComparison.Ordinal);
+        Assert.Contains("+baijia_jianfa（20级）", text, StringComparison.Ordinal);
+        Assert.Contains("特殊技能：", text, StringComparison.Ordinal);
+        Assert.Contains("+火枪", text, StringComparison.Ordinal);
+        Assert.Contains("开枪射击。", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ItemDescriptionFormatter_FormatsEquipmentInstanceExtraAffixesSeparately()
     {
         var equipment = TestContentFactory.CreateEquipment("ward_charm", EquipmentSlotType.Accessory) with

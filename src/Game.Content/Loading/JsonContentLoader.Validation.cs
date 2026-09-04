@@ -1153,6 +1153,8 @@ public sealed partial class JsonContentLoader
         var internalSkillIds = repository.InternalSkills.Keys.ToHashSet(StringComparer.Ordinal);
         var specialSkillIds = repository.SpecialSkills.Keys.ToHashSet(StringComparer.Ordinal);
         var talentIds = repository.Talents.Keys.ToHashSet(StringComparer.Ordinal);
+        var characterTitleIds = repository.CharacterTitles.Keys.ToHashSet(StringComparer.Ordinal);
+        var itemIds = repository.Items.Keys.ToHashSet(StringComparer.Ordinal);
         foreach (var item in repository.Items.Values)
         {
             foreach (var requirement in item.Requirements ?? [])
@@ -1180,6 +1182,27 @@ public sealed partial class JsonContentLoader
                         Ensure(genderRequirement.Genders.Distinct().Count() == genderRequirement.Genders.Count,
                             $"Item '{item.Id}' gender requirement contains duplicate genders.");
                         break;
+                }
+            }
+
+            if (item is EquipmentDefinition equipment)
+            {
+                foreach (var grantedSkill in equipment.GrantedSkills ?? [])
+                {
+                    Ensure(!string.IsNullOrWhiteSpace(grantedSkill.SkillId),
+                        $"Item '{item.Id}' granted skill is missing skillId.");
+                    Ensure(externalSkillIds.Contains(grantedSkill.SkillId),
+                        $"Item '{item.Id}' references missing external skill '{grantedSkill.SkillId}'.");
+                    Ensure(grantedSkill.Level >= 1,
+                        $"Item '{item.Id}' granted skill '{grantedSkill.SkillId}' has invalid level '{grantedSkill.Level}'.");
+                }
+
+                foreach (var grantedSpecial in equipment.GrantedSpecialSkills ?? [])
+                {
+                    Ensure(!string.IsNullOrWhiteSpace(grantedSpecial.SkillId),
+                        $"Item '{item.Id}' granted special skill is missing skillId.");
+                    Ensure(specialSkillIds.Contains(grantedSpecial.SkillId),
+                        $"Item '{item.Id}' references missing special skill '{grantedSpecial.SkillId}'.");
                 }
             }
 
@@ -1253,16 +1276,41 @@ public sealed partial class JsonContentLoader
                             $"Item '{item.Id}' references missing story segment '{runStory.StoryId}'.");
                         Ensure(item is NormalItemDefinition &&
                                item.Type is ItemType.SkillBook or ItemType.SpecialSkillBook or
-                                   ItemType.TalentBook or ItemType.Booster or ItemType.Utility,
+                                   ItemType.TalentBook or ItemType.Booster or ItemType.Utility or
+                                   ItemType.QuestItem,
                             $"Item '{item.Id}' run_story effect is only supported by out-of-battle normal items.");
                         Ensure(item.UseEffects is { Count: 1 },
                             $"Item '{item.Id}' run_story effect must be the item's only use effect.");
+                        break;
+
+                    case GrantTitleItemUseEffectDefinition grantTitle:
+                        Ensure(!string.IsNullOrWhiteSpace(grantTitle.TitleId),
+                            $"Item '{item.Id}' grant_title effect is missing titleId.");
+                        Ensure(characterTitleIds.Contains(grantTitle.TitleId),
+                            $"Item '{item.Id}' references missing character title '{grantTitle.TitleId}'.");
+                        break;
+
+                    case SetPortraitItemUseEffectDefinition setPortrait:
+                        Ensure(!string.IsNullOrWhiteSpace(setPortrait.PictureId),
+                            $"Item '{item.Id}' set_portrait effect is missing pictureId.");
+                        Ensure(repository.TryGetResource(setPortrait.PictureId, out _),
+                            $"Item '{item.Id}' references missing portrait resource '{setPortrait.PictureId}'.");
+                        break;
+
+                    case RandomItemItemUseEffectDefinition randomItem:
+                        Ensure(randomItem.Items is { Count: > 0 },
+                            $"Item '{item.Id}' random_item effect has no entries.");
+                        Ensure(randomItem.Items!.All(entry =>
+                                !string.IsNullOrWhiteSpace(entry.ItemId) &&
+                                entry.Quantity >= 1 &&
+                                itemIds.Contains(entry.ItemId)),
+                            $"Item '{item.Id}' random_item effect references a missing item or an invalid quantity.");
                         break;
                 }
             }
 
             if (item is not EquipmentDefinition &&
-                item.Type is not (ItemType.Consumable or ItemType.QuestItem) &&
+                item.Type is not ItemType.Consumable &&
                 item.UseEffects is { Count: > 0 })
             {
                 Ensure(item.UseEffects.All(IsSupportedOutOfBattleItemEffect),
@@ -1338,6 +1386,9 @@ public sealed partial class JsonContentLoader
             GrantInternalSkillItemUseEffectDefinition or
             GrantSpecialSkillItemUseEffectDefinition or
             GrantTalentItemUseEffectDefinition or
+            GrantTitleItemUseEffectDefinition or
+            SetPortraitItemUseEffectDefinition or
+            RandomItemItemUseEffectDefinition or
             AddStatsItemUseEffectDefinition or
             SetGenderItemUseEffectDefinition or
             ReduceMaxResourceRatioItemUseEffectDefinition or

@@ -2,17 +2,56 @@
 
 [ext_resource type="Script" uid="uid://y7omqi147a7k" path="res://src/Game.Godot/UI/Hud/HudPanel.cs" id="1_hud_script"]
 [ext_resource type="Texture2D" uid="uid://3oqhk4cx0io6" path="res://assets/art/misc/story/dingbu.png" id="2_top_frame"]
+[ext_resource type="Texture2D" uid="uid://bw1cf2iw5dtu0" path="res://assets/art/misc/story/dingbu_lan.png" id="3_devq0"]
 [ext_resource type="Texture2D" uid="uid://dskv8y611d62s" path="res://assets/art/misc/story/gold_ingot.png" id="3_gold"]
+[ext_resource type="Texture2D" uid="uid://cfhqdgh64uufe" path="res://assets/art/misc/story/ying.png" id="4_a3iiw"]
 [ext_resource type="Texture2D" uid="uid://c3blrbqi0vr2j" path="res://assets/art/misc/story/silver_ingot.png" id="4_silver"]
 [ext_resource type="PackedScene" uid="uid://cveba3f8kxvxc" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="5_avatar_box"]
 [ext_resource type="Texture2D" uid="uid://bdjuv8dnauuna" path="res://assets/art/misc/story/nandu.png" id="6_difficulty"]
 [ext_resource type="Texture2D" uid="uid://87tpd68w0d1v" path="res://assets/art/misc/story/anniukuang.png" id="7_menu_frame"]
-[ext_resource type="Texture2D" uid="uid://dgwbyq7dicqt4" path="res://assets/art/misc/story/chilun.png" id="8_system"]
+[ext_resource type="Texture2D" uid="uid://caobusdtt04m8" path="res://assets/art/misc/story/top_kuang3.png" id="8_y6bai"]
 [ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="9_button"]
 [ext_resource type="Texture2D" uid="uid://co16la5kihi6o" path="res://assets/art/misc/story/daoju.png" id="10_backpack"]
 [ext_resource type="Texture2D" uid="uid://bpbr4s8fsji6r" path="res://assets/art/misc/story/rizhi.png" id="11_log"]
+[ext_resource type="Texture2D" uid="uid://do05me7ts368o" path="res://assets/art/misc/story/top_kuang1.png" id="11_qd53f"]
+[ext_resource type="Texture2D" uid="uid://evsr5c5v5hfb" path="res://assets/art/misc/story/top_kuang2.png" id="12_gkg7y"]
 [ext_resource type="Texture2D" uid="uid://cc7yi6jgcfwde" path="res://assets/art/misc/story/zhuangtai.png" id="12_team"]
-[ext_resource type="BitMap" uid="uid://bove0n4ighy11" path="res://scenes/ui/hud/system_button_click_mask.svg" id="13_system_click_mask"]
+[ext_resource type="Texture2D" uid="uid://b8r8q4akubs33" path="res://assets/art/misc/story/bottom_di.png" id="13_qd53f"]
+[ext_resource type="Texture2D" uid="uid://cwap3508tvucd" path="res://assets/art/misc/story/bottom_xitong.png" id="18_gkg7y"]
+[ext_resource type="Texture2D" uid="uid://cg6r1hoeuxewg" path="res://assets/art/misc/story/bottom_email.png" id="20_gkg7y"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_nr60q"]
+font_size = 36
+font_color = Color(0.9764706, 0.9019608, 0.6156863, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_qd53f"]
+font_size = 25
+font_color = Color(0.94509804, 0.8784314, 0.59607846, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_211po"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_y6bai"]
+font = SubResource("FontVariation_211po")
+font_size = 30
+font_color = Color(0.8745098, 0.8156863, 0.59607846, 1)
+outline_size = 4
+outline_color = Color(0.05490196, 0.05490196, 0.05490196, 1)
+shadow_color = Color(0.35979325, 0.27647215, 0.021952195, 0)
+
+[sub_resource type="LabelSettings" id="LabelSettings_tsfp7"]
+font_size = 20
+font_color = Color(0.8745098, 0.81960785, 0.5372549, 1)
+outline_size = 3
+outline_color = Color(0.056291588, 0.056291603, 0.056291573, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_nr60q"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_gkg7y"]
+font = SubResource("FontVariation_nr60q")
+font_size = 60
+font_color = Color(0.8745098, 0.8156863, 0.59607846, 1)
+outline_size = 10
+outline_color = Color(0.00015821587, 0.0001109682, 1.3353246e-05, 1)
 
 [node name="Hud" type="Control" unique_id=1846363281]
 layout_mode = 3
@@ -28,8 +67,8 @@ script = ExtResource("1_hud_script")
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = -1.0
-offset_bottom = 89.0
+offset_top = 8.0
+offset_bottom = 128.0
 grow_horizontal = 2
 
 [node name="ShadowPanel" type="Panel" parent="TopBar" unique_id=35497544]
@@ -37,8 +76,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 4.0
-offset_bottom = -9.0
+offset_top = 1.0
+offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -47,37 +86,101 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 0.35998535
+offset_top = -41.0
+offset_right = 0.35998535
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_top_frame")
+expand_mode = 1
+
+[node name="top_line" type="TextureRect" parent="TopBar" unique_id=300212672]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = -1392.4401
+offset_top = 36.0
+offset_right = -1322.4401
+offset_bottom = 127.0
+texture = ExtResource("3_devq0")
+expand_mode = 1
+
+[node name="top_line2" type="TextureRect" parent="TopBar" unique_id=144480255]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = -1003.80005
+offset_top = 36.0
+offset_right = -933.80005
+offset_bottom = 127.0
+texture = ExtResource("3_devq0")
+expand_mode = 1
+
+[node name="top_line3" type="TextureRect" parent="TopBar" unique_id=308622557]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = -463.44006
+offset_top = 36.0
+offset_right = -393.44006
+offset_bottom = 127.0
+texture = ExtResource("3_devq0")
+expand_mode = 1
+
+[node name="top_line4" type="TextureRect" parent="TopBar" unique_id=551526542]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = 212.55994
+offset_top = 36.0
+offset_right = 282.5597
+offset_bottom = 127.0
+texture = ExtResource("3_devq0")
+expand_mode = 1
+
+[node name="top_ying" type="TextureRect" parent="TopBar" unique_id=1420290943]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = -1660.4401
+offset_top = -47.0
+offset_right = 259.55994
+offset_bottom = 134.0
+texture = ExtResource("4_a3iiw")
 expand_mode = 1
 
 [node name="HeroWidget" type="Control" parent="TopBar" unique_id=1555668131]
 layout_mode = 1
 anchor_left = 0.092
 anchor_right = 0.092
-offset_left = -109.99999
-offset_top = 2.999999
-offset_right = -109.99999
-offset_bottom = 2.999999
+offset_left = -212.64
+offset_top = -22.000008
+offset_right = -212.64
+offset_bottom = -22.000008
 scale = Vector2(0.4, 0.4)
 
 [node name="HeroButton" parent="TopBar/HeroWidget" unique_id=75376425 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 228.0
-offset_top = 14.500004
-offset_right = 529.0
-offset_bottom = 311.5
+offset_left = 108.0
+offset_top = 72.0
+offset_right = 108.0
+offset_bottom = 72.0
 tooltip_text = "玩家数据"
 
 [node name="HeroBox" parent="TopBar/HeroWidget/HeroButton" unique_id=1235880245 instance=ExtResource("5_avatar_box")]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = 155.0
-offset_top = 151.0
-offset_right = 155.0
-offset_bottom = 151.0
+offset_left = 207.90002
+offset_top = 178.00006
+offset_right = 207.90002
+offset_bottom = 178.00006
 scale = Vector2(0.36274618, 0.36274618)
 mouse_filter = 2
 
@@ -92,15 +195,39 @@ offset_bottom = 512.0
 scale = Vector2(0.3784722, 0.3784722)
 texture = ExtResource("6_difficulty")
 
+[node name="top_moneydi1" type="TextureRect" parent="TopBar" unique_id=1933617549]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = -317.4403
+offset_top = 54.0
+offset_right = -99.44031
+offset_bottom = 119.0
+texture = ExtResource("8_y6bai")
+expand_mode = 1
+
+[node name="top_moneydi2" type="TextureRect" parent="TopBar" unique_id=217114466]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = -46.440308
+offset_top = 52.0
+offset_right = 171.5597
+offset_bottom = 117.0
+texture = ExtResource("8_y6bai")
+expand_mode = 1
+
 [node name="GoldIngot" type="TextureRect" parent="TopBar" unique_id=1207954560]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.865
 anchor_right = 0.865
-offset_left = -40.200073
-offset_top = 22.0
-offset_right = 39.799927
-offset_bottom = 70.0
+offset_left = -69.84021
+offset_top = 60.0
+offset_right = 10.15979
+offset_bottom = 108.0
 texture = ExtResource("3_gold")
 expand_mode = 1
 
@@ -109,11 +236,23 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.7
 anchor_right = 0.7
-offset_left = -42.0
-offset_top = 22.0
-offset_right = 43.18506
-offset_bottom = 68.0
+offset_left = -25.640015
+offset_top = 60.0
+offset_right = 59.545044
+offset_bottom = 106.0
 texture = ExtResource("4_silver")
+expand_mode = 1
+
+[node name="top_mapnamedi" type="TextureRect" parent="TopBar" unique_id=1987896671]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = -896.80005
+offset_top = 34.0
+offset_right = -506.54187
+offset_bottom = 126.0
+texture = ExtResource("11_qd53f")
 expand_mode = 1
 
 [node name="MapLabel" type="Label" parent="TopBar" unique_id=1162998076]
@@ -122,12 +261,27 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.26
 anchor_right = 0.26
-offset_left = -131.00003
-offset_top = 29.0
-offset_right = 119.99997
-offset_bottom = 60.0
+offset_left = 329.80002
+offset_top = 51.0
+offset_right = 598.80005
+offset_bottom = 111.0
 text = "桃花岛"
+label_settings = SubResource("LabelSettings_nr60q")
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="top_timedi" type="TextureRect" parent="TopBar" unique_id=962582632]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.865
+anchor_right = 0.865
+offset_left = -1338.4401
+offset_top = 45.0
+offset_right = -985.44006
+offset_bottom = 127.0
+texture = ExtResource("12_gkg7y")
+expand_mode = 1
 
 [node name="DataTimeLabel" type="Label" parent="TopBar" unique_id=190790743]
 unique_name_in_owner = true
@@ -135,12 +289,14 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -226.0
-offset_top = 29.0
-offset_right = 248.0
-offset_bottom = 60.0
-text = "1年1月1日 子时"
+offset_left = -630.0
+offset_top = 70.0
+offset_right = -292.0
+offset_bottom = 102.0
+text = "江湖十一年十一月十一日 子时"
+label_settings = SubResource("LabelSettings_qd53f")
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SilverIngotLabel" type="Label" parent="TopBar" unique_id=194327460]
 unique_name_in_owner = true
@@ -148,10 +304,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.77
 anchor_right = 0.77
-offset_left = -64.3999
-offset_top = 28.0
-offset_right = 63.600098
-offset_bottom = 59.0
+offset_left = -80.04016
+offset_top = 71.0
+offset_right = 47.95984
+offset_bottom = 102.0
 text = "0"
 horizontal_alignment = 1
 
@@ -161,11 +317,37 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.93
 anchor_right = 0.93
-offset_left = -78.599976
-offset_top = 27.0
-offset_right = 76.400024
-offset_bottom = 58.0
+offset_left = -119.6001
+offset_top = 69.0
+offset_right = 4.3999023
+offset_bottom = 100.0
 text = "0"
+horizontal_alignment = 1
+
+[node name="top_name" type="Label" parent="TopBar" unique_id=1997457790]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.26
+anchor_right = 0.26
+offset_left = -338.19998
+offset_top = 55.0
+offset_right = -248.19998
+offset_bottom = 91.0
+text = "主角"
+label_settings = SubResource("LabelSettings_y6bai")
+horizontal_alignment = 1
+
+[node name="top_round" type="Label" parent="TopBar" unique_id=2133194394]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.26
+anchor_right = 0.26
+offset_left = -337.19998
+offset_top = 90.0
+offset_right = -247.19998
+offset_bottom = 114.0
+text = "第1周目"
+label_settings = SubResource("LabelSettings_tsfp7")
 horizontal_alignment = 1
 
 [node name="BottomRight" type="Control" parent="." unique_id=294277723]
@@ -176,11 +358,19 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 14.0
-offset_top = 13.0
+offset_top = 18.0
 offset_right = 14.0
-offset_bottom = 13.0
+offset_bottom = 18.0
 grow_horizontal = 0
 grow_vertical = 0
+
+[node name="Frame2" type="TextureRect" parent="BottomRight" unique_id=1904137392]
+layout_mode = 0
+offset_left = -1936.0
+offset_top = -165.0
+offset_right = -10.0
+offset_bottom = 16.565628
+texture = ExtResource("13_qd53f")
 
 [node name="MenueButtonGroup" type="Control" parent="BottomRight" unique_id=737845938]
 anchors_preset = 0
@@ -191,6 +381,7 @@ offset_bottom = -195.0
 scale = Vector2(0.3684396, 0.36843964)
 
 [node name="Frame" type="TextureRect" parent="BottomRight/MenueButtonGroup" unique_id=1224916071]
+visible = false
 layout_mode = 0
 offset_left = -455.97705
 offset_top = -464.1194
@@ -201,45 +392,81 @@ texture = ExtResource("7_menu_frame")
 [node name="BackpackButton" parent="BottomRight/MenueButtonGroup" unique_id=708079883 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -428.83554
-offset_top = 100.4235
-offset_right = -92.83554
-offset_bottom = 436.4235
+offset_left = -2358.5957
+offset_top = 130.28116
+offset_right = -2022.5957
+offset_bottom = 466.28116
+pivot_offset = Vector2(0.0007324219, 0)
 tooltip_text = "物品"
 texture_normal = ExtResource("10_backpack")
 
 [node name="LogButton" parent="BottomRight/MenueButtonGroup" unique_id=822725145 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -317.55542
-offset_top = -320.26956
-offset_right = 18.44458
-offset_bottom = 15.730438
+offset_left = -1772.3389
+offset_top = 127.56665
+offset_right = -1436.3389
+offset_bottom = 463.56665
 tooltip_text = "江湖日志"
 texture_normal = ExtResource("11_log")
 
 [node name="TeamButton" parent="BottomRight/MenueButtonGroup" unique_id=713409378 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 86.85277
-offset_top = -436.97794
-offset_right = 422.85278
-offset_bottom = -100.977936
+offset_left = -2990.9922
+offset_top = 132.9956
+offset_right = -2654.9922
+offset_bottom = 468.9956
 tooltip_text = "队伍"
 texture_normal = ExtResource("12_team")
 
 [node name="SystemButton" parent="BottomRight/MenueButtonGroup" unique_id=2079598957 instance=ExtResource("9_button")]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -214.41699
-offset_top = -187.27661
-offset_right = 477.583
-offset_bottom = 496.7234
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = -374.552
+offset_top = 225.274
+offset_right = 124.85132
+offset_bottom = 434.2635
 tooltip_text = "系统"
-texture_normal = ExtResource("8_system")
-texture_click_mask = ExtResource("13_system_click_mask")
+texture_normal = ExtResource("18_gkg7y")
+
+[node name="systemname" type="Label" parent="BottomRight/MenueButtonGroup/SystemButton" unique_id=2022547939]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12100001
+anchor_top = 0.128
+anchor_right = 0.12100001
+anchor_bottom = 0.128
+offset_left = 181.1303
+offset_top = 32.9606
+offset_right = 301.1303
+offset_bottom = 103.9606
+text = "设置"
+label_settings = SubResource("LabelSettings_gkg7y")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="emailButton" parent="BottomRight/MenueButtonGroup" unique_id=1774622667 instance=ExtResource("9_button")]
+layout_mode = 0
+offset_left = -958.0944
+offset_top = 225.27438
+offset_right = -458.6911
+offset_bottom = 434.2639
+tooltip_text = "信件"
+texture_normal = ExtResource("20_gkg7y")
+
+[node name="systemname" type="Label" parent="BottomRight/MenueButtonGroup/emailButton" unique_id=1827196839]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.12100001
+anchor_top = 0.128
+anchor_right = 0.12100001
+anchor_bottom = 0.128
+offset_left = 175.70335
+offset_top = 32.9606
+offset_right = 295.70337
+offset_bottom = 103.9606
+text = "信"
+label_settings = SubResource("LabelSettings_gkg7y")
+horizontal_alignment = 1
+vertical_alignment = 1

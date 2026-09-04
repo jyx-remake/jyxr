@@ -5,6 +5,9 @@ namespace Game.Application;
 
 public sealed class CharacterResourceLimitPolicy
 {
+    // Legacy UPGRADE.MAXHP/MAXMP floors the resulting maximum at 100.
+    public const int MinHpMp = 100;
+
     private readonly Func<GameConfig> _configProvider;
     private readonly Func<int> _roundProvider;
 

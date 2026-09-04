@@ -93,73 +93,26 @@ public partial class ItemTargetSelectionPanel : JyPanel
 
 		_isUsing = true;
 		var entry = _entry;
-		var character = Game.State.Party.GetMember(characterId);
-		var candidate = Game.ItemUseService.AnalyzeTarget(entry, character);
-		if (!candidate.CanUse)
-		{
-			UIRoot.Instance.ShowSuggestion(candidate.Reason);
-			_isUsing = false;
-			return;
-		}
-
-		var acceptPartialEffects = false;
-		if (candidate.RequiresConfirmation)
-		{
-			var skippedEffectLines = candidate.SkippedEffects
-				.Select(effect => ItemUseEffectFormatter.FormatCn(effect, Game.ContentRepository)
-					.Replace('\n', ' '));
-			var confirmationText =
-				$"以下效果不会生效：\n{string.Join("\n", skippedEffectLines.Select(line => $"• {line}"))}\n\n仍要使用【{entry.Definition.Name}】吗？";
-			acceptPartialEffects = await UIRoot.Instance.ShowConfirmAsync(
-				confirmationText,
-				ConfirmDialogTone.Warning);
-			if (!acceptPartialEffects)
-			{
-				_isUsing = false;
-				return;
-			}
-		}
-
 		var runsStory = entry.Definition.UseEffects is [RunStoryItemUseEffectDefinition];
-		if (runsStory)
-		{
-			UIRoot.Instance.CloseMainPanel();
-			UIRoot.Instance.SetStoryPresentationActive(true);
-			QueueFree();
-		}
-
+		var used = false;
 		try
 		{
-			var result = acceptPartialEffects
-				? await Game.ItemUseService.UseAsync(entry, characterId, true)
-				: await Game.ItemUseService.UseAsync(entry, characterId);
-			if (!result.Success)
-			{
-				UIRoot.Instance.ShowSuggestion(result.Message);
-				return;
-			}
-
-			if (!result.Message.IsWhiteSpace())
-			{
-				UIRoot.Instance.ShowToast(result.Message);
-			}
-			if (!runsStory)
-			{
-				QueueFree();
-			}
-		}
-		catch (Exception exception)
-		{
-			Game.Logger.Error("Using inventory item failed.", exception);
-			UIRoot.Instance.ShowSuggestion(exception.Message);
+			used = await InventoryItemUseFlow.UseAsync(
+				entry,
+				characterId,
+				onStoryStarted: () =>
+				{
+					UIRoot.Instance.CloseMainPanel();
+					QueueFree();
+				});
 		}
 		finally
 		{
-			if (runsStory && GodotObject.IsInstanceValid(UIRoot.Instance))
-			{
-				UIRoot.Instance.SetStoryPresentationActive(false);
-			}
 			_isUsing = false;
+			if ((used || runsStory) && GodotObject.IsInstanceValid(this) && IsInsideTree())
+			{
+				QueueFree();
+			}
 		}
 	}
 

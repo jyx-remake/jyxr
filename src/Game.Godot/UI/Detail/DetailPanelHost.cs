@@ -1,3 +1,4 @@
+using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 using Game.Application;
 using Game.Core.Model;
@@ -16,6 +17,12 @@ public partial class DetailPanelHost : Control
 	{
 		ArgumentNullException.ThrowIfNull(skill);
 		return Show(DetailPanelContentFactory.CreateSkill(skill, action));
+	}
+
+	public Control ShowTitle(CharacterTitleInstance title, DetailPanelAction? action = null)
+	{
+		ArgumentNullException.ThrowIfNull(title);
+		return Show(DetailPanelContentFactory.CreateTitle(title, action));
 	}
 
 	public Control ShowInventoryEntry(InventoryEntry entry, DetailPanelAction? action = null)

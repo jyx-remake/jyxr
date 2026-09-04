@@ -36,6 +36,23 @@ public sealed class FavorabilityStoryTests
     }
 
     [Fact]
+    public void ChangeFavorability_ClampsAtZeroLikeLegacyHaogan()
+    {
+        // Legacy addHaogan floors the 50-base store at zero; XMJH reset flows
+        // rely on large negative deltas (for example 采药#-100) landing on 0.
+        var adventure = new AdventureState();
+
+        adventure.ChangeFavorability("采药", -100);
+        Assert.Equal(0, adventure.GetFavorability("采药"));
+
+        adventure.ChangeFavorability("采药", -50);
+        Assert.Equal(0, adventure.GetFavorability("采药"));
+
+        adventure.ChangeFavorability("采药", 3);
+        Assert.Equal(3, adventure.GetFavorability("采药"));
+    }
+
+    [Fact]
     public void FavorabilityFunction_ReturnsTargetedFavorability()
     {
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());

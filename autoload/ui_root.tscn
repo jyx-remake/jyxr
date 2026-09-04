@@ -36,6 +36,7 @@
 [ext_resource type="PackedScene" uid="uid://chmb657ktjrbe" path="res://scenes/ui/minigame/strength_training_screen.tscn" id="24_strength_training"]
 [ext_resource type="Script" uid="uid://564a0r68gkg3" path="res://src/Game.Godot/UI/StoryVisualEffects.cs" id="25_story_effects"]
 [ext_resource type="PackedScene" path="res://scenes/ui/story/story_video_player.tscn" id="26_story_video"]
+[ext_resource type="PackedScene" path="res://scenes/ui/party_panel/recall_panel.tscn" id="28_recall_panel"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_story_filter"]
 shader = ExtResource("10_story_filter")
@@ -57,6 +58,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_ui_root")
 PartyPanelScene = ExtResource("2_party_panel")
+RecallPanelScene = ExtResource("28_recall_panel")
 CharacterRosterPanelScene = ExtResource("3_i0hgf")
 InventoryPanelScene = ExtResource("12_inventory_panel")
 GameLogPanelScene = ExtResource("7_journal")

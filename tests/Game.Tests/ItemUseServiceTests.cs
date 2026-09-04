@@ -788,6 +788,35 @@ public sealed class ItemUseServiceTests
         Assert.Empty(state.Inventory.Entries);
     }
 
+    [Fact]
+    public async Task UseAsync_RunStory_KeepItemSkipsConsumption()
+    {
+        var item = CreateItem(
+            "reusable_phone",
+            ItemType.Utility,
+            [new RunStoryItemUseEffectDefinition("keep_story", KeepItem: true)],
+            consumeOnUse: true);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(item);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            storyScripts:
+            [
+                new StoryScript(
+                    StoryScript.CurrentVersion,
+                    [new Segment("keep_story", [])]),
+            ],
+            items: [item]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(item);
+
+        var result = await session.ItemUseService.UseAsync(entry, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Single(state.Inventory.Entries);
+    }
+
     private static GameState CreateStateWithHero(
         CharacterDefinition heroDefinition,
         out Game.Core.Model.Character.CharacterInstance hero)
@@ -796,6 +825,194 @@ public sealed class ItemUseServiceTests
         hero = TestContentFactory.CreateCharacterInstance("hero", heroDefinition, state.EquipmentInstanceFactory);
         state.Party.AddMember(hero);
         return state;
+    }
+
+    [Fact]
+    public async Task Use_TitleItem_GrantsTitleAndConsumes()
+    {
+        var title = new CharacterTitleDefinition { Id = "襄阳义士", Name = "襄阳义士" };
+        var item = CreateItem(
+            "襄阳义士称号",
+            ItemType.SpecialSkillBook,
+            [new GrantTitleItemUseEffectDefinition(title.Id)],
+            consumeOnUse: true);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(item);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            characterTitles: [title],
+            items: [item]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(item);
+
+        var result = await session.ItemUseService.UseAsync(entry, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Contains(hero.Titles, owned => owned.Id == title.Id);
+        Assert.Empty(state.Inventory.Entries);
+    }
+
+    [Fact]
+    public async Task Use_TitleItem_AlreadyOwned_FailsWithoutConsuming()
+    {
+        var title = new CharacterTitleDefinition { Id = "襄阳义士", Name = "襄阳义士" };
+        var item = CreateItem(
+            "襄阳义士称号",
+            ItemType.SpecialSkillBook,
+            [new GrantTitleItemUseEffectDefinition(title.Id)],
+            consumeOnUse: true);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        hero.AddTitle(title);
+        state.Inventory.AddItem(item);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            characterTitles: [title],
+            items: [item]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(item);
+
+        var result = await session.ItemUseService.UseAsync(entry, hero.Id);
+
+        Assert.False(result.Success);
+        Assert.Single(state.Inventory.Entries);
+    }
+
+    [Fact]
+    public async Task Use_PortraitItem_SetsPortraitAndConsumes()
+    {
+        var resource = new ResourceDefinition { Id = "头像.雄霸", Group = "head" };
+        var item = CreateItem(
+            "雄霸面具",
+            ItemType.QuestItem,
+            [new SetPortraitItemUseEffectDefinition(resource.Id)],
+            consumeOnUse: true);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        state.Inventory.AddItem(item);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            resources: [resource],
+            items: [item]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(item);
+
+        var result = await session.ItemUseService.UseAsync(entry, hero.Id);
+
+        Assert.True(result.Success);
+        Assert.Equal(resource.Id, hero.Portrait);
+        Assert.Empty(state.Inventory.Entries);
+    }
+
+    [Fact]
+    public async Task Use_RandomBox_GrantsExactlyOneEntryAndConsumes()
+    {
+        var rewards = new[]
+        {
+            CreateItem("猪肉", ItemType.Consumable, []),
+            CreateItem("王母蟠桃", ItemType.Consumable, []),
+            CreateItem("雕羽", ItemType.Consumable, []),
+        };
+        var box = CreateItem(
+            "宝箱",
+            ItemType.QuestItem,
+            [new RandomItemItemUseEffectDefinition(
+                rewards.Select(reward => new RandomItemEntry(reward.Id, 1)).ToList())],
+            consumeOnUse: true);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out _);
+        state.Inventory.AddItem(box);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            items: [box, .. rewards]);
+        var session = new GameSession(state, repository, randomService: new Game.Core.Engine.DeterministicRandomService(7));
+        var entry = state.Inventory.GetStack(box);
+
+        var result = await session.ItemUseService.UseAsync(entry, "hero");
+
+        Assert.True(result.Success);
+        Assert.Single(state.Inventory.Entries);
+        var grantedRewards = rewards.Where(reward => state.Inventory.ContainsStack(reward, 1)).ToList();
+        Assert.Single(grantedRewards);
+    }
+
+    [Fact]
+    public void Analyze_QuestItemWithRunStoryEffect_IsSupported()
+    {
+        var item = CreateItem(
+            "水底宝箱",
+            ItemType.QuestItem,
+            [new RunStoryItemUseEffectDefinition("水底宝箱剧情")],
+            consumeOnUse: true);
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out _);
+        state.Inventory.AddItem(item);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            items: [item]);
+        var session = new GameSession(state, repository);
+        var entry = state.Inventory.GetStack(item);
+
+        var analysis = session.ItemUseService.Analyze(entry);
+
+        Assert.True(analysis.IsSupported);
+    }
+
+    [Fact]
+    public void ResolveAutoTarget_RoleKeyPinsPartyMember()
+    {
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        var pinnedItem = CreateItem(
+            "圣火光明袍",
+            ItemType.QuestItem,
+            [],
+            consumeOnUse: false) with
+        {
+            Requirements = [new RoleKeyItemRequirementDefinition("hero")],
+        };
+        state.Inventory.AddItem(pinnedItem);
+        var strangerPinnedItem = CreateItem(
+            "龙痕剑",
+            ItemType.QuestItem,
+            [],
+            consumeOnUse: false) with
+        {
+            Requirements = [new RoleKeyItemRequirementDefinition("雷震")],
+        };
+        state.Inventory.AddItem(strangerPinnedItem);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            items: [pinnedItem, strangerPinnedItem]);
+        var session = new GameSession(state, repository);
+
+        Assert.Equal(
+            hero.Id,
+            session.ItemUseService.ResolveAutoTargetCharacterId(state.Inventory.GetStack(pinnedItem)));
+        Assert.Null(
+            session.ItemUseService.ResolveAutoTargetCharacterId(state.Inventory.GetStack(strangerPinnedItem)));
+    }
+
+    [Fact]
+    public void ResolveAutoTarget_InventoryEffectTargetsFirstPartyMember()
+    {
+        var heroDefinition = TestContentFactory.CreateCharacterDefinition("hero");
+        var state = CreateStateWithHero(heroDefinition, out var hero);
+        var box = CreateItem(
+            "宝箱",
+            ItemType.QuestItem,
+            [new RandomItemItemUseEffectDefinition([new RandomItemEntry("猪肉", 1)])],
+            consumeOnUse: true);
+        state.Inventory.AddItem(box);
+        var repository = TestContentFactory.CreateRepository(
+            characters: [heroDefinition],
+            items: [box]);
+        var session = new GameSession(state, repository);
+
+        Assert.Equal(
+            hero.Id,
+            session.ItemUseService.ResolveAutoTargetCharacterId(state.Inventory.GetStack(box)));
     }
 
     private static NormalItemDefinition CreateItem(

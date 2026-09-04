@@ -61,6 +61,14 @@ public sealed partial class GodotStoryRuntimeHost
 		CancellationToken cancellationToken = default) =>
 		new(UIRoot.Instance.ShowSuggestionAsync(text, title, acknowledgeText, cancellationToken));
 
+	[StoryCommand("show_favorability")]
+	private ValueTask ExecuteShowFavorabilityAsync(
+		string target,
+		CancellationToken cancellationToken = default) =>
+		new(UIRoot.Instance.ShowSuggestionAsync(
+			$"{target}：{Game.State.Adventure.GetFavorability(target)}",
+			cancellationToken: cancellationToken));
+
 	[StoryCommand("toast")]
 	private ValueTask ExecuteToastAsync(bool enabled)
 	{

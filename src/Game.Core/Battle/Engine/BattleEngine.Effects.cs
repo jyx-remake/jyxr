@@ -307,6 +307,11 @@ public sealed partial class BattleEngine
                         detoxify.Values![0],
                         detoxify.Values[1]);
                     break;
+                case ClearBuffsItemUseEffectDefinition:
+                    // Legacy 清除所有BUFF: strip every status on the target,
+                    // positive and negative alike.
+                    _battleBuffResolver.Remove(state, source, target, static _ => true);
+                    break;
             }
         }
     }

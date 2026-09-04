@@ -596,7 +596,13 @@ public sealed record BattleBoardUnitVisual(
 	int ActionGauge,
 	Texture2D? PortraitTexture,
 	IReadOnlyList<BattleBoardBuffVisual> Buffs,
-	string? EquippedTitleName = null);
+	string? EquippedTitleName = null,
+	BattleRoleEffectVisual? RoleEffect = null);
+
+public sealed record BattleRoleEffectVisual(
+	string AnimationId,
+	double Transparency,
+	int Order);
 
 public sealed record BattleBoardBuffVisual(
 	string Name,

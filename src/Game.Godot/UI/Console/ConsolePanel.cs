@@ -48,9 +48,23 @@ public partial class ConsolePanel : JyPanel
 			return;
 		}
 
+		var closePanelsForPreview = IsFullscreenPreviewCommand(commandLine);
+		if (closePanelsForPreview)
+		{
+			// A story jump or console-started battle is a preview request: drop
+			// the console and any open panel first so the flow plays on a clean
+			// screen instead of stacking under the still-open console UI.
+			UIRoot.Instance.CloseMainPanel();
+		}
+
 		try
 		{
 			await Game.StoryService.CommandLine.ExecuteAsync(commandLine);
+			if (closePanelsForPreview)
+			{
+				return;
+			}
+
 			_consoleInput.Clear();
 			AppendConsoleLine("控制台", $"已执行剧本指令：{commandLine}");
 		}
@@ -58,8 +72,40 @@ public partial class ConsolePanel : JyPanel
 		{
 			Game.Logger.Error($"Console command failed: {commandLine}", exception);
 			AppendConsoleLine("错误", exception.Message);
+			if (closePanelsForPreview)
+			{
+				ReopenConsoleWithError(exception.Message);
+			}
 		}
 	}
+
+	private static bool IsFullscreenPreviewCommand(string commandLine)
+	{
+		// Matches all console forms: `story <id>`, `story('<id>')`,
+		// `battle <id>` and `run_battle <id>`.
+		var nameEnd = commandLine.IndexOfAny([' ', '\t', '(']);
+		var name = nameEnd < 0 ? commandLine : commandLine[..nameEnd];
+		return string.Equals(name, "story", StringComparison.Ordinal)
+			|| string.Equals(name, "battle", StringComparison.Ordinal)
+			|| string.Equals(name, "run_battle", StringComparison.Ordinal);
+	}
+
+	private static void ReopenConsoleWithError(string message)
+	{
+		try
+		{
+			if (UIRoot.Instance.ShowConsolePanel() is ConsolePanel panel)
+			{
+				panel.AppendErrorLine(message);
+			}
+		}
+		catch (Exception exception)
+		{
+			Game.Logger.Error("Reopening console panel failed.", exception);
+		}
+	}
+
+	private void AppendErrorLine(string message) => AppendConsoleLine("错误", message);
 
 	private void AppendConsoleLine(string source, string message)
 	{

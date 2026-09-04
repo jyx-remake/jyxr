@@ -1,6 +1,7 @@
 using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
 using Game.Core.Story;
 using Godot;
@@ -19,6 +20,9 @@ public partial class UIRoot : Control
 	[ExportGroup("Panels")]
 	[Export]
 	public PackedScene PartyPanelScene { get; set; } = null!;
+
+	[Export]
+	public PackedScene RecallPanelScene { get; set; } = null!;
 
 	[Export]
 	public PackedScene CharacterRosterPanelScene { get; set; } = null!;
@@ -88,6 +92,12 @@ public partial class UIRoot : Control
 	public StoryVisualEffects VisualEffects { get; private set; } = null!;
 	public bool IsBattleActive => BattleLayer.GetChildCount() > 0;
 	private HudPanel? _hud;
+
+	/// <summary>
+	/// The in-game HUD (null until the scene is ready). Map views read its
+	/// safe insets so their viewport never extends under the HUD strips.
+	/// </summary>
+	public HudPanel? Hud => _hud;
 	private StoryDialoguePanel _storyDialoguePanel = null!;
 	private StoryIntertitlePanel _storyIntertitlePanel = null!;
 	private StoryVideoPlayer _storyVideoPlayer = null!;
@@ -262,6 +272,25 @@ public partial class UIRoot : Control
 			characterRosterPanel.CharacterId = characterId;
 		});
 
+	/// <summary>
+	/// Opens the recall panel listing every kicked companion as party cards.
+	/// Clicking a card confirms and recalls that companion; the story command
+	/// awaits the panel closing. This replaces the legacy REJOIN_MENU
+	/// selection dialog. The default character id is retained for
+	/// story-command signature compatibility and is not used for selection.
+	/// </summary>
+	public async Task ShowRecallPanelAsync(string defaultCharacterId = "神秘少女", CancellationToken cancellationToken = default)
+	{
+		var panel = ShowPopupPanel(RecallPanelScene, "recall panel", panel =>
+		{
+			if (panel is not RecallPanel)
+			{
+				throw new InvalidOperationException("Recall panel scene root must be RecallPanel.");
+			}
+		});
+		await AwaitPanelClosedAsync(panel, cancellationToken);
+	}
+
 	public Control ShowInventoryPanel() => ShowMainPanel(InventoryPanelScene, "inventory panel");
 
 	public Control ShowGameLogPanel() => ShowMainPanel(GameLogPanelScene, "game log panel");
@@ -284,6 +313,9 @@ public partial class UIRoot : Control
 
 	public Control ShowSkillDetailPanel(SkillInstance skill, DetailPanelAction? action = null) =>
 		_detailPanelHost.ShowSkill(skill, action);
+
+	public Control ShowTitleDetailPanel(CharacterTitleInstance title, DetailPanelAction? action = null) =>
+		_detailPanelHost.ShowTitle(title, action);
 
 	public Control ShowInventoryEntryDetailPanel(
 		InventoryEntry entry,
@@ -389,6 +421,49 @@ public partial class UIRoot : Control
 		ModalLayer.AddChild(panel);
 		panel.Configure(entries);
 		return await panel.AwaitSelectionAsync(cancellationToken);
+	}
+
+	/// <summary>
+	/// Opens the backpack in pick mode for gift selection. Returns the
+	/// picked entry, or null when the player closes the panel.
+	/// </summary>
+	public async Task<InventoryEntry?> ShowItemPickPanelAsync(
+		string prompt,
+		CancellationToken cancellationToken = default)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(prompt);
+		if (InventoryPanelScene.Instantiate() is not InventoryPanel panel)
+		{
+			throw new InvalidOperationException("Inventory panel scene root must be InventoryPanel.");
+		}
+
+		ShowToast(prompt);
+		ModalLayer.AddChild(panel);
+		panel.ConfigurePickMode();
+		var picked = new TaskCompletionSource<InventoryEntry?>(TaskCreationOptions.RunContinuationsAsynchronously);
+		panel.EntryPicked += entry => picked.TrySetResult(entry);
+		panel.TreeExited += () => picked.TrySetResult(null);
+		using var registration = cancellationToken.CanBeCanceled
+			? cancellationToken.Register(() =>
+			{
+				picked.TrySetCanceled(cancellationToken);
+				if (GodotObject.IsInstanceValid(panel))
+				{
+					panel.QueueFree();
+				}
+			})
+			: default;
+		try
+		{
+			return await picked.Task;
+		}
+		finally
+		{
+			if (GodotObject.IsInstanceValid(panel))
+			{
+				panel.QueueFree();
+			}
+		}
 	}
 
 	public async Task<int> ShowLightnessTrainingScreenAsync(CancellationToken cancellationToken = default)
@@ -653,7 +728,8 @@ public partial class UIRoot : Control
 			throw new InvalidOperationException($"UIRoot panel scene is not assigned: {description}.");
 		}
 
-		var instance = scene.Instantiate();
+		var instance = scene.Instantiate()
+			?? throw new InvalidOperationException($"Panel scene could not be instantiated (check the scene for errors): {description}.");
 		if (instance is not Control panel)
 		{
 			instance.QueueFree();
@@ -763,7 +839,7 @@ public partial class UIRoot : Control
 
 	private void OnAchievementUnlocked(AchievementUnlockedEvent sessionEvent)
 	{
-		ShowToast($"获得称号【{sessionEvent.AchievementId}】", ToastTone.Important);
+		ShowToast($"获得成就【{sessionEvent.AchievementId}】", ToastTone.Important);
 	}
 
 	private void OnProfileChanged(ProfileChangedEvent _)

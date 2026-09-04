@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://og4o54kuyhm2" path="res://assets/art/ui/character_stat/iconqimen.png" id="9_muhdb"]
 [ext_resource type="Texture2D" uid="uid://d2hjb1d5p507" path="res://assets/art/ui/character_stat/icongengu.png" id="10_ptgvi"]
 [ext_resource type="PackedScene" uid="uid://cn1marksgcufq" path="res://scenes/ui/skill_tab/skill_box.tscn" id="11_skill_box"]
+[ext_resource type="Texture2D" uid="uid://4allowhfbyga" path="res://assets/art/misc/btn_cross.png" id="12_cd78k"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_tab_title"]
 font_size = 60
@@ -391,6 +392,11 @@ theme_override_constants/h_separation = 0
 columns = 6
 
 [node name="CloseButton" parent="." index="3" unique_id=962603895]
+offset_left = 683.0
+offset_top = -524.0
+offset_right = 883.0
+offset_bottom = -324.0
+texture_normal = ExtResource("12_cd78k")
 PressOffset = Vector2(2, 2)
 PressColor = Color(0.8, 0.8, 0.8, 1)
 

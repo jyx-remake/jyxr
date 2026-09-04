@@ -1,6 +1,8 @@
 using Game.Application;
 using Game.Core.Model;
 using Game.Core.Story;
+using Game.Expressions;
+using Game.Godot.Map;
 using Game.Godot.UI;
 
 namespace Game.Godot.Story;
@@ -83,6 +85,31 @@ public sealed partial class GodotStoryRuntimeHost
 	private ValueTask ExecuteChestAsync(CancellationToken cancellationToken) =>
 		new(UIRoot.Instance.ShowChestPanelAsync(cancellationToken));
 
+	[StoryCommand("rejoin_menu")]
+	private ValueTask ExecuteRejoinMenuAsync(
+		string defaultCharacterId = "神秘少女",
+		CancellationToken cancellationToken = default) =>
+		new(UIRoot.Instance.ShowRecallPanelAsync(defaultCharacterId, cancellationToken));
+
+	[StoryCommand("give_gift")]
+	private async ValueTask<StoryCommandResult> ExecuteGiveGiftAsync(
+		IReadOnlyList<string> itemIds,
+		CancellationToken cancellationToken)
+	{
+		if (itemIds.Count == 0)
+		{
+			throw new ArgumentException("give_gift requires at least one candidate item.", nameof(itemIds));
+		}
+
+		var picked = await UIRoot.Instance.ShowItemPickPanelAsync("请选择需要出示的物品", cancellationToken);
+		var index = GiftResolutionService.ResolveGiftIndex(picked?.Definition, [.. itemIds]);
+		Game.Session.State.Story.SetVariable(
+			GiftResolutionService.GiftVariableName,
+			ExpressionValue.FromNumber(index));
+		Game.Session.Events.Publish(new StoryStateChangedEvent());
+		return StoryCommandResult.None;
+	}
+
 	[StoryCommand("battle")]
 	private async ValueTask ExecuteBattleAsync(string packedBattleId, CancellationToken cancellationToken)
 	{
@@ -139,9 +166,16 @@ public sealed partial class GodotStoryRuntimeHost
 	}
 
 	[StoryCommand("background")]
-	private ValueTask ExecuteBackgroundAsync(string backgroundId)
+	private ValueTask ExecuteBackgroundAsync(string backgroundId, ExpressionValue legacyExtra = default)
 	{
-		World.Instance.SetBackground(backgroundId);
+		// Legacy BACKGROUND: a lone argument shows the backdrop at the ambient
+		// time-of-day opacity; any extra argument requests full alpha. Keeping
+		// this on the same rule as `fadein` avoids a brightness pop when a
+		// story switches between the two commands.
+		var alpha = legacyExtra == default
+			? MapTimeLighting.GetAmbientOpacity(Game.State.Clock.TimeSlot)
+			: 1f;
+		World.Instance.SetBackground(ResolveBackdropCandidate(backgroundId), alpha);
 		return ValueTask.CompletedTask;
 	}
 }

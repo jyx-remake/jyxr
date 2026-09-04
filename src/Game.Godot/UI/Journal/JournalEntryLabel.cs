@@ -4,7 +4,7 @@ using Godot;
 
 namespace Game.Godot.UI;
 
-public partial class JournalEntryLabel : Label
+public partial class JournalEntryLabel : RichTextLabel
 {
     public void Setup(JournalEntry entry)
     {

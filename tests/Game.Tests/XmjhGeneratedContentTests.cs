@@ -119,6 +119,11 @@ public sealed class XmjhGeneratedContentTests
             mapEvent.RepeatMode));
 
         var completedHomeState = new Game.Core.Model.GameState();
+        // Legacy judges the 天书 branch against the shared 50-default favorability
+        // store; a real playthrough always reaches 大厅 after the opening story
+        // zeroed these counters (新手村_出生后续).  Model that post-opening state
+        // so the branch stays dormant exactly like the shipped game.
+        completedHomeState.Adventure.ChangeFavorability("天书", -50);
         completedHomeState.Story.MarkCompleted("家剧情");
         var completedHomeSession = new Game.Application.GameSession(completedHomeState, repository);
         var completedHomeLocations = completedHomeSession.MapService.EnterMap("大厅").Locations;

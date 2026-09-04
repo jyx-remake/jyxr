@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://74yk3o2ss5nx" path="res://src/Game.Godot/Map/LargeMapView.cs" id="8_large_map_view"]
 [ext_resource type="PackedScene" uid="uid://b6ehkt03bhugq" path="res://scenes/map/map_entity_tooltip.tscn" id="9_tooltip"]
 [ext_resource type="Shader" uid="uid://bxd1eb3y3s4sm" path="res://assets/shader/map_cloud_scroll.gdshader" id="10_cloud_scroll"]
-[ext_resource type="Script" path="res://src/Game.Godot/Map/MapLocationTooltipLayer.cs" id="11_tooltip_layer"]
+[ext_resource type="Script" uid="uid://byjoibhfewbcs" path="res://src/Game.Godot/Map/MapLocationTooltipLayer.cs" id="11_tooltip_layer"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cloud_scroll"]
 shader = ExtResource("10_cloud_scroll")
@@ -75,7 +75,20 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="LargeMapView" type="Control" parent="MapBigTab" unique_id=325343108]
+[node name="LargeMapSafeArea" type="Control" parent="MapBigTab" unique_id=877047664]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 114.0
+offset_bottom = -97.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LargeMapView" type="Control" parent="MapBigTab/LargeMapSafeArea" unique_id=325343108]
 unique_name_in_owner = true
 clip_contents = true
 layout_mode = 1
@@ -88,12 +101,12 @@ script = ExtResource("8_large_map_view")
 MarkerScene = ExtResource("2_slot")
 TooltipScene = ExtResource("9_tooltip")
 
-[node name="MapSurface" type="Control" parent="MapBigTab/LargeMapView" unique_id=1747356365]
+[node name="MapSurface" type="Control" parent="MapBigTab/LargeMapSafeArea/LargeMapView" unique_id=1747356365]
 unique_name_in_owner = true
 anchors_preset = 0
 mouse_filter = 2
 
-[node name="LargeMapBackground" type="TextureRect" parent="MapBigTab/LargeMapView/MapSurface" unique_id=1143418225]
+[node name="LargeMapBackground" type="TextureRect" parent="MapBigTab/LargeMapSafeArea/LargeMapView/MapSurface" unique_id=1143418225]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -104,7 +117,7 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 
-[node name="LargeMapTimeDim" type="ColorRect" parent="MapBigTab/LargeMapView/MapSurface" unique_id=1207814987]
+[node name="LargeMapTimeDim" type="ColorRect" parent="MapBigTab/LargeMapSafeArea/LargeMapView/MapSurface" unique_id=1207814987]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -115,7 +128,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
-[node name="Cloud" type="TextureRect" parent="MapBigTab/LargeMapView/MapSurface" unique_id=1116946840]
+[node name="Cloud" type="TextureRect" parent="MapBigTab/LargeMapSafeArea/LargeMapView/MapSurface" unique_id=1116946840]
 unique_name_in_owner = true
 self_modulate = Color(1, 1, 1, 0.39215687)
 z_index = 1
@@ -131,7 +144,7 @@ mouse_filter = 2
 texture = ExtResource("4_cloud")
 expand_mode = 1
 
-[node name="MarkerOverlay" type="Control" parent="MapBigTab/LargeMapView" unique_id=1989514195]
+[node name="MarkerOverlay" type="Control" parent="MapBigTab/LargeMapSafeArea/LargeMapView" unique_id=1989514195]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -140,24 +153,24 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="MapEntitySlots" type="Control" parent="MapBigTab/LargeMapView/MarkerOverlay" unique_id=356276484]
+[node name="MapEntitySlots" type="Control" parent="MapBigTab/LargeMapSafeArea/LargeMapView/MarkerOverlay" unique_id=356276484]
 unique_name_in_owner = true
 anchors_preset = 0
 mouse_filter = 2
 
-[node name="MapPin" type="Control" parent="MapBigTab/LargeMapView/MarkerOverlay" unique_id=1444961703]
+[node name="MapPin" type="Control" parent="MapBigTab/LargeMapSafeArea/LargeMapView/MarkerOverlay" unique_id=1444961703]
 unique_name_in_owner = true
 anchors_preset = 0
 mouse_filter = 2
 
-[node name="PinVisual" type="Control" parent="MapBigTab/LargeMapView/MarkerOverlay/MapPin" unique_id=1183406179]
-layout_mode = 0
+[node name="PinVisual" type="Control" parent="MapBigTab/LargeMapSafeArea/LargeMapView/MarkerOverlay/MapPin" unique_id=1183406179]
+anchors_preset = 0
 offset_left = -38.0
 offset_top = -76.0
 offset_right = 38.0
 mouse_filter = 2
 
-[node name="PinAvatar" type="TextureRect" parent="MapBigTab/LargeMapView/MarkerOverlay/MapPin/PinVisual" unique_id=1626363249]
+[node name="PinAvatar" type="TextureRect" parent="MapBigTab/LargeMapSafeArea/LargeMapView/MarkerOverlay/MapPin/PinVisual" unique_id=1626363249]
 unique_name_in_owner = true
 layout_mode = 0
 offset_right = 76.0
@@ -166,7 +179,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="MapBigTab/LargeMapView/MarkerOverlay/MapPin" unique_id=1840084638]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MapBigTab/LargeMapSafeArea/LargeMapView/MarkerOverlay/MapPin" unique_id=1840084638]
 libraries/ = SubResource("AnimationLibrary_pin")
 autoplay = &"default"
 
@@ -214,30 +227,24 @@ rotation = 0.5235988
 scale = Vector2(0.4255765, 0.4255765)
 texture_normal = ExtResource("6_camera")
 
-[node name="SmallMapLocationScroll" type="ScrollContainer" parent="MapSmallTab" unique_id=300000001]
+[node name="SmallMapLocationArea" type="Control" parent="MapSmallTab" unique_id=300000001]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = -1
 anchor_left = 0.05
+anchor_top = 0.12
 anchor_right = 0.95
+anchor_bottom = 0.68
 offset_left = -40.0
-offset_top = 338.0
+offset_top = 50.0
 offset_right = 40.0
-offset_bottom = 708.0
-horizontal_scroll_mode = 1
-vertical_scroll_mode = 0
+offset_bottom = 50.0
 
-[node name="SmallMapLocationContent" type="MarginContainer" parent="MapSmallTab/SmallMapLocationScroll" unique_id=300000003]
-layout_mode = 2
-theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 68
-
-[node name="MapEntityList" type="HBoxContainer" parent="MapSmallTab/SmallMapLocationScroll/SmallMapLocationContent" unique_id=274914384]
+[node name="MapEntityList" type="GridContainer" parent="MapSmallTab/SmallMapLocationArea" unique_id=274914384]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 80
+layout_mode = 0
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 24
+columns = 5
 
 [node name="BottomBox" type="Control" parent="MapSmallTab" unique_id=294292032]
 unique_name_in_owner = true

@@ -32,6 +32,10 @@ public static class ItemUseEffectFormatter
             GrantSpecialSkillItemUseEffectDefinition specialSkill =>
                 $"学会特殊技能「{FormatterTextCn.ResolveSpecialSkillName(specialSkill.SkillId, contentRepository)}」",
             GrantTalentItemUseEffectDefinition talent => FormatGrantTalentCn(talent, contentRepository),
+            GrantTitleItemUseEffectDefinition title => FormatGrantTitleCn(title, contentRepository),
+            SetPortraitItemUseEffectDefinition => "改变头像",
+            ClearBuffsItemUseEffectDefinition => "清除自身所有状态",
+            RandomItemItemUseEffectDefinition randomItem => FormatRandomItemCn(randomItem, contentRepository),
             SetGenderItemUseEffectDefinition setGender =>
                 $"性别变为{FormatterTextCn.GetGenderNameCn(setGender.Gender)}",
             ReduceMaxResourceRatioItemUseEffectDefinition reduction =>
@@ -79,4 +83,25 @@ public static class ItemUseEffectFormatter
         level is null
             ? $"学会{kind}「{skillName}」"
             : $"学会{kind}「{skillName}」（{level.Value}级）";
+
+    private static string FormatGrantTitleCn(
+        GrantTitleItemUseEffectDefinition grantTitle,
+        IContentRepository contentRepository) =>
+        contentRepository.TryGetCharacterTitle(grantTitle.TitleId, out var title)
+            ? $"获得称号「{title.Name}」"
+            : $"获得称号「{grantTitle.TitleId}」";
+
+    private static string FormatRandomItemCn(
+        RandomItemItemUseEffectDefinition randomItem,
+        IContentRepository contentRepository)
+    {
+        var entries = randomItem.Items.Select(entry =>
+        {
+            var name = contentRepository.TryGetItem(entry.ItemId, out var item)
+                ? item.Name
+                : entry.ItemId;
+            return $"{name}×{entry.Quantity}";
+        });
+        return $"随机获得：{string.Join(" / ", entries)}";
+    }
 }

@@ -111,10 +111,13 @@ public partial class PartyCharacterBox : Button
 		}
 	}
 
-	public void Setup(CharacterInstance character, int partyIndex, PartyPanel ownerPanel)
+	/// <summary>
+	/// The owner panel drives drag-to-reorder. Pass null for read-only card
+	/// lists (such as the recall panel) where dragging is not supported.
+	/// </summary>
+	public void Setup(CharacterInstance character, int partyIndex, PartyPanel? ownerPanel)
 	{
 		ArgumentNullException.ThrowIfNull(character);
-		ArgumentNullException.ThrowIfNull(ownerPanel);
 		_character = character;
 		_partyIndex = partyIndex;
 		_ownerPanel = ownerPanel;

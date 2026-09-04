@@ -55,6 +55,7 @@ public sealed class SessionFlowService
     {
         ArgumentNullException.ThrowIfNull(state);
         _session.ReplaceState(state);
+        _session.InventoryService.RestoreEquipmentGrantedSkills();
         _session.Events.Publish(new SaveLoadedEvent());
     }
 }

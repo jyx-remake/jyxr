@@ -28,6 +28,7 @@ public static class AffixFormatter
             GrantTalentAffix grantTalent => FormatGrantTalentCn(grantTalent, contentRepository),
             GrantModelAffix grantModel => $"时装「{GetModelDisplayText(grantModel)}」",
             SkillBonusModifierAffix skillBonus => $"技能「{FormatterTextCn.ResolveSkillName(skillBonus.SkillId, contentRepository)}」威力{FormatModifierValueCn(skillBonus.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
+            RoleEffectAffix roleEffect => $"+战斗特效 {roleEffect.Label}",
             WeaponBonusModifierAffix weaponBonus => $"{GetWeaponSkillBonusNameCn(weaponBonus.WeaponType)}系技能加成{FormatModifierValueCn(weaponBonus.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
             LegendSkillChanceModifierAffix legendChance => $"奥义「{FormatterTextCn.ResolveSkillName(legendChance.SkillId, contentRepository)}」触发率{FormatModifierValueCn(legendChance.Value, new ValueDisplaySpec(ValueDisplayKind.Percentage, 100))}",
             _ => throw new NotSupportedException($"Unsupported affix type '{affix.GetType().Name}'.")
