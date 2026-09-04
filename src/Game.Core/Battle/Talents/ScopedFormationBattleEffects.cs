@@ -4,7 +4,9 @@ namespace Game.Core.Battle.Talents;
 
 public sealed record TeamCountAttackBonusParameters(
     [property: NonNegative] double FactorPerUnit,
-    [property: NonNegative] int MaximumUnits = 10);
+    [property: NonNegative] int MaximumUnits = 10,
+    bool IncludeSelf = false,
+    bool CountTargetTeam = false);
 
 public sealed class TeamCountAttackBonusHandler
     : CustomBattleEffectHandler<TeamCountAttackBonusParameters, IDamageCalculationEffectContext>
@@ -16,9 +18,13 @@ public sealed class TeamCountAttackBonusHandler
     public override void Execute(IDamageCalculationEffectContext context, TeamCountAttackBonusParameters parameters)
     {
         if (!ReferenceEquals(context.Source, context.Unit) || context.Skill?.Power is not > 0) return;
+        var countedTeam = parameters.CountTargetTeam && context.Target is not null
+            ? context.Target.Team
+            : context.Unit.Team;
+        var livingTeamSize = context.State.GetLivingUnits().Count(unit => unit.Team == countedTeam);
         var count = Math.Min(
             parameters.MaximumUnits,
-            context.State.GetLivingUnits().Count(unit => unit.Team == context.Unit.Team) - 1);
+            livingTeamSize - (parameters.IncludeSelf ? 0 : 1));
         context.DamageCalculation.AddModifier(
             BattleDamageContextField.FinalDamage,
             ModifierOp.More,

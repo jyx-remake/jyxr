@@ -16,6 +16,7 @@ public sealed class CharacterInstance
     public string? Model { get; set; }
     public string? GrowTemplateId { get; set; }
     public CharacterGender Gender { get; private set; } = CharacterGender.Neutral;
+    public CharacterLeaveState LeaveState { get; private set; } = CharacterLeaveState.None;
 
     public int Level { get; private set; } = 1;
     public int Experience { get; private set; }
@@ -42,6 +43,24 @@ public sealed class CharacterInstance
     public List<CharacterTitleInstance> Titles { get; } = [];
     public string? EquippedInternalSkillId { get; private set; }
     public Dictionary<EquipmentSlotType, EquipmentInstance> EquippedItems { get; } = [];
+    /// <summary>
+    /// Equipment-granted skill provenance by equipment instance id.
+    /// Persisted with the character. Only instances created by the grant
+    /// are ever removed, so book-learned skills are never stolen; ownership
+    /// transfers to still-equipped covering gear on unequip.
+    /// </summary>
+    public Dictionary<string, List<EquipmentGrantedSkillKey>> EquipmentGrantedSkills { get; } = new(StringComparer.Ordinal);
+
+    public sealed record EquipmentGrantedSkillKey(SkillKind Kind, string SkillId, bool CreatedByGrant);
+
+    /// <summary>
+    /// Whether the skill is currently carried by equipped equipment (granted
+    /// or covered). Equipment-carried skills are read-only in the character
+    /// panel: no toggling, no detail editing.
+    /// </summary>
+    public bool IsEquipmentGrantedSkill(SkillKind kind, string skillId) =>
+        EquipmentGrantedSkills.Values.Any(keys => keys.Any(key =>
+            key.Kind == kind && string.Equals(key.SkillId, skillId, StringComparison.Ordinal)));
 
     public void GrantExperience(int experience)
     {
@@ -128,6 +147,31 @@ public sealed class CharacterInstance
 
         BaseStats[statType] = value;
     }
+
+    /// <summary>
+    /// Legacy UPGRADE.MAXHP/MAXMP sets the current resource to the new maximum
+    /// in the same breath (an injury story drains current HP/MP along with the
+    /// cap; a growth story refills it).
+    /// </summary>
+    public void SetCurrentResourceToCap(StatType statType)
+    {
+        if (statType == StatType.MaxHp)
+        {
+            CurrentHp = ResolveMaxHp();
+        }
+        else if (statType == StatType.MaxMp)
+        {
+            CurrentMp = ResolveMaxMp();
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(statType), statType, "Only maximum resource stats track a current value.");
+        }
+    }
+
+    public void SetLeaveState(CharacterLeaveState state) => LeaveState = state;
+
+    public void ClearLeaveState() => LeaveState = CharacterLeaveState.None;
 
     public int ReduceBaseResourceStat(StatType statType, double ratio)
     {
@@ -599,6 +643,33 @@ public sealed class CharacterInstance
         foreach (var skill in SpecialSkills)
         {
             skill.ResetBattleCooldown();
+        }
+    }
+
+    internal void RecoverSkillCooldowns()
+    {
+        foreach (var skill in ExternalSkills)
+        {
+            if (skill.CurrentCooldown > 0)
+            {
+                skill.CurrentCooldown--;
+            }
+        }
+
+        foreach (var skill in InternalSkills)
+        {
+            if (skill.CurrentCooldown > 0)
+            {
+                skill.CurrentCooldown--;
+            }
+        }
+
+        foreach (var skill in SpecialSkills)
+        {
+            if (skill.CurrentCooldown > 0)
+            {
+                skill.CurrentCooldown--;
+            }
         }
     }
 

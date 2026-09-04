@@ -118,6 +118,24 @@ public sealed class CustomBattleEffectRegistry
         registry.Register("restore_missing_mp", new RestoreMissingMpBattleEffectHandler());
         registry.Register("bagua_formation", new BaguaFormationBattleEffectHandler());
         registry.Register("team_count_attack_bonus", new TeamCountAttackBonusHandler());
+        registry.Register("team_count_defense", new TeamCountDefenseBattleEffectHandler());
+        registry.Register("stat_based_damage", new StatBasedDamageBattleEffectHandler());
+        registry.Register("stat_based_mp_damage", new StatBasedMpDamageBattleEffectHandler());
+        registry.Register("companion_combat_modifier", new CompanionCombatModifierBattleEffectHandler());
+        registry.Register("area_buff_on_hit", new AreaBuffOnHitBattleEffectHandler());
+        registry.Register("area_direct_damage_on_hit", new AreaDirectDamageOnHitBattleEffectHandler());
+        registry.Register("ally_talent_source_damage", new AllyTalentSourceDamageBattleEffectHandler());
+        registry.Register("deplete_mp_or_backlash", new DepleteMpOrBacklashBattleEffectHandler());
+        registry.Register("action_start_cooldown_recovery", new ActionStartCooldownRecoveryBattleEffectHandler());
+        registry.Register("area_buff_on_action_start", new AreaBuffOnActionStartBattleEffectHandler());
+        registry.Register("companion_dodge", new CompanionDodgeBattleEffectHandler());
+        registry.Register("hit_damage_override", new HitDamageOverrideBattleEffectHandler());
+        registry.Register("missing_hp_damage", new MissingHpDamageBattleEffectHandler());
+        registry.Register("target_hp_ratio_damage", new TargetHpRatioDamageBattleEffectHandler());
+        registry.Register("target_hp_level_damage_reduction", new TargetHpLevelDamageReductionBattleEffectHandler());
+        registry.Register("target_hp_threshold_random_damage", new TargetHpThresholdRandomDamageBattleEffectHandler());
+        registry.Register("distance_weapon_damage", new DistanceWeaponDamageBattleEffectHandler());
+        registry.Register("companion_damage_immunity", new CompanionDamageImmunityBattleEffectHandler());
         registry.Register(
             "five_elements_formation_damage_share",
             new FiveElementsFormationDamageShareHandler());
