@@ -1,5 +1,4 @@
 using Game.Application;
-using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Presentation.Items;
 using Godot;
@@ -13,8 +12,6 @@ public partial class InventoryPanel : JyPanel
 
 	[Export]
 	public PackedScene ItemTargetSelectionPanelScene { get; set; } = null!;
-	[Export]
-	public PackedScene TagButtonScene { get; set; } = null!;
 
 	private static readonly IReadOnlyList<ItemCategoryOption> Categories = ItemCatalogPresentation.Categories;
 
@@ -24,9 +21,8 @@ public partial class InventoryPanel : JyPanel
 	private GridContainer _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private Label _countLabel = null!;
-	private HFlowContainer _tagButtons = null!;
+	private ItemTagBar _tagBar = null!;
 	private ItemCategoryOption _selectedCategory = Categories[0];
-	private string? _selectedTagId;
 
 	public override void _Ready()
 	{
@@ -34,7 +30,8 @@ public partial class InventoryPanel : JyPanel
 		_gridContainer = GetNode<GridContainer>("%GridContainer");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_countLabel = GetNode<Label>("%CountLabel");
-		_tagButtons = GetNode<HFlowContainer>("%TagButtons");
+		_tagBar = GetNode<ItemTagBar>("%TagButtons");
+		_tagBar.SelectionChanged += Refresh;
 
 		InitializeCategoryButtons();
 
@@ -56,7 +53,7 @@ public partial class InventoryPanel : JyPanel
 	private void SelectCategory(ItemCategoryOption category)
 	{
 		_selectedCategory = category;
-		_selectedTagId = null;
+		_tagBar.ResetSelection();
 		Refresh();
 	}
 
@@ -89,9 +86,8 @@ public partial class InventoryPanel : JyPanel
 		ClearGrid();
 
 		var sourceEntries = Game.State.Inventory.Entries;
-		var tags = ResolveAvailableTags(sourceEntries.Select(entry => entry.Definition));
+		_tagBar.SetItems(sourceEntries.Select(entry => entry.Definition), _selectedCategory.ItemType);
 		UpdateCategoryButtons();
-		UpdateTagButtons(tags);
 		var entries = sourceEntries
 			.Where(EntryMatchesSelectedCategory)
 			.OrderBy(entry => entry.EntryNumber)
@@ -108,56 +104,7 @@ public partial class InventoryPanel : JyPanel
 	}
 
 	private bool EntryMatchesSelectedCategory(InventoryEntry entry) =>
-		ItemCatalogPresentation.Matches(entry.Definition, _selectedCategory.ItemType, _selectedTagId);
-
-	private IReadOnlyList<ItemTagDefinition> ResolveAvailableTags(IEnumerable<ItemDefinition> items)
-	{
-		var tags = ItemCatalogPresentation.GetAvailableTags(items, _selectedCategory.ItemType);
-		if (_selectedTagId is not null && !tags.Any(tag => tag.Id == _selectedTagId))
-		{
-			_selectedTagId = null;
-		}
-		return tags;
-	}
-
-	private void UpdateTagButtons(IReadOnlyList<ItemTagDefinition> tags)
-	{
-		ClearChildren(_tagButtons);
-		if (_selectedCategory.ItemType is null)
-		{
-			return;
-		}
-
-		foreach (var tag in tags)
-		{
-			AddTagButton(tag.Id, tag.Name);
-		}
-	}
-
-	private void AddTagButton(string? tagId, string displayName)
-	{
-		if (TagButtonScene is null)
-		{
-			throw new InvalidOperationException("TagButtonScene is not assigned.");
-		}
-
-		var instance = TagButtonScene.Instantiate();
-		if (instance is not InventoryTagButton button)
-		{
-			instance.QueueFree();
-			throw new InvalidOperationException("Tag button scene root must be InventoryTagButton.");
-		}
-
-		button.Configure(
-			displayName,
-			string.Equals(_selectedTagId, tagId, StringComparison.Ordinal),
-			() =>
-			{
-				_selectedTagId = tagId;
-				Refresh();
-			});
-		_tagButtons.AddChild(button);
-	}
+		_tagBar.Matches(entry.Definition);
 
 	private InventoryItemBox CreateItemBox(InventoryEntry entry)
 	{
@@ -219,7 +166,7 @@ public partial class InventoryPanel : JyPanel
 		{
 			var button = _buttonsByCategoryKey[category.Key];
 			var isSelected = category.Key == _selectedCategory.Key;
-			button.Disabled = isSelected && _selectedTagId is null;
+			button.Disabled = isSelected && _tagBar.SelectedTagId is null;
 			button.Modulate = isSelected
 				? new Color(1.0f, 0.92f, 0.68f)
 				: Colors.White;

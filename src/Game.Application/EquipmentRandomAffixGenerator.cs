@@ -102,20 +102,36 @@ public static class EquipmentRandomAffixGenerator
         int round,
         IRandomService random,
         IReadOnlyList<IReadOnlyList<AffixDefinition>> excludedGroups)
+        => TryGenerateSingleRoll(equipment, contentRepository, round, random, excludedGroups)
+            ?? throw new InvalidOperationException(
+                $"Equipment '{equipment.Id}' cannot generate a random affix outside its current affixes.");
+
+    public static GeneratedEquipmentAffixRoll? TryGenerateSingleRoll(
+        EquipmentDefinition equipment,
+        IContentRepository contentRepository,
+        int round,
+        IRandomService random,
+        IReadOnlyList<IReadOnlyList<AffixDefinition>> excludedGroups)
     {
+        ArgumentNullException.ThrowIfNull(equipment);
+        ArgumentNullException.ThrowIfNull(contentRepository);
+        ArgumentNullException.ThrowIfNull(random);
+        ArgumentOutOfRangeException.ThrowIfLessThan(round, 1);
         ArgumentNullException.ThrowIfNull(excludedGroups);
 
-        for (var attempt = 0; attempt < 4096; attempt++)
-        {
-            var roll = GenerateSingleRoll(equipment, contentRepository, round, random);
-            if (excludedGroups.All(group => !Matches(group, roll, contentRepository)))
-            {
-                return roll;
-            }
-        }
+        var options = ResolveOptions(equipment, contentRepository, round)
+            .Select(option => option.Kind == EquipmentRandomAffixKind.Talent
+                ? option with { Pool = option.Pool.Where(id => excludedGroups.All(group =>
+                    !Matches(group, option.Kind, contentRepository, talentId: id))).ToArray() }
+                : option)
+            .Where(option => option.Kind == EquipmentRandomAffixKind.Talent
+                ? option.Pool.Count > 0
+                : excludedGroups.All(group => !Matches(group, option.Kind, contentRepository, weaponType: option.WeaponType)))
+            .ToArray();
 
-        throw new InvalidOperationException(
-            $"Equipment '{equipment.Id}' cannot generate a random affix outside its current affixes.");
+        return options.Length == 0 ? null : GenerateRoll(
+            WeightedRandomSelector.Select(options, static option => option.Weight, random),
+            equipment.Level, round, contentRepository, random);
     }
 
     private static EquipmentRandomAffixOptionDefinition[] ResolveOptions(
@@ -456,8 +472,10 @@ public static class EquipmentRandomAffixGenerator
 
     private static bool Matches(
         IReadOnlyList<AffixDefinition> group,
-        GeneratedEquipmentAffixRoll roll,
-        IContentRepository contentRepository) => roll.Kind switch
+        EquipmentRandomAffixKind kind,
+        IContentRepository contentRepository,
+        string? talentId = null,
+        WeaponType? weaponType = null) => kind switch
         {
             EquipmentRandomAffixKind.AttackCombo => group is
                 [StatModifierAffix { Stat: StatType.Attack }, StatModifierAffix { Stat: StatType.CritChance }],
@@ -466,7 +484,7 @@ public static class EquipmentRandomAffixGenerator
             EquipmentRandomAffixKind.RandomAttribute => group is [StatModifierAffix stat]
                 && RandomAttributeStats.Contains(stat.Stat),
             EquipmentRandomAffixKind.Talent => group is [GrantTalentAffix talent]
-                && talent.TalentId == ((GrantTalentAffix)roll.Affixes[0]).TalentId,
+                && talent.TalentId == talentId,
             EquipmentRandomAffixKind.ExternalSkillBonus => group is [SkillBonusModifierAffix skill]
                 && contentRepository.TryGetExternalSkill(skill.SkillId, out _),
             EquipmentRandomAffixKind.InternalSkillBonus => group is [SkillBonusModifierAffix skill]
@@ -477,10 +495,18 @@ public static class EquipmentRandomAffixGenerator
             EquipmentRandomAffixKind.LegendSkillBonus => group is
                 [SkillBonusModifierAffix, LegendSkillChanceModifierAffix],
             EquipmentRandomAffixKind.WeaponBonus => group is [WeaponBonusModifierAffix weapon]
-                && weapon.WeaponType == ((WeaponBonusModifierAffix)roll.Affixes[0]).WeaponType,
+                && weapon.WeaponType == weaponType,
             _ => group is [StatModifierAffix stat]
-                && roll.Affixes is [StatModifierAffix generated]
-                && stat.Stat == generated.Stat,
+                && stat.Stat == (kind switch
+                {
+                    EquipmentRandomAffixKind.Accuracy => StatType.Accuracy,
+                    EquipmentRandomAffixKind.CritChance => StatType.CritChance,
+                    EquipmentRandomAffixKind.CritMult => StatType.CritMult,
+                    EquipmentRandomAffixKind.Lifesteal => StatType.Lifesteal,
+                    EquipmentRandomAffixKind.Speed => StatType.Speed,
+                    EquipmentRandomAffixKind.AntiDebuff => StatType.AntiDebuff,
+                    _ => throw new InvalidOperationException($"Unsupported equipment random affix kind '{kind}'."),
+                }),
         };
 
     private static double? ResolveLegendSkillHard(

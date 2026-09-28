@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://bqk7f4j8tm2xp" path="res://UI/Inventory/ItemTagBar.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://h5ua5325v82x" path="res://scenes/ui/inventory_panel/inventory_tag_button.tscn" id="2_button"]
+
+[node name="ItemTagBar" type="HFlowContainer"]
+custom_minimum_size = Vector2(0, 60)
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+script = ExtResource("1_script")
+TagButtonScene = ExtResource("2_button")

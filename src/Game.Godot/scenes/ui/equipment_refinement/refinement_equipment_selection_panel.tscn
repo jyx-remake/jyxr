@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
 [ext_resource type="Script" uid="uid://cg4q2duksfaqb" path="res://UI/EquipmentRefinement/RefinementEquipmentSelectionPanel.cs" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://bhq13l0u7c1hg" path="res://scenes/ui/inventory_panel/inventory_item_box.tscn" id="3_item_box"]
+[ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/item_tag_bar.tscn" id="4_tag_bar"]
 
 [node name="RefinementEquipmentSelectionPanel" unique_id=1469049339 instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
@@ -23,38 +24,56 @@ horizontal_alignment = 1
 
 [node name="HintLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=940594705]
 layout_mode = 0
-offset_left = 360.0
-offset_top = 168.0
-offset_right = 1570.0
-offset_bottom = 216.0
-theme_override_colors/font_color = Color(0.32, 0.22, 0.14, 1)
-theme_override_font_sizes/font_size = 35
-text = "选择带有附加词条的装备，每次洗练花费一个元宝。"
+offset_left = 305.0
+offset_top = 932.0
+offset_right = 1515.0
+offset_bottom = 1001.0
+theme_override_font_sizes/font_size = 28
+text = "词条最多 5 条，白装也可增加。
+每次 1 元宝，8 选 1，放弃不退。"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=384582669]
+[node name="EquipmentLayout" type="VBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=296798269]
 layout_mode = 0
-offset_left = 310.0
-offset_top = 238.0
-offset_right = 1660.0
-offset_bottom = 884.0
+offset_left = 276.0
+offset_top = 157.0
+offset_right = 1606.0
+offset_bottom = 894.0
+theme_override_constants/separation = 12
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=1525176899]
+[node name="TagButtons" parent="ContentRoot/EquipmentLayout" index="0" unique_id=615828148 instance=ExtResource("4_tag_bar")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EmptyLabel" type="Label" parent="ContentRoot/EquipmentLayout" index="1" unique_id=1875452143]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.7, 0.53, 1)
+theme_override_font_sizes/font_size = 32
+text = "当前分类下没有装备。"
+horizontal_alignment = 1
+
+[node name="EquipmentScroll" type="ScrollContainer" parent="ContentRoot/EquipmentLayout" index="2" unique_id=384582669]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="ContentRoot/EquipmentLayout/EquipmentScroll" index="0" unique_id=1525176899]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 40
 columns = 6
 
-[node name="EmptyLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=1875452143]
+[node name="CountLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=1477130748]
 unique_name_in_owner = true
-visible = false
 layout_mode = 0
-offset_left = 430.0
-offset_top = 318.0
-offset_right = 1510.0
-offset_bottom = 376.0
-theme_override_colors/font_color = Color(0.78, 0.7, 0.53, 1)
-theme_override_font_sizes/font_size = 32
-text = "背包中没有可洗练的装备。"
-horizontal_alignment = 1
+offset_left = 1170.0
+offset_top = 100.0
+offset_right = 1370.0
+offset_bottom = 150.0
+theme_override_colors/font_color = Color(0.32, 0.22, 0.14, 1)
+theme_override_font_sizes/font_size = 28
+text = "0 项"
+vertical_alignment = 1

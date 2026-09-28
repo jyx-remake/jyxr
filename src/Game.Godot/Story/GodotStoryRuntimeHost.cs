@@ -31,8 +31,8 @@ public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattle
 		return isWin ? BattleOutcome.Win : BattleOutcome.Lose;
 	}
 
-	public async ValueTask<EquipmentInstanceInventoryEntry?> SelectRefinementEquipmentAsync(
-		IReadOnlyList<EquipmentInstanceInventoryEntry> entries,
+	public async ValueTask<InventoryEntry?> SelectRefinementEquipmentAsync(
+		IReadOnlyList<InventoryEntry> entries,
 		CancellationToken cancellationToken)
 	{
 		ArgumentNullException.ThrowIfNull(entries);

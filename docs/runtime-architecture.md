@@ -39,6 +39,10 @@
 
 `Inventory` 使用有序条目表示堆叠物品和独立装备；带实例差异的装备独立保存。`ChestState` 复用 Inventory，存取规则由 `ChestService` 执行。装备实例序列属于 GameState，由 `EquipmentInstanceFactory` 统一分配。
 
+背包、储物箱与洗练选装共用 `ItemTagBar`，标签来自当前候选物品的 definition。`ItemCatalogFilter` 在 Presentation 中管理分类、标签与匹配规则；数据刷新保留仍有效的标签，切换分类或标签消失时回到全部。洗练选装只展示装备标签，包含白装堆叠与独立装备。
+
+`EquipmentRefinementService` 编排选装、操作选择、付费候选与结果应用，显式区分新增、替换和退出。每次候选消耗 1 元宝、8 选 1；附加词条按组计数，最多增加至 5 条，满额仍可替换。白装确认新增后才从堆叠拆出一件实例；异步选择完成后统一校验原状态、档案、背包条目和词条快照，拒绝失效结果。
+
 背包选人界面支持选择使用数量。`ItemUseService` 对可消耗的场外堆叠物品逐件校验、应用效果和扣除库存，返回实际使用数量；条件不再满足或出现未经确认的失效效果时停止，已完成的使用保留。装备、不消耗的物品及剧情效果仅允许单次使用，战斗内物品仍遵循战斗行动规则。
 
 角色派生属性通过 `CharacterInstance.RebuildSnapshot()` 收集装备、天赋和满足条件的技能 affix，再由 resolver 展开。外功激活状态不决定其被动 affix 是否生效；内功 affix 是否要求装备由 `requiresEquippedInternalSkill` 明确表达。新增 affix 来源时要同时检查内容引用解析与角色快照收集。

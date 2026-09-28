@@ -9,12 +9,15 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 	[Export]
 	public PackedScene InventoryItemBoxScene { get; set; } = null!;
 
-	private readonly TaskCompletionSource<EquipmentInstanceInventoryEntry?> _selectionCompletion =
+	private readonly TaskCompletionSource<InventoryEntry?> _selectionCompletion =
 		new(TaskCreationOptions.RunContinuationsAsynchronously);
 
 	private GridContainer _gridContainer = null!;
 	private Label _emptyLabel = null!;
-	private IReadOnlyList<EquipmentInstanceInventoryEntry> _entries = [];
+	private Label _countLabel = null!;
+	private ItemTagBar _tagBar = null!;
+	private ScrollContainer _scrollContainer = null!;
+	private IReadOnlyList<InventoryEntry> _entries = [];
 	private IDisposable? _saveLoadedSubscription;
 
 	public override void _Ready()
@@ -22,19 +25,27 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 		base._Ready();
 		_gridContainer = GetNode<GridContainer>("%GridContainer");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
+		_countLabel = GetNode<Label>("%CountLabel");
+		_tagBar = GetNode<ItemTagBar>("%TagButtons");
+		_scrollContainer = GetNode<ScrollContainer>("%EquipmentScroll");
+		_tagBar.SelectionChanged += () =>
+		{
+			_scrollContainer.ScrollVertical = 0;
+			Refresh();
+		};
 		ClosePanelRequested += () => _selectionCompletion.TrySetResult(null);
 		_saveLoadedSubscription = Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => QueueFree());
 		Refresh();
 	}
 
-	public void Configure(IReadOnlyList<EquipmentInstanceInventoryEntry> entries)
+	public void Configure(IReadOnlyList<InventoryEntry> entries)
 	{
 		ArgumentNullException.ThrowIfNull(entries);
 		_entries = entries;
 		Refresh();
 	}
 
-	public async Task<EquipmentInstanceInventoryEntry?> AwaitSelectionAsync(CancellationToken cancellationToken = default)
+	public async Task<InventoryEntry?> AwaitSelectionAsync(CancellationToken cancellationToken = default)
 	{
 		using var registration = cancellationToken.CanBeCanceled
 			? cancellationToken.Register(() =>
@@ -68,15 +79,21 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 		}
 
 		ClearGrid();
-		_emptyLabel.Visible = _entries.Count == 0;
+		_tagBar.SetItems(_entries.Select(entry => entry.Definition), ItemType.Equipment);
+		var visibleEntries = _entries
+			.Where(entry => _tagBar.Matches(entry.Definition))
+			.OrderBy(entry => entry.EntryNumber)
+			.ToArray();
+		_countLabel.Text = $"{visibleEntries.Length} 项";
+		_emptyLabel.Visible = visibleEntries.Length == 0;
 
-		foreach (var entry in _entries)
+		foreach (var entry in visibleEntries)
 		{
 			_gridContainer.AddChild(CreateItemBox(entry));
 		}
 	}
 
-	private InventoryItemBox CreateItemBox(EquipmentInstanceInventoryEntry entry)
+	private InventoryItemBox CreateItemBox(InventoryEntry entry)
 	{
 		if (InventoryItemBoxScene is null)
 		{
@@ -97,24 +114,24 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 
 	private void OnEntrySelected(InventoryEntry entry)
 	{
-		if (entry is not EquipmentInstanceInventoryEntry equipmentEntry)
+		if (!_entries.Contains(entry))
 		{
-			throw new InvalidOperationException("Refinement selection received a non-equipment inventory entry.");
+			throw new InvalidOperationException("Refinement selection received an entry outside the candidate list.");
 		}
 
 		UIRoot.Instance.ShowInventoryEntryDetailPanel(
-			equipmentEntry,
+			entry,
 			new DetailPanelAction(
 				"选择",
 				true,
 				() =>
 				{
-					CompleteSelection(equipmentEntry);
+					CompleteSelection(entry);
 					return Task.CompletedTask;
 				}));
 	}
 
-	private void CompleteSelection(EquipmentInstanceInventoryEntry entry)
+	private void CompleteSelection(InventoryEntry entry)
 	{
 		if (_selectionCompletion.TrySetResult(entry))
 		{
@@ -126,6 +143,7 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 	{
 		foreach (var child in _gridContainer.GetChildren())
 		{
+			_gridContainer.RemoveChild(child);
 			child.QueueFree();
 		}
 	}

@@ -4,7 +4,7 @@ namespace Game.Application;
 
 public interface IApplicationRuntimeHost
 {
-    ValueTask<EquipmentInstanceInventoryEntry?> SelectRefinementEquipmentAsync(
-        IReadOnlyList<EquipmentInstanceInventoryEntry> entries,
+    ValueTask<InventoryEntry?> SelectRefinementEquipmentAsync(
+        IReadOnlyList<InventoryEntry> entries,
         CancellationToken cancellationToken);
 }

@@ -125,6 +125,26 @@ public sealed class EquipmentRandomAffixGeneratorTests
         Assert.Equal(4, WeightedRandomSelector.Select(entries, static entry => entry.Weight, new TicketRandomService(900)).Count);
     }
 
+    [Fact]
+    public void TryGenerateSingleRoll_ExcludesExistingKindsBeforeRandomSelection()
+    {
+        var equipment = TestContentFactory.CreateEquipment("weapon");
+        var repository = TestContentFactory.CreateRepository(equipmentRandomAffixTables:
+        [Table("test", "true",
+            Option(EquipmentRandomAffixKind.Accuracy, Range("1", "1")),
+            Option(EquipmentRandomAffixKind.Speed) with { Pool = ["2"] })]);
+        IReadOnlyList<IReadOnlyList<AffixDefinition>> excluded =
+            [[new StatModifierAffix(StatType.Speed, ModifierValue.Add(2))]];
+
+        var roll = EquipmentRandomAffixGenerator.TryGenerateSingleRoll(
+            equipment, repository, 1, new MaxRandomService(), excluded);
+
+        Assert.NotNull(roll);
+        Assert.Equal(EquipmentRandomAffixKind.Accuracy, roll.Kind);
+        Assert.Null(EquipmentRandomAffixGenerator.TryGenerateSingleRoll(
+            equipment, repository, 1, new MaxRandomService(), [.. excluded, roll.Affixes]));
+    }
+
     private static EquipmentRandomAffixTableDefinition Table(
         string id,
         string when,

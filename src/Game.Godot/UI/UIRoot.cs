@@ -373,8 +373,8 @@ public partial class UIRoot : Control
 			cancellationToken);
 	}
 
-	public async Task<EquipmentInstanceInventoryEntry?> ShowRefinementEquipmentSelectionPanelAsync(
-		IReadOnlyList<EquipmentInstanceInventoryEntry> entries,
+	public async Task<InventoryEntry?> ShowRefinementEquipmentSelectionPanelAsync(
+		IReadOnlyList<InventoryEntry> entries,
 		CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(entries);
