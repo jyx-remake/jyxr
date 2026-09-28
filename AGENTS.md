@@ -21,7 +21,7 @@
 - `World`、`UIRoot`、`AudioManager` 由 bootstrap 挂在 `/root/__GameRuntime`，不是 Godot autoload；先完成初始化，再使用各自 `Instance`。
 - Godot 运行期日志使用 `Game.Logger`。资源加载统一经 `AssetResolver`，不要在面板重复拼接资源路径或实现扩展名回退。
 - 场景脚本取节点优先使用 `unique_name_in_owner = true` 与 `%Name`；仅在层级本身具有语义时使用固定 NodePath。UI 默认使用轻量面板脚本，复杂显示可提取 Presenter，不为每个面板创建 ViewModel。
-- `tests/Game.Tests` 不引用 Godot 宿主或 GodotSharp。节点生命周期、延迟回调和实际演出需在 Godot 中验证。
+- `tests/Game.Tests` 不引用 Godot 宿主或 GodotSharp。节点生命周期、延迟回调和实际演出可按需在 Godot 中验证。
 - `legacy_scenes`、`jyx-legacy-data`、`jyx-legacy-dll` 用于参考，不恢复已移除的旧运行路径。
 
 ## 按任务查阅
@@ -37,7 +37,7 @@
 
 ## 验证入口
 
-按改动影响选择验证，已有通过结果且代码未变化时不重复运行。文档修改检查内容与链接即可；涉及宿主时补宿主构建，涉及执行时序时补实际 Godot 场景验证。
+按改动影响选择验证，已有通过结果且代码未变化时不重复运行。文档修改检查内容与链接即可；涉及宿主时补宿主构建。实际 Godot 场景验证按风险与现有验证覆盖情况选择，不因涉及执行时序而强制执行；未执行时说明仍未验证的运行期行为。
 
 ```powershell
 # 普通 .NET 测试，可加 --filter 限定受影响用例
