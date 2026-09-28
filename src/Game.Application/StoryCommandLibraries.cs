@@ -15,7 +15,6 @@ internal sealed class InventoryCurrencyStoryCommands
         if (delta > 0)
         {
             _session.InventoryService.AddItem(itemId, delta);
-            return _session.StoryService.Host.PlayEffectAsync("音效.升级", cancellationToken);
         }
         else if (delta < 0)
         {
@@ -243,8 +242,8 @@ internal sealed class CharacterGrowthStoryCommands
 
         _session.Events.Publish(new ToastRequestedEvent(
             $"武学精通【{skillName}】+ {levels}",
-            ToastTone.Important));
-        return _session.StoryService.Host.PlayEffectAsync("音效.升级", cancellationToken);
+            ToastTone.Important, "音效.升级"));
+        return ValueTask.CompletedTask;
     }
 
     private string ResolveSkillName(string skillId)

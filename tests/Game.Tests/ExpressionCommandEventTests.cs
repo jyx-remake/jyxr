@@ -185,17 +185,22 @@ public sealed class ExpressionCommandEventTests
         var item = new NormalItemDefinition { Id = "pill", Name = "pill", Type = ItemType.Utility, ConsumeOnUse = false };
         var host = new RecordingEffectHost();
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(items: [item]), host);
+        var acquiredItems = new List<ItemAcquiredEvent>();
+        using var acquisitionSubscription = session.Events.Subscribe<ItemAcquiredEvent>(acquiredItems.Add);
         await session.StoryService.CommandDispatcher.ExecuteCommandAsync("change_item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(3)]);
+        Assert.Equal(new ItemAcquiredEvent("pill", "pill", 3), Assert.Single(acquiredItems));
+        Assert.Empty(host.Effects);
         await session.StoryService.CommandDispatcher.ExecuteCommandAsync("item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(-1)]);
         Assert.True(session.State.Inventory.ContainsStack(item, 2));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
             await session.StoryService.CommandDispatcher.ExecuteCommandAsync("remove_item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(-1)]));
         var parser = new ExpressionParser();
         await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("change_item('pill', 0)"));
-        Assert.Equal(new[] { "音效.升级", "音效.装备" }, host.Effects);
+        Assert.Equal(new[] { "音效.装备" }, host.Effects);
         await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("cost_item('pill')"));
         await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("item_random(['pill'])"));
-        Assert.Equal(new[] { "音效.升级", "音效.装备", "音效.装备", "音效.升级" }, host.Effects);
+        Assert.Equal(new[] { 3, 1 }, acquiredItems.Select(itemEvent => itemEvent.Quantity));
+        Assert.Equal(new[] { "音效.装备", "音效.装备" }, host.Effects);
     }
 
     [Fact]
@@ -224,7 +229,8 @@ public sealed class ExpressionCommandEventTests
         var toast = Assert.Single(toasts);
         Assert.Equal("武学精通【starter_sword】+ 2", toast.Message);
         Assert.Equal(ToastTone.Important, toast.Tone);
-        Assert.Equal("音效.升级", Assert.Single(host.Effects));
+        Assert.Equal("音效.升级", toast.SoundEffectId);
+        Assert.Empty(host.Effects);
     }
 
     [Fact]
@@ -244,7 +250,7 @@ public sealed class ExpressionCommandEventTests
 
         Assert.Equal(1, session.Profile.GetSkillMaxLevelBonus("starter_internal"));
         Assert.Equal(13, session.SkillMaxLevelPolicy.GetMaxLevel(skill));
-        Assert.Equal("音效.升级", Assert.Single(host.Effects));
+        Assert.Empty(host.Effects);
     }
 
     [Theory]

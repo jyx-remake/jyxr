@@ -131,7 +131,7 @@ public enum ToastTone
     Error,
 }
 
-public sealed record ToastRequestedEvent(string Message, ToastTone Tone = ToastTone.Normal) : ISessionEvent;
+public sealed record ToastRequestedEvent(string Message, ToastTone Tone = ToastTone.Normal, string? SoundEffectId = null) : ISessionEvent;
 
 public sealed record AutoSaveRequestedEvent(string Reason) : ISessionEvent;
 

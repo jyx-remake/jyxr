@@ -572,7 +572,7 @@ public partial class UIRoot : Control
 		CancellationToken cancellationToken = default) =>
 		_confirmDialog.ShowConfirmAsync(text, tone, cancellationToken);
 
-	public void ShowToast(string text, ToastTone tone = ToastTone.Normal)
+	public void ShowToast(string text, ToastTone tone = ToastTone.Normal, string? soundEffectId = null)
 	{
 		if (_isToastSuppressed)
 		{
@@ -580,6 +580,10 @@ public partial class UIRoot : Control
 		}
 
 		_toastPanel.Enqueue(text, tone);
+		if (soundEffectId is not null)
+		{
+			Game.Audio.PlaySfx(soundEffectId);
+		}
 	}
 
 	private static IReadOnlySet<string> EmptyForbiddenSet { get; } = new HashSet<string>(StringComparer.Ordinal);
@@ -721,11 +725,11 @@ public partial class UIRoot : Control
 		var quantitySuffix = sessionEvent.Quantity > 1
 			? $" x{sessionEvent.Quantity}"
 			: string.Empty;
-		ShowToast($"获得物品【{sessionEvent.ItemName}】{quantitySuffix}");
+		ShowToast($"获得物品【{sessionEvent.ItemName}】{quantitySuffix}", soundEffectId: "音效.升级");
 	}
 
 	private void OnToastRequested(ToastRequestedEvent sessionEvent) =>
-		ShowToast(sessionEvent.Message, sessionEvent.Tone);
+		ShowToast(sessionEvent.Message, sessionEvent.Tone, sessionEvent.SoundEffectId);
 
 	private void OnCharacterLeveledUp(CharacterLeveledUpEvent sessionEvent)
 	{
