@@ -1,6 +1,7 @@
 # 战斗伤害 Timing 设计
 
-> 当前实现说明：伤害阶段已按本文顺序落地，并通过能力型 Context 限制各阶段可执行的操作。
+> 本文说明伤害阶段的职责划分；具体入口存在差异，不能将下述推荐管线视为所有伤害的统一实现。
+> 普通技能、直接伤害和毒伤的当前行为见下节；阶段操作受能力型 Context 限制。
 > Effect、Context 和消息流总览见 `battle-runtime-architecture.md` 与
 > `battle-effect-phase-hook-design.md`。
 
@@ -14,7 +15,11 @@
 - 明确普通伤害与真实伤害分别走哪些 timing
 - 避免把“命中前拦截”“防御修正”“扣血后触发”混在同一个 timing
 
-本文是伤害阶段的现行语义规范，不要求兼容旧运行时代码。
+## 当前实现与设计边界
+
+普通技能执行命中与伤害步骤。`ApplyDirectDamage` 直接调用公共伤害 resolver，跳过命中、普通攻防计算与 `BeforeDamageApplied`，保留实际扣血后的响应。毒伤额外关闭承伤后响应，并限制为至少保留 1 HP。
+
+公共承伤后路径已实现 `OnDamageTaken`、受击回怒、`BeforeDefeated`、`OnDefeated` 和攻击方的 `OnDamageDealt`；关闭该路径的伤害不会执行这些阶段。下文的真实伤害推荐流程和 legacy 效果分类用于表达设计方向，不表示每项已按该分类接入。统一伤害来源与阶段策略的待办见 [TODO](../TODO.md) 和 [战斗后续议题](battle-runtime-refactoring-backlog.md)。
 
 ## 核心原则
 
@@ -507,7 +512,7 @@
 
 - 毒伤、灼烧、自残是否复用同一套 timing
 - 治疗是否需要独立 `BeforeHealApplied / OnHealed`
-- 死亡前与死亡后是否需要单独 timing
+- 死亡阶段如何覆盖不同伤害来源（当前已有 `BeforeDefeated` 和 `OnDefeated`）
 - 多段伤害与一次技能多目标命中的事件聚合
 
 这些问题后续再拆文档。

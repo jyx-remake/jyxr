@@ -22,7 +22,7 @@
 - Godot 运行期日志使用 `Game.Logger`。资源加载统一经 `AssetResolver`，不要在面板重复拼接资源路径或实现扩展名回退。
 - 场景脚本取节点优先使用 `unique_name_in_owner = true` 与 `%Name`；仅在层级本身具有语义时使用固定 NodePath。UI 默认使用轻量面板脚本，复杂显示可提取 Presenter，不为每个面板创建 ViewModel。
 - `tests/Game.Tests` 不引用 Godot 宿主或 GodotSharp。节点生命周期、延迟回调和实际演出可按需在 Godot 中验证。
-- `legacy_scenes`、`jyx-legacy-data`、`jyx-legacy-dll` 用于参考，不恢复已移除的旧运行路径。
+- `jyx-legacy-data`、`jyx-legacy-dll` 用于参考，不恢复已移除的旧运行路径。
 
 ## 按任务查阅
 
