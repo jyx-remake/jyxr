@@ -84,6 +84,10 @@ Godot 工程位于 `src/Game.Godot`，入口是 `res://scenes/ui/mod_launcher/mo
 
 ## 剧情与会话事件
 
+对话面板的“跳过”按钮会结束当前对白，并持续跳过本次剧情的后续对白；显示选项前恢复正常，选择后的对白需重新点击跳过。剧情结束或读档时清除跳过状态。跳过对白不省略剧情命令或其他演出。
+
+跳过状态由 `StoryDialoguePanel` 管理；`UIRoot` 仅在显示选项与重置剧情展示时通知面板停止跳过。
+
 剧情运行时位于 Core，应用入口是 StoryService。命令经 [StoryCommandDispatcher](../src/Game.Application/StoryCommandDispatcher.cs) 的调用注册表分派；应用层负责状态用例，GodotStoryRuntimeHost 负责对话、选项、场景与演出。
 
 剧情当前使用 DSL/IR v3，地图和世界触发使用 `action` 与可选 `when`；不维护另一份命令清单，统一查 [DSL v3 参考](game-dsl-v3.md)。对白使用 `kind: dialogue`；选项宿主回传 ChoiceOptionView.Index，不能把过滤后的数组位置当作原选项标识。

@@ -14,6 +14,7 @@ public partial class StoryDialoguePanel : Control
 	private RichTextLabel _contentLabel = null!;
 	private Button _skipButton = null!;
 	private bool _isTyping;
+	private bool _isSkipping;
 	private double _typewriterProgress;
 	private int _typewriterTargetCharacters;
 
@@ -26,7 +27,7 @@ public partial class StoryDialoguePanel : Control
 		_contentLabel = GetNode<RichTextLabel>("%ContentLabel");
 		_skipButton = GetNode<Button>("%SkipButton");
 
-		_skipButton.Pressed += Complete;
+		_skipButton.Pressed += RequestSkip;
 		SetProcess(false);
 		Apply();
 	}
@@ -85,6 +86,13 @@ public partial class StoryDialoguePanel : Control
 		_completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
 		PresentationVersion += 1;
 
+		if (_isSkipping)
+		{
+			_completionSource.TrySetResult(true);
+			Hide();
+			return;
+		}
+
 		if (IsInsideTree())
 		{
 			Apply();
@@ -95,13 +103,14 @@ public partial class StoryDialoguePanel : Control
 
 	public async Task AwaitCompletionAsync(CancellationToken cancellationToken = default)
 	{
+		cancellationToken.ThrowIfCancellationRequested();
 		if (_completionSource is null)
 		{
 			throw new InvalidOperationException("Dialogue panel must be configured before awaiting completion.");
 		}
 
 		using var registration = cancellationToken.Register(() => _completionSource.TrySetCanceled(cancellationToken));
-		if (Input.IsActionPressed("ui-ctrl"))
+		if (!_completionSource.Task.IsCompleted && Input.IsActionPressed("ui-ctrl"))
 		{
 			await ToSignal(GetTree().CreateTimer(0.1d), SceneTreeTimer.SignalName.Timeout);
 			return;
@@ -186,6 +195,14 @@ public partial class StoryDialoguePanel : Control
 
 		Complete();
 	}
+
+	private void RequestSkip()
+	{
+		_isSkipping = true;
+		Complete();
+	}
+
+	public void StopSkipping() => _isSkipping = false;
 
 	private void Complete()
 	{

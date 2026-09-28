@@ -214,6 +214,7 @@ public partial class UIRoot : Control
 
 	private void ResetStoryEffects()
 	{
+		_storyDialoguePanel.StopSkipping();
 		_storyVideoPlayer.ResetImmediate();
 		_storyIntertitlePanel.ResetImmediate();
 		VisualEffects.ResetImmediate();
@@ -541,6 +542,7 @@ public partial class UIRoot : Control
 			throw new InvalidOperationException("Choices cannot be empty.");
 		}
 
+		_storyDialoguePanel.StopSkipping();
 		_storyDialoguePanel.HidePanel();
 		_regularStoryChoicePanel.HidePanel();
 		_boldStoryChoicePanel.HidePanel();
