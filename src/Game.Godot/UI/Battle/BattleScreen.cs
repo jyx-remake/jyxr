@@ -5,7 +5,7 @@ using Game.Core.Model;
 using Game.Core.Model.Skills;
 using Game.Presentation.Battle;
 using Game.Application;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Game.Godot.Audio;
 using Godot;
 using GameRoot = Game.Godot.Game;

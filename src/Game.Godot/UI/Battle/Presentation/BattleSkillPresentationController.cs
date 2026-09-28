@@ -3,7 +3,7 @@ using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Game.Godot.Audio;
 using Godot;
 using GameRoot = Game.Godot.Game;

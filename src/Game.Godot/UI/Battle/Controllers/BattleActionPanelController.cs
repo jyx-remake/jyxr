@@ -2,7 +2,7 @@ using Game.Core.Battle;
 using Game.Presentation.Battle;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Godot;
 using GameRoot = Game.Godot.Game;
 

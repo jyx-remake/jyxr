@@ -1,0 +1,335 @@
+[gd_scene format=3 uid="uid://dtr5c0pjawo7x"]
+
+[ext_resource type="Script" uid="uid://m2jcypjverpf" path="res://UI/SaveLoad/SaveSlotCard.cs" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_normal"]
+bg_color = Color(0.91, 0.87, 0.78, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.2, 0.18, 0.14, 0.92)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.08, 0.06, 0.03, 0.24)
+shadow_size = 10
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_pressed"]
+bg_color = Color(0.83, 0.78, 0.68, 0.99)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.38, 0.12, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_hover"]
+bg_color = Color(0.95, 0.92, 0.84, 0.99)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7, 0.5, 0.18, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.08, 0.06, 0.03, 0.28)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_disabled"]
+bg_color = Color(0.76, 0.74, 0.69, 0.82)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.35, 0.34, 0.31, 0.72)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_title_brush"]
+content_margin_left = 14.0
+content_margin_top = 1.0
+content_margin_right = 18.0
+content_margin_bottom = 3.0
+bg_color = Color(0.12, 0.11, 0.09, 0.94)
+corner_radius_top_left = 6
+corner_radius_top_right = 18
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_latest_badge"]
+content_margin_left = 10.0
+content_margin_top = 2.0
+content_margin_right = 10.0
+content_margin_bottom = 3.0
+bg_color = Color(0.78, 0.64, 0.36, 0.2)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.56, 0.4, 0.13, 0.95)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_no_regret_badge"]
+content_margin_left = 10.0
+content_margin_top = 2.0
+content_margin_right = 10.0
+content_margin_bottom = 3.0
+bg_color = Color(0.45, 0.08, 0.3, 0.12)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.08, 0.36, 0.88)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_structural_risk_badge"]
+content_margin_left = 9.0
+content_margin_top = 2.0
+content_margin_right = 9.0
+content_margin_bottom = 3.0
+bg_color = Color(0.68, 0.08, 0.05, 0.12)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.68, 0.08, 0.05, 0.9)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gameplay_risk_badge"]
+content_margin_left = 9.0
+content_margin_top = 2.0
+content_margin_right = 9.0
+content_margin_bottom = 3.0
+bg_color = Color(0.72, 0.45, 0.06, 0.14)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.72, 0.45, 0.06, 0.92)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0yoa5"]
+
+[node name="SaveSlotCard" type="Button" unique_id=1168732317]
+custom_minimum_size = Vector2(650, 250)
+offset_right = 650.0
+offset_bottom = 250.0
+mouse_filter = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_card_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_card_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_card_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_card_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_card_hover")
+alignment = 0
+script = ExtResource("1_script")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1138809716]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 14.0
+offset_right = 632.0
+offset_bottom = 237.0
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="TitleRow" type="HBoxContainer" parent="VBox" unique_id=2035587860]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="TitleBrush" type="PanelContainer" parent="VBox/TitleRow" unique_id=407137853]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_title_brush")
+
+[node name="TitleLabel" type="Label" parent="VBox/TitleRow/TitleBrush" unique_id=78954124]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.89, 0.76, 0.51, 1)
+theme_override_font_sizes/font_size = 34
+text = "存档1"
+
+[node name="LatestBadge" type="PanelContainer" parent="VBox/TitleRow" unique_id=626193621]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_latest_badge")
+
+[node name="Label" type="Label" parent="VBox/TitleRow/LatestBadge" unique_id=746086135]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.28, 0.08, 1)
+theme_override_font_sizes/font_size = 20
+text = "最近"
+vertical_alignment = 1
+
+[node name="NoRegretBadge" type="PanelContainer" parent="VBox/TitleRow" unique_id=1256749044]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_no_regret_badge")
+
+[node name="Label" type="Label" parent="VBox/TitleRow/NoRegretBadge" unique_id=1399139790]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.04, 0.3, 1)
+theme_override_font_sizes/font_size = 20
+text = "无悔"
+vertical_alignment = 1
+
+[node name="StructuralRiskBadge" type="PanelContainer" parent="VBox/TitleRow" unique_id=19121123]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "MOD 结构环境不同，读取存在较高风险"
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_structural_risk_badge")
+
+[node name="Label" type="Label" parent="VBox/TitleRow/StructuralRiskBadge" unique_id=1608025210]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.05, 0.03, 1)
+theme_override_font_sizes/font_size = 19
+text = "结构风险"
+vertical_alignment = 1
+
+[node name="GameplayRiskBadge" type="PanelContainer" parent="VBox/TitleRow" unique_id=694451052]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "MOD 玩法环境不同，内容表现可能发生变化"
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_gameplay_risk_badge")
+
+[node name="Label" type="Label" parent="VBox/TitleRow/GameplayRiskBadge" unique_id=1484227337]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.58, 0.34, 0.02, 1)
+theme_override_font_sizes/font_size = 19
+text = "玩法差异"
+vertical_alignment = 1
+
+[node name="TitleSpacer" type="Control" parent="VBox/TitleRow" unique_id=1631898134]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ContentRow" type="HBoxContainer" parent="VBox" unique_id=970388627]
+custom_minimum_size = Vector2(0, 126)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="PortraitPanel" type="PanelContainer" parent="VBox/ContentRow" unique_id=15342250]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_0yoa5")
+
+[node name="Portrait" type="TextureRect" parent="VBox/ContentRow/PortraitPanel" unique_id=457092067]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 126)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="VBox/ContentRow" unique_id=517824296]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="NameLabel" type="Label" parent="VBox/ContentRow/InfoVBox" unique_id=395789326]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.11, 0.09, 1)
+theme_override_font_sizes/font_size = 32
+text = "空档"
+
+[node name="RunInfoRow" type="HBoxContainer" parent="VBox/ContentRow/InfoVBox" unique_id=1940620639]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="DifficultyLabel" type="Label" parent="VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=2015163800]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 24
+text = "炼狱"
+
+[node name="RoundLabel" type="Label" parent="VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=694259001]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.28, 0.24, 0.18, 1)
+theme_override_font_sizes/font_size = 24
+text = "周目 2"
+
+[node name="PartyCountLabel" type="Label" parent="VBox/ContentRow/InfoVBox/RunInfoRow" unique_id=1410164908]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.28, 0.24, 0.18, 1)
+theme_override_font_sizes/font_size = 24
+text = "队伍 9"
+
+[node name="GameTimeLabel" type="Label" parent="VBox/ContentRow/InfoVBox" unique_id=1735996101]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.2, 0.16, 1)
+theme_override_font_sizes/font_size = 24
+
+[node name="LocationLabel" type="Label" parent="VBox/ContentRow/InfoVBox" unique_id=335058721]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.2, 0.16, 1)
+theme_override_font_sizes/font_size = 24
+
+[node name="FooterSeparator" type="HSeparator" parent="VBox" unique_id=883604490]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="SaveInfoRow" type="HBoxContainer" parent="VBox" unique_id=407778216]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="SavedAtLabel" type="Label" parent="VBox/SaveInfoRow" unique_id=1985571942]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.4, 0.36, 0.29, 1)
+theme_override_font_sizes/font_size = 21
+
+[node name="PlayTimeLabel" type="Label" parent="VBox/SaveInfoRow" unique_id=804586650]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.08, 0.5, 0.56, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 2

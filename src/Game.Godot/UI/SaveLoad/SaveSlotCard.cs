@@ -2,7 +2,7 @@ using Game.Application;
 using Game.Application.Mods;
 using Game.Core.Model;
 using Game.Core.Persistence;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Game.Godot.Persistence;
 using Godot;
 

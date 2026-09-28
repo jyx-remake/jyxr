@@ -1,0 +1,307 @@
+[gd_scene format=3 uid="uid://di28xqh0osmwk"]
+
+[ext_resource type="Script" uid="uid://cp5451k3twt6r" path="res://UI/Battle/BattleScreen.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://5n52fg3sl8bk" path="res://assets/art/battle_bg/zhulin.jpg" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://beuwbdagaqxxq" path="res://assets/art/ui/battle/battle_actionBarBg.png" id="3_action_bg"]
+[ext_resource type="Texture2D" uid="uid://cx575i6rso56w" path="res://assets/art/ui/battle/battle_shuimodi.png" id="4_bottom_strip"]
+[ext_resource type="Texture2D" uid="uid://cvcu58vmb6qvl" path="res://assets/art/ui/battle/battle_shijianxianzhi.png" id="6_clock"]
+[ext_resource type="PackedScene" uid="uid://cstdi8n6cph7k" path="res://scenes/ui/battle/battle_skill_box.tscn" id="18_skill_box"]
+[ext_resource type="PackedScene" uid="uid://d1qdddofh12io" path="res://scenes/ui/battle/battle_board_view.tscn" id="19_board_view"]
+[ext_resource type="PackedScene" uid="uid://oei4u3648ovq" path="res://scenes/ui/battle/battle_item_panel.tscn" id="20_item_panel"]
+[ext_resource type="PackedScene" uid="uid://b77m8rj4t6o0x" path="res://scenes/ui/battle/battle_legend_overlay.tscn" id="21_legend_overlay"]
+[ext_resource type="Texture2D" uid="uid://cy8b0ml1bq8e0" path="res://assets/art/ui/battle/battle_jiasu.png" id="22_speed_button"]
+[ext_resource type="Texture2D" uid="uid://ck4dvgt1nywut" path="res://assets/art/ui/battle/battle_jiasuhong.png" id="23_speed_active"]
+[ext_resource type="Texture2D" uid="uid://ba8m81qumgdct" path="res://assets/art/ui/battle/battle_zidong.png" id="24_auto_button"]
+[ext_resource type="Texture2D" uid="uid://bc8dyte7msrvf" path="res://assets/art/ui/battle/battle_zidonghong.png" id="25_auto_active"]
+[ext_resource type="Texture2D" uid="uid://dukqh5gd77ixk" path="res://assets/art/ui/battle/touxiang.png" id="26_surrender_button"]
+[ext_resource type="PackedScene" uid="uid://dtbij03bvh027" path="res://scenes/ui/battle/battle_settlement_panel.tscn" id="27_settlement_panel"]
+[ext_resource type="PackedScene" uid="uid://cnfci8vqthgqc" path="res://scenes/ui/battle/battle_selected_skill_box.tscn" id="28_selected_skill_box"]
+[ext_resource type="PackedScene" uid="uid://bucx4fp6bcml8" path="res://scenes/ui/battle/battle_status_panel.tscn" id="29_status_panel"]
+[ext_resource type="PackedScene" uid="uid://cr8b5xtf5q13e" path="res://scenes/ui/battle/battle_log_drawer.tscn" id="30_log_drawer"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_action_drawer.tscn" id="31_action_drawer"]
+
+[node name="BattleScreen" type="Control" unique_id=96008142]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+BattleSkillBoxScene = ExtResource("18_skill_box")
+BattleItemPanelScene = ExtResource("20_item_panel")
+BattleLegendOverlayScene = ExtResource("21_legend_overlay")
+BattleSettlementPanelScene = ExtResource("27_settlement_panel")
+BattleStatusPanelScene = ExtResource("29_status_panel")
+
+[node name="Background" type="TextureRect" parent="." unique_id=372176778]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BackgroundDim" type="ColorRect" parent="." unique_id=198460847]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.2)
+
+[node name="ContentRoot" type="Control" parent="." unique_id=1435293204]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -960.0
+offset_right = 960.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="BoardGrid" parent="ContentRoot" unique_id=843775524 instance=ExtResource("19_board_view")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 237.0
+offset_top = 242.0
+offset_right = 237.0
+offset_bottom = 242.0
+
+[node name="BattleUiRoot" type="Control" parent="." unique_id=1422596367]
+z_index = 30
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopClock" type="TextureRect" parent="BattleUiRoot" unique_id=1545890483]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.5
+offset_top = 16.0
+offset_bottom = 199.0
+mouse_filter = 2
+texture = ExtResource("6_clock")
+expand_mode = 1
+
+[node name="TitleLabel" type="Label" parent="BattleUiRoot/TopClock" unique_id=1760768761]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 178.0
+offset_top = 26.0
+offset_right = 560.0
+offset_bottom = 82.0
+theme_override_colors/font_color = Color(0.98, 0.94, 0.74, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 38
+text = "战场"
+
+[node name="SubtitleLabel" type="Label" parent="BattleUiRoot/TopClock" unique_id=731501548]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 180.0
+offset_top = 88.0
+offset_right = 776.0
+offset_bottom = 148.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+
+[node name="TimelineCaptionLabel" type="Label" parent="BattleUiRoot/TopClock" unique_id=306299844]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 754.0
+offset_top = 32.0
+offset_right = 826.0
+offset_bottom = 61.0
+theme_override_colors/font_color = Color(0.98, 0.94, 0.74, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "时序："
+
+[node name="TimelineValueLabel" type="Label" parent="BattleUiRoot/TopClock" unique_id=306337323]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 819.0
+offset_top = 32.0
+offset_right = 894.0
+offset_bottom = 61.0
+theme_override_colors/font_color = Color(0.98, 0.94, 0.74, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "0"
+
+[node name="SurrenderButton" type="TextureButton" parent="BattleUiRoot" unique_id=1078304102]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -552.0
+offset_top = 19.0
+offset_right = -406.0
+offset_bottom = 163.0
+grow_horizontal = 0
+tooltip_text = "投降"
+texture_normal = ExtResource("26_surrender_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AutoBattleButton" type="TextureButton" parent="BattleUiRoot" unique_id=1003218841]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -375.0
+offset_top = 20.0
+offset_right = -190.0
+offset_bottom = 178.0
+grow_horizontal = 0
+tooltip_text = "自动战斗"
+texture_normal = ExtResource("24_auto_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AutoBattleActive" type="TextureRect" parent="BattleUiRoot/AutoBattleButton" unique_id=743190248]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 18.0
+offset_top = 20.0
+offset_right = 156.0
+offset_bottom = 135.0
+mouse_filter = 2
+texture = ExtResource("25_auto_active")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SpeedUpButton" type="TextureButton" parent="BattleUiRoot" unique_id=1052298601]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -172.0
+offset_top = 20.0
+offset_right = -14.0
+offset_bottom = 156.0
+grow_horizontal = 0
+tooltip_text = "战斗加速"
+texture_normal = ExtResource("22_speed_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="SpeedUpActive" type="TextureRect" parent="BattleUiRoot/SpeedUpButton" unique_id=1743614407]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 8.0
+offset_top = 7.0
+offset_right = 136.0
+offset_bottom = 132.0
+mouse_filter = 2
+texture = ExtResource("23_speed_active")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BattleLogDrawer" parent="BattleUiRoot" unique_id=1851036359 instance=ExtResource("30_log_drawer")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -1.0
+offset_top = 163.0
+offset_right = 415.0
+offset_bottom = 849.0
+
+[node name="BottomHud" type="Control" parent="BattleUiRoot" unique_id=2050466151]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -507.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="ActionBarBg" type="TextureRect" parent="BattleUiRoot/BottomHud" unique_id=1125755907]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+mouse_filter = 2
+texture = ExtResource("3_action_bg")
+expand_mode = 1
+
+[node name="BottomStrip" type="TextureRect" parent="BattleUiRoot/BottomHud" unique_id=1312754331]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_top = 250.0
+offset_bottom = 507.0
+mouse_filter = 2
+texture = ExtResource("4_bottom_strip")
+expand_mode = 1
+
+[node name="BattleSelectedSkillBox" parent="BattleUiRoot/BottomHud" unique_id=1885387874 instance=ExtResource("28_selected_skill_box")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.04
+anchor_right = 0.04
+offset_top = 221.0
+offset_bottom = 503.0
+
+[node name="ListScroll" type="ScrollContainer" parent="BattleUiRoot/BottomHud" unique_id=60321938]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_right = 0.75
+offset_top = 305.0
+offset_bottom = 502.0
+vertical_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="BattleUiRoot/BottomHud/ListScroll" unique_id=1440051364]
+layout_mode = 2
+theme_override_constants/margin_left = 38
+theme_override_constants/margin_top = 45
+theme_override_constants/margin_bottom = 60
+
+[node name="ListContainer" type="HBoxContainer" parent="BattleUiRoot/BottomHud/ListScroll/MarginContainer" unique_id=2070798312]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 38
+
+[node name="BattleActionDrawer" parent="BattleUiRoot" unique_id=617508197 instance=ExtResource("31_action_drawer")]
+unique_name_in_owner = true
+layout_mode = 1
+ActionBarBackgroundPath = NodePath("../BottomHud/ActionBarBg")
+
+[node name="OverlayRoot" type="Control" parent="BattleUiRoot" unique_id=2009935606]
+unique_name_in_owner = true
+z_index = 100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

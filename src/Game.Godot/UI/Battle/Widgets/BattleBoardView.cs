@@ -1,6 +1,6 @@
 using Game.Core.Battle;
 using Game.Core.Model;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Godot;
 
 namespace Game.Godot.UI.Battle;

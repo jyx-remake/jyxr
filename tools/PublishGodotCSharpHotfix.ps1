@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")
 
 if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
-    $ProjectPath = Join-Path $repoRoot "engine-free-rpg.csproj"
+    $ProjectPath = Join-Path $repoRoot "src/Game.Godot/engine-free-rpg.csproj"
 }
 
 if ([string]::IsNullOrWhiteSpace($ExportDataDir)) {
@@ -67,7 +67,9 @@ $files = @(
     "engine-free-rpg.dll",
     "Game.Core.dll",
     "Game.Content.dll",
-    "Game.Application.dll"
+    "Game.Application.dll",
+    "Game.Expressions.dll",
+    "Game.Presentation.dll"
 )
 
 if (-not $SkipRuntimeDescriptors) {
@@ -82,7 +84,9 @@ if ($IncludePdb) {
         "engine-free-rpg.pdb",
         "Game.Core.pdb",
         "Game.Content.pdb",
-        "Game.Application.pdb"
+        "Game.Application.pdb",
+        "Game.Expressions.pdb",
+        "Game.Presentation.pdb"
     )
 }
 

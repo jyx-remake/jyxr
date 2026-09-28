@@ -3,7 +3,7 @@ using Game.Presentation.Battle;
 using Game.Core.Affix;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Godot;
 
 namespace Game.Godot.UI.Battle;

@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" path="res://UI/Console/ConsolePanel.cs" id="2_script"]
+
+[node name="ConsolePanel" instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+
+[node name="ConsoleTitle" type="Label" parent="ContentRoot" index="0"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 145.0
+offset_right = 950.0
+offset_bottom = 215.0
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_font_sizes/font_size = 54
+text = "剧情命令行"
+
+[node name="ConsoleSubtitle" type="Label" parent="ContentRoot" index="1"]
+layout_mode = 0
+offset_left = 262.0
+offset_top = 220.0
+offset_right = 1350.0
+offset_bottom = 270.0
+theme_override_colors/font_color = Color(0.32, 0.22, 0.14, 1)
+theme_override_font_sizes/font_size = 28
+text = "用于调试剧情指令；执行结果会立即写入当前游戏状态。"
+
+[node name="ConsoleVBox" type="VBoxContainer" parent="ContentRoot" index="2"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 310.0
+offset_right = 1660.0
+offset_bottom = 875.0
+theme_override_constants/separation = 24
+
+[node name="InputRow" type="HBoxContainer" parent="ContentRoot/ConsoleVBox"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ConsoleInput" type="LineEdit" parent="ContentRoot/ConsoleVBox/InputRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "输入指令..."
+keep_editing_on_text_submit = true
+
+[node name="ExecuteButton" type="Button" parent="ContentRoot/ConsoleVBox/InputRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 84)
+layout_mode = 2
+text = "执行"
+
+[node name="ConsoleOutput" type="RichTextLabel" parent="ContentRoot/ConsoleVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 430)
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+
+[editable path="CloseButton"]

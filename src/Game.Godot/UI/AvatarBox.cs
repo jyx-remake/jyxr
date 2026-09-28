@@ -1,6 +1,6 @@
 using Game.Core.Definitions;
 using Game.Core.Model.Character;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Godot;
 
 namespace Game.Godot.UI;

@@ -1,0 +1,230 @@
+[gd_scene format=3 uid="uid://sdtyoj35nitl"]
+
+[ext_resource type="Script" uid="uid://dfeiaxmn5awtk" path="res://UI/System/SystemPanel.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://5n52fg3sl8bk" path="res://assets/art/battle_bg/zhulin.jpg" id="2_background"]
+[ext_resource type="Texture2D" uid="uid://rp0frp5p0jig" path="res://assets/art/misc/cross.png" id="3_close"]
+[ext_resource type="Texture2D" uid="uid://b1n3vntrjjyry" path="res://assets/art/ui/icon_main_menu.svg" id="4_main_menu"]
+[ext_resource type="Texture2D" uid="uid://bbc8vj3vn1kxx" path="res://assets/art/ui/icon_load.svg" id="5_load"]
+[ext_resource type="Texture2D" uid="uid://yw4d3sy6ibqr" path="res://assets/art/ui/icon_save.svg" id="6_save"]
+[ext_resource type="Texture2D" uid="uid://bk4oxdt3ugto2" path="res://assets/art/ui/icon_delete.svg" id="7_delete"]
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://UI/Base/JyButton.cs" id="8_button"]
+[ext_resource type="PackedScene" uid="uid://dglpv52kau1u4" path="res://scenes/ui/settings/settings_section.tscn" id="9_settings"]
+[ext_resource type="Texture2D" uid="uid://yq5cq27hyj8i" path="res://assets/art/ui/icon_console.svg" id="10_console"]
+[ext_resource type="Texture2D" uid="uid://b5t8r8n130xfh" path="res://assets/art/ui/icon_exit.svg" id="11_exit"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
+content_margin_left = 20.0
+content_margin_top = 12.0
+content_margin_right = 20.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 0.99, 0.95, 0.88)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.48, 0.3, 0.16, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.2, 0.1, 0.04, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_hover"]
+content_margin_left = 20.0
+content_margin_top = 12.0
+content_margin_right = 20.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 0.93, 0.72, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.68, 0.4, 0.12, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="SystemPanel" type="Control" unique_id=713738667]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=622011440]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=142697128]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.18)
+
+[node name="ContentRoot" type="Control" parent="." unique_id=1555368924]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -960.0
+offset_right = 960.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="SettingsSection" parent="ContentRoot" unique_id=819248979 instance=ExtResource("9_settings")]
+layout_mode = 1
+
+[node name="BackButton" type="TextureButton" parent="ContentRoot" unique_id=1126001445]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1615.0
+offset_top = 5.0
+offset_right = 1815.0
+offset_bottom = 205.0
+texture_normal = ExtResource("3_close")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("8_button")
+
+[node name="ActionRow" type="HBoxContainer" parent="ContentRoot" unique_id=999978676]
+layout_mode = 0
+offset_left = 189.0
+offset_top = 835.0
+offset_right = 1709.0
+offset_bottom = 940.0
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="ConsoleButton" type="Button" parent="ContentRoot/ActionRow" unique_id=745599204]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 105)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.13, 0.08, 1)
+theme_override_colors/font_focus_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_colors/font_pressed_color = Color(0.32, 0.1, 0.05, 1)
+theme_override_colors/font_hover_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_hover")
+text = "控制台"
+icon = ExtResource("10_console")
+expand_icon = true
+
+[node name="MainMenuButton" type="Button" parent="ContentRoot/ActionRow" unique_id=2114454890]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 105)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.13, 0.08, 1)
+theme_override_colors/font_focus_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_colors/font_pressed_color = Color(0.32, 0.1, 0.05, 1)
+theme_override_colors/font_hover_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_hover")
+text = "主菜单"
+icon = ExtResource("4_main_menu")
+expand_icon = true
+
+[node name="ExitGameButton" type="Button" parent="ContentRoot/ActionRow" unique_id=125549846]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 105)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.38, 0.1, 0.06, 1)
+theme_override_colors/font_focus_color = Color(0.6, 0.08, 0.04, 1)
+theme_override_colors/font_pressed_color = Color(0.46, 0.04, 0.02, 1)
+theme_override_colors/font_hover_color = Color(0.6, 0.08, 0.04, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_hover")
+text = "退出游戏"
+icon = ExtResource("11_exit")
+expand_icon = true
+
+[node name="ActionGroupSpacer" type="Control" parent="ContentRoot/ActionRow" unique_id=730522355]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="DeleteSaveButton" type="Button" parent="ContentRoot/ActionRow" unique_id=2048954853]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 105)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.13, 0.08, 1)
+theme_override_colors/font_focus_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_colors/font_pressed_color = Color(0.32, 0.1, 0.05, 1)
+theme_override_colors/font_hover_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_hover")
+text = "删档"
+icon = ExtResource("7_delete")
+expand_icon = true
+
+[node name="SaveButton" type="Button" parent="ContentRoot/ActionRow" unique_id=1475166066]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 105)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.13, 0.08, 1)
+theme_override_colors/font_focus_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_colors/font_pressed_color = Color(0.32, 0.1, 0.05, 1)
+theme_override_colors/font_hover_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_colors/font_disabled_color = Color(0.46, 0.42, 0.36, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_action")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_hover")
+text = "存档"
+icon = ExtResource("6_save")
+expand_icon = true
+
+[node name="LoadButton" type="Button" parent="ContentRoot/ActionRow" unique_id=333751980]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 105)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.13, 0.08, 1)
+theme_override_colors/font_focus_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_colors/font_pressed_color = Color(0.32, 0.1, 0.05, 1)
+theme_override_colors/font_hover_color = Color(0.42, 0.17, 0.08, 1)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_action")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_action_hover")
+text = "读档"
+icon = ExtResource("5_load")
+expand_icon = true
+
+[node name="HotkeyHint" type="Label" parent="ContentRoot" unique_id=1418546467]
+layout_mode = 0
+offset_left = 610.0
+offset_top = 970.0
+offset_right = 1310.0
+offset_bottom = 1025.0
+theme_override_colors/font_color = Color(0.94, 0.91, 0.78, 0.9)
+theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.05, 0.85)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 30
+text = "F1  快速存档    ·    F2  快速读档"
+horizontal_alignment = 1

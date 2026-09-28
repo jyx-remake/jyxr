@@ -1,13 +1,12 @@
 [CmdletBinding()]
 param(
     [string[]]$SourceRoots = @(
-        (Join-Path $PSScriptRoot '..\src'),
-        (Join-Path $PSScriptRoot '..\test')
+        (Join-Path $PSScriptRoot '../src/Game.Godot')
     )
 )
 
 $resolvedRoots = $SourceRoots | ForEach-Object { (Resolve-Path -LiteralPath $_).Path }
-$ignoredSegments = @('.godot', 'bin', 'obj')
+$ignoredSegments = @('.godot', 'bin', 'obj', 'android')
 
 function Test-IgnoredPath([string]$Path) {
     $segments = $Path -split '[\\/]'

@@ -1,0 +1,292 @@
+[gd_scene format=3 uid="uid://cx0h6a41fqirj"]
+
+[ext_resource type="Script" uid="uid://dsbitu5c6u6hw" path="res://Map/MapScreen.cs" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://jl0mhh433a7u" path="res://scenes/map/map_entity_slot.tscn" id="2_slot"]
+[ext_resource type="PackedScene" uid="uid://ddj5n2c43qsj6" path="res://scenes/map/map_entity_box.tscn" id="3_box"]
+[ext_resource type="Texture2D" uid="uid://cltnrkehfughq" path="res://assets/art/ui/bigmap_yun.png" id="4_cloud"]
+[ext_resource type="Texture2D" uid="uid://cc3wboaaf4svd" path="res://assets/art/misc/story/dibukuang.png" id="5_bottom_frame"]
+[ext_resource type="Texture2D" uid="uid://dlkp8qcmfkcfa" path="res://assets/art/misc/story/camera.png" id="6_camera"]
+[ext_resource type="Script" uid="uid://74yk3o2ss5nx" path="res://Map/LargeMapView.cs" id="8_large_map_view"]
+[ext_resource type="PackedScene" uid="uid://b6ehkt03bhugq" path="res://scenes/map/map_entity_tooltip.tscn" id="9_tooltip"]
+[ext_resource type="Shader" uid="uid://bxd1eb3y3s4sm" path="res://assets/shader/map_cloud_scroll.gdshader" id="10_cloud_scroll"]
+[ext_resource type="Script" path="res://Map/MapLocationTooltipLayer.cs" id="11_tooltip_layer"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cloud_scroll"]
+shader = ExtResource("10_cloud_scroll")
+shader_parameter/scroll_period_seconds = 360.0
+
+[sub_resource type="Animation" id="Animation_pin_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PinVisual/PinAvatar:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_pin_bounce"]
+resource_name = "default"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PinVisual/PinAvatar:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -40), Vector2(0, -30)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pin"]
+_data = {
+&"RESET": SubResource("Animation_pin_reset"),
+&"default": SubResource("Animation_pin_bounce")
+}
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_description_shadow"]
+bg_color = Color(0, 0, 0, 0.627451)
+
+[node name="MapScreen" type="Control" unique_id=2062229598]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+MapEntityBoxScene = ExtResource("3_box")
+
+[node name="MapBigTab" type="Control" parent="." unique_id=411197870]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LargeMapView" type="Control" parent="MapBigTab" unique_id=325343108]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_large_map_view")
+MarkerScene = ExtResource("2_slot")
+TooltipScene = ExtResource("9_tooltip")
+
+[node name="MapSurface" type="Control" parent="MapBigTab/LargeMapView" unique_id=1747356365]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="LargeMapBackground" type="TextureRect" parent="MapBigTab/LargeMapView/MapSurface" unique_id=1143418225]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+
+[node name="LargeMapTimeDim" type="ColorRect" parent="MapBigTab/LargeMapView/MapSurface" unique_id=1207814987]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="Cloud" type="TextureRect" parent="MapBigTab/LargeMapView/MapSurface" unique_id=1116946840]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.39215687)
+z_index = 1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_cloud_scroll")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_cloud")
+expand_mode = 1
+
+[node name="MarkerOverlay" type="Control" parent="MapBigTab/LargeMapView" unique_id=1989514195]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MapEntitySlots" type="Control" parent="MapBigTab/LargeMapView/MarkerOverlay" unique_id=356276484]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="MapPin" type="Control" parent="MapBigTab/LargeMapView/MarkerOverlay" unique_id=1444961703]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="PinVisual" type="Control" parent="MapBigTab/LargeMapView/MarkerOverlay/MapPin" unique_id=1183406179]
+layout_mode = 0
+offset_left = -38.0
+offset_top = -76.0
+offset_right = 38.0
+mouse_filter = 2
+
+[node name="PinAvatar" type="TextureRect" parent="MapBigTab/LargeMapView/MarkerOverlay/MapPin/PinVisual" unique_id=1626363249]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 76.0
+offset_bottom = 76.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MapBigTab/LargeMapView/MarkerOverlay/MapPin" unique_id=1840084638]
+libraries/ = SubResource("AnimationLibrary_pin")
+autoplay = &"default"
+
+[node name="MapSmallTab" type="Control" parent="." unique_id=1873506715]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SmallMapBackground" type="TextureRect" parent="MapSmallTab" unique_id=210545785]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+
+[node name="SmallMapTimeDim" type="ColorRect" parent="MapSmallTab" unique_id=692932441]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="CameraButton" type="TextureButton" parent="MapSmallTab" unique_id=1253279403]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 1776.0
+offset_top = 180.0
+offset_right = 2036.0
+offset_bottom = 396.0
+rotation = 0.5235988
+scale = Vector2(0.4255765, 0.4255765)
+texture_normal = ExtResource("6_camera")
+
+[node name="SmallMapLocationScroll" type="ScrollContainer" parent="MapSmallTab" unique_id=300000001]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_right = 0.95
+offset_left = -40.0
+offset_top = 338.0
+offset_right = 40.0
+offset_bottom = 708.0
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
+
+[node name="SmallMapLocationContent" type="MarginContainer" parent="MapSmallTab/SmallMapLocationScroll" unique_id=300000003]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 68
+
+[node name="MapEntityList" type="HBoxContainer" parent="MapSmallTab/SmallMapLocationScroll/SmallMapLocationContent" unique_id=274914384]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 80
+
+[node name="BottomBox" type="Control" parent="MapSmallTab" unique_id=294292032]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_left = 0.018
+anchor_top = 0.694
+anchor_right = 0.95
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="DialogueShadowPanel" type="Panel" parent="MapSmallTab/BottomBox" unique_id=627662737]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.095
+anchor_top = 0.3
+anchor_right = 0.99
+anchor_bottom = 0.96
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_description_shadow")
+
+[node name="Frame" type="TextureRect" parent="MapSmallTab/BottomBox" unique_id=1253864497]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_bottom_frame")
+expand_mode = 1
+
+[node name="MapDescriptionLabel" type="RichTextLabel" parent="MapSmallTab/BottomBox" unique_id=527718196]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.13
+anchor_top = 0.41
+anchor_right = 0.82
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+bbcode_enabled = true
+
+[node name="TooltipHost" type="CanvasLayer" parent="." unique_id=300000002]
+unique_name_in_owner = true
+layer = 100
+script = ExtResource("11_tooltip_layer")
+TooltipScene = ExtResource("9_tooltip")

@@ -3,7 +3,7 @@ using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Game.Presentation.Items;
 using Godot;
 

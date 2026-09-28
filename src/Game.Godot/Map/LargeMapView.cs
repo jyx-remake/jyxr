@@ -1,7 +1,7 @@
 using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Model;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Godot;
 
 namespace Game.Godot.Map;

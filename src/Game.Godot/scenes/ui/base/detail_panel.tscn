@@ -1,0 +1,147 @@
+[gd_scene format=3 uid="uid://52n8a1s5b8e0"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Script" uid="uid://c0s6evbgarntb" path="res://UI/Detail/DetailPanel.cs" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://iuhrh668ir72" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_icon"]
+[ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="4_v41dm"]
+
+[sub_resource type="StyleBoxFlat" id="1_icon_panel"]
+bg_color = Color(0, 0, 0, 0.55)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="LabelSettings" id="3_title_settings"]
+font_size = 54
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="4_category_settings"]
+font_size = 40
+font_color = Color(0.85, 0.85, 0.85, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="2_content_panel"]
+bg_color = Color(0, 0, 0, 0.52)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_4qcj2"]
+texture = ExtResource("4_v41dm")
+
+[node name="DetailPanel" unique_id=100000201 instance=ExtResource("1_panel")]
+script = ExtResource("2_script")
+
+[node name="IconPanel" type="Panel" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=100000202]
+layout_mode = 0
+offset_left = 309.0
+offset_top = 189.0
+offset_right = 589.0
+offset_bottom = 469.0
+theme_override_styles/panel = SubResource("1_icon_panel")
+
+[node name="IconMargin" type="MarginContainer" parent="ContentRoot/IconPanel" index="0" unique_id=100000203]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="IconRect" type="TextureRect" parent="ContentRoot/IconPanel/IconMargin" index="0" unique_id=100000204]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("3_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=100000205]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 236.0
+offset_top = 480.0
+offset_right = 676.0
+offset_bottom = 565.0
+text = "技能名称"
+label_settings = SubResource("3_title_settings")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="CategoryLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=100000206]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 229.0
+offset_top = 626.0
+offset_right = 669.0
+offset_bottom = 753.0
+text = "类型"
+label_settings = SubResource("4_category_settings")
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ContentPanel" type="Panel" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=100000207]
+layout_mode = 0
+offset_left = 758.0
+offset_top = 128.0
+offset_right = 1647.0
+offset_bottom = 806.0
+theme_override_styles/panel = SubResource("2_content_panel")
+
+[node name="ContentMargin" type="MarginContainer" parent="ContentRoot/ContentPanel" index="0" unique_id=100000208]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot/ContentPanel/ContentMargin" index="0" unique_id=100000209]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ContentLabel" type="RichTextLabel" parent="ContentRoot/ContentPanel/ContentMargin/ScrollContainer" index="0" unique_id=100000210]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(760, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_constants/line_separation = 8
+theme_override_constants/paragraph_separation = 0
+theme_override_font_sizes/normal_font_size = 36
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="ActionButton" type="Button" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="4" unique_id=1412977311]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 70)
+layout_mode = 0
+offset_left = 1074.0
+offset_top = 813.0
+offset_right = 1334.0
+offset_bottom = 897.0
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxTexture_4qcj2")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_4qcj2")
+theme_override_styles/hover = SubResource("StyleBoxTexture_4qcj2")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_4qcj2")
+text = "装备"
+
+[node name="CloseButton" parent="." index="3" unique_id=962603895]
+PressOffset = Vector2(2, 2)
+PressColor = Color(0.8, 0.8, 0.8, 1)

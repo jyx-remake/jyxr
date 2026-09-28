@@ -127,7 +127,7 @@ public sealed class MediaReferenceResolverTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "engine-free-rpg.sln")))
+            if (File.Exists(Path.Combine(directory.FullName, "engine-free-rpg.slnx")))
             {
                 return directory.FullName;
             }

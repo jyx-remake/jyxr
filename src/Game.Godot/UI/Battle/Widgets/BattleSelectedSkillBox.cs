@@ -1,5 +1,5 @@
 using Game.Core.Model.Skills;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Game.Godot.UI;
 using Godot;
 

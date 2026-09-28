@@ -1,5 +1,5 @@
 using Game.Application;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Game.Godot.UI;
 
 namespace Game.Godot.Story;

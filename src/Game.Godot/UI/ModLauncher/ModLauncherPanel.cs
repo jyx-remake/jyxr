@@ -7,7 +7,6 @@ public partial class ModLauncherPanel : Control
 {
 	private const string ClientAuthor = "虹乡俗人";
 	private const string ClientVersionSetting = "application/config/version";
-	private const string AndroidProjectDataRootPath = "/storage/emulated/0/JYXR";
 
 	private ModShowcasePage _showcasePage = null!;
 	private Button _startLoadoutButton = null!;
@@ -30,7 +29,7 @@ public partial class ModLauncherPanel : Control
 		_startLoadoutButton.Pressed += OnStartPressed;
 		_showcasePage.SelectionChanged += RefreshStartButton;
 
-		_projectDataRoot = ProjectDataRoot.FromPath(ResolveProjectDataRootPath());
+		_projectDataRoot = ProjectDataRootResolver.Resolve();
 		RefreshMods();
 	}
 
@@ -108,18 +107,4 @@ public partial class ModLauncherPanel : Control
 			loadout.AddonMods.Select(static mod => mod.ModId).ToArray()));
 	}
 
-	private static string ResolveProjectDataRootPath()
-	{
-		if (OS.HasFeature("editor"))
-		{
-			return ProjectSettings.GlobalizePath("res://");
-		}
-
-		if (OS.HasFeature("android") || OS.HasFeature("web_android"))
-		{
-			return AndroidProjectDataRootPath;
-		}
-
-		return Path.GetDirectoryName(OS.GetExecutablePath()) ?? OS.GetUserDataDir();
-	}
 }

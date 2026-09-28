@@ -1,0 +1,145 @@
+[gd_scene format=3 uid="uid://b3y1v74gx7pwx"]
+
+[ext_resource type="Script" uid="uid://bwtki3di1qnoc" path="res://UI/MainMenu/MainMenu.cs" id="1_main_menu"]
+[ext_resource type="Texture2D" uid="uid://rp0frp5p0jig" path="res://assets/art/misc/cross.png" id="3_cross"]
+[ext_resource type="Texture2D" uid="uid://cl10qj3ldt3vv" path="res://assets/art/misc/title.png" id="4_title"]
+[ext_resource type="Texture2D" uid="uid://cnv6tdvl73b26" path="res://assets/art/misc/moji2.png" id="5_button"]
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://UI/Base/JyButton.cs" id="6_jy_button"]
+
+[node name="MainMenu" type="Control" unique_id=1629534210]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main_menu")
+
+[node name="Bg" type="TextureRect" parent="." unique_id=8043285]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+
+[node name="Cross" type="TextureRect" parent="." unique_id=574558454]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 364.0
+offset_top = -410.0
+offset_right = 612.0
+offset_bottom = -162.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_cross")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="TextureRect" parent="." unique_id=550980989]
+custom_minimum_size = Vector2(1027, 287)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -642.0
+offset_top = -432.0
+offset_right = 385.0
+offset_bottom = -145.0
+mouse_filter = 2
+texture = ExtResource("4_title")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=122092386]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -348.0
+offset_top = -119.0
+offset_right = 352.0
+offset_bottom = 371.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartButton" type="TextureButton" parent="VBoxContainer" unique_id=1435000838]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(700, 150)
+layout_mode = 2
+texture_normal = ExtResource("5_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("6_jy_button")
+
+[node name="Label" type="Label" parent="VBoxContainer/StartButton" unique_id=2038369757]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.88400006
+offset_right = 1.0
+offset_bottom = 0.051986694
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 60
+text = "启程"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LoadButton" type="TextureButton" parent="VBoxContainer" unique_id=985472801]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(700, 150)
+layout_mode = 2
+texture_normal = ExtResource("5_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("6_jy_button")
+
+[node name="Label" type="Label" parent="VBoxContainer/LoadButton" unique_id=581887894]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.88400006
+offset_right = 1.0
+offset_bottom = 0.051986694
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 60
+text = "追忆"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MusicButton" type="TextureButton" parent="VBoxContainer" unique_id=1799712082]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(700, 150)
+layout_mode = 2
+texture_normal = ExtResource("5_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("6_jy_button")
+
+[node name="Label" type="Label" parent="VBoxContainer/MusicButton" unique_id=375866280]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.88400006
+offset_right = 1.0
+offset_bottom = 0.051986694
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 60
+text = "抚琴"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,0 +1,398 @@
+[gd_scene format=3 uid="uid://bdvws2ugdkk6a"]
+
+[ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
+[ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="2_button_texture"]
+[ext_resource type="Script" uid="uid://dk1o2p3qb36f" path="res://UI/Base/JyButton.cs" id="3_button_script"]
+[ext_resource type="Script" uid="uid://gajb5sg2ub38" path="res://UI/Hero/HeroPanel.cs" id="4_script"]
+[ext_resource type="Texture2D" uid="uid://beveqit6i4mqk" path="res://assets/art/ui/character_stat/iconquanbu.png" id="5_3htau"]
+[ext_resource type="Texture2D" uid="uid://broc3ykivhb6d" path="res://assets/art/ui/character_stat/iconquanzhang.png" id="6_hf86k"]
+[ext_resource type="Texture2D" uid="uid://ucxhityfcr5k" path="res://assets/art/ui/character_stat/iconjianfa.png" id="7_cd78k"]
+[ext_resource type="Texture2D" uid="uid://dcdftdynmhiyq" path="res://assets/art/ui/character_stat/icondaofa.png" id="8_543kb"]
+[ext_resource type="Texture2D" uid="uid://og4o54kuyhm2" path="res://assets/art/ui/character_stat/iconqimen.png" id="9_muhdb"]
+[ext_resource type="Texture2D" uid="uid://d2hjb1d5p507" path="res://assets/art/ui/character_stat/icongengu.png" id="10_ptgvi"]
+[ext_resource type="PackedScene" uid="uid://cn1marksgcufq" path="res://scenes/ui/skill_tab/skill_box.tscn" id="11_skill_box"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_tab_title"]
+font_size = 60
+
+[sub_resource type="Theme" id="Theme_dr12l"]
+Label/constants/line_spacing = 10
+Label/font_sizes/font_size = 40
+RichTextLabel/constants/line_separation = 10
+RichTextLabel/font_sizes/mono_font_size = 40
+RichTextLabel/font_sizes/normal_font_size = 40
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_adventure_surface"]
+content_margin_left = 40.0
+content_margin_top = 22.0
+content_margin_right = 40.0
+content_margin_bottom = 22.0
+bg_color = Color(0, 0, 0, 0)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="HeroPanel" unique_id=1789677815 instance=ExtResource("1_panel")]
+script = ExtResource("4_script")
+SkillBoxScene = ExtResource("11_skill_box")
+
+[node name="TabButtonRow" type="HBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="0" unique_id=1213870777]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 134.0
+offset_right = 1684.0
+offset_bottom = 246.0
+theme_override_constants/separation = 80
+alignment = 1
+
+[node name="AdventureTabButton" type="TextureButton" parent="ContentRoot/TabButtonRow" index="0" unique_id=880954121]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(342, 112)
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("2_button_texture")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/TabButtonRow/AdventureTabButton" index="0" unique_id=1588260131]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "江湖历练"
+label_settings = SubResource("LabelSettings_tab_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AchievementTabButton" type="TextureButton" parent="ContentRoot/TabButtonRow" index="1" unique_id=2026592363]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(342, 112)
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("2_button_texture")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/TabButtonRow/AchievementTabButton" index="0" unique_id=386301227]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "我的成就"
+label_settings = SubResource("LabelSettings_tab_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MasteryTabButton" type="TextureButton" parent="ContentRoot/TabButtonRow" index="2" unique_id=1633701570]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(342, 112)
+layout_mode = 2
+size_flags_horizontal = 3
+texture_normal = ExtResource("2_button_texture")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/TabButtonRow/MasteryTabButton" index="0" unique_id=888277509]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "武学精通"
+label_settings = SubResource("LabelSettings_tab_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeroTabContainer" type="TabContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=1703835921]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 217.0
+offset_top = 264.0
+offset_right = 1691.0
+offset_bottom = 913.0
+theme = SubResource("Theme_dr12l")
+current_tab = 1
+tabs_visible = false
+
+[node name="AdventureTab" type="Control" parent="ContentRoot/HeroTabContainer" index="1" unique_id=1308277667]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot/HeroTabContainer/AdventureTab" index="0" unique_id=1310414327]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 23.0
+offset_right = 1441.0
+offset_bottom = 638.0
+
+[node name="AdventureContentCenter" type="CenterContainer" parent="ContentRoot/HeroTabContainer/AdventureTab/ScrollContainer" index="0" unique_id=609164632]
+custom_minimum_size = Vector2(1400, 0)
+layout_mode = 2
+
+[node name="AdventureSurface" type="PanelContainer" parent="ContentRoot/HeroTabContainer/AdventureTab/ScrollContainer/AdventureContentCenter" index="0" unique_id=1118265700]
+custom_minimum_size = Vector2(1240, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_adventure_surface")
+
+[node name="AdventureContent" type="VBoxContainer" parent="ContentRoot/HeroTabContainer/AdventureTab/ScrollContainer/AdventureContentCenter/AdventureSurface" index="0" unique_id=422930551]
+custom_minimum_size = Vector2(1160, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="AdventurePageSubtitle" type="RichTextLabel" parent="ContentRoot/HeroTabContainer/AdventureTab/ScrollContainer/AdventureContentCenter/AdventureSurface/AdventureContent" index="0" unique_id=58969025]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1160, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "[center][font_size=34][color=#f0ebe3]本周目历练[/color][/font_size]
+[table=5][cell expand=1 padding=18,12,18,12][center][font_size=32][color=#e8e2d9]门派[/color][/font_size]
+[font_size=38][color=#fbf8f1]无门派[/color][/font_size][/center][/cell][cell expand=1 padding=18,12,18,12][center][font_size=32][color=#e8e2d9]道德[/color][/font_size]
+[font_size=38][color=#fbf8f1]0[/color][/font_size][/center][/cell][cell expand=1 padding=18,12,18,12][center][font_size=32][color=#e8e2d9]难度[/color][/font_size]
+[font_size=38][color=#d86b62]简单[/color][/font_size][/center][/cell][cell expand=1 padding=18,12,18,12][center][font_size=32][color=#e8e2d9]周目[/color][/font_size]
+[font_size=38][color=#fbf8f1]1[/color][/font_size][/center][/cell][cell expand=1 padding=18,12,18,12][center][font_size=32][color=#e8e2d9]血内上限[/color][/font_size]
+[font_size=38][color=#fbf8f1]10000[/color][/font_size][/center][/cell][/table]
+[font_size=32][color=#f0ebe3]人物好感[/color][/font_size]
+[table=4][cell expand=1 padding=18,8,18,8][center][font_size=32][color=#f0ebe3]李文秀[/color]  [color=#fbf8f1]70[/color][/font_size][/center][/cell][/table][/center]"
+fit_content = true
+
+[node name="StatsSeparatorCenter" type="CenterContainer" parent="ContentRoot/HeroTabContainer/AdventureTab/ScrollContainer/AdventureContentCenter/AdventureSurface/AdventureContent" index="1" unique_id=1908052599]
+layout_mode = 2
+
+[node name="StatsSeparator" type="HSeparator" parent="ContentRoot/HeroTabContainer/AdventureTab/ScrollContainer/AdventureContentCenter/AdventureSurface/AdventureContent/StatsSeparatorCenter" index="0" unique_id=1480007084]
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 2
+
+[node name="ProfileStatsLabel" type="RichTextLabel" parent="ContentRoot/HeroTabContainer/AdventureTab/ScrollContainer/AdventureContentCenter/AdventureSurface/AdventureContent" index="2" unique_id=2025009835]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1160, 250)
+layout_mode = 2
+bbcode_enabled = true
+text = "[center][font_size=34][color=#f0ebe3]生涯留痕[/color][/font_size]
+[table=3][cell expand=1 padding=30,14,30,14][center][font_size=32][color=#e8e2d9]死亡次数[/color][/font_size]
+[font_size=40][color=#d86b62]0[/color][/font_size][/center][/cell][cell expand=1 padding=30,14,30,14][center][font_size=32][color=#e8e2d9]存档次数[/color][/font_size]
+[font_size=40][color=#fbf8f1]0[/color][/font_size][/center][/cell][cell expand=1 padding=30,14,30,14][center][font_size=32][color=#e8e2d9]击杀数量[/color][/font_size]
+[font_size=40][color=#fbf8f1]0[/color][/font_size][/center][/cell][cell expand=1 padding=30,14,30,14][center][font_size=32][color=#e8e2d9]通关次数[/color][/font_size]
+[font_size=40][color=#fbf8f1]0[/color][/font_size][/center][/cell][cell expand=1 padding=30,14,30,14][center][font_size=32][color=#e8e2d9]最高周目[/color][/font_size]
+[font_size=40][color=#fbf8f1]0[/color][/font_size][/center][/cell][cell expand=1 padding=30,14,30,14][center][font_size=32][color=#e8e2d9]总游玩时间[/color][/font_size]
+[font_size=40][color=#fbf8f1]0分钟[/color][/font_size][/center][/cell][/table][/center]"
+fit_content = true
+
+[node name="AchievementTab" type="Control" parent="ContentRoot/HeroTabContainer" index="2" unique_id=728918971]
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="CompletionLabel" type="Label" parent="ContentRoot/HeroTabContainer/AchievementTab" index="0" unique_id=1048106557]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 33.0
+offset_top = 84.0
+offset_right = 341.0
+offset_bottom = 144.0
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "完成度：0%"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/AchievementTab" index="1" unique_id=1970319434]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 214.0
+offset_right = 369.0
+offset_bottom = 494.0
+text = "成就代表你在金X世界中探索剧情程度。完成不同的分支剧情可能会解锁不同的成就噢！"
+autowrap_mode = 3
+
+[node name="AchievementLabel" type="RichTextLabel" parent="ContentRoot/HeroTabContainer/AchievementTab" index="2" unique_id=1009544496]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 401.0
+offset_top = 19.0
+offset_right = 1450.0
+offset_bottom = 636.0
+bbcode_enabled = true
+
+[node name="PreviewCheckBox" type="CheckBox" parent="ContentRoot/HeroTabContainer/AchievementTab" index="3" unique_id=1439308183]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 0
+offset_left = 74.0
+offset_top = 539.0
+offset_right = 264.0
+offset_bottom = 617.0
+text = "预览"
+
+[node name="MasteryTab" type="Control" parent="ContentRoot/HeroTabContainer" index="3" unique_id=627145902]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab" index="0" unique_id=810616775]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 17.0
+offset_right = 207.0
+offset_bottom = 646.0
+text = "武学精通代表当前各个技能的等级上限。你可以通过提高周目、完成解锁剧情:获得残章来提升。"
+autowrap_mode = 3
+
+[node name="MasteryPreviewHardMaxCheckBox" type="CheckBox" parent="ContentRoot/HeroTabContainer/MasteryTab" index="1" unique_id=1519027442]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 543.0
+offset_right = 228.0
+offset_bottom = 621.0
+theme_override_font_sizes/font_size = 50
+text = "预览"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ContentRoot/HeroTabContainer/MasteryTab" index="2" unique_id=4709377]
+layout_mode = 0
+offset_left = 434.0
+offset_top = 476.0
+offset_right = 1264.0
+offset_bottom = 671.0
+theme_override_constants/separation = 20
+
+[node name="AllButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="0" unique_id=1846521811]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("5_3htau")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/AllButton" index="0" unique_id=1339409515]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "全部"
+
+[node name="QuanzhangButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="1" unique_id=392235821]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("6_hf86k")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/QuanzhangButton" index="0" unique_id=1687443556]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "拳掌"
+
+[node name="JianfaButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="2" unique_id=938617151]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("7_cd78k")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/JianfaButton" index="0" unique_id=1067145244]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "剑法"
+
+[node name="DaofaButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="3" unique_id=1034674272]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("8_543kb")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/DaofaButton" index="0" unique_id=809465393]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "刀法"
+
+[node name="QimenButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="4" unique_id=23883254]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("9_muhdb")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/QimenButton" index="0" unique_id=1460782374]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "奇门"
+
+[node name="NeigongButton" type="TextureButton" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer" index="5" unique_id=83270784]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+texture_normal = ExtResource("10_ptgvi")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("3_button_script")
+metadata/_custom_type_script = "uid://dk1o2p3qb36f"
+
+[node name="Label" type="Label" parent="ContentRoot/HeroTabContainer/MasteryTab/HBoxContainer/NeigongButton" index="0" unique_id=1395066687]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 107.0
+offset_right = 98.0
+offset_bottom = 155.0
+text = "内功"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot/HeroTabContainer/MasteryTab" index="3" unique_id=200335630]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 23.0
+offset_right = 1475.0
+offset_bottom = 493.0
+mouse_filter = 0
+
+[node name="GridContainer" type="GridContainer" parent="ContentRoot/HeroTabContainer/MasteryTab/ScrollContainer" index="0" unique_id=476130249]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 0
+columns = 6
+
+[node name="CloseButton" parent="." index="3" unique_id=962603895]
+PressOffset = Vector2(2, 2)
+PressColor = Color(0.8, 0.8, 0.8, 1)
+
+[node name="ProfileStatsRefreshTimer" type="Timer" parent="." index="4" unique_id=718804356]
+unique_name_in_owner = true
+wait_time = 60.0
+autostart = true

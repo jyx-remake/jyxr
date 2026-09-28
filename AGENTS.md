@@ -1,6 +1,6 @@
 # 项目协作约定
 
-这是基于 .NET 10 与 Godot 4.7.2 C# 的 2D 半即时制战棋 RPG。仓库根目录是 Godot 工程根；宿主程序集为 `engine-free-rpg.csproj`。
+这是基于 .NET 10 与 Godot 4.7.2 C# 的 2D 半即时制战棋 RPG。仓库根是 .NET 解决方案根；Godot 工程与宿主程序集位于 `src/Game.Godot`，其他类库与它平级。
 
 ## 工作方式
 
@@ -41,13 +41,13 @@
 
 ```powershell
 # 普通 .NET 测试，可加 --filter 限定受影响用例
-dotnet test engine-free-rpg.sln
+dotnet test engine-free-rpg.slnx
 
 # Godot 宿主编译
-dotnet build engine-free-rpg.csproj
+dotnet build src/Game.Godot/engine-free-rpg.csproj
 
-# 新增或删除 C# 文件后检查配对的 .uid
-./tools/ValidateGodotScriptUids.ps1 -SourceRoots src,tests
+# 新增或删除 Godot C# 文件后检查配对的 .uid
+./tools/ValidateGodotScriptUids.ps1
 ```
 
 在任务范围内可自行执行本地构建、隔离测试并修复本次改动引入的失败。结束时说明变更、验证结果和仍未验证的部分。

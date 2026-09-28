@@ -11,7 +11,7 @@
 | Game.Content | JSON 输入、definition 引用解析、内容仓储与校验；依赖 Core、Expressions |
 | Game.Application | GameSession、业务用例、持久化装配、会话事件与 MOD 模型；依赖 Core、Expressions |
 | Game.Presentation | 展示流程、交互状态与宿主能力抽象；只依赖 Core |
-| Game.Godot | Godot 节点、UI、资源、音频、存储适配和演出；由根宿主项目编译 |
+| Game.Godot | Godot 节点、UI、资源、音频、存储适配和演出；独立工程位于 src/Game.Godot |
 
 纯展示计算可归入 Presentation；领域规则、应用用例、序列化协议和资源路径解析各自保留在所属层。业务服务由 session 显式装配，UI 通过服务执行用例。
 
@@ -39,7 +39,7 @@
 
 ## MOD 启动与内容装配
 
-入口是 `scenes/ui/mod_launcher/mod_launcher_panel.tscn`。项目数据根由平台确定：编辑器为工程根，PC 导出为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。
+Godot 工程位于 `src/Game.Godot`，入口是 `res://scenes/ui/mod_launcher/mod_launcher_panel.tscn`。`res://` 只覆盖宿主目录，类库、测试和 MOD 数据位于其外。项目数据根由 `ProjectDataRootResolver` 统一确定：编辑器为仓库根（宿主目录的 `../..`），PC 导出为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。
 
 [GameRuntimeBootstrap](../src/Game.Godot/Bootstrap/GameRuntimeBootstrap.cs) 接收 ModLoadout：
 
@@ -53,7 +53,7 @@
 
 [JsonContentLoader](../src/Game.Content/Loading/JsonContentLoader.cs) 负责定义索引、引用解析、affix 解析与仓储校验。正式内容不从 SampleData 读取；故事加载保持同步，避免 Godot 主线程 sync-over-async。当前定义依赖按有向无环图装配；若引入循环引用，需明确设计注册与 resolve 两阶段。
 
-新增定义、修改已有定义、地图与剧情目录规则统一见 [MOD 数据补丁](mod-data-patching.md)。MOD 资源覆盖只走 PCK，[AssetResolver](../src/Game.Godot/Assets/AssetResolver.cs) 统一加载内置或已覆盖资源，不读取 MOD loose assets。
+新增定义、修改已有定义、地图与剧情目录规则统一见 [MOD 数据补丁](mod-data-patching.md)。MOD 资源覆盖只走 PCK，[AssetResolver](../src/Game.Godot/Resources/AssetResolver.cs) 统一加载内置或已覆盖资源，不读取 MOD loose assets。
 
 ## 地图与全局事件
 

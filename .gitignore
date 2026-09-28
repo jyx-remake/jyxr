@@ -24,7 +24,7 @@ coverage/
 mono_crash.*.json
 
 # Android generated project and signing secrets
-/android/
+/src/Game.Godot/android/
 *.jks
 *.keystore
 **/keystore.properties
@@ -34,12 +34,12 @@ mono_crash.*.json
 /export/
 
 # Project-local content and runtime data
-/assets/animation/
-/assets/art/
-/assets/audio/
-/assets/font/
-/assets/launcher_art/
-/assets/video/
+/src/Game.Godot/assets/animation/
+/src/Game.Godot/assets/art/
+/src/Game.Godot/assets/audio/
+/src/Game.Godot/assets/font/
+/src/Game.Godot/assets/launcher_art/
+/src/Game.Godot/assets/video/
 /launcher/
 /mods/
 /userdata/

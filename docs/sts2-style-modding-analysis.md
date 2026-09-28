@@ -19,7 +19,7 @@
 
 Godot 宿主启用了动态加载：
 
-- `engine-free-rpg.csproj`
+- `src/Game.Godot/engine-free-rpg.csproj`
   - `AssemblyName` 是 `engine-free-rpg`
   - `EnableDynamicLoading` 是 `true`
   - 宿主引用 `Game.Content` 与 `Game.Application`

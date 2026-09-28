@@ -4,7 +4,7 @@ using Game.Core.Battle;
 using Game.Core.Model;
 using Game.Core.Model.Character;
 using Game.Core.Model.Skills;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Godot;
 
 namespace Game.Godot.UI;

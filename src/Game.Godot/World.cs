@@ -1,5 +1,5 @@
 using Game.Application;
-using Game.Godot.Assets;
+using Game.Godot.Resources;
 using Game.Godot.Map;
 using Game.Godot.Persistence;
 using Game.Godot.UI;

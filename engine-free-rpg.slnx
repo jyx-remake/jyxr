@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="ExportDebug" />
+    <BuildType Name="ExportRelease" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/Game.Application/Game.Application.csproj" />
+    <Project Path="src/Game.Content/Game.Content.csproj" />
+    <Project Path="src/Game.Core/Game.Core.csproj" />
+    <Project Path="src/Game.Expressions/Game.Expressions.csproj" />
+    <Project Path="src/Game.Godot/engine-free-rpg.csproj" />
+    <Project Path="src/Game.Presentation/Game.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Game.Tests/Game.Tests.csproj" />
+    <Project Path="tests/Game.Expressions.Tests/Game.Expressions.Tests.csproj" />
+  </Folder>
+</Solution>
