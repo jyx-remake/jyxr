@@ -65,7 +65,7 @@ try {
             Set-PresetOption 'preset.2.options' 'package/signed' 'true'
             $extraArguments = @('--install-android-build-template')
             $presetName = 'Android Base'
-            $outputPath = Join-Path $exportRoot 'android/JYXR.apk'
+            $outputPath = Join-Path $exportRoot 'android/金庸群侠传XR.apk'
             if ($TestSigning) {
                 $keyPath = Join-Path $exportRoot 'android/jyxr-test.keystore'
                 New-Item -ItemType Directory -Force (Split-Path $keyPath -Parent) | Out-Null
