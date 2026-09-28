@@ -16,7 +16,7 @@ if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($ExportDataDir)) {
-    $ExportDataDir = Join-Path (Split-Path -Parent $repoRoot) "export\data_engine-free-rpg_windows_x86_64"
+    $ExportDataDir = Join-Path $repoRoot "export\windows\data_engine-free-rpg_windows_x86_64"
 }
 
 if ([string]::IsNullOrWhiteSpace($PublishDir)) {
@@ -24,7 +24,7 @@ if ([string]::IsNullOrWhiteSpace($PublishDir)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($PatchDir)) {
-    $PatchDir = Join-Path (Split-Path -Parent $repoRoot) "export\patch"
+    $PatchDir = Join-Path $repoRoot "export\windows\patch"
 }
 
 $ProjectPath = (Resolve-Path -LiteralPath $ProjectPath).Path

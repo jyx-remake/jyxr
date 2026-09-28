@@ -27,6 +27,29 @@ dotnet test engine-free-rpg.slnx
 
 Godot 节点、输入、动画和异步演出需在引擎内另行验证。发布已导出 Windows 版本的 C# 热更程序集使用 [PublishGodotCSharpHotfix.ps1](tools/PublishGodotCSharpHotfix.ps1)。
 
+## 导出
+
+[导出预设](src/Game.Godot/export_presets.cfg) 分为三项，输出路径相对于 Godot 工程根：
+
+| 预设 | 默认输出（相对于仓库根） | 内容 |
+| --- | --- | --- |
+| `Windows Base` | `export/windows/金庸群侠传XR.exe` | Windows 宿主、场景、脚本与启动器等基础资源 |
+| `Android Base` | `export/android/JYXR.apk` | Android 宿主及相同的本体资源 |
+| `Shared Resources PCK` | `export/shared/base.pck` | `assets/animation`、`assets/art`、`assets/audio` |
+
+本体使用“导出所有资源”并以 `assets/animation/*,assets/art/*,assets/audio/*` 排除共用资源；PCK 使用“导出所选资源”（不逐项勾选），以相同通配符加入资源。Godot 的 `*` 匹配完整路径，包含子目录，不需要 `**`。PCK 排除 `.uid` 辅助文件，导入资源仍由 Godot 正常处理。新增这三个目录内的资源会自动纳入 PCK。字体、启动器图片、shader、theme 和 video 仍随本体导出。
+
+PCK 预设借用 Windows 导出平台，保留现有纹理配置与 `extra_pck` 特性；使用 **Export PCK/ZIP**，不要使用 **Export Project**。命令行示例（先创建输出目录）：
+
+```powershell
+New-Item -ItemType Directory -Force export/windows, export/android, export/shared
+godot --headless --path src/Game.Godot --export-pack "Shared Resources PCK" ../../export/shared/base.pck
+godot --headless --path src/Game.Godot --export-release "Windows Base"
+godot --headless --path src/Game.Godot --export-release "Android Base"
+```
+
+发布时将同一份 `base.pck` 放入对应 MOD 目录，并在该 MOD 的 `mod.json` 中通过 `packs` 声明相对路径（例如 `"packs": ["base.pck"]`）。仅把 PCK 放在本体旁不会自动加载；`mods` 数据也需单独分发。Windows 的数据根为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。Windows 本体导出的配套 PCK 与 .NET 数据目录也需一同分发。
+
 ## 目录
 
 | 位置 | 用途 |
