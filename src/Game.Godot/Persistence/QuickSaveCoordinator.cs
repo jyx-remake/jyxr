@@ -52,6 +52,7 @@ public partial class QuickSaveCoordinator : Node
 		try
 		{
 			_saveStore.SaveCurrentSession(LocalSaveId.Quick);
+			Game.Audio.PlaySfx("音效.装备");
 			UIRoot.Instance.ShowToast("已写入快速存档");
 		}
 		catch (Exception exception)
@@ -75,6 +76,7 @@ public partial class QuickSaveCoordinator : Node
 			}
 
 			GameFlow.LoadSave(envelope.SaveGame);
+			Game.Audio.PlaySfx("音效.装备");
 			UIRoot.Instance.ShowToast("已读取快速存档");
 		}
 		catch (Exception exception)

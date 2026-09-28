@@ -262,6 +262,7 @@ public partial class ChestPanel : JyPanel
 
 			if (result.Success)
 			{
+				Game.Audio.PlaySfx("音效.装备");
 				UIRoot.Instance.ShowToast(result.Message);
 				Refresh();
 				return;

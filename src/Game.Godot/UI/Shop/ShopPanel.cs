@@ -296,6 +296,7 @@ public partial class ShopPanel : JyPanel
 	{
 		if (result.Success)
 		{
+			Game.Audio.PlaySfx("音效.装备");
 			if (showToast)
 			{
 				UIRoot.Instance.ShowToast(result.Message);

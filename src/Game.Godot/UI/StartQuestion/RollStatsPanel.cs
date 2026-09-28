@@ -17,7 +17,7 @@ public partial class RollStatsPanel : Control
 		_characterPanel = GetNode<CharacterPanel>("%CharacterPanel");
 		_rollButton = GetNode<TextureButton>("%RollButton");
 		_ackButton = GetNode<TextureButton>("%AckButton");
-		_rollButton.Pressed += RollAndSync;
+		_rollButton.Pressed += OnRollButtonPressed;
 		_ackButton.Pressed += Submit;
 		_characterPanel.GetNode<Control>("%CloseButton").Hide();
 	}
@@ -49,6 +49,12 @@ public partial class RollStatsPanel : Control
 		{
 			_completion.TrySetCanceled();
 		}
+	}
+
+	private void OnRollButtonPressed()
+	{
+		RollAndSync();
+		Game.Audio.PlaySfx("音效.装备");
 	}
 
 	private void RollAndSync()

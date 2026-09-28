@@ -179,6 +179,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		}
 
 		_saveStore.SaveCurrentSession(saveId);
+		Game.Audio.PlaySfx("音效.装备");
 		UIRoot.Instance.ShowToast($"已写入{saveId.Title}");
 		UIRoot.Instance.CloseMainPanel();
 	}
@@ -207,6 +208,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		}
 
 		UIRoot.Instance.ShowToast($"已删除{saveId.Title}");
+		Game.Audio.PlaySfx("音效.装备");
 		RefreshSlots();
 	}
 
@@ -225,6 +227,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		}
 
 		GameFlow.LoadSave(envelope.SaveGame);
+		Game.Audio.PlaySfx("音效.装备");
 		CompleteLoad($"已读取{saveId.Title}");
 	}
 

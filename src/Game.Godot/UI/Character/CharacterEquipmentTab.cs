@@ -173,6 +173,7 @@ public partial class CharacterEquipmentTab : Control
 		try
 		{
 			var equipment = Game.InventoryService.UnequipToInventory(_character, slotType);
+			Game.Audio.PlaySfx("音效.装备");
 			UIRoot.Instance.ShowToast($"卸下【{equipment.Definition.Name}】");
 		}
 		catch (Exception exception)

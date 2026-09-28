@@ -10,33 +10,36 @@ internal sealed class InventoryCurrencyStoryCommands
     public InventoryCurrencyStoryCommands(GameSession session) => _session = session;
 
     [StoryCommand("change_item", "item")]
-    public void ChangeItem(string itemId, int delta = 1)
+    public ValueTask ChangeItem(string itemId, int delta = 1, CancellationToken cancellationToken = default)
     {
         if (delta > 0)
         {
             _session.InventoryService.AddItem(itemId, delta);
+            return _session.StoryService.Host.PlayEffectAsync("音效.升级", cancellationToken);
         }
         else if (delta < 0)
         {
             ArgumentOutOfRangeException.ThrowIfEqual(delta, int.MinValue);
             _session.InventoryService.RemoveItem(itemId, -delta);
+            return _session.StoryService.Host.PlayEffectAsync("音效.装备", cancellationToken);
         }
+        return ValueTask.CompletedTask;
     }
 
     [StoryCommand("remove_item", "cost_item")]
-    public void RemoveItem(string itemId, int quantity = 1)
+    public ValueTask RemoveItem(string itemId, int quantity = 1, CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
-        ChangeItem(itemId, -quantity);
+        return ChangeItem(itemId, -quantity, cancellationToken);
     }
 
     [StoryCommand("add_random_item", "item_random")]
-    public void AddRandomItem(IReadOnlyList<string> itemIds, int quantity = 1)
+    public ValueTask AddRandomItem(IReadOnlyList<string> itemIds, int quantity = 1, CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
         if (itemIds.Count == 0) throw new InvalidOperationException("add_random_item requires at least one item id.");
         foreach (var id in itemIds) _session.ContentRepository.GetItem(id);
-        _session.InventoryService.AddItem(itemIds[_session.RandomService.Next(0, itemIds.Count)], quantity);
+        return ChangeItem(itemIds[_session.RandomService.Next(0, itemIds.Count)], quantity, cancellationToken);
     }
 
     [StoryCommand("change_silver", "get_money")]
@@ -229,19 +232,20 @@ internal sealed class CharacterGrowthStoryCommands
         _session.CharacterService.UpgradeSkillLevel(characterId, skillId, levels);
 
     [StoryCommand("maxlevel", "max_skill_level")]
-    public void MaxSkillLevel(string skillId, int levels = 1, string onceKey = "")
+    public ValueTask MaxSkillLevel(string skillId, int levels = 1, string onceKey = "", CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(levels);
         var skillName = ResolveSkillName(skillId);
         if (!_session.ProfileService.TryAddSkillMaxLevelBonusOnce(skillId, levels, onceKey))
         {
-            return;
+            return ValueTask.CompletedTask;
         }
 
         _session.Events.Publish(new ProfileChangedEvent());
         _session.Events.Publish(new ToastRequestedEvent(
             $"武学精通【{skillName}】+ {levels}",
             ToastTone.Important));
+        return _session.StoryService.Host.PlayEffectAsync("音效.升级", cancellationToken);
     }
 
     private string ResolveSkillName(string skillId)

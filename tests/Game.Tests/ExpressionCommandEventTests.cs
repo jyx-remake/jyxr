@@ -183,21 +183,29 @@ public sealed class ExpressionCommandEventTests
     public async Task ChangeItemUsesSignedDeltaAndRemoveItemRequiresPositiveQuantity()
     {
         var item = new NormalItemDefinition { Id = "pill", Name = "pill", Type = ItemType.Utility, ConsumeOnUse = false };
-        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(items: [item]));
+        var host = new RecordingEffectHost();
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(items: [item]), host);
         await session.StoryService.CommandDispatcher.ExecuteCommandAsync("change_item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(3)]);
         await session.StoryService.CommandDispatcher.ExecuteCommandAsync("item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(-1)]);
         Assert.True(session.State.Inventory.ContainsStack(item, 2));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
             await session.StoryService.CommandDispatcher.ExecuteCommandAsync("remove_item", [ExpressionValue.FromString("pill"), ExpressionValue.FromNumber(-1)]));
+        var parser = new ExpressionParser();
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("change_item('pill', 0)"));
+        Assert.Equal(new[] { "音效.升级", "音效.装备" }, host.Effects);
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("cost_item('pill')"));
+        await session.StoryService.CommandDispatcher.ExecuteCallAsync(parser.ParseCall("item_random(['pill'])"));
+        Assert.Equal(new[] { "音效.升级", "音效.装备", "音效.装备", "音效.升级" }, host.Effects);
     }
 
     [Fact]
     public async Task MaxLevelSupportsOnceKeyDefaultLevelAndApprovedAlias()
     {
         var skill = TestContentFactory.CreateExternalSkill("starter_sword");
+        var host = new RecordingEffectHost();
         var session = new GameSession(
             new GameState(),
-            TestContentFactory.CreateRepository(externalSkills: [skill]));
+            TestContentFactory.CreateRepository(externalSkills: [skill]), host);
         var profileChanges = 0;
         var toasts = new List<ToastRequestedEvent>();
         using var profileSubscription = session.Events.Subscribe<ProfileChangedEvent>(_ => profileChanges++);
@@ -216,17 +224,19 @@ public sealed class ExpressionCommandEventTests
         var toast = Assert.Single(toasts);
         Assert.Equal("武学精通【starter_sword】+ 2", toast.Message);
         Assert.Equal(ToastTone.Important, toast.Tone);
+        Assert.Equal("音效.升级", Assert.Single(host.Effects));
     }
 
     [Fact]
     public async Task MaxLevelDefaultIncreaseIsIndependentOfRoundBonus()
     {
         var skill = TestContentFactory.CreateInternalSkill("starter_internal");
+        var host = new RecordingEffectHost();
         var state = new GameState();
         state.Adventure.SetRound(5);
         var session = new GameSession(
             state,
-            TestContentFactory.CreateRepository(internalSkills: [skill]),
+            TestContentFactory.CreateRepository(internalSkills: [skill]), host,
             config: new GameConfig { RoundsPerMaxSkillLevelIncrease = 2 });
 
         await session.StoryService.CommandDispatcher.ExecuteCallAsync(
@@ -234,6 +244,7 @@ public sealed class ExpressionCommandEventTests
 
         Assert.Equal(1, session.Profile.GetSkillMaxLevelBonus("starter_internal"));
         Assert.Equal(13, session.SkillMaxLevelPolicy.GetMaxLevel(skill));
+        Assert.Equal("音效.升级", Assert.Single(host.Effects));
     }
 
     [Theory]
@@ -358,6 +369,26 @@ public sealed class ExpressionCommandEventTests
             ? session.State.Party.Followers.Single(candidate => candidate.Id == "identity")
             : session.State.Party.GetMember("identity");
         Assert.Equal("identity", character.Definition.Id);
+    }
+
+    private sealed class RecordingEffectHost : IRuntimeHost
+    {
+        public List<string> Effects { get; } = [];
+
+        public ValueTask PlayEffectAsync(string effectId, CancellationToken cancellationToken)
+        {
+            Effects.Add(effectId);
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
     }
 
     private sealed class SelectingRandom(int selectedIndex) : IRandomService

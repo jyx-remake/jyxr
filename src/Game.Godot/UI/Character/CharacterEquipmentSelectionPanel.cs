@@ -119,6 +119,7 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 				return;
 			}
 
+			Game.Audio.PlaySfx("音效.装备");
 			UIRoot.Instance.ShowToast(result.Message);
 			if (detailPanel is not null && GodotObject.IsInstanceValid(detailPanel))
 			{

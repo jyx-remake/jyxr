@@ -114,6 +114,7 @@ public partial class CharacterAttributeTab : Control
 		}
 
 		Game.CharacterService.AllocateStat(_characterId, statType);
+		Game.Audio.PlaySfx("音效.加点");
 	}
 
 	private void HideAssignStatWidget()

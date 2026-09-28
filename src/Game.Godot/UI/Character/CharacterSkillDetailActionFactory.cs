@@ -34,6 +34,7 @@ public static class CharacterSkillDetailActionFactory
 			() =>
 			{
 				action();
+				Game.Audio.PlaySfx("音效.恢复2");
 				return Task.CompletedTask;
 			});
 	}

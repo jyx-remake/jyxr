@@ -87,7 +87,7 @@ public partial class AudioManager : Node
 
 	public void PlaySfx(string? reference)
 	{
-		if (string.IsNullOrWhiteSpace(reference))
+		if (string.IsNullOrWhiteSpace(reference) || !Game.UserSettings.Current.SfxEnabled)
 		{
 			return;
 		}

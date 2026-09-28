@@ -139,6 +139,15 @@ public partial class ItemTargetSelectionPanel : JyPanel
 				return;
 			}
 
+			if (entry.Definition is EquipmentDefinition)
+			{
+				Game.Audio.PlaySfx("音效.装备");
+			}
+			else if (entry.Definition.Type == ItemType.Booster)
+			{
+				Game.Audio.PlaySfx("音效.升级");
+			}
+
 			if (!result.Message.IsWhiteSpace())
 			{
 				UIRoot.Instance.ShowToast(result.Message);

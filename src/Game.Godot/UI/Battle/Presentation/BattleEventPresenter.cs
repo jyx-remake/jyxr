@@ -102,6 +102,7 @@ internal sealed class BattleEventPresenter(
                 PresentRest(fact, unitName);
                 break;
             case BattleFactKind.ItemUsed:
+                AudioManager.Instance.PlaySfx("音效.恢复类物品");
                 var itemName = ResolveItemName(fact.Detail);
                 board.PlayFloatText(fact.UnitId, itemName, BattleFloatTextStyle.Normal);
                 AppendLog($"{unitName} 使用【{itemName}】。");
