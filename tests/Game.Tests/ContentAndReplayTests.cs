@@ -14,6 +14,30 @@ namespace Game.Tests;
 
 public sealed class ContentLoadingTests
 {
+    [Fact]
+    public void JsonLoader_IndexesLegendSkillsByStartSkillInContentOrder()
+    {
+        var first = new LegendSkillDefinition("first", "first", "strike", 0.5d, [], []);
+        var unrelated = first with { Id = "other", StartSkill = "other" };
+        var second = first with { Id = "second" };
+        var repository = new JsonContentLoader().LoadFromPackage(new ContentPackage
+        {
+            ExternalSkills =
+            [
+                TestContentFactory.CreateExternalSkill("strike"),
+                TestContentFactory.CreateExternalSkill("other"),
+            ],
+            LegendSkills = [first, unrelated, second],
+        });
+
+        Assert.Equal([first, second], repository.GetLegendSkillsFor("strike"));
+        Assert.Same(first, repository.GetLegendSkillsFor("strike")[0]);
+        Assert.Equal([unrelated], repository.GetLegendSkillsFor("other"));
+        Assert.Empty(repository.GetLegendSkillsFor("missing"));
+        Assert.Empty(repository.GetLegendSkillsFor("STRIKE"));
+        Assert.Equal([first, unrelated, second], repository.GetLegendSkills());
+    }
+
     private static string SampleContentDirectoryPath =>
         Path.Combine(AppContext.BaseDirectory, "SampleData", "sample-content");
 

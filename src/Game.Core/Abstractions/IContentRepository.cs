@@ -57,6 +57,7 @@ public interface IContentRepository
     bool TryGetEquipment(string id, [NotNullWhen(true)] out EquipmentDefinition? definition);
     IReadOnlyList<EquipmentRandomAffixTableDefinition> GetEquipmentRandomAffixTables();
     IReadOnlyList<LegendSkillDefinition> GetLegendSkills();
+    IReadOnlyList<LegendSkillDefinition> GetLegendSkillsFor(string startSkillId);
     IReadOnlyList<ResourceDefinition> GetResourcesByGroup(string group);
     TowerDefinition GetTower(string id);
     bool TryGetTower(string id, [NotNullWhen(true)] out TowerDefinition? definition);

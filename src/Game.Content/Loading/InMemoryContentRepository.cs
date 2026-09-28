@@ -29,7 +29,21 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public required Dictionary<string, BuffDefinition> Buffs { get; init; }
 	public required Dictionary<string, TalentDefinition> Talents { get; init; }
 	public required Dictionary<string, EquipmentDefinition> Equipments { get; init; }
-	public required List<LegendSkillDefinition> LegendSkills { get; init; }
+	private IReadOnlyList<LegendSkillDefinition> _legendSkills = [];
+	private Dictionary<string, IReadOnlyList<LegendSkillDefinition>> _legendSkillsByStartSkill = new(StringComparer.Ordinal);
+	public required IReadOnlyList<LegendSkillDefinition> LegendSkills
+	{
+		get => _legendSkills;
+		init
+		{
+			_legendSkills = Array.AsReadOnly(value.ToArray());
+			_legendSkillsByStartSkill = _legendSkills
+				.GroupBy(definition => definition.StartSkill, StringComparer.Ordinal)
+				.ToDictionary(group => group.Key,
+					group => (IReadOnlyList<LegendSkillDefinition>)Array.AsReadOnly(group.ToArray()),
+					StringComparer.Ordinal);
+		}
+	}
 	public required Dictionary<string, TowerDefinition> Towers { get; init; }
 
 	public BattleDefinition GetBattle(string id) => Battles[id];
@@ -117,6 +131,8 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public IReadOnlyList<EquipmentRandomAffixTableDefinition> GetEquipmentRandomAffixTables() => EquipmentRandomAffixTables;
 
 	public IReadOnlyList<LegendSkillDefinition> GetLegendSkills() => LegendSkills;
+	public IReadOnlyList<LegendSkillDefinition> GetLegendSkillsFor(string startSkillId) =>
+		_legendSkillsByStartSkill.GetValueOrDefault(startSkillId) ?? Array.Empty<LegendSkillDefinition>();
 	public IReadOnlyList<ResourceDefinition> GetResourcesByGroup(string group)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(group);

@@ -905,6 +905,29 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void LegendResolution_IndexedCandidatesPreserveRollOrder()
+    {
+        var definition = TestContentFactory.CreateExternalSkill("strike");
+        var hero = CreateUnit("hero", team: 1, new GridPosition(0, 0),
+            externalSkills: [new InitialExternalSkillEntryDefinition(definition, 1)]);
+        var first = new LegendSkillDefinition("first", "first", "strike", 0.5d, [], []);
+        var unrelated = first with { Id = "other", StartSkill = "other" };
+        var ineligible = first with { Id = "high_level", RequiredLevel = 10 };
+        var second = first with { Id = "second" };
+        var third = first with { Id = "third" };
+        var repository = TestContentFactory.CreateRepository(
+            legendSkills: [unrelated, ineligible, first, second, third]);
+        var random = new SequenceRandomService([0.99d, 0d, 0.37d], fallback: 1d);
+
+        var resolved = new LegendSkillResolver().Resolve(
+            repository.GetLegendSkillsFor("strike"),
+            hero.Character.GetExternalSkills().Single(), random);
+
+        Assert.Equal("second", Assert.IsType<LegendSkillInstance>(resolved).Id);
+        Assert.Equal(0.37d, random.NextDouble());
+    }
+
+    [Fact]
     public void CastSkill_RequiresBaseRageBeforeLegendResolution()
     {
         var stagger = new BuffDefinition { Id = "stagger", Name = "stagger", IsDebuff = true };
@@ -951,7 +974,11 @@ public sealed class BattleEngineTests
         var engine = new BattleEngine(
             new BattleDamageCalculator(new FixedRandomService(0.5d)),
             random: new FixedRandomService(1d),
-            legendSkillsProvider: () => [legendSkill]);
+            legendSkillsProvider: startSkillId =>
+            {
+                Assert.Equal(legendSkill.StartSkill, startSkillId);
+                return [legendSkill];
+            });
         engine.BeginAction(state, hero.Id);
 
         var skill = hero.Character.GetExternalSkills().Single();
@@ -1001,7 +1028,11 @@ public sealed class BattleEngineTests
         var state = new BattleState(new BattleGrid(4, 4), [hero, enemy]);
         var engine = new BattleEngine(
             random: new FixedRandomService(1d),
-            legendSkillsProvider: () => [legendSkill]);
+            legendSkillsProvider: startSkillId =>
+            {
+                Assert.Equal(legendSkill.StartSkill, startSkillId);
+                return [legendSkill];
+            });
         engine.BeginAction(state, hero.Id);
 
         var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);
@@ -1054,7 +1085,11 @@ public sealed class BattleEngineTests
         var engine = new BattleEngine(
             new BattleDamageCalculator(new FixedRandomService(0.5d)),
             random: new FixedRandomService(0.25d),
-            legendSkillsProvider: () => [legendSkill]);
+            legendSkillsProvider: startSkillId =>
+            {
+                Assert.Equal(legendSkill.StartSkill, startSkillId);
+                return [legendSkill];
+            });
         engine.BeginAction(state, hero.Id);
 
         var result = engine.CastSkill(
@@ -1109,7 +1144,11 @@ public sealed class BattleEngineTests
         var engine = new BattleEngine(
             new BattleDamageCalculator(new FixedRandomService(0.5d)),
             random: new FixedRandomService(0.25d),
-            legendSkillsProvider: () => [legendSkill]);
+            legendSkillsProvider: startSkillId =>
+            {
+                Assert.Equal(legendSkill.StartSkill, startSkillId);
+                return [legendSkill];
+            });
         engine.BeginAction(state, hero.Id);
 
         var result = engine.CastSkill(
@@ -1162,7 +1201,11 @@ public sealed class BattleEngineTests
         var engine = new BattleEngine(
             new BattleDamageCalculator(new FixedRandomService(0.5d)),
             random: new FixedRandomService(1d),
-            legendSkillsProvider: () => [legendSkill]);
+            legendSkillsProvider: startSkillId =>
+            {
+                Assert.Equal(legendSkill.StartSkill, startSkillId);
+                return [legendSkill];
+            });
         engine.BeginAction(state, hero.Id);
 
         var result = engine.CastSkill(state, hero.Id, hero.Character.GetExternalSkills().Single(), enemy.Position);

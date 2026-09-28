@@ -49,7 +49,7 @@ public sealed partial class BattleEngine
                 command.Messages);
         }
 
-        var resolvedSkill = _legendSkillResolver.Resolve(_legendSkillsProvider(), skill, _random);
+        var resolvedSkill = _legendSkillResolver.Resolve(_legendSkillsProvider(skill.Id), skill, _random);
         var resolvedSpecialSkill = resolvedSkill as SpecialSkillInstance;
         var skillCastInfo = BattleSkillCastInfo.Create(skill, resolvedSkill);
 

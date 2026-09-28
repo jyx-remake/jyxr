@@ -22,7 +22,7 @@ internal sealed class BattleFlowContext : IBattleFlowContext
 		State = state ?? throw new ArgumentNullException(nameof(state));
 		Engine = new BattleEngine(
 			buffResolver: buffId => GameRoot.ContentRepository.GetBuff(buffId),
-			legendSkillsProvider: () => GameRoot.ContentRepository.GetLegendSkills(),
+			legendSkillsProvider: startSkillId => GameRoot.ContentRepository.GetLegendSkillsFor(startSkillId),
 			skillMaxLevelResolver: GameRoot.SkillMaxLevelPolicy.GetMaxLevel,
 			characterGrowTemplateResolver: character =>
 				GameRoot.ContentRepository.GetGrowTemplate(

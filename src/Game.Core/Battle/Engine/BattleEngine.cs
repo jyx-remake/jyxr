@@ -29,7 +29,7 @@ public sealed partial class BattleEngine
     private readonly BattleHookExecutor _hookExecutor;
     private readonly BattleHookRunner _hookRunner;
     private readonly LegendSkillResolver _legendSkillResolver;
-    private readonly Func<IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
+    private readonly Func<string, IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
     private readonly IRandomService _random;
 
     public BattleEngine(
@@ -38,7 +38,7 @@ public sealed partial class BattleEngine
         IRandomService? random = null,
         Func<string, BuffDefinition>? buffResolver = null,
         LegendSkillResolver? legendSkillResolver = null,
-        Func<IReadOnlyList<LegendSkillDefinition>>? legendSkillsProvider = null,
+        Func<string, IReadOnlyList<LegendSkillDefinition>>? legendSkillsProvider = null,
         Func<SkillInstance, int>? skillMaxLevelResolver = null,
         Func<CharacterInstance, GrowTemplateDefinition>? characterGrowTemplateResolver = null,
         Func<CharacterInstance, int>? characterMaxLevelResolver = null,
@@ -150,7 +150,7 @@ public sealed partial class BattleEngine
     private static BuffDefinition MissingBuffResolver(string buffId) =>
         throw new InvalidOperationException($"Battle engine cannot resolve buff '{buffId}'.");
 
-    private static IReadOnlyList<LegendSkillDefinition> EmptyLegendSkillProvider() => [];
+    private static IReadOnlyList<LegendSkillDefinition> EmptyLegendSkillProvider(string startSkillId) => [];
 
     private static GrowTemplateDefinition DefaultCharacterGrowTemplateResolver(CharacterInstance _) => EmptyGrowTemplate;
 
