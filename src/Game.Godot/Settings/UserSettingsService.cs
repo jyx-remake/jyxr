@@ -1,20 +1,24 @@
 using Game.Godot.Persistence;
+using Game.Application;
 
 namespace Game.Godot.Settings;
 
 public sealed class UserSettingsService
 {
-	private readonly LocalUserSettingsStore _store;
+	private readonly DeferredPersistence<UserSettingsRecord> _persistence;
 
 	public UserSettingsService(LocalUserSettingsStore store, UserSettingsRecord initialSettings)
 	{
-		_store = store ?? throw new ArgumentNullException(nameof(store));
+		ArgumentNullException.ThrowIfNull(store);
 		Current = initialSettings ?? throw new ArgumentNullException(nameof(initialSettings));
+		_persistence = new(initialSettings, settings => store.Save(settings));
 	}
 
 	public UserSettingsRecord Current { get; private set; }
 
 	public void ApplyCurrent() => UserSettingsApplier.Apply(Current);
+	public void Flush() => _persistence.Flush();
+	public void FlushIfDue() => _persistence.FlushIfDue();
 
 	public void Update(Func<UserSettingsRecord, UserSettingsRecord> update)
 	{
@@ -35,9 +39,9 @@ public sealed class UserSettingsService
 
 		try
 		{
-			UserSettingsApplier.Apply(updated);
-			_store.Save(updated);
+			UserSettingsApplier.Apply(updated, previous);
 			Current = updated;
+			_persistence.Update(updated);
 		}
 		catch
 		{

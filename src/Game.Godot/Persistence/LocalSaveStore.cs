@@ -75,8 +75,6 @@ public sealed class LocalSaveStore
 			Game.ProfileService.AddSaves();
 		}
 
-		new LocalProfileStore().SaveCurrentProfile();
-
 		return absolutePath;
 	}
 

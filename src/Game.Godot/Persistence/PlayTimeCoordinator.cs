@@ -5,13 +5,11 @@ namespace Game.Godot.Persistence;
 
 public partial class PlayTimeCoordinator : Node
 {
-	private const double PersistenceIntervalSeconds = 60d;
-	private readonly LocalProfileStore _profileStore = new();
 	private GameSession? _session;
 	private bool _isGameplayActive;
 	private bool _hasApplicationFocus = true;
+	private bool _isApplicationSuspended;
 	private bool _wasTreePaused;
-	private double _persistenceElapsed;
 
 	public override void _Ready()
 	{
@@ -26,25 +24,7 @@ public partial class PlayTimeCoordinator : Node
 		{
 			_wasTreePaused = isTreePaused;
 			SynchronizeRunningState();
-			if (isTreePaused)
-			{
-				PersistProfile();
-			}
 		}
-
-		if (!ShouldRun())
-		{
-			return;
-		}
-
-		_persistenceElapsed += delta;
-		if (_persistenceElapsed < PersistenceIntervalSeconds)
-		{
-			return;
-		}
-
-		_persistenceElapsed = 0d;
-		CheckpointAndPersist();
 	}
 
 	public override void _Notification(int what)
@@ -53,11 +33,23 @@ public partial class PlayTimeCoordinator : Node
 		{
 			_hasApplicationFocus = false;
 			SynchronizeRunningState();
-			PersistProfile();
+			PersistUserData();
 		}
 		else if (what == NotificationApplicationFocusIn)
 		{
 			_hasApplicationFocus = true;
+			SynchronizeRunningState();
+		}
+		else if (what == NotificationApplicationPaused)
+		{
+			_isApplicationSuspended = true;
+			SynchronizeRunningState();
+			// The process may be killed after suspension; do not defer this write.
+			PersistUserData();
+		}
+		else if (what == NotificationApplicationResumed)
+		{
+			_isApplicationSuspended = false;
 			SynchronizeRunningState();
 		}
 	}
@@ -70,7 +62,6 @@ public partial class PlayTimeCoordinator : Node
 		}
 
 		_session.PlayTimeService.Stop();
-		PersistProfile();
 		_session = null;
 	}
 
@@ -79,14 +70,12 @@ public partial class PlayTimeCoordinator : Node
 		ArgumentNullException.ThrowIfNull(session);
 		_session = session;
 		_isGameplayActive = false;
-		_persistenceElapsed = 0d;
 	}
 
 	public void StartGameplay()
 	{
 		EnsureBound();
 		_isGameplayActive = true;
-		_persistenceElapsed = 0d;
 		SynchronizeRunningState();
 	}
 
@@ -98,15 +87,15 @@ public partial class PlayTimeCoordinator : Node
 		}
 
 		_isGameplayActive = false;
-		_persistenceElapsed = 0d;
 		_session.PlayTimeService.Stop();
-		PersistProfile();
+		PersistUserData();
 	}
 
 	private bool ShouldRun() =>
 		_session is not null &&
 		_isGameplayActive &&
 		_hasApplicationFocus &&
+		!_isApplicationSuspended &&
 		!GetTree().Paused;
 
 	private void SynchronizeRunningState()
@@ -132,27 +121,14 @@ public partial class PlayTimeCoordinator : Node
 		}
 	}
 
-	private void CheckpointAndPersist()
-	{
-		_session?.PlayTimeService.Checkpoint();
-		PersistProfile();
-	}
-
-	private void PersistProfile()
+	private void PersistUserData()
 	{
 		if (_session is null || !Game.IsInitialized)
 		{
 			return;
 		}
 
-		try
-		{
-			_profileStore.SaveCurrentProfile();
-		}
-		catch (Exception exception)
-		{
-			Game.Logger.Error("Persisting play time failed.", exception);
-		}
+		World.Instance.Persistence.FlushNow();
 	}
 
 	private void EnsureBound()

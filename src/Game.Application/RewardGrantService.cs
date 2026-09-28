@@ -64,7 +64,6 @@ public sealed class RewardGrantService(GameSession session)
                 }
 
                 session.ProfileService.AddSkillMaxLevelBonus(fragment.SkillId, appliedLevels);
-                session.Events.Publish(new ProfileChangedEvent());
                 return;
             default:
                 throw new NotSupportedException($"Unsupported reward grant '{reward.GetType().Name}'.");

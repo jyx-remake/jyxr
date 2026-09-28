@@ -241,7 +241,6 @@ internal sealed class CharacterGrowthStoryCommands
             return ValueTask.CompletedTask;
         }
 
-        _session.Events.Publish(new ProfileChangedEvent());
         _session.Events.Publish(new ToastRequestedEvent(
             $"武学精通【{skillName}】+ {levels}",
             ToastTone.Important));

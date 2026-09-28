@@ -30,6 +30,11 @@ public static class GameRuntimeBootstrap
 		ArgumentNullException.ThrowIfNull(modLoadout);
 		ArgumentNullException.ThrowIfNull(sceneTree);
 
+		if (Game.IsInitialized)
+		{
+			World.Instance.PlayTime.StopGameplay();
+		}
+
 		_activeModLoadout = modLoadout;
 		var logger = EnsureLogger();
 		LoadResourcePacks(modLoadout, logger);
@@ -49,11 +54,13 @@ public static class GameRuntimeBootstrap
 		var settingsStore = new LocalUserSettingsStore(modLoadout.StoragePaths.SettingsPath, logger);
 		var settings = settingsStore.LoadOrDefault();
 		var userSettings = new UserSettingsService(settingsStore, settings);
-		var profile = new LocalProfileStore(modLoadout.StoragePaths.ProfilePath, logger).LoadOrEmpty().Restore();
+		var profileStore = new LocalProfileStore(modLoadout.StoragePaths.ProfilePath, logger);
+		var profile = profileStore.LoadOrEmpty().Restore();
 		var session = BuildSession(repository, logger, config, profile);
 
 		Game.Initialize(session, modLoadout, userSettings, logger);
 		userSettings.ApplyCurrent();
+		World.Instance.Persistence.Bind(session, profileStore, userSettings);
 		BindUiToSession(session);
 	}
 

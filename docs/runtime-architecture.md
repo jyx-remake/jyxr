@@ -27,6 +27,12 @@
 
 本地路径由 [ModStoragePaths](../src/Game.Application/Mods/ModStoragePaths.cs) 统一生成。无悔规则独立于战斗难度，只允许自动存档，且不受普通自动存档开关限制。
 
+`profile.json` 与 `settings.json` 在启动时读取，运行中使用内存状态。World 下的 `ProfilePersistenceCoordinator` 每 60 秒真实时间、结束游玩和退出时检查点保存 profile；场景树暂停不停止保存周期，战斗加速不改变周期。失焦或收到移动端 `NotificationApplicationPaused` 时，先暂停并结算游玩计时，再同步 flush profile 和 settings，不等待下一帧。恢复通知与焦点通知独立维护，只有应用未挂起、有焦点且场景树未暂停时才恢复游玩计时。移动端后台进程可能停止执行，不能依赖周期或退出回调，强杀与断电仍只能恢复到最后成功保存的数据。
+
+档案业务变更、自动/手动/快速存档均不额外触发 profile 写入。写入以最后成功保存的快照去重，因此连续失焦与挂起通知不会重复写入相同数据；失败保留内存状态，等下一个保存时机重试。单个存档与 profile 不保证同步落盘。
+
+`UserSettingsService` 立即应用变化的设置并更新内存，持久化由同一宿主协调器驱动；大地图缩放不在临时面板内维护待保存计时器。profile、用户设置和启动器设置均先写同目录临时文件，再替换目标文件。配置内容 `game-config.json` 只参与启动内容装配。
+
 ## 角色、队伍与物品
 
 `Party` 是全局伙伴名册，`Members`、`Followers`、`Reserves` 三个池子中的实例互斥。入队和跟随优先移动既有实例；离队移入后备池，保留成长、装备与技能。存档角色记录覆盖整个名册。

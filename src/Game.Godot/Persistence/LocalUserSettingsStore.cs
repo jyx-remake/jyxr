@@ -28,7 +28,7 @@ public sealed class LocalUserSettingsStore
 
 		Directory.CreateDirectory(directoryPath);
 		var json = JsonSerializer.Serialize(settings, GameJson.Default);
-		File.WriteAllText(absolutePath, json);
+		AtomicTextFile.Write(absolutePath, json);
 		Logger.Info($"Saved user settings to '{absolutePath}'.");
 		return absolutePath;
 	}

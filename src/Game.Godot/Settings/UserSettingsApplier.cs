@@ -10,7 +10,7 @@ public static class UserSettingsApplier
 	private const int DefaultViewportWidth = 1920;
 	private const int DefaultViewportHeight = 1080;
 
-	public static void Apply(UserSettingsRecord settings)
+	public static void Apply(UserSettingsRecord settings, UserSettingsRecord? previous = null)
 	{
 		ArgumentNullException.ThrowIfNull(settings);
 
@@ -22,13 +22,13 @@ public static class UserSettingsApplier
 			Game.Settings.LargeMapMovementAnimationEnabled = settings.LargeMapMovementAnimationEnabled;
 		}
 
-		ApplyBusEnabled(BgmBusName, settings.MusicEnabled);
-		ApplyBusEnabled(SfxBusName, settings.SfxEnabled);
-		if (Game.IsDesktopPlatform)
+		if (previous?.MusicEnabled != settings.MusicEnabled) ApplyBusEnabled(BgmBusName, settings.MusicEnabled);
+		if (previous?.SfxEnabled != settings.SfxEnabled) ApplyBusEnabled(SfxBusName, settings.SfxEnabled);
+		if (Game.IsDesktopPlatform && previous?.WindowDisplayMode != settings.WindowDisplayMode)
 		{
 			ApplyWindowDisplayMode(settings.WindowDisplayMode);
 		}
-		ApplyScreenAspect(settings.ScreenAspectMode);
+		if (previous?.ScreenAspectMode != settings.ScreenAspectMode) ApplyScreenAspect(settings.ScreenAspectMode);
 	}
 
 	private static void ApplyBusEnabled(string busName, bool enabled)

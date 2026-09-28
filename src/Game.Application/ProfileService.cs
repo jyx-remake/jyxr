@@ -49,6 +49,7 @@ public sealed class ProfileService
     public void AddSkillMaxLevelBonus(string skillId, int levels)
     {
         Profile.AddSkillMaxLevelBonus(skillId, levels);
+        _session.Events.Publish(new ProfileChangedEvent());
         _logger.Info($"Added {levels} skill max level bonus to '{skillId}'.");
     }
 
@@ -57,6 +58,7 @@ public sealed class ProfileService
         var applied = Profile.TryAddSkillMaxLevelBonusOnce(skillId, levels, onceKey);
         if (applied)
         {
+            _session.Events.Publish(new ProfileChangedEvent());
             _logger.Info($"Added {levels} skill max level bonus to '{skillId}'.");
         }
         else

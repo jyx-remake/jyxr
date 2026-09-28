@@ -55,6 +55,6 @@ public sealed class LauncherSettingsStore
 
         Directory.CreateDirectory(directoryPath);
         var json = JsonSerializer.Serialize(settings, GameJson.Default);
-        File.WriteAllText(_settingsPath, json);
+		AtomicTextFile.Write(_settingsPath, json);
     }
 }

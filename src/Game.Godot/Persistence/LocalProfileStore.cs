@@ -17,7 +17,7 @@ public sealed class LocalProfileStore
 		_logger = logger;
 	}
 
-	public string SaveCurrentProfile()
+	public string Save(string json)
 	{
 		var absolutePath = ResolveAbsolutePath();
 		var directoryPath = Path.GetDirectoryName(absolutePath);
@@ -27,8 +27,7 @@ public sealed class LocalProfileStore
 		}
 
 		Directory.CreateDirectory(directoryPath);
-		var json = JsonSerializer.Serialize(Game.ProfileService.CreateProfileRecord(), GameJson.Default);
-		File.WriteAllText(absolutePath, json);
+		AtomicTextFile.Write(absolutePath, json);
 		Logger.Info($"Saved global profile to '{absolutePath}'.");
 		return absolutePath;
 	}

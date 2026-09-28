@@ -12,7 +12,6 @@ public partial class LargeMapView : Control
 	private const float MaximumZoom = 3f;
 	private const float MobileDefaultZoom = 1.5f;
 	private const float MouseWheelZoomStep = 1.15f;
-	private const double ZoomSaveDelaySeconds = 1.0;
 	private const float DragThreshold = 10f;
 	private const float PinMovePixelsPerSecond = 900f;
 	private const float PinMoveMinDuration = 0.25f;
@@ -29,8 +28,6 @@ public partial class LargeMapView : Control
 	private Control _locations = null!;
 	private Control _heroPin = null!;
 	private TextureRect _heroAvatar = null!;
-	private global::Godot.Timer _zoomSaveTimer = null!;
-	private float _savedZoom;
 	private Vector2 _heroLogicalPosition;
 	private bool _mousePressed;
 	private bool _mouseDragging;
@@ -65,14 +62,6 @@ public partial class LargeMapView : Control
 		_heroPin = GetNode<Control>("%MapPin");
 		_heroAvatar = GetNode<TextureRect>("%PinAvatar");
 		_mapSurface.Size = CanvasSize;
-		_savedZoom = Game.UserSettings.Current.LargeMapZoom;
-		_zoomSaveTimer = new global::Godot.Timer
-		{
-			OneShot = true,
-			WaitTime = ZoomSaveDelaySeconds,
-		};
-		_zoomSaveTimer.Timeout += PersistZoom;
-		AddChild(_zoomSaveTimer);
 		Resized += OnResized;
 		ResetView();
 	}
@@ -246,8 +235,9 @@ public partial class LargeMapView : Control
 
 	private void ResetView(Vector2? centerLogicalPosition = null)
 	{
-		var initialZoom = _savedZoom > 0f
-			? _savedZoom
+		var preferredZoom = Game.UserSettings.Current.LargeMapZoom;
+		var initialZoom = preferredZoom > 0f
+			? preferredZoom
 			: Game.IsMobilePlatform ? MobileDefaultZoom : MinimumZoom;
 		_transform.Reset(Size, initialZoom, centerLogicalPosition);
 		ApplyVisualTransform();
@@ -293,23 +283,17 @@ public partial class LargeMapView : Control
 		ApplyVisualTransform();
 	}
 
-	private void ScheduleZoomSave()
+	private void UpdateZoomPreference()
 	{
-		if (Mathf.IsEqualApprox(_savedZoom, _transform.Zoom))
+		if (Mathf.IsEqualApprox(Game.UserSettings.Current.LargeMapZoom, _transform.Zoom))
 		{
 			return;
 		}
 
-		_zoomSaveTimer.Start();
-	}
-
-	private void PersistZoom()
-	{
 		try
 		{
 			var zoom = _transform.Zoom;
 			Game.UserSettings.Update(settings => settings with { LargeMapZoom = zoom });
-			_savedZoom = zoom;
 		}
 		catch (Exception exception)
 		{
@@ -336,7 +320,7 @@ public partial class LargeMapView : Control
 				? MouseWheelZoomStep
 				: 1f / MouseWheelZoomStep;
 			ApplyGesture(position, position, factor);
-			ScheduleZoomSave();
+			UpdateZoomPreference();
 			return true;
 		}
 
@@ -446,7 +430,7 @@ public partial class LargeMapView : Control
 		_touches.Remove(touch.Index);
 		if (wasPinching)
 		{
-			ScheduleZoomSave();
+			UpdateZoomPreference();
 		}
 		if (shouldActivate)
 		{

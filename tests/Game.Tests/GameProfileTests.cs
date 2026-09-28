@@ -271,7 +271,7 @@ public sealed class GameProfileTests
     }
 
     [Fact]
-    public void ProfileService_AddSkillMaxLevelBonus_DoesNotPublishProfileChangedEvent()
+    public void ProfileService_AddSkillMaxLevelBonus_PublishesProfileChangedEvent()
     {
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
         var publishedEvents = CollectPublishedEvents(session);
@@ -280,11 +280,11 @@ public sealed class GameProfileTests
         session.ProfileService.AddSkillMaxLevelBonus("dragon_palm", 2);
 
         Assert.Equal(5, session.Profile.GetSkillMaxLevelBonus("dragon_palm"));
-        Assert.Empty(publishedEvents.OfType<ProfileChangedEvent>());
+        Assert.Equal(2, publishedEvents.OfType<ProfileChangedEvent>().Count());
     }
 
     [Fact]
-    public void ProfileService_TryAddSkillMaxLevelBonusOnce_ConsumesKeyWithoutPublishingProfileChangedEvent()
+    public void ProfileService_TryAddSkillMaxLevelBonusOnce_PublishesOnlyWhenApplied()
     {
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
         var publishedEvents = CollectPublishedEvents(session);
@@ -307,7 +307,7 @@ public sealed class GameProfileTests
         Assert.True(repeated);
         Assert.Equal(5, session.Profile.GetSkillMaxLevelBonus("dragon_palm"));
         Assert.Contains("reward.dragon_palm.mastery", session.Profile.ConsumedSkillMaxLevelKeys);
-        Assert.Empty(publishedEvents.OfType<ProfileChangedEvent>());
+        Assert.Equal(2, publishedEvents.OfType<ProfileChangedEvent>().Count());
     }
 
     private static List<object> CollectPublishedEvents(GameSession session)

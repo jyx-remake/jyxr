@@ -77,8 +77,8 @@ public static class GameFlow
 
 	public static void GameOver()
 	{
-		World.Instance.PlayTime.StopGameplay();
 		Game.ProfileService.AddDeaths();
+		World.Instance.PlayTime.StopGameplay();
 		UIRoot.Instance.ShowGameOverScreen();
 	}
 

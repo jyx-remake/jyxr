@@ -20,6 +20,7 @@ public partial class World : Control
 
 	public AutoSaveCoordinator AutoSave { get; private set; } = null!;
 	public PlayTimeCoordinator PlayTime { get; private set; } = null!;
+	public ProfilePersistenceCoordinator Persistence { get; private set; } = null!;
 
 	public override void _Ready()
 	{
@@ -27,6 +28,8 @@ public partial class World : Control
 		AutoSave = GetNode<AutoSaveCoordinator>("%AutoSaveCoordinator");
 		PlayTime = GetNode<PlayTimeCoordinator>("%PlayTimeCoordinator");
 		Instance = this;
+		Persistence = new ProfilePersistenceCoordinator();
+		AddChild(Persistence);
 	}
 
 	public MapScreen EnterMap(string mapId) =>

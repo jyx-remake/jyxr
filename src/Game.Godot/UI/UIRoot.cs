@@ -99,7 +99,6 @@ public partial class UIRoot : Control
 	private DetailPanelHost _detailPanelHost = null!;
 	private SessionEvents? _sessionEvents;
 	private readonly List<IDisposable> _sessionSubscriptions = [];
-	private ProfilePersistenceCoordinator _profilePersistence = null!;
 	private Control? _mainPanel;
 	private Control? _popupPanel;
 	private bool _isStoryPresentationActive;
@@ -124,13 +123,11 @@ public partial class UIRoot : Control
 		_hintBox = GetNode<HintBox>("%HintBox");
 		_confirmDialog = GetNode<ConfirmDialog>("%ConfirmDialog");
 		_detailPanelHost = GetNode<DetailPanelHost>("%DetailPanelHost");
-		_profilePersistence = new ProfilePersistenceCoordinator(this);
 		Instance = this;
 	}
 
 	public override void _ExitTree()
 	{
-		_profilePersistence.FlushNow();
 		DisposeSessionSubscriptions();
 	}
 	
@@ -752,14 +749,12 @@ public partial class UIRoot : Control
 	private void OnProfileChanged(ProfileChangedEvent _)
 	{
 		RefreshHud();
-		_profilePersistence.RequestSave();
 	}
 
 	private void OnProfileLoaded(ProfileLoadedEvent _) => RefreshHud();
 
 	private void DisposeSessionSubscriptions()
 	{
-		_profilePersistence.FlushNow();
 		foreach (var subscription in _sessionSubscriptions)
 		{
 			subscription.Dispose();
