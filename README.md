@@ -12,13 +12,7 @@
 
 ## 开发与运行
 
-准备 .NET 10 SDK 和 Godot 4.7.2 的 C#/.NET 版本，在仓库根目录执行：
-
-```powershell
-dotnet build src/Game.Godot/engine-free-rpg.csproj
-```
-
-使用 Godot 打开 [src/Game.Godot/project.godot](src/Game.Godot/project.godot)，运行项目后进入 MOD 启动器，选择基础 MOD 或 addon 加载组合，再进入游戏主菜单。基础 MOD 需包含有效的 `mod.json` 和 `data` 目录。
+准备 .NET 10 SDK 和 Godot 4.7.2 的 C#/.NET 版本，使用 Godot 打开 [src/Game.Godot/project.godot](src/Game.Godot/project.godot) 并运行。进入 MOD 启动器后，选择基础 MOD 或 addon 加载组合，再进入游戏主菜单。基础 MOD 需包含有效的 `mod.json` 和 `data` 目录。
 
 普通 .NET 测试：
 
