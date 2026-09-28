@@ -30,7 +30,7 @@ public partial class PreviewRoot : Control
 	{
 		try
 		{
-			World.Instance.ShowMap("南贤屋内");
+			World.Instance.EnterMap("南贤屋内");
 		}
 		catch (Exception exception)
 		{

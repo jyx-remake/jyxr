@@ -8,6 +8,8 @@ public sealed class WorldTriggerService
 {
     private readonly GameSession _session;
     private readonly GameConditionExpressionService _conditions;
+    private GameState? _pendingState;
+    private GameState? _executingState;
 
     public WorldTriggerService(GameSession session)
     {
@@ -17,35 +19,56 @@ public sealed class WorldTriggerService
 
     private GameState State => _session.State;
 
-    public MapInteractionResult? ResolvePendingTrigger()
+    public bool HasPendingCheck => ReferenceEquals(_pendingState, State);
+
+    public void RequestCheck()
     {
-        if (State.WorldTriggers.IsBlocked)
+        // Map commands inside a global event must not schedule that event again.
+        if (!ReferenceEquals(_executingState, State))
         {
-            return null;
+            _pendingState = State;
+        }
+    }
+
+    public async Task<bool> ExecutePendingAsync(CancellationToken cancellationToken = default)
+    {
+        if (!HasPendingCheck || _executingState is not null || State.WorldTriggers.IsBlocked)
+        {
+            return false;
         }
 
-        foreach (var trigger in _session.ContentRepository.GetWorldTriggers())
+        cancellationToken.ThrowIfCancellationRequested();
+        _pendingState = null;
+        var trigger = _session.ContentRepository.GetWorldTriggers().FirstOrDefault(candidate =>
+            !IsCompleted(candidate) && _conditions.Evaluate(candidate.When));
+        if (trigger is null)
         {
-            if (IsCompleted(trigger) || !_conditions.Evaluate(trigger.When))
+            return false;
+        }
+
+        var executionState = State;
+        _executingState = executionState;
+        try
+        {
+            await _session.StoryService.CommandDispatcher.ExecuteCallAsync(trigger.Action, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!ReferenceEquals(executionState, State))
             {
-                continue;
+                return false;
             }
 
-            // Mark before dispatch so a map-changing command cannot resolve the same trigger recursively.
             if (trigger.RepeatMode == RepeatMode.Once)
             {
-                State.WorldTriggers.MarkCompleted(trigger.Id);
+                executionState.WorldTriggers.MarkCompleted(trigger.Id);
             }
 
-            return new MapInteractionResult
-            {
-                Command = trigger.Action,
-                Message = trigger.Description,
-                ConsumedTimeSlots = 0,
-            };
+            _session.Events.Publish(new AutoSaveRequestedEvent($"world trigger '{trigger.Id}' completed"));
+            return true;
         }
-
-        return null;
+        finally
+        {
+            _executingState = null;
+        }
     }
 
     public void Block() => State.WorldTriggers.Block();

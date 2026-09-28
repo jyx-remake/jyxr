@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://b4kwdhhutdr0x" path="res://src/Game.Godot/Story/TimedStoryCoordinator.cs" id="3_timed_story"]
 [ext_resource type="Script" uid="uid://bmski24jx6cwn" path="res://src/Game.Godot/Persistence/AutoSaveCoordinator.cs" id="4_auto_save"]
 [ext_resource type="Script" uid="uid://cqvc56k0l2iub" path="res://src/Game.Godot/Persistence/PlayTimeCoordinator.cs" id="5_play_time"]
+[ext_resource type="Script" uid="uid://dohfpyejiurym" path="res://src/Game.Godot/Story/WorldTriggerCoordinator.cs" id="6_world_trigger"]
 
 [node name="World" type="Control" unique_id=724556095]
 layout_mode = 3
@@ -39,3 +40,7 @@ script = ExtResource("4_auto_save")
 [node name="PlayTimeCoordinator" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("5_play_time")
+
+[node name="WorldTriggerCoordinator" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("6_world_trigger")

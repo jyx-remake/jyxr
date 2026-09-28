@@ -29,12 +29,6 @@ public partial class World : Control
 		Instance = this;
 	}
 
-	public MapScreen ShowMap(string mapId)
-	{
-		var result = Game.MapService.EnterMap(mapId);
-		return ShowMap(result);
-	}
-
 	public MapScreen EnterMap(string mapId) =>
 		ShowMap(Game.MapService.EnterMap(mapId));
 
@@ -71,8 +65,19 @@ public partial class World : Control
 		return mapScreen;
 	}
 
-	public MapScreen RefreshCurrentMap() =>
-		ShowMap(Game.State.Location.CurrentMapId);
+	public MapScreen RefreshCurrentMap()
+	{
+		var result = Game.MapService.GetCurrentMap();
+		if (CurrentScene is MapScreen mapScreen)
+		{
+			mapScreen.Refresh(result);
+			return mapScreen;
+		}
+
+		return ShowMap(result);
+	}
+
+	public MapScreen RestoreCurrentMap() => ShowMap(Game.MapService.GetCurrentMap());
 
 	private void ReplaceCurrentScene(Control scene)
 	{

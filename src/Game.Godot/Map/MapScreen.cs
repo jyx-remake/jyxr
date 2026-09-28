@@ -23,7 +23,6 @@ public partial class MapScreen : Control
 	private MapLocationTooltipLayer _locationTooltipLayer = null!;
 	private Control _bottomBox = null!;
 	private RichTextLabel _mapDescriptionLabel = null!;
-	private MapInteractionResult? _pendingInteraction;
 	private IDisposable? _clockChangedSubscription;
 	private bool _isStoryPresentationActive;
 
@@ -46,10 +45,9 @@ public partial class MapScreen : Control
 
 		if (_pendingInitialResult is not null)
 		{
+			Game.Audio.PlayBgm(_pendingInitialResult.Map.Musics);
 			Apply(_pendingInitialResult);
-			SchedulePendingInteraction(_pendingInitialResult);
 			_pendingInitialResult = null;
-			return;
 		}
 	}
 
@@ -86,23 +84,13 @@ public partial class MapScreen : Control
 		_pendingInitialResult = result;
 	}
 
-	public void ShowMap(string mapId)
-	{
-		ArgumentException.ThrowIfNullOrWhiteSpace(mapId);
+	public bool IsHandlingInteraction => _isHandlingInteraction;
 
-		var result = Game.MapService.EnterMap(mapId);
-		Apply(result);
-		SchedulePendingInteraction(result);
-	}
+	public void Refresh(MapEnterResult result) => Apply(result);
 
 	private void Apply(MapEnterResult result)
 	{
 		_locationTooltipLayer.Dismiss();
-		if (result.Map.Musics.Any())
-		{
-			Game.Audio.PlayBgm(result.Map.Musics);
-		}
-		
 		_mapDescriptionLabel.Text = result.Map.Description ?? "";
 
 		if (result.Map.Kind == MapKind.Large)
@@ -180,11 +168,12 @@ public partial class MapScreen : Control
 
 	private async Task HandleLocationPressedAsync((string MapId, MapLocationDefinition Location, MapEventDefinition? Event) location)
 	{
+		var session = Game.Session;
 		BeginLargeMapTimeLightingDeferral();
 		MapInteractionResult result;
 		try
 		{
-			result = Game.MapService.InteractWithLocation(location);
+			result = session.MapService.InteractWithLocation(location);
 		}
 		catch
 		{
@@ -192,73 +181,17 @@ public partial class MapScreen : Control
 			throw;
 		}
 
-		await CompleteMapInteractionAsync(result);
-	}
-
-	private async Task CompleteMapInteractionAsync(MapInteractionResult result)
-	{
 		await PlayLargeMapInteractionMovementAsync(result.Movement);
-		var completed = await HandleMapInteractionResultAsync(result);
-		if (completed)
-		{
-			Game.Session.Events.Publish(
-				new AutoSaveRequestedEvent(
-					$"map interaction command completed: '{result.Command?.Root.Name}'"));
-		}
-	}
-
-	private async Task<bool> HandleMapInteractionResultAsync(MapInteractionResult result)
-	{
-		if (result.Command is null)
-		{
-			Game.Logger.Info("Map interaction is blocked because it has no command.");
-			return false;
-		}
-
-		await Game.StoryService.CommandDispatcher.ExecuteCallAsync(result.Command);
-		Game.MapService.CompleteInteraction(result);
-
-		if (GodotObject.IsInstanceValid(World.Instance) && World.Instance.CurrentScene is MapScreen)
-		{
-			World.Instance.RefreshCurrentMap();
-		}
-
-		return true;
-	}
-
-	private void SchedulePendingInteraction(MapEnterResult result)
-	{
-		if (result.PendingInteraction is null || _isHandlingInteraction)
+		if (!ReferenceEquals(session, Game.Session))
 		{
 			return;
 		}
 
-		_pendingInteraction = result.PendingInteraction;
-		_isHandlingInteraction = true;
-		CallDeferred(nameof(ProcessPendingInteractionDeferred));
-	}
-
-	private async void ProcessPendingInteractionDeferred()
-	{
-		try
+		if (await session.MapService.ExecuteInteractionAsync(result) &&
+			ReferenceEquals(session, Game.Session) && !GameFlow.IsMainMenuActive &&
+			GodotObject.IsInstanceValid(World.Instance) && World.Instance.CurrentScene is MapScreen)
 		{
-			if (_pendingInteraction is { } pendingInteraction)
-			{
-				_pendingInteraction = null;
-				await CompleteMapInteractionAsync(pendingInteraction);
-			}
-		}
-		catch (Exception exception)
-		{
-			Game.Logger.Error("Handling map enter interaction failed.", exception);
-			throw;
-		}
-		finally
-		{
-			if (GodotObject.IsInstanceValid(this))
-			{
-				_isHandlingInteraction = false;
-			}
+			World.Instance.RefreshCurrentMap();
 		}
 	}
 

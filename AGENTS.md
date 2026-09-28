@@ -361,6 +361,16 @@
   - 切换当前地图。
   - 大地图会记忆当前位置。
   - 发布 `MapChangedEvent`。
+  - 请求一次全局事件检查，不在地图返回值中携带待播放剧情。
+- `MapService.GetCurrentMap()` 只构建当前地图展示数据，不切图、不恢复战斗资源、不发布地图事件，也不触发全局事件检查。
+- `World.RefreshCurrentMap()` 使用上述查询刷新地图显示；不要用 `EnterMap(...)` 实现刷新。
+  - 刷新不重新选播地图 BGM；读档通过 `World.RestoreCurrentMap()` 重建地图视图，避免复用旧交互的忙碌状态。
+- `MapService.ExecuteInteractionAsync(...)` 统一执行点位命令、确认完成并请求自动存档；执行前后都校验发起交互的 `GameState`，旧存档的交互不能继续执行或保存新状态。
+- `WorldTriggerService` 持有与当前 `GameState` 绑定的待检查、执行中状态；一次性事件只有命令成功完成后才写入 `WorldTriggerState.CompletedTriggerIds` 并请求自动存档。
+- `WorldTriggerCoordinator` 挂在稳定的 `World` 节点下，等待地图交互、剧情和战斗空闲后执行全局事件；地图节点重建不拥有或取消全局事件播放。
+  - 进入地图、成功完成点位交互、读档后请求检查；执行全局事件期间的地图命令不重复排队。
+  - 执行失败或取消不消耗事件，下次检查可重试；读档会取消旧执行，旧执行不能把完成记录写入新状态。
+  - 全局事件被屏蔽时保留待检查请求，解除屏蔽后继续检查。
 - `MapService.InteractWithLocation(...)`
   - 处理地图点位事件。
   - 大地图移动按距离消耗时辰。

@@ -206,7 +206,7 @@ public partial class UIRoot : Control
 		var currentMapId = Game.State.Location.CurrentMapId;
 		if (!string.IsNullOrWhiteSpace(currentMapId))
 		{
-			World.Instance.RefreshCurrentMap();
+			World.Instance.RestoreCurrentMap();
 		}
 
 		RefreshHud();

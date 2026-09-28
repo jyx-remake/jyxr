@@ -59,13 +59,21 @@ public sealed class MapService
         }
 
         _session.Events.Publish(new MapChangedEvent(map.Id));
+        _session.WorldTriggerService.RequestCheck();
 
+        return GetCurrentMap();
+    }
+
+    public MapEnterResult GetCurrentMap()
+    {
+        var map = ContentRepository.GetMap(State.Location.CurrentMapId);
         return new MapEnterResult
         {
             Map = map,
-            HeroPosition = currentPosition,
+            HeroPosition = map.Kind == MapKind.Large
+                ? State.Location.GetLargeMapPosition(map.Id)
+                : null,
             ConsumedTimeSlots = 0,
-            PendingInteraction = _session.WorldTriggerService.ResolvePendingTrigger(),
             Locations = BuildLocations(map),
         };
     }
@@ -212,14 +220,43 @@ public sealed class MapService
         return (int)Math.Floor(currentPosition.DistanceTo(targetPosition) / map.TravelSpeed);
     }
 
-    public void CompleteInteraction(MapInteractionResult interaction)
+    public async Task<bool> ExecuteInteractionAsync(
+        MapInteractionResult interaction,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(interaction);
-        if (ReferenceEquals(interaction.OriginatingState, State) &&
-            interaction.MapEventCompletionKey is { } eventKey)
+        if (interaction.Command is null || !ReferenceEquals(interaction.OriginatingState, State))
+        {
+            return false;
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        await _session.StoryService.CommandDispatcher.ExecuteCallAsync(interaction.Command, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!CompleteInteraction(interaction))
+        {
+            return false;
+        }
+
+        _session.Events.Publish(new AutoSaveRequestedEvent($"map interaction command completed: '{interaction.Command.Root.Name}'"));
+        return true;
+    }
+
+    public bool CompleteInteraction(MapInteractionResult interaction)
+    {
+        ArgumentNullException.ThrowIfNull(interaction);
+        if (!ReferenceEquals(interaction.OriginatingState, State))
+        {
+            return false;
+        }
+
+        if (interaction.MapEventCompletionKey is { } eventKey)
         {
             State.MapEventProgress.MarkCompleted(eventKey.MapId, eventKey.LocationId, eventKey.EventId);
         }
+
+        _session.WorldTriggerService.RequestCheck();
+        return true;
     }
 
     private bool IsOnceEventCompleted(string mapId, string locationId, string eventId) =>
@@ -231,7 +268,6 @@ public sealed record MapEnterResult
 {
     public required MapDefinition Map { get; init; }
     public required int ConsumedTimeSlots { get; init; }
-    public MapInteractionResult? PendingInteraction { get; init; }
     public IReadOnlyList<(string MapId, MapLocationDefinition Location, MapEventDefinition? Event)> Locations { get; init; } = [];
     public MapPosition? HeroPosition { get; init; }
 }

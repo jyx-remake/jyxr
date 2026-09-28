@@ -2,6 +2,7 @@ using Game.Application;
 using Game.Core.Definitions;
 using Game.Core.Model;
 using Game.Core.Model.Character;
+using Game.Core.Story;
 using Game.Expressions;
 
 namespace Game.Tests;
@@ -9,6 +10,93 @@ namespace Game.Tests;
 public sealed class MapServiceTests
 {
     private const string WorldVillageEventId = "intro";
+
+    [Fact]
+    public async Task ExecuteInteraction_DoesNotDispatchAnInteractionFromBeforeLoad()
+    {
+        var host = new MapCommandHost(_ => throw new InvalidOperationException("stale command executed"));
+        var (session, interaction) = CreateCommandInteraction(host);
+        session.ReplaceState(new GameState());
+        var saves = 0;
+        using var subscription = session.Events.Subscribe<AutoSaveRequestedEvent>(_ => saves++);
+
+        Assert.False(await session.MapService.ExecuteInteractionAsync(interaction));
+        Assert.Equal(0, saves);
+        Assert.False(session.WorldTriggerService.HasPendingCheck);
+    }
+
+    [Fact]
+    public async Task ExecuteInteraction_StateReplacedWhileAwaiting_DoesNotCompleteOrSave()
+    {
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var (session, interaction) = CreateCommandInteraction(new MapCommandHost(_ => new ValueTask(release.Task)));
+        var previous = session.State;
+        var saves = 0;
+        using var subscription = session.Events.Subscribe<AutoSaveRequestedEvent>(_ => saves++);
+        var execution = session.MapService.ExecuteInteractionAsync(interaction);
+        Assert.False(execution.IsCompleted);
+
+        session.ReplaceState(new GameState());
+        release.SetResult();
+
+        Assert.False(await execution);
+        Assert.False(previous.MapEventProgress.IsCompleted("inn", "door", "enter"));
+        Assert.False(session.State.MapEventProgress.IsCompleted("inn", "door", "enter"));
+        Assert.False(session.WorldTriggerService.HasPendingCheck);
+        Assert.Equal(0, saves);
+    }
+
+    [Fact]
+    public async Task ExecuteInteraction_CompletesAndRequestsSaveOnlyAfterCommandSucceeds()
+    {
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var (session, interaction) = CreateCommandInteraction(new MapCommandHost(_ => new ValueTask(release.Task)));
+        var saves = 0;
+        using var subscription = session.Events.Subscribe<AutoSaveRequestedEvent>(_ => saves++);
+        var execution = session.MapService.ExecuteInteractionAsync(interaction);
+
+        Assert.False(session.State.MapEventProgress.IsCompleted("inn", "door", "enter"));
+        Assert.Equal(0, saves);
+        release.SetResult();
+
+        Assert.True(await execution);
+        Assert.True(session.State.MapEventProgress.IsCompleted("inn", "door", "enter"));
+        Assert.True(session.WorldTriggerService.HasPendingCheck);
+        Assert.Equal(1, saves);
+    }
+
+    [Fact]
+    public async Task ExecuteInteraction_FailureDoesNotCompleteOrSave()
+    {
+        var (session, interaction) = CreateCommandInteraction(new MapCommandHost(_ => throw new InvalidOperationException("failed")));
+        var saves = 0;
+        using var subscription = session.Events.Subscribe<AutoSaveRequestedEvent>(_ => saves++);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => session.MapService.ExecuteInteractionAsync(interaction));
+        Assert.False(session.State.MapEventProgress.IsCompleted("inn", "door", "enter"));
+        Assert.Equal(0, saves);
+    }
+
+    private static (GameSession Session, MapInteractionResult Interaction) CreateCommandInteraction(MapCommandHost host)
+    {
+        var map = CreateMap("inn", MapKind.Small, CreateLocation("door", events:
+        [
+            new MapEventDefinition { Id = "enter", Action = Call("probe()"), RepeatMode = RepeatMode.Once },
+        ]));
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(maps: [map]), host);
+        var location = Assert.Single(session.MapService.EnterMap("inn").Locations);
+        return (session, session.MapService.InteractWithLocation(location));
+    }
+
+    private sealed class MapCommandHost(Func<CancellationToken, ValueTask> execute) : IRuntimeHost
+    {
+        [StoryCommand("probe")]
+        private ValueTask ProbeAsync(CancellationToken cancellationToken) => execute(cancellationToken);
+
+        public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) => throw new NotSupportedException();
+        public ValueTask<int> ChooseOptionAsync(ChoiceContext choice, CancellationToken cancellationToken) => throw new NotSupportedException();
+        public ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken) => throw new NotSupportedException();
+    }
 
     [Fact]
     public void EnterMap_LargeMap_FirstVisitUsesDefaultLocation()
@@ -258,7 +346,7 @@ public sealed class MapServiceTests
     }
 
     [Fact]
-    public void EnterMap_WhenWorldTriggerConditionMatches_ReturnsPendingStoryInteraction()
+    public void EnterMap_RequestsWorldTriggerCheckWithoutConsumingEvent()
     {
         var worldMap = CreateMap(
             "world",
@@ -279,16 +367,14 @@ public sealed class MapServiceTests
         state.Party.AddMember(CreateCharacter("ally_3"));
         var session = new GameSession(state, repository);
 
-        var result = session.MapService.EnterMap("world");
+        session.MapService.EnterMap("world");
 
-        Assert.NotNull(result.PendingInteraction);
-        Assert.Equal("story", result.PendingInteraction!.Command!.Root.Name);
-        Assert.Equal("story_global", CallArgument(result.PendingInteraction.Command));
-        Assert.True(state.WorldTriggers.IsCompleted("story_global"));
+        Assert.True(session.WorldTriggerService.HasPendingCheck);
+        Assert.False(state.WorldTriggers.IsCompleted("story_global"));
     }
 
     [Fact]
-    public void EnterMap_WorldTriggerFriendCount_DoesNotCountFollowers()
+    public async Task EnterMap_WorldTriggerFriendCount_DoesNotCountFollowers()
     {
         var worldMap = CreateMap(
             "world",
@@ -309,9 +395,30 @@ public sealed class MapServiceTests
         state.Party.AddFollower(CreateCharacter("ally_3"));
         var session = new GameSession(state, repository);
 
-        var result = session.MapService.EnterMap("world");
+        session.MapService.EnterMap("world");
 
-        Assert.Null(result.PendingInteraction);
+        Assert.False(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.False(state.WorldTriggers.IsCompleted("story_global"));
+    }
+
+    [Fact]
+    public async Task GetCurrentMap_RefreshesLocationsWithoutEnteringMapOrRequestingWorldTriggers()
+    {
+        var map = CreateMap("inn", MapKind.Small, CreateLocation("door", events:
+        [
+            new MapEventDefinition { Id = "door", Action = Call("story('intro')"), When = Expr("elapsed_days > 0") },
+        ]));
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(maps: [map]));
+        session.MapService.EnterMap("inn");
+        await session.WorldTriggerService.ExecutePendingAsync();
+        var changedEvents = 0;
+        using var subscription = session.Events.Subscribe<MapChangedEvent>(_ => changedEvents++);
+
+        Assert.Empty(session.MapService.GetCurrentMap().Locations);
+        session.State.Clock.AdvanceDays(1);
+        Assert.Single(session.MapService.GetCurrentMap().Locations);
+        Assert.Equal(0, changedEvents);
+        Assert.False(session.WorldTriggerService.HasPendingCheck);
     }
 
     [Fact]
