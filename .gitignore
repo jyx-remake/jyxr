@@ -32,6 +32,7 @@ mono_crash.*.json
 
 # Export output
 /export/
+/tools/ExportGame.local.psd1
 
 # Project-local content and runtime data
 /src/Game.Godot/assets/animation/
