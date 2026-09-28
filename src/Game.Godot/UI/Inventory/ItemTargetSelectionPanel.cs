@@ -15,6 +15,7 @@ public partial class ItemTargetSelectionPanel : JyPanel
 	private GridContainer _gridContainer = null!;
 	private Label _itemLabel = null!;
 	private Label _hintLabel = null!;
+	private SpinBox _quantityInput = null!;
 	private InventoryEntry? _entry;
 	private IDisposable? _saveLoadedSubscription;
 	private bool _isUsing;
@@ -25,6 +26,7 @@ public partial class ItemTargetSelectionPanel : JyPanel
 		_gridContainer = GetNode<GridContainer>("%GridContainer");
 		_itemLabel = GetNode<Label>("%ItemLabel");
 		_hintLabel = GetNode<Label>("%HintLabel");
+		_quantityInput = GetNode<SpinBox>("%QuantityInput");
 		_saveLoadedSubscription = Game.Session.Events.Subscribe<SaveLoadedEvent>(_ => QueueFree());
 		Refresh();
 	}
@@ -52,8 +54,12 @@ public partial class ItemTargetSelectionPanel : JyPanel
 
 		ClearGrid();
 		var analysis = Game.ItemUseService.Analyze(_entry);
-		_itemLabel.Text = $"选择目标：{_entry.Definition.Name}";
+		_itemLabel.Text = _entry.Definition.Name;
 		_hintLabel.Text = analysis.Message;
+		var maxQuantity = Game.ItemUseService.GetMaxUseQuantity(_entry);
+		_quantityInput.MaxValue = Math.Max(1, maxQuantity);
+		_quantityInput.Value = 1;
+		_quantityInput.Editable = maxQuantity > 1;
 
 		foreach (var candidate in analysis.Targets)
 		{
@@ -93,6 +99,9 @@ public partial class ItemTargetSelectionPanel : JyPanel
 
 		_isUsing = true;
 		var entry = _entry;
+		var state = Game.State;
+		_quantityInput.Apply();
+		var quantity = (int)_quantityInput.Value;
 		var character = Game.State.Party.GetMember(characterId);
 		var candidate = Game.ItemUseService.AnalyzeTarget(entry, character);
 		if (!candidate.CanUse)
@@ -109,7 +118,7 @@ public partial class ItemTargetSelectionPanel : JyPanel
 				.Select(effect => ItemUseEffectFormatter.FormatCn(effect, Game.ContentRepository)
 					.Replace('\n', ' '));
 			var confirmationText =
-				$"以下效果不会生效：\n{string.Join("\n", skippedEffectLines.Select(line => $"• {line}"))}\n\n仍要使用【{entry.Definition.Name}】吗？";
+				$"以下效果不会生效：\n{string.Join("\n", skippedEffectLines.Select(line => $"• {line}"))}\n\n仍要使用【{entry.Definition.Name}】×{quantity}吗？";
 			acceptPartialEffects = await UIRoot.Instance.ShowConfirmAsync(
 				confirmationText,
 				ConfirmDialogTone.Warning);
@@ -118,6 +127,12 @@ public partial class ItemTargetSelectionPanel : JyPanel
 				_isUsing = false;
 				return;
 			}
+		}
+
+		if (!GodotObject.IsInstanceValid(this) || IsQueuedForDeletion() || !ReferenceEquals(state, Game.State))
+		{
+			_isUsing = false;
+			return;
 		}
 
 		var runsStory = entry.Definition.UseEffects is [RunStoryItemUseEffectDefinition];
@@ -130,9 +145,7 @@ public partial class ItemTargetSelectionPanel : JyPanel
 
 		try
 		{
-			var result = acceptPartialEffects
-				? await Game.ItemUseService.UseAsync(entry, characterId, true)
-				: await Game.ItemUseService.UseAsync(entry, characterId);
+			var result = await Game.ItemUseService.UseBatchAsync(entry, characterId, quantity, acceptPartialEffects);
 			if (!result.Success)
 			{
 				UIRoot.Instance.ShowSuggestion(result.Message);

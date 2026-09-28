@@ -2,7 +2,45 @@
 
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
 [ext_resource type="Script" uid="uid://bmuvi6e6ogspp" path="res://UI/Inventory/ItemTargetSelectionPanel.cs" id="2_script"]
-[ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/item_target_character_box.tscn" id="3_character_box"]
+[ext_resource type="PackedScene" uid="uid://bhdr74hohb0e4" path="res://scenes/ui/inventory_panel/item_target_character_box.tscn" id="3_character_box"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quantity"]
+content_margin_left = 14.0
+content_margin_top = 5.0
+content_margin_right = 14.0
+content_margin_bottom = 5.0
+bg_color = Color(0.18, 0.13, 0.08, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.72, 0.55, 0.3, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_left = 5
+corner_radius_bottom_right = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quantity_focus"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.8, 0.4, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_left = 5
+corner_radius_bottom_right = 5
+
+[sub_resource type="Theme" id="Theme_quantity"]
+LineEdit/colors/font_color = Color(1, 0.94, 0.77, 1)
+LineEdit/colors/font_uneditable_color = Color(0.77, 0.7, 0.57, 1)
+LineEdit/colors/caret_color = Color(1, 0.94, 0.77, 1)
+LineEdit/colors/selection_color = Color(0.6, 0.43, 0.2, 0.35)
+LineEdit/font_sizes/font_size = 28
+LineEdit/styles/normal = SubResource("StyleBoxFlat_quantity")
+LineEdit/styles/read_only = SubResource("StyleBoxFlat_quantity")
+LineEdit/styles/focus = SubResource("StyleBoxFlat_quantity_focus")
 
 [node name="ItemTargetSelectionPanel" unique_id=1475795774 instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
@@ -21,24 +59,48 @@ theme_override_font_sizes/font_size = 58
 text = "选择人物"
 horizontal_alignment = 1
 
-[node name="ItemLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=146252365]
-unique_name_in_owner = true
+[node name="ItemUseRow" type="HBoxContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1"]
 layout_mode = 0
 offset_left = 360.0
-offset_top = 166.0
-offset_right = 1570.0
-offset_bottom = 214.0
-theme_override_colors/font_color = Color(0.93, 0.88, 0.7, 1)
+offset_top = 158.0
+offset_right = 1560.0
+offset_bottom = 206.0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="ItemLabel" type="Label" parent="ContentRoot/ItemUseRow" unique_id=146252365]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.28, 0.18, 0.09, 1)
 theme_override_font_sizes/font_size = 30
-text = "选择目标：物品"
+text = "物品名"
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QuantityLabel" type="Label" parent="ContentRoot/ItemUseRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.28, 0.18, 0.09, 1)
+theme_override_font_sizes/font_size = 28
+text = "使用数量"
+vertical_alignment = 1
+
+[node name="QuantityInput" type="SpinBox" parent="ContentRoot/ItemUseRow" unique_id=1626962385]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 48)
+layout_mode = 2
+theme = SubResource("Theme_quantity")
+min_value = 1.0
+max_value = 1.0
+value = 1.0
+rounded = true
+alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=941231250]
 layout_mode = 0
-offset_left = 330.0
-offset_top = 238.0
-offset_right = 1660.0
-offset_bottom = 850.0
+offset_left = 254.0
+offset_top = 213.0
+offset_right = 1646.0
+offset_bottom = 896.0
 
 [node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=1064672287]
 unique_name_in_owner = true
@@ -50,11 +112,12 @@ columns = 5
 [node name="HintLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=158857563]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 330.0
-offset_top = 880.0
-offset_right = 1660.0
-offset_bottom = 930.0
+offset_left = 319.0
+offset_top = 937.0
+offset_right = 1649.0
+offset_bottom = 987.0
 theme_override_colors/font_color = Color(0.93, 0.88, 0.7, 1)
 theme_override_font_sizes/font_size = 28
 text = "请选择目标。"
 horizontal_alignment = 1
+

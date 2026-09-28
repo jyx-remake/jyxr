@@ -39,6 +39,8 @@
 
 `Inventory` 使用有序条目表示堆叠物品和独立装备；带实例差异的装备独立保存。`ChestState` 复用 Inventory，存取规则由 `ChestService` 执行。装备实例序列属于 GameState，由 `EquipmentInstanceFactory` 统一分配。
 
+背包选人界面支持选择使用数量。`ItemUseService` 对可消耗的场外堆叠物品逐件校验、应用效果和扣除库存，返回实际使用数量；条件不再满足或出现未经确认的失效效果时停止，已完成的使用保留。装备、不消耗的物品及剧情效果仅允许单次使用，战斗内物品仍遵循战斗行动规则。
+
 角色派生属性通过 `CharacterInstance.RebuildSnapshot()` 收集装备、天赋和满足条件的技能 affix，再由 resolver 展开。外功激活状态不决定其被动 affix 是否生效；内功 affix 是否要求装备由 `requiresEquippedInternalSkill` 明确表达。新增 affix 来源时要同时检查内容引用解析与角色快照收集。
 
 新游戏与下一周目由 `SessionFlowService` 和 [NewGameStateFactory](../src/Game.Application/NewGameStateFactory.cs) 装配。下一周目保留银两和储物箱、重建初始队伍；全局元宝保留在 GameProfile。

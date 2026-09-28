@@ -66,6 +66,89 @@ public sealed class ItemUseService
         return ItemUseTargetCandidate.Enabled(character.Id, effectAnalysis.SkippedEffects);
     }
 
+    public int GetMaxUseQuantity(InventoryEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        if (!State.Inventory.Entries.Any(candidate => ReferenceEquals(candidate, entry)))
+        {
+            return 0;
+        }
+
+        var support = ResolveSupport(entry);
+        if (!support.IsSupported)
+        {
+            return 0;
+        }
+
+        return entry is StackInventoryEntry stack && entry.Definition.ConsumeOnUse &&
+            support.Kind == ItemUseKind.Effects &&
+            !support.Effects.Any(effect => effect is RunStoryItemUseEffectDefinition)
+                ? stack.Quantity
+                : 1;
+    }
+
+    public async Task<ItemUseBatchResult> UseBatchAsync(
+        InventoryEntry entry,
+        string targetCharacterId,
+        int quantity,
+        bool acceptPartialEffects = false,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetCharacterId);
+        if (quantity <= 0 || quantity > GetMaxUseQuantity(entry))
+        {
+            return new(0, "使用数量无效或超过可用数量。");
+        }
+
+        var state = State;
+        var target = state.Party.Members.FirstOrDefault(character => character.Id == targetCharacterId);
+        if (target is null)
+        {
+            return new(0, "目标已不在队伍中。");
+        }
+
+        var acceptedSkippedEffects = acceptPartialEffects
+            ? AnalyzeTarget(entry, target).SkippedEffects
+            : [];
+        var usedQuantity = 0;
+        var message = string.Empty;
+        while (usedQuantity < quantity)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!ReferenceEquals(state, State))
+            {
+                message = "游戏状态已切换，停止使用。";
+                break;
+            }
+            if (!state.Party.Members.Contains(target))
+            {
+                message = "目标已不在队伍中。";
+                break;
+            }
+
+            var candidate = AnalyzeTarget(entry, target);
+            if (candidate.SkippedEffects.Except(acceptedSkippedEffects).Any())
+            {
+                message = "后续物品有新的效果无法生效，请重新确认后使用。";
+                break;
+            }
+
+            var result = await UseAsyncCore(entry, targetCharacterId, acceptPartialEffects, cancellationToken);
+            message = result.Message;
+            if (!result.Success)
+            {
+                break;
+            }
+            usedQuantity++;
+        }
+
+        return new(usedQuantity, quantity == 1 || usedQuantity == 0
+            ? message
+            : $"【{target.Name}】使用【{entry.Definition.Name}】×{usedQuantity}/{quantity}"
+                + (usedQuantity < quantity ? $"：{message}" : string.Empty));
+    }
+
     public async Task<ItemUseResult> UseAsync(
         InventoryEntry entry,
         string targetCharacterId,
@@ -546,4 +629,9 @@ public sealed record ItemUseResult(
     public static ItemUseResult Succeeded(string message = "") => new(true, message);
 
     public static ItemUseResult Failed(string message) => new(false, message);
+}
+
+public sealed record ItemUseBatchResult(int UsedQuantity, string Message)
+{
+    public bool Success => UsedQuantity > 0;
 }
