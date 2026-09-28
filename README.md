@@ -89,10 +89,9 @@ PCK 预设借用 Windows 导出平台，保留现有纹理配置与 `extra_pck` 
 | 代理协作约定 | [AGENTS.md](AGENTS.md) |
 | 分层、会话、持久化、地图与全局事件 | [运行时架构](docs/runtime-architecture.md) |
 | 剧情、地图 action、条件与控制台 | [游戏内容 DSL v3](docs/game-dsl-v3.md) |
-| MOD 内容编辑与迁移 | [数据补丁](docs/mod-data-patching.md)、[原版 MOD 迁移](docs/legacy-mod-migration-guide.md) |
+| MOD 内容扩展、编辑与迁移 | [内容扩展与数据补丁](docs/mod-data-patching.md)、[原版 MOD 迁移](docs/legacy-mod-migration-guide.md) |
 | 战斗实现与状态效果 | [战斗运行时架构](docs/battle-runtime-architecture.md)、[Buff 指南](docs/buff-effects-guide.md) |
 | 战斗扩展设计 | [Effect 与 Phase Hook](docs/battle-effect-phase-hook-design.md)、[伤害 Timing 设计](docs/battle-damage-timing-design.md) |
 | 待办与设计草案 | [TODO](TODO.md)、[战斗后续议题](docs/battle-runtime-refactoring-backlog.md)、[技能切换草案](docs/character-skill-switching-design.md) |
-| MOD 扩展调研 | [STS2 风格 MOD 分析](docs/sts2-style-modding-analysis.md) |
 
 专题文档描述职责、协议和设计取舍；完整类型、字段和命令实现以对应源码及测试为准。

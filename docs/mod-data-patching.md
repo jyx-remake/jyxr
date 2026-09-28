@@ -1,4 +1,47 @@
-# MOD 数据补丁
+# MOD 内容扩展与数据补丁
+
+## 当前扩展方式
+
+项目通过 JSON 内容、结构化数据补丁和 PCK 资源包扩展游戏。启动器选择一个 `type: "game"` 主 MOD，并启用多个 `type: "addon"` 扩展。主 MOD 不限定为 `jyxr-base`；addon 可通过 `dependencies` 声明所需主 MOD 或其他 addon 的 ID。依赖先于使用者加载，用户排序必须满足依赖关系；缺失依赖、循环依赖或依赖另一个主 MOD 会阻止组合解析。
+
+| 需求 | 当前做法 |
+| --- | --- |
+| 新增角色、物品、武学、地图等定义 | 在 MOD 的 `data` 中提供完整定义，使用新的稳定 ID |
+| 新增剧情 | 在 `data/stories/**/*.story.json` 中编写脚本，指令见 [游戏内容 DSL v3](game-dsl-v3.md) |
+| 修改已有内容 | 使用 `patches/**/*.patch.json`，操作规则见下文 |
+| 新增或覆盖图片、音频等 Godot 资源 | 导出 PCK，在 `mod.json` 的 `packs` 中声明相对路径 |
+| 迁移旧版内容 | 按 [旧 MOD 迁移指南](legacy-mod-migration-guide.md) 更新源数据 |
+
+### MOD 清单与目录
+
+每个 MOD 位于数据根的 `mods/<modId>`，目录内提供 `mod.json`。清单必须包含 `id`、`name`、`version`、`type`、`dependencies`、`saveImpact`。例如，一个修改基础内容的 addon：
+
+```json
+{
+  "id": "example-addon",
+  "name": "示例扩展",
+  "version": "1.0.0",
+  "type": "addon",
+  "dependencies": ["jyxr-base"],
+  "saveImpact": "gameplay",
+  "packs": [],
+  "assemblies": []
+}
+```
+
+`saveImpact` 支持 `none`、`gameplay`、`structural`，主 MOD 必须声明 `structural`；存档记录加载组合，用于读档时的变更风险判断。玩家数据按主 MOD 隔离。数据根位置、启动流程与存档规则见 [运行时架构](runtime-architecture.md)。
+
+主 MOD 必须提供 `data` 目录。PCK 路径相对于所在 MOD 目录，必须指向存在的 `.pck` 文件。资源按有效 MOD 加载顺序和各清单中的 `packs` 顺序加载，后加载的包可以覆盖相同资源路径；不读取 loose assets 覆盖。启动时先加载 PCK，再创建运行时节点、装配 JSON 内容并建立会话。
+
+发布时应同步清单、`data`、`patches` 和清单引用的资源包。本体升级不会自动迁移 MOD；缺少必填字段等无效清单目前会被发现流程跳过，可能表现为启动器没有可用 MOD。
+
+### 代码扩展边界
+
+`assemblies` 字段目前仅解析和规范化路径，启动流程不加载其中的 DLL。项目没有 MOD initializer、独立代码插件 API 或 Harmony 加载流程；宿主启用 `EnableDynamicLoading` 不代表已经支持代码 MOD。内容作者应使用当前内置的剧情命令、条件与战斗效果类型；新增执行行为需要修改对应引擎实现。清单也不接受 `harmony` 字段。
+
+实现入口为 `Game.Application/Mods` 下的清单、发现和加载组合解析，`Game.Content/Loading/JsonContentLoader.cs` 的内容装配，以及 `Game.Godot/Bootstrap/GameRuntimeBootstrap.cs` 的启动装配。
+
+## 数据装配规则
 
 运行时按主 MOD、依赖 addon、用户排序 addon 的顺序装配内容。每个 MOD 先注册 `data` 中的完整新定义和 `stories/**/*.story.json`，再执行自己的 `patches/**/*.patch.json`。补丁文件按规范化相对路径排序，文件内操作按声明顺序执行。
 
