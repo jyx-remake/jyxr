@@ -15,7 +15,6 @@
 准备 .NET 10 SDK 和 Godot 4.7.2 的 C#/.NET 版本，在仓库根目录执行：
 
 ```powershell
-git submodule update --init --recursive
 dotnet build src/Game.Godot/engine-free-rpg.csproj
 ```
 
@@ -27,11 +26,11 @@ dotnet build src/Game.Godot/engine-free-rpg.csproj
 dotnet test engine-free-rpg.slnx
 ```
 
-Godot 节点、输入、动画和异步演出需在引擎内另行验证。发布已导出 Windows 版本的 C# 热更程序集使用 [PublishGodotCSharpHotfix.ps1](tools/PublishGodotCSharpHotfix.ps1)。
+Godot 节点、输入、动画和异步演出需在引擎内另行验证。
 
 ## 导出
 
-本体、共享资源包和签名配置见 [导出与发布](docs/exporting.md)。当前主要在 Windows 平台开发与验证；其他平台尚未充分验证，不代表不支持。
+本体、共享资源包和签名配置见 [导出与发布](docs/exporting.md)。主要支持 Windows 和 Android，项目已提供对应导出配置；其他平台也支持，但尚未配置导出流程。
 
 ## 目录
 
