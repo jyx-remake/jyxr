@@ -22,7 +22,7 @@ Presentation 负责与 UI 引擎无关的交互状态和展示流程；Godot 负
 - 各状态 resolver：伤害、恢复、Buff、资源与成长；
 - `BattleHookRunner`：角色与 Buff Hook 的收集、稳定顺序和 Trace；
 - `BattleOutcomeEvaluator`：阵营存活结果；
-- `BattleTargetResolver` / `BattleSkillTargeting`：Effect 与技能空间目标；
+- `BattleUnitSelectorResolver` / `BattleSkillTargeting`：Effect 与技能空间目标；
 - `BattleExecutionScope`：Effect 链顺序和递归保护。
 
 `BattleUnit` 继续直接引用 `CharacterInstance`，战斗成长立即写入角色实例。

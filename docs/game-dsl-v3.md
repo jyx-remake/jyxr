@@ -282,7 +282,7 @@ remove_external('主角', '野球拳')
 | `suggest(text)` | 显示并等待剧情提示。 | — |
 | `toast(enabled)` | 开启或抑制 toast 及其附带提示音（如获得物品、武学精通）；不影响显式 `sound` / `effect` 与界面操作音效。 | — |
 
-每个地图事件必须声明在所属地点内唯一且稳定的 `id`。`once` 事件在 command 成功后按 `mapId + locationId + eventId` 记录完成状态，因此调整事件数组顺序不会改变存档语义。地图 action 可调用当前会话注册的任意 StoryCommand，不限于场景指令；世界触发会在派发一次性 command 前记录完成状态，防止换图递归触发。
+每个地图事件必须声明在所属地点内唯一且稳定的 `id`。`once` 事件在 command 成功后按 `mapId + locationId + eventId` 记录完成状态，因此调整事件数组顺序不会改变存档语义。地图 action 可调用当前会话注册的任意 StoryCommand，不限于场景指令；世界触发在 command 成功完成且仍属于原状态后记录一次性完成状态；执行中的触发检查不会因换图递归进入，失败或取消后可重试。
 
 ```json
 {

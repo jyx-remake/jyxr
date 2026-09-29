@@ -1,8 +1,8 @@
 # TODO
 
 - 当同一角色实例可由多个 `CharacterDefinition` 模板创建时，若以后需要把既有实例从一个模板升级为另一个模板，应建立独立的“角色转化/重建”用例，不能让 `join` 隐式完成。例如低级程英升级为高级模板应走该用例。
-- ``nvliumang`（移动）、`nvpanjun`（移动）、`huangrong`（移动、受击） 的模型动画帧区域、播放顺序与偏移均由 AI 根据现有图集推断，可能不正确；后续需要结合原始动画数据或人工逐帧校验并修正。
-- 重新审视 `CharacterDefinition` 中初始技能/装备的表达方式：继续使用纯 `SkillIds` / `EquipmentIds`，还是引入定义侧条目对象来承载默认等级、开关、锻造等初始配置。
+- `nvliumang`（移动）、`nvpanjun`（移动）、`huangrong`（移动、受击） 的模型动画帧区域、播放顺序与偏移均由 AI 根据现有图集推断，可能不正确；后续需要结合原始动画数据或人工逐帧校验并修正。
+- `CharacterDefinition` 的初始外功、内功已使用条目对象承载等级、上限和装备状态；装备仍使用 `EquipmentIds`。后续若需要在定义侧配置初始装备锻造等实例属性，再为装备引入相应条目对象。
 - 技能等级上限目前已接入 `SkillMaxLevelPolicy`，由基础上限、全局档案技能精通加成、周目加成和硬上限共同计算。`maxlevel` 剧情命令当前为了复刻 legacy 行为保留了独立的高周目指令增强；后续应去掉这层 `maxlevel` 增强，只保留普通精通加成和人物技能上限的周目规则。
 - 武学书学习默认会把 `GrantExternalSkillItemUseEffectDefinition.Level` / `GrantInternalSkillItemUseEffectDefinition.Level` 作为书本上限，并与 `SkillMaxLevelPolicy` 当前上限取较小值；`GameConfig.IgnoreSkillBookLevelLimit` 可切回旧的忽略书本上限行为。后续如要支持残章进度或特殊书籍覆盖规则，需要继续细化物品效果语义。
 - 随机战斗临时敌人的技能上限不按玩家技能实例上限配置单独设置。legacy 行为是按 `NPC_SKILL_LEVEL_ADD_BY_ZHOUMU` 增加 NPC 实际技能等级，并 clamp 到 `MAX_SKILL_LEVEL` / `MAX_INTERNALSKILL_LEVEL`；后续如复刻高周目 NPC 强化，应接入等级加成规则，而不是简单给临时敌人写入配置化 `MaxLevel`。
@@ -23,14 +23,9 @@
 - `IContentRepository` 在真实游戏中是否需要全局可访问，后续需要结合地图、事件、宿主装配再判断。
 - 当前 `Party` 是全局队伍，无队伍 id/name；如果后续支持多队伍/多编队，需要重新建模队伍集合、队伍标识与存档结构。
 - 统一空值校验策略：内部代码以 C# nullable reference types 为主，边界层（宿主入口、内容加载入口、外部输入入口）保留显式运行时校验，避免在内部领域代码中堆积大量 `ArgumentNullException.ThrowIfNull`。
-- 世界/地图层待建模对象：`MapDefinition`、`MapState`、`MapNode`/`MapCell`、`MapRegion`，用于承载非战斗地图、区域信息、可通行性、场景切换锚点等。
+- 当前地图采用地点与事件模型，已由 `MapDefinition`、`LocationState` 和 `MapEventProgressState` 承载。后续如需连续地形、区域、可通行性或场景切换锚点，再扩展相应模型。
 - 地图交互对象待建模：`InteractableDefinition`、`InteractableState`、`MapObjectDefinition`、`MapObjectState`，用于承载宝箱、门、机关、调查点、采集点、触发器等。
-- 事件/剧本系统待建模：`StoryEventDefinition`、`StoryConditionDefinition`、`StoryActionDefinition`、`StoryFlagSet`，用于承载剧情触发条件、状态位、分支与执行动作。
-- 演出系统待建模：`CutsceneDefinition`、`CutsceneStepDefinition`、`DialogueDefinition`、`DialogueLineDefinition`、`SpeakerDefinition`，用于承载对话、镜头、角色入场退场、立绘/动画/音效触发。
-- 地图会话层待建模：`MapSession` 或 `WorldSession`，用于承载当前地图、当前交互状态、场景内事件进度，并与 `GameSession` / 战斗入口衔接。
-- 当前“进入地图后的自动触发事件”消费编排暂放在 `MapScreen`。后续应上移到 `World` 或专门的宿主 flow coordinator，保持 `MapService` 只负责返回结果、`MapScreen` 只负责展示和点击交互，避免 Godot screen 承担场景流转编排职责。
-- 地图剧情结束后的刷新目前由 `MapScreen` 直接调用 `World.RefreshCurrentMap()`，不再用 `world.CurrentScene == this` 判定当前 screen 实例；后续上移地图 flow 编排时，应把“是否仍需刷新地图”的判断改成显式流程状态，而不是依赖 Godot 节点实例身份。
-- 战斗外触发入口待建模：`InteractionCommand`、`StoryCommand`、`MapTransitionCommand`，用于统一地图交互、剧情推进、场景切换等外部输入。
+- 剧情已有对白、选项及宿主演出命令。后续如需要统一镜头、角色入退场和多轨演出的时序，再设计独立演出序列模型。
 - 地图与战斗的衔接对象待建模：`BattleEncounterDefinition`、`EncounterTriggerDefinition`、`BattleResultProjection`，用于表达地图遭遇战入口、触发条件，以及战斗结果如何回写世界状态。
 - 剧情对白/选项中的 `$MALE$` / `$FEMALE$` 当前先在 `Game.Application` 做临时文本插值，只覆盖主角名与女主名，不属于正式统一变量系统。后续应与剧情变量读取/写入模型统一设计，避免模板文本占位与表达式变量长期分裂。
 - 剧情命令行调试入口 `StoryCommandLineService` 当前只把参数解析成 bool/number/string，不支持 list 参数；`random_item` / `random_join` 这类命令只能通过 JSON 剧情的 `["list", ...]` 调用。后续如需要在系统面板调试这些命令，应补明确的 list 命令行语法，例如 `random_item ["potion","elixir"] 2`，并覆盖带引号字符串与执行路径测试。
@@ -55,7 +50,6 @@
 - `BeforeHitResolved` 应只承载命中结果确定前的闪避、破闪避、失手等逻辑。后续内容校验应禁止来源侧 `context_hit_state == hit` 的 hook，命中确认后的追加效果应使用 `OnHitConfirmed`，避免数据写法被运行时静默跳过。
 - 奥义音效配置列表目前由 `GameConfig.LegendFemaleVoiceSfxIds` / `LegendMaleVoiceSfxIds` / `LegendEffectSfxIds` 驱动。后续需要在配置加载或内容校验阶段保证这些列表非空，避免运行时随机取值时因空列表崩溃。
 - 天关 `achievementIds` 当前数据仍为空，legacy `nick` 未实际落入 `data/towers.json`。后续需要重新确认 legacy tower XML 的 `nick` 来源和转换逻辑，并补内容测试断言预期关卡能加载出成就。
-- 持久化层后续可能要补：`MapStateRecord`、`InteractableRecord`、`StoryFlagRecord`，用于把地图交互进度、机关状态、剧情标记纳入存档。
 - 存档槽数量扩展到较大规模后，应把存档列表摘要升级为 `LocalSaveEnvelope` 内的一等 `metadata` 字段，而不是额外维护独立 `.meta.json` 文件。列表页应通过流式 JSON 读取只解析 envelope version 与 metadata，不完整反序列化 `SaveGame`；实际读档时再读取完整存档。metadata 可同时承载玩家自定义存档备注，用于在存档页显示和搜索/筛选。
 - 当前诊断日志抽象暂放在 `Game.Application`，后续如补齐 `Infrastructure` / `Hosting` 层，应迁移 `IDiagnosticLogger` 及相关实现的抽象边界，避免应用层长期承载宿主/基础设施能力接口。
 - 当前 DTO 与 runtime definition 存在较多重复字段。后续应收缩 DTO 噪音：优先只保留确有 raw/runtime 差异的类型，并考虑把 DTO 模型进一步内聚到 loader 内部，避免扩散成整层平行定义。

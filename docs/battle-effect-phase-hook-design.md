@@ -11,7 +11,7 @@
 - 技能、Hook 和周期效果最终都经 `BattleEffectExecutor` 执行。
 - 物品保持独立事务语义，只复用 Buff、恢复和资源 resolver。
 
-所有带目标的 Effect 实现 `ITargetedBattleEffectDefinition`，由 `BattleTargetResolver` 解释
+所有带目标的 Effect 实现 `ITargetedBattleEffectDefinition`，由 `BattleUnitSelectorResolver` 解释
 自身、来源、主目标、全体友军、全体敌军和附近友军等选择器。技能覆盖范围只决定初始目标，
 具体 Effect 可以再次选择自己的作用对象。
 

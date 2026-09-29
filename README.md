@@ -40,7 +40,7 @@ Godot 节点、输入、动画和异步演出需在引擎内另行验证。
 | `tests` | 普通 .NET 测试 |
 | `mods` | game/addon MOD；基础内容在 `mods/jyxr-base/data` |
 | `launcher`、`userdata` | 启动器设置与按主 MOD 隔离的玩家数据 |
-| `src/Game.Godot/{assets,scenes,autoload,addons}` | Godot 资源、场景与插件；运行时节点由 bootstrap 创建 |
+| `src/Game.Godot/{assets,scenes,autoload}` | Godot 资源与场景；运行时节点由 bootstrap 创建 |
 | `jyx-legacy-data`、`jyx-legacy-dll` | 原版与迁移参考，不是当前主运行路径 |
 
 ## MOD 与玩家数据
