@@ -20,7 +20,7 @@
 
 | 预设 | 默认输出（相对于仓库根） | 内容 |
 | --- | --- | --- |
-| `Windows Base` | `export/windows/金庸群侠传XR.exe` | Windows 宿主、场景、脚本与启动器等基础资源 |
+| `Windows Base` | `export/windows/金庸群侠传XR.exe` | 单文件 Windows 本体，内嵌基础资源 PCK 与 .NET 构建输出 |
 | `Android Base` | `export/android/金庸群侠传XR.apk` | Android 宿主及相同的本体资源 |
 | `Shared Resources PCK` | `export/shared/base.pck` | `assets/animation`、`assets/art`、`assets/audio` |
 
@@ -28,4 +28,6 @@
 
 PCK 预设借用 Windows 导出平台，保留现有纹理配置与 `extra_pck` 特性；编辑器中使用 **Export PCK/ZIP**，不要使用 **Export Project**。命令行使用上面的 `-Target Shared`，脚本会自动创建输出目录并调用 `--export-pack`。
 
-发布时将同一份 `base.pck` 放入对应 MOD 目录，并在该 MOD 的 `mod.json` 中通过 `packs` 声明相对路径（例如 `"packs": ["base.pck"]`）。仅把 PCK 放在本体旁不会自动加载；`mods` 数据也需单独分发。Windows 的数据根为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。Windows 本体导出的配套 PCK 与 .NET 数据目录也需一同分发。
+Windows 本体启用 Godot 的 `binary_format/embed_pck` 和 `dotnet/embed_build_outputs`，并关闭控制台包装器，仅需分发本体 EXE。旧导出遗留的同名 `.pck`、`.console.exe` 和 `data_engine-free-rpg_windows_x86_64` 目录不属于新的发布产物，脚本不会自动删除它们。
+
+发布时将同一份 `base.pck` 放入对应 MOD 目录，并在该 MOD 的 `mod.json` 中通过 `packs` 声明相对路径（例如 `"packs": ["base.pck"]`）。仅把 PCK 放在本体旁不会自动加载；`mods` 数据也需单独分发。Windows 的数据根为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。
