@@ -28,8 +28,19 @@ public partial class ModLauncherPanel : Control
 		_clientVersionLabel.Text = $"XR 客户端 v{clientVersion} · 重制：{ClientAuthor} · 原作：汉家松鼠";
 		_startLoadoutButton.Pressed += OnStartPressed;
 		_showcasePage.SelectionChanged += RefreshStartButton;
+		_showcasePage.RefreshRequested += RefreshMods;
 
 		_projectDataRoot = ProjectDataRootResolver.Resolve();
+		var permissionHint = OS.HasFeature("android") || OS.HasFeature("web_android")
+			? "权限：在系统设置中搜索“所有文件访问权限”，找到本游戏并开启“允许管理所有文件”。仅安装游戏不会自动授权。"
+			: "权限：确认当前用户可以读取 MOD 目录和其中的文件。";
+		_showcasePage.SetEmptyStateMessage(
+			$"未找到可用的 MOD，请依次检查：\n\n" +
+			$"版本：当前客户端 v{clientVersion}，请使用与该客户端匹配的 MOD 和资源包。\n\n" +
+			$"{permissionHint}\n\n" +
+			$"文件：请将完整 MOD 解压到下方目录，避免多套一层文件夹；每个 MOD 文件夹内应直接包含 mod.json，主 MOD 还需包含 data 文件夹和所需资源包。\n\n" +
+			$"扫描目录：{_projectDataRoot.ModsDirectoryPath}\n\n" +
+			"处理后点击“重新扫描”。");
 		RefreshMods();
 	}
 
@@ -48,21 +59,27 @@ public partial class ModLauncherPanel : Control
 
 	private void RefreshMods()
 	{
-		if (!Directory.Exists(_projectDataRoot.ModsDirectoryPath))
+		if (_isStarting) return;
+		try
+		{
+			var mods = new ModRegistry(_projectDataRoot).DiscoverMods();
+			var settings = new LauncherSettingsStore(_projectDataRoot.LauncherSettingsPath).LoadOrEmpty();
+			_showcasePage.Configure(mods, settings);
+		}
+		catch (Exception exception)
 		{
 			_showcasePage.Configure([], LauncherSettingsRecord.Empty);
-			return;
-		}
-
-		var mods = new ModRegistry(_projectDataRoot).DiscoverMods();
-		var settings = new LauncherSettingsStore(_projectDataRoot.LauncherSettingsPath).LoadOrEmpty();
-		_showcasePage.Configure(mods, settings);
-
-		if (mods.Count == 0)
-		{
-			GD.PushWarning($"No valid mods found under '{_projectDataRoot.ModsDirectoryPath}'.");
+			GD.PushError(exception.ToString());
+			_showcasePage.ShowLoadError(FormatLoadError(exception));
 		}
 	}
+
+	private static string FormatLoadError(Exception exception) => exception switch
+	{
+		UnauthorizedAccessException => "文件访问被拒绝，请检查权限设置后重新扫描。",
+		FileNotFoundException or DirectoryNotFoundException => "缺少所需文件，请完整解压 MOD 和配套资源包后重新扫描。",
+		_ => $"加载失败，请检查客户端与 MOD 版本是否匹配、文件是否完整。\n详细原因：{exception.Message}",
+	};
 
 	private async void OnStartRequested(ModLoadout loadout)
 	{
@@ -94,7 +111,7 @@ public partial class ModLauncherPanel : Control
 			_isStarting = false;
 			RefreshStartButton();
 			GD.PushError(exception.ToString());
-			OS.Alert(exception.Message, "MOD 启动失败");
+			_showcasePage.ShowLoadError(FormatLoadError(exception));
 		}
 	}
 

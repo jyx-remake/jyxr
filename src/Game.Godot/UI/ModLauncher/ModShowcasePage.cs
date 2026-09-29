@@ -10,7 +10,9 @@ public partial class ModShowcasePage : Control
 
 	private VBoxContainer _cardList = null!;
 	private Control _emptyState = null!;
+	private Label _emptyStateLabel = null!;
 	private Label _validationLabel = null!;
+	private Button _refreshModsButton = null!;
 	private IReadOnlyList<ModContext> _mods = [];
 	private string? _primaryModId;
 	private List<string> _enabledAddonIds = [];
@@ -18,13 +20,26 @@ public partial class ModShowcasePage : Control
 
 	public ModLoadout? ResolvedLoadout => _resolvedLoadout;
 	public event Action? SelectionChanged;
+	public event Action? RefreshRequested;
 
 	public override void _Ready()
 	{
 		_cardList = GetNode<VBoxContainer>("%CardList");
 		_emptyState = GetNode<Control>("%EmptyState");
+		_emptyStateLabel = GetNode<Label>("%EmptyStateLabel");
 		_validationLabel = GetNode<Label>("%ValidationLabel");
+		_refreshModsButton = GetNode<Button>("%RefreshModsButton");
+		_refreshModsButton.Pressed += () => RefreshRequested?.Invoke();
 		ClearCards();
+	}
+
+	public void SetEmptyStateMessage(string message) => _emptyStateLabel.Text = message;
+
+	public void ShowLoadError(string message)
+	{
+		_validationLabel.Text = message;
+		_validationLabel.Show();
+		_refreshModsButton.Show();
 	}
 
 	public void Configure(IReadOnlyList<ModContext> mods, LauncherSettingsRecord settings)
@@ -69,8 +84,9 @@ public partial class ModShowcasePage : Control
 		}
 
 		RefreshCards();
-		_validationLabel.Visible = _resolvedLoadout is null;
+		_validationLabel.Visible = _mods.Count > 0 && _resolvedLoadout is null;
 		_validationLabel.Text = error;
+		_refreshModsButton.Visible = _resolvedLoadout is null;
 		SelectionChanged?.Invoke();
 	}
 

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cedgv7xkofuwx"]
 
-[ext_resource type="PackedScene" path="res://scenes/ui/mod_launcher/mod_item_card.tscn" id="1_card"]
-[ext_resource type="Script" path="res://UI/ModLauncher/ModShowcasePage.cs" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://b45kac4nmbbu4" path="res://scenes/ui/mod_launcher/mod_item_card.tscn" id="1_card"]
+[ext_resource type="Script" uid="uid://c2b51l6l3pe3n" path="res://UI/ModLauncher/ModShowcasePage.cs" id="2_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_empty"]
 bg_color = Color(0.08, 0.065, 0.05, 0.28)
@@ -63,18 +63,36 @@ custom_minimum_size = Vector2(1040, 96)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_empty")
 
-[node name="Label" type="Label" parent="RootMargin/Root/ScrollContainer/CardList/EmptyState" unique_id=721677642]
+[node name="Margin" type="MarginContainer" parent="RootMargin/Root/ScrollContainer/CardList/EmptyState" unique_id=1808136577]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="EmptyStateLabel" type="Label" parent="RootMargin/Root/ScrollContainer/CardList/EmptyState/Margin" unique_id=721677642]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0.76)
 theme_override_font_sizes/font_size = 24
-text = "暂无 MOD"
-horizontal_alignment = 1
+text = "未找到可用的 MOD，请检查版本、文件访问权限与安装目录。"
 vertical_alignment = 1
+autowrap_mode = 3
 
 [node name="ValidationLabel" type="Label" parent="RootMargin/Root" unique_id=721677644]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.45, 0.3, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 32
 text = "组合无效"
+horizontal_alignment = 2
 autowrap_mode = 3
+
+[node name="RefreshModsButton" type="Button" parent="RootMargin/Root" unique_id=1808035471]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(180, 56)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_font_sizes/font_size = 26
+text = "重新扫描"
