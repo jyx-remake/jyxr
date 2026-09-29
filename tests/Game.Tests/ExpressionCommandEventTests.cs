@@ -25,6 +25,35 @@ public sealed class ExpressionCommandEventTests
         Assert.Equal(1, adventure);
     }
 
+    [Theory]
+    [InlineData("change_morality", 5, "道德 +5")]
+    [InlineData("change_morality", -5, "道德 -5")]
+    [InlineData("change_morality", 0, null)]
+    [InlineData("daode", 5, "道德 +5")]
+    [InlineData("daode", -5, "道德 -5")]
+    [InlineData("daode", 0, null)]
+    public async Task MoralityCommandsNotifyOnlyForNonZeroChanges(string command, int delta, string? expectedMessage)
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var initialMorality = session.State.Adventure.Morality;
+        var toasts = new List<ToastRequestedEvent>();
+        using var subscription = session.Events.Subscribe<ToastRequestedEvent>(toasts.Add);
+
+        await session.StoryService.CommandDispatcher.ExecuteCommandAsync(command, [ExpressionValue.FromNumber(delta)]);
+
+        Assert.Equal(initialMorality + delta, session.State.Adventure.Morality);
+        if (expectedMessage is null)
+        {
+            Assert.Empty(toasts);
+        }
+        else
+        {
+            var toast = Assert.Single(toasts);
+            Assert.Equal(expectedMessage, toast.Message);
+            Assert.Equal(ToastTone.Normal, toast.Tone);
+        }
+    }
+
     [Fact]
     public async Task SetRound_RecordsOnlyHigherReachedRound()
     {

@@ -106,6 +106,10 @@ internal sealed class AdventureStoryCommands
     {
         _session.State.Adventure.ChangeMorality(delta);
         _session.Events.Publish(new AdventureStateChangedEvent());
+        if (delta != 0)
+        {
+            _session.Events.Publish(new ToastRequestedEvent($"道德 {delta:+0;-0;0}"));
+        }
     }
 
     [StoryCommand("change_favorability", "haogan")]

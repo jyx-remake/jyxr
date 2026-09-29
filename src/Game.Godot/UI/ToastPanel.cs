@@ -8,7 +8,7 @@ public partial class ToastPanel : Control
 	private const int MaxVisibleMessages = 3;
 	private const int MaxPendingMessages = 5;
 	private const double FadeInDuration = 0.14d;
-	private const double HoldDuration = 1.8d;
+	private const double HoldDuration = 2.5d;
 	private const double FadeOutDuration = 0.26d;
 
 	[Export]
