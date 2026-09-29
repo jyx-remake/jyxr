@@ -120,11 +120,11 @@ public static class EquipmentRandomAffixGenerator
         ArgumentNullException.ThrowIfNull(excludedGroups);
 
         var options = ResolveOptions(equipment, contentRepository, round)
-            .Select(option => option.Kind == EquipmentRandomAffixKind.Talent
+            .Select(option => option.Kind is EquipmentRandomAffixKind.Talent or EquipmentRandomAffixKind.Speed
                 ? option with { Pool = option.Pool.Where(id => excludedGroups.All(group =>
-                    !Matches(group, option.Kind, contentRepository, talentId: id))).ToArray() }
+                    !Matches(group, option.Kind, contentRepository, poolValue: id))).ToArray() }
                 : option)
-            .Where(option => option.Kind == EquipmentRandomAffixKind.Talent
+            .Where(option => option.Kind is EquipmentRandomAffixKind.Talent or EquipmentRandomAffixKind.Speed
                 ? option.Pool.Count > 0
                 : excludedGroups.All(group => !Matches(group, option.Kind, contentRepository, weaponType: option.WeaponType)))
             .ToArray();
@@ -463,7 +463,7 @@ public static class EquipmentRandomAffixGenerator
             EquipmentRandomAffixKind.CritChance => "crit_chance",
             EquipmentRandomAffixKind.CritMult => "crit_mult",
             EquipmentRandomAffixKind.Lifesteal => "lifesteal",
-            EquipmentRandomAffixKind.Speed => "speed",
+            EquipmentRandomAffixKind.Speed => $"speed:{((StatModifierAffix)affixes[0]).Value.Delta.ToString("R", CultureInfo.InvariantCulture)}",
             EquipmentRandomAffixKind.AntiDebuff => "anti_debuff",
             EquipmentRandomAffixKind.WeaponBonus =>
                 $"weapon_bonus:{((WeaponBonusModifierAffix)affixes[0]).WeaponType}",
@@ -474,7 +474,7 @@ public static class EquipmentRandomAffixGenerator
         IReadOnlyList<AffixDefinition> group,
         EquipmentRandomAffixKind kind,
         IContentRepository contentRepository,
-        string? talentId = null,
+        string? poolValue = null,
         WeaponType? weaponType = null) => kind switch
         {
             EquipmentRandomAffixKind.AttackCombo => group is
@@ -484,7 +484,9 @@ public static class EquipmentRandomAffixGenerator
             EquipmentRandomAffixKind.RandomAttribute => group is [StatModifierAffix stat]
                 && RandomAttributeStats.Contains(stat.Stat),
             EquipmentRandomAffixKind.Talent => group is [GrantTalentAffix talent]
-                && talent.TalentId == talentId,
+                && talent.TalentId == poolValue,
+            EquipmentRandomAffixKind.Speed => group is [StatModifierAffix { Stat: StatType.Speed } speed]
+                && speed.Value.Delta == double.Parse(poolValue!, CultureInfo.InvariantCulture),
             EquipmentRandomAffixKind.ExternalSkillBonus => group is [SkillBonusModifierAffix skill]
                 && contentRepository.TryGetExternalSkill(skill.SkillId, out _),
             EquipmentRandomAffixKind.InternalSkillBonus => group is [SkillBonusModifierAffix skill]
@@ -503,7 +505,6 @@ public static class EquipmentRandomAffixGenerator
                     EquipmentRandomAffixKind.CritChance => StatType.CritChance,
                     EquipmentRandomAffixKind.CritMult => StatType.CritMult,
                     EquipmentRandomAffixKind.Lifesteal => StatType.Lifesteal,
-                    EquipmentRandomAffixKind.Speed => StatType.Speed,
                     EquipmentRandomAffixKind.AntiDebuff => StatType.AntiDebuff,
                     _ => throw new InvalidOperationException($"Unsupported equipment random affix kind '{kind}'."),
                 }),

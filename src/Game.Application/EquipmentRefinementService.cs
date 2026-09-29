@@ -10,7 +10,7 @@ namespace Game.Application;
 public sealed class EquipmentRefinementService
 {
     private const int CandidateCount = 8;
-    private const int MaxAffixGroupCount = 5;
+    private const int MaxAffixGroupCount = 4;
     private const string NoEquipmentStoryId = "洗练_没有装备";
     private const string InsufficientYuanbaoStoryId = "洗练元宝不够";
     private const string CancelOptionText = "不替换了";

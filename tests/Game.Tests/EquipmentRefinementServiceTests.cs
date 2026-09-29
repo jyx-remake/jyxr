@@ -126,42 +126,43 @@ public sealed class EquipmentRefinementServiceTests
     }
 
     [Fact]
-    public async Task Add_FourGroupsBecomeFiveEvenWhenNewGroupContainsTwoAffixes()
+    public async Task Add_ThreeGroupsBecomeFourEvenWhenNewGroupContainsTwoAffixes()
     {
         var (session, definition) = CreateSession();
-        var original = CreateFourGroups();
+        var original = CreateFourGroups().Take(3).ToArray();
         var equipment = session.State.EquipmentInstanceFactory.Create(definition, original);
         session.State.Inventory.AddEquipmentInstance(equipment);
-        var host = new Host(4, 0, 5);
+        var host = new Host(3, 0, 4);
 
         await session.EquipmentRefinementService.RunAsync(host);
 
-        Assert.Equal(5, EquipmentAffixGroups.Count(equipment.ExtraAffixes));
-        Assert.Equal(6, equipment.ExtraAffixes.Count);
-        Assert.Equal(original, equipment.ExtraAffixes.Take(4));
+        Assert.Equal(4, EquipmentAffixGroups.Count(equipment.ExtraAffixes));
+        Assert.Equal(5, equipment.ExtraAffixes.Count);
+        Assert.Equal(original, equipment.ExtraAffixes.Take(3));
         Assert.DoesNotContain(host.Choices[2].Options, option => option.Text.StartsWith("增加"));
-        Assert.Equal("退出洗练", host.Choices[2].Options[5].Text);
+        Assert.Equal("退出洗练", host.Choices[2].Options[4].Text);
         Assert.Equal(9, session.Profile.Yuanbao);
     }
 
     [Fact]
-    public async Task AtFiveGroups_StillAllowsReplacementWithoutIncreasingCount()
+    public async Task AtFourGroups_StillAllowsReplacementWithoutIncreasingCount()
     {
         var (session, definition) = CreateSession();
         var equipment = session.State.EquipmentInstanceFactory.Create(definition,
-            [.. CreateFourGroups(), new StatModifierAffix(StatType.CritMult, ModifierValue.Add(0.1))]);
+            CreateFourGroups());
         session.State.Inventory.AddEquipmentInstance(equipment);
-        var host = new Host(0, 0, 5);
+        var host = new Host(0, 0, 4);
 
         await session.EquipmentRefinementService.RunAsync(host);
 
-        Assert.Equal(5, EquipmentAffixGroups.Count(equipment.ExtraAffixes));
+        Assert.Equal(4, EquipmentAffixGroups.Count(equipment.ExtraAffixes));
         Assert.DoesNotContain(host.Choices[0].Options, option => option.Text.StartsWith("增加"));
         Assert.Equal(9, session.Profile.Yuanbao);
         Assert.Equal(1, host.Effects);
     }
 
     [Theory]
+    [InlineData(4)]
     [InlineData(5)]
     [InlineData(6)]
     public async Task AtOrAboveLimit_OnlyOffersReplacementAndExitWithoutCharging(int count)

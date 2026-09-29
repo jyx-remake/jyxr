@@ -1,15 +1,86 @@
+using System.Text.Json;
 using Game.Application;
 using Game.Core;
 using Game.Core.Abstractions;
 using Game.Core.Affix;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Core.Serialization;
 using Game.Expressions;
 
 namespace Game.Tests;
 
 public sealed class EquipmentRandomAffixGeneratorTests
 {
+    [Theory]
+    [InlineData("level-4-5", 4, 1, 2, 4)]
+    [InlineData("level-4-5", 5, 5, 11, 22)]
+    [InlineData("level-6-7", 6, 1, 3, 7)]
+    [InlineData("level-6-7", 7, 5, 15, 30)]
+    public void BaseContent_WeaponBonusesScaleWithLevelAndRound(
+        string tableId, int level, int round, int min, int max)
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "engine-free-rpg.slnx")))
+        {
+            directory = directory.Parent;
+        }
+        Assert.NotNull(directory);
+        var tables = JsonSerializer.Deserialize<EquipmentRandomAffixTableDefinition[]>(
+            File.ReadAllText(Path.Combine(directory.FullName, "mods", "jyxr-base", "data", "random-affix-tables.json")),
+            GameJson.Default)!;
+        var table = Assert.Single(tables, value => value.Id == tableId);
+        var options = table.Options.Where(option => option.Kind == EquipmentRandomAffixKind.WeaponBonus).ToArray();
+        Assert.Equal(4, options.Select(option => option.WeaponType).Distinct().Count());
+        foreach (var option in options)
+        {
+            var repository = TestContentFactory.CreateRepository(equipmentRandomAffixTables:
+                [Table("weapon", "true", option)]);
+            var equipment = TestContentFactory.CreateEquipment("weapon", level: level);
+            foreach (var upper in new[] { false, true })
+            {
+                var roll = EquipmentRandomAffixGenerator.GenerateSingleRoll(
+                    equipment, repository, round, new EndpointRandomService(upper));
+                var affix = Assert.IsType<WeaponBonusModifierAffix>(Assert.Single(roll.Affixes));
+                Assert.Equal(option.WeaponType, affix.WeaponType);
+                Assert.Equal((upper ? max : min) / 100d, affix.Value.Delta);
+            }
+        }
+    }
+
+    [Fact]
+    public void TryGenerateSingleRoll_SpeedExcludesOnlyExistingValuesAcrossPools()
+    {
+        var equipment = TestContentFactory.CreateEquipment("weapon", level: 7);
+        var repository = TestContentFactory.CreateRepository(equipmentRandomAffixTables:
+        [Table("speed", "true",
+            Option(EquipmentRandomAffixKind.Speed) with { Pool = ["0.10"] },
+            Option(EquipmentRandomAffixKind.Speed) with { Pool = ["0.1", "0.15"] })]);
+        IReadOnlyList<IReadOnlyList<AffixDefinition>> excluded =
+            [[new StatModifierAffix(StatType.Speed, ModifierValue.Add(0.1))]];
+
+        var roll = EquipmentRandomAffixGenerator.TryGenerateSingleRoll(
+            equipment, repository, 1, new EndpointRandomService(false), excluded);
+
+        Assert.NotNull(roll);
+        Assert.Equal(0.15, Assert.IsType<StatModifierAffix>(Assert.Single(roll.Affixes)).Value.Delta);
+        Assert.Null(EquipmentRandomAffixGenerator.TryGenerateSingleRoll(
+            equipment, repository, 1, new MaxRandomService(), [.. excluded, roll.Affixes]));
+    }
+
+    [Fact]
+    public void GenerateRolls_AllowsDistinctSpeedValuesButNotDuplicates()
+    {
+        var equipment = TestContentFactory.CreateEquipment("weapon");
+        var repository = TestContentFactory.CreateRepository(equipmentRandomAffixTables:
+            [Table("speed", "true", Option(EquipmentRandomAffixKind.Speed) with { Pool = ["0.1", "0.15"] })]);
+        var rolls = EquipmentRandomAffixGenerator.GenerateRolls(
+            equipment, repository, 1, 3, new AlternatingPoolRandomService());
+
+        Assert.Equal(new[] { 0.1, 0.15 }, rolls.Select(roll =>
+            Assert.IsType<StatModifierAffix>(Assert.Single(roll.Affixes)).Value.Delta));
+    }
+
     [Fact]
     public void GenerateRolls_EvaluatesTableAndIntegerRangeExpressions()
     {
@@ -171,6 +242,20 @@ public sealed class EquipmentRandomAffixGeneratorTests
     };
 
     private static ParsedExpression Expr(string source) => new ExpressionParser().ParseExpression(source);
+
+    private sealed class EndpointRandomService(bool upper) : IRandomService
+    {
+        public double NextDouble() => upper ? 0.999999d : 0d;
+        public int Next(int minInclusive, int maxExclusive) => upper ? maxExclusive - 1 : minInclusive;
+    }
+
+    private sealed class AlternatingPoolRandomService : IRandomService
+    {
+        private int _poolIndex;
+        public double NextDouble() => 0d;
+        public int Next(int minInclusive, int maxExclusive) =>
+            maxExclusive - minInclusive == 2 ? minInclusive + _poolIndex++ % 2 : minInclusive;
+    }
 
     private sealed class MaxRandomService : IRandomService
     {
