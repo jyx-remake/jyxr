@@ -1,7 +1,6 @@
 using Game.Application;
 using Game.Core.Model;
 using Game.Core.Story;
-using Game.Godot.Map;
 using Game.Godot.UI;
 using Godot;
 
@@ -22,11 +21,17 @@ public sealed partial class GodotStoryRuntimeHost
 
 	private static async Task RunDebugStoryAsync(string storyId)
 	{
+		var session = Game.Session;
+		var state = session.State;
 		UIRoot.Instance.ClosePanel();
 		UIRoot.Instance.SetStoryPresentationActive(true);
 		try
 		{
-			await Game.StoryService.ExecuteAsync(storyId);
+			await session.StoryService.ExecuteAsync(storyId);
+			if (ReferenceEquals(session, Game.Session) && !GameFlow.IsMainMenuActive)
+			{
+				session.MapService.ReturnToMap(state, $"debug story '{storyId}' completed");
+			}
 		}
 		catch (Exception exception)
 		{
@@ -38,11 +43,6 @@ public sealed partial class GodotStoryRuntimeHost
 			if (GodotObject.IsInstanceValid(UIRoot.Instance))
 			{
 				UIRoot.Instance.SetStoryPresentationActive(false);
-			}
-
-			if (GodotObject.IsInstanceValid(World.Instance) && World.Instance.CurrentScene is MapScreen)
-			{
-				World.Instance.RefreshCurrentMap();
 			}
 		}
 	}

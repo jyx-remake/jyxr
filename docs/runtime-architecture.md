@@ -69,28 +69,29 @@ Godot 工程位于 `src/Game.Godot`，入口是 `res://scenes/ui/mod_launcher/mo
 
 ## 地图与全局事件
 
-[MapService](../src/Game.Application/MapService.cs) 区分四种操作：
+[MapService](../src/Game.Application/MapService.cs) 区分以下操作：
 
 | 操作 | 语义 |
 | --- | --- |
 | EnterMap | 切图、恢复队伍战斗资源、记录位置、发布 MapChangedEvent、请求全局事件检查 |
 | GetCurrentMap | 构建当前地图展示数据，不改变状态或触发事件 |
+| ReturnToMap | 校验原状态，恢复队伍战斗资源，请求全局检查，发布 MapReturnedEvent，然后请求自动存档 |
 | InteractWithLocation | 根据距离和点位交互推进时间，生成带原状态身份的命令结果 |
-| ExecuteInteractionAsync | 校验原状态、执行命令、确认点位完成、请求全局检查和自动存档 |
+| ExecuteInteractionAsync | 校验原状态、执行整段命令、确认点位完成，再调用 ReturnToMap |
 
 大地图分别记忆当前位置；首次进入使用 defaultLocation，显式入口可指定已有地点。移动耗时与坐标协议见 MOD 数据文档。命令在异步等待前后都校验所属 GameState，旧交互不继续派发或给新状态标记完成、请求存档。
 
-`World.RefreshCurrentMap()` 原地更新展示，不重新进入地图，也不重新选播 BGM。读档使用 `World.RestoreCurrentMap()` 重建视图，避免继承旧交互的忙碌状态。
+`World.RefreshCurrentMap()` 原地更新展示，不重新进入地图，也不重新选播 BGM。成功结束整段地图交互、全局事件、限时剧情或独立调试剧情时，通过 `ReturnToMap` 恢复血量、内力、怒气和技能冷却；连续战斗中途不执行此操作。宿主响应 `MapReturnedEvent` 刷新地图和 HUD，恢复地图音乐（没有地图音乐则停止 BGM，相同播放列表保持播放）。自动存档发生在资源恢复之后。读档使用 `World.RestoreCurrentMap()` 重建视图，保留存档中的战斗资源，避免继承旧交互的忙碌状态。
 
 [WorldTriggerService](../src/Game.Application/WorldTriggerService.cs) 保存与发起状态绑定的待检查请求和执行中状态：
 
 - 进入地图、成功完成点位交互、读档后请求检查；多个未执行请求合并。
-- 每次检查按仓储顺序执行首个满足条件的事件。屏蔽期间保留请求，解除后继续检查。
-- 执行中的事件内部切图不再次排队，避免递归触发；可重复事件仍需下一次外部请求。
+- 每次调度按仓储顺序执行首个满足条件且本轮尚未执行的事件；成功后继续检查，直到没有符合条件的事件。后执行事件改变条件后，先前未符合条件的事件仍可在本轮执行。屏蔽期间保留请求，解除后继续检查。
+- 执行中的事件内部切图不另开一轮检查，避免递归触发。每个事件一轮最多成功执行一次；可重复事件再次执行需要下一轮外部请求。
 - 一次性事件在命令成功完成且状态仍有效后才写入 CompletedTriggerIds，随后请求自动存档。
 - 失败或取消不标记完成，下次请求可重试；这不意味着自动回滚命令已经产生的副作用。
 
-[WorldTriggerCoordinator](../src/Game.Godot/Story/WorldTriggerCoordinator.cs) 挂在稳定的 World 下，等待地图交互、剧情和战斗空闲后执行；不把播放请求交给临时 MapScreen 的延迟回调。读档或解绑会取消旧执行。待检查和执行中状态不持久化，只有成功完成记录进入存档。
+[WorldTriggerCoordinator](../src/Game.Godot/Story/WorldTriggerCoordinator.cs) 挂在稳定的 World 下，等待地图交互、剧情和战斗空闲后执行；不把播放请求交给临时 MapScreen 的延迟回调。读档或解绑会取消旧执行。待检查、执行中状态和本轮已执行集合不持久化，只有一次性事件的成功完成记录进入存档。
 
 已有错误完成标记不会通过运行时猜测自动清除；修复具体存档是独立的数据操作。
 

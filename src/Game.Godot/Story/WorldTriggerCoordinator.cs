@@ -53,16 +53,9 @@ public partial class WorldTriggerCoordinator : Node
 		using var cancellation = new CancellationTokenSource();
 		_executionCancellation = cancellation;
 		var cancellationToken = cancellation.Token;
-		var state = session.State;
 		try
 		{
-			var completed = await session.WorldTriggerService.ExecutePendingAsync(cancellationToken);
-			if (completed && !cancellationToken.IsCancellationRequested && !GameFlow.IsMainMenuActive &&
-				ReferenceEquals(session, _session) && ReferenceEquals(state, session.State) &&
-				World.Instance.CurrentScene is MapScreen)
-			{
-				World.Instance.RefreshCurrentMap();
-			}
+			await session.WorldTriggerService.ExecutePendingAsync(cancellationToken);
 		}
 		catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
 		{

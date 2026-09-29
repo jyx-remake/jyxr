@@ -10,6 +10,7 @@ public sealed class WorldTriggerService
     private readonly GameConditionExpressionService _conditions;
     private GameState? _pendingState;
     private GameState? _executingState;
+    private readonly HashSet<string> _executedInCheck = new(StringComparer.Ordinal);
 
     public WorldTriggerService(GameSession session)
     {
@@ -26,6 +27,7 @@ public sealed class WorldTriggerService
         // Map commands inside a global event must not schedule that event again.
         if (!ReferenceEquals(_executingState, State))
         {
+            if (!HasPendingCheck) _executedInCheck.Clear();
             _pendingState = State;
         }
     }
@@ -40,7 +42,7 @@ public sealed class WorldTriggerService
         cancellationToken.ThrowIfCancellationRequested();
         _pendingState = null;
         var trigger = _session.ContentRepository.GetWorldTriggers().FirstOrDefault(candidate =>
-            !IsCompleted(candidate) && _conditions.Evaluate(candidate.When));
+            !_executedInCheck.Contains(candidate.Id) && !IsCompleted(candidate) && _conditions.Evaluate(candidate.When));
         if (trigger is null)
         {
             return false;
@@ -62,7 +64,9 @@ public sealed class WorldTriggerService
                 executionState.WorldTriggers.MarkCompleted(trigger.Id);
             }
 
-            _session.Events.Publish(new AutoSaveRequestedEvent($"world trigger '{trigger.Id}' completed"));
+            _executedInCheck.Add(trigger.Id);
+            _session.MapService.ReturnToMap(executionState, $"world trigger '{trigger.Id}' completed");
+            _pendingState = executionState;
             return true;
         }
         finally

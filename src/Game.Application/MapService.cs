@@ -238,7 +238,23 @@ public sealed class MapService
             return false;
         }
 
-        _session.Events.Publish(new AutoSaveRequestedEvent($"map interaction command completed: '{interaction.Command.Root.Name}'"));
+        return ReturnToMap(interaction.OriginatingState!,
+            $"map interaction command completed: '{interaction.Command.Root.Name}'");
+    }
+
+    public bool ReturnToMap(GameState originatingState, string saveReason)
+    {
+        ArgumentNullException.ThrowIfNull(originatingState);
+        ArgumentException.ThrowIfNullOrWhiteSpace(saveReason);
+        if (!ReferenceEquals(originatingState, State))
+        {
+            return false;
+        }
+
+        _session.BattleService.RestorePartyBattleResources();
+        _session.WorldTriggerService.RequestCheck();
+        _session.Events.Publish(new MapReturnedEvent(State.Location.CurrentMapId));
+        _session.Events.Publish(new AutoSaveRequestedEvent(saveReason));
         return true;
     }
 

@@ -109,6 +109,8 @@ public interface ISessionEvent;
 
 public sealed record MapChangedEvent(string MapId) : ISessionEvent;
 
+public sealed record MapReturnedEvent(string MapId) : ISessionEvent;
+
 public sealed record ClockChangedEvent : ISessionEvent;
 
 public sealed record CurrencyChangedEvent : ISessionEvent;

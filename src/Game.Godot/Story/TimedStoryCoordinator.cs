@@ -1,5 +1,4 @@
 using Game.Application;
-using Game.Godot.Map;
 using Game.Godot.UI;
 using Godot;
 
@@ -115,7 +114,8 @@ public partial class TimedStoryCoordinator : Node
 
 	private async Task RunStoryAsync(string storyId)
 	{
-		var world = World.Instance;
+		var session = Game.Session;
+		var state = session.State;
 		UIRoot.Instance.ClosePanel();
 		UIRoot.Instance.ClosePopupPanel();
 		UIRoot.Instance.SetStoryPresentationActive(true);
@@ -128,7 +128,10 @@ public partial class TimedStoryCoordinator : Node
 				return;
 			}
 
-			Game.Session.Events.Publish(new AutoSaveRequestedEvent($"story '{storyId}' completed"));
+			if (ReferenceEquals(session, Game.Session) && !GameFlow.IsMainMenuActive)
+			{
+				session.MapService.ReturnToMap(state, $"story '{storyId}' completed");
+			}
 		}
 		finally
 		{
@@ -136,16 +139,6 @@ public partial class TimedStoryCoordinator : Node
 			{
 				UIRoot.Instance.SetStoryPresentationActive(false);
 			}
-		}
-
-		if (!GodotObject.IsInstanceValid(world))
-		{
-			return;
-		}
-
-		if (world.CurrentScene is MapScreen)
-		{
-			world.RefreshCurrentMap();
 		}
 	}
 }

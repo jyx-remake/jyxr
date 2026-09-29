@@ -12,6 +12,56 @@ public sealed class MapServiceTests
     private const string WorldVillageEventId = "intro";
 
     [Fact]
+    public async Task InteractionRestoresResourcesOnlyAfterEntireCommandAndBeforeSave()
+    {
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var (session, interaction) = CreateCommandInteraction(new MapCommandHost(_ => new ValueTask(release.Task)));
+        var hero = CreateCharacter("hero");
+        session.State.Party.AddMember(hero);
+        hero.ApplyBattleCarryover(1, 2, 3);
+        var events = new List<string>();
+        using var returned = session.Events.Subscribe<MapReturnedEvent>(_ => events.Add("return"));
+        using var changed = session.Events.Subscribe<MapChangedEvent>(_ => events.Add("enter"));
+        using var saved = session.Events.Subscribe<AutoSaveRequestedEvent>(_ =>
+        {
+            Assert.Equal((int)hero.GetStat(StatType.MaxHp), hero.CurrentHp);
+            Assert.Equal((int)hero.GetStat(StatType.MaxMp), hero.CurrentMp);
+            Assert.Equal(0, hero.CurrentRage);
+            events.Add("save");
+        });
+
+        var execution = session.MapService.ExecuteInteractionAsync(interaction);
+        Assert.Equal(1, hero.CurrentHp);
+        session.MapService.GetCurrentMap();
+        Assert.Equal(1, hero.CurrentHp);
+        Assert.Empty(events);
+        release.SetResult();
+
+        Assert.True(await execution);
+        Assert.Equal(new[] { "return", "save" }, events);
+        Assert.Equal("inn", session.State.Location.CurrentMapId);
+    }
+
+    [Fact]
+    public void ReturnToMapRejectsStateFromBeforeLoad()
+    {
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository());
+        var previous = session.State;
+        var loaded = new GameState();
+        var hero = CreateCharacter("hero");
+        loaded.Party.AddMember(hero);
+        hero.ApplyBattleCarryover(1, 2, 3);
+        session.ReplaceState(loaded);
+        var returns = 0;
+        using var subscription = session.Events.Subscribe<MapReturnedEvent>(_ => returns++);
+
+        Assert.False(session.MapService.ReturnToMap(previous, "stale story"));
+        Assert.Equal(1, hero.CurrentHp);
+        Assert.Equal(0, returns);
+        Assert.False(session.WorldTriggerService.HasPendingCheck);
+    }
+
+    [Fact]
     public async Task ExecuteInteraction_DoesNotDispatchAnInteractionFromBeforeLoad()
     {
         var host = new MapCommandHost(_ => throw new InvalidOperationException("stale command executed"));

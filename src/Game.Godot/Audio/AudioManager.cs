@@ -60,6 +60,7 @@ public partial class AudioManager : Node
 			return;
 		}
 
+		if (_bgmPlaylist.SequenceEqual(normalizedReferences) && _bgmPlayer.Playing) return;
 		_bgmPlaylist = normalizedReferences;
 		PlayPlaylistIndex(PickNextPlaylistIndex());
 	}

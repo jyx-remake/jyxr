@@ -234,6 +234,7 @@ public partial class UIRoot : Control
 
 		_sessionEvents = session.Events;
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<MapChangedEvent>(OnMapChanged));
+		_sessionSubscriptions.Add(_sessionEvents.Subscribe<MapReturnedEvent>(OnMapReturned));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ClockChangedEvent>(OnClockChanged));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<CurrencyChangedEvent>(OnCurrencyChanged));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<AdventureStateChangedEvent>(OnAdventureStateChanged));
@@ -713,6 +714,16 @@ public partial class UIRoot : Control
 	}
 
 	private void OnMapChanged(MapChangedEvent _) => RefreshHud();
+
+	private void OnMapReturned(MapReturnedEvent returned)
+	{
+		if (GameFlow.IsMainMenuActive || string.IsNullOrWhiteSpace(returned.MapId)) return;
+		World.Instance.RefreshCurrentMap();
+		var music = Game.ContentRepository.GetMap(returned.MapId).Musics;
+		if (music.Count == 0) Game.Audio.StopBgm();
+		else Game.Audio.PlayBgm(music);
+		RefreshHud();
+	}
 
 	private void OnClockChanged(ClockChangedEvent _) => RefreshHud();
 

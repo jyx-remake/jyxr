@@ -187,12 +187,7 @@ public partial class MapScreen : Control
 			return;
 		}
 
-		if (await session.MapService.ExecuteInteractionAsync(result) &&
-			ReferenceEquals(session, Game.Session) && !GameFlow.IsMainMenuActive &&
-			GodotObject.IsInstanceValid(World.Instance) && World.Instance.CurrentScene is MapScreen)
-		{
-			World.Instance.RefreshCurrentMap();
-		}
+		await session.MapService.ExecuteInteractionAsync(result);
 	}
 
 	private void SetSmallMapBackground(string? resourceId)

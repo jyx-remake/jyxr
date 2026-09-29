@@ -32,6 +32,8 @@ public sealed class WorldTriggerServiceTests
         Assert.True(await execution);
         Assert.True(session.State.WorldTriggers.IsCompleted("global"));
         Assert.Equal(1, autoSaves);
+        Assert.True(service.HasPendingCheck);
+        Assert.False(await service.ExecutePendingAsync());
         Assert.False(service.HasPendingCheck);
         service.RequestCheck();
         Assert.False(await service.ExecutePendingAsync());
@@ -123,6 +125,7 @@ public sealed class WorldTriggerServiceTests
         {
             session.WorldTriggerService.RequestCheck();
             Assert.True(await session.WorldTriggerService.ExecutePendingAsync());
+            Assert.False(await session.WorldTriggerService.ExecutePendingAsync());
             Assert.False(session.WorldTriggerService.HasPendingCheck);
             Assert.Empty(session.State.WorldTriggers.CompletedTriggerIds);
         }
@@ -141,6 +144,43 @@ public sealed class WorldTriggerServiceTests
         Assert.True(session.WorldTriggerService.HasPendingCheck);
         session.WorldTriggerService.Unblock();
         Assert.True(await session.WorldTriggerService.ExecutePendingAsync());
+    }
+
+    [Fact]
+    public async Task CheckContinuesToNewlyEligibleEventsWithoutRepeatingEarlierEvents()
+    {
+        var host = new TriggerHost();
+        var parser = new ExpressionParser();
+        var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(worldTriggers:
+        [
+            new WorldTriggerDefinition
+            {
+                Id = "later", Action = parser.ParseCall("probe()"), RepeatMode = RepeatMode.Once,
+                When = parser.ParseExpression("elapsed_days > 0"),
+            },
+            new WorldTriggerDefinition
+            {
+                Id = "repeatable", Action = parser.ParseCall("probe()"), RepeatMode = RepeatMode.Infinite,
+            },
+        ]), host);
+        host.Execute = _ =>
+        {
+            session.State.Clock.AdvanceDays(1);
+            session.WorldTriggerService.RequestCheck();
+            return ValueTask.CompletedTask;
+        };
+
+        session.WorldTriggerService.RequestCheck();
+        Assert.True(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.True(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.True(session.State.WorldTriggers.IsCompleted("later"));
+        Assert.False(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.Equal(2, host.Calls);
+
+        session.WorldTriggerService.RequestCheck();
+        Assert.True(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.False(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.Equal(3, host.Calls);
     }
 
     private static GameSession CreateSession(TriggerHost host, RepeatMode repeatMode = RepeatMode.Once) =>
