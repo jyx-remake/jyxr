@@ -1,4 +1,6 @@
 using Game.Core.Battle;
+using Game.Core.Definitions;
+using Game.Core.Model;
 
 namespace Game.Application;
 
@@ -22,7 +24,10 @@ public sealed class BattleService
 
     public BattleState BuildBattleState(SpecialBattleRequest request) =>
         _stateFactory.BuildBattleState(request);
-
+    public IReadOnlyList<BattleJoinCombatant> SpawnCombatant(BattleUnit actingUnit, BattleState state, IReadOnlyList<string> characterIds, IReadOnlyList<GridPosition> impactedPositions)
+    {
+        return _stateFactory.SpawnCombatant(actingUnit, state, characterIds, impactedPositions);
+    }
     public OrdinaryBattleVictorySettlement PreviewVictorySettlement(
         BattleState state,
         SpecialBattleRequest request) =>

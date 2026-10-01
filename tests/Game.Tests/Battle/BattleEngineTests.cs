@@ -2445,6 +2445,69 @@ public sealed class BattleEngineTests
     }
 
     [Fact]
+    public void CastSkill_SummonEffectInvokesHandlerAndEmitsSummonedFact()
+    {
+        var specialSkill = new SpecialSkillDefinition(
+            "summon_minion",
+            "summon_minion",
+            string.Empty,
+            SpecialSkillIntent.Support,
+            string.Empty,
+            Cooldown: 0,
+            SkillCostDefinition.None,
+            new SkillTargetingDefinition(CastSize: 3, ImpactType: SkillImpactType.Single, ImpactSize: 0),
+            string.Empty,
+            string.Empty,
+            Speech: null,
+            Buffs: [],
+            Effects:
+            [
+                new SummonCombatantBattleHookEffectDefinition(new List<string> { "minion" }),
+            ]);
+        var source = CreateUnit(
+            "source",
+            team: 1,
+            new GridPosition(0, 0),
+            specialSkills: [specialSkill]);
+        var target = CreateUnit("target", team: 2, new GridPosition(1, 0), maxHp: 500);
+        source.ActionGauge = 100;
+        var state = new BattleState(new BattleGrid(4, 4), [source, target]);
+
+        var summoned = new BattleJoinCombatant
+        {
+            CharacterId = "minion",
+            Team = 1,
+            Position = new GridPosition(0, 1),
+            Facing = BattleFacing.Right,
+        };
+        IReadOnlyList<string>? capturedCharacterIds = null;
+        IReadOnlyList<GridPosition>? capturedPositions = null;
+        var engine = new BattleEngine(
+            random: new FixedRandomService(0d),
+            summonCombatant: (_, _, characterIds, impactedPositions) =>
+            {
+                capturedCharacterIds = characterIds;
+                capturedPositions = impactedPositions;
+                return [summoned];
+            });
+        engine.BeginAction(state, source.Id);
+
+        var result = engine.CastSkill(
+            state,
+            source.Id,
+            source.Character.GetSpecialSkills().Single(),
+            target.Position);
+
+        Assert.True(result.Success);
+        Assert.Equal(["minion"], capturedCharacterIds!);
+        Assert.Equal([target.Position], capturedPositions!);
+        var summonedFact = Assert.Single(
+            result.Messages.OfType<BattleFact>(),
+            fact => fact.Kind == BattleFactKind.Summoned);
+        Assert.Same(summoned, Assert.Single(summonedFact.BattleJoinCombatant!));
+    }
+
+    [Fact]
     public void BeginAction_DrunkennessSkipsActionWhenRollIsBelowChance()
     {
         var drunkenness = CreateDrunkennessBuff(skipChance: 0.2d, rage: 6);

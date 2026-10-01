@@ -65,6 +65,7 @@ public sealed record ExplicitUnitsBattleUnitSelectorDefinition : BattleUnitSelec
 [JsonDerivedType(typeof(ModifyMpCostBattleHookEffectDefinition), "modify_mp_cost")]
 [JsonDerivedType(typeof(ModifyRecoveryBattleHookEffectDefinition), "modify_recovery")]
 [JsonDerivedType(typeof(ModifyLifestealBattleHookEffectDefinition), "modify_lifesteal")]
+[JsonDerivedType(typeof(SummonCombatantBattleHookEffectDefinition), "summon_combatant")]
 [JsonDerivedType(typeof(StrengthenContextBuffBattleHookEffectDefinition), "strengthen_context_buff")]
 [JsonDerivedType(typeof(ExtraStrikeBattleHookEffectDefinition), "extra_strike")]
 [JsonDerivedType(typeof(CustomBattleEffectDefinition), "custom")]
@@ -76,6 +77,7 @@ public abstract record BattleEffectDefinition
     {
     }
 }
+
 
 public sealed record GrantScopedBattleEffectDefinition(string EffectId) : BattleEffectDefinition
 {
@@ -152,6 +154,9 @@ public sealed record AddMpBattleEffectDefinition(
 public sealed record ModifyLifestealBattleHookEffectDefinition(
     double Factor,
     double FactorPerUnitLevel = 0d) : BattleEffectDefinition;
+public sealed record SummonCombatantBattleHookEffectDefinition(
+    List<string> characterIds
+    ) : BattleEffectDefinition;
 
 public sealed record CancelHitBattleHookEffectDefinition(
     bool SuppressHitEffects = true) : BattleEffectDefinition;

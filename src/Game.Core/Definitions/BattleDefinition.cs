@@ -1,3 +1,4 @@
+using Game.Core.Battle;
 using Game.Core.Model;
 
 namespace Game.Core.Definitions;
@@ -50,4 +51,15 @@ public sealed record BattleRandomParticipantDefinition
     public string? Model { get; init; }
 
     public bool Boss { get; init; }
+}
+public sealed record BattleJoinCombatant
+{
+    public required GridPosition Position { get; init; }
+
+    public int Team { get; init; }
+
+    public BattleFacing Facing { get; init; }
+
+    public string? CharacterId { get; init; }
+
 }

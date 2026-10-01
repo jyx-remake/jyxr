@@ -10,6 +10,7 @@ internal sealed class BattleStateFactory
 {
     private const int GridWidth = 11;
     private const int GridHeight = 4;
+    private const int SpawnSearchRadius = 8;
     private readonly GameSession _session;
     private readonly ProceduralBattleCharacterFactory _characterFactory;
     private readonly ZhenlongqijuBattleFactory _zhenlongqijuFactory;
@@ -234,6 +235,70 @@ internal sealed class BattleStateFactory
             EnableDifficultyItemCooldownRules = true,
         };
     }
+    private CharacterInstance CreateCombatantCharacter(
+        BattleState state,
+        string characterId,
+        EquipmentInstanceFactory tempFactory)
+    {
+        var definition = ContentRepository.GetCharacter(characterId);
+        return CharacterMapper.CreateInitial(
+            $"battle_{state.Units.Count + 1}_{characterId}",
+            definition,
+            tempFactory);
+    }
+
+    public IReadOnlyList<BattleJoinCombatant> SpawnCombatant(
+        BattleUnit actingUnit,
+        BattleState state,
+        IReadOnlyList<string> characterIds,
+        IReadOnlyList<GridPosition> impactedPositions)
+    {
+        var queue = new Queue<GridPosition>(impactedPositions);
+        var spawnedUnits = new List<BattleJoinCombatant>();
+        foreach (var characterId in characterIds)
+        {
+            if (queue.Count == 0)
+            {
+                queue.Enqueue(actingUnit.Position);
+            }
+
+            var gridPosition = queue.Dequeue();
+            var position = state.IsOccupied(gridPosition)
+                ? state.FindNearestEmptyPosition(gridPosition, SpawnSearchRadius)
+                : gridPosition;
+            if (position is null)
+            {
+                break;
+            }
+
+            var combatant = new BattleJoinCombatant
+            {
+                CharacterId = characterId,
+                Team = actingUnit.Team,
+                Position = position.Value,
+                Facing = actingUnit.Facing,
+            };
+
+            spawnedUnits.Add(combatant);
+            CreateBattleCombatant(state, combatant);
+        }
+
+        return spawnedUnits;
+    }
+
+    private void CreateBattleCombatant(BattleState state, BattleJoinCombatant combatant)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(combatant.CharacterId);
+        var tempFactory = new EquipmentInstanceFactory();
+        var character = CreateCombatantCharacter(state, combatant.CharacterId, tempFactory);
+        state.AddUnit(CreateUnit(
+            $"participant_{state.Units.Count + 1}_{combatant.CharacterId}",
+            character,
+            combatant.Team,
+            combatant.Position,
+            combatant.Facing));
+    }
 
     private CharacterInstance? ResolvePartyCharacter(string characterId) =>
         State.Party.TryGetCharacter(characterId, out var character) ? character : null;
@@ -244,12 +309,20 @@ internal sealed class BattleStateFactory
         int team,
         GridPosition position,
         int facing) =>
+        CreateUnit(id, character, team, position, facing <= 0 ? BattleFacing.Left : BattleFacing.Right);
+
+    private static BattleUnit CreateUnit(
+        string id,
+        CharacterInstance character,
+        int team,
+        GridPosition position,
+        BattleFacing facing) =>
         new(
             id,
             character,
             team,
             position,
-            facing <= 0 ? BattleFacing.Left : BattleFacing.Right,
+            facing,
             hp: character.CurrentHp,
             mp: character.CurrentMp,
             rage: character.CurrentRage);

@@ -92,11 +92,36 @@ public sealed class BattleState
     public bool IsOccupied(GridPosition position, string? ignoredUnitId = null) =>
         GetUnitAt(position, ignoredUnitId) is not null;
 
+    public GridPosition? FindNearestEmptyPosition(GridPosition center, int maxRadius)
+    {
+        foreach (var pos in BattleEngine.EnumerateSquareSpiral(center, maxRadius))
+        {
+            if (pos != center && Grid.IsWalkable(pos) && !IsOccupied(pos))
+            {
+                return pos;
+            }
+        }
+        return null;
+    }
+
     public bool AreEnemies(BattleUnit first, BattleUnit second) => first.Team != second.Team;
 
     public IReadOnlyList<BattleUnit> GetLivingUnits() =>
         _units.Where(static unit => unit.IsAlive).ToList();
+    public void AddUnit(BattleUnit unit)
+    {
+        unit.BindProjectionResolver(ProjectionResolver);
+        if (!Grid.IsWalkable(unit.Position))
+        {
+            throw new InvalidOperationException($"Unit '{unit.Id}' starts on an invalid cell '{unit.Position}'.");
+        }
 
+        if (IsOccupied(unit.Position, unit.Id))
+        {
+            throw new InvalidOperationException($"Cell '{unit.Position}' is already occupied.");
+        }
+        _units.Add(unit);
+    }
     internal void AddMessage(BattleMessage message)
     {
         if (_commandMessages is null)
