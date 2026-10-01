@@ -1009,10 +1009,25 @@ public sealed partial class JsonContentLoader
                 }
                 ValidateBattleUnitSelector(extraStrike.Target!, ownerName, null);
                 break;
+            case SummonCombatantBattleHookEffectDefinition summon:
+                Ensure(summon.characterIds is { Count: > 0 },
+                    $"{ownerName} summon_combatant effect must provide at least one character id.");
+                foreach (var characterId in summon.characterIds)
+                {
+                    Ensure(!string.IsNullOrWhiteSpace(characterId),
+                        $"{ownerName} summon_combatant effect has empty character id.");
+                    if (repository is not null)
+                    {
+                        Ensure(repository.Characters.ContainsKey(characterId),
+                            $"{ownerName} references missing character '{characterId}'.");
+                    }
+                }
+                break;
             default:
                 throw new InvalidOperationException($"{ownerName} has unsupported shared battle effect '{effect.GetType().Name}'.");
         }
     }
+
 
     private static void ValidateBattleHookSpeech(HookAffix hook, string ownerName)
     {
