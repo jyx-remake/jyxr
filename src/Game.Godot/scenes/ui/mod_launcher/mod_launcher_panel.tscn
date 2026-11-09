@@ -191,6 +191,25 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_start")
 theme_override_styles/hover = SubResource("StyleBoxFlat_start_hover")
 text = "启动!"
 
+[node name="ImportModButton" type="Button" parent="ContentRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 1390.0
+offset_top = 925.0
+offset_right = 1655.0
+offset_bottom = 991.0
+theme_override_font_sizes/font_size = 32
+text = "导入 ZIP"
+
+[node name="ImportModDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+title = "选择 MOD 压缩包"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.zip;ZIP 压缩包;application/zip,application/x-zip-compressed")
+use_native_dialog = true
+
 [node name="LoadingOverlay" type="ColorRect" parent="." unique_id=154767508]
 unique_name_in_owner = true
 visible = false

@@ -37,7 +37,12 @@ public partial class ModShowcasePage : Control
 	public void SetRefreshButtonText(string text) => _refreshModsButton.Text = text;
 
 	public void ShowLoadError(string message)
+		=> ShowMessage(message, isError: true);
+
+	public void ShowMessage(string message, bool isError)
 	{
+		_validationLabel.AddThemeColorOverride("font_color",
+			isError ? new Color(1f, 0.45f, 0.3f) : new Color(0.5f, 1f, 0.5f));
 		_validationLabel.Text = message;
 		_validationLabel.Show();
 		_refreshModsButton.Show();
@@ -87,6 +92,7 @@ public partial class ModShowcasePage : Control
 		RefreshCards();
 		_validationLabel.Visible = _mods.Count > 0 && _resolvedLoadout is null;
 		_validationLabel.Text = error;
+		_validationLabel.RemoveThemeColorOverride("font_color");
 		_refreshModsButton.Visible = _resolvedLoadout is null;
 		SelectionChanged?.Invoke();
 	}

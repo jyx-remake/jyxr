@@ -1,5 +1,7 @@
+using Game.Application;
 using Game.Application.Mods;
 using Godot;
+using GodotFileAccess = global::Godot.FileAccess;
 
 namespace Game.Godot.UI.ModLauncher;
 
@@ -8,21 +10,26 @@ public partial class ModLauncherPanel : Control
 	private const string ClientAuthor = "虹乡俗人";
 	private const string ClientVersionSetting = "application/config/version";
 	private const string StoragePermission = "android.permission.MANAGE_EXTERNAL_STORAGE";
+	private readonly IDiagnosticLogger _logger = new GodotDiagnosticLogger(GD.Print, GD.PushWarning, GD.PushError);
 
 	private ModShowcasePage _showcasePage = null!;
 	private Button _startLoadoutButton = null!;
+	private Button _importModButton = null!;
+	private FileDialog _importModDialog = null!;
 	private Label _clientVersionLabel = null!;
 	private ColorRect _loadingOverlay = null!;
 	private Label _loadingTitleLabel = null!;
 	private ProjectDataRoot _projectDataRoot = null!;
 	private string _modSetupMessage = string.Empty;
 	private bool _waitingForStoragePermission;
-	private bool _isStarting;
+	private bool _isBusy;
 
 	public override void _Ready()
 	{
 		_showcasePage = GetNode<ModShowcasePage>("%ModShowcasePage");
 		_startLoadoutButton = GetNode<Button>("%StartLoadoutButton");
+		_importModButton = GetNode<Button>("%ImportModButton");
+		_importModDialog = GetNode<FileDialog>("%ImportModDialog");
 		_clientVersionLabel = GetNode<Label>("%ClientVersionLabel");
 		_loadingOverlay = GetNode<ColorRect>("%LoadingOverlay");
 		_loadingTitleLabel = GetNode<Label>("%LoadingTitleLabel");
@@ -30,7 +37,10 @@ public partial class ModLauncherPanel : Control
 		var clientVersion = ProjectSettings.GetSetting(ClientVersionSetting).AsString();
 		_clientVersionLabel.Text = $"XR 客户端 v{clientVersion} · 重制：{ClientAuthor} · 原作：汉家松鼠";
 		_startLoadoutButton.Pressed += OnStartPressed;
-		_showcasePage.SelectionChanged += RefreshStartButton;
+		_importModButton.Visible = OS.HasFeature("android");
+		_importModButton.Pressed += OnImportPressed;
+		_importModDialog.FileSelected += OnImportFileSelected;
+		_showcasePage.SelectionChanged += RefreshActions;
 		_showcasePage.RefreshRequested += OnRefreshRequested;
 
 		_projectDataRoot = ProjectDataRootResolver.Resolve();
@@ -49,7 +59,7 @@ public partial class ModLauncherPanel : Control
 
 	public override void _Notification(int what)
 	{
-		if (what == NotificationApplicationFocusIn && IsNodeReady() && _waitingForStoragePermission)
+		if (what == NotificationApplicationFocusIn && IsNodeReady() && !_isBusy && _waitingForStoragePermission)
 		{
 			RefreshMods();
 		}
@@ -60,7 +70,7 @@ public partial class ModLauncherPanel : Control
 
 	private void OnRefreshRequested()
 	{
-		if (_isStarting) return;
+		if (_isBusy) return;
 		if (HasStoragePermission())
 		{
 			RefreshMods();
@@ -94,18 +104,80 @@ public partial class ModLauncherPanel : Control
 		}
 	}
 
-	private void RefreshStartButton()
+	private void RefreshActions()
 	{
-		_startLoadoutButton.Disabled = _showcasePage.ResolvedLoadout is null || _isStarting;
+		_startLoadoutButton.Disabled = _showcasePage.ResolvedLoadout is null || _isBusy;
+		_importModButton.Disabled = _isBusy || !HasStoragePermission();
 	}
 
-	private void RefreshMods()
+	private void SetBusy(bool busy, string? title = null)
 	{
-		if (_isStarting) return;
+		_isBusy = busy;
+		if (title is not null) _loadingTitleLabel.Text = title;
+		_loadingOverlay.Visible = busy;
+		RefreshActions();
+	}
+
+	private void OnImportPressed()
+	{
+		if (_isBusy) return;
+		if (!HasStoragePermission())
+		{
+			OnRefreshRequested();
+			return;
+		}
+		_importModDialog.PopupCenteredRatio();
+	}
+
+	private async void OnImportFileSelected(string path)
+	{
+		if (_isBusy) return;
+		SetBusy(true, "正在导入 MOD，请稍候…");
+		try
+		{
+			await ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+			var ids = await Task.Run(() => ImportArchive(path));
+			if (RefreshMods())
+				_showcasePage.ShowMessage($"导入完成：{string.Join("、", ids)}", isError: false);
+		}
+		catch (Exception exception)
+		{
+			_logger.Error("Importing MOD archive failed.", exception);
+			_showcasePage.ShowLoadError($"导入失败：{exception.Message}");
+		}
+		finally
+		{
+			SetBusy(false);
+		}
+	}
+
+	private IReadOnlyList<string> ImportArchive(string path)
+	{
+		// Android's system picker returns content:// URIs; System.IO cannot open them.
+		using var source = GodotFileAccess.Open(path, GodotFileAccess.ModeFlags.Read)
+			?? throw new IOException($"无法读取所选 ZIP：{GodotFileAccess.GetOpenError()}");
+		Directory.CreateDirectory(_projectDataRoot.LauncherDirectoryPath);
+		var archivePath = Path.Combine(_projectDataRoot.LauncherDirectoryPath, $"archive-{Guid.NewGuid():N}.zip");
+		using var archive = new FileStream(archivePath, FileMode.CreateNew, System.IO.FileAccess.ReadWrite,
+			FileShare.None, bufferSize: 81920, FileOptions.DeleteOnClose);
+		while (true)
+		{
+			var buffer = source.GetBuffer(1024 * 1024);
+			if (buffer.Length == 0) break;
+			archive.Write(buffer);
+		}
+		if (source.GetError() is not (Error.Ok or Error.FileEof))
+			throw new IOException("读取 ZIP 文件失败。");
+		archive.Position = 0;
+		return new ModArchiveImporter(_projectDataRoot).Import(archive);
+	}
+
+	private bool RefreshMods()
+	{
 		if (!HasStoragePermission())
 		{
 			ShowStoragePermissionRequired();
-			return;
+			return false;
 		}
 
 		_waitingForStoragePermission = false;
@@ -116,12 +188,14 @@ public partial class ModLauncherPanel : Control
 			var mods = new ModRegistry(_projectDataRoot).DiscoverMods();
 			var settings = new LauncherSettingsStore(_projectDataRoot.LauncherSettingsPath).LoadOrEmpty();
 			_showcasePage.Configure(mods, settings);
+			return true;
 		}
 		catch (Exception exception)
 		{
 			_showcasePage.Configure([], LauncherSettingsRecord.Empty);
 			GD.PushError(exception.ToString());
 			_showcasePage.ShowLoadError(FormatLoadError(exception));
+			return false;
 		}
 	}
 
@@ -134,16 +208,12 @@ public partial class ModLauncherPanel : Control
 
 	private async void OnStartRequested(ModLoadout loadout)
 	{
-		if (_isStarting)
+		if (_isBusy)
 		{
 			return;
 		}
 
-		_isStarting = true;
-		RefreshStartButton();
-		_loadingTitleLabel.Text =
-			$"正在加载《{loadout.PrimaryMod.Manifest.Name.Trim()}》与 {loadout.AddonMods.Count} 个扩展";
-		_loadingOverlay.Show();
+		SetBusy(true, $"正在加载《{loadout.PrimaryMod.Manifest.Name.Trim()}》与 {loadout.AddonMods.Count} 个扩展");
 
 		try
 		{
@@ -158,9 +228,7 @@ public partial class ModLauncherPanel : Control
 		}
 		catch (Exception exception)
 		{
-			_loadingOverlay.Hide();
-			_isStarting = false;
-			RefreshStartButton();
+			SetBusy(false);
 			GD.PushError(exception.ToString());
 			_showcasePage.ShowLoadError(FormatLoadError(exception));
 		}
