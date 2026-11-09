@@ -53,6 +53,8 @@
 
 Godot 工程位于 `src/Game.Godot`，入口是 `res://scenes/ui/mod_launcher/mod_launcher_panel.tscn`。`res://` 只覆盖宿主目录，类库、测试和 MOD 数据位于其外。项目数据根由 `ProjectDataRootResolver` 统一确定：编辑器为仓库根（宿主目录的 `../..`），PC 导出为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。
 
+Android 启动器在扫描 MOD 前检查“所有文件访问权限”；未授权时通过 Godot 权限接口直接打开系统授权页面。返回游戏并恢复焦点后重新检查，授权成功才扫描 MOD；未授权时保留“前往授权”入口，不自动反复跳转。此流程不包含 Android 10 及以下的传统存储权限请求。
+
 [GameRuntimeBootstrap](../src/Game.Godot/Bootstrap/GameRuntimeBootstrap.cs) 接收 ModLoadout：
 
 1. 按有效顺序加载 MOD 声明的 PCK，在运行时场景实例化之前完成资源覆盖。

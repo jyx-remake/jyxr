@@ -7,6 +7,7 @@ public partial class ModLauncherPanel : Control
 {
 	private const string ClientAuthor = "虹乡俗人";
 	private const string ClientVersionSetting = "application/config/version";
+	private const string StoragePermission = "android.permission.MANAGE_EXTERNAL_STORAGE";
 
 	private ModShowcasePage _showcasePage = null!;
 	private Button _startLoadoutButton = null!;
@@ -14,6 +15,8 @@ public partial class ModLauncherPanel : Control
 	private ColorRect _loadingOverlay = null!;
 	private Label _loadingTitleLabel = null!;
 	private ProjectDataRoot _projectDataRoot = null!;
+	private string _modSetupMessage = string.Empty;
+	private bool _waitingForStoragePermission;
 	private bool _isStarting;
 
 	public override void _Ready()
@@ -28,20 +31,59 @@ public partial class ModLauncherPanel : Control
 		_clientVersionLabel.Text = $"XR 客户端 v{clientVersion} · 重制：{ClientAuthor} · 原作：汉家松鼠";
 		_startLoadoutButton.Pressed += OnStartPressed;
 		_showcasePage.SelectionChanged += RefreshStartButton;
-		_showcasePage.RefreshRequested += RefreshMods;
+		_showcasePage.RefreshRequested += OnRefreshRequested;
 
 		_projectDataRoot = ProjectDataRootResolver.Resolve();
 		var permissionHint = OS.HasFeature("android") || OS.HasFeature("web_android")
-			? "权限：在系统设置中搜索“所有文件访问权限”，找到本游戏并开启“允许管理所有文件”。仅安装游戏不会自动授权。"
+			? "权限：需要开启“允许管理所有文件”，才能读取 MOD 和保存游戏数据。"
 			: "权限：确认当前用户可以读取 MOD 目录和其中的文件。";
-		_showcasePage.SetEmptyStateMessage(
+		_modSetupMessage =
 			$"未找到可用的 MOD，请依次检查：\n\n" +
 			$"版本：当前客户端 v{clientVersion}，请使用与该客户端匹配的 MOD 和资源包。\n\n" +
 			$"{permissionHint}\n\n" +
 			$"文件：请将完整 MOD 解压到下方目录，避免多套一层文件夹；每个 MOD 文件夹内应直接包含 mod.json，主 MOD 还需包含 data 文件夹和所需资源包。\n\n" +
 			$"扫描目录：{_projectDataRoot.ModsDirectoryPath}\n\n" +
-			"处理后点击“重新扫描”。");
-		RefreshMods();
+			"处理后点击“重新扫描”。";
+		OnRefreshRequested();
+	}
+
+	public override void _Notification(int what)
+	{
+		if (what == NotificationApplicationFocusIn && IsNodeReady() && _waitingForStoragePermission)
+		{
+			RefreshMods();
+		}
+	}
+
+	private static bool HasStoragePermission() =>
+		!OS.HasFeature("android") || OS.GetGrantedPermissions().Contains(StoragePermission);
+
+	private void OnRefreshRequested()
+	{
+		if (_isStarting) return;
+		if (HasStoragePermission())
+		{
+			RefreshMods();
+			return;
+		}
+
+		ShowStoragePermissionRequired();
+		_waitingForStoragePermission = true;
+		if (OS.RequestPermission(StoragePermission))
+		{
+			RefreshMods();
+		}
+	}
+
+	private void ShowStoragePermissionRequired()
+	{
+		_showcasePage.SetEmptyStateMessage(
+			"需要文件访问权限\n\n" +
+			"请在系统授权页面开启“允许管理所有文件”，返回游戏后将自动扫描 MOD。\n\n" +
+			"如果尚未授权，请点击“前往授权”。\n\n" +
+			$"数据目录：{_projectDataRoot.Path}");
+		_showcasePage.SetRefreshButtonText("前往授权");
+		_showcasePage.Configure([], LauncherSettingsRecord.Empty);
 	}
 
 	private void OnStartPressed()
@@ -60,6 +102,15 @@ public partial class ModLauncherPanel : Control
 	private void RefreshMods()
 	{
 		if (_isStarting) return;
+		if (!HasStoragePermission())
+		{
+			ShowStoragePermissionRequired();
+			return;
+		}
+
+		_waitingForStoragePermission = false;
+		_showcasePage.SetEmptyStateMessage(_modSetupMessage);
+		_showcasePage.SetRefreshButtonText("重新扫描");
 		try
 		{
 			var mods = new ModRegistry(_projectDataRoot).DiscoverMods();

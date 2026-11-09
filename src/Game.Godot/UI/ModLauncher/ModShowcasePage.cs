@@ -34,6 +34,7 @@ public partial class ModShowcasePage : Control
 	}
 
 	public void SetEmptyStateMessage(string message) => _emptyStateLabel.Text = message;
+	public void SetRefreshButtonText(string text) => _refreshModsButton.Text = text;
 
 	public void ShowLoadError(string message)
 	{
