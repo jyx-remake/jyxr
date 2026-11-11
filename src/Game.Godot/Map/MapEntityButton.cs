@@ -1,4 +1,5 @@
 using Game.Core.Definitions;
+using Game.Godot.UI;
 using Godot;
 
 namespace Game.Godot.Map;
@@ -12,7 +13,7 @@ public partial class MapEntityButton : Button
 	public PackedScene TooltipScene { get; set; } = null!;
 
 	private TextureRect _avatar = null!;
-	private Label _nameLabel = null!;
+	private AutoFitRichTextLabel _nameLabel = null!;
 	private TextureRect _notice = null!;
 	private (string MapId, MapLocationDefinition Location, MapEventDefinition? Event)? _location;
 
@@ -23,7 +24,7 @@ public partial class MapEntityButton : Button
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
-		_nameLabel = GetNode<Label>("%NameLabel");
+		_nameLabel = GetNode<AutoFitRichTextLabel>("%NameLabel");
 		_notice = GetNode<TextureRect>("%Notice");
 		Pressed += OnPressed;
 		Refresh();
@@ -53,7 +54,7 @@ public partial class MapEntityButton : Button
 			return;
 		}
 
-		_nameLabel.Text = MapEntityPresentation.ResolveLocationName(location.Location);
+		_nameLabel.SetContent(MapEntityPresentation.ResolveLocationName(location.Location));
 		_notice.Visible = location.Event?.RepeatMode == RepeatMode.Once;
 		_avatar.Texture = MapEntityPresentation.ResolveAvatar(
 			DefaultTexture,
