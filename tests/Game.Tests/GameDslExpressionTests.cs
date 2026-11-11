@@ -92,10 +92,10 @@ public sealed class GameDslExpressionTests
     [Fact]
     public async Task ContextVariableCannotBeOverwrittenByAssignment()
     {
-        const string json = """
-        {"version":3,"segments":[{"name":"x","steps":[{"kind":"set","target":"item_target","value":"'other'"}]}]}
-        """;
-        var script = Game.Core.Story.StoryScriptJson.Parse(json);
+        var script = Game.StoryDsl.StoryCompiler.Compile("""
+            # x
+            item_target = 'other'
+            """);
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]));
         var context = new StoryExecutionContext(new Dictionary<string, ExpressionValue> { ["item_target"] = ExpressionValue.FromString("hero") });
         await Assert.ThrowsAsync<InvalidOperationException>(() => session.StoryService.ExecuteAsync("x", context));

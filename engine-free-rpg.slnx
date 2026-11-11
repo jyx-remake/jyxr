@@ -12,6 +12,7 @@
     <Project Path="src/Game.Expressions/Game.Expressions.csproj" />
     <Project Path="src/Game.Godot/engine-free-rpg.csproj" />
     <Project Path="src/Game.Presentation/Game.Presentation.csproj" />
+    <Project Path="src/Game.StoryDsl/Game.StoryDsl.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Game.Tests/Game.Tests.csproj" />

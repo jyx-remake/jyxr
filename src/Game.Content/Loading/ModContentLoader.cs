@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Game.Core.Model;
-using Game.Core.Story;
 
 namespace Game.Content.Loading;
 
@@ -22,8 +21,6 @@ internal static class ModContentLoader
 {
     private const string GameConfigFileName = "game-config.json";
     private const string PatchFilePattern = "*.patch.json";
-    private const string StoryDirectoryName = "stories";
-    private const string StoryFilePattern = "*.story.json";
 
     public static LoadedModContent Load(IReadOnlyList<ModContentInput> inputs)
     {
@@ -32,12 +29,13 @@ internal static class ModContentLoader
         JsonContentLoader.Ensure(inputs[0].Required, "The first mod must be the required primary package.");
 
         var catalog = new RawContentCatalog();
+        var stories = new StoryContentCatalog(catalog.Warnings);
         foreach (var input in inputs)
         {
             ValidateInput(input);
             try
             {
-                LoadMod(catalog, input);
+                LoadMod(catalog, stories, input);
             }
             catch (Exception exception) when (exception is not ContentLoadException)
             {
@@ -50,7 +48,9 @@ internal static class ModContentLoader
         var config = DeserializeRequired<GameConfig>(catalog.GameConfig, "gameConfig");
         ValidateConfig(config);
         var package = BuildPackage(catalog);
-        var repository = new JsonContentLoader().LoadFromPackage(package);
+        var repository = new JsonContentLoader().LoadFromPackage(package, stories.BuildScripts());
+        JsonContentLoader.Ensure(repository.TryGetStorySegment(config.InitialStorySegmentId, out _),
+            $"Game config initialStorySegmentId '{config.InitialStorySegmentId}' references a missing story segment.");
         JsonContentLoader.ValidateGameConfigMediaReferences(config, repository);
         return new LoadedModContent(config, repository, new ContentLoadReport(catalog.Warnings.ToArray()));
     }
@@ -75,7 +75,7 @@ internal static class ModContentLoader
         }
     }
 
-    private static void LoadMod(RawContentCatalog catalog, ModContentInput input)
+    private static void LoadMod(RawContentCatalog catalog, StoryContentCatalog stories, ModContentInput input)
     {
         foreach (var spec in ContentTypeCatalog.All)
         {
@@ -91,31 +91,9 @@ internal static class ModContentLoader
             }
         }
 
-        LoadStoryFiles(catalog, input);
+        stories.AddMod(input);
         LoadGameConfig(catalog, input);
         LoadPatchFiles(catalog, input);
-    }
-
-    private static void LoadStoryFiles(RawContentCatalog catalog, ModContentInput input)
-    {
-        var storyDirectory = Path.Combine(input.DataDirectoryPath, StoryDirectoryName);
-        if (!Directory.Exists(storyDirectory))
-        {
-            return;
-        }
-
-        foreach (var storyPath in Directory.GetFiles(storyDirectory, StoryFilePattern, SearchOption.AllDirectories)
-                     .OrderBy(static path => path, StringComparer.Ordinal))
-        {
-            var relativePath = Path.GetRelativePath(storyDirectory, storyPath).Replace('\\', '/');
-            const string suffix = ".story.json";
-            JsonContentLoader.Ensure(relativePath.EndsWith(suffix, StringComparison.Ordinal),
-                $"Story file '{relativePath}' must end with '{suffix}'.");
-            var scriptId = relativePath[..^suffix.Length];
-            var script = ParseNode(storyPath) as JsonObject
-                ?? throw new ContentLoadException($"Story file '{storyPath}' must contain a JSON object.");
-            catalog.AddStoryScript(scriptId, script, input.ModId, storyPath);
-        }
     }
 
     private static void LoadGameConfig(RawContentCatalog catalog, ModContentInput input)
@@ -634,7 +612,7 @@ internal static class ModContentLoader
         string propertyName,
         PatchSource source)
     {
-        var rootIdentity = target.Kind == "storySegment" ? "name" : target.Kind == "gameConfig" ? null : "id";
+        var rootIdentity = target.Kind == "gameConfig" ? null : "id";
         if ((path.Count == 1 && string.Equals(propertyName, rootIdentity, StringComparison.Ordinal)) ||
             (parent.SelectedId is not null && string.Equals(propertyName, "id", StringComparison.Ordinal)))
         {
@@ -654,7 +632,7 @@ internal static class ModContentLoader
 
     private static void EnsureIdentityUnchanged(RawTarget target, JsonObject patch, PatchSource source)
     {
-        var identityProperty = target.Kind == "storySegment" ? "name" : target.Kind == "gameConfig" ? null : "id";
+        var identityProperty = target.Kind == "gameConfig" ? null : "id";
         if (identityProperty is not null && patch.ContainsKey(identityProperty))
         {
             throw new ContentLoadException($"{source.Description} merge cannot modify identity property '{identityProperty}'.");
@@ -673,7 +651,7 @@ internal static class ModContentLoader
             return;
         }
 
-        var propertyName = target.Kind == "storySegment" ? "name" : "id";
+        const string propertyName = "id";
         var replacementId = GetRequiredString(replacement, propertyName, source.Description);
         JsonContentLoader.Ensure(string.Equals(target.Id, replacementId, StringComparison.Ordinal),
             $"{source.Description} replacement must preserve {propertyName} '{target.Id}'.");
@@ -701,7 +679,6 @@ internal static class ModContentLoader
         {
             var package = packageNode.Deserialize<ContentPackage>(JsonContentLoader.ContentJson)
                 ?? throw new ContentLoadException("Unable to deserialize content package.");
-            package.StoryScripts = catalog.BuildStoryScripts();
             return package;
         }
         catch (JsonException exception)
@@ -802,8 +779,6 @@ internal static class ModContentLoader
             ContentTypeCatalog.All.ToDictionary(static spec => spec.Kind, static _ => new OrderedDictionary<string, JsonObject>(StringComparer.Ordinal), StringComparer.Ordinal);
         private readonly Dictionary<string, Dictionary<string, string>> _definitionSources =
             ContentTypeCatalog.All.ToDictionary(static spec => spec.Kind, static _ => new Dictionary<string, string>(StringComparer.Ordinal), StringComparer.Ordinal);
-        private readonly Dictionary<string, StoryDocument> _stories = new(StringComparer.Ordinal);
-        private readonly Dictionary<string, string> _segmentOwners = new(StringComparer.Ordinal);
         private readonly Dictionary<string, PatchWrite> _writes = new(StringComparer.Ordinal);
 
         public JsonObject? GameConfig { get; private set; }
@@ -826,29 +801,6 @@ internal static class ModContentLoader
             _definitionSources[kind].Add(id, filePath);
         }
 
-        public void AddStoryScript(string scriptId, JsonObject script, string modId, string filePath)
-        {
-            if (_stories.ContainsKey(scriptId))
-            {
-                throw new ContentLoadException($"Story script '{scriptId}' from mod '{modId}' is duplicated.");
-            }
-
-            var segments = script["segments"] as JsonArray
-                ?? throw new ContentLoadException($"Story script '{filePath}' is missing array 'segments'.");
-            foreach (var node in segments)
-            {
-                var segment = node as JsonObject
-                    ?? throw new ContentLoadException($"Story script '{filePath}' contains a non-object segment.");
-                var segmentId = GetRequiredString(segment, "name", filePath);
-                if (!_segmentOwners.TryAdd(segmentId, scriptId))
-                {
-                    throw new ContentLoadException($"Story segment '{segmentId}' from mod '{modId}' is duplicated.");
-                }
-            }
-
-            _stories.Add(scriptId, new StoryDocument(script, modId, filePath));
-        }
-
         public void SetGameConfig(JsonObject config, string modId, string filePath)
         {
             if (GameConfig is not null)
@@ -866,18 +818,6 @@ internal static class ModContentLoader
                 JsonContentLoader.Ensure(id is null, $"{source.Description} gameConfig target must not contain id.");
                 return new RawTarget(kind, null, GameConfig
                     ?? throw new ContentLoadException($"{source.Description} gameConfig target is not loaded."), "gameConfig", "gameConfig");
-            }
-
-            if (kind == "storySegment")
-            {
-                JsonContentLoader.Ensure(!string.IsNullOrWhiteSpace(id), $"{source.Description} storySegment target requires id.");
-                if (!_segmentOwners.TryGetValue(id!, out var scriptId))
-                {
-                    throw new ContentLoadException($"{source.Description} story segment '{id}' does not exist.");
-                }
-
-                var segment = GetStorySegment(scriptId, id!);
-                return new RawTarget(kind, id, segment, $"storySegment:{id}", $"story:{scriptId}:{id}");
             }
 
             if (!_definitions.TryGetValue(kind, out var definitions))
@@ -903,15 +843,6 @@ internal static class ModContentLoader
                 return;
             }
 
-            if (target.Kind == "storySegment")
-            {
-                var scriptId = _segmentOwners[target.Id!];
-                var segments = _stories[scriptId].Node["segments"]!.AsArray();
-                var index = FindStorySegmentIndex(segments, target.Id!);
-                segments[index] = replacement;
-                return;
-            }
-
             _definitions[target.Kind][target.Id!] = replacement;
         }
 
@@ -923,16 +854,6 @@ internal static class ModContentLoader
             }
 
             RecordWrite(target, string.Empty, target.Node, null, source);
-            if (target.Kind == "storySegment")
-            {
-                var scriptId = _segmentOwners.Remove(target.Id!, out var owner)
-                    ? owner
-                    : throw new ContentLoadException($"{source.Description} story segment '{target.Id}' does not exist.");
-                var segments = _stories[scriptId].Node["segments"]!.AsArray();
-                segments.RemoveAt(FindStorySegmentIndex(segments, target.Id!));
-                return;
-            }
-
             _definitions[target.Kind].Remove(target.Id!);
             _definitionSources[target.Kind].Remove(target.Id!);
         }
@@ -954,17 +875,6 @@ internal static class ModContentLoader
             _definitions[kind].Clear();
             _definitionSources[kind].Clear();
             return array;
-        }
-
-        public Dictionary<string, StoryScript> BuildStoryScripts()
-        {
-            var result = new Dictionary<string, StoryScript>(StringComparer.Ordinal);
-            foreach (var (scriptId, story) in _stories)
-            {
-                result.Add(scriptId, StoryScriptJson.Parse(story.Node, story.FilePath));
-            }
-
-            return result;
         }
 
         public void RecordWrite(
@@ -994,27 +904,6 @@ internal static class ModContentLoader
             _writes[target.OwnerKey + path + "/$append/" + source.ModId] = new PatchWrite(source, null);
         }
 
-        private JsonObject GetStorySegment(string scriptId, string segmentId)
-        {
-            var segments = _stories[scriptId].Node["segments"]!.AsArray();
-            return segments[FindStorySegmentIndex(segments, segmentId)]!.AsObject();
-        }
-
-        private static int FindStorySegmentIndex(JsonArray segments, string segmentId)
-        {
-            for (var index = 0; index < segments.Count; index++)
-            {
-                if (segments[index] is JsonObject segment &&
-                    string.Equals(segment["name"]?.GetValue<string>(), segmentId, StringComparison.Ordinal))
-                {
-                    return index;
-                }
-            }
-
-            throw new ContentLoadException($"Story segment '{segmentId}' was indexed but not found.");
-        }
-
-        private sealed record StoryDocument(JsonObject Node, string ModId, string FilePath);
         private sealed record PatchWrite(PatchSource Source, JsonNode? Value);
     }
 }

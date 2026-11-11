@@ -1009,11 +1009,8 @@ public sealed class ContentLoadingTests
                   }
                 ]
                 """,
-            ["stories/item-effect.story.json"] = """
-                {
-                  "version": 3,
-                  "segments": [{ "name": "item_effect", "steps": [] }]
-                }
+            ["stories/item-effect.story"] = """
+                # item_effect
                 """,
         });
 
@@ -1073,11 +1070,8 @@ public sealed class ContentLoadingTests
             var directoryPath = CreateContentDirectory(new Dictionary<string, string>
             {
                 ["items.json"] = itemsJson,
-                ["stories/item-effect.story.json"] = """
-                    {
-                      "version": 3,
-                      "segments": [{ "name": "item_effect", "steps": [] }]
-                    }
+                ["stories/item-effect.story"] = """
+                    # item_effect
                     """,
             });
 
@@ -1458,26 +1452,14 @@ public sealed class ContentLoadingTests
     {
         var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["stories/main.story.json"] =
+            ["stories/main.story"] =
                 """
-                {
-                  "version": 3,
-                  "segments": [
-                    {
-                      "name": "story_intro",
-                      "steps": [
-                        { "kind": "dialogue", "speaker": "旁白", "text": "开始。" },
-                        { "kind": "jump", "target": "story_end" }
-                      ]
-                    },
-                    {
-                      "name": "story_end",
-                      "steps": [
-                        { "kind": "dialogue", "speaker": "旁白", "text": "结束。" }
-                      ]
-                    }
-                  ]
-                }
+                # story_intro
+                旁白：开始。
+                jump story_end
+
+                # story_end
+                旁白：结束。
                 """,
         });
 
@@ -1503,6 +1485,12 @@ public sealed class ContentLoadingTests
     }
 
     [Fact]
+    public void JsonLoader_RejectsStoryScriptsInJsonDefinitionPackage()
+    {
+        Assert.Throws<JsonException>(() => LoadRepositoryFromJson("""{"storyScripts":{}}"""));
+    }
+
+    [Fact]
     public void JsonLoader_LoadsStoryBattleWithoutOutcomeBranches()
     {
         var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)
@@ -1517,19 +1505,10 @@ public sealed class ContentLoadingTests
                   }
                 ]
                 """,
-            ["stories/main.story.json"] =
+            ["stories/main.story"] =
                 """
-                {
-                  "version": 3,
-                  "segments": [
-                    {
-                      "name": "story_intro",
-                      "steps": [
-                        { "kind": "battle", "battleId": "training", "outcomes": {} }
-                      ]
-                    }
-                  ]
-                }
+                # story_intro
+                battle training
                 """,
         });
 
@@ -1551,19 +1530,10 @@ public sealed class ContentLoadingTests
     {
         var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["stories/main.story.json"] =
+            ["stories/main.story"] =
                 """
-                {
-                  "version": 3,
-                  "segments": [
-                    {
-                      "name": "story_intro",
-                      "steps": [
-                        { "kind": "jump", "target": "story_missing" }
-                      ]
-                    }
-                  ]
-                }
+                # story_intro
+                jump story_missing
                 """,
         });
 
@@ -1582,19 +1552,10 @@ public sealed class ContentLoadingTests
     {
         var directoryPath = CreateContentDirectory(new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["stories/main.story.json"] =
+            ["stories/main.story"] =
                 """
-                {
-                  "version": 3,
-                  "segments": [
-                    {
-                      "name": "story_intro",
-                      "steps": [
-                        { "kind": "call", "target": "story_missing" }
-                      ]
-                    }
-                  ]
-                }
+                # story_intro
+                call story_missing
                 """,
         });
 
@@ -1635,19 +1596,10 @@ public sealed class ContentLoadingTests
                   }
                 ]
                 """,
-            ["stories/main.story.json"] =
+            ["stories/main.story"] =
                 """
-                {
-                  "version": 3,
-                  "segments": [
-                    {
-                      "name": "story_intro",
-                      "steps": [
-                        { "kind": "dialogue", "speaker": "旁白", "text": "开始。" }
-                      ]
-                    }
-                  ]
-                }
+                # story_intro
+                旁白：开始。
                 """,
         });
 
@@ -1691,19 +1643,10 @@ public sealed class ContentLoadingTests
                   }
                 ]
                 """,
-            ["stories/main.story.json"] =
+            ["stories/main.story"] =
                 $$"""
-                {
-                  "version": 3,
-                  "segments": [
-                    {
-                      "name": "story_intro",
-                      "steps": [
-                        {"kind":"command","call":{{JsonSerializer.Serialize(call)}}}
-                      ]
-                    }
-                  ]
-                }
+                # story_intro
+                {{call}}
                 """,
         });
 
@@ -1738,19 +1681,10 @@ public sealed class ContentLoadingTests
                   }
                 ]
                 """,
-            ["stories/main.story.json"] =
+            ["stories/main.story"] =
                 """
-                {
-                  "version": 3,
-                  "segments": [
-                    {
-                      "name": "story_intro",
-                      "steps": [
-                        {"kind":"command","call":"map('world_map', 'gate')"}
-                      ]
-                    }
-                  ]
-                }
+                # story_intro
+                map('world_map', 'gate')
                 """,
         });
 
@@ -1793,19 +1727,10 @@ public sealed class ContentLoadingTests
                   }
                 ]
                 """,
-            ["stories/main.story.json"] =
+            ["stories/main.story"] =
                 """
-                {
-                  "version": 3,
-                  "segments": [
-                    {
-                      "name": "story_intro",
-                      "steps": [
-                        { "kind": "dialogue", "speaker": "旁白", "text": "开始。" }
-                      ]
-                    }
-                  ]
-                }
+                # story_intro
+                旁白：开始。
                 """,
         });
 

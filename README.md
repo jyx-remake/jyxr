@@ -32,8 +32,9 @@ Godot 节点、输入、动画和异步演出需在引擎内另行验证。
 | --- | --- |
 | `engine-free-rpg.slnx`、`Directory.Build.props` | .NET 解决方案与共享编译设置 |
 | `src/Game.Expressions` | 通用表达式解析与调用绑定 |
+| `src/Game.StoryDsl` | `.story` 源码编译，复用通用表达式并生成类型化剧情模型 |
 | `src/Game.Core` | 领域定义、运行态、战斗规则、剧情解释器和存档记录 |
-| `src/Game.Content` | JSON 装配、引用解析与仓储校验；`SampleData` 为测试样例 |
+| `src/Game.Content` | JSON 与剧情源码装配、引用解析与仓储校验；`SampleData` 为测试样例 |
 | `src/Game.Application` | 会话、业务用例、MOD 模型、存读档与会话事件 |
 | `src/Game.Presentation` | 不依赖 Godot 的展示流程与交互状态 |
 | `src/Game.Godot` | 独立 Godot 工程，包含宿主 csproj、代码、场景、资源与导出配置 |
@@ -47,6 +48,8 @@ Godot 节点、输入、动画和异步演出需在引擎内另行验证。
 
 内容从各 MOD 的 loose `data` 与 `patches` 装配，资源覆盖通过 PCK。加载顺序、补丁协议和存档影响声明见 [MOD 数据补丁](docs/mod-data-patching.md)。
 
+剧情直接编写为 `data/stories/**/*.story`，加载 MOD 时由游戏在内存中自动编译。源码语法和示例见 [剧情源码编写指南](docs/story-authoring.md)。
+
 项目数据根在编辑器下为仓库根（Godot 工程根的 `../..`），PC 导出后为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。启动器配置位于 `launcher/settings.json`；存档、全局档案和设置位于 `userdata/<主MOD id>/`。`mods` 与玩家数据独立于 Godot 的 `res://`，迁移宿主目录不会移动玩家存档。
 
 `autoload` 中的运行时节点并非项目设置中的 autoload。启动与存储边界见 [运行时架构](docs/runtime-architecture.md)。
@@ -58,6 +61,7 @@ Godot 节点、输入、动画和异步演出需在引擎内另行验证。
 | 代理协作约定 | [AGENTS.md](AGENTS.md) |
 | 分层、会话、持久化、地图与全局事件 | [运行时架构](docs/runtime-architecture.md) |
 | 剧情、地图 action、条件与控制台 | [游戏内容 DSL v3](docs/game-dsl-v3.md) |
+| `.story` 源码语法、编译与诊断 | [剧情源码编写指南](docs/story-authoring.md) |
 | MOD 内容扩展、编辑与迁移 | [内容扩展与数据补丁](docs/mod-data-patching.md)、[原版 MOD 迁移](docs/legacy-mod-migration-guide.md) |
 | 战斗实现与状态效果 | [战斗运行时架构](docs/battle-runtime-architecture.md)、[Buff 指南](docs/buff-effects-guide.md) |
 | 战斗扩展设计 | [Effect 与 Phase Hook](docs/battle-effect-phase-hook-design.md)、[伤害 Timing 设计](docs/battle-damage-timing-design.md) |

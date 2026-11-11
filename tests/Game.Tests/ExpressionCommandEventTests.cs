@@ -137,9 +137,7 @@ public sealed class ExpressionCommandEventTests
     [Fact]
     public async Task SetTimeKeySupportsOptionalAndValidatedStoryTargets()
     {
-        var script = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"timeout_story","steps":[]}]}
-        """);
+        var script = Game.StoryDsl.StoryCompiler.Compile("# timeout_story");
         var session = new GameSession(
             new GameState(),
             TestContentFactory.CreateRepository(storyScripts: [script]));

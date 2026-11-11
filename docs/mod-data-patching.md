@@ -2,13 +2,14 @@
 
 ## 当前扩展方式
 
-项目通过 JSON 内容、结构化数据补丁和 PCK 资源包扩展游戏。启动器选择一个 `type: "game"` 主 MOD，并启用多个 `type: "addon"` 扩展。主 MOD 不限定为 `jyxr-base`；addon 可通过 `dependencies` 声明所需主 MOD 或其他 addon 的 ID。依赖先于使用者加载，用户排序必须满足依赖关系；缺失依赖、循环依赖或依赖另一个主 MOD 会阻止组合解析。
+项目通过 JSON 定义、`.story` 剧情源码、结构化数据补丁和 PCK 资源包扩展游戏。启动器选择一个 `type: "game"` 主 MOD，并启用多个 `type: "addon"` 扩展。主 MOD 不限定为 `jyxr-base`；addon 可通过 `dependencies` 声明所需主 MOD 或其他 addon 的 ID。依赖先于使用者加载，用户排序必须满足依赖关系；缺失依赖、循环依赖或依赖另一个主 MOD 会阻止组合解析。
 
 | 需求 | 当前做法 |
 | --- | --- |
 | 新增角色、物品、武学、地图等定义 | 在 MOD 的 `data` 中提供完整定义，使用新的稳定 ID |
-| 新增剧情 | 在 `data/stories/**/*.story.json` 中编写脚本，指令见 [游戏内容 DSL v3](game-dsl-v3.md) |
-| 修改已有内容 | 使用 `patches/**/*.patch.json`，操作规则见下文 |
+| 新增剧情 | 在 `data/stories/**/*.story` 中编写源码，语法见 [剧情源码编写指南](story-authoring.md)，指令见 [游戏内容 DSL v3](game-dsl-v3.md) |
+| 修改已有剧情 | 在 `.story` 中提供同名段，按 MOD 加载顺序整体替换 |
+| 修改已有 JSON 定义 | 使用 `patches/**/*.patch.json`，操作规则见下文 |
 | 新增或覆盖图片、音频等 Godot 资源 | 导出 PCK，在 `mod.json` 的 `packs` 中声明相对路径 |
 | 迁移旧版内容 | 按 [旧 MOD 迁移指南](legacy-mod-migration-guide.md) 更新源数据 |
 
@@ -45,9 +46,9 @@ Android 启动器提供“导入 ZIP”，通过系统文件选择器选择压�
 
 ## 数据装配规则
 
-运行时按主 MOD、依赖 addon、用户排序 addon 的顺序装配内容。每个 MOD 先注册 `data` 中的完整新定义和 `stories/**/*.story.json`，再执行自己的 `patches/**/*.patch.json`。补丁文件按规范化相对路径排序，文件内操作按声明顺序执行。
+运行时按主 MOD、依赖 addon、用户排序 addon 的顺序装配内容。每个 MOD 先注册 `data` 中的完整新定义，编译并装配 `stories/**/*.story`，再执行针对 JSON 定义的 `patches/**/*.patch.json`。补丁文件按规范化相对路径排序，文件内操作按声明顺序执行。
 
-已有定义不能通过同 ID 的完整 JSON 覆盖；这种情况会中止加载。新增内容继续写入对应的普通数据文件，修改已有内容使用补丁。
+已有角色、物品、地图等 JSON 定义出现同 ID 完整定义时会中止加载。新增内容写入对应普通数据文件，修改已有 JSON 定义使用补丁。剧情使用下文的按段替换规则。
 
 ## Map 数据目录
 
@@ -80,7 +81,26 @@ data/maps/sects/wudang.json
 
 首次进入大地图时使用 `defaultLocation` 的坐标，之后每张大地图分别记忆自己的当前位置。`map('world', 'town')` 可显式从已有地点进入并更新该地图的记忆位置；当前不支持裸坐标或独立入口定义。
 
-剧情脚本使用 `data/stories/**/*.story.json`，目录同样支持任意层级嵌套。脚本 ID 是相对于 `stories` 目录的路径去掉 `.story.json` 后缀；目录名称不进入脚本 ID。
+## 剧情源码目录
+
+剧情使用 `data/stories/**/*.story`，文件按规范化相对路径排序。MOD 装配后的脚本 ID 为 MOD ID 加上相对于 `stories` 的路径，去掉 `.story` 后缀，例如 MOD `inn-addon` 的 `stories/支线/客栈.story` 对应 `inn-addon/支线/客栈`。不同 MOD 可以使用相同文件名。单独调用目录加载接口时，脚本 ID 使用去掉后缀的相对路径。剧情执行与替换均使用文件内的段名。
+
+加载器递归读取 `.story` 源码，每次加载时自动编译为类型化剧情模型。发布时携带源码文件。
+
+- 每个 MOD 内的段名唯一，跨文件重复也会中止加载。
+- addon 使用新段名新增剧情，使用已有段名整体替换该段。
+- 多个 MOD 提供同名段时，后加载者生效，加载报告记录段名、双方 MOD 和源文件路径。
+- 段替换只影响该段，原文件中的其他段继续参与装配。
+- 最终生效段组成全局剧情目录，再统一校验跳转、调用和内容引用。
+
+例如，addon 要修改基础 MOD 的 `客栈_问候`，可以在自己的任意 `.story` 文件中提供完整的新段。
+
+```text
+# 客栈_问候
+掌柜：客官，今日茶水免费。
+```
+
+多个 MOD 修改同一段时需要协调加载顺序和完整内容。剧情变更统一通过源码段替换表达。
 
 ## 文件格式
 
@@ -100,9 +120,9 @@ data/maps/sects/wudang.json
 }
 ```
 
-支持以下目标：`battle`、`scopedBattleEffect`、`character`、`externalSkill`、`gameTip`、`growTemplate`、`internalSkill`、`legendSkill`、`map`、`worldTrigger`、`resource`、`sect`、`shop`、`specialSkill`、`item`、`itemTag`、`equipmentRandomAffixTable`、`buff`、`talent`、`tower`、`storySegment` 和 `gameConfig`。
+支持以下目标：`battle`、`scopedBattleEffect`、`character`、`externalSkill`、`gameTip`、`growTemplate`、`internalSkill`、`legendSkill`、`map`、`worldTrigger`、`resource`、`sect`、`shop`、`specialSkill`、`item`、`itemTag`、`equipmentRandomAffixTable`、`buff`、`talent`、`tower` 和 `gameConfig`。
 
-普通目标必须提供稳定 `id`；`storySegment` 的 ID 是 segment 的 `name`；`gameConfig` 不提供 ID。
+普通目标必须提供稳定 `id`，`gameConfig` 不提供 ID。
 
 ## 结构化路径
 
@@ -187,11 +207,9 @@ ID 选择必须恰好找到一个元素；找不到或出现重复 ID 都会中�
 ```json
 {
   "op": "prepend",
-  "target": {"kind": "storySegment", "id": "获得元宝"},
-  "path": ["steps"],
-  "values": [
-    {"kind": "command", "name": "get_money", "args": [100]}
-  ]
+  "target": {"kind": "gameConfig"},
+  "path": ["initialPartyCharacterIds"],
+  "values": ["郭襄"]
 }
 ```
 

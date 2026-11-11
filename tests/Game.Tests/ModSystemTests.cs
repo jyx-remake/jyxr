@@ -629,36 +629,31 @@ public sealed class ModSystemTests
     }
 
     [Fact]
-    public void JsonContentLoader_ReplacesStorySegmentWithPatch()
+    public void JsonContentLoader_ReplacesStorySegmentWithSource()
     {
         var addonDirectory = CreateSparseAddonDirectory();
-        WritePatch(
+        WriteStory(
             addonDirectory,
+            "replacement.story",
             """
-            {
-              "format": 2,
-              "operations": [
-                {
-                  "op": "set",
-                  "target": {"kind": "storySegment", "id": "test_story"},
-                  "value": {
-                    "name": "test_story",
-                    "steps": [{"kind":"command","call":"change_yuanbao(99)"}]
-                  }
-                }
-              ]
-            }
+            # test_story
+            change_yuanbao(99)
             """);
 
-        var repository = new JsonContentLoader().LoadFromMods(
-        [
-            new ModContentInput("test-base", PrimaryModDirectoryPath, Required: true),
-            new ModContentInput("test-addon", addonDirectory, Required: false),
-        ]);
+        var loaded = LoadWithAddon(addonDirectory);
+        var repository = loaded.Repository;
 
         var segment = repository.GetStorySegment("test_story");
         var command = Assert.IsType<Game.Core.Story.CommandStep>(Assert.Single(segment.Segment.Steps));
         Assert.Equal("change_yuanbao", command.Call.Root.Name);
+        Assert.Equal("test-addon/replacement", segment.ScriptId);
+        Assert.Empty(repository.GetStoryScript("test-base/test").Segments);
+        var warning = Assert.Single(loaded.Report.Warnings);
+        Assert.Equal("story:test_story", warning.Target);
+        Assert.Equal("test-base", warning.PreviousModId);
+        Assert.Equal("test-addon", warning.CurrentModId);
+        Assert.Contains("test.story", warning.Message);
+        Assert.Contains("replacement.story", warning.Message);
     }
 
     [Fact]
@@ -674,9 +669,34 @@ public sealed class ModSystemTests
     }
 
     [Fact]
-    public void JsonContentLoader_LoadModContentPatchesGameConfigAndStorySteps()
+    public void JsonContentLoader_RejectsMissingInitialStorySegmentAfterModComposition()
+    {
+        var addon = CreateSparseAddonDirectory();
+        WritePatch(addon, """
+            {
+              "format": 2,
+              "operations": [
+                {
+                  "op": "merge",
+                  "target": {"kind":"gameConfig"},
+                  "value": {"initialStorySegmentId":"addon_start"}
+                }
+              ]
+            }
+            """);
+
+        var exception = Assert.Throws<InvalidOperationException>(() => LoadWithAddon(addon));
+        Assert.Contains("initialStorySegmentId 'addon_start'", exception.Message);
+
+        WriteStory(addon, "start.story", "# addon_start");
+        Assert.Equal("addon_start", LoadWithAddon(addon).Config.InitialStorySegmentId);
+    }
+
+    [Fact]
+    public void JsonContentLoader_LoadModContentPatchesGameConfigAndReplacesStory()
     {
         var addonDirectory = CreateSparseAddonDirectory();
+        WriteStory(addonDirectory, "replacement.story", "# test_story\nchange_silver(2)");
         WritePatch(
             addonDirectory,
             """
@@ -693,12 +713,6 @@ public sealed class ModSystemTests
                   "target": {"kind": "gameConfig"},
                   "path": ["initialPartyCharacterIds"],
                   "values": ["ally_mage"]
-                },
-                {
-                  "op": "prepend",
-                  "target": {"kind": "storySegment", "id": "test_story"},
-                  "path": ["steps"],
-                  "values": [{"kind":"command","call":"change_silver(1)"}]
                 }
               ]
             }
@@ -713,7 +727,7 @@ public sealed class ModSystemTests
         Assert.Equal(42, loaded.Config.MaxLevel);
         Assert.Equal(["ally_warrior", "ally_mage"], loaded.Config.InitialPartyCharacterIds);
         var steps = loaded.Repository.GetStorySegment("test_story").Segment.Steps;
-        Assert.Equal("change_silver", Assert.IsType<Game.Core.Story.CommandStep>(steps[0]).Call.Root.Name);
+        Assert.Equal("change_silver(2)", Assert.IsType<Game.Core.Story.CommandStep>(Assert.Single(steps)).Call.Source);
     }
 
     [Fact]
@@ -823,18 +837,22 @@ public sealed class ModSystemTests
         Assert.Contains("unsupported format '1'", exception.Message);
     }
 
-    [Fact]
-    public void JsonContentLoader_RejectsIdSelectorOnUnkeyedStorySteps()
+    [Theory]
+    [InlineData("set")]
+    [InlineData("merge")]
+    [InlineData("remove")]
+    [InlineData("append")]
+    public void JsonContentLoader_RejectsStoryPatchTargets(string operation)
     {
         var addonDirectory = CreateSparseAddonDirectory();
         WritePatch(
             addonDirectory,
-            """
+            $$"""
             {
               "format": 2,
               "operations": [
                 {
-                  "op": "remove",
+                  "op": "{{operation}}",
                   "target": {"kind": "storySegment", "id": "test_story"},
                   "path": ["steps", {"id": "step-1"}]
                 }
@@ -844,7 +862,7 @@ public sealed class ModSystemTests
 
         var exception = Assert.Throws<ContentLoadException>(() => LoadWithAddon(addonDirectory));
 
-        Assert.Contains("expected one 'id=step-1'", exception.Message);
+        Assert.Contains("unknown target kind 'storySegment'", exception.Message);
     }
 
     [Fact]
@@ -904,6 +922,191 @@ public sealed class ModSystemTests
         var exception = Assert.Throws<ContentLoadException>(() => LoadWithAddon(addonDirectory));
 
         Assert.Contains("test failed", exception.Message);
+    }
+
+    [Fact]
+    public void JsonContentLoader_CompilesNestedSourcesAndResolvesCrossFileAndDependencyReferences()
+    {
+        var addon = CreateSparseAddonDirectory();
+        var storyDirectory = Path.Combine(addon, "data", "stories", "支线");
+        Directory.CreateDirectory(storyDirectory);
+        File.WriteAllText(Path.Combine(storyDirectory, "a.story"), """
+            # addon_start
+            call addon_end
+            call test_story
+            """);
+        File.WriteAllText(Path.Combine(storyDirectory, "b.story"), """
+            # addon_end
+            change_silver(7)
+            """);
+
+        var loaded = LoadWithAddon(addon);
+
+        var script = loaded.Repository.GetStoryScript("test-addon/支线/a");
+        Assert.Equal("addon_start", Assert.Single(script.Segments).Name);
+        Assert.Equal("test-addon/支线/b", loaded.Repository.GetStorySegment("addon_end").ScriptId);
+        Assert.Equal("test-base/test", loaded.Repository.GetStorySegment("test_story").ScriptId);
+        Assert.Empty(Directory.GetFiles(storyDirectory, "*.json", SearchOption.AllDirectories));
+    }
+
+    [Fact]
+    public void JsonContentLoader_RecompilesChangedSourceOnNextLoad()
+    {
+        var addon = CreateSparseAddonDirectory();
+        var storyDirectory = Path.Combine(addon, "data", "stories");
+        Directory.CreateDirectory(storyDirectory);
+        var sourcePath = Path.Combine(storyDirectory, "new.story");
+        File.WriteAllText(sourcePath, "# addon_story\nchange_silver(7)");
+        var first = LoadWithAddon(addon);
+
+        File.WriteAllText(sourcePath, "# addon_story\nchange_silver(9)");
+        var second = LoadWithAddon(addon);
+
+        var original = Assert.IsType<Game.Core.Story.CommandStep>(
+            Assert.Single(first.Repository.GetStorySegment("addon_story").Segment.Steps));
+        var updated = Assert.IsType<Game.Core.Story.CommandStep>(
+            Assert.Single(second.Repository.GetStorySegment("addon_story").Segment.Steps));
+        Assert.Equal("change_silver(7)", original.Call.Source);
+        Assert.Equal("change_silver(9)", updated.Call.Source);
+        Assert.Single(Directory.GetFiles(storyDirectory));
+    }
+
+    [Fact]
+    public void JsonContentLoader_ReportsInvalidStorySourceAndCanLoadAfterCorrection()
+    {
+        var addon = CreateSparseAddonDirectory();
+        var storyDirectory = Path.Combine(addon, "data", "stories");
+        Directory.CreateDirectory(storyDirectory);
+        var sourcePath = Path.Combine(storyDirectory, "broken.story");
+        const string invalidSource = "# addon_story\nif @";
+        File.WriteAllText(sourcePath, invalidSource);
+
+        var exception = Assert.Throws<ContentLoadException>(() => LoadWithAddon(addon));
+
+        Assert.Contains(sourcePath + "(2,4)", exception.Message);
+        Assert.Contains("addon_story", exception.Message);
+        Assert.IsType<Game.StoryDsl.StoryCompilationException>(exception.InnerException);
+        Assert.Equal(invalidSource, File.ReadAllText(sourcePath));
+        Assert.Single(Directory.GetFiles(storyDirectory));
+
+        File.WriteAllText(sourcePath, "# addon_story\nchange_silver(9)");
+        Assert.NotNull(LoadWithAddon(addon).Repository.GetStorySegment("addon_story"));
+    }
+
+    [Fact]
+    public void JsonContentLoader_LoadsOnlyStorySourcesFromStoryDirectory()
+    {
+        var addon = CreateSparseAddonDirectory();
+        var storyDirectory = Path.Combine(addon, "data", "stories");
+        Directory.CreateDirectory(storyDirectory);
+        File.WriteAllText(Path.Combine(storyDirectory, "notes.json"), "not a story source");
+        File.WriteAllText(Path.Combine(storyDirectory, "new.story"), "# addon_story");
+
+        var loaded = LoadWithAddon(addon);
+
+        Assert.Empty(loaded.Repository.GetStorySegment("addon_story").Segment.Steps);
+        Assert.False(loaded.Repository.TryGetStoryScript("test-addon/notes", out _));
+    }
+
+    [Fact]
+    public void JsonContentLoader_RejectsDuplicateCompiledSegmentsWithinMod()
+    {
+        var addon = CreateSparseAddonDirectory();
+        var storyDirectory = Path.Combine(addon, "data", "stories");
+        Directory.CreateDirectory(storyDirectory);
+        File.WriteAllText(Path.Combine(storyDirectory, "first.story"), "# addon_story");
+        File.WriteAllText(Path.Combine(storyDirectory, "second.story"), "# addon_story");
+
+        var exception = Assert.Throws<ContentLoadException>(() => LoadWithAddon(addon));
+
+        Assert.Contains("addon_story", exception.Message);
+        Assert.Contains("duplicated", exception.Message);
+        Assert.Contains("first.story", exception.Message);
+        Assert.Contains("second.story", exception.Message);
+    }
+
+    [Fact]
+    public void JsonContentLoader_PreservesOtherSegmentsAndSourceOrderWithSameFileNameAcrossMods()
+    {
+        var primary = CreateTestPrimaryModDirectory();
+        File.AppendAllText(Path.Combine(primary, "data", "stories", "test.story"),
+            "\n# kept\nchange_silver(5)");
+        var addon = CreateSparseAddonDirectory();
+        WriteStory(addon, "test.story", """
+            # added
+            call kept
+            # test_story
+            call added
+            """);
+
+        var loaded = new JsonContentLoader().LoadModContent(
+        [
+            new ModContentInput("test-base", primary, Required: true),
+            new ModContentInput("test-addon", addon, Required: false),
+        ]);
+
+        Assert.Equal("kept", Assert.Single(loaded.Repository.GetStoryScript("test-base/test").Segments).Name);
+        Assert.Equal(["added", "test_story"],
+            loaded.Repository.GetStoryScript("test-addon/test").Segments.Select(segment => segment.Name));
+        var entry = loaded.Repository.GetStorySegment("test_story");
+        Assert.Equal(3, entry.Script.Segments.Count);
+        Assert.Same(entry.Segment, Assert.Single(entry.Script.Segments, segment => segment.Name == "test_story"));
+        Assert.Equal("added", Assert.IsType<Game.Core.Story.CallStep>(Assert.Single(entry.Segment.Steps)).Target);
+        Assert.Single(loaded.Report.Warnings);
+    }
+
+    [Fact]
+    public void JsonContentLoader_LaterStoryReplacementWinsAndReportsEachSource()
+    {
+        var first = CreateSparseAddonDirectory();
+        var second = CreateSparseAddonDirectory();
+        WriteStory(first, "test.story", "# test_story\nchange_silver(7)");
+        WriteStory(second, "test.story", "# test_story\nchange_silver(9)");
+
+        var loaded = new JsonContentLoader().LoadModContent(
+        [
+            new ModContentInput("test-base", PrimaryModDirectoryPath, Required: true),
+            new ModContentInput("first-addon", first, Required: false),
+            new ModContentInput("second-addon", second, Required: false),
+        ]);
+
+        var entry = loaded.Repository.GetStorySegment("test_story");
+        Assert.Equal("second-addon/test", entry.ScriptId);
+        Assert.Equal("change_silver(9)",
+            Assert.IsType<Game.Core.Story.CommandStep>(Assert.Single(entry.Segment.Steps)).Call.Source);
+        Assert.Empty(loaded.Repository.GetStoryScript("first-addon/test").Segments);
+        Assert.Collection(loaded.Report.Warnings,
+            warning =>
+            {
+                Assert.Equal("test-base", warning.PreviousModId);
+                Assert.Equal("first-addon", warning.CurrentModId);
+            },
+            warning =>
+            {
+                Assert.Equal("first-addon", warning.PreviousModId);
+                Assert.Equal("second-addon", warning.CurrentModId);
+            });
+    }
+
+    [Fact]
+    public void JsonContentLoader_ValidatesReferencesAfterStoryReplacement()
+    {
+        var primary = CreateTestPrimaryModDirectory();
+        WriteStory(primary, "test.story", "# test_story\ncall removed_target");
+        var addon = CreateSparseAddonDirectory();
+        WriteStory(addon, "replacement.story", "# test_story\ncall added\n# added\nchange_silver(7)");
+        var inputs = new[]
+        {
+            new ModContentInput("test-base", primary, Required: true),
+            new ModContentInput("test-addon", addon, Required: false),
+        };
+
+        var loaded = new JsonContentLoader().LoadModContent(inputs);
+        Assert.Equal(2, loaded.Repository.GetStorySegment("test_story").Script.Segments.Count);
+
+        WriteStory(addon, "replacement.story", "# test_story\ncall missing_target");
+        var exception = Assert.Throws<InvalidOperationException>(() => new JsonContentLoader().LoadModContent(inputs));
+        Assert.Contains("missing_target", exception.Message);
     }
 
     private static ProjectDataRoot CreateTempProjectDataRoot()
@@ -967,19 +1170,10 @@ public sealed class ModSystemTests
         var storyDirectory = Path.Combine(dataDirectory, "stories");
         Directory.CreateDirectory(storyDirectory);
         File.WriteAllText(
-            Path.Combine(storyDirectory, "test.story.json"),
+            Path.Combine(storyDirectory, "test.story"),
             """
-            {
-              "version": 3,
-              "segments": [
-                {
-                  "name": "test_story",
-                  "steps": [
-                    {"kind": "command", "call": "change_silver(1)"}
-                  ]
-                }
-              ]
-            }
+            # test_story
+            change_silver(1)
             """);
         return modDirectory;
     }
@@ -1020,5 +1214,12 @@ public sealed class ModSystemTests
         var patchDirectory = Path.Combine(addonDirectory, "patches");
         Directory.CreateDirectory(patchDirectory);
         File.WriteAllText(Path.Combine(patchDirectory, "010-test.patch.json"), json);
+    }
+
+    private static void WriteStory(string modDirectory, string relativePath, string source)
+    {
+        var path = Path.Combine(modDirectory, "data", "stories", relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllText(path, source);
     }
 }

@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Game.Core.Definitions;
 using Game.Core.Serialization;
+using Game.Core.Story;
 
 namespace Game.Content.Loading;
 
@@ -27,7 +28,7 @@ public sealed partial class JsonContentLoader
     }
 
     public InMemoryContentRepository LoadFromDirectory(string directoryPath) =>
-        LoadFromPackage(LoadPackageFromDirectory(directoryPath));
+        LoadFromPackage(LoadPackageFromDirectory(directoryPath), LoadStoryScripts(directoryPath));
 
     public InMemoryContentRepository LoadFromMods(IReadOnlyList<ModContentInput> inputs)
         => LoadModContent(inputs).Repository;
@@ -35,9 +36,11 @@ public sealed partial class JsonContentLoader
     public LoadedModContent LoadModContent(IReadOnlyList<ModContentInput> inputs) =>
         ModContentLoader.Load(inputs);
 
-    public InMemoryContentRepository LoadFromPackage(ContentPackage package)
+    public InMemoryContentRepository LoadFromPackage(
+        ContentPackage package,
+        IReadOnlyDictionary<string, StoryScript>? storyScripts = null)
     {
-        var repository = BuildRepository(package);
+        var repository = BuildRepository(package, storyScripts ?? new Dictionary<string, StoryScript>(StringComparer.Ordinal));
         ValidateRepository(repository);
         return repository;
     }

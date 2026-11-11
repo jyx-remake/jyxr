@@ -1,11 +1,6 @@
 namespace Game.Core.Story;
 
-public sealed record StoryScript(
-    int Version,
-    IReadOnlyList<Segment> Segments)
-{
-    public const int CurrentVersion = 3;
-}
+public sealed record StoryScript(IReadOnlyList<Segment> Segments);
 
 public sealed record Segment(
     string Name,

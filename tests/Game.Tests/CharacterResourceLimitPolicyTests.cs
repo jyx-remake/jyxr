@@ -72,7 +72,6 @@ public sealed class CharacterResourceLimitPolicyTests
                 [StatType.MaxMp] = 135,
             });
         var script = new StoryScript(
-            StoryScript.CurrentVersion,
             [
                 new Segment(
                     "resource_boost",

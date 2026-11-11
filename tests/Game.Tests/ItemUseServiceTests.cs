@@ -725,7 +725,6 @@ public sealed class ItemUseServiceTests
         state.Party.AddMember(ally);
         state.Inventory.AddItem(item);
         var story = new StoryScript(
-            StoryScript.CurrentVersion,
             [
                 new Segment("item_story", [new CallStep("apply_item_effect")]),
                 new Segment(
@@ -775,7 +774,6 @@ public sealed class ItemUseServiceTests
             storyScripts:
             [
                 new StoryScript(
-                    StoryScript.CurrentVersion,
                     [new Segment("broken_story", [new CommandStep(new ExpressionParser().ParseCall("unsupported()"))])]),
             ],
             items: [item]);

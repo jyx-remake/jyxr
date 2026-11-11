@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../Game.Core/Game.Core.csproj" />
+    <ProjectReference Include="../Game.Expressions/Game.Expressions.csproj" />
+  </ItemGroup>
+</Project>

@@ -7,8 +7,9 @@
 | 层 | 职责与依赖 |
 | --- | --- |
 | Game.Expressions | 通用表达式语法、求值与调用注册，不依赖游戏领域 |
+| Game.StoryDsl | `.story` 源码解析与编译，直接构建 Core 剧情模型；依赖 Core、Expressions |
 | Game.Core | 领域模型、规则、战斗与剧情运行时、存档记录；依赖 Expressions |
-| Game.Content | JSON 输入、definition 引用解析、内容仓储与校验；依赖 Core、Expressions |
+| Game.Content | JSON 与剧情源码输入、definition 引用解析、内容仓储与校验；依赖 Core、Expressions、StoryDsl |
 | Game.Application | GameSession、业务用例、持久化装配、会话事件与 MOD 模型；依赖 Core、Expressions |
 | Game.Presentation | 展示流程、交互状态与宿主能力抽象；只依赖 Core |
 | Game.Godot | Godot 节点、UI、资源、音频、存储适配和演出；独立工程位于 src/Game.Godot |
@@ -75,6 +76,10 @@ Android 启动器在扫描 MOD 前检查“所有文件访问权限”；未授�
 
 [JsonContentLoader](../src/Game.Content/Loading/JsonContentLoader.cs) 负责定义索引、引用解析、affix 解析与仓储校验。正式内容不从 SampleData 读取；故事加载保持同步，避免 Godot 主线程 sync-over-async。当前定义依赖按有向无环图装配；若引入循环引用，需明确设计注册与 resolve 两阶段。
 
+剧情输入统一为 `data/stories/**/*.story`。[StorySourceReader](../src/Game.Content/Loading/StorySourceReader.cs) 在每次内容加载时调用独立的 `Game.StoryDsl` 编译器，直接构建包含已解析表达式的 `StoryScript` 和各类 Step。[StoryContentCatalog](../src/Game.Content/Loading/StoryContentCatalog.cs) 按加载顺序装配剧情段，同一 MOD 内重复段名报错，跨 MOD 同名段由后加载者整体替换，并向加载报告写入双方来源。最终运行目录只包含生效段，随后统一校验跨文件引用和内容引用。正式发布携带 `.story` 源码，语法、诊断和编译归一化规则见 [剧情源码编写指南](story-authoring.md)。
+
+`ContentPackage` 承载 JSON 定义，已编译剧情通过独立参数传入仓储构建入口。`StoryScript` 保存类型化剧情段，调用与表达式直接持有解析后的语法树。
+
 新增定义、修改已有定义、地图与剧情目录规则统一见 [MOD 数据补丁](mod-data-patching.md)。MOD 资源覆盖只走 PCK，[AssetResolver](../src/Game.Godot/Resources/AssetResolver.cs) 统一加载内置或已覆盖资源，不读取 MOD loose assets。
 
 ## 地图与全局事件
@@ -115,7 +120,7 @@ Android 启动器在扫描 MOD 前检查“所有文件访问权限”；未授�
 
 剧情运行时位于 Core，应用入口是 StoryService。命令经 [StoryCommandDispatcher](../src/Game.Application/StoryCommandDispatcher.cs) 的调用注册表分派；应用层负责状态用例，GodotStoryRuntimeHost 负责对话、选项、场景与演出。
 
-剧情当前使用 DSL/IR v3，地图和世界触发使用 `action` 与可选 `when`；不维护另一份命令清单，统一查 [DSL v3 参考](game-dsl-v3.md)。对白使用 `kind: dialogue`；选项宿主回传 ChoiceOptionView.Index，不能把过滤后的数组位置当作原选项标识。
+剧情当前使用 DSL v3，地图和世界触发使用 `action` 与可选 `when`；命令清单统一查 [DSL v3 参考](game-dsl-v3.md)。对白对应 `DialogueStep`；选项宿主回传 ChoiceOptionView.Index，不能把过滤后的数组位置当作原选项标识。
 
 `StoryTextInterpolator` 在进入宿主前处理主角与女主名字占位符，查找覆盖整个 Party 名册。限时剧情由 [StoryTimeKeyExpirationService](../src/Game.Application/StoryTimeKeyExpirationService.cs) 检查严格超过期限的 key；到期移除 key，仅对非空目标排队播放，由 TimedStoryCoordinator 等待当前剧情结束后执行。
 

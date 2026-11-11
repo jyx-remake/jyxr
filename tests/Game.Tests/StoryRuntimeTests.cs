@@ -1,94 +1,27 @@
-using System.Text.Json.Nodes;
 using Game.Application;
 using Game.Core.Abstractions;
 using Game.Core.Model;
 using Game.Core.Story;
+using Game.StoryDsl;
 
 namespace Game.Tests;
 
-public sealed class StoryV3Tests
+public sealed class StoryRuntimeTests
 {
     [Fact]
-    public void JsonParser_JsonObjectAndStringEntrypointsProduceEquivalentIr()
+    public async Task Service_ExecutesStrictVariablesBranchAndJump()
     {
-        const string json = """
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"set","target":"quest_stage","value":"3"},
-          {"kind":"choice","prompt":{"speaker":"主角","text":"走吗"},"style":"bold","blocks":[
-            {"kind":"branch","cases":[{"when":"quest_stage >= 3","options":[{"text":"走","when":"true","steps":[]}]}],"fallback":null}
-          ]},
-          {"kind":"battle","battleId":"sample_battle","outcomes":{"win":[],"lose":[],"timeout":[]}},
-          {"kind":"branch","cases":[{"when":"quest_stage == 3","steps":[]}],"fallback":[]}
-        ]}]}
+        const string source = """
+        # start
+        quest_stage = 1
+        quest_stage += 2
+        if quest_stage == 3
+          jump end
+
+        # end
+        主角：完成
         """;
-        var root = JsonNode.Parse(json)!.AsObject();
-
-        var fromString = StoryScriptJson.Parse(json, "equivalent-story");
-        var fromNode = StoryScriptJson.Parse(root, "equivalent-story");
-
-        Assert.Equivalent(fromString, fromNode, strict: true);
-    }
-
-    [Fact]
-    public void JsonParser_JsonObjectEntrypointIncludesSourceNameInExpressionErrors()
-    {
-        var root = JsonNode.Parse("""
-            {"version":3,"segments":[{"name":"start","steps":[
-              {"kind":"set","target":"quest_stage","value":"("}
-            ]}]}
-            """)!.AsObject();
-
-        var exception = Assert.Throws<StoryRuntimeException>(() =>
-            StoryScriptJson.Parse(root, "stories/invalid.story.json"));
-
-        Assert.Contains("stories/invalid.story.json", exception.Message);
-    }
-
-    [Fact]
-    public void JsonParser_ParsesV3StateStepsBranchAndChoice()
-    {
-        const string json = """
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"set","target":"quest_stage","value":"3"},
-          {"kind":"delete","target":"obsolete_flag"},
-          {"kind":"branch","cases":[{"when":"quest_stage >= 3","steps":[]}]},
-          {"kind":"choice","prompt":{"speaker":"主角","text":"走吗"},"blocks":[{"kind":"branch","cases":[{"when":"has_var('quest_stage')","options":[{"text":"走","steps":[]}]}],"fallback":null}]}
-        ]}]}
-        """;
-
-        var script = StoryScriptJson.Parse(json, "v3-test");
-
-        Assert.Equal(3, script.Version);
-        Assert.IsType<SetVariableStep>(script.Segments[0].Steps[0]);
-        Assert.IsType<DeleteVariableStep>(script.Segments[0].Steps[1]);
-        Assert.IsType<BranchStep>(script.Segments[0].Steps[2]);
-        var choice = Assert.IsType<ChoiceStep>(script.Segments[0].Steps[3]);
-        var block = Assert.IsType<ChoiceBranchBlock>(Assert.Single(choice.Blocks));
-        Assert.Null(block.Fallback);
-        Assert.Single(block.Cases);
-    }
-
-    [Theory]
-    [InlineData("{\"version\":2,\"segments\":[]}")]
-    [InlineData("{\"version\":3,\"segments\":[{\"name\":\"x\",\"steps\":[{\"kind\":\"command\",\"name\":\"journal\",\"args\":[]}]}]}")]
-    [InlineData("{\"version\":3,\"segments\":[{\"name\":\"x\",\"steps\":[{\"kind\":\"command\",\"call\":[\"journal\"]}]}]}")]
-    public void JsonParser_RejectsV2AndOldCommandShapes(string json) =>
-        Assert.Throws<StoryRuntimeException>(() => StoryScriptJson.Parse(json, "invalid-story"));
-
-    [Fact]
-    public async Task Service_ExecutesStrictVariablesBranchChoiceAndJump()
-    {
-        const string json = """
-        {"version":3,"segments":[
-          {"name":"start","steps":[
-            {"kind":"set","target":"quest_stage","value":"1"},
-            {"kind":"set","target":"quest_stage","value":"quest_stage + (2)"},
-            {"kind":"branch","cases":[{"when":"quest_stage == 3","steps":[{"kind":"jump","target":"end"}]}]}
-          ]},
-          {"name":"end","steps":[{"kind":"dialogue","speaker":"主角","text":"完成"}]}
-        ]}
-        """;
-        var script = StoryScriptJson.Parse(json);
+        var script = StoryCompiler.Compile(source);
         var host = new RecordingHost();
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]), host);
 
@@ -102,17 +35,15 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task Service_ExecutesChineseVariableIdentifiers()
     {
-        const string json = """
-        {"version":3,"segments":[{"name":"中文变量","steps":[
-          {"kind":"set","target":"是否拜师","value":"true"},
-          {"kind":"set","target":"门派声望","value":"9"},
-          {"kind":"branch","cases":[{"when":"是否拜师 && 门派声望 >= 9","steps":[
-            {"kind":"set","target":"完成入门任务","value":"true"}
-          ]}]},
-          {"kind":"delete","target":"门派声望"}
-        ]}]}
+        const string source = """
+        # 中文变量
+        是否拜师 = true
+        门派声望 = 9
+        if 是否拜师 && 门派声望 >= 9
+          完成入门任务 = true
+        del 门派声望
         """;
-        var script = StoryScriptJson.Parse(json);
+        var script = StoryCompiler.Compile(source);
         var session = new GameSession(
             new GameState(),
             TestContentFactory.CreateRepository(storyScripts: [script]));
@@ -127,11 +58,10 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task Service_StateReplacementTerminatesOriginatingStoryWithoutPollutingReplacementState()
     {
-        var script = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"command","call":"replace_state()"},
-          {"kind":"set","target":"polluted","value":"true"}
-        ]}]}
+        var script = StoryCompiler.Compile("""
+        # start
+        replace_state()
+        polluted = true
         """);
         var originalState = new GameState();
         var replacementState = new GameState();
@@ -153,10 +83,12 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task Service_ExecutionContextIsIsolatedAndRequired()
     {
-        const string json = """
-        {"version":3,"segments":[{"name":"item","steps":[{"kind":"branch","cases":[{"when":"item_target == 'hero'","steps":[{"kind":"command","call":"journal('ok')"}]}]}]}]}
+        const string source = """
+        # item
+        if item_target == 'hero'
+          journal('ok')
         """;
-        var script = StoryScriptJson.Parse(json);
+        var script = StoryCompiler.Compile(source);
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]));
         var context = new StoryExecutionContext(new Dictionary<string, ExpressionValue> { ["item_target"] = ExpressionValue.FromString("hero") });
 
@@ -168,21 +100,19 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task DynamicVariablesEnforceTypeAndReservedNames()
     {
-        var typeScript = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"type","steps":[
-          {"kind":"set","target":"flag","value":"true"},
-          {"kind":"set","target":"flag","value":"1"}
-        ]}]}
+        var typeScript = StoryCompiler.Compile("""
+        # type
+        flag = true
+        flag = 1
         """);
         var typeSession = new GameSession(
             new GameState(),
             TestContentFactory.CreateRepository(storyScripts: [typeScript]));
         await Assert.ThrowsAsync<InvalidOperationException>(() => typeSession.StoryService.ExecuteAsync("type"));
 
-        var reservedScript = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"reserved","steps":[
-          {"kind":"set","target":"silver","value":"1"}
-        ]}]}
+        var reservedScript = StoryCompiler.Compile("""
+        # reserved
+        silver = 1
         """);
         var reservedSession = new GameSession(
             new GameState(),
@@ -193,15 +123,14 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task VariableDeletionPublishesEventsOnlyWhenStateChanges()
     {
-        const string json = """
-        {"version":3,"segments":[{"name":"delete","steps":[
-          {"kind":"set","target":"temporary","value":"['a', 'b']"},
-          {"kind":"delete","target":"temporary"},
-          {"kind":"delete","target":"temporary"}
-        ]}]}
+        const string source = """
+        # delete
+        temporary = ['a', 'b']
+        del temporary
+        del temporary
         """;
         var logger = new CollectingDiagnosticLogger();
-        var script = StoryScriptJson.Parse(json);
+        var script = StoryCompiler.Compile(source);
         var session = new GameSession(
             new GameState(),
             TestContentFactory.CreateRepository(storyScripts: [script]),
@@ -226,10 +155,9 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task AssignmentEvaluatesRightHandSideOnceAndCompoundFormRequiresExistingNumber()
     {
-        var assignment = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"assign","steps":[
-          {"kind":"set","target":"sampled","value":"chance(0.5)"}
-        ]}]}
+        var assignment = StoryCompiler.Compile("""
+        # assign
+        sampled = chance(0.5)
         """);
         var random = new RecordingRandom();
         var session = new GameSession(
@@ -242,10 +170,9 @@ public sealed class StoryV3Tests
         Assert.Equal(1, random.DoubleCalls);
         Assert.True(session.State.Story.Variables["sampled"].AsBoolean("test"));
 
-        var compound = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"compound","steps":[
-          {"kind":"set","target":"missing","value":"missing + (1)"}
-        ]}]}
+        var compound = StoryCompiler.Compile("""
+        # compound
+        missing += 1
         """);
         var compoundSession = new GameSession(
             new GameState(),
@@ -261,12 +188,8 @@ public sealed class StoryV3Tests
     [InlineData("delete", "item_target")]
     public async Task StateStepsRejectReadOnlyVariables(string kind, string target)
     {
-        var step = kind == "set"
-            ? $$"""{"kind":"set","target":"{{target}}","value":"1"}"""
-            : $$"""{"kind":"delete","target":"{{target}}"}""";
-        var script = StoryScriptJson.Parse($$"""
-        {"version":3,"segments":[{"name":"readonly","steps":[{{step}}]}]}
-        """);
+        var statement = kind == "set" ? $"{target} = 1" : $"del {target}";
+        var script = StoryCompiler.Compile("# readonly\n" + statement);
         var session = new GameSession(
             new GameState(),
             TestContentFactory.CreateRepository(storyScripts: [script]));
@@ -296,18 +219,19 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task Service_ResolvesJumpAndCallTargetsAcrossStoryFiles()
     {
-        var first = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"call","target":"shared"},
-          {"kind":"jump","target":"finish"}
-        ]}]}
-        """, "first.story.json");
-        var second = StoryScriptJson.Parse("""
-        {"version":3,"segments":[
-          {"name":"shared","steps":[{"kind":"dialogue","speaker":"主角","text":"共享片段"},{"kind":"return"}]},
-          {"name":"finish","steps":[{"kind":"dialogue","speaker":"主角","text":"结束"}]}
-        ]}
-        """, "second.story.json");
+        var first = StoryCompiler.Compile("""
+        # start
+        call shared
+        jump finish
+        """, "first.story");
+        var second = StoryCompiler.Compile("""
+        # shared
+        主角：共享片段
+        return
+
+        # finish
+        主角：结束
+        """, "second.story");
         var host = new RecordingHost();
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [first, second]), host);
 
@@ -321,20 +245,18 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task Runtime_CallReturnsThroughNestedBranchAndChoicePreservesSourceIndex()
     {
-        var script = StoryScriptJson.Parse("""
-        {"version":3,"segments":[
-          {"name":"start","steps":[
-            {"kind":"call","target":"sub"},
-            {"kind":"choice","prompt":{"speaker":"主角","text":"选择"},"blocks":[
-              {"kind":"options","options":[{"text":"隐藏","when":"false","steps":[]}]},
-              {"kind":"options","options":[{"text":"可见","steps":[{"kind":"dialogue","speaker":"主角","text":"选择完成"}]}]}
-            ]}
-          ]},
-          {"name":"sub","steps":[
-            {"kind":"branch","cases":[{"when":"true","steps":[{"kind":"return"}]}]},
-            {"kind":"dialogue","speaker":"主角","text":"不应执行"}
-          ]}
-        ]}
+        var script = StoryCompiler.Compile("""
+        # start
+        call sub
+        主角：选择
+        - 隐藏 if false
+        - 可见
+          主角：选择完成
+
+        # sub
+        if true
+          return
+        主角：不应执行
         """);
         var host = new RecordingHost { SelectedOptionIndex = 1 };
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]), host);
@@ -348,12 +270,10 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task Runtime_RejectsChoiceWithoutAnyVisibleOption()
     {
-        var script = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"choice","prompt":{"speaker":"主角","text":"无路可走"},"blocks":[
-            {"kind":"options","options":[{"text":"隐藏","when":"false","steps":[]}]}
-          ]}
-        ]}]}
+        var script = StoryCompiler.Compile("""
+        # start
+        主角：无路可走
+        - 隐藏 if false
         """);
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]));
 
@@ -365,22 +285,19 @@ public sealed class StoryV3Tests
     [Fact]
     public async Task Runtime_MixesChoiceBlocksAndEvaluatesOnlyVisitedConditionsOnce()
     {
-        var script = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"choice","prompt":{"speaker":"主角","text":"选择"},"blocks":[
-            {"kind":"options","options":[
-              {"text":"隐藏","when":"chance(0)","steps":[]},
-              {"text":"普通","steps":[]}
-            ]},
-            {"kind":"branch","cases":[
-              {"when":"chance(1)","options":[{"text":"首个分支","when":"chance(1)","steps":[]}]},
-              {"when":"chance(1)","options":[{"text":"未访问分支","when":"chance(1)","steps":[]}]}
-            ],"fallback":[{"text":"回退","when":"chance(1)","steps":[]}]},
-            {"kind":"branch","cases":[
-              {"when":"chance(1)","options":[{"text":"独立分支","steps":[]}]}
-            ],"fallback":null}
-          ]}
-        ]}]}
+        var script = StoryCompiler.Compile("""
+        # start
+        主角：选择
+        - 隐藏 if chance(0)
+        - 普通
+        if chance(1)
+          - 首个分支 if chance(1)
+        elif chance(1)
+          - 未访问分支 if chance(1)
+        else
+          - 回退 if chance(1)
+        if chance(1)
+          - 独立分支
         """);
         var random = new RecordingRandom();
         var host = new RecordingHost { SelectedOptionIndex = 1 };
@@ -396,37 +313,6 @@ public sealed class StoryV3Tests
         Assert.Equal(4, random.DoubleCalls);
     }
 
-    [Fact]
-    public void JsonParser_RejectsOldChoiceGroups()
-    {
-        const string json = """
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"choice","prompt":{"speaker":"主角","text":"旧结构"},"groups":[
-            {"options":[{"text":"旧选项","steps":[]}]}
-          ]}
-        ]}]}
-        """;
-
-        var exception = Assert.Throws<StoryRuntimeException>(() => StoryScriptJson.Parse(json));
-        Assert.Contains("old 'groups' shape", exception.Message);
-    }
-
-    [Theory]
-    [InlineData("{\"kind\":\"options\",\"options\":[]}")]
-    [InlineData("{\"kind\":\"branch\",\"cases\":[],\"fallback\":null}")]
-    [InlineData("{\"kind\":\"branch\",\"cases\":[{\"when\":\"true\",\"options\":[{\"text\":\"x\",\"steps\":[]}]}]}")]
-    [InlineData("{\"kind\":\"branch\",\"cases\":[{\"when\":\"true\",\"options\":[{\"text\":\"x\",\"steps\":[]}]}],\"fallback\":[]}")]
-    public void JsonParser_RejectsMalformedChoiceBlocks(string block)
-    {
-        var json = $$"""
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"choice","prompt":{"speaker":"主角","text":"错误"},"blocks":[{{block}}]}
-        ]}]}
-        """;
-
-        Assert.Throws<StoryRuntimeException>(() => StoryScriptJson.Parse(json));
-    }
-
     [Theory]
     [InlineData(BattleOutcome.Win, false, true)]
     [InlineData(BattleOutcome.Lose, true, false)]
@@ -435,11 +321,10 @@ public sealed class StoryV3Tests
         bool expectedGameOver,
         bool expectedContinuation)
     {
-        var script = StoryScriptJson.Parse("""
-        {"version":3,"segments":[{"name":"start","steps":[
-          {"kind":"battle","battleId":"test","outcomes":{}},
-          {"kind":"dialogue","speaker":"主角","text":"继续"}
-        ]}]}
+        var script = StoryCompiler.Compile("""
+        # start
+        battle test
+        主角：继续
         """);
         var host = new RecordingHost { BattleOutcome = outcome };
         var session = new GameSession(new GameState(), TestContentFactory.CreateRepository(storyScripts: [script]), host);

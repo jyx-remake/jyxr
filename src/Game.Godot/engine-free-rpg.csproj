@@ -28,6 +28,7 @@
     <TrimmerRootAssembly Include="Game.Content" />
     <TrimmerRootAssembly Include="Game.Application" />
     <TrimmerRootAssembly Include="Game.Expressions" />
+    <TrimmerRootAssembly Include="Game.StoryDsl" />
     <TrimmerRootAssembly Include="Game.Presentation" />
   </ItemGroup>
 

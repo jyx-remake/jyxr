@@ -8,7 +8,9 @@ namespace Game.Content.Loading;
 
 public sealed partial class JsonContentLoader
 {
-    private static InMemoryContentRepository BuildRepository(ContentPackage package)
+    private static InMemoryContentRepository BuildRepository(
+        ContentPackage package,
+        IReadOnlyDictionary<string, StoryScript> storyScripts)
     {
         var repository = new InMemoryContentRepository
         {
@@ -26,8 +28,8 @@ public sealed partial class JsonContentLoader
             Sects = IndexOrderedById(package.Sects, "Sect"),
             Shops = IndexById(package.Shops, "Shop"),
             SpecialSkills = IndexById(package.SpecialSkills, "SpecialSkill"),
-            StoryScripts = new Dictionary<string, StoryScript>(package.StoryScripts, StringComparer.Ordinal),
-            StorySegments = BuildStorySegments(package.StoryScripts),
+            StoryScripts = new Dictionary<string, StoryScript>(storyScripts, StringComparer.Ordinal),
+            StorySegments = BuildStorySegments(storyScripts),
             Items = BuildItems(package),
             ItemTags = IndexById(package.ItemTags, "ItemTag"),
             EquipmentRandomAffixTables = package.RandomAffixTables.ToList(),
@@ -134,9 +136,7 @@ public sealed partial class JsonContentLoader
         var allSegments = storyScripts
             .SelectMany(static entry => entry.Value.Segments)
             .ToList();
-        var combinedScript = new StoryScript(
-            storyScripts.Values.FirstOrDefault()?.Version ?? StoryScript.CurrentVersion,
-            allSegments);
+        var combinedScript = new StoryScript(allSegments);
 
         foreach (var (scriptId, script) in storyScripts)
         {

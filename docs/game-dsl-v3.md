@@ -2,6 +2,8 @@
 
 本文是剧情、地图事件、世界触发、天关条件和调试控制台的统一参考。内容作者通常只需阅读“快速开始”“条件表达式”“查询参考”和“指令参考”；引擎扩展方式放在文末。
 
+剧情源文件使用 `.story`，游戏加载 MOD 时在内存中自动编译。段头、缩进、对白、控制流、变量与战斗分支的完整说明见 [剧情源码编写指南](story-authoring.md)。本页集中维护命令与表达式参考。
+
 ## 快速开始
 
 剧情 command、地图 action 和控制台完整模式都写成函数调用：
@@ -22,7 +24,7 @@ current_time_slot not in ['子', '丑']
 not story_completed('星宿派_毒物林3胜利') and chance(0.1)
 ```
 
-DSL 字符串优先使用单引号，提高 json 可读性。
+DSL 字符串优先使用单引号，提高源码与 JSON 中表达式的可读性。
 
 地图与世界触发使用 `action` 和可选 `when`，天关使用可选 `when`。省略 `when` 等价于 `true`。
 
@@ -66,7 +68,7 @@ false
 
 Number 是 invariant-culture `double`。绑定到 `int` 参数时，数值必须没有小数部分且位于 `Int32` 范围内。不同基础类型之间没有隐式转换。
 
-不支持 `null`、赋值表达式、成员访问、索引、三元表达式、语句序列或字符串拼接。列表元素异构、除零、非有限结果和异类型比较都会报错。
+支持条件表达式 `条件 ? 真值 : 假值`，只对选中的分支求值。不支持 `null`、赋值表达式、成员访问、索引、语句序列或字符串拼接。列表元素异构、除零、非有限结果和异类型比较都会报错。
 
 ### 运算符与优先级
 
@@ -80,6 +82,7 @@ Number 是 invariant-culture `double`。绑定到 `int` 参数时，数值必须
 6. `==`、`!=`
 7. `and`、`&&`
 8. `or`、`||`
+9. 条件表达式 `? :`，按右结合解析
 
 `and`/`&&` 与 `or`/`||` 都短路。内容中优先使用单词形式，复杂条件用括号明确意图：
 
@@ -228,7 +231,7 @@ world_triggers(false)
 | `upgrade_external(character_id, skill_id, levels=1)` | 明确升级外功。 | — |
 | `upgrade_internal(character_id, skill_id, levels=1)` | 明确升级内功。 | — |
 | `upgrade_skill(character_id, skill_id, levels=1)` | 按外功、内功顺序自动分类升级。 | — |
-| `maxlevel(skill_id, levels=1, once_key='')` | 永久增加指定数值的武学等级上限；同一非空 once key 只生效一次。周目加成只影响当前有效上限，不改变本指令的永久增量。once key如果为空，DSL编译时候会自动生成。 | `max_skill_level` |
+| `maxlevel(skill_id, levels=1, once_key='')` | 永久增加指定数值的武学等级上限。同一非空 once key 只生效一次。周目加成只影响当前有效上限。剧情源码中的双参数 `maxlevel` 会按段名和技能名生成 key，显式传入空 key 时每次执行都会生效。 | `max_skill_level` |
 
 属性名支持中文显示名或 code：`拳掌/quanzhang`、`剑法/jianfa`、`刀法/daofa`、`奇门/qimen`、`臂力/bili`、`身法/shenfa`、`悟性/wuxing`、`福缘/fuyuan`、`根骨/gengu`、`定力/dingli`、`武学点/wuxue`、`气血上限/max_hp/maxhp`、`内力上限/max_mp/maxmp`、`攻击力/attack`、`防御力/defence`、`闪避率/evasion`、`命中率/accuracy`、`暴击率/crit_chance`、`暴击伤害/crit_mult`、`抗暴率/anti_crit_chance`、`吸血/lifesteal`、`抗异常/anti_debuff`、`集气速度/speed`、`移动力/movement`。
 

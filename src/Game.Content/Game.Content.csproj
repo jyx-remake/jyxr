@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Game.Core\Game.Core.csproj" />
     <ProjectReference Include="..\Game.Expressions\Game.Expressions.csproj" />
+    <ProjectReference Include="..\Game.StoryDsl\Game.StoryDsl.csproj" />
   </ItemGroup>
 
 </Project>
