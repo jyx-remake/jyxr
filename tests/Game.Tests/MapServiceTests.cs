@@ -16,7 +16,12 @@ public sealed class MapServiceTests
     {
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var (session, interaction) = CreateCommandInteraction(new MapCommandHost(_ => new ValueTask(release.Task)));
-        var hero = CreateCharacter("hero");
+        var definition = TestContentFactory.CreateCharacterDefinition("hero", new Dictionary<StatType, int>
+        {
+            [StatType.MaxHp] = 100,
+            [StatType.MaxMp] = 50,
+        });
+        var hero = TestContentFactory.CreateCharacterInstance("hero", definition);
         session.State.Party.AddMember(hero);
         hero.ApplyBattleCarryover(1, 2, 3);
         var events = new List<string>();
@@ -31,9 +36,14 @@ public sealed class MapServiceTests
         });
 
         var execution = session.MapService.ExecuteInteractionAsync(interaction);
+        Assert.False(execution.IsCompleted);
         Assert.Equal(1, hero.CurrentHp);
+        Assert.Equal(2, hero.CurrentMp);
+        Assert.Equal(3, hero.CurrentRage);
         session.MapService.GetCurrentMap();
         Assert.Equal(1, hero.CurrentHp);
+        Assert.Equal(2, hero.CurrentMp);
+        Assert.Equal(3, hero.CurrentRage);
         Assert.Empty(events);
         release.SetResult();
 
