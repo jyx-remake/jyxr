@@ -43,6 +43,7 @@ public partial class QuickSaveCoordinator : Node
 
 	private void Save()
 	{
+		if (!Game.Session.Execution.CanSave) return;
 		if (Game.State.Adventure.NoRegret)
 		{
 			UIRoot.Instance.ShowToast("无悔周目只允许自动存档", ToastTone.Error);

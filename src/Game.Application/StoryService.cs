@@ -21,12 +21,17 @@ public sealed class StoryService
     public StoryCommandDispatcher CommandDispatcher { get; }
     public StoryCommandLineService CommandLine { get; }
 
-    public async Task ExecuteAsync(
+    public async Task<StoryOutcome> ExecuteAsync(
         string storyId,
         StoryExecutionContext? context = null,
         CancellationToken cancellationToken = default)
     {
-        await foreach (var _ in RunAsync(storyId, context, cancellationToken)) { }
+        var outcome = StoryOutcome.StateReplaced;
+        await foreach (var storyEvent in RunAsync(storyId, context, cancellationToken))
+        {
+            if (storyEvent is StoryEndedEvent ended) outcome = ended.Outcome;
+        }
+        return outcome;
     }
 
     public async IAsyncEnumerable<StoryEvent> RunAsync(
@@ -35,6 +40,7 @@ public sealed class StoryService
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(storyId);
+        using var execution = _session.Execution.Begin($"story '{storyId}'", cancellationToken);
         var executionState = _session.State;
         var entry = _session.ContentRepository.GetStorySegment(storyId);
         var executionContext = context ?? StoryExecutionContext.Empty;
@@ -47,7 +53,7 @@ public sealed class StoryService
             new StoryTextInterpolator(_session),
             _expressions.Create(executionContext));
 
-        await foreach (var storyEvent in _runtime.RunAsync(entry.Script, runtimeHost, entry.Segment.Name, cancellationToken))
+        await foreach (var storyEvent in _runtime.RunAsync(entry.Script, runtimeHost, entry.Segment.Name, execution.Token))
         {
             if (storyEvent is SegmentCompletedEvent completed)
             {
@@ -56,5 +62,6 @@ public sealed class StoryService
             }
             yield return storyEvent;
         }
+        yield return new StoryEndedEvent(execution.Complete());
     }
 }

@@ -1,6 +1,6 @@
 using Game.Application;
 using Game.Core.Persistence;
-using Game.Godot.Story;
+using Game.Core.Story;
 using Game.Godot.UI;
 using Godot;
 
@@ -57,6 +57,7 @@ public static class GameFlow
 
 	public static void ReturnToMainMenu()
 	{
+		Game.Session.Execution.End(StoryOutcome.MainMenu);
 		World.Instance.PlayTime.StopGameplay();
 		UIRoot.Instance.ClosePanel();
 		UIRoot.Instance.SetHudSuppressed(true);
@@ -77,7 +78,6 @@ public static class GameFlow
 
 	public static void GameOver()
 	{
-		Game.ProfileService.AddDeaths();
 		World.Instance.PlayTime.StopGameplay();
 		UIRoot.Instance.ShowGameOverScreen();
 	}
@@ -95,17 +95,22 @@ public static class GameFlow
 		UIRoot.Instance.SetStoryPresentationActive(true);
 		
 		var storyId = Game.Config.InitialStorySegmentId;
+		var session = Game.Session;
+		var state = session.State;
 		try
 		{
-			var completed = await StoryRunHelper.RunAsync(storyId, cancellationToken);
-			if (completed)
+			var outcome = await session.StoryService.ExecuteAsync(storyId, cancellationToken: cancellationToken);
+			if (outcome == StoryOutcome.Completed && ReferenceEquals(session, Game.Session) && ReferenceEquals(state, session.State))
 			{
-				Game.Session.Events.Publish(new AutoSaveRequestedEvent($"story '{storyId}' completed"));
+				session.Execution.RequestAutoSave($"story '{storyId}' completed");
 			}
 		}
 		finally
 		{
-			UIRoot.Instance.SetStoryPresentationActive(false);
+			if (ReferenceEquals(session, Game.Session) && ReferenceEquals(state, session.State))
+			{
+				UIRoot.Instance.SetStoryPresentationActive(false);
+			}
 		}
 	}
 }

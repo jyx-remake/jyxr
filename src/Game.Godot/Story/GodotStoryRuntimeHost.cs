@@ -25,6 +25,7 @@ public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattle
 	{
 		ArgumentNullException.ThrowIfNull(battle);
 		var selectedCharacterIds = await UIRoot.Instance.ShowCombatantSelectPanelAsync(battle.BattleId, cancellationToken);
+		cancellationToken.ThrowIfCancellationRequested();
 		var isWin = await UIRoot.Instance.ShowBattleScreenAsync(
 			new OrdinaryBattleRequest(battle.BattleId, selectedCharacterIds.ToArray()),
 			cancellationToken);
@@ -68,5 +69,4 @@ public sealed partial class GodotStoryRuntimeHost : IRuntimeHost, ISpecialBattle
 
 	public ValueTask PlayEffectAsync(string effectId, CancellationToken cancellationToken) => ExecuteEffectAsync(effectId);
 
-	public ValueTask GameOverAsync(CancellationToken cancellationToken) => ExecuteGameOverAsync();
 }

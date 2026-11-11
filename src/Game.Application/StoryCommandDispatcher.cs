@@ -4,6 +4,7 @@ namespace Game.Application;
 
 public sealed class StoryCommandDispatcher
 {
+    private readonly GameSession _session;
     private readonly StoryExecutionContext _context;
     private readonly GameExpressionEnvironment _expressions;
     private readonly ExpressionEvaluator _evaluator = new();
@@ -16,6 +17,7 @@ public sealed class StoryCommandDispatcher
     {
         ArgumentNullException.ThrowIfNull(session);
         ArgumentNullException.ThrowIfNull(host);
+        _session = session;
         _context = context ?? StoryExecutionContext.Empty;
         _expressions = new GameExpressionEnvironment(session);
         VariableMutations = new StoryVariableMutationService(session, _context);
@@ -40,11 +42,16 @@ public sealed class StoryCommandDispatcher
 
     internal StoryVariableMutationService VariableMutations { get; }
 
-    public ValueTask<StoryCommandResult> ExecuteCommandAsync(
+    public async ValueTask<StoryCommandResult> ExecuteCommandAsync(
         string name,
         IReadOnlyList<ExpressionValue> args,
-        CancellationToken cancellationToken = default) =>
-        Registry.InvokeAsync(name, args, cancellationToken);
+        CancellationToken cancellationToken = default)
+    {
+        var state = _session.State;
+        var result = await Registry.InvokeAsync(name, args, cancellationToken);
+        _session.Execution.ObserveResult(result, state);
+        return result;
+    }
 
     public async ValueTask<StoryCommandResult> ExecuteCallAsync(
         ParsedCall call,
@@ -52,7 +59,7 @@ public sealed class StoryCommandDispatcher
     {
         try
         {
-            return await Registry.InvokeAsync(
+            return await ExecuteCommandAsync(
                 call.Root.Name,
                 _evaluator.EvaluateArguments(call, _expressions.Create(_context)),
                 cancellationToken);

@@ -12,6 +12,10 @@ public interface IRuntimeHost
     ValueTask PlayEffectAsync(string effectId, CancellationToken cancellationToken) => ValueTask.CompletedTask;
 
     ValueTask GameOverAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
+
+    ValueTask GameCompleteAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
+
+    ValueTask MainMenuAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
 }
 
 public interface IStoryRuntimeContext : IRuntimeHost
@@ -20,7 +24,10 @@ public interface IStoryRuntimeContext : IRuntimeHost
 
     ExpressionEnvironment ExpressionEnvironment { get; }
 
-    AsyncExpressionCallRegistry<StoryCommandResult> Commands { get; }
+    ValueTask<StoryCommandResult> ExecuteCommandAsync(
+        string name,
+        IReadOnlyList<ExpressionValue> args,
+        CancellationToken cancellationToken);
 
     ValueTask AssignVariableAsync(
         string name,

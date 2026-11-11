@@ -9,6 +9,7 @@ public sealed partial class GodotStoryRuntimeHost
 	private async ValueTask ExecuteSelectSectAsync(CancellationToken cancellationToken)
 	{
 		var sect = await UIRoot.Instance.ShowSelectSectScreenAsync(cancellationToken);
+		cancellationToken.ThrowIfCancellationRequested();
 		if (string.IsNullOrWhiteSpace(sect.StoryId))
 		{
 			throw new InvalidOperationException($"Sect '{sect.Id}' does not define an entry story.");
@@ -24,6 +25,7 @@ public sealed partial class GodotStoryRuntimeHost
 		CancellationToken cancellationToken = default)
 	{
 		var name = await UIRoot.Instance.ShowInputNamePanelAsync(characterId, defaultName, cancellationToken);
+		cancellationToken.ThrowIfCancellationRequested();
 		Game.PartyService.RenameOrCreateReserve(characterId, name);
 	}
 
@@ -31,6 +33,7 @@ public sealed partial class GodotStoryRuntimeHost
 	private async ValueTask ExecuteSelectHeadAsync(string characterId, CancellationToken cancellationToken)
 	{
 		var head = await UIRoot.Instance.ShowSelectHeadPanelAsync(cancellationToken);
+		cancellationToken.ThrowIfCancellationRequested();
 		Game.CharacterService.SetCharacterPortrait(characterId, head);
 	}
 

@@ -29,27 +29,23 @@ public partial class AutoSaveCoordinator : Node
 		Unbind();
 	}
 
-	private void OnAutoSaveRequested(AutoSaveRequestedEvent sessionEvent) =>
-		SaveIfEnabled(sessionEvent.Reason);
-
-	private bool SaveIfEnabled(string reason)
+	private void OnAutoSaveRequested(AutoSaveRequestedEvent request)
 	{
 		if (_session is null ||
+			!_session.Execution.IsCurrentCheckpoint(request) ||
 			(!Game.Settings.AutoSave && !_session.State.Adventure.NoRegret))
 		{
-			return false;
+			return;
 		}
 
 		try
 		{
-			_saveStore.SaveCurrentSession(LocalSaveId.Auto);
-			Game.Logger.Info($"Auto save completed: {reason}.");
-			return true;
+			_saveStore.SaveAutoSave(request);
+			Game.Logger.Info($"Auto save completed: {request.Reason}.");
 		}
 		catch (Exception exception)
 		{
-			Game.Logger.Error($"Auto save failed: {reason}.", exception);
-			return false;
+			Game.Logger.Error($"Auto save failed: {request.Reason}.", exception);
 		}
 	}
 }

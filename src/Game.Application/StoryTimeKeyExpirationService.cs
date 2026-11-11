@@ -1,5 +1,6 @@
 using Game.Core.Model;
 using Game.Core.Persistence;
+using Game.Core.Story;
 
 namespace Game.Application;
 
@@ -29,15 +30,36 @@ public sealed class StoryTimeKeyExpirationService
         var results = new List<ExpiredStoryTimeKey>(expired.Length);
         foreach (var timeKey in expired)
         {
-            _session.State.Story.RemoveTimeKey(timeKey.Key);
             if (!string.IsNullOrWhiteSpace(timeKey.TargetStoryId))
             {
-                results.Add(new ExpiredStoryTimeKey(timeKey.Key, timeKey.TargetStoryId));
+                results.Add(new ExpiredStoryTimeKey(_session.State, timeKey));
+            }
+            else
+            {
+                _session.State.Story.RemoveTimeKey(timeKey.Key);
             }
         }
 
-        _session.Events.Publish(new StoryStateChangedEvent());
+        if (results.Count != expired.Length) _session.Events.Publish(new StoryStateChangedEvent());
         return results;
+    }
+
+    public async Task<bool> ExecuteAsync(ExpiredStoryTimeKey expired, CancellationToken cancellationToken = default)
+    {
+        if (!ReferenceEquals(expired.State, _session.State) ||
+            !_session.State.Story.TimeKeys.TryGetValue(expired.TimeKey.Key, out var current) ||
+            !ReferenceEquals(current, expired.TimeKey))
+        {
+            return false;
+        }
+
+        using var execution = _session.Execution.Begin($"timed story '{current.TargetStoryId}'", cancellationToken);
+        _session.State.Story.RemoveTimeKey(current.Key);
+        _session.Events.Publish(new StoryStateChangedEvent());
+        var outcome = await _session.StoryService.ExecuteAsync(current.TargetStoryId, cancellationToken: execution.Token);
+        execution.Complete();
+        return outcome == StoryOutcome.Completed &&
+            _session.MapService.ReturnToMap(expired.State, $"timed story '{current.TargetStoryId}' completed");
     }
 
     private static bool IsAfter(ClockState current, ClockRecord deadline) =>
@@ -58,4 +80,4 @@ public sealed class StoryTimeKeyExpirationService
     }
 }
 
-public sealed record ExpiredStoryTimeKey(string Key, string TargetStoryId);
+public sealed record ExpiredStoryTimeKey(GameState State, StoryTimeKeyState TimeKey);

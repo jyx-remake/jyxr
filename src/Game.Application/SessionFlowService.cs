@@ -43,6 +43,36 @@ public sealed class SessionFlowService
         StartRound(checked(State.Adventure.Round + 1));
     }
 
+    public async ValueTask<StoryCommandResult> EndAsync(
+        StoryOutcome outcome,
+        IRuntimeHost host,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var state = State;
+        if (_session.Execution.IsTerminal && outcome != StoryOutcome.MainMenu)
+        {
+            return StoryCommandResult.End(_session.Execution.GetOutcome(state));
+        }
+
+        _session.Execution.End(outcome);
+        switch (outcome)
+        {
+            case StoryOutcome.Defeated:
+                _session.ProfileService.AddDeaths();
+                await host.GameOverAsync(cancellationToken);
+                break;
+            case StoryOutcome.GameCompleted:
+                _session.ProfileService.RecordCompletion(state.Adventure.Round);
+                await host.GameCompleteAsync(cancellationToken);
+                break;
+            case StoryOutcome.MainMenu:
+                await host.MainMenuAsync(cancellationToken);
+                break;
+        }
+        return StoryCommandResult.End(_session.Execution.GetOutcome(state));
+    }
+
     private void StartRound(int round)
     {
         _session.PlayTimeService.Checkpoint();

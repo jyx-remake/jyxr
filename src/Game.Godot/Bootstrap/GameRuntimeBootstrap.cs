@@ -105,8 +105,7 @@ public static class GameRuntimeBootstrap
 	private static void BindUiToSession(ApplicationGameSession session)
 	{
 		UIRoot.Instance.BindSessionEvents(session);
-		World.Instance.GetNode<TimedStoryCoordinator>("%TimedStoryCoordinator").Bind(session);
-		World.Instance.GetNode<WorldTriggerCoordinator>("%WorldTriggerCoordinator").Bind(session);
+		World.Instance.GetNode<WorldEventCoordinator>("%WorldEventCoordinator").Bind(session);
 		World.Instance.AutoSave.Bind(session);
 		World.Instance.PlayTime.Bind(session);
 	}

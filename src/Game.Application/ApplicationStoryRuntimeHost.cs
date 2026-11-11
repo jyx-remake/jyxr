@@ -9,7 +9,7 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
     private readonly GameState _executionState;
     private readonly IRuntimeHost _externalHost;
     private readonly StoryTextInterpolator _textInterpolator;
-    private readonly StoryVariableMutationService _variableMutations;
+    private readonly StoryCommandDispatcher _commandDispatcher;
 
     public ApplicationStoryRuntimeHost(
         GameSession session,
@@ -22,29 +22,32 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _executionState = executionState ?? throw new ArgumentNullException(nameof(executionState));
         _externalHost = externalHost ?? throw new ArgumentNullException(nameof(externalHost));
-        ArgumentNullException.ThrowIfNull(commandDispatcher);
+        _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
         _textInterpolator = textInterpolator ?? throw new ArgumentNullException(nameof(textInterpolator));
-        _variableMutations = commandDispatcher.VariableMutations;
-        Commands = commandDispatcher.Registry;
         ExpressionEnvironment = expressionEnvironment ?? throw new ArgumentNullException(nameof(expressionEnvironment));
     }
 
-    public bool IsExecutionActive => ReferenceEquals(_session.State, _executionState);
+    public bool IsExecutionActive => ReferenceEquals(_session.State, _executionState) && !_session.Execution.IsTerminal;
 
     public ExpressionEnvironment ExpressionEnvironment { get; }
-    public AsyncExpressionCallRegistry<StoryCommandResult> Commands { get; }
+
+    public ValueTask<StoryCommandResult> ExecuteCommandAsync(
+        string name,
+        IReadOnlyList<ExpressionValue> args,
+        CancellationToken cancellationToken) =>
+        _commandDispatcher.ExecuteCommandAsync(name, args, cancellationToken);
 
     public ValueTask AssignVariableAsync(
         string name,
         ExpressionValue value,
         CancellationToken cancellationToken)
     {
-        _variableMutations.Assign(name, value);
+        _commandDispatcher.VariableMutations.Assign(name, value);
         return ValueTask.CompletedTask;
     }
 
     public ValueTask<bool> DeleteVariableAsync(string name, CancellationToken cancellationToken) =>
-        ValueTask.FromResult(_variableMutations.Delete(name, "del"));
+        ValueTask.FromResult(_commandDispatcher.VariableMutations.Delete(name, "del"));
 
     public ValueTask DialogueAsync(DialogueContext dialogue, CancellationToken cancellationToken) =>
         _externalHost.DialogueAsync(
@@ -66,5 +69,6 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
     public ValueTask PlayEffectAsync(string effectId, CancellationToken cancellationToken) =>
         _externalHost.PlayEffectAsync(effectId, cancellationToken);
 
-    public ValueTask GameOverAsync(CancellationToken cancellationToken) => _externalHost.GameOverAsync(cancellationToken);
+    public async ValueTask GameOverAsync(CancellationToken cancellationToken) =>
+        await _session.SessionFlowService.EndAsync(StoryOutcome.Defeated, _externalHost, cancellationToken);
 }

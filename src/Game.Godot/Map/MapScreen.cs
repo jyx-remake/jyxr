@@ -1,4 +1,5 @@
 using Game.Application;
+using Game.Godot.UI;
 using Game.Core.Definitions;
 using Game.Godot.Resources;
 using Godot;
@@ -147,15 +148,20 @@ public partial class MapScreen : Control
 
 		_isHandlingInteraction = true;
 		_locationTooltipLayer.Dismiss();
+		var session = Game.Session;
+		var state = session.State;
 
 		try
 		{
 			await HandleLocationPressedAsync(location);
 		}
+		catch (OperationCanceledException) when (!ReferenceEquals(session, Game.Session) || !ReferenceEquals(state, session.State))
+		{
+		}
 		catch (Exception exception)
 		{
 			Game.Logger.Error("Handling map interaction failed.", exception);
-			throw;
+			UIRoot.Instance.ShowSuggestion(exception.Message);
 		}
 		finally
 		{
@@ -181,6 +187,7 @@ public partial class MapScreen : Control
 			throw;
 		}
 
+		using var interaction = result;
 		await PlayLargeMapInteractionMovementAsync(result.Movement);
 		if (!ReferenceEquals(session, Game.Session))
 		{

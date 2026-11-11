@@ -19,8 +19,7 @@ public sealed partial class GodotStoryRuntimeHost
 		return ValueTask.CompletedTask;
 	}
 
-	[StoryCommand("main_menu", "mainmenu")]
-	private ValueTask ExecuteMainMenuAsync()
+	public ValueTask MainMenuAsync(CancellationToken cancellationToken)
 	{
 		GameFlow.ReturnToMainMenu();
 		return ValueTask.CompletedTask;
@@ -30,27 +29,25 @@ public sealed partial class GodotStoryRuntimeHost
 	private async ValueTask ExecuteRestartAsync(CancellationToken cancellationToken)
 	{
 		Game.ProfileService.RecordCompletion(Game.State.Adventure.Round);
-		await GameFlow.RestartCurrentRoundAsync(cancellationToken);
+		// Replacing State cancels this execution. The opening story belongs to the new State.
+		await GameFlow.RestartCurrentRoundAsync();
 	}
 
 	[StoryCommand("next_round", "nextzhoumu")]
 	private ValueTask ExecuteNextZhoumuAsync(CancellationToken cancellationToken)
 	{
 		Game.ProfileService.RecordCompletion(Game.State.Adventure.Round);
-		return new ValueTask(GameFlow.StartNextRoundAsync(cancellationToken));
+		return new ValueTask(GameFlow.StartNextRoundAsync());
 	}
 
-	[StoryCommand("game_over", "gameover")]
-	private ValueTask ExecuteGameOverAsync()
+	public ValueTask GameOverAsync(CancellationToken cancellationToken)
 	{
 		GameFlow.GameOver();
 		return ValueTask.CompletedTask;
 	}
 
-	[StoryCommand("game_complete", "gamefin")]
-	private ValueTask ExecuteGameFinAsync()
+	public ValueTask GameCompleteAsync(CancellationToken cancellationToken)
 	{
-		Game.ProfileService.RecordCompletion(Game.State.Adventure.Round);
 		GameFlow.GameComplete();
 		return ValueTask.CompletedTask;
 	}

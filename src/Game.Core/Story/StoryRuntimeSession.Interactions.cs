@@ -42,6 +42,11 @@ internal sealed partial class StoryRuntimeSession
         yield return StepResult.FromEvent(new ChoiceOfferedEvent(context));
 
         var selectedIndex = await host.ChooseOptionAsync(context, ct);
+        if (!host.IsExecutionActive)
+        {
+            yield return StepResult.Terminate();
+            yield break;
+        }
         if (!availableOptions.TryGetValue(selectedIndex, out var selectedOption))
         {
             throw new StoryRuntimeException(
@@ -138,6 +143,11 @@ internal sealed partial class StoryRuntimeSession
         yield return StepResult.FromEvent(new BattleStartedEvent(context));
 
         var selectedOutcome = await host.ResolveBattleAsync(context, ct);
+        if (!host.IsExecutionActive)
+        {
+            yield return StepResult.Terminate();
+            yield break;
+        }
         if (!battle.Outcomes.TryGetValue(selectedOutcome, out var steps))
         {
             if (selectedOutcome == BattleOutcome.Win)

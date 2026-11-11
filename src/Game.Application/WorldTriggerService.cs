@@ -1,6 +1,7 @@
 using Game.Core;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Core.Story;
 
 namespace Game.Application;
 
@@ -34,7 +35,7 @@ public sealed class WorldTriggerService
 
     public async Task<bool> ExecutePendingAsync(CancellationToken cancellationToken = default)
     {
-        if (!HasPendingCheck || _executingState is not null || State.WorldTriggers.IsBlocked)
+        if (!HasPendingCheck || _executingState is not null || State.WorldTriggers.IsBlocked || !_session.Execution.CanSave)
         {
             return false;
         }
@@ -49,12 +50,13 @@ public sealed class WorldTriggerService
         }
 
         var executionState = State;
+        using var execution = _session.Execution.Begin($"world trigger '{trigger.Id}'", cancellationToken);
         _executingState = executionState;
         try
         {
-            await _session.StoryService.CommandDispatcher.ExecuteCallAsync(trigger.Action, cancellationToken);
+            await _session.StoryService.CommandDispatcher.ExecuteCallAsync(trigger.Action, execution.Token);
             cancellationToken.ThrowIfCancellationRequested();
-            if (!ReferenceEquals(executionState, State))
+            if (execution.Outcome != StoryOutcome.Completed)
             {
                 return false;
             }
@@ -65,6 +67,7 @@ public sealed class WorldTriggerService
             }
 
             _executedInCheck.Add(trigger.Id);
+            execution.Complete();
             _session.MapService.ReturnToMap(executionState, $"world trigger '{trigger.Id}' completed");
             _pendingState = executionState;
             return true;

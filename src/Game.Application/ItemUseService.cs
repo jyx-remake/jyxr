@@ -195,13 +195,23 @@ public sealed class ItemUseService
 
         if (support.Effects is [RunStoryItemUseEffectDefinition runStory])
         {
+            using var execution = _session.Execution.Begin($"item '{entry.Definition.Id}'", cancellationToken);
             CommitSuccessfulUse(entry);
             var storyService = _session.StoryService;
             var context = new StoryExecutionContext(new Dictionary<string, ExpressionValue>(StringComparer.Ordinal)
             {
                 [ItemTargetCharacterIdVariable] = ExpressionValue.FromString(target.Id),
             });
-            await storyService.ExecuteAsync(runStory.StoryId, context, cancellationToken);
+            var outcome = await storyService.ExecuteAsync(runStory.StoryId, context, execution.Token);
+            execution.Complete();
+            if (outcome != Game.Core.Story.StoryOutcome.Completed)
+            {
+                return ItemUseResult.Failed("物品剧情已结束当前流程。");
+            }
+            if (!string.IsNullOrWhiteSpace(State.Location.CurrentMapId))
+            {
+                _session.MapService.ReturnToMap(execution.State, $"item story '{runStory.StoryId}' completed");
+            }
             return ItemUseResult.Succeeded($"【{target.Name}】使用【{entry.Definition.Name}】");
         }
 

@@ -22,9 +22,20 @@ public sealed record SetVariableStep(
 public sealed record DeleteVariableStep(
     string Target) : Step;
 
-public readonly record struct StoryCommandResult(string? JumpTarget)
+public enum StoryOutcome
+{
+    Completed,
+    Defeated,
+    GameCompleted,
+    MainMenu,
+    StateReplaced,
+}
+
+public readonly record struct StoryCommandResult(string? JumpTarget, StoryOutcome? Outcome = null)
 {
     public static StoryCommandResult None { get; } = new(null);
+
+    public static StoryCommandResult End(StoryOutcome outcome) => new(null, outcome);
 
     public static StoryCommandResult Jump(string target)
     {

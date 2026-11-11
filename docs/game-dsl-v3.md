@@ -346,11 +346,11 @@ fade('in', 0.6)
 | `roll_stats()` | 打开主角随机属性 UI。 | — |
 | `set_portrait(character_id, portrait_id)` | 设置指定角色头像。 | `head` |
 | `set_model(character_id, model_id)` | 设置角色战斗模型。 | `animation` |
-| `main_menu()` | 返回主菜单。 | `mainmenu` |
+| `main_menu()` | 终止当前调用链并返回主菜单。 | `mainmenu` |
 | `restart()` | 记录当前周目通关并重新开始游戏。 | — |
 | `next_round()` | 记录当前周目通关并进入下一周目。 | `nextzhoumu` |
-| `game_over()` | 记录死亡并显示失败界面。 | `gameover` |
-| `game_complete()` | 记录当前周目通关并显示通关界面。 | `gamefin` |
+| `game_over()` | 终止当前调用链，记录死亡并显示失败界面；保留流程入口自动档。 | `gameover` |
+| `game_complete()` | 终止当前调用链，记录当前周目通关并显示通关界面；保留流程入口自动档。 | `gamefin` |
 
 ```text
 select_portrait('主角')

@@ -196,6 +196,7 @@ public partial class UIRoot : Control
 
 	public void ResetPresentationAfterLoad()
 	{
+		SetStoryPresentationActive(false);
 		ResetStoryEffects();
 		CloseMainPanel();
 		_detailPanelHost.Close();
@@ -242,6 +243,7 @@ public partial class UIRoot : Control
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ToastRequestedEvent>(OnToastRequested));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<CharacterLeveledUpEvent>(OnCharacterLeveledUp));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<SaveLoadedEvent>(OnSaveLoaded));
+		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ExecutionAbortedEvent>(_ => ResetPresentationAfterLoad()));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<AchievementUnlockedEvent>(OnAchievementUnlocked));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ProfileChangedEvent>(OnProfileChanged));
 		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ProfileLoadedEvent>(OnProfileLoaded));

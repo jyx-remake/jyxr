@@ -2,7 +2,7 @@ namespace Game.Application;
 
 public static class AtomicTextFile
 {
-    public static void Write(string path, string content)
+    public static void Write(string path, string content, string? backupPath = null)
     {
         var absolutePath = Path.GetFullPath(path);
         Directory.CreateDirectory(Path.GetDirectoryName(absolutePath)!);
@@ -18,7 +18,14 @@ public static class AtomicTextFile
                 }
                 stream.Flush(flushToDisk: true);
             }
-            File.Move(temporaryPath, absolutePath, overwrite: true);
+            if (backupPath is not null && File.Exists(absolutePath))
+            {
+                File.Replace(temporaryPath, absolutePath, backupPath);
+            }
+            else
+            {
+                File.Move(temporaryPath, absolutePath, overwrite: true);
+            }
         }
         finally
         {

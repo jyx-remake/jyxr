@@ -20,6 +20,15 @@ public sealed class SaveGameService
 
 	public SaveGame CreateSave()
 	{
+		if (!_session.Execution.CanSave)
+		{
+			throw new InvalidOperationException("当前流程尚未回到可存档状态。");
+		}
+		return CaptureSave();
+	}
+
+	internal SaveGame CaptureSave()
+	{
 		_session.PlayTimeService.Checkpoint();
 		var saveGame = SaveGame.Create(
 			State.Adventure,

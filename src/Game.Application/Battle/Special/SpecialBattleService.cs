@@ -133,8 +133,7 @@ public sealed class SpecialBattleService
                 cancellationToken);
             if (!isWin)
             {
-                await host.GameOverAsync(cancellationToken);
-                return StoryCommandResult.None;
+                return await _session.SessionFlowService.EndAsync(StoryOutcome.Defeated, host, cancellationToken);
             }
         }
 
@@ -266,9 +265,11 @@ public sealed class SpecialBattleService
         CancellationToken cancellationToken)
     {
         var specialHost = GetSpecialHost(host);
-        return await specialHost.SelectCombatantsAsync(
+        var selected = await specialHost.SelectCombatantsAsync(
             new CombatantSelectionRequest(battleId, forbiddenCharacterIds),
             cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        return selected;
     }
 
     private static async ValueTask<bool> RunBattleAsync(
@@ -277,7 +278,9 @@ public sealed class SpecialBattleService
         CancellationToken cancellationToken)
     {
         var specialHost = GetSpecialHost(host);
-        return await specialHost.RunBattleAsync(request, cancellationToken);
+        var isWin = await specialHost.RunBattleAsync(request, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        return isWin;
     }
 
     private static ISpecialBattleRuntimeHost GetSpecialHost(IRuntimeHost host) =>
@@ -395,20 +398,27 @@ public sealed class SpecialBattleService
         string speaker,
         string prompt,
         IReadOnlyList<string> options,
-        CancellationToken cancellationToken) =>
-        await host.ChooseOptionAsync(
+        CancellationToken cancellationToken)
+    {
+        var selected = await host.ChooseOptionAsync(
             new ChoiceContext(
                 speaker,
                 prompt,
                 options.Select(static (option, index) => new ChoiceOptionView(index, option)).ToArray()),
             cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        return selected;
+    }
 
-    private static ValueTask SayAsync(
+    private static async ValueTask SayAsync(
         IRuntimeHost host,
         string speaker,
         string text,
-        CancellationToken cancellationToken) =>
-        host.DialogueAsync(new DialogueContext(speaker, text), cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        await host.DialogueAsync(new DialogueContext(speaker, text), cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+    }
 
     private static StoryCommandResult CreateArenaReturn(string? callbackStoryId) =>
         string.IsNullOrWhiteSpace(callbackStoryId)

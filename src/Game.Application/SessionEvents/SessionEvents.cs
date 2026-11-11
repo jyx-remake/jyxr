@@ -135,7 +135,10 @@ public enum ToastTone
 
 public sealed record ToastRequestedEvent(string Message, ToastTone Tone = ToastTone.Normal, string? SoundEffectId = null) : ISessionEvent;
 
-public sealed record AutoSaveRequestedEvent(string Reason) : ISessionEvent;
+public sealed record AutoSaveRequestedEvent(
+    string Reason,
+    Game.Core.Model.GameState State,
+    Game.Core.Persistence.SaveGame Save) : ISessionEvent;
 
 public sealed record PartyChangedEvent : ISessionEvent;
 
@@ -148,6 +151,8 @@ public sealed record JournalChangedEvent : ISessionEvent;
 public sealed record StoryStateChangedEvent : ISessionEvent;
 
 public sealed record SaveLoadedEvent : ISessionEvent;
+
+public sealed record ExecutionAbortedEvent : ISessionEvent;
 
 public sealed record ProfileChangedEvent : ISessionEvent;
 

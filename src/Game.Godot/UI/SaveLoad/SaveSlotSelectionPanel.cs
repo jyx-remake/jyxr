@@ -149,6 +149,8 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private async Task SaveAsync(LocalSaveId saveId)
 	{
+		var session = Game.Session;
+		var state = session.State;
 		if (_saveStore.Exists(saveId) && !ShouldSkipConfirmation())
 		{
 			var confirmed = await UIRoot.Instance.ShowConfirmAsync($"{saveId.Title}已有进度，确认覆盖吗？");
@@ -158,6 +160,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 			}
 		}
 
+		if (!ReferenceEquals(session, Game.Session) || !ReferenceEquals(state, session.State)) return;
 		_saveStore.SaveCurrentSession(saveId);
 		Game.Audio.PlaySfx("音效.装备");
 		UIRoot.Instance.ShowToast($"已写入{saveId.Title}");

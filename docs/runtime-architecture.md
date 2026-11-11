@@ -28,6 +28,12 @@
 
 本地路径由 [ModStoragePaths](../src/Game.Application/Mods/ModStoragePaths.cs) 统一生成。无悔规则独立于战斗难度，只允许自动存档，且不受普通自动存档开关限制。
 
+[SessionExecutionService](../src/Game.Application/SessionExecutionService.cs) 管理执行范围、终局结果与可恢复检查点。运行状态由当前外层执行范围及 `StoryOutcome` 共同决定；没有执行中流程且没有终局结果时允许手动、快速保存。进入地图交互前先捕获检查点，再移动、推进时间与执行命令。独立剧情、全局事件、限时剧情和物品剧情也建立外层执行范围，嵌套剧情共享入口检查点。存在当前地图时，入口检查点请求自动落盘；自动存档开关和无悔规则由宿主统一执行。执行中、战败、通关和主菜单阶段禁止创建当前状态存档。
+
+`StoryService.ExecuteAsync` 返回 `StoryOutcome`，事件流以 `StoryEndedEvent` 给出结果。战败、通关与返回主菜单先由应用层设置终止阶段，再调用宿主展示界面；结果终止调用链。正常完成的外层交互提交一次性事件标记、恢复队伍资源，再保存结束检查点。战败或通关保留入口自动档，读档可重新挑战整段流程。剧情内部的段完成标记仍即时参与条件求值。
+
+异常、取消或提前释放外层执行范围时，恢复入口快照，通过 `SaveLoadedEvent` 使旧状态任务失效，再以 `ExecutionAbortedEvent` 重建宿主展示。读档、重开与下一周目会取消原执行，清除原检查点身份；新状态独立执行开场。自动存档请求携带状态身份与已捕获的 `SaveGame`，宿主仅写入仍有效的检查点。存档先写同目录临时文件、flush 后原子替换，自动档替换时将上一份完整文件保留为 `autosave.json.bak`。
+
 `profile.json` 与 `settings.json` 在启动时读取，运行中使用内存状态。World 下的 `ProfilePersistenceCoordinator` 每 60 秒真实时间、结束游玩和退出时检查点保存 profile；场景树暂停不停止保存周期，战斗加速不改变周期。失焦或收到移动端 `NotificationApplicationPaused` 时，先暂停并结算游玩计时，再同步 flush profile 和 settings，不等待下一帧。恢复通知与焦点通知独立维护，只有应用未挂起、有焦点且场景树未暂停时才恢复游玩计时。移动端后台进程可能停止执行，不能依赖周期或退出回调，强杀与断电仍只能恢复到最后成功保存的数据。
 
 档案业务变更、自动/手动/快速存档均不额外触发 profile 写入。写入以最后成功保存的快照去重，因此连续失焦与挂起通知不会重复写入相同数据；失败保留内存状态，等下一个保存时机重试。单个存档与 profile 不保证同步落盘。
@@ -100,11 +106,13 @@ Godot 调试器自定义监控 `assets/texture_cache/*` 提供预算、保留字
 | --- | --- |
 | EnterMap | 切图、恢复队伍战斗资源、记录位置、发布 MapChangedEvent、请求全局事件检查 |
 | GetCurrentMap | 构建当前地图展示数据，不改变状态或触发事件 |
-| ReturnToMap | 校验原状态，恢复队伍战斗资源，请求全局检查，发布 MapReturnedEvent，然后请求自动存档 |
-| InteractWithLocation | 根据距离和点位交互推进时间，生成带原状态身份的命令结果 |
+| ReturnToMap | 校验原状态与可保存阶段，恢复队伍战斗资源，请求全局检查，发布 MapReturnedEvent，然后请求自动存档 |
+| InteractWithLocation | 建立入口检查点，根据距离和点位交互推进时间，生成持有执行范围与原状态身份的命令结果 |
 | ExecuteInteractionAsync | 校验原状态、执行整段命令、确认点位完成，再调用 ReturnToMap |
 
 大地图分别记忆当前位置；首次进入使用 defaultLocation，显式入口可指定已有地点。移动耗时与坐标协议见 MOD 数据文档。命令在异步等待前后都校验所属 GameState，旧交互不继续派发或给新状态标记完成、请求存档。
+
+地图交互结果持有执行范围，调用方使用 `using` 覆盖赶路演出与命令执行。正常完成会结束该范围；赶路失败、取消或未执行命令即释放时恢复入口检查点。
 
 `World.RefreshCurrentMap()` 原地更新展示，不重新进入地图，也不重新选播 BGM。成功结束整段地图交互、全局事件、限时剧情或独立调试剧情时，通过 `ReturnToMap` 恢复血量、内力、怒气和技能冷却；连续战斗中途不执行此操作。宿主响应 `MapReturnedEvent` 刷新地图和 HUD，恢复地图音乐（没有地图音乐则停止 BGM，相同播放列表保持播放）。自动存档发生在资源恢复之后。读档使用 `World.RestoreCurrentMap()` 重建视图，保留存档中的战斗资源，避免继承旧交互的忙碌状态。
 
@@ -114,9 +122,9 @@ Godot 调试器自定义监控 `assets/texture_cache/*` 提供预算、保留字
 - 每次调度按仓储顺序执行首个满足条件且本轮尚未执行的事件；成功后继续检查，直到没有符合条件的事件。后执行事件改变条件后，先前未符合条件的事件仍可在本轮执行。屏蔽期间保留请求，解除后继续检查。
 - 执行中的事件内部切图不另开一轮检查，避免递归触发。每个事件一轮最多成功执行一次；可重复事件再次执行需要下一轮外部请求。
 - 一次性事件在命令成功完成且状态仍有效后才写入 CompletedTriggerIds，随后请求自动存档。
-- 失败或取消不标记完成，下次请求可重试；这不意味着自动回滚命令已经产生的副作用。
+- 失败或取消时恢复该事件入口的 GameState 检查点，下次请求可重试。GameProfile 中的跨存档统计与解锁独立保留。
 
-[WorldTriggerCoordinator](../src/Game.Godot/Story/WorldTriggerCoordinator.cs) 挂在稳定的 World 下，等待地图交互、剧情和战斗空闲后执行；不把播放请求交给临时 MapScreen 的延迟回调。读档或解绑会取消旧执行。待检查、执行中状态和本轮已执行集合不持久化，只有一次性事件的成功完成记录进入存档。
+[WorldEventCoordinator](../src/Game.Godot/Story/WorldEventCoordinator.cs) 挂在稳定的 World 下，统一等待地图交互、剧情和战斗空闲，先执行到期限时剧情，再处理全局事件。读档或解绑会取消旧执行。待检查、执行中状态和本轮已执行集合不持久化，只有一次性事件的成功完成记录进入存档。
 
 已有错误完成标记不会通过运行时猜测自动清除；修复具体存档是独立的数据操作。
 
@@ -132,7 +140,7 @@ Godot 调试器自定义监控 `assets/texture_cache/*` 提供预算、保留字
 
 剧情当前使用 DSL v3，地图和世界触发使用 `action` 与可选 `when`；命令清单统一查 [DSL v3 参考](game-dsl-v3.md)。对白对应 `DialogueStep`；选项宿主回传 ChoiceOptionView.Index，不能把过滤后的数组位置当作原选项标识。
 
-`StoryTextInterpolator` 在进入宿主前处理主角与女主名字占位符，查找覆盖整个 Party 名册。限时剧情由 [StoryTimeKeyExpirationService](../src/Game.Application/StoryTimeKeyExpirationService.cs) 检查严格超过期限的 key；到期移除 key，仅对非空目标排队播放，由 TimedStoryCoordinator 等待当前剧情结束后执行。
+`StoryTextInterpolator` 在进入宿主前处理主角与女主名字占位符，查找覆盖整个 Party 名册。限时剧情由 [StoryTimeKeyExpirationService](../src/Game.Application/StoryTimeKeyExpirationService.cs) 检查严格超过期限的 key。非空目标的到期 key 继续保存在 StoryState 中，作为持久化待办；空目标直接移除。WorldEventCoordinator 按到期顺序执行待办。执行范围在消费 key 前建立，正常完成后提交消费结果，异常或取消恢复 key；保存、退出与读档后可重新发现待办，旧状态的任务不能进入新状态执行。
 
 [SessionEvents](../src/Game.Application/SessionEvents/SessionEvents.cs) 用于应用结果到 UI、持久化与协调器的通知。增加事件时明确发布方、订阅方，以及读档后的刷新或取消语义。事件类型与完整服务列表直接查看源码，避免在多份文档中复制。
 

@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Core.Model;
+using Game.Core.Story;
 using Game.Godot.UI;
 
 namespace Game.Godot.Story;
@@ -7,8 +8,10 @@ namespace Game.Godot.Story;
 public sealed partial class GodotStoryRuntimeHost
 {
 	[StoryCommand("story")]
-	private async ValueTask ExecuteStoryAsync(string storyId, CancellationToken cancellationToken)
+	private async ValueTask<StoryCommandResult> ExecuteStoryAsync(string storyId, CancellationToken cancellationToken)
 	{
+		var session = Game.Session;
+		var state = session.State;
 		var wasStoryPresentationActive = UIRoot.Instance.IsStoryPresentationActive;
 		if (!wasStoryPresentationActive)
 		{
@@ -17,16 +20,13 @@ public sealed partial class GodotStoryRuntimeHost
 
 		try
 		{
-			var executionState = Game.State;
-			if (!await StoryRunHelper.RunAsync(storyId, cancellationToken) &&
-				ReferenceEquals(executionState, Game.State))
-			{
-				throw new InvalidOperationException($"Story command '{storyId}' did not complete a segment.");
-			}
+			var outcome = await Game.StoryService.ExecuteAsync(storyId, cancellationToken: cancellationToken);
+			return outcome == StoryOutcome.Completed ? StoryCommandResult.None : StoryCommandResult.End(outcome);
 		}
 		finally
 		{
-			if (!wasStoryPresentationActive && global::Godot.GodotObject.IsInstanceValid(UIRoot.Instance))
+			if (!wasStoryPresentationActive && ReferenceEquals(session, Game.Session) &&
+				ReferenceEquals(state, session.State) && global::Godot.GodotObject.IsInstanceValid(UIRoot.Instance))
 			{
 				UIRoot.Instance.SetStoryPresentationActive(false);
 			}
@@ -62,16 +62,19 @@ public sealed partial class GodotStoryRuntimeHost
 		new(UIRoot.Instance.ShowChestPanelAsync(cancellationToken));
 
 	[StoryCommand("battle")]
-	private async ValueTask ExecuteBattleAsync(string battleId, CancellationToken cancellationToken)
+	private async ValueTask<StoryCommandResult> ExecuteBattleAsync(string battleId, CancellationToken cancellationToken)
 	{
 		var selected = await UIRoot.Instance.ShowCombatantSelectPanelAsync(battleId, cancellationToken);
+		cancellationToken.ThrowIfCancellationRequested();
 		var isWin = await UIRoot.Instance.ShowBattleScreenAsync(
 			new OrdinaryBattleRequest(battleId, selected.ToArray()),
 			cancellationToken);
+		cancellationToken.ThrowIfCancellationRequested();
 		if (!isWin)
 		{
-			GameFlow.GameOver();
+			return await Game.SessionFlowService.EndAsync(StoryOutcome.Defeated, this, cancellationToken);
 		}
+		return StoryCommandResult.None;
 	}
 
 	[StoryCommand("background")]

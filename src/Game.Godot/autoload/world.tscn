@@ -2,10 +2,9 @@
 
 [ext_resource type="Script" uid="uid://byh01asg0e7rr" path="res://World.cs" id="1_world"]
 [ext_resource type="PackedScene" uid="uid://cx0h6a41fqirj" path="res://scenes/map/map_screen.tscn" id="2_map_screen"]
-[ext_resource type="Script" uid="uid://b4kwdhhutdr0x" path="res://Story/TimedStoryCoordinator.cs" id="3_timed_story"]
+[ext_resource type="Script" uid="uid://dohfpyejiurym" path="res://Story/WorldEventCoordinator.cs" id="3_world_event"]
 [ext_resource type="Script" uid="uid://bmski24jx6cwn" path="res://Persistence/AutoSaveCoordinator.cs" id="4_auto_save"]
 [ext_resource type="Script" uid="uid://cqvc56k0l2iub" path="res://Persistence/PlayTimeCoordinator.cs" id="5_play_time"]
-[ext_resource type="Script" uid="uid://dohfpyejiurym" path="res://Story/WorldTriggerCoordinator.cs" id="6_world_trigger"]
 
 [node name="World" type="Control" unique_id=724556095]
 layout_mode = 3
@@ -29,9 +28,9 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 
-[node name="TimedStoryCoordinator" type="Node" parent="." unique_id=1606403680]
+[node name="WorldEventCoordinator" type="Node" parent="." unique_id=1606403680]
 unique_name_in_owner = true
-script = ExtResource("3_timed_story")
+script = ExtResource("3_world_event")
 
 [node name="AutoSaveCoordinator" type="Node" parent="." unique_id=1626403681]
 unique_name_in_owner = true
@@ -40,7 +39,3 @@ script = ExtResource("4_auto_save")
 [node name="PlayTimeCoordinator" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("5_play_time")
-
-[node name="WorldTriggerCoordinator" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("6_world_trigger")

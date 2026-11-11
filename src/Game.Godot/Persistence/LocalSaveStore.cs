@@ -69,7 +69,7 @@ public sealed class LocalSaveStore
 			throw new InvalidOperationException("无悔周目只允许自动存档。");
 		}
 
-		var absolutePath = SaveCurrentSession(ResolveSavePath(saveId), GetLogName(saveId));
+		var absolutePath = SaveSnapshot(saveId, Game.SaveGameService.CreateSave());
 		if (saveId.Kind is LocalSaveKind.Quick or LocalSaveKind.Manual)
 		{
 			Game.ProfileService.AddSaves();
@@ -81,25 +81,34 @@ public sealed class LocalSaveStore
 	private static bool CanWriteCurrentSession(LocalSaveId saveId) =>
 		!Game.State.Adventure.NoRegret || saveId.Kind == LocalSaveKind.Auto;
 
-	private static string SaveCurrentSession(string savePath, string logName)
+	public string SaveAutoSave(AutoSaveRequestedEvent request)
+	{
+		if (!Game.Session.Execution.IsCurrentCheckpoint(request))
+		{
+			throw new InvalidOperationException("自动存档检查点已失效。");
+		}
+		return SaveSnapshot(LocalSaveId.Auto, request.Save);
+	}
+
+	private string SaveSnapshot(LocalSaveId saveId, SaveGame save)
 	{
 		var envelope = new LocalSaveEnvelope(
 			LocalSaveEnvelope.CurrentVersion,
-			Game.SaveGameService.CreateSave(),
+			save,
 			DateTimeOffset.UtcNow,
 			Game.ActiveModLoadout.CreateVersionReferences());
 
-		var absolutePath = savePath;
+		var absolutePath = ResolveSavePath(saveId);
 		var directoryPath = Path.GetDirectoryName(absolutePath);
 		if (string.IsNullOrWhiteSpace(directoryPath))
 		{
-			throw new InvalidOperationException($"Invalid save path: {savePath}");
+			throw new InvalidOperationException($"Invalid save path: {absolutePath}");
 		}
 
 		Directory.CreateDirectory(directoryPath);
 		var json = JsonSerializer.Serialize(envelope, GameJson.Default);
-		File.WriteAllText(absolutePath, json);
-		Game.Logger.Info($"Saved {logName} to '{absolutePath}'.");
+		AtomicTextFile.Write(absolutePath, json, saveId.Kind == LocalSaveKind.Auto ? absolutePath + ".bak" : null);
+		Game.Logger.Info($"Saved {GetLogName(saveId)} to '{absolutePath}'.");
 		return absolutePath;
 	}
 
@@ -124,6 +133,7 @@ public sealed class LocalSaveStore
 		}
 
 		File.Delete(absolutePath);
+		if (saveId.Kind == LocalSaveKind.Auto) File.Delete(absolutePath + ".bak");
 		Game.Logger.Info($"Deleted {GetLogName(saveId)} at '{absolutePath}'.");
 		return true;
 	}

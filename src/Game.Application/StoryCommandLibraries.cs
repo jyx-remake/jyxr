@@ -367,6 +367,18 @@ internal sealed class SpecialFlowStoryCommands
         _host = host;
     }
 
+    [StoryCommand("game_over", "gameover")]
+    public ValueTask<StoryCommandResult> GameOver(CancellationToken cancellationToken) =>
+        _session.SessionFlowService.EndAsync(StoryOutcome.Defeated, _host, cancellationToken);
+
+    [StoryCommand("game_complete", "gamefin")]
+    public ValueTask<StoryCommandResult> GameComplete(CancellationToken cancellationToken) =>
+        _session.SessionFlowService.EndAsync(StoryOutcome.GameCompleted, _host, cancellationToken);
+
+    [StoryCommand("main_menu", "mainmenu")]
+    public ValueTask<StoryCommandResult> MainMenu(CancellationToken cancellationToken) =>
+        _session.SessionFlowService.EndAsync(StoryOutcome.MainMenu, _host, cancellationToken);
+
     [StoryCommand("minigame", "game")]
     public ValueTask<StoryCommandResult> Minigame(string gameId, CancellationToken cancellationToken) =>
         _session.MiniGameService.RunAsync(_host, gameId, cancellationToken);

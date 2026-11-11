@@ -27,8 +27,8 @@ public sealed partial class GodotStoryRuntimeHost
 		UIRoot.Instance.SetStoryPresentationActive(true);
 		try
 		{
-			await session.StoryService.ExecuteAsync(storyId);
-			if (ReferenceEquals(session, Game.Session) && !GameFlow.IsMainMenuActive)
+			var outcome = await session.StoryService.ExecuteAsync(storyId);
+			if (outcome == StoryOutcome.Completed && ReferenceEquals(session, Game.Session) && !GameFlow.IsMainMenuActive)
 			{
 				session.MapService.ReturnToMap(state, $"debug story '{storyId}' completed");
 			}
@@ -40,7 +40,8 @@ public sealed partial class GodotStoryRuntimeHost
 		}
 		finally
 		{
-			if (GodotObject.IsInstanceValid(UIRoot.Instance))
+			if (ReferenceEquals(session, Game.Session) && ReferenceEquals(state, session.State) &&
+				GodotObject.IsInstanceValid(UIRoot.Instance))
 			{
 				UIRoot.Instance.SetStoryPresentationActive(false);
 			}

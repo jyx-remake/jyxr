@@ -43,6 +43,7 @@ public sealed class GameSession
         CharacterResourceLimitPolicy = new CharacterResourceLimitPolicy(this);
         PlayTimeService = new PlayTimeService(this, timeProvider);
         SaveGameService = new SaveGameService(this, DiagnosticLogger);
+        Execution = new SessionExecutionService(this);
         ProfileService = new ProfileService(this, DiagnosticLogger);
         SessionFlowService = new SessionFlowService(this);
         PartyService = new PartyService(this);
@@ -74,6 +75,7 @@ public sealed class GameSession
     public CharacterResourceLimitPolicy CharacterResourceLimitPolicy { get; }
     public PlayTimeService PlayTimeService { get; }
     public SaveGameService SaveGameService { get; }
+    public SessionExecutionService Execution { get; }
     public ProfileService ProfileService { get; }
     public SessionFlowService SessionFlowService { get; }
     public PartyService PartyService { get; }
@@ -97,6 +99,7 @@ public sealed class GameSession
         ArgumentNullException.ThrowIfNull(state);
         GameExpressionSymbols.ValidateDynamicVariables(state, StoryExecutionContext.Empty);
         State = state;
+        Execution.Reset();
     }
 
     public void ReplaceProfile(GameProfile profile) => Profile = profile;

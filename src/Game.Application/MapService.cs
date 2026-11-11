@@ -2,6 +2,7 @@ using Game.Core.Abstractions;
 using Game.Core;
 using Game.Core.Definitions;
 using Game.Core.Model;
+using Game.Core.Story;
 
 namespace Game.Application;
 
@@ -109,22 +110,36 @@ public sealed class MapService
             };
         }
 
-        var movement = MoveHeroIfNeeded(location);
-        var consumedTimeSlots = movement.ConsumedTimeSlots + 1;
-        State.Clock.AdvanceTimeSlots(1);
-        _session.Events.Publish(new ClockChangedEvent());
-
-        return new MapInteractionResult
+        if (!_session.Execution.CanSave)
         {
-            Command = location.Event.Action,
-            Message = location.Event.Description,
-            ConsumedTimeSlots = consumedTimeSlots,
-            Movement = movement.Result,
-            OriginatingState = State,
-            MapEventCompletionKey = location.Event.RepeatMode == RepeatMode.Once
-                ? new MapEventKey(location.MapId, location.Location.Id, location.Event.Id)
-                : null,
-        };
+            throw new InvalidOperationException("当前流程尚未结束。");
+        }
+
+        var execution = _session.Execution.Begin("map interaction");
+        try
+        {
+            var movement = MoveHeroIfNeeded(location);
+            var consumedTimeSlots = movement.ConsumedTimeSlots + 1;
+            State.Clock.AdvanceTimeSlots(1);
+            _session.Events.Publish(new ClockChangedEvent());
+
+            return new MapInteractionResult
+            {
+                Command = location.Event.Action,
+                Message = location.Event.Description,
+                ConsumedTimeSlots = consumedTimeSlots,
+                Movement = movement.Result,
+                Execution = execution,
+                MapEventCompletionKey = location.Event.RepeatMode == RepeatMode.Once
+                    ? new MapEventKey(location.MapId, location.Location.Id, location.Event.Id)
+                    : null,
+            };
+        }
+        catch
+        {
+            execution.Dispose();
+            throw;
+        }
     }
 
     public int PreviewInteractionConsumedTimeSlots((string MapId, MapLocationDefinition Location, MapEventDefinition? Event) location)
@@ -225,20 +240,23 @@ public sealed class MapService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(interaction);
-        if (interaction.Command is null || !ReferenceEquals(interaction.OriginatingState, State))
+        using var execution = interaction.Execution;
+        if (interaction.Command is null || execution is null || execution.Outcome != StoryOutcome.Completed)
         {
             return false;
         }
 
         cancellationToken.ThrowIfCancellationRequested();
-        await _session.StoryService.CommandDispatcher.ExecuteCallAsync(interaction.Command, cancellationToken);
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken, execution.Token);
+        await _session.StoryService.CommandDispatcher.ExecuteCallAsync(interaction.Command, cancellation.Token);
         cancellationToken.ThrowIfCancellationRequested();
         if (!CompleteInteraction(interaction))
         {
             return false;
         }
 
-        return ReturnToMap(interaction.OriginatingState!,
+        return ReturnToMap(execution.State,
             $"map interaction command completed: '{interaction.Command.Root.Name}'");
     }
 
@@ -246,7 +264,7 @@ public sealed class MapService
     {
         ArgumentNullException.ThrowIfNull(originatingState);
         ArgumentException.ThrowIfNullOrWhiteSpace(saveReason);
-        if (!ReferenceEquals(originatingState, State))
+        if (!ReferenceEquals(originatingState, State) || !_session.Execution.CanSave)
         {
             return false;
         }
@@ -254,14 +272,14 @@ public sealed class MapService
         _session.BattleService.RestorePartyBattleResources();
         _session.WorldTriggerService.RequestCheck();
         _session.Events.Publish(new MapReturnedEvent(State.Location.CurrentMapId));
-        _session.Events.Publish(new AutoSaveRequestedEvent(saveReason));
+        _session.Execution.RequestAutoSave(saveReason);
         return true;
     }
 
     public bool CompleteInteraction(MapInteractionResult interaction)
     {
         ArgumentNullException.ThrowIfNull(interaction);
-        if (!ReferenceEquals(interaction.OriginatingState, State))
+        if (interaction.Execution is not { } execution || execution.Outcome != StoryOutcome.Completed)
         {
             return false;
         }
@@ -272,6 +290,7 @@ public sealed class MapService
         }
 
         _session.WorldTriggerService.RequestCheck();
+        execution.Complete();
         return true;
     }
 
@@ -288,14 +307,16 @@ public sealed record MapEnterResult
     public MapPosition? HeroPosition { get; init; }
 }
 
-public sealed record MapInteractionResult
+public sealed class MapInteractionResult : IDisposable
 {
     public ParsedCall? Command { get; init; }
     public int ConsumedTimeSlots { get; init; }
     public MapMovementResult? Movement { get; init; }
     public string? Message { get; init; }
-    internal GameState? OriginatingState { get; init; }
+    internal SessionExecution? Execution { get; init; }
     internal MapEventKey? MapEventCompletionKey { get; init; }
+
+    public void Dispose() => Execution?.Dispose();
 }
 
 public sealed record MapMovementResult(

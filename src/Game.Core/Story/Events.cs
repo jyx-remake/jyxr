@@ -2,6 +2,8 @@ namespace Game.Core.Story;
 
 public abstract record StoryEvent;
 
+public sealed record StoryEndedEvent(StoryOutcome Outcome) : StoryEvent;
+
 public sealed record SegmentStartedEvent(
     string SegmentId) : StoryEvent;
 

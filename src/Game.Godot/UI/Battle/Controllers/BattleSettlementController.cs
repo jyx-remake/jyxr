@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Core.Battle;
+using Game.Core.Model;
 using Godot;
 using GameRoot = Game.Godot.Game;
 
@@ -12,6 +13,8 @@ internal sealed class BattleSettlementController(
     BattlePresenter presenter,
     Action<string> appendLog)
 {
+    private readonly GameSession _session = GameRoot.Session;
+    private readonly GameState _originatingState = GameRoot.State;
     private readonly TaskCompletionSource<bool> _completion =
         new(TaskCreationOptions.RunContinuationsAsynchronously);
     private bool _isEnding;
@@ -26,6 +29,12 @@ internal sealed class BattleSettlementController(
 
     public async Task CompleteAsync(bool isWin, BattleState? state, SpecialBattleRequest? request)
     {
+        if (_completion.Task.IsCompleted || !ReferenceEquals(_session, GameRoot.Session) ||
+            !ReferenceEquals(_originatingState, _session.State))
+        {
+            Cancel();
+            return;
+        }
         if (_isEnding) return;
         _isEnding = true;
         try

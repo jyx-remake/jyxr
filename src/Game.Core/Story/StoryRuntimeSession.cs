@@ -168,7 +168,7 @@ internal sealed partial class StoryRuntimeSession(
                 StoryCommandResult result;
                 try
                 {
-                    result = await host.Commands.InvokeAsync(command.Call.Root.Name, args, ct);
+                    result = await host.ExecuteCommandAsync(command.Call.Root.Name, args, ct);
                 }
                 catch (ExpressionException exception)
                 {
@@ -178,6 +178,11 @@ internal sealed partial class StoryRuntimeSession(
                         command.Call.Root.Span);
                 }
                 yield return StepResult.FromEvent(new CommandExecutedEvent(command.Call.Root.Name, args));
+                if (result.Outcome is { } outcome && outcome != StoryOutcome.Completed)
+                {
+                    yield return StepResult.Terminate();
+                    yield break;
+                }
                 if (result.JumpTarget is not null)
                 {
                     yield return StepResult.FromEvent(new JumpEvent(result.JumpTarget));
