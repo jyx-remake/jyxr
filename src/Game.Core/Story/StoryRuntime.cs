@@ -1,3 +1,4 @@
+using Game.Core.Story;
 namespace Game.Core.Story;
 
 public sealed class StoryRuntime

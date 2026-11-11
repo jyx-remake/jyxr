@@ -1,4 +1,5 @@
 using Game.Core.Affix;
+using Game.Core.Model;
 using Game.Core.Model.Skills;
 
 namespace Game.Core.Battle;
@@ -7,14 +8,15 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
 {
     public void ExecuteHook(BattleHookContext context, BattleEffectDefinition effect) =>
         Execute(context.State, context.Unit, context.Source ?? context.Unit,
-            context.Target is null ? [] : [context.Target], effect, context.Timing, context);
+            context.Target is null ? [] : [context.Target], effect, context.Timing, context,null);
 
     public void ExecuteAbility(
         BattleState state,
         BattleUnit source,
         IReadOnlyList<BattleUnit> primaryTargets,
         BattleEffectDefinition effect,
-        SkillInstance skill)
+        SkillInstance skill,
+        IReadOnlyList<GridPosition> impactedPositions)
     {
         if (effect is CustomAbilityBattleEffectDefinition custom)
         {
@@ -34,7 +36,7 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
             return;
         }
 
-        Execute(state, source, source, primaryTargets, effect, null, null);
+        Execute(state, source, source, primaryTargets, effect, null, null, impactedPositions);
     }
 
     private void Execute(
@@ -44,12 +46,12 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
         IReadOnlyList<BattleUnit> primaryTargets,
         BattleEffectDefinition effect,
         HookTiming? timing,
-        BattleHookContext? hookContext)
+        BattleHookContext? hookContext,
+        IReadOnlyList<GridPosition>? impactedPositions)
     {
         var targets = effect is ITargetedBattleEffectDefinition targeted
             ? BattleUnitSelectorResolver.Resolve(state, contextUnit, source, primaryTargets, targeted.Target)
             : [];
-
         switch (effect)
         {
             case ModifyDamageBattleHookEffectDefinition modify:
@@ -152,6 +154,20 @@ internal sealed class BattleEffectExecutor(BattleEngine engine)
                 break;
             case ExtraStrikeBattleHookEffectDefinition extra:
                 foreach (var target in targets) engine.ApplyHookExtraStrikeEffect(RequireHook(), target, extra);
+                break;
+            case SummonCombatantBattleHookEffectDefinition summon:
+                var sortedPositions = impactedPositions?
+                .OrderBy(p => p.Y)
+                .ThenBy(p => p.X)
+                .ToList();
+                var summonPositions = sortedPositions
+                    ?? throw new InvalidOperationException(
+                        "Summon combatant requires skill impact positions and cannot run from a battle hook.");
+                var summoned = engine.SummonCombatant(source, state, summon.characterIds, summonPositions);
+                BattleEngine.AddMessage(state, new BattleFact(
+                    BattleFactKind.Summoned,
+                    source.Id,
+                    battleJoinCombatant: summoned));
                 break;
             case CustomBattleEffectDefinition custom:
                 custom.ExecuteHook(RequireHook());

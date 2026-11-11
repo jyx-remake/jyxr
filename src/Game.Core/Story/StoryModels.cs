@@ -1,6 +1,6 @@
 namespace Game.Core.Story;
 
-public sealed record StoryScript(
+public   record StoryScript(
     int Version,
     IReadOnlyList<Segment> Segments)
 {

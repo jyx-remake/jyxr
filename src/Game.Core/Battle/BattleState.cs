@@ -1,3 +1,4 @@
+using Game.Core.Definitions;
 using Game.Core.Model;
 
 namespace Game.Core.Battle;
@@ -6,6 +7,7 @@ public sealed class BattleState
 {
     private readonly List<BattleUnit> _units;
     private List<BattleMessage>? _commandMessages;
+
     private int _commandDepth;
     private int _effectDepth;
     private long _effectSequence;
@@ -13,7 +15,8 @@ public sealed class BattleState
     public BattleState(
         BattleGrid grid,
         IEnumerable<BattleUnit> units,
-        BattleRuleSettings? ruleSettings = null)
+        BattleRuleSettings? ruleSettings = null
+        )
     {
         ArgumentNullException.ThrowIfNull(grid);
         ArgumentNullException.ThrowIfNull(units);
@@ -43,6 +46,7 @@ public sealed class BattleState
             throw new InvalidOperationException($"Multiple units start on cell '{duplicatedPosition.Key}'.");
         }
 
+        
         ScopedEffects = new ScopedBattleEffectRegistry();
         ProjectionResolver = new BattleEffectProjectionResolver(this);
         foreach (var unit in _units)
@@ -71,6 +75,10 @@ public sealed class BattleState
 
     public BattleExecutionScope? CurrentExecutionScope { get; private set; }
 
+    public BattleMainSegment? BattleMainSegment { get;  set; }
+
+    public BattleEventProgress BattleEvents { get; } = new();
+
     public BattleUnit GetUnit(string unitId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(unitId);
@@ -83,6 +91,22 @@ public sealed class BattleState
         return _units.FirstOrDefault(unit => string.Equals(unit.Id, unitId, StringComparison.Ordinal));
     }
 
+    public bool TryGetUnitByName(string name, out BattleUnit? unit)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        unit = _units.FirstOrDefault(existing =>
+            string.Equals(existing.Character.Name, name, StringComparison.Ordinal));
+        return unit is not null;
+    }
+
+    public IReadOnlyList<BattleUnit> GetUnitsByName(string name)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        return _units
+            .Where(existing => string.Equals(existing.Character.Name, name, StringComparison.Ordinal))
+            .ToList();
+    }
+
     public BattleUnit? GetUnitAt(GridPosition position, string? ignoredUnitId = null) =>
         _units.FirstOrDefault(unit =>
             unit.IsAlive &&
@@ -92,11 +116,36 @@ public sealed class BattleState
     public bool IsOccupied(GridPosition position, string? ignoredUnitId = null) =>
         GetUnitAt(position, ignoredUnitId) is not null;
 
+    public GridPosition? FindNearestEmptyPosition(GridPosition center, int maxRadius)
+    {
+        foreach (var pos in BattleEngine.EnumerateSquareSpiral(center, maxRadius))
+        {
+            if (pos != center && Grid.IsWalkable(pos) && !IsOccupied(pos))
+            {
+                return pos;
+            }
+        }
+        return null;
+    }
+
     public bool AreEnemies(BattleUnit first, BattleUnit second) => first.Team != second.Team;
 
     public IReadOnlyList<BattleUnit> GetLivingUnits() =>
         _units.Where(static unit => unit.IsAlive).ToList();
+    public void AddUnit(BattleUnit unit)
+    {
+        unit.BindProjectionResolver(ProjectionResolver);
+        if (!Grid.IsWalkable(unit.Position))
+        {
+            throw new InvalidOperationException($"Unit '{unit.Id}' starts on an invalid cell '{unit.Position}'.");
+        }
 
+        if (IsOccupied(unit.Position, unit.Id))
+        {
+            throw new InvalidOperationException($"Cell '{unit.Position}' is already occupied.");
+        }
+        _units.Add(unit);
+    }
     internal void AddMessage(BattleMessage message)
     {
         if (_commandMessages is null)
@@ -164,5 +213,31 @@ public sealed class BattleState
             state.CurrentExecutionScope = parent;
             _disposed = true;
         }
+    }
+}
+
+public sealed class BattleEventProgress
+{
+    private readonly Dictionary<string, Dictionary<int, int>> _counts = new(StringComparer.Ordinal);
+
+    public int CountExecutions(string mainSegmentName, int smallSegmentIndex)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(mainSegmentName);
+        return _counts.TryGetValue(mainSegmentName, out var byIndex) &&
+            byIndex.TryGetValue(smallSegmentIndex, out var count)
+                ? count
+                : 0;
+    }
+
+    public void RecordExecution(string mainSegmentName, int smallSegmentIndex)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(mainSegmentName);
+        if (!_counts.TryGetValue(mainSegmentName, out var byIndex))
+        {
+            byIndex = new Dictionary<int, int>();
+            _counts[mainSegmentName] = byIndex;
+        }
+
+        byIndex[smallSegmentIndex] = byIndex.TryGetValue(smallSegmentIndex, out var count) ? count + 1 : 1;
     }
 }

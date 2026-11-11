@@ -45,7 +45,35 @@ public sealed partial class BattleEngine
             _ => new HashSet<GridPosition> { target },
         };
     }
+    public static IEnumerable<GridPosition> EnumerateSquareSpiral(GridPosition center, int radius)
+    {
+        // 先返回中心
+        yield return center;
 
+        for (int r = 1; r <= radius; r++)
+        {
+            // 上边（从左到右）
+            for (int x = center.X - r; x <= center.X + r; x++)
+            {
+                yield return new GridPosition(x, center.Y - r);
+            }
+            // 右边（从上到下，跳过右上角）
+            for (int y = center.Y - r + 1; y <= center.Y + r; y++)
+            {
+                yield return new GridPosition(center.X + r, y);
+            }
+            // 下边（从右到左，跳过右下角）
+            for (int x = center.X + r - 1; x >= center.X - r; x--)
+            {
+                yield return new GridPosition(x, center.Y + r);
+            }
+            // 左边（从下到上，跳过左下角和左上角）
+            for (int y = center.Y + r - 1; y > center.Y - r; y--)
+            {
+                yield return new GridPosition(center.X - r, y);
+            }
+        }
+    }
     private static IEnumerable<GridPosition> EnumerateSquare(GridPosition center, int radius)
     {
         for (var y = center.Y - radius; y <= center.Y + radius; y++)

@@ -53,7 +53,7 @@ public sealed class GameSession
         RewardGrantService = new RewardGrantService(this);
         ShopService = new ShopService(this);
         EquipmentRefinementService = new EquipmentRefinementService(this);
-        BattleService = new BattleService(this);
+        BattleService = new BattleService(this, storyRuntimeHost);
         SpecialBattleService = new SpecialBattleService(this);
         MiniGameService = new MiniGameService(this);
         WorldTriggerService = new WorldTriggerService(this);

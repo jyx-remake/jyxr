@@ -1,0 +1,34 @@
+<Project Sdk="Godot.NET.Sdk/4.7.2">
+  <PropertyGroup>
+    <AssemblyName>engine-free-rpg</AssemblyName>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>enginefreerpg</RootNamespace>
+    <!-- Godot's editor reads this directly rather than evaluating Directory.Build.props. -->
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'ExportRelease'">
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <_EnableConsumingManagedCodeFromNativeHosting>true</_EnableConsumingManagedCodeFromNativeHosting>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Game.Content/Game.Content.csproj" />
+    <ProjectReference Include="../Game.Application/Game.Application.csproj" />
+    <ProjectReference Include="../Game.Expressions/Game.Expressions.csproj" />
+    <ProjectReference Include="../Game.Presentation/Game.Presentation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)' == 'ExportRelease'">
+    <TrimmerRootAssembly Include="GodotSharp" />
+    <TrimmerRootAssembly Include="$(AssemblyName)" />
+    <TrimmerRootAssembly Include="Game.Core" />
+    <TrimmerRootAssembly Include="Game.Content" />
+    <TrimmerRootAssembly Include="Game.Application" />
+    <TrimmerRootAssembly Include="Game.Expressions" />
+    <TrimmerRootAssembly Include="Game.Presentation" />
+  </ItemGroup>
+
+</Project>

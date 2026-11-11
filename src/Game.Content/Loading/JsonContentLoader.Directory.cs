@@ -1,6 +1,7 @@
+using Game.Core.Battle;
+using Game.Core.Story;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Game.Core.Story;
 
 namespace Game.Content.Loading;
 
@@ -8,6 +9,8 @@ public sealed partial class JsonContentLoader
 {
     private const string StoryDirectoryName = "stories";
     private const string StoryFilePattern = "*.story.json";
+    private const string BattleEventDirectoryName = "battleevents";
+    private const string BattleEventFilePattern = "*.battleevent.json";
 
     private static ContentPackage LoadPackageFromDirectory(string directoryPath, bool required = true)
     {
@@ -30,6 +33,7 @@ public sealed partial class JsonContentLoader
         var package = packageNode.Deserialize<ContentPackage>(ContentJson)
             ?? throw new InvalidOperationException($"Unable to deserialize content directory '{directoryPath}'.");
         package.StoryScripts = LoadStoryScripts(directoryPath);
+        package.BattleEventScripts = LoadBattleEventScripts(directoryPath);
         return package;
     }
 
@@ -60,6 +64,27 @@ public sealed partial class JsonContentLoader
         {
             var scriptId = BuildStoryScriptId(storyDirectoryPath, storyPath);
             Ensure(scripts.TryAdd(scriptId, StoryScriptJson.LoadFromFile(storyPath)),
+                $"Story script '{scriptId}' is duplicated.");
+        }
+
+        return scripts;
+    }
+    private static Dictionary<string, BattleEventScript> LoadBattleEventScripts(string directoryPath)
+    {
+        var battleEventDirectoryPath = Path.Combine(directoryPath, BattleEventDirectoryName);
+        if (!Directory.Exists(battleEventDirectoryPath))
+        {
+            return new Dictionary<string, BattleEventScript>(StringComparer.Ordinal);
+        }
+
+        var scripts = new Dictionary<string, BattleEventScript>(StringComparer.Ordinal);
+        var battleEventPaths = Directory.GetFiles(battleEventDirectoryPath, BattleEventFilePattern, SearchOption.AllDirectories)
+            .OrderBy(path => path, StringComparer.Ordinal);
+
+        foreach (var battleEventPath in battleEventPaths)
+        {
+            var scriptId = BuildStoryScriptId(battleEventDirectoryPath, battleEventPath);
+            Ensure(scripts.TryAdd(scriptId, BattleEventScriptJson.LoadFromFile(battleEventPath)),
                 $"Story script '{scriptId}' is duplicated.");
         }
 

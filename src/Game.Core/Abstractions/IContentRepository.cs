@@ -1,7 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
+using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Story;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Game.Core.Abstractions;
 
@@ -46,6 +47,7 @@ public interface IContentRepository
     StoryScript GetStoryScript(string id);
     bool TryGetStoryScript(string id, [NotNullWhen(true)] out StoryScript? script);
     StorySegmentEntry GetStorySegment(string id);
+    BattleEventSegmentEntry GetBattleEventSegment(string id);
     bool TryGetStorySegment(string id, [NotNullWhen(true)] out StorySegmentEntry? entry);
     ItemDefinition GetItem(string id);
     bool TryGetItem(string id, [NotNullWhen(true)] out ItemDefinition? definition);

@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://74yk3o2ss5nx" path="res://Map/LargeMapView.cs" id="8_large_map_view"]
 [ext_resource type="PackedScene" uid="uid://b6ehkt03bhugq" path="res://scenes/map/map_entity_tooltip.tscn" id="9_tooltip"]
 [ext_resource type="Shader" uid="uid://bxd1eb3y3s4sm" path="res://assets/shader/map_cloud_scroll.gdshader" id="10_cloud_scroll"]
-[ext_resource type="Script" path="res://Map/MapLocationTooltipLayer.cs" id="11_tooltip_layer"]
+[ext_resource type="Script" uid="uid://byjoibhfewbcs" path="res://Map/MapLocationTooltipLayer.cs" id="11_tooltip_layer"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cloud_scroll"]
 shader = ExtResource("10_cloud_scroll")
@@ -151,7 +151,7 @@ anchors_preset = 0
 mouse_filter = 2
 
 [node name="PinVisual" type="Control" parent="MapBigTab/LargeMapView/MarkerOverlay/MapPin" unique_id=1183406179]
-layout_mode = 0
+anchors_preset = 0
 offset_left = -38.0
 offset_top = -76.0
 offset_right = 38.0
@@ -224,7 +224,6 @@ offset_left = -40.0
 offset_top = 338.0
 offset_right = 40.0
 offset_bottom = 708.0
-horizontal_scroll_mode = 1
 vertical_scroll_mode = 0
 
 [node name="SmallMapLocationContent" type="MarginContainer" parent="MapSmallTab/SmallMapLocationScroll" unique_id=300000003]

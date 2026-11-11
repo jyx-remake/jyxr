@@ -13,6 +13,7 @@ public enum BattleFlowStateKind
 	SelectingItem,
 	SelectingItemTarget,
 	PresentingAction,
+	BattleEvent,
 	AutomatedTurn,
 	BattleEnded,
 }

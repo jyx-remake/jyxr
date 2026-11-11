@@ -3,6 +3,7 @@ using Game.Core.Abstractions;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Story;
+using Game.Core.Battle;
 
 namespace Game.Content.Loading;
 
@@ -23,7 +24,9 @@ public sealed class InMemoryContentRepository : IContentRepository
 	public required Dictionary<string, SpecialSkillDefinition> SpecialSkills { get; init; }
 	public required Dictionary<string, StoryScript> StoryScripts { get; init; }
 	public required Dictionary<string, StorySegmentEntry> StorySegments { get; init; }
-	public required Dictionary<string, ItemDefinition> Items { get; init; }
+    public required Dictionary<string, BattleEventScript> BattleEventScripts { get; init; }
+    public required Dictionary<string, BattleEventSegmentEntry> BattleEventSegments { get; init; }
+    public required Dictionary<string, ItemDefinition> Items { get; init; }
 	public Dictionary<string, ItemTagDefinition> ItemTags { get; init; } = new(StringComparer.Ordinal);
 	public required List<EquipmentRandomAffixTableDefinition> EquipmentRandomAffixTables { get; init; }
 	public required Dictionary<string, BuffDefinition> Buffs { get; init; }
@@ -45,8 +48,9 @@ public sealed class InMemoryContentRepository : IContentRepository
 		}
 	}
 	public required Dictionary<string, TowerDefinition> Towers { get; init; }
+    
 
-	public BattleDefinition GetBattle(string id) => Battles[id];
+    public BattleDefinition GetBattle(string id) => Battles[id];
 	public bool TryGetBattle(string id, [NotNullWhen(true)] out BattleDefinition? definition) =>
 		Battles.TryGetValue(id, out definition);
 	public IReadOnlyCollection<BattleDefinition> GetBattles() => Battles.Values;
@@ -110,7 +114,8 @@ public sealed class InMemoryContentRepository : IContentRepository
 		StoryScripts.TryGetValue(id, out script);
 
 	public StorySegmentEntry GetStorySegment(string id) => StorySegments[id];
-	public bool TryGetStorySegment(string id, [NotNullWhen(true)] out StorySegmentEntry? entry) =>
+    public BattleEventSegmentEntry GetBattleEventSegment(string id) => BattleEventSegments[id];
+    public bool TryGetStorySegment(string id, [NotNullWhen(true)] out StorySegmentEntry? entry) =>
 		StorySegments.TryGetValue(id, out entry);
 
 	public ItemDefinition GetItem(string id) => Items[id];

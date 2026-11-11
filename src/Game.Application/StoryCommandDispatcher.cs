@@ -1,3 +1,4 @@
+using Game.Core.Battle;
 using Game.Core.Story;
 
 namespace Game.Application;
@@ -12,7 +13,8 @@ public sealed class StoryCommandDispatcher
         GameSession session,
         IRuntimeHost host,
         StoryExecutionContext? context = null,
-        bool includeDebugCommands = true)
+        bool includeDebugCommands = true,
+        BattleState? battleState = null)
     {
         ArgumentNullException.ThrowIfNull(session);
         ArgumentNullException.ThrowIfNull(host);
@@ -31,6 +33,12 @@ public sealed class StoryCommandDispatcher
         if (includeDebugCommands)
         {
             builder.AddLibrary<DebugCommandAttribute>(host);
+        }
+
+        if (battleState is not null)
+        {
+            builder.AddLibrary<BattleEventCommandAttribute>(
+                new InventoryCurrencyBattleEventCommands(session, host, battleState));
         }
 
         Registry = builder.Build();

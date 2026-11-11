@@ -27,6 +27,7 @@ public sealed class StoryService
         CancellationToken cancellationToken = default)
     {
         await foreach (var _ in RunAsync(storyId, context, cancellationToken)) { }
+        
     }
 
     public async IAsyncEnumerable<StoryEvent> RunAsync(

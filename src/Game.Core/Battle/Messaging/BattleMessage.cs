@@ -1,6 +1,7 @@
-using System.Text.Json.Serialization;
 using Game.Core.Affix;
+using Game.Core.Definitions;
 using Game.Core.Model.Skills;
+using System.Text.Json.Serialization;
 
 namespace Game.Core.Battle;
 
@@ -19,7 +20,8 @@ public sealed record BattleFact : BattleMessage
         BattleSkillExperienceEvent? skillExperience = null,
         BattleCharacterExperienceEvent? characterExperience = null,
         BattleLifestealEvent? lifesteal = null,
-        BattleBuffReductionEvent? buffReduction = null)
+        BattleBuffReductionEvent? buffReduction = null,
+        IReadOnlyList<BattleJoinCombatant>? battleJoinCombatant = null)
         : base(unitId, timing)
     {
         Kind = kind;
@@ -31,6 +33,7 @@ public sealed record BattleFact : BattleMessage
         CharacterExperience = characterExperience;
         Lifesteal = lifesteal;
         BuffReduction = buffReduction;
+        BattleJoinCombatant = battleJoinCombatant;
     }
 
     public BattleFactKind Kind { get; }
@@ -42,6 +45,7 @@ public sealed record BattleFact : BattleMessage
     public BattleCharacterExperienceEvent? CharacterExperience { get; }
     public BattleLifestealEvent? Lifesteal { get; }
     public BattleBuffReductionEvent? BuffReduction { get; }
+    public IReadOnlyList<BattleJoinCombatant>? BattleJoinCombatant { get; }
 }
 
 public sealed record BattleCue : BattleMessage
@@ -112,6 +116,7 @@ public enum BattleFactKind
     ScopedEffectRemoved,
     SkillLeveledUp,
     CharacterLeveledUp,
+    Summoned
 }
 
 public enum BattleCueKind

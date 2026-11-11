@@ -209,7 +209,7 @@ public partial class BattleScreen : Control
 		_eventPresenter.Clear();
 		AppendLog($"战斗开始：{_battleDefinition.Name}");
 		_flowContext.StartBattle();
-		await _flow.StartAsync();
+		await _flow.StartAsync(new WaitingTimelineState(suppressBattleEvent: true));
 	}
 
 	private void ApplyBattlePresentation(BattleDefinition battle)

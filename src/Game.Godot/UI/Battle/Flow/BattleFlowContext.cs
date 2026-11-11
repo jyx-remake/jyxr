@@ -1,3 +1,4 @@
+using Game.Application;
 using Game.Core.Battle;
 using Game.Core.Model;
 using Game.Core.Model.Character;
@@ -28,7 +29,8 @@ internal sealed class BattleFlowContext : IBattleFlowContext
 				GameRoot.ContentRepository.GetGrowTemplate(
 					character.GrowTemplateId ?? CharacterExperienceProgression.DefaultGrowTemplateId),
 			characterMaxLevelResolver: _ => GameRoot.Config.MaxLevel,
-			battleExperienceEligibilityResolver: unit => unit.Team == PlayerTeam);
+			battleExperienceEligibilityResolver: unit => unit.Team == PlayerTeam,
+			summonCombatant: Game.BattleService.SpawnCombatant);
 		_battleAgent = new BasicEnemyBattleAgent(
 			new BattleTurnCandidateGenerator(Engine),
 			new BattleAiPolicyResolver(GameRoot.SkillMaxLevelPolicy.GetMaxLevel));
@@ -170,6 +172,9 @@ internal sealed class BattleFlowContext : IBattleFlowContext
 			SceneTreeTimer.SignalName.Timeout);
 		return true;
 	}
+
+	public Task<bool> RunBattleEventAsync(BattleMainSegment battleEventSegment) =>
+		Game.BattleService.RunBattleEventAsync(battleEventSegment, State);
 
 	public bool ExecuteEndAction(BattleUnit actingUnit)
 	{

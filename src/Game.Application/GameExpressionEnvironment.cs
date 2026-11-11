@@ -1,6 +1,8 @@
 using Game.Core.Abstractions;
+using Game.Core.Battle;
 using Game.Core.Model;
 using Game.Core.Model.Character;
+using Game.Core.Story;
 
 namespace Game.Application;
 
@@ -76,18 +78,24 @@ public sealed class GameExpressionEnvironment
     private readonly GameSession _session;
     private readonly ExpressionFunctionRegistry _functions;
 
-    public GameExpressionEnvironment(GameSession session)
+    public GameExpressionEnvironment(GameSession session, BattleState? battleState = null)
     {
         _session = session ?? throw new ArgumentNullException(nameof(session));
-        _functions = new ExpressionFunctionRegistryBuilder()
+        var builder = new ExpressionFunctionRegistryBuilder()
             .AddLibrary(new CoreExpressionFunctions())
             .AddLibrary(new InventoryQueryFunctions(session))
             .AddLibrary(new AdventureQueryFunctions(session))
             .AddLibrary(new MapQueryFunctions(session))
             .AddLibrary(new StoryQueryFunctions(session))
             .AddLibrary(new PartyCharacterQueryFunctions(session))
-            .AddLibrary(new RandomQueryFunctions(session))
-            .Build();
+            .AddLibrary(new RandomQueryFunctions(session));
+
+        if (battleState is not null)
+        {
+            builder.AddLibrary(
+                new BattleEventQueryFunctions(session, battleState));
+        }
+        _functions=builder.Build();
     }
 
     public ExpressionEnvironment Create(StoryExecutionContext? context = null)
@@ -165,6 +173,49 @@ internal sealed class StoryQueryFunctions
 
         return value.AsBoolean($"Story flag '{name}'");
     }
+}
+
+internal sealed class BattleEventQueryFunctions
+{
+    private readonly GameSession _session;
+    private readonly BattleState _battleState;
+
+
+    public BattleEventQueryFunctions(GameSession session, BattleState battleState)
+    {
+        _session = session;
+        _battleState = battleState ?? throw new ArgumentNullException(nameof(battleState));
+    }
+
+    [ExpressionFunction("unit_hp")]
+    public int UnitHp(string unitId) {
+            var unit = _battleState.TryGetUnit(unitId);
+            if (unit is null)
+            {
+                var available = string.Join(", ", _battleState.Units.Select(existing => existing.Id));
+                throw new InvalidOperationException(
+                    $"Battle unit '{unitId}' was not found. Available unit ids: {available}.");
+            }
+
+        return unit.Hp;
+
+        }
+    [ExpressionFunction("unit_mp")]
+    public int UnitMp(string unitId)
+    {
+        var unit = _battleState.TryGetUnit(unitId);
+        if (unit is null)
+        {
+            var available = string.Join(", ", _battleState.Units.Select(existing => existing.Id));
+            throw new InvalidOperationException(
+                $"Battle unit '{unitId}' was not found. Available unit ids: {available}.");
+        }
+
+        return unit.Mp;
+
+    }
+
+
 }
 
 internal sealed class PartyCharacterQueryFunctions

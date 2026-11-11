@@ -1,6 +1,7 @@
+using Game.Core.Affix;
+using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
-using Game.Core.Affix;
 using Game.Core.Model;
 using Game.Core.Story;
 
@@ -28,6 +29,8 @@ public sealed partial class JsonContentLoader
             SpecialSkills = IndexById(package.SpecialSkills, "SpecialSkill"),
             StoryScripts = new Dictionary<string, StoryScript>(package.StoryScripts, StringComparer.Ordinal),
             StorySegments = BuildStorySegments(package.StoryScripts),
+            BattleEventScripts = new Dictionary<string, BattleEventScript>(package.BattleEventScripts, StringComparer.Ordinal),
+            BattleEventSegments = BuildBattleEventSegments(package.BattleEventScripts),
             Items = BuildItems(package),
             ItemTags = IndexById(package.ItemTags, "ItemTag"),
             EquipmentRandomAffixTables = package.RandomAffixTables.ToList(),
@@ -149,7 +152,28 @@ public sealed partial class JsonContentLoader
 
         return segments;
     }
+    private static Dictionary<string, BattleEventSegmentEntry> BuildBattleEventSegments(
+        IReadOnlyDictionary<string, BattleEventScript> battleEventScripts)
+    {
+        var segments = new Dictionary<string, BattleEventSegmentEntry>(StringComparer.Ordinal);
+        var allSegments = battleEventScripts
+            .SelectMany(static entry => entry.Value.Segments)
+            .ToList();
+        var combinedScript = new BattleEventScript(
+            battleEventScripts.Values.FirstOrDefault()?.Version ?? StoryScript.CurrentVersion,
+            allSegments);
 
+        foreach (var (scriptId, script) in battleEventScripts)
+        {
+            foreach (var segment in script.Segments)
+            {
+                Ensure(segments.TryAdd(segment.Name, new BattleEventSegmentEntry(segment.Name, scriptId, combinedScript, segment)),
+                    $"Story segment '{segment.Name}' is duplicated.");
+            }
+        }
+
+        return segments;
+    }
     private static Dictionary<string, TDefinition> IndexById<TDefinition>(IEnumerable<TDefinition> definitions, string typeName)
         where TDefinition : class
     {

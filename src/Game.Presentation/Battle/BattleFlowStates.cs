@@ -4,7 +4,7 @@ using Game.Core.Model.Skills;
 
 namespace Game.Presentation.Battle;
 
-public sealed class WaitingTimelineState : BattleFlowState
+public sealed class WaitingTimelineState(bool suppressBattleEvent = false) : BattleFlowState
 {
 	private static readonly BattleInteractionState ViewState = new(
 		BattleFlowStateKind.WaitingTimeline,
@@ -15,6 +15,7 @@ public sealed class WaitingTimelineState : BattleFlowState
 	public override IReadOnlySet<BattleFlowStateKind> AllowedTransitions { get; } = Transitions(
 		BattleFlowStateKind.SelectingMove,
 		BattleFlowStateKind.AutomatedTurn,
+		BattleFlowStateKind.BattleEvent,
 		BattleFlowStateKind.BattleEnded);
 
 	public override async Task EnterAsync(BattleFlowStateMachine machine)
@@ -24,6 +25,14 @@ public sealed class WaitingTimelineState : BattleFlowState
 		if (context.TryGetBattleResult(out var isWin))
 		{
 			await machine.TransitionAsync(new BattleEndedState(isWin));
+			return;
+		}
+
+		if (!suppressBattleEvent && context.State.BattleMainSegment is { } battleEventSegment)
+		{
+			await machine.TransitionAsync(new BattleEventState(
+				battleEventSegment,
+				new WaitingTimelineState(suppressBattleEvent: true)));
 			return;
 		}
 
@@ -103,6 +112,8 @@ public abstract class InteractiveBattleFlowState : BattleFlowState
 					_ => Task.FromResult<IBattleFlowState>(new WaitingTimelineState())));
 				break;
 			case BattleUiIntent.EndAction:
+				
+
 				if (context.ExecuteEndAction(actingUnit))
 				{
 					await machine.TransitionAsync(new WaitingTimelineState());
@@ -340,6 +351,42 @@ public sealed class PresentingActionState(
 		}
 
 		await machine.TransitionAsync(await resolveSuccessState(context));
+	}
+}
+
+public sealed class BattleEventState(
+	BattleMainSegment battleEventSegment,
+	IBattleFlowState nextState) : BattleFlowState
+{
+	private static readonly BattleInteractionState ViewState = new(
+		BattleFlowStateKind.BattleEvent,
+		new BattleUiCapabilities());
+
+	public BattleMainSegment BattleEventSegment { get; } =
+		battleEventSegment ?? throw new ArgumentNullException(nameof(battleEventSegment));
+
+	public override BattleFlowStateKind Kind => BattleFlowStateKind.BattleEvent;
+	public override BattleInteractionState Interaction => ViewState;
+	public override IReadOnlySet<BattleFlowStateKind> AllowedTransitions { get; } = Transitions(
+		BattleFlowStateKind.WaitingTimeline,
+		BattleFlowStateKind.SelectingMove,
+		BattleFlowStateKind.UnitActing,
+		BattleFlowStateKind.SelectingSkillTarget,
+		BattleFlowStateKind.SelectingItemTarget,
+		BattleFlowStateKind.AutomatedTurn,
+		BattleFlowStateKind.BattleEnded);
+
+	public override async Task EnterAsync(BattleFlowStateMachine machine)
+	{
+		machine.Context.BeginActionPresentation(Interaction);
+		await machine.Context.RunBattleEventAsync(BattleEventSegment);
+		if (machine.Context.TryGetBattleResult(out var isWin))
+		{
+			await machine.TransitionAsync(new BattleEndedState(isWin));
+			return;
+		}
+
+		await machine.TransitionAsync(nextState);
 	}
 }
 

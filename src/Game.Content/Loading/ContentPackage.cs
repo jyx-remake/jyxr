@@ -1,3 +1,4 @@
+using Game.Core.Battle;
 using Game.Core.Definitions;
 using Game.Core.Definitions.Skills;
 using Game.Core.Story;
@@ -21,6 +22,7 @@ public sealed class ContentPackage
     public List<ShopDefinition> Shops { get; init; } = [];
     public List<SpecialSkillDefinition> SpecialSkills { get; init; } = [];
     public Dictionary<string, StoryScript> StoryScripts { get; set; } = new(StringComparer.Ordinal);
+    public Dictionary<string, BattleEventScript> BattleEventScripts { get; set; } = new(StringComparer.Ordinal);
     public List<ItemDefinition> Items { get; init; } = [];
     public List<ItemTagDefinition> ItemTags { get; init; } = [];
     public List<EquipmentRandomAffixTableDefinition> RandomAffixTables { get; init; } = [];

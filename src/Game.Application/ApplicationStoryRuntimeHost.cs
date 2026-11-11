@@ -1,3 +1,4 @@
+using Game.Core.Battle;
 using Game.Core.Model;
 using Game.Core.Story;
 
@@ -7,6 +8,7 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
 {
     private readonly GameSession _session;
     private readonly GameState _executionState;
+
     private readonly IRuntimeHost _externalHost;
     private readonly StoryTextInterpolator _textInterpolator;
     private readonly StoryVariableMutationService _variableMutations;
@@ -17,7 +19,8 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
         IRuntimeHost externalHost,
         StoryCommandDispatcher commandDispatcher,
         StoryTextInterpolator textInterpolator,
-        ExpressionEnvironment expressionEnvironment)
+        ExpressionEnvironment expressionEnvironment
+        )
     {
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _executionState = executionState ?? throw new ArgumentNullException(nameof(executionState));
@@ -27,6 +30,7 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
         _variableMutations = commandDispatcher.VariableMutations;
         Commands = commandDispatcher.Registry;
         ExpressionEnvironment = expressionEnvironment ?? throw new ArgumentNullException(nameof(expressionEnvironment));
+      
     }
 
     public bool IsExecutionActive => ReferenceEquals(_session.State, _executionState);
@@ -60,7 +64,7 @@ internal sealed class ApplicationStoryRuntimeHost : IStoryRuntimeContext
                 choice.Style),
             cancellationToken);
 
-    public ValueTask<BattleOutcome> ResolveBattleAsync(BattleContext battle, CancellationToken cancellationToken) =>
+    public ValueTask<Core.Story.BattleOutcome> ResolveBattleAsync(Core.Story.BattleContext battle, CancellationToken cancellationToken) =>
         _externalHost.ResolveBattleAsync(battle, cancellationToken);
 
     public ValueTask PlayEffectAsync(string effectId, CancellationToken cancellationToken) =>

@@ -91,10 +91,11 @@ public sealed partial class BattleEngine
         resolvedSkill.CurrentCooldown = resolvedSkill.Cooldown;
         UpdateFacingByTarget(unit, target);
 
-        var impactedPositions = ResolveImpactPositions(unit.Position, target, resolvedSkill.ImpactType, impactSize)
+        var impactedPositionSet = ResolveImpactPositions(unit.Position, target, resolvedSkill.ImpactType, impactSize)
             .Where(state.Grid.Contains)
             .ToHashSet();
-        var targets = BattleSkillTargeting.ResolveEffectiveTargets(state, unit, resolvedSkill, impactedPositions);
+        var targets = BattleSkillTargeting.ResolveEffectiveTargets(state, unit, resolvedSkill, impactedPositionSet);
+        var impactedPositions = impactedPositionSet.ToList();
 
         var battleEvent = new BattleFact(
             BattleFactKind.SkillCast,
@@ -106,7 +107,8 @@ public sealed partial class BattleEngine
             state,
             unit,
             targets,
-            BattleSkillExecutionPlanFactory.Create(resolvedSkill));
+            BattleSkillExecutionPlanFactory.Create(resolvedSkill),
+            impactedPositions);
         TriggerHooks(state, HookTiming.AfterSkillCast, unit, context =>
         {
             context.Source = unit;

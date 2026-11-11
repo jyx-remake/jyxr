@@ -135,6 +135,13 @@ internal sealed class BattleEventPresenter(
             case BattleFactKind.ScopedEffectRemoved:
                 AppendLog($"战场效果【{fact.Detail}】解除。");
                 break;
+            case BattleFactKind.Summoned:
+                ArgumentNullException.ThrowIfNull(fact.BattleJoinCombatant);
+                foreach (var battleJoinCombatant in fact.BattleJoinCombatant)
+                {
+                    AppendLog($"{unitName} 招呼 {battleJoinCombatant.CharacterId} ,坐标 {battleJoinCombatant.Position.X},{battleJoinCombatant.Position.Y}");
+                }
+                break;
         }
     }
 

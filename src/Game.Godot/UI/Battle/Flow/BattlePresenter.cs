@@ -32,6 +32,7 @@ public sealed class BattlePresenter
 			BattleFlowStateKind.SelectingItem => "选择物品",
 			BattleFlowStateKind.SelectingItemTarget => "选择物品目标",
 			BattleFlowStateKind.PresentingAction => "行动中",
+			BattleFlowStateKind.BattleEvent => "战斗事件",
 			BattleFlowStateKind.AutomatedTurn => "自动行动",
 			BattleFlowStateKind.BattleEnded => "战斗结束",
 			_ => string.Empty,

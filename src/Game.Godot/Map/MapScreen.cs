@@ -147,7 +147,7 @@ public partial class MapScreen : Control
 
 		_isHandlingInteraction = true;
 		_locationTooltipLayer.Dismiss();
-
+		
 		try
 		{
 			await HandleLocationPressedAsync(location);
@@ -174,6 +174,7 @@ public partial class MapScreen : Control
 		try
 		{
 			result = session.MapService.InteractWithLocation(location);
+			//Game.Logger.Info("测试数据1" + location.Event.Action.Source + "2"+ location.Event.Action.SourceName + "3"+location.Event.Action.Root.Name);
 		}
 		catch
 		{

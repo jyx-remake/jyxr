@@ -31,6 +31,7 @@ public sealed partial class BattleEngine
     private readonly LegendSkillResolver _legendSkillResolver;
     private readonly Func<string, IReadOnlyList<LegendSkillDefinition>> _legendSkillsProvider;
     private readonly IRandomService _random;
+    private readonly SummonCombatantHandler? _summonCombatant;
 
     public BattleEngine(
         BattleDamageCalculator? damageCalculator = null,
@@ -42,7 +43,8 @@ public sealed partial class BattleEngine
         Func<SkillInstance, int>? skillMaxLevelResolver = null,
         Func<CharacterInstance, GrowTemplateDefinition>? characterGrowTemplateResolver = null,
         Func<CharacterInstance, int>? characterMaxLevelResolver = null,
-        Func<BattleUnit, bool>? battleExperienceEligibilityResolver = null)
+        Func<BattleUnit, bool>? battleExperienceEligibilityResolver = null,
+        SummonCombatantHandler? summonCombatant = null)
     {
         _damageCalculator = damageCalculator ?? new BattleDamageCalculator();
         _damageResolver = new BattleDamageResolver(this);
@@ -65,8 +67,12 @@ public sealed partial class BattleEngine
             battleExperienceEligibilityResolver ?? DefaultBattleExperienceEligibilityResolver);
         _recoveryResolver = new BattleRecoveryResolver(
             (state, timing, unit, configure) => TriggerHooks(state, timing, unit, configure));
+        _summonCombatant = summonCombatant;
     }
 
+    internal SummonCombatantHandler SummonCombatant => _summonCombatant
+        ?? throw new InvalidOperationException(
+            "Battle engine is not configured with a summon combatant handler.");
     internal BattleRecoveryResolver RecoveryResolver => _recoveryResolver;
 
     internal BattleBuffResolver BuffResolver => _battleBuffResolver;
