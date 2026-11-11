@@ -5,7 +5,7 @@ namespace Game.Godot.UI;
 
 internal sealed class HeroSkillMasteryView
 {
-	private readonly GridContainer _gridContainer;
+	private readonly VirtualGrid _gridContainer;
 	private readonly PackedScene _skillBoxScene;
 	private readonly HeroSkillMasteryPresenter _presenter;
 	private readonly JyButton _allButton;
@@ -19,7 +19,7 @@ internal sealed class HeroSkillMasteryView
 	private MasterySkillFilter _filter = MasterySkillFilter.Internal;
 
 	public HeroSkillMasteryView(
-		GridContainer gridContainer,
+		VirtualGrid gridContainer,
 		PackedScene skillBoxScene,
 		HeroSkillMasteryPresenter presenter,
 		JyButton allButton,
@@ -67,14 +67,12 @@ internal sealed class HeroSkillMasteryView
 
 	private void Render()
 	{
-		ClearGrid();
-		foreach (var skill in _presenter.GetSkills(_filter, _previewHardMaxCheckBox.ButtonPressed))
-		{
-			_gridContainer.AddChild(CreateSkillBox(skill));
-		}
+		var skills = _presenter.GetSkills(_filter, _previewHardMaxCheckBox.ButtonPressed);
+		_gridContainer.SetItems(skills, CreateSkillBox,
+			(box, skill, _) => box.Setup(skill, isInteractive: false, showToggleButton: false));
 	}
 
-	private SkillBox CreateSkillBox(SkillInstance skill)
+	private SkillBox CreateSkillBox()
 	{
 		var instance = _skillBoxScene.Instantiate();
 		if (instance is not SkillBox skillBox)
@@ -83,7 +81,6 @@ internal sealed class HeroSkillMasteryView
 			throw new InvalidOperationException("SkillBox scene root must be SkillBox.");
 		}
 
-		skillBox.Setup(skill, isInteractive: false, showToggleButton: false);
 		skillBox.DetailRequested += OnSkillDetailRequested;
 		return skillBox;
 	}
@@ -93,11 +90,4 @@ internal sealed class HeroSkillMasteryView
 		UIRoot.Instance.ShowSkillDetailPanel(skill);
 	}
 
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			child.QueueFree();
-		}
-	}
 }

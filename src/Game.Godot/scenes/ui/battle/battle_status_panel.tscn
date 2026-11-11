@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://c7xwca038g3px" path="res://scenes/ui/character_panel/character_panel.tscn" id="2_character_panel"]
 [ext_resource type="PackedScene" uid="uid://cw2lo46cxge44" path="res://scenes/ui/battle/battle_status_unit_button.tscn" id="3_unit_button"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [node name="BattleStatusPanel" type="Control" unique_id=1675857464]
 layout_mode = 3
 anchors_preset = 15
@@ -39,7 +41,10 @@ offset_bottom = 957.0
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
 
-[node name="UnitList" type="VBoxContainer" parent="ContentRoot/ScrollContainer" unique_id=523957599]
+[node name="UnitList" type="Control" parent="ContentRoot/ScrollContainer" unique_id=523957599]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("virtual_grid")
+Columns = 1
+CellSize = Vector2(120, 120)
+Separation = Vector2(4, 8)

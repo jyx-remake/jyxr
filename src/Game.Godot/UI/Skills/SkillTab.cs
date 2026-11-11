@@ -14,14 +14,14 @@ public partial class SkillTab : Control
 
 	public bool IsReadOnly { get; set; } = true;
 
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _emptyLabel = null!;
 
 	private CharacterInstance? _character;
 
 	public override void _Ready()
 	{
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		Refresh();
 	}
@@ -40,22 +40,19 @@ public partial class SkillTab : Control
 			return;
 		}
 
-		ClearGrid();
 		if (_character is null)
 		{
+			_gridContainer.ClearItems();
 			_emptyLabel.Visible = true;
 			return;
 		}
 
 		var skills = EnumerateSkills(_character).ToArray();
 		_emptyLabel.Visible = skills.Length == 0;
-		foreach (var skill in skills)
-		{
-			_gridContainer.AddChild(CreateSkillBox(skill));
-		}
+		_gridContainer.SetItems(skills, CreateSkillBox, (box, skill, _) => box.Setup(skill, isInteractive: !IsReadOnly));
 	}
 
-	private SkillBox CreateSkillBox(SkillInstance skill)
+	private SkillBox CreateSkillBox()
 	{
 		if (SkillBoxScene is null)
 		{
@@ -69,7 +66,6 @@ public partial class SkillTab : Control
 			throw new InvalidOperationException("SkillBox scene root must be SkillBox.");
 		}
 
-		skillBox.Setup(skill, isInteractive: !IsReadOnly);
 		skillBox.ToggleRequested += OnSkillBoxToggleRequested;
 		skillBox.DetailRequested += OnSkillBoxDetailRequested;
 		return skillBox;
@@ -83,14 +79,6 @@ public partial class SkillTab : Control
 	private void OnSkillBoxDetailRequested(SkillInstance skill)
 	{
 		SkillDetailRequested?.Invoke(skill);
-	}
-
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			child.QueueFree();
-		}
 	}
 
 	private static IEnumerable<SkillInstance> EnumerateSkills(CharacterInstance character)

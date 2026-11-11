@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://b2mjgxqlxtul1" path="res://scenes/ui/party_panel/party_character_box.tscn" id="3_box"]
 [ext_resource type="Script" uid="uid://cu36f2el8bdgj" path="res://UI/Party/PartyDropSurface.cs" id="4_drop"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [node name="PartyPanel" unique_id=410951020 instance=ExtResource("2_base")]
 script = ExtResource("2_dov0m")
 PartyCharacterBoxScene = ExtResource("3_box")
@@ -17,15 +19,13 @@ offset_top = 144.0
 offset_right = 1677.0
 offset_bottom = 885.0
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=199504820]
+[node name="VirtualGrid" type="Control" parent="ContentRoot/ScrollContainer" index="0" unique_id=199504820]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-columns = 5
-
-[node name="PartyCharacterBox" parent="ContentRoot/ScrollContainer/GridContainer" index="0" unique_id=527980720 instance=ExtResource("3_box")]
-layout_mode = 2
+script = ExtResource("virtual_grid")
+Columns = 5
+CellSize = Vector2(280, 280)
+Separation = Vector2(8, 8)
 
 [node name="DragOverlay" type="Control" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="1" unique_id=100000001]
 unique_name_in_owner = true

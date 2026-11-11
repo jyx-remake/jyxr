@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://ek7sgmynm5gw" path="res://UI/Character/CharacterEquipmentSelectionPanel.cs" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://bhq13l0u7c1hg" path="res://scenes/ui/inventory_panel/inventory_item_box.tscn" id="3_item_box"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [node name="CharacterEquipmentSelectionPanel" unique_id=292688310 instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
 InventoryItemBoxScene = ExtResource("3_item_box")
@@ -41,12 +43,13 @@ offset_top = 238.0
 offset_right = 1660.0
 offset_bottom = 884.0
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=1255083395]
+[node name="VirtualGrid" type="Control" parent="ContentRoot/ScrollContainer" index="0" unique_id=1255083395]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 40
-columns = 6
+script = ExtResource("virtual_grid")
+Columns = 6
+CellSize = Vector2(180, 180)
+Separation = Vector2(20, 40)
 
 [node name="EmptyLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=1407379081]
 unique_name_in_owner = true

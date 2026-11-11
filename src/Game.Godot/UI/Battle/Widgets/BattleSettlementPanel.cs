@@ -20,7 +20,7 @@ public partial class BattleSettlementPanel : JyPanel
 	private Label _detailLabel = null!;
 	private Label _rewardHeaderLabel = null!;
 	private Label _countLabel = null!;
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private TextureButton _confirmButton = null!;
 	private Label _confirmButtonLabel = null!;
@@ -34,7 +34,7 @@ public partial class BattleSettlementPanel : JyPanel
 		_detailLabel = GetNode<Label>("%DetailLabel");
 		_rewardHeaderLabel = GetNode<Label>("%RewardHeaderLabel");
 		_countLabel = GetNode<Label>("%CountLabel");
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_confirmButton = GetNode<TextureButton>("%ConfirmButton");
 		_confirmButtonLabel = GetNode<Label>("%ConfirmButtonLabel");
@@ -111,27 +111,34 @@ public partial class BattleSettlementPanel : JyPanel
 
 	private void FillRewardList(IReadOnlyList<BattleSettlementRewardView> rewardEntries)
 	{
-		ClearGrid();
 		_emptyLabel.Visible = rewardEntries.Count == 0
 			&& !string.IsNullOrWhiteSpace(_view?.RewardHeader);
 
-		foreach (var rewardEntry in rewardEntries)
+		_gridContainer.SetItems(rewardEntries, CreateRewardControl, (control, reward, _) =>
 		{
-			_gridContainer.AddChild(CreateRewardControl(rewardEntry));
-		}
+			switch (reward)
+			{
+				case BattleSettlementInventoryRewardView inventoryReward:
+					((InventoryItemBox)control).Setup(inventoryReward.Entry);
+					break;
+				case BattleSettlementSkillFragmentRewardView fragmentReward:
+					((BattleSkillFragmentRewardBox)control).Setup(fragmentReward);
+					break;
+			}
+		}, reward => reward.GetType().FullName!);
 	}
 
 	private Control CreateRewardControl(BattleSettlementRewardView reward)
 	{
 		return reward switch
 		{
-			BattleSettlementInventoryRewardView inventoryReward => CreateItemBox(inventoryReward.Entry),
-			BattleSettlementSkillFragmentRewardView fragmentReward => CreateSkillFragmentBox(fragmentReward),
+			BattleSettlementInventoryRewardView => CreateItemBox(),
+			BattleSettlementSkillFragmentRewardView => CreateSkillFragmentBox(),
 			_ => throw new NotSupportedException($"Unsupported settlement reward view '{reward.GetType().Name}'."),
 		};
 	}
 
-	private InventoryItemBox CreateItemBox(InventoryEntry entry)
+	private InventoryItemBox CreateItemBox()
 	{
 		if (InventoryItemBoxScene is null)
 		{
@@ -145,12 +152,11 @@ public partial class BattleSettlementPanel : JyPanel
 			throw new InvalidOperationException("InventoryItemBox scene root must be InventoryItemBox.");
 		}
 
-		itemBox.Setup(entry);
 		itemBox.EntrySelected += OnRewardEntrySelected;
 		return itemBox;
 	}
 
-	private BattleSkillFragmentRewardBox CreateSkillFragmentBox(BattleSettlementSkillFragmentRewardView reward)
+	private BattleSkillFragmentRewardBox CreateSkillFragmentBox()
 	{
 		if (SkillFragmentRewardBoxScene is null)
 		{
@@ -164,7 +170,6 @@ public partial class BattleSettlementPanel : JyPanel
 			throw new InvalidOperationException("Skill fragment reward box scene root must be BattleSkillFragmentRewardBox.");
 		}
 
-		rewardBox.Setup(reward);
 		return rewardBox;
 	}
 
@@ -173,11 +178,4 @@ public partial class BattleSettlementPanel : JyPanel
 		UIRoot.Instance.ShowInventoryEntryDetailPanel(entry);
 	}
 
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			child.QueueFree();
-		}
-	}
 }

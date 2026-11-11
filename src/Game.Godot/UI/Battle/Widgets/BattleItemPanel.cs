@@ -11,7 +11,7 @@ public partial class BattleItemPanel : JyPanel
 	private readonly TaskCompletionSource<InventoryEntry?> _selectionCompletion =
 		new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _countLabel = null!;
 	private Label _emptyLabel = null!;
 	private IReadOnlyList<InventoryEntry> _entries = [];
@@ -19,7 +19,7 @@ public partial class BattleItemPanel : JyPanel
 	public override void _Ready()
 	{
 		base._Ready();
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_countLabel = GetNode<Label>("%CountLabel");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		ClosePanelRequested += () => _selectionCompletion.TrySetResult(null);
@@ -64,17 +64,13 @@ public partial class BattleItemPanel : JyPanel
 			return;
 		}
 
-		ClearGrid();
 		_countLabel.Text = $"{_entries.Count} 项";
 		_emptyLabel.Visible = _entries.Count == 0;
 
-		foreach (var entry in _entries)
-		{
-			_gridContainer.AddChild(CreateItemBox(entry));
-		}
+		_gridContainer.SetItems(_entries, CreateItemBox, (box, entry, _) => box.Setup(entry));
 	}
 
-	private InventoryItemBox CreateItemBox(InventoryEntry entry)
+	private InventoryItemBox CreateItemBox()
 	{
 		if (InventoryItemBoxScene is null)
 		{
@@ -88,7 +84,6 @@ public partial class BattleItemPanel : JyPanel
 			throw new InvalidOperationException("InventoryItemBox scene root must be InventoryItemBox.");
 		}
 
-		itemBox.Setup(entry);
 		itemBox.EntrySelected += OnEntrySelected;
 		return itemBox;
 	}
@@ -114,11 +109,4 @@ public partial class BattleItemPanel : JyPanel
 		}
 	}
 
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			child.QueueFree();
-		}
-	}
 }

@@ -2,7 +2,6 @@ using Game.Application;
 using Game.Application.Formatters;
 using Game.Core.Definitions;
 using Game.Core.Model;
-using Game.Core.Model.Character;
 using Godot;
 
 namespace Game.Godot.UI;
@@ -12,7 +11,7 @@ public partial class ItemTargetSelectionPanel : JyPanel
 	[Export]
 	public PackedScene TargetCharacterBoxScene { get; set; } = null!;
 
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _itemLabel = null!;
 	private Label _hintLabel = null!;
 	private SpinBox _quantityInput = null!;
@@ -23,7 +22,7 @@ public partial class ItemTargetSelectionPanel : JyPanel
 	public override void _Ready()
 	{
 		base._Ready();
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_itemLabel = GetNode<Label>("%ItemLabel");
 		_hintLabel = GetNode<Label>("%HintLabel");
 		_quantityInput = GetNode<SpinBox>("%QuantityInput");
@@ -52,7 +51,6 @@ public partial class ItemTargetSelectionPanel : JyPanel
 			return;
 		}
 
-		ClearGrid();
 		var analysis = Game.ItemUseService.Analyze(_entry);
 		_itemLabel.Text = _entry.Definition.Name;
 		_hintLabel.Text = analysis.Message;
@@ -61,17 +59,11 @@ public partial class ItemTargetSelectionPanel : JyPanel
 		_quantityInput.Value = 1;
 		_quantityInput.Editable = maxQuantity > 1;
 
-		foreach (var candidate in analysis.Targets)
-		{
-			var character = Game.State.Party.GetMember(candidate.CharacterId);
-			var box = CreateCharacterBox(character, candidate);
-			_gridContainer.AddChild(box);
-		}
+		_gridContainer.SetItems(analysis.Targets, CreateCharacterBox, (box, candidate, _) =>
+			box.Setup(Game.State.Party.GetMember(candidate.CharacterId), candidate));
 	}
 
-	private ItemTargetCharacterBox CreateCharacterBox(
-		CharacterInstance character,
-		ItemUseTargetCandidate candidate)
+	private ItemTargetCharacterBox CreateCharacterBox()
 	{
 		if (TargetCharacterBoxScene is null)
 		{
@@ -85,7 +77,6 @@ public partial class ItemTargetSelectionPanel : JyPanel
 			throw new InvalidOperationException("TargetCharacterBox scene root must be ItemTargetCharacterBox.");
 		}
 
-		box.Setup(character, candidate);
 		box.TargetSelected += OnTargetSelected;
 		return box;
 	}
@@ -185,11 +176,4 @@ public partial class ItemTargetSelectionPanel : JyPanel
 		}
 	}
 
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			child.QueueFree();
-		}
-	}
 }

@@ -7,6 +7,8 @@
 [ext_resource type="LabelSettings" uid="uid://c1rrni2e1gbhl" path="res://assets/theme/panel_title_label_settings.tres" id="4_mfbij"]
 [ext_resource type="Texture2D" uid="uid://browbb8ve6io8" path="res://assets/art/misc/btn_heng.png" id="5_button_texture"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_shdk0"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_confirm"]
@@ -39,15 +41,13 @@ offset_top = 154.0
 offset_right = 1463.0
 offset_bottom = 912.0
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=1023698332]
+[node name="VirtualGrid" type="Control" parent="ContentRoot/ScrollContainer" index="0" unique_id=1023698332]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-columns = 4
-
-[node name="CombatantSelectCard" parent="ContentRoot/ScrollContainer/GridContainer" index="0" unique_id=785250075 instance=ExtResource("3_card")]
-layout_mode = 2
+script = ExtResource("virtual_grid")
+Columns = 4
+CellSize = Vector2(280, 280)
+Separation = Vector2(8, 8)
 
 [node name="SidePanel" type="Panel" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="2" unique_id=388389115]
 layout_mode = 0

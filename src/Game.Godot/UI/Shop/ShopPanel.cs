@@ -33,7 +33,7 @@ public partial class ShopPanel : JyPanel
 	private CheckBox _quickBuyCheckBox = null!;
 	private CheckBox _quickSellCheckBox = null!;
 	private Label _countLabel = null!;
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private Label _promptLabel = null!;
 	private Label _silverLabel = null!;
@@ -52,7 +52,7 @@ public partial class ShopPanel : JyPanel
 		_quickBuyCheckBox = GetNode<CheckBox>("%QuickBuyCheckBox");
 		_quickSellCheckBox = GetNode<CheckBox>("%QuickSellCheckBox");
 		_countLabel = GetNode<Label>("%CountLabel");
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_promptLabel = GetNode<Label>("%PromptLabel");
 		_silverLabel = GetNode<Label>("%SilverLabel");
@@ -131,7 +131,6 @@ public partial class ShopPanel : JyPanel
 
 	private void Refresh()
 	{
-		ClearGrid();
 		UpdateModeButtons();
 		UpdateCurrencyLabels();
 
@@ -168,13 +167,8 @@ public partial class ShopPanel : JyPanel
 		_countLabel.Text = $"{products.Count} 项";
 		_emptyLabel.Visible = products.Count == 0;
 
-		foreach (var product in products)
-		{
-			var itemBox = CreateItemBox();
-			itemBox.SetupProduct(product, CanBuy(product));
-			itemBox.ProductSelected += OnProductSelected;
-			_gridContainer.AddChild(itemBox);
-		}
+		_gridContainer.SetItems(products, CreateItemBox,
+			(box, product, _) => box.SetupProduct(product, CanBuy(product)));
 	}
 
 	private void RefreshInventoryEntries()
@@ -190,14 +184,9 @@ public partial class ShopPanel : JyPanel
 		_countLabel.Text = $"{entries.Count} 项";
 		_emptyLabel.Visible = entries.Count == 0;
 
-		foreach (var entry in entries)
-		{
-			var sellPrice = Game.ShopService.GetSellPrice(entry.Definition);
-			var itemBox = CreateItemBox();
-			itemBox.SetupInventoryEntry(entry, sellPrice, Game.ShopService.CanSell(entry.Definition));
-			itemBox.InventoryEntrySelected += OnInventoryEntrySelected;
-			_gridContainer.AddChild(itemBox);
-		}
+		_gridContainer.SetItems(entries, CreateItemBox, (box, entry, _) =>
+			box.SetupInventoryEntry(entry, Game.ShopService.GetSellPrice(entry.Definition),
+				Game.ShopService.CanSell(entry.Definition)));
 	}
 
 	private ShopItemBox CreateItemBox()
@@ -214,6 +203,8 @@ public partial class ShopPanel : JyPanel
 			throw new InvalidOperationException("ShopItemBox scene root must be ShopItemBox.");
 		}
 
+		itemBox.ProductSelected += OnProductSelected;
+		itemBox.InventoryEntrySelected += OnInventoryEntrySelected;
 		return itemBox;
 	}
 
@@ -418,11 +409,6 @@ public partial class ShopPanel : JyPanel
 	{
 		_silverLabel.Text = Game.State.Currency.Silver.ToString();
 		_goldLabel.Text = Game.Profile.Yuanbao.ToString();
-	}
-
-	private void ClearGrid()
-	{
-		ClearChildren(_gridContainer);
 	}
 
 	private static void ClearChildren(Node parent)

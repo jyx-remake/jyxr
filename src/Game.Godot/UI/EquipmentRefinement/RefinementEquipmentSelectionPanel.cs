@@ -12,7 +12,7 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 	private readonly TaskCompletionSource<InventoryEntry?> _selectionCompletion =
 		new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private Label _countLabel = null!;
 	private ItemTagBar _tagBar = null!;
@@ -23,7 +23,7 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 	public override void _Ready()
 	{
 		base._Ready();
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_countLabel = GetNode<Label>("%CountLabel");
 		_tagBar = GetNode<ItemTagBar>("%TagButtons");
@@ -78,7 +78,6 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 			return;
 		}
 
-		ClearGrid();
 		_tagBar.SetItems(_entries.Select(entry => entry.Definition), ItemType.Equipment);
 		var visibleEntries = _entries
 			.Where(entry => _tagBar.Matches(entry.Definition))
@@ -87,13 +86,10 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 		_countLabel.Text = $"{visibleEntries.Length} 项";
 		_emptyLabel.Visible = visibleEntries.Length == 0;
 
-		foreach (var entry in visibleEntries)
-		{
-			_gridContainer.AddChild(CreateItemBox(entry));
-		}
+		_gridContainer.SetItems(visibleEntries, CreateItemBox, (box, entry, _) => box.Setup(entry));
 	}
 
-	private InventoryItemBox CreateItemBox(InventoryEntry entry)
+	private InventoryItemBox CreateItemBox()
 	{
 		if (InventoryItemBoxScene is null)
 		{
@@ -107,7 +103,6 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 			throw new InvalidOperationException("InventoryItemBox scene root must be InventoryItemBox.");
 		}
 
-		itemBox.Setup(entry);
 		itemBox.EntrySelected += OnEntrySelected;
 		return itemBox;
 	}
@@ -139,12 +134,4 @@ public partial class RefinementEquipmentSelectionPanel : JyPanel
 		}
 	}
 
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			_gridContainer.RemoveChild(child);
-			child.QueueFree();
-		}
-	}
 }

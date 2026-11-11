@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://dnacvsxreo2hx" path="res://scenes/ui/inventory_panel/item_target_selection_panel.tscn" id="5_target_panel"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/item_tag_bar.tscn" id="6_tag_bar"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [sub_resource type="StyleBoxTexture" id="1_button_normal"]
 texture = ExtResource("4_filter_button")
 
@@ -166,12 +168,13 @@ theme_override_constants/v_separation = 8
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/GoodsLayout/ScrollContainer" index="0" unique_id=2085090513]
+[node name="VirtualGrid" type="Control" parent="ContentRoot/GoodsLayout/ScrollContainer" index="0" unique_id=2085090513]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 18
-theme_override_constants/v_separation = 34
-columns = 6
+script = ExtResource("virtual_grid")
+Columns = 6
+CellSize = Vector2(180, 180)
+Separation = Vector2(18, 34)
 
 [node name="EmptyLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="4" unique_id=867196283]
 unique_name_in_owner = true

@@ -10,6 +10,8 @@ namespace Game.Godot.UI;
 
 public partial class SaveSlotCard : Button
 {
+	public LocalSaveId SaveId { get; private set; } = LocalSaveId.Auto;
+
 	private Label _titleLabel = null!;
 	private Label _nameLabel = null!;
 	private Label _partyCountLabel = null!;
@@ -48,6 +50,7 @@ public partial class SaveSlotCard : Button
 		SaveSlotPanelMode mode,
 		bool isMostRecentNonAuto)
 	{
+		SaveId = summary.SaveId;
 		Disabled = mode switch
 		{
 			SaveSlotPanelMode.Save => false,

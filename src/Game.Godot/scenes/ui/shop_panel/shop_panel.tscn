@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="6_filter_button"]
 [ext_resource type="PackedScene" uid="uid://h5ua5325v82x" path="res://scenes/ui/inventory_panel/inventory_tag_button.tscn" id="7_tag_button"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [sub_resource type="StyleBoxTexture" id="1_button_normal"]
 texture = ExtResource("6_filter_button")
 
@@ -285,12 +287,13 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_fjhgy")
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/GoodsPanel/GoodsLayout/ScrollContainer" index="0" unique_id=100000025]
+[node name="VirtualGrid" type="Control" parent="ContentRoot/GoodsPanel/GoodsLayout/ScrollContainer" index="0" unique_id=100000025]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 24
-theme_override_constants/v_separation = 30
-columns = 5
+script = ExtResource("virtual_grid")
+Columns = 5
+CellSize = Vector2(180, 218)
+Separation = Vector2(24, 30)
 
 [node name="EmptyLabel" type="Label" parent="ContentRoot/GoodsPanel" index="1" unique_id=100000026]
 unique_name_in_owner = true

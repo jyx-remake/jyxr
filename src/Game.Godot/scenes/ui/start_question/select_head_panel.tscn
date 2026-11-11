@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="4_jy_button"]
 [ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="5_head"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [node name="SelectHeadPanel" type="Control" unique_id=971016697]
 layout_mode = 3
 anchors_preset = 15
@@ -56,17 +58,13 @@ offset_top = 169.0
 offset_right = 1588.0
 offset_bottom = 813.0
 
-[node name="HeadContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" unique_id=409473605]
+[node name="HeadContainer" type="Control" parent="ContentRoot/ScrollContainer" unique_id=409473605]
 unique_name_in_owner = true
 layout_mode = 2
-columns = 5
-
-[node name="TextureRect" type="TextureRect" parent="ContentRoot/ScrollContainer/HeadContainer" unique_id=571213946]
-custom_minimum_size = Vector2(220, 220)
-layout_mode = 2
-texture = ExtResource("5_head")
-expand_mode = 1
-stretch_mode = 5
+script = ExtResource("virtual_grid")
+Columns = 5
+CellSize = Vector2(220, 220)
+Separation = Vector2(4, 4)
 
 [node name="AckButton" parent="ContentRoot" unique_id=1526949031 instance=ExtResource("4_jy_button")]
 unique_name_in_owner = true

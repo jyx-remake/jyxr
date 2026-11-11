@@ -23,13 +23,13 @@ public partial class CharacterRosterPanel : Control
 	} = string.Empty;
 
 	private CharacterPanel _characterPanel = null!;
-	private VBoxContainer _avatarList = null!;
+	private VirtualGrid _avatarList = null!;
 	private readonly List<IDisposable> _subscriptions = [];
 
 	public override void _Ready()
 	{
 		_characterPanel = GetNode<CharacterPanel>("%CharacterPanel");
-		_avatarList = GetNode<VBoxContainer>("%AvatarList");
+		_avatarList = GetNode<VirtualGrid>("%AvatarList");
 		_characterPanel.ClosePanelRequested += QueueFree;
 		_subscriptions.Add(Game.Session.Events.Subscribe<PartyChangedEvent>(_ => Render()));
 		_subscriptions.Add(Game.Session.Events.Subscribe<CharacterChangedEvent>(_ => Render()));
@@ -73,27 +73,17 @@ public partial class CharacterRosterPanel : Control
 
 	private void RenderAvatarList(IReadOnlyList<CharacterInstance> members)
 	{
-		foreach (var child in _avatarList.GetChildren())
-		{
-			_avatarList.RemoveChild(child);
-			child.QueueFree();
-		}
-
-		foreach (var member in members)
-		{
-			_avatarList.AddChild(CreateAvatarButton(member));
-		}
+		_avatarList.SetItems(members, CreateAvatarButton, (button, member, _) =>
+			button.Setup(member, string.Equals(member.Id, CharacterId, StringComparison.Ordinal)));
 	}
 
-	private CharacterRosterAvatarButton CreateAvatarButton(CharacterInstance character)
+	private CharacterRosterAvatarButton CreateAvatarButton()
 	{
 		if (CharacterAvatarButtonScene.Instantiate() is not CharacterRosterAvatarButton button)
 		{
 			throw new InvalidOperationException("Character avatar button scene root must be CharacterRosterAvatarButton.");
 		}
 
-		var isSelected = string.Equals(character.Id, CharacterId, StringComparison.Ordinal);
-		button.Setup(character, isSelected);
 		button.CharacterSelected += SelectCharacter;
 		return button;
 	}

@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://bhq13l0u7c1hg" path="res://scenes/ui/inventory_panel/inventory_item_box.tscn" id="3_item_box"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/item_tag_bar.tscn" id="4_tag_bar"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [node name="RefinementEquipmentSelectionPanel" unique_id=1469049339 instance=ExtResource("1_panel")]
 script = ExtResource("2_script")
 InventoryItemBoxScene = ExtResource("3_item_box")
@@ -59,12 +61,13 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/EquipmentLayout/EquipmentScroll" index="0" unique_id=1525176899]
+[node name="VirtualGrid" type="Control" parent="ContentRoot/EquipmentLayout/EquipmentScroll" index="0" unique_id=1525176899]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 40
-columns = 6
+script = ExtResource("virtual_grid")
+Columns = 6
+CellSize = Vector2(180, 180)
+Separation = Vector2(20, 40)
 
 [node name="CountLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=1477130748]
 unique_name_in_owner = true

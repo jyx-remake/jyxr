@@ -19,14 +19,13 @@ public partial class PartyPanel : JyPanel
 	public PackedScene PartyCharacterBoxScene { get; set; } = null!;
 
 	private ScrollContainer _scrollContainer = null!;
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private PartyDropSurface _dragOverlay = null!;
 	private ColorRect _insertionIndicator = null!;
 	private Label _hintLabel = null!;
 	private Label _emptyLabel = null!;
 	private readonly List<IDisposable> _subscriptions = [];
-	private readonly Dictionary<string, PartyCharacterBox> _characterBoxes = [];
-	private readonly List<PartyCharacterBox> _orderedCharacterBoxes = [];
+	private IReadOnlyList<CharacterInstance> _members = [];
 
 	private string? _draggedCharacterId;
 	private int _draggedCharacterIndex = -1;
@@ -41,7 +40,7 @@ public partial class PartyPanel : JyPanel
 	{
 		base._Ready();
 		_scrollContainer = GetNode<ScrollContainer>("%ScrollContainer");
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_dragOverlay = GetNode<PartyDropSurface>("%DragOverlay");
 		_insertionIndicator = GetNode<ColorRect>("%InsertionIndicator");
 		_hintLabel = GetNode<Label>("%HintLabel");
@@ -119,7 +118,7 @@ public partial class PartyPanel : JyPanel
 	internal bool CanDropCharacter(Vector2 pointerPosition, Variant data)
 	{
 		if (!MatchesActiveDrag(data) ||
-			!_scrollContainer.GetGlobalRect().HasPoint(pointerPosition))
+			!IsPointerInsideScroll(pointerPosition))
 		{
 			return false;
 		}
@@ -167,7 +166,7 @@ public partial class PartyPanel : JyPanel
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(characterId);
 		if (characterIndex <= 0 ||
-			characterIndex >= _orderedCharacterBoxes.Count ||
+			characterIndex >= _members.Count ||
 			string.Equals(characterId, Party.HeroCharacterId, StringComparison.Ordinal))
 		{
 			return;
@@ -176,6 +175,7 @@ public partial class PartyPanel : JyPanel
 		EndCharacterDrag();
 		_draggedCharacterId = characterId;
 		_draggedCharacterIndex = characterIndex;
+		_gridContainer.PinItem(characterIndex);
 		_dragTouchIndex = touchIndex;
 		_dragPointerPosition = pointerPosition;
 		_dragStartPointerPosition = pointerPosition;
@@ -198,6 +198,7 @@ public partial class PartyPanel : JyPanel
 			_scrollContainer.MouseFilter = _scrollMouseFilterBeforeDrag;
 		}
 
+		_gridContainer?.PinItem(null);
 		_draggedCharacterId = null;
 		_draggedCharacterIndex = -1;
 		_dragTouchIndex = -1;
@@ -219,28 +220,13 @@ public partial class PartyPanel : JyPanel
 	private void Refresh()
 	{
 		EndCharacterDrag();
-		ClearGrid();
-		_characterBoxes.Clear();
-		_orderedCharacterBoxes.Clear();
-
-		var party = Game.State.Party;
-		if (party.Members.Count == 0)
-		{
-			_emptyLabel.Visible = true;
-			return;
-		}
-
-		_emptyLabel.Visible = false;
-		for (var index = 0; index < party.Members.Count; index += 1)
-		{
-			var characterBox = CreateCharacterBox(party.Members[index], index);
-			_characterBoxes[party.Members[index].Id] = characterBox;
-			_orderedCharacterBoxes.Add(characterBox);
-			_gridContainer.AddChild(characterBox);
-		}
+		_members = Game.State.Party.Members;
+		_emptyLabel.Visible = _members.Count == 0;
+		_gridContainer.SetItems(_members, CreateCharacterBox,
+			(box, character, index) => box.Setup(character, index, this));
 	}
 
-	private PartyCharacterBox CreateCharacterBox(CharacterInstance character, int partyIndex)
+	private PartyCharacterBox CreateCharacterBox()
 	{
 		if (PartyCharacterBoxScene is null)
 		{
@@ -254,7 +240,6 @@ public partial class PartyPanel : JyPanel
 			throw new InvalidOperationException("PartyCharacterBox scene root must be PartyCharacterBox.");
 		}
 
-		characterBox.Setup(character, partyIndex, this);
 		characterBox.CharacterSelected += OnCharacterSelected;
 		return characterBox;
 	}
@@ -268,7 +253,7 @@ public partial class PartyPanel : JyPanel
 	{
 		if (!IsCharacterDragActive ||
 			_draggedCharacterId is null ||
-			!_scrollContainer.GetGlobalRect().HasPoint(_dragPointerPosition))
+			!IsPointerInsideScroll(_dragPointerPosition))
 		{
 			EndCharacterDrag();
 			return;
@@ -296,21 +281,21 @@ public partial class PartyPanel : JyPanel
 
 	private void OnCharacterChanged(CharacterChangedEvent sessionEvent)
 	{
-		if (_characterBoxes.TryGetValue(sessionEvent.CharacterId, out var characterBox))
+		for (var index = 0; index < _members.Count; index++)
 		{
-			characterBox.RefreshView();
+			if (_members[index].Id == sessionEvent.CharacterId)
+			{
+				_gridContainer.RefreshItem(index);
+				return;
+			}
 		}
 	}
 
 	private void OnSaveLoaded(SaveLoadedEvent _) => Refresh();
 
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			child.QueueFree();
-		}
-	}
+	private bool IsPointerInsideScroll(Vector2 pointerPosition) =>
+		new Rect2(Vector2.Zero, _scrollContainer.Size).HasPoint(
+			_scrollContainer.GetGlobalTransformWithCanvas().AffineInverse() * pointerPosition);
 
 	private bool IsCharacterDragActive => _draggedCharacterId is not null;
 
@@ -328,21 +313,22 @@ public partial class PartyPanel : JyPanel
 			return;
 		}
 
-		var scrollRect = _scrollContainer.GetGlobalRect();
+		var pointerPosition = _scrollContainer.GetGlobalTransformWithCanvas().AffineInverse() * _dragPointerPosition;
+		var scrollRect = new Rect2(Vector2.Zero, _scrollContainer.Size);
 		var speed = 0f;
-		if (_dragPointerPosition.Y < scrollRect.Position.Y + AutoScrollEdgeSize)
+		if (pointerPosition.Y < scrollRect.Position.Y + AutoScrollEdgeSize)
 		{
 			var intensity = Mathf.Clamp(
-				(scrollRect.Position.Y + AutoScrollEdgeSize - _dragPointerPosition.Y) /
+				(scrollRect.Position.Y + AutoScrollEdgeSize - pointerPosition.Y) /
 				AutoScrollEdgeSize,
 				0f,
 				1f);
 			speed = -AutoScrollMaximumSpeed * intensity;
 		}
-		else if (_dragPointerPosition.Y > scrollRect.End.Y - AutoScrollEdgeSize)
+		else if (pointerPosition.Y > scrollRect.End.Y - AutoScrollEdgeSize)
 		{
 			var intensity = Mathf.Clamp(
-				(_dragPointerPosition.Y - (scrollRect.End.Y - AutoScrollEdgeSize)) /
+				(pointerPosition.Y - (scrollRect.End.Y - AutoScrollEdgeSize)) /
 				AutoScrollEdgeSize,
 				0f,
 				1f);
@@ -367,7 +353,7 @@ public partial class PartyPanel : JyPanel
 	{
 		_dropTargetIndex = null;
 		_insertionIndicator.Visible = false;
-		if (!IsCharacterDragActive || _orderedCharacterBoxes.Count < 2)
+		if (!IsCharacterDragActive || _members.Count < 2)
 		{
 			return;
 		}
@@ -382,7 +368,7 @@ public partial class PartyPanel : JyPanel
 			? insertionSlot - 1
 			: insertionSlot;
 		if (targetIndex <= 0 ||
-			targetIndex >= _orderedCharacterBoxes.Count ||
+			targetIndex >= _members.Count ||
 			targetIndex == _draggedCharacterIndex)
 		{
 			return;
@@ -394,74 +380,23 @@ public partial class PartyPanel : JyPanel
 
 	private int ResolveInsertionSlot(Vector2 pointerPosition)
 	{
-		var columnCount = Math.Max(1, _gridContainer.Columns);
-		var closestRowStart = 0;
-		var closestRowDistance = float.MaxValue;
-		for (var rowStart = 0; rowStart < _orderedCharacterBoxes.Count; rowStart += columnCount)
-		{
-			var rowEnd = Math.Min(rowStart + columnCount, _orderedCharacterBoxes.Count);
-			var rowCenterY = 0f;
-			for (var index = rowStart; index < rowEnd; index += 1)
-			{
-				rowCenterY += _orderedCharacterBoxes[index].GetGlobalRect().GetCenter().Y;
-			}
-
-			rowCenterY /= rowEnd - rowStart;
-			var rowDistance = Mathf.Abs(pointerPosition.Y - rowCenterY);
-			if (rowDistance < closestRowDistance)
-			{
-				closestRowDistance = rowDistance;
-				closestRowStart = rowStart;
-			}
-		}
-
-		var closestRowEnd = Math.Min(
-			closestRowStart + columnCount,
-			_orderedCharacterBoxes.Count);
-		var closestIndex = closestRowStart;
-		var closestHorizontalDistance = float.MaxValue;
-		for (var index = closestRowStart; index < closestRowEnd; index += 1)
-		{
-			var centerX = _orderedCharacterBoxes[index].GetGlobalRect().GetCenter().X;
-			var horizontalDistance = Mathf.Abs(pointerPosition.X - centerX);
-			if (horizontalDistance < closestHorizontalDistance)
-			{
-				closestHorizontalDistance = horizontalDistance;
-				closestIndex = index;
-			}
-		}
-
-		var closestCenterX = _orderedCharacterBoxes[closestIndex]
-			.GetGlobalRect()
-			.GetCenter()
-			.X;
-		return pointerPosition.X < closestCenterX
-			? closestIndex
-			: closestIndex + 1;
+		var localPosition = _gridContainer.GetGlobalTransformWithCanvas().AffineInverse() * pointerPosition;
+		return _gridContainer.GetInsertionSlot(localPosition);
 	}
 
 	private void ShowInsertionIndicator(int insertionSlot)
 	{
-		Rect2 anchorRect;
-		float globalX;
-		if (insertionSlot < _orderedCharacterBoxes.Count)
-		{
-			anchorRect = _orderedCharacterBoxes[insertionSlot].GetGlobalRect();
-			globalX = anchorRect.Position.X;
-		}
-		else
-		{
-			anchorRect = _orderedCharacterBoxes[^1].GetGlobalRect();
-			globalX = anchorRect.End.X;
-		}
-
-		var overlayRect = _dragOverlay.GetGlobalRect();
-		_insertionIndicator.Position = new Vector2(
-			globalX - overlayRect.Position.X - InsertionIndicatorThickness / 2f,
-			anchorRect.Position.Y - overlayRect.Position.Y + InsertionIndicatorVerticalInset);
-		_insertionIndicator.Size = new Vector2(
-			InsertionIndicatorThickness,
-			Mathf.Max(0f, anchorRect.Size.Y - InsertionIndicatorVerticalInset * 2f));
+		var anchorIndex = Math.Min(insertionSlot, _members.Count - 1);
+		var rect = _gridContainer.GetItemRect(anchorIndex);
+		var anchorX = insertionSlot < _members.Count ? rect.Position.X : rect.End.X;
+		var gridToOverlay = _dragOverlay.GetGlobalTransformWithCanvas().AffineInverse()
+			* _gridContainer.GetGlobalTransformWithCanvas();
+		var top = gridToOverlay * new Vector2(anchorX, rect.Position.Y);
+		var bottom = gridToOverlay * new Vector2(anchorX, rect.End.Y);
+		_insertionIndicator.Position = top + new Vector2(
+			-InsertionIndicatorThickness / 2f, InsertionIndicatorVerticalInset);
+		_insertionIndicator.Size = new Vector2(InsertionIndicatorThickness,
+			Mathf.Max(0f, bottom.Y - top.Y - InsertionIndicatorVerticalInset * 2f));
 		_insertionIndicator.Visible = true;
 	}
 }

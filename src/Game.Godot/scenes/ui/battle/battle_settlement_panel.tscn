@@ -8,6 +8,8 @@
 [ext_resource type="FontVariation" path="res://assets/theme/fonts/martial_display_font.tres" id="6_font"]
 [ext_resource type="PackedScene" path="res://scenes/ui/battle/battle_skill_fragment_reward_box.tscn" id="7_fragment_box"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [sub_resource type="LabelSettings" id="1_title"]
 font = ExtResource("6_font")
 font_size = 58
@@ -79,13 +81,14 @@ offset_top = 304.0
 offset_right = 1664.0
 offset_bottom = 856.0
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=1977328070]
+[node name="VirtualGrid" type="Control" parent="ContentRoot/ScrollContainer" index="0" unique_id=1977328070]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 18
-theme_override_constants/v_separation = 34
-columns = 6
+script = ExtResource("virtual_grid")
+Columns = 6
+CellSize = Vector2(180, 180)
+Separation = Vector2(18, 34)
 
 [node name="EmptyLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="5" unique_id=1807244912]
 unique_name_in_owner = true

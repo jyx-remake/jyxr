@@ -9,6 +9,7 @@ namespace Game.Godot.UI;
 public partial class CombatantSelectCard : Button
 {
 	private TextureRect _avatar = null!;
+	private Texture2D? _defaultAvatarTexture;
 	private Label _nameLabel = null!;
 	private Label _levelLabel = null!;
 	private Label _attackLabel = null!;
@@ -29,6 +30,7 @@ public partial class CombatantSelectCard : Button
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_defaultAvatarTexture = _avatar.Texture;
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_levelLabel = GetNode<Label>("%LevelLabel");
 		_attackLabel = GetNode<Label>("%AttackLabel");
@@ -48,12 +50,6 @@ public partial class CombatantSelectCard : Button
 		_isSelected = isSelected;
 		_isRequired = isRequired;
 		_isForbidden = isForbidden;
-		Refresh();
-	}
-
-	public void SetSelected(bool selected)
-	{
-		_isSelected = selected;
 		Refresh();
 	}
 
@@ -88,11 +84,7 @@ public partial class CombatantSelectCard : Button
 				? "剧情要求出战"
 				: _character.Name;
 
-		var portrait = AssetResolver.LoadTexture(_character.Portrait);
-		if (portrait is not null)
-		{
-			_avatar.Texture = portrait;
-		}
+		_avatar.Texture = AssetResolver.LoadTexture(_character.Portrait) ?? _defaultAvatarTexture;
 
 		_maleLogo.Visible = _character.Gender == CharacterGender.Male;
 		_femaleLogo.Visible = _character.Gender == CharacterGender.Female;

@@ -209,7 +209,7 @@ public partial class HeroPanel : JyPanel
 
 	private HeroSkillMasteryView CreateMasteryView() =>
 		new(
-			GetNode<GridContainer>("%GridContainer"),
+			GetNode<VirtualGrid>("%VirtualGrid"),
 			SkillBoxScene,
 			new HeroSkillMasteryPresenter(
 				Game.ContentRepository,

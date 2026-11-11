@@ -9,7 +9,7 @@ public partial class BattleStatusPanel : Control
 	public PackedScene UnitButtonScene { get; set; } = null!;
 
 	private CharacterPanel _characterPanel = null!;
-	private VBoxContainer _unitList = null!;
+	private VirtualGrid _unitList = null!;
 	private BattleState? _state;
 	private string? _selectedUnitId;
 	private int _playerTeam;
@@ -17,7 +17,7 @@ public partial class BattleStatusPanel : Control
 	public override void _Ready()
 	{
 		_characterPanel = GetNode<CharacterPanel>("%CharacterPanel");
-		_unitList = GetNode<VBoxContainer>("%UnitList");
+		_unitList = GetNode<VirtualGrid>("%UnitList");
 		_characterPanel.ClosePanelRequested += QueueFree;
 		Refresh();
 	}
@@ -56,14 +56,11 @@ public partial class BattleStatusPanel : Control
 
 	private void RefreshUnitList(IReadOnlyList<BattleUnit> units)
 	{
-		ClearChildren(_unitList);
-		foreach (var unit in units)
-		{
-			_unitList.AddChild(CreateUnitButton(unit));
-		}
+		_unitList.SetItems(units, CreateUnitButton, (button, unit, _) =>
+			button.Setup(unit, unit.Team == _playerTeam, string.Equals(unit.Id, _selectedUnitId, StringComparison.Ordinal)));
 	}
 
-	private BattleStatusUnitButton CreateUnitButton(BattleUnit unit)
+	private BattleStatusUnitButton CreateUnitButton()
 	{
 		if (UnitButtonScene is null)
 		{
@@ -77,7 +74,6 @@ public partial class BattleStatusPanel : Control
 			throw new InvalidOperationException("Battle status unit button scene root must be BattleStatusUnitButton.");
 		}
 
-		button.Setup(unit, unit.Team == _playerTeam, string.Equals(unit.Id, _selectedUnitId, StringComparison.Ordinal));
 		button.UnitSelected += OnUnitSelected;
 		return button;
 	}
@@ -98,11 +94,4 @@ public partial class BattleStatusPanel : Control
 			.ThenBy(unit => unit.Team)
 			.ThenBy(unit => unit.Id, StringComparer.Ordinal);
 
-	private static void ClearChildren(Node node)
-	{
-		foreach (var child in node.GetChildren())
-		{
-			child.QueueFree();
-		}
-	}
 }

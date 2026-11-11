@@ -13,11 +13,11 @@ public partial class PartyDropSurface : Control
 	}
 
 	public override bool _CanDropData(Vector2 atPosition, Variant data) =>
-		_ownerPanel?.CanDropCharacter(ToGlobalPosition(atPosition), data) ?? false;
+		_ownerPanel?.CanDropCharacter(ToViewportPosition(atPosition), data) ?? false;
 
 	public override void _DropData(Vector2 atPosition, Variant data)
 	{
-		_ownerPanel?.DropCharacter(ToGlobalPosition(atPosition), data);
+		_ownerPanel?.DropCharacter(ToViewportPosition(atPosition), data);
 	}
 
 	public override void _GuiInput(InputEvent @event)
@@ -26,6 +26,6 @@ public partial class PartyDropSurface : Control
 		_ownerPanel?.HandleDropSurfaceInput(@event);
 	}
 
-	private Vector2 ToGlobalPosition(Vector2 localPosition) =>
-		GetGlobalRect().Position + localPosition;
+	private Vector2 ToViewportPosition(Vector2 localPosition) =>
+		GetGlobalTransformWithCanvas() * localPosition;
 }

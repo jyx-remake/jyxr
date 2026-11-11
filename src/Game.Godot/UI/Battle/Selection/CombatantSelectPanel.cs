@@ -1,6 +1,5 @@
 using Game.Application;
 using Game.Core.Definitions;
-using Game.Core.Model.Character;
 using Godot;
 using GameRoot = Game.Godot.Game;
 
@@ -14,7 +13,7 @@ public partial class CombatantSelectPanel : JyPanel
 	[Export]
 	public string PreviewBattleId { get; set; } = string.Empty;
 
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _titleLabel = null!;
 	private Label _capacityLabel = null!;
 	private Label _selectedCountLabel = null!;
@@ -25,7 +24,6 @@ public partial class CombatantSelectPanel : JyPanel
 	private readonly HashSet<string> _requiredIds = new(StringComparer.Ordinal);
 	private readonly HashSet<string> _forbiddenIds = new(StringComparer.Ordinal);
 	private readonly HashSet<string> _selectedIds = new(StringComparer.Ordinal);
-	private readonly Dictionary<string, CombatantSelectCard> _cards = new(StringComparer.Ordinal);
 	private string _battleId = string.Empty;
 	private string _battleName = string.Empty;
 	private int _deploySlotCount;
@@ -39,7 +37,7 @@ public partial class CombatantSelectPanel : JyPanel
 	public override void _Ready()
 	{
 		base._Ready();
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_capacityLabel = GetNode<Label>("%CapacityLabel");
 		_selectedCountLabel = GetNode<Label>("%SelectedCountLabel");
@@ -48,7 +46,6 @@ public partial class CombatantSelectPanel : JyPanel
 		_confirmButtonLabel = GetNode<Label>("%ConfirmButtonLabel");
 		_confirmButton.Pressed += ConfirmSelection;
 
-		ClearGrid();
 		if (!string.IsNullOrWhiteSpace(PreviewBattleId))
 		{
 			Configure(PreviewBattleId);
@@ -136,32 +133,22 @@ public partial class CombatantSelectPanel : JyPanel
 			return;
 		}
 
-		ClearGrid();
-		_cards.Clear();
-
 		_titleLabel.Text = string.IsNullOrWhiteSpace(_battleName)
 			? "出战人物选择"
 			: $"出战人物选择 - {_battleName}";
 
 		var members = Game.State.Party.Members;
-		foreach (var member in members)
+		_gridContainer.SetItems(members, CreateCard, (card, member, _) =>
 		{
 			var isRequired = _requiredIds.Contains(member.Id);
-			var isForbidden = _forbiddenIds.Contains(member.Id) && !isRequired;
-			var isSelected = _selectedIds.Contains(member.Id);
-			var card = CreateCard(member, isSelected, isRequired, isForbidden);
-			_gridContainer.AddChild(card);
-			_cards[member.Id] = card;
-		}
+			card.Setup(member, _selectedIds.Contains(member.Id), isRequired,
+				_forbiddenIds.Contains(member.Id) && !isRequired);
+		});
 
 		RefreshFooter();
 	}
 
-	private CombatantSelectCard CreateCard(
-		CharacterInstance character,
-		bool isSelected,
-		bool isRequired,
-		bool isForbidden)
+	private CombatantSelectCard CreateCard()
 	{
 		if (CharacterCardScene is null)
 		{
@@ -175,7 +162,6 @@ public partial class CombatantSelectPanel : JyPanel
 			throw new InvalidOperationException("Combatant select card scene root must be CombatantSelectCard.");
 		}
 
-		card.Setup(character, isSelected, isRequired, isForbidden);
 		card.SelectionRequested += ToggleSelection;
 		return card;
 	}
@@ -196,7 +182,7 @@ public partial class CombatantSelectPanel : JyPanel
 		if (_selectedIds.Contains(characterId))
 		{
 			_selectedIds.Remove(characterId);
-			SetCardSelected(characterId, false);
+			_gridContainer.RefreshItems();
 			RefreshFooter();
 			return;
 		}
@@ -208,7 +194,7 @@ public partial class CombatantSelectPanel : JyPanel
 		}
 
 		_selectedIds.Add(characterId);
-		SetCardSelected(characterId, true);
+		_gridContainer.RefreshItems();
 		RefreshFooter();
 	}
 
@@ -274,27 +260,11 @@ public partial class CombatantSelectPanel : JyPanel
 		return string.Empty;
 	}
 
-	private void SetCardSelected(string characterId, bool selected)
-	{
-		if (_cards.TryGetValue(characterId, out var card))
-		{
-			card.SetSelected(selected);
-		}
-	}
-
 	private IReadOnlyList<string> GetSelectedCharacterIds() =>
 		Game.State.Party.Members
 			.Where(member => _selectedIds.Contains(member.Id))
 			.Select(member => member.Id)
 			.ToArray();
-
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			child.QueueFree();
-		}
-	}
 
 	private int CountPlayerDeploySlots(BattleDefinition battle) =>
 		battle.Participants.Count(participant =>

@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://bmuvi6e6ogspp" path="res://UI/Inventory/ItemTargetSelectionPanel.cs" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://bhdr74hohb0e4" path="res://scenes/ui/inventory_panel/item_target_character_box.tscn" id="3_character_box"]
 
+[ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quantity"]
 content_margin_left = 14.0
 content_margin_top = 5.0
@@ -102,12 +104,13 @@ offset_top = 213.0
 offset_right = 1646.0
 offset_bottom = 896.0
 
-[node name="GridContainer" type="GridContainer" parent="ContentRoot/ScrollContainer" index="0" unique_id=1064672287]
+[node name="VirtualGrid" type="Control" parent="ContentRoot/ScrollContainer" index="0" unique_id=1064672287]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 32
-theme_override_constants/v_separation = 38
-columns = 5
+script = ExtResource("virtual_grid")
+Columns = 5
+CellSize = Vector2(240, 240)
+Separation = Vector2(32, 38)
 
 [node name="HintLabel" type="Label" parent="ContentRoot" parent_id_path=PackedInt32Array(196658441) index="3" unique_id=158857563]
 unique_name_in_owner = true

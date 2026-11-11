@@ -17,6 +17,7 @@ public partial class SkillBox : Button
 	private Label _formNameLabel = null!;
 	private Label _levelLabel = null!;
 	private TextureRect _avatar = null!;
+	private Texture2D? _defaultAvatarTexture;
 	private TextureButton _activeButton = null!;
 	private TextureRect _checkMark = null!;
 
@@ -30,6 +31,17 @@ public partial class SkillBox : Button
 		_formNameLabel = GetNode<Label>("%FormNameLabel");
 		_levelLabel = GetNode<Label>("%LevelLabel");
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_defaultAvatarTexture = _avatar.Texture;
+		if (_nameLabel.LabelSettings is not null)
+		{
+			_nameLabel.LabelSettings = (LabelSettings)_nameLabel.LabelSettings.Duplicate();
+		}
+
+		if (_formNameLabel.LabelSettings is not null)
+		{
+			_formNameLabel.LabelSettings = (LabelSettings)_formNameLabel.LabelSettings.Duplicate();
+		}
+
 		_activeButton = GetNode<TextureButton>("%ActiveButton");
 		_checkMark = GetNode<TextureRect>("%CheckMark");
 		Pressed += OnPressed;
@@ -83,7 +95,7 @@ public partial class SkillBox : Button
 			_activeButton.Visible = showFormToggle;
 			_activeButton.Disabled = !showFormToggle || !_isInteractive || !CanToggle(formSkill);
 			_checkMark.Visible = showFormToggle && formSkill.IsEnabled;
-			_avatar.Texture = ResolveTexture(formSkill) ?? _avatar.Texture;
+			_avatar.Texture = ResolveTexture(formSkill) ?? _defaultAvatarTexture;
 			_levelLabel.Visible = false;
 			_nameLabel.Visible = false;
 			_formNameLabel.Text = formSkill.Name;
@@ -95,7 +107,7 @@ public partial class SkillBox : Button
 		_activeButton.Visible = _showToggleButton;
 		_activeButton.Disabled = !_showToggleButton || !_isInteractive || !CanToggle(_skill);
 		_checkMark.Visible = _showToggleButton && _skill.IsActive;
-		_avatar.Texture = ResolveTexture(_skill) ?? _avatar.Texture;
+		_avatar.Texture = ResolveTexture(_skill) ?? _defaultAvatarTexture;
 		_nameLabel.Visible = true;
 		_nameLabel.Text = _skill.Name;
 		ApplyLabelColor(_nameLabel, ResolveNameColor(_skill));
@@ -131,9 +143,7 @@ public partial class SkillBox : Button
 			return;
 		}
 
-		var labelSettings = (LabelSettings)label.LabelSettings.Duplicate();
-		labelSettings.FontColor = color;
-		label.LabelSettings = labelSettings;
+		label.LabelSettings.FontColor = color;
 	}
 
 	private static bool ShouldShowLevel(SkillInstance skill) =>

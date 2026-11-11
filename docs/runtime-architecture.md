@@ -49,6 +49,14 @@
 
 新游戏与下一周目由 `SessionFlowService` 和 [NewGameStateFactory](../src/Game.Application/NewGameStateFactory.cs) 装配。下一周目保留银两和储物箱、重建初始队伍；全局元宝保留在 GameProfile。
 
+## 虚拟化数据网格
+
+固定尺寸的数据卡片共用 [VirtualGrid](../src/Game.Godot/UI/Base/VirtualGrid.cs)，直接放在 ScrollContainer 下。场景声明列数、卡片尺寸和间距，页面提供数据快照、节点工厂与绑定回调。控件维护完整内容高度，只实例化视口及上下各一行的卡片，滚动时复用移出视口的节点。混合奖励按卡片类型分别复用。
+
+[VirtualGridLayout](../src/Game.Presentation/Collections/VirtualGridLayout.cs) 在 Presentation 中计算可见范围、条目位置与排序插入槽。背包、商店、储物箱、武学、选装、选人、出战选择、战斗奖励、存档和头像列表使用同一套布局。选中项和操作目标由页面的数据标识维护，节点信号在工厂中连接一次，绑定回调更新当前条目与显示状态。
+
+队伍页保留桌面拖拽、移动端长按与边缘自动滚动。拖动期间固定源卡片以维持 Godot 拖放生命周期，落点及插入指示由完整成员快照和网格坐标计算。成员变化或读档结束当前拖动并替换快照，排序提交仍通过 PartyService.MoveMember 执行。键盘方向导航按数据索引跨越虚拟化边界并滚动到目标，持有焦点的卡片在滚出视口时继续保留。
+
 ## MOD 启动与内容装配
 
 Godot 工程位于 `src/Game.Godot`，入口是 `res://scenes/ui/mod_launcher/mod_launcher_panel.tscn`。`res://` 只覆盖宿主目录，类库、测试和 MOD 数据位于其外。项目数据根由 `ProjectDataRootResolver` 统一确定：编辑器为仓库根（宿主目录的 `../..`），PC 导出为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。

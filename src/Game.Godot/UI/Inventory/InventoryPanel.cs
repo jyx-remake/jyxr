@@ -18,7 +18,7 @@ public partial class InventoryPanel : JyPanel
 	private readonly List<IDisposable> _subscriptions = [];
 	private readonly Dictionary<string, Button> _buttonsByCategoryKey = [];
 
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private Label _countLabel = null!;
 	private ItemTagBar _tagBar = null!;
@@ -27,7 +27,7 @@ public partial class InventoryPanel : JyPanel
 	public override void _Ready()
 	{
 		base._Ready();
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_countLabel = GetNode<Label>("%CountLabel");
 		_tagBar = GetNode<ItemTagBar>("%TagButtons");
@@ -83,8 +83,6 @@ public partial class InventoryPanel : JyPanel
 
 	private void Refresh()
 	{
-		ClearGrid();
-
 		var sourceEntries = Game.State.Inventory.Entries;
 		_tagBar.SetItems(sourceEntries.Select(entry => entry.Definition), _selectedCategory.ItemType);
 		UpdateCategoryButtons();
@@ -96,17 +94,13 @@ public partial class InventoryPanel : JyPanel
 		_countLabel.Text = $"{entries.Count} 项";
 		_emptyLabel.Visible = entries.Count == 0;
 
-		foreach (var entry in entries)
-		{
-			var itemBox = CreateItemBox(entry);
-			_gridContainer.AddChild(itemBox);
-		}
+		_gridContainer.SetItems(entries, CreateItemBox, (box, entry, _) => box.Setup(entry));
 	}
 
 	private bool EntryMatchesSelectedCategory(InventoryEntry entry) =>
 		_tagBar.Matches(entry.Definition);
 
-	private InventoryItemBox CreateItemBox(InventoryEntry entry)
+	private InventoryItemBox CreateItemBox()
 	{
 		if (InventoryItemBoxScene is null)
 		{
@@ -120,7 +114,6 @@ public partial class InventoryPanel : JyPanel
 			throw new InvalidOperationException("InventoryItemBox scene root must be InventoryItemBox.");
 		}
 
-		itemBox.Setup(entry);
 		itemBox.EntrySelected += OnEntrySelected;
 		return itemBox;
 	}
@@ -176,11 +169,6 @@ public partial class InventoryPanel : JyPanel
 	private void OnInventoryChanged(InventoryChangedEvent _) => Refresh();
 
 	private void OnSaveLoaded(SaveLoadedEvent _) => Refresh();
-
-	private void ClearGrid()
-	{
-		ClearChildren(_gridContainer);
-	}
 
 	private static void ClearChildren(Node parent)
 	{

@@ -17,11 +17,10 @@ public partial class SaveSlotSelectionPanel : JyPanel
 
 	private SaveSlotPanelMode _mode;
 	private PackedScene _slotCardScene = null!;
-	private GridContainer _slotsGrid = null!;
+	private VirtualGrid _slotsGrid = null!;
 	private Label _titleLabel = null!;
 	private Label _subtitleLabel = null!;
 	private CheckBox _skipConfirmationCheckBox = null!;
-	private IReadOnlyDictionary<LocalSaveId, SaveSlotCard> _saveCards = new Dictionary<LocalSaveId, SaveSlotCard>();
 
 	public void Configure(SaveSlotPanelMode mode) => _mode = mode;
 
@@ -32,9 +31,8 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
 		_skipConfirmationCheckBox = GetNode<CheckBox>("%SkipConfirmationCheckBox");
-		_slotsGrid = GetNode<GridContainer>("%SlotsGrid");
+		_slotsGrid = GetNode<VirtualGrid>("%SlotsGrid");
 		_slotCardScene = GD.Load<PackedScene>("res://scenes/ui/save_load/save_slot_card.tscn");
-		_saveCards = CreateSaveCards();
 
 		ApplyModeText();
 		RefreshSlots();
@@ -70,13 +68,8 @@ public partial class SaveSlotSelectionPanel : JyPanel
 			.ToDictionary(saveId => saveId, _saveStore.GetSummary);
 		var mostRecentNonAutoSaveId = ResolveMostRecentNonAutoSaveId(summaries.Values);
 
-		foreach (var (saveId, card) in _saveCards)
-		{
-			card.Configure(
-				summaries[saveId],
-				_mode,
-				saveId == mostRecentNonAutoSaveId);
-		}
+		_slotsGrid.SetItems(GetVisibleSaveIds().ToArray(), CreateSlotCard,
+			(card, saveId, _) => card.Configure(summaries[saveId], _mode, saveId == mostRecentNonAutoSaveId));
 	}
 
 	private static LocalSaveId? ResolveMostRecentNonAutoSaveId(IEnumerable<LocalSaveSummary> summaries) =>
@@ -90,20 +83,6 @@ public partial class SaveSlotSelectionPanel : JyPanel
 			.ThenBy(summary => summary.SaveId.SlotIndex)
 			.Select(summary => summary.SaveId)
 			.FirstOrDefault();
-
-	private IReadOnlyDictionary<LocalSaveId, SaveSlotCard> CreateSaveCards()
-	{
-		var cards = new Dictionary<LocalSaveId, SaveSlotCard>();
-		foreach (var saveId in GetVisibleSaveIds())
-		{
-			var card = CreateSlotCard();
-			card.Pressed += () => OnSaveCardPressed(saveId);
-			_slotsGrid.AddChild(card);
-			cards.Add(saveId, card);
-		}
-
-		return cards;
-	}
 
 	private IEnumerable<LocalSaveId> GetVisibleSaveIds()
 	{
@@ -135,6 +114,7 @@ public partial class SaveSlotSelectionPanel : JyPanel
 		var instance = _slotCardScene.Instantiate();
 		if (instance is SaveSlotCard card)
 		{
+			card.Pressed += () => OnSaveCardPressed(card.SaveId);
 			return card;
 		}
 

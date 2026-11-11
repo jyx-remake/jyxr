@@ -10,7 +10,7 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 	[Export]
 	public PackedScene InventoryItemBoxScene { get; set; } = null!;
 
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _titleLabel = null!;
 	private Label _emptyLabel = null!;
 	private Label _hintLabel = null!;
@@ -22,7 +22,7 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 	public override void _Ready()
 	{
 		base._Ready();
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_hintLabel = GetNode<Label>("%HintLabel");
@@ -52,8 +52,6 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 			return;
 		}
 
-		ClearGrid();
-
 		var character = Game.State.Party.GetMember(_characterId);
 		var entries = Game.State.Inventory.Entries
 			.Where(IsMatchingEquipmentSlot)
@@ -65,18 +63,14 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 		_hintLabel.Text = $"为【{character.Name}】选择可装备的{FormatSlotName(_slotType)}。";
 		_emptyLabel.Visible = entries.Count == 0;
 
-		foreach (var entry in entries)
-		{
-			var itemBox = CreateItemBox(entry);
-			_gridContainer.AddChild(itemBox);
-		}
+		_gridContainer.SetItems(entries, CreateItemBox, (box, entry, _) => box.Setup(entry));
 	}
 
 	private bool IsMatchingEquipmentSlot(InventoryEntry entry) =>
 		entry.Definition is EquipmentDefinition equipment &&
 		equipment.SlotType == _slotType;
 
-	private InventoryItemBox CreateItemBox(InventoryEntry entry)
+	private InventoryItemBox CreateItemBox()
 	{
 		if (InventoryItemBoxScene is null)
 		{
@@ -90,7 +84,6 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 			throw new InvalidOperationException("InventoryItemBox scene root must be InventoryItemBox.");
 		}
 
-		itemBox.Setup(entry);
 		itemBox.EntrySelected += OnEntrySelected;
 		return itemBox;
 	}
@@ -132,14 +125,6 @@ public partial class CharacterEquipmentSelectionPanel : JyPanel
 		{
 			Game.Logger.Error("Equipping character equipment failed.", exception);
 			UIRoot.Instance.ShowSuggestion(exception.Message);
-		}
-	}
-
-	private void ClearGrid()
-	{
-		foreach (var child in _gridContainer.GetChildren())
-		{
-			child.QueueFree();
 		}
 	}
 

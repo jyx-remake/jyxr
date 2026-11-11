@@ -26,7 +26,7 @@ public partial class ChestPanel : JyPanel
 	private Label _countLabel = null!;
 	private Label _promptLabel = null!;
 	private Label _capacityLabel = null!;
-	private GridContainer _gridContainer = null!;
+	private VirtualGrid _gridContainer = null!;
 	private Label _emptyLabel = null!;
 	private ItemTagBar _tagBar = null!;
 	private IDisposable? _saveLoadedSubscription;
@@ -42,7 +42,7 @@ public partial class ChestPanel : JyPanel
 		_countLabel = GetNode<Label>("%CountLabel");
 		_promptLabel = GetNode<Label>("%PromptLabel");
 		_capacityLabel = GetNode<Label>("%CapacityLabel");
-		_gridContainer = GetNode<GridContainer>("%GridContainer");
+		_gridContainer = GetNode<VirtualGrid>("%VirtualGrid");
 		_emptyLabel = GetNode<Label>("%EmptyLabel");
 		_tagBar = GetNode<ItemTagBar>("%TagButtons");
 		_tagBar.SelectionChanged += Refresh;
@@ -103,7 +103,6 @@ public partial class ChestPanel : JyPanel
 
 	private void Refresh()
 	{
-		ClearGrid();
 		UpdateModeButtons();
 
 		var chest = Game.ChestService.Open();
@@ -123,16 +122,8 @@ public partial class ChestPanel : JyPanel
 		_capacityLabel.Text = $"当前总数 {chest.StoredItemCount}/{chest.Capacity}";
 		_emptyLabel.Visible = entries.Count == 0;
 
-		foreach (var entry in entries)
-		{
-			var itemBox = CreateItemBox();
-			itemBox.SetupTransferEntry(
-				entry,
-				_mode == ChestMode.Deposit ? "存入" : "取出",
-				CanSelectEntry(entry, chest));
-			itemBox.InventoryEntrySelected += OnInventoryEntrySelected;
-			_gridContainer.AddChild(itemBox);
-		}
+		_gridContainer.SetItems(entries, CreateItemBox, (box, entry, _) =>
+			box.SetupTransferEntry(entry, _mode == ChestMode.Deposit ? "存入" : "取出", CanSelectEntry(entry, chest)));
 	}
 
 	private IReadOnlyList<InventoryEntry> GetEntriesForCurrentMode() =>
@@ -167,6 +158,7 @@ public partial class ChestPanel : JyPanel
 			throw new InvalidOperationException("Chest item box scene root must be ShopItemBox.");
 		}
 
+		itemBox.InventoryEntrySelected += OnInventoryEntrySelected;
 		return itemBox;
 	}
 
@@ -242,20 +234,6 @@ public partial class ChestPanel : JyPanel
 			button.Modulate = isSelected
 				? new Color(1.0f, 0.92f, 0.68f)
 				: Colors.White;
-		}
-	}
-
-	private void ClearGrid()
-	{
-		ClearChildren(_gridContainer);
-	}
-
-	private static void ClearChildren(Node parent)
-	{
-		foreach (var child in parent.GetChildren())
-		{
-			parent.RemoveChild(child);
-			child.QueueFree();
 		}
 	}
 
