@@ -50,6 +50,8 @@ Godot 节点、输入、动画和异步演出需在引擎内另行验证。
 
 剧情直接编写为 `data/stories/**/*.story`，加载 MOD 时由游戏在内存中自动编译。源码语法和示例见 [剧情源码编写指南](docs/story-authoring.md)。
 
+旧剧情 XML 可使用 .NET 命令行工具转换，运行 `dotnet run --project tools/StoryXmlConverter -- "path/to/main.xml"`。输出规则与迁移复核见[原版 MOD 迁移](docs/legacy-mod-migration-guide.md#5-将剧情-xml-转成-story)。
+
 项目数据根在编辑器下为仓库根（Godot 工程根的 `../..`），PC 导出后为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。启动器配置位于 `launcher/settings.json`；存档、全局档案和设置位于 `userdata/<主MOD id>/`。`mods` 与玩家数据独立于 Godot 的 `res://`，迁移宿主目录不会移动玩家存档。
 
 `autoload` 中的运行时节点并非项目设置中的 autoload。启动与存储边界见 [运行时架构](docs/runtime-architecture.md)。

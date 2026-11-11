@@ -6,6 +6,8 @@
 
 完整命令和查询见 [游戏内容 DSL v3](game-dsl-v3.md)，目录、加载顺序和已有剧情的修改方式见 [MOD 数据补丁](mod-data-patching.md)。
 
+已有剧情 XML 可通过 .NET 工具 `tools/StoryXmlConverter` 转成 `.story`，用法与分支复核要求见[旧 MOD 迁移指南](legacy-mod-migration-guide.md#5-将剧情-xml-转成-story)。
+
 ## 最小示例
 
 将下面内容保存为 `data/stories/客栈.story`。地图事件的 `action` 可以通过 `story('客栈_问候')` 发起这段剧情。

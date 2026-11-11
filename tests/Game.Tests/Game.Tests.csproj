@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\src\Game.Expressions\Game.Expressions.csproj" />
     <ProjectReference Include="..\..\src\Game.Presentation\Game.Presentation.csproj" />
     <ProjectReference Include="..\..\src\Game.StoryDsl\Game.StoryDsl.csproj" />
+    <ProjectReference Include="..\..\tools\StoryXmlConverter\StoryXmlConverter.csproj" />
   </ItemGroup>
 
   <ItemGroup>

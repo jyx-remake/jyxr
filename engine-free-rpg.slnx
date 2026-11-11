@@ -18,4 +18,7 @@
     <Project Path="tests/Game.Tests/Game.Tests.csproj" />
     <Project Path="tests/Game.Expressions.Tests/Game.Expressions.Tests.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/StoryXmlConverter/StoryXmlConverter.csproj" />
+  </Folder>
 </Solution>

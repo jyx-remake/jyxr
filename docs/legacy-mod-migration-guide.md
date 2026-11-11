@@ -93,3 +93,26 @@ legacy 的 `mapunit@time` 把移动规则写在目的地点上，但“前往某
 legacy 转换器不会推断大地图入口。完成地图目录拆分和坐标迁移后，必须为每张大地图手动增加 `defaultLocation`，其值应引用该地图已有且具有坐标的 `location.id`。例如基础大地图使用 `"defaultLocation": "南贤居"`。
 
 不带地点参数的 `map(mapId)` 会优先恢复该大地图的存档位置；尚无记录时才使用 `defaultLocation`。需要从确定地点进入时使用 `map(mapId, locationId)`，该地点坐标会成为新的记忆位置。本版不支持任意坐标入口。
+
+## 5. 将剧情 XML 转成 `.story`
+
+仓库提供独立的 .NET 10 命令行项目 `tools/StoryXmlConverter`。在仓库根目录运行以下命令，将包含 `<root><story ...>...</story></root>` 的剧情 XML 转成当前源码格式。
+
+```powershell
+# 自动选择输出文件名
+dotnet run --project tools/StoryXmlConverter -- "path/to/main.xml"
+
+# 指定输出文件
+dotnet run --project tools/StoryXmlConverter -- "path/to/main.xml" "path/to/main.story"
+```
+
+默认输出位于输入文件旁，依次选用 `main.converted.story`、`main.converted-2.story` 等可用文件名。指定的输出路径已存在时转换失败。工具先完成转换并调用 `Game.StoryDsl` 校验语法，再写入 UTF-8 无 BOM 文件。成功返回退出码 `0`，失败返回 `1`，XML 和 DSL 错误会标明对应文件及位置。
+
+转换规则包含以下内容。
+
+- `story@name` 转成段头，对白、选项和战斗结果转成对应的缩进结构。
+- 旧命令转成当前函数调用，变量操作转成赋值或 `del`，条件转成共享表达式。队友属性查询会增加 `in_team(...)` 判断。
+- `[[red:文本]]` 等旧颜色标记转成 BBCode，正文换行转成 `[br]`。`newbie`、`touch` 按已移除指令处理。
+- 同组选项或战斗结果中的条件分支全部保留。存在条件分支时采用最后一个无条件结果作为默认分支。全部为无条件结果时，优先采用首个数字 `ret` 结果，其次采用首个结果。其余冲突结果保留为 `//` 注释，供作者复核。
+
+生成后应复核注释中的冲突分支、角色实例 ID、命令参数和剧情目标，再将文件放入目标 MOD 的 `data/stories` 并加载 MOD 验证内容引用。源码编写方式见[剧情源码编写指南](story-authoring.md)。
