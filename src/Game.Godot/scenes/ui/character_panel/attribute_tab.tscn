@@ -18,6 +18,11 @@
 [ext_resource type="Texture2D" uid="uid://io7wtm55j24j" path="res://assets/art/ui/character_stat/shuxingfenpei.png" id="16_qq1ga"]
 [ext_resource type="Texture2D" uid="uid://rp0frp5p0jig" path="res://assets/art/misc/cross.png" id="17_tjgo3"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_stat_value"]
+font_size = 32
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
 [node name="AttributeTab" type="Control" unique_id=478578747]
 layout_mode = 3
 anchors_preset = 15
@@ -70,12 +75,13 @@ vertical_alignment = 1
 layout_mode = 0
 offset_left = 42.0
 offset_top = 116.0
-offset_right = 1070.0
+offset_right = 1154.0
 offset_bottom = 480.0
-theme_override_constants/separation = 72
+theme_override_constants/separation = 24
 
 [node name="Column1" type="HBoxContainer" parent="Columns" unique_id=1357001928]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
 [node name="Icons" type="VBoxContainer" parent="Columns/Column1" unique_id=2018199271]
@@ -148,46 +154,52 @@ vertical_alignment = 1
 
 [node name="Values" type="VBoxContainer" parent="Columns/Column1" unique_id=390428417]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
 [node name="QuanzhangLabel" type="Label" parent="Columns/Column1/Values" unique_id=68762523]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="JianfaLabel" type="Label" parent="Columns/Column1/Values" unique_id=377183406]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="DaofaLabel" type="Label" parent="Columns/Column1/Values" unique_id=698881966]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="QimenLabel" type="Label" parent="Columns/Column1/Values" unique_id=702911616]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="Column2" type="HBoxContainer" parent="Columns" unique_id=1702531807]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
 [node name="Icons" type="VBoxContainer" parent="Columns/Column2" unique_id=2036347529]
@@ -245,37 +257,42 @@ vertical_alignment = 1
 
 [node name="Values" type="VBoxContainer" parent="Columns/Column2" unique_id=1688556484]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
 [node name="BiliLabel" type="Label" parent="Columns/Column2/Values" unique_id=1987173335]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="ShenfaLabel" type="Label" parent="Columns/Column2/Values" unique_id=1421813712]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="WuxingLabel" type="Label" parent="Columns/Column2/Values" unique_id=631566080]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="Column3" type="HBoxContainer" parent="Columns" unique_id=2000552467]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
 [node name="Icons" type="VBoxContainer" parent="Columns/Column3" unique_id=100986728]
@@ -333,33 +350,37 @@ vertical_alignment = 1
 
 [node name="Values" type="VBoxContainer" parent="Columns/Column3" unique_id=323841367]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
 [node name="FuyuanLabel" type="Label" parent="Columns/Column3/Values" unique_id=905330995]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="GenguLabel" type="Label" parent="Columns/Column3/Values" unique_id=1159327397]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="DingliLabel" type="Label" parent="Columns/Column3/Values" unique_id=1787822230]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+clip_text = true
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "0(+0)"
-label_settings = ExtResource("14_label_settings")
+label_settings = SubResource("LabelSettings_stat_value")
 vertical_alignment = 1
 
 [node name="AssignStatWidget" type="Control" parent="." unique_id=161896769]
