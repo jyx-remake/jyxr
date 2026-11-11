@@ -40,10 +40,13 @@ public sealed record MediaReferenceResolution(
 
 public static class MediaReferenceResolver
 {
+    public static IReadOnlyList<string> RasterTextureExtensions { get; } =
+        Array.AsReadOnly<string>([".png", ".jpg", ".jpeg", ".webp"]);
+
     private static readonly IReadOnlyDictionary<MediaAssetKind, string[]> SupportedExtensions =
         new Dictionary<MediaAssetKind, string[]>
         {
-            [MediaAssetKind.Texture] = [".png", ".jpg", ".jpeg", ".webp", ".tres", ".res"],
+            [MediaAssetKind.Texture] = [.. RasterTextureExtensions, ".tres", ".res"],
             [MediaAssetKind.Audio] = [".ogg", ".mp3", ".wav", ".flac"],
             [MediaAssetKind.Video] = [".ogv"],
         };

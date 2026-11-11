@@ -94,7 +94,7 @@ public partial class StoryDialoguePanel : Control
 		if (_isSkipping)
 		{
 			_completionSource.TrySetResult(true);
-			Hide();
+			HidePanel();
 			return;
 		}
 
@@ -274,5 +274,6 @@ public partial class StoryDialoguePanel : Control
 	{
 		RevealCurrentPage();
 		Hide();
+		_avatarBox.SetAvatarTexture(null);
 	}
 }

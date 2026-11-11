@@ -32,6 +32,17 @@ public sealed class ModArchiveImporterTests : IDisposable
     }
 
     [Fact]
+    public void ImportsExternalTexturesWithModContent()
+    {
+        using var zip = CreateZip(("mod.json", Manifest), ("assets/art/head/hero.png", "image data"));
+
+        new ModArchiveImporter(_root).Import(zip);
+
+        var path = Path.Combine(_root.ModsDirectoryPath, "demo", "assets", "art", "head", "hero.png");
+        Assert.Equal("image data", File.ReadAllText(path));
+    }
+
+    [Fact]
     public void RejectsDuplicateManifestIds()
     {
         using var zip = CreateZip(("a/mod.json", Manifest), ("b/mod.json", Manifest));

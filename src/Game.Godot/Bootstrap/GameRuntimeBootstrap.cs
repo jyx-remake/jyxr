@@ -3,6 +3,7 @@ using Game.Application.Mods;
 using Game.Content.Loading;
 using Game.Core.Model;
 using Game.Godot.Persistence;
+using Game.Godot.Resources;
 using Game.Godot.Settings;
 using Game.Godot.Story;
 using Game.Godot.UI;
@@ -38,6 +39,7 @@ public static class GameRuntimeBootstrap
 		_activeModLoadout = modLoadout;
 		var logger = EnsureLogger();
 		LoadResourcePacks(modLoadout, logger);
+		AssetResolver.InitializeTextures(modLoadout.ModsInLoadOrder.Select(static mod => mod.ModDirectoryPath));
 		EnsureRuntimeNodes(sceneTree);
 
 		var contentInputs = modLoadout.ModsInLoadOrder

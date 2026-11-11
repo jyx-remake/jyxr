@@ -30,4 +30,4 @@ PCK 预设借用 Windows 导出平台，保留现有纹理配置与 `extra_pck` 
 
 Windows 本体启用 Godot 的 `binary_format/embed_pck` 和 `dotnet/embed_build_outputs`，并关闭控制台包装器，仅需分发本体 EXE。旧导出遗留的同名 `.pck`、`.console.exe` 和 `data_engine-free-rpg_windows_x86_64` 目录不属于新的发布产物，脚本不会自动删除它们。
 
-发布时将同一份 `base.pck` 放入对应 MOD 目录，并在该 MOD 的 `mod.json` 中通过 `packs` 声明相对路径（例如 `"packs": ["base.pck"]`）。仅把 PCK 放在本体旁不会自动加载；`mods` 数据也需单独分发。Windows 的数据根为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。
+发布时将同一份 `base.pck` 放入对应 MOD 目录，并在该 MOD 的 `mod.json` 中通过 `packs` 声明相对路径（例如 `"packs": ["base.pck"]`）。仅把 PCK 放在本体旁不会自动加载；`mods` 数据也需单独分发。内容字段引用的外部静态图片随 MOD 的 `assets/art` 目录分发，优先级见 [外部静态图片](mod-data-patching.md#外部静态图片)。Windows 的数据根为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。

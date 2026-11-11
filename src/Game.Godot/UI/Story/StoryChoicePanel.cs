@@ -116,5 +116,9 @@ public partial class StoryChoicePanel : Control
 		_completionSource?.TrySetResult(index);
 	}
 
-	public void HidePanel() => Hide();
+	public void HidePanel()
+	{
+		Hide();
+		_avatarBox.SetAvatarTexture(null);
+	}
 }
