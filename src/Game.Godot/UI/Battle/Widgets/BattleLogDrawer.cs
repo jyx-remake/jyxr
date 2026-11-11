@@ -4,7 +4,7 @@ namespace Game.Godot.UI.Battle;
 
 public partial class BattleLogDrawer : Control
 {
-	private const int MaximumLogCount = 12;
+	private const int MaximumLogCount = 18;
 	private const double TransitionDurationSeconds = 0.2d;
 	private const float ClosedTagOvershoot = 20f;
 
