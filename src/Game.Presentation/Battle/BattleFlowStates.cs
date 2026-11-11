@@ -79,10 +79,7 @@ public abstract class InteractiveBattleFlowState : BattleFlowState
 		switch (intent)
 		{
 			case BattleUiIntent.SelectMove:
-				await machine.TransitionAsync(PresentingActionState.RollbackMove(
-					actingUnit,
-					new SelectingMoveState(),
-					new SelectingMoveState()));
+				await ReturnToMoveSelectionAsync(machine, actingUnit, new SelectingMoveState());
 				break;
 			case BattleUiIntent.Back:
 				await HandleBackAsync(machine, actingUnit);
@@ -123,14 +120,25 @@ public abstract class InteractiveBattleFlowState : BattleFlowState
 		BattleUnit actingUnit,
 		BattleUiIntent intent) => Task.CompletedTask;
 
-	protected virtual async Task HandleBackAsync(
+	protected virtual Task HandleBackAsync(
 		BattleFlowStateMachine machine,
-		BattleUnit actingUnit)
+		BattleUnit actingUnit) => ReturnToMoveSelectionAsync(machine, actingUnit, this);
+
+	private static Task ReturnToMoveSelectionAsync(
+		BattleFlowStateMachine machine,
+		BattleUnit actingUnit,
+		IBattleFlowState failureState)
 	{
-		await machine.TransitionAsync(PresentingActionState.RollbackMove(
+		var moveState = new SelectingMoveState();
+		if (machine.Context.State.CurrentAction?.HasMoved != true)
+		{
+			return machine.TransitionAsync(moveState);
+		}
+
+		return machine.TransitionAsync(PresentingActionState.RollbackMove(
 			actingUnit,
-			this,
-			new SelectingMoveState()));
+			failureState,
+			moveState));
 	}
 
 	protected static async Task<IBattleFlowState> ResolvePostMoveStateAsync(

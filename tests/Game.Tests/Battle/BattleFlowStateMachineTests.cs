@@ -1,4 +1,5 @@
 using Game.Core.Battle;
+using Game.Core.Definitions.Skills;
 using Game.Core.Model;
 using Game.Core.Model.Skills;
 using Game.Presentation.Battle;
@@ -109,6 +110,81 @@ public sealed class BattleFlowStateMachineTests
 		Assert.Same(origin, machine.Current);
 	}
 
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task ReturningToMoveSelectionWithoutMovingDoesNotAttemptRollback(bool useMoveButton)
+	{
+		var context = CreateInteractiveContext();
+		var actingUnit = context.ActingUnit!;
+		var action = context.State.CurrentAction!;
+		var movePower = action.RemainingMovePower;
+		var machine = new BattleFlowStateMachine(context);
+		await machine.StartAsync(new SelectingMoveState());
+		await machine.DispatchAsync(new BattleUiIntent.SelectSkill(actingUnit.Character.GetExternalSkills().Single()));
+		Assert.Equal(BattleFlowStateKind.SelectingSkillTarget, machine.Current.Kind);
+
+		await machine.DispatchAsync(useMoveButton ? new BattleUiIntent.SelectMove() : new BattleUiIntent.Back());
+
+		Assert.Equal(BattleFlowStateKind.SelectingMove, machine.Current.Kind);
+		Assert.Same(action, context.State.CurrentAction);
+		Assert.False(action.HasMoved);
+		Assert.Equal(action.StartPosition, actingUnit.Position);
+		Assert.Equal(movePower, action.RemainingMovePower);
+		Assert.Equal(0, context.RollbackMoveCount);
+		Assert.Equal(0, context.BeginPresentationCount);
+	}
+
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task ReturningToMoveSelectionAfterConfirmingCurrentCellDoesNotAttemptRollback(bool useMoveButton)
+	{
+		var context = CreateInteractiveContext();
+		var actingUnit = context.ActingUnit!;
+		var action = context.State.CurrentAction!;
+		var machine = new BattleFlowStateMachine(context);
+		await machine.StartAsync(new SelectingMoveState());
+		await machine.DispatchAsync(new BattleUiIntent.ActivateCell(actingUnit.Position));
+		Assert.Equal(BattleFlowStateKind.SelectingSkillTarget, machine.Current.Kind);
+
+		await machine.DispatchAsync(useMoveButton ? new BattleUiIntent.SelectMove() : new BattleUiIntent.Back());
+
+		Assert.Equal(BattleFlowStateKind.SelectingMove, machine.Current.Kind);
+		Assert.Same(action, context.State.CurrentAction);
+		Assert.False(action.HasMoved);
+		Assert.Equal(action.StartPosition, actingUnit.Position);
+		Assert.Equal(0, context.RollbackMoveCount);
+		Assert.Equal(1, context.BeginPresentationCount);
+	}
+
+	[Theory]
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task ReturningToMoveSelectionAfterMovingRollsBackMovement(bool useMoveButton)
+	{
+		var context = CreateInteractiveContext();
+		var actingUnit = context.ActingUnit!;
+		var action = context.State.CurrentAction!;
+		var movePower = action.RemainingMovePower;
+		var machine = new BattleFlowStateMachine(context);
+		await machine.StartAsync(new SelectingMoveState());
+		await machine.DispatchAsync(new BattleUiIntent.ActivateCell(new GridPosition(1, 0)));
+		Assert.Equal(BattleFlowStateKind.SelectingSkillTarget, machine.Current.Kind);
+		Assert.True(action.HasMoved);
+
+		await machine.DispatchAsync(useMoveButton ? new BattleUiIntent.SelectMove() : new BattleUiIntent.Back());
+
+		Assert.Equal(BattleFlowStateKind.SelectingMove, machine.Current.Kind);
+		Assert.Same(action, context.State.CurrentAction);
+		Assert.False(action.HasMoved);
+		Assert.Equal(action.StartPosition, actingUnit.Position);
+		Assert.Equal(action.StartFacing, actingUnit.Facing);
+		Assert.Equal(movePower, action.RemainingMovePower);
+		Assert.Equal(1, context.RollbackMoveCount);
+		Assert.Equal(2, context.BeginPresentationCount);
+	}
+
 	[Fact]
 	public async Task SurrenderDuringPresentationWaitsForPresentationBeforeEndingBattle()
 	{
@@ -136,6 +212,23 @@ public sealed class BattleFlowStateMachineTests
 
 		Assert.Equal(BattleFlowStateKind.BattleEnded, machine.Current.Kind);
 		Assert.Equal(1, context.CompleteBattleCount);
+	}
+
+	private static FakeContext CreateInteractiveContext()
+	{
+		var definition = TestContentFactory.CreateCharacterDefinition(
+			"hero",
+			stats: new Dictionary<StatType, int> { [StatType.MaxHp] = 100 },
+			externalSkills: [new InitialExternalSkillEntryDefinition(TestContentFactory.CreateExternalSkill("strike"), 1)]);
+		var character = TestContentFactory.CreateCharacterInstance("hero", definition);
+		var actingUnit = new BattleUnit("hero", character, team: 0, new GridPosition(0, 0)) { ActionGauge = 100 };
+		var context = new FakeContext
+		{
+			State = new BattleState(new BattleGrid(4, 4), [actingUnit]),
+			ActingUnit = actingUnit,
+		};
+		Assert.True(context.Engine.BeginAction(context.State, actingUnit.Id).Success);
+		return context;
 	}
 
 	private class RecordingState(BattleFlowStateKind kind) : BattleFlowState
@@ -205,14 +298,15 @@ public sealed class BattleFlowStateMachineTests
 		public int BeginPresentationCount { get; private set; }
 		public int CommitCount { get; private set; }
 		public int CompleteBattleCount { get; private set; }
+		public int RollbackMoveCount { get; private set; }
 		public Task<InventoryEntry?> ItemSelection { get; init; } =
 			Task.FromResult<InventoryEntry?>(null);
-		public BattleState State => throw new NotSupportedException();
-		public BattleEngine Engine => throw new NotSupportedException();
+		public BattleState State { get; init; } = null!;
+		public BattleEngine Engine { get; } = new();
 		public bool IsAutoBattleEnabled { get; private set; }
 		public bool IsSurrenderRequested { get; private set; }
 		public int PlayerTeam => 0;
-		public BattleUnit? ActingUnit => null;
+		public BattleUnit? ActingUnit { get; init; }
 		public void RenderInteraction(BattleInteractionState interaction) { }
 		public void CommitBattleStateToView(BattleInteractionState interaction) => CommitCount++;
 		public void BeginActionPresentation(BattleInteractionState interaction) => BeginPresentationCount++;
@@ -221,14 +315,19 @@ public sealed class BattleFlowStateMachineTests
 		public BattleUnit AdvanceTimelineToNextAction() => throw new NotSupportedException();
 		public BattleTurnPlan DecideAutomatedTurn(BattleUnit actingUnit) => throw new NotSupportedException();
 		public void AppendTurnLog(BattleUnit unit, bool isAutomated) => throw new NotSupportedException();
-		public Task<bool> ExecuteMoveAsync(BattleUnit actingUnit, GridPosition destination) => throw new NotSupportedException();
+		public Task<bool> ExecuteMoveAsync(BattleUnit actingUnit, GridPosition destination) =>
+			Task.FromResult(Engine.MoveTo(State, actingUnit.Id, destination).Success);
 		public Task<bool> ExecuteSkillAsync(BattleUnit actingUnit, SkillInstance skill, GridPosition target) => throw new NotSupportedException();
 		public bool ExecuteItem(BattleUnit actingUnit, InventoryEntry item, string targetUnitId) => throw new NotSupportedException();
 		public Task<bool> ExecuteRestAsync(BattleUnit actingUnit) => throw new NotSupportedException();
 		public bool ExecuteEndAction(BattleUnit actingUnit) => throw new NotSupportedException();
-		public Task<bool> RollbackMoveAsync(BattleUnit actingUnit) => throw new NotSupportedException();
+		public Task<bool> RollbackMoveAsync(BattleUnit actingUnit)
+		{
+			RollbackMoveCount++;
+			return Task.FromResult(State.CurrentAction?.HasMoved == true && Engine.RollbackMove(State, actingUnit.Id).Success);
+		}
 		public Task RollbackPlayerMoveForAutoBattleAsync() => Task.CompletedTask;
-		public SkillInstance? ResolveDefaultSkill(BattleUnit actingUnit) => throw new NotSupportedException();
+		public SkillInstance? ResolveDefaultSkill(BattleUnit actingUnit) => actingUnit.Character.GetExternalSkills().SingleOrDefault();
 		public SkillInstance? ResolveSkill(BattleUnit actingUnit, string? skillId) => throw new NotSupportedException();
 		public Task<InventoryEntry?> ShowItemPanelAsync() => ItemSelection;
 		public void ShowStatusPanel() => throw new NotSupportedException();
