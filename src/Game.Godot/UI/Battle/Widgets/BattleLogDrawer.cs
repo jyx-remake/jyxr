@@ -4,7 +4,8 @@ namespace Game.Godot.UI.Battle;
 
 public partial class BattleLogDrawer : Control
 {
-	private const int MaximumLogCount = 18;
+	private const int MaximumLogCount = 200;
+	private const double WheelScrollStep = 60d;
 	private const double TransitionDurationSeconds = 0.2d;
 	private const float ClosedTagOvershoot = 20f;
 
@@ -13,6 +14,7 @@ public partial class BattleLogDrawer : Control
 	private Control _drawerBody = null!;
 	private Control _background = null!;
 	private RichTextLabel _logLabel = null!;
+	private VScrollBar _scrollBar = null!;
 	private BaseButton _tagButton = null!;
 	private Tween? _transition;
 	private Vector2 _openBodyPosition;
@@ -26,6 +28,7 @@ public partial class BattleLogDrawer : Control
 		_drawerBody = GetNode<Control>("%DrawerBody");
 		_background = GetNode<Control>("%Background");
 		_logLabel = GetNode<RichTextLabel>("%LogLabel");
+		_scrollBar = _logLabel.GetVScrollBar();
 		_tagButton = GetNode<BaseButton>("%BattleLogTag");
 
 		_openBodyPosition = _drawerBody.Position;
@@ -40,7 +43,7 @@ public partial class BattleLogDrawer : Control
 		_tagButton.Pressed += Toggle;
 
 		ApplyClosedState();
-		RefreshText();
+		RefreshText(followLatest: true, scrollOffset: 0d);
 	}
 
 	public override void _ExitTree()
@@ -57,15 +60,30 @@ public partial class BattleLogDrawer : Control
 			return;
 		}
 
-		_logLines.Add(text);
+		var isReady = IsNodeReady();
+		var scrollOffset = 0d;
+		var followLatest = true;
+		if (isReady)
+		{
+			_logLabel.GetLineCount();
+			scrollOffset = _scrollBar.Value;
+			followLatest = scrollOffset >= _scrollBar.MaxValue - _scrollBar.Page - 1d;
+		}
+
+		_logLines.Add(text.ReplaceLineEndings("\n"));
 		if (_logLines.Count > MaximumLogCount)
 		{
+			if (isReady && !followLatest)
+			{
+				var removedParagraphs = _logLines[0].Count(character => character == '\n') + 1;
+				scrollOffset -= _logLabel.GetParagraphOffset(removedParagraphs) - _logLabel.GetParagraphOffset(0);
+			}
 			_logLines.RemoveAt(0);
 		}
 
-		if (IsNodeReady())
+		if (isReady)
 		{
-			RefreshText();
+			RefreshText(followLatest, scrollOffset);
 		}
 	}
 
@@ -74,8 +92,36 @@ public partial class BattleLogDrawer : Control
 		_logLines.Clear();
 		if (IsNodeReady())
 		{
-			RefreshText();
+			RefreshText(followLatest: true, scrollOffset: 0d);
 		}
+	}
+
+	public bool TryScroll(InputEventMouseButton button)
+	{
+		if (!_isOpen || _transition is not null || !IsVisibleInTree())
+		{
+			return false;
+		}
+
+		var localPosition = _logLabel.GetGlobalTransformWithCanvas().AffineInverse() * button.Position;
+		if (!new Rect2(Vector2.Zero, _logLabel.Size).HasPoint(localPosition))
+		{
+			return false;
+		}
+
+		var direction = button.ButtonIndex switch
+		{
+			MouseButton.WheelUp => -1,
+			MouseButton.WheelDown => 1,
+			_ => 0,
+		};
+		if (!button.Pressed || direction == 0)
+		{
+			return false;
+		}
+
+		_scrollBar.Value += direction * WheelScrollStep * button.Factor;
+		return true;
 	}
 
 	private void Toggle()
@@ -119,5 +165,12 @@ public partial class BattleLogDrawer : Control
 		_tagButton.Disabled = false;
 	}
 
-	private void RefreshText() => _logLabel.Text = string.Join('\n', _logLines);
+	private void RefreshText(bool followLatest, double scrollOffset)
+	{
+		_logLabel.ScrollFollowing = followLatest;
+		_logLabel.Text = string.Join('\n', _logLines);
+		// Resolve wrapping and scrollbar bounds before restoring the reading position.
+		_logLabel.GetLineCount();
+		_scrollBar.Value = followLatest ? _scrollBar.MaxValue : Math.Max(0d, scrollOffset);
+	}
 }

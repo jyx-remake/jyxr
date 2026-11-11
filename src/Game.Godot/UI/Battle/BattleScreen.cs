@@ -168,6 +168,28 @@ public partial class BattleScreen : Control
 		}
 	}
 
+	public override void _Input(InputEvent @event)
+	{
+		if (@event is not InputEventMouseButton { Pressed: true } button ||
+			button.ButtonIndex is not (MouseButton.WheelUp or MouseButton.WheelDown))
+		{
+			return;
+		}
+
+		var hovered = GetViewport().GuiGetHoveredControl();
+		if (hovered is null ||
+			(hovered != this && hovered != _boardGrid &&
+			 !_boardGrid.IsAncestorOf(hovered) && !_logDrawer.IsAncestorOf(hovered)))
+		{
+			return;
+		}
+
+		if (_logDrawer.TryScroll(button))
+		{
+			GetViewport().SetInputAsHandled();
+		}
+	}
+
 	public async Task<bool> AwaitBattleAsync(CancellationToken cancellationToken = default)
 	{
 		var completionTask = _settlementController.AwaitAsync(cancellationToken);
