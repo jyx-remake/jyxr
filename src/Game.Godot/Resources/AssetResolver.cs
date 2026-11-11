@@ -11,8 +11,8 @@ public static class AssetResolver
 {
 	private const string AssetsDirectoryPath = "res://assets";
 	private const string AnimationDirectoryPath = "res://assets/animation";
-	private const long DesktopTextureBudgetBytes = 128L * 1024 * 1024;
-	private const long MobileTextureBudgetBytes = 64L * 1024 * 1024;
+	private const long DesktopTextureBudgetBytes = 256L * 1024 * 1024;
+	private const long MobileTextureBudgetBytes = 128L * 1024 * 1024;
 	private const int MaximumFailureEntries = 1024;
 	private static ExternalMediaCatalog _externalMedia = new([]);
 	private static TextureCache _textureCache = new(DesktopTextureBudgetBytes);
