@@ -55,6 +55,7 @@ public sealed class MediaReferenceResolverTests
     [InlineData("icon//foo", MediaAssetKind.Texture)]
     [InlineData("icon\\foo", MediaAssetKind.Texture)]
     [InlineData("audio/foo.exe", MediaAssetKind.Audio)]
+    [InlineData("audio/foo.flac", MediaAssetKind.Audio)]
     [InlineData("video/foo.mp4", MediaAssetKind.Video)]
     public void Resolve_RejectsInvalidReferences(string reference, MediaAssetKind assetKind)
     {
@@ -85,7 +86,7 @@ public sealed class MediaReferenceResolverTests
     public void GetCandidateAssetPaths_ProbesOnlyWhenExtensionIsOmitted()
     {
         Assert.Equal(
-            ["audio/theme.ogg", "audio/theme.mp3", "audio/theme.wav", "audio/theme.flac"],
+            ["audio/theme.ogg", "audio/theme.mp3", "audio/theme.wav"],
             MediaReferenceResolver.GetCandidateAssetPaths("audio/theme", MediaAssetKind.Audio));
         Assert.Equal(
             ["audio/theme.mp3"],

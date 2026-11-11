@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
 [ext_resource type="Script" uid="uid://c0s6evbgarntb" path="res://UI/Detail/DetailPanel.cs" id="2_script"]
-[ext_resource type="Texture2D" uid="uid://iuhrh668ir72" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_icon"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/icon.jpg" id="3_icon"]
 [ext_resource type="Texture2D" uid="uid://jjbxbs51fduu" path="res://assets/art/misc/moji3.png" id="4_v41dm"]
 
 [sub_resource type="StyleBoxFlat" id="1_icon_panel"]

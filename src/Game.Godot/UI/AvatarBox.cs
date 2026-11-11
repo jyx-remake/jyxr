@@ -1,6 +1,3 @@
-using Game.Core.Definitions;
-using Game.Core.Model.Character;
-using Game.Godot.Resources;
 using Godot;
 
 namespace Game.Godot.UI;
@@ -13,6 +10,7 @@ public partial class AvatarBox : Control
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_avatar.Texture = null;
 	}
 
 	public void SetAvatarTexture(Texture2D? texture)

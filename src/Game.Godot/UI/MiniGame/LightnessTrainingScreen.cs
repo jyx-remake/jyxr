@@ -27,6 +27,7 @@ public partial class LightnessTrainingScreen : Control
 
 	public override void _Ready()
 	{
+		GetNode<TextureRect>("%Background").Texture = AssetResolver.LoadTexture("地图.客栈");
 		_playArea = GetNode<Control>("%PlayArea");
 		_hero = GetNode<TextureRect>("%Hero");
 		_timeLabel = GetNode<Label>("%TimeLabel");

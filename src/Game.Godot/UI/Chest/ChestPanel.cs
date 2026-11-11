@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Core.Model;
+using Game.Godot.Resources;
 using Game.Presentation.Items;
 using Godot;
 
@@ -34,6 +35,7 @@ public partial class ChestPanel : JyPanel
 	public override void _Ready()
 	{
 		base._Ready();
+		GetNode<TextureRect>("%Background").Texture = AssetResolver.LoadTexture("场景.商店");
 		_depositModeButton = GetNode<Button>("%DepositModeButton");
 		_withdrawModeButton = GetNode<Button>("%WithdrawModeButton");
 		_leaveButton = GetNode<Button>("%LeaveButton");

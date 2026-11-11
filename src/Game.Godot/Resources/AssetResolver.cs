@@ -14,22 +14,22 @@ public static class AssetResolver
 	private const long DesktopTextureBudgetBytes = 128L * 1024 * 1024;
 	private const long MobileTextureBudgetBytes = 64L * 1024 * 1024;
 	private const int MaximumFailureEntries = 1024;
-	private static ExternalTextureCatalog _externalTextures = new([]);
+	private static ExternalMediaCatalog _externalMedia = new([]);
 	private static TextureCache _textureCache = new(DesktopTextureBudgetBytes);
-	private static readonly Dictionary<string, string> TextureSourcesByReference = new(StringComparer.Ordinal);
-	private static readonly HashSet<(string Key, TextureFailureKind Kind)> TextureFailures = [];
-	private static readonly Queue<(string Key, TextureFailureKind Kind)> RecentFailures = [];
+	private static readonly Dictionary<(MediaAssetKind Kind, string Reference), string> SourcesByReference = [];
+	private static readonly HashSet<(MediaAssetKind AssetKind, string Key, MediaFailureKind Kind)> MediaFailures = [];
+	private static readonly Queue<(MediaAssetKind AssetKind, string Key, MediaFailureKind Kind)> RecentFailures = [];
 
-	public static void InitializeTextures(IEnumerable<string> modDirectoriesInLoadOrder, long? cacheBudgetBytes = null)
+	public static void InitializeMedia(IEnumerable<string> modDirectoriesInLoadOrder, long? cacheBudgetBytes = null)
 	{
-		var catalog = new ExternalTextureCatalog(modDirectoriesInLoadOrder);
+		var catalog = new ExternalMediaCatalog(modDirectoriesInLoadOrder);
 		var defaultBudget = Game.IsMobilePlatform ? MobileTextureBudgetBytes : DesktopTextureBudgetBytes;
 		var cache = new TextureCache(cacheBudgetBytes ?? defaultBudget);
-		_externalTextures = catalog;
+		_externalMedia = catalog;
 		_textureCache.Dispose();
 		_textureCache = cache;
-		TextureSourcesByReference.Clear();
-		TextureFailures.Clear();
+		SourcesByReference.Clear();
+		MediaFailures.Clear();
 		RecentFailures.Clear();
 		RegisterTextureCacheMonitors();
 	}
@@ -42,24 +42,8 @@ public static class AssetResolver
 		}
 
 		var normalizedReference = reference.Trim();
-		if (!TextureSourcesByReference.TryGetValue(normalizedReference, out var source))
-		{
-			if (TextureFailures.Contains((normalizedReference, TextureFailureKind.Reference)))
-			{
-				return null;
-			}
-
-			source = ResolveMediaPath(normalizedReference, MediaAssetKind.Texture);
-			if (source is null)
-			{
-				RememberTextureFailure(normalizedReference, TextureFailureKind.Reference);
-				return null;
-			}
-
-			TextureSourcesByReference.Add(normalizedReference, source);
-		}
-
-		if (TextureFailures.Contains((source, TextureFailureKind.Source)))
+		var source = ResolveMediaPath(normalizedReference, MediaAssetKind.Texture);
+		if (source is null || MediaFailures.Contains((MediaAssetKind.Texture, source, MediaFailureKind.Source)))
 		{
 			return null;
 		}
@@ -75,7 +59,7 @@ public static class AssetResolver
 			: LoadExternalTexture(source);
 		if (texture is null)
 		{
-			RememberTextureFailure(source, TextureFailureKind.Source);
+			RememberMediaFailure(MediaAssetKind.Texture, source, MediaFailureKind.Source);
 			Game.Logger.Warning($"Texture reference '{reference}' could not be loaded. Resolved path: {source}");
 			return null;
 		}
@@ -86,30 +70,45 @@ public static class AssetResolver
 
 	private static string? ResolveMediaPath(string reference, MediaAssetKind assetKind)
 	{
+		var key = (assetKind, reference);
+		if (SourcesByReference.TryGetValue(key, out var cached))
+		{
+			return cached;
+		}
+
+		if (MediaFailures.Contains((assetKind, reference, MediaFailureKind.Reference)))
+		{
+			return null;
+		}
+
 		var resolution = MediaReferenceResolver.Resolve(reference, assetKind, Game.ContentRepository);
 		if (!resolution.IsSuccess)
 		{
 			Game.Logger.Warning($"{assetKind} reference could not be resolved: '{reference}'. {resolution.Error}");
+			RememberMediaFailure(assetKind, reference, MediaFailureKind.Reference);
 			return null;
 		}
 
 		var candidates = MediaReferenceResolver.GetCandidateAssetPaths(resolution.AssetPath!, assetKind);
-		var externalPath = assetKind == MediaAssetKind.Texture ? _externalTextures.Resolve(candidates) : null;
+		var externalPath = _externalMedia.Resolve(candidates)?.Replace('\\', '/');
 		var source = externalPath ?? candidates
 			.Select(path => $"{AssetsDirectoryPath}/{path}")
 			.FirstOrDefault(static path => ResourceLoader.Exists(path));
 		if (source is null)
 		{
 			Game.Logger.Warning($"{assetKind} reference '{reference}' does not exist. Candidate paths: {string.Join(", ", candidates)}");
+			RememberMediaFailure(assetKind, reference, MediaFailureKind.Reference);
+			return null;
 		}
 
+		SourcesByReference.Add(key, source);
 		return source;
 	}
 
-	private static void RememberTextureFailure(string key, TextureFailureKind kind)
+	private static void RememberMediaFailure(MediaAssetKind assetKind, string key, MediaFailureKind kind)
 	{
-		var failure = (key, kind);
-		if (!TextureFailures.Add(failure))
+		var failure = (assetKind, key, kind);
+		if (!MediaFailures.Add(failure))
 		{
 			return;
 		}
@@ -117,7 +116,7 @@ public static class AssetResolver
 		RecentFailures.Enqueue(failure);
 		while (RecentFailures.Count > MaximumFailureEntries)
 		{
-			TextureFailures.Remove(RecentFailures.Dequeue());
+			MediaFailures.Remove(RecentFailures.Dequeue());
 		}
 	}
 
@@ -152,8 +151,48 @@ public static class AssetResolver
 		return ImageTexture.CreateFromImage(image);
 	}
 
-	public static AudioStream? LoadAudio(string? reference) =>
-		LoadMedia<AudioStream>(reference, MediaAssetKind.Audio);
+	public static AudioStream? LoadAudio(string? reference)
+	{
+		if (string.IsNullOrWhiteSpace(reference))
+		{
+			return null;
+		}
+
+		var source = ResolveMediaPath(reference.Trim(), MediaAssetKind.Audio);
+		if (source is null || MediaFailures.Contains((MediaAssetKind.Audio, source, MediaFailureKind.Source)))
+		{
+			return null;
+		}
+
+		if (ResourceLoader.GetCachedRef(source) is AudioStream cached)
+		{
+			return cached;
+		}
+
+		var isImported = source.StartsWith("res://", StringComparison.Ordinal);
+		var stream = isImported ? ResourceLoader.Load<AudioStream>(source) : LoadExternalAudio(source);
+		if (stream is null)
+		{
+			RememberMediaFailure(MediaAssetKind.Audio, source, MediaFailureKind.Source);
+			Game.Logger.Warning($"Audio reference '{reference}' could not be loaded. Resolved path: {source}");
+			return null;
+		}
+
+		if (!isImported)
+		{
+			stream.TakeOverPath(source);
+		}
+
+		return stream;
+	}
+
+	private static AudioStream? LoadExternalAudio(string path) => Path.GetExtension(path).ToLowerInvariant() switch
+	{
+		".ogg" => AudioStreamOggVorbis.LoadFromFile(path),
+		".mp3" => AudioStreamMP3.LoadFromFile(path),
+		".wav" => AudioStreamWav.LoadFromFile(path),
+		_ => null,
+	};
 
 	public static VideoStream? LoadVideo(string? reference) =>
 		LoadMedia<VideoStream>(reference, MediaAssetKind.Video);
@@ -235,7 +274,7 @@ public static class AssetResolver
 		}
 
 		var resourcePath = ResolveMediaPath(reference, assetKind);
-		if (resourcePath is null)
+		if (resourcePath is null || MediaFailures.Contains((assetKind, resourcePath, MediaFailureKind.Source)))
 		{
 			return null;
 		}
@@ -243,6 +282,7 @@ public static class AssetResolver
 		var resource = ResourceLoader.Load<T>(resourcePath);
 		if (resource is null)
 		{
+			RememberMediaFailure(assetKind, resourcePath, MediaFailureKind.Source);
 			Game.Logger.Warning(
 				$"{assetKind} reference '{reference}' could not be loaded as {typeof(T).Name}. Resolved path: {resourcePath}");
 		}
@@ -326,7 +366,7 @@ public static class AssetResolver
 		return false;
 	}
 
-	private enum TextureFailureKind
+	private enum MediaFailureKind
 	{
 		Reference,
 		Source,

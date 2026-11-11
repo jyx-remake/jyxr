@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://jsmmfitkrv5x" path="res://assets/art/misc/dikuang2.png" id="1_panel"]
 [ext_resource type="Script" uid="uid://b8rlntlsothvr" path="res://UI/SelectSect/SelectSectScreen.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://r3uusveb0rxt" path="res://assets/art/misc/duiwu_yidong.png" id="2_arrow"]
-[ext_resource type="Texture2D" uid="uid://drx7o46xwypla" path="res://assets/art/map/wudang.jpg" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/background.jpg" id="2_bg"]
 [ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="3_button"]
 [ext_resource type="PackedScene" uid="uid://cveba3f8kxvxc" path="res://scenes/ui/avatar_box/avatar_box.tscn" id="4_avatar"]
 [ext_resource type="Texture2D" uid="uid://db82ulbrpujgy" path="res://assets/art/misc/btn-cross.png" id="7_ack"]

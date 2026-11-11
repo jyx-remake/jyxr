@@ -21,6 +21,7 @@ public partial class InventoryItemBox : TextureButton
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_avatar.Texture = null;
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_stackLabel = GetNode<Label>("%StackLabel");
 		_rarityBand = GetNode<Panel>("%RarityBand");

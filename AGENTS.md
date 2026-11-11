@@ -17,7 +17,7 @@
 - `Game.Presentation` 只依赖 `Game.Core`，表达交互状态和展示流程。`Game.Godot` 承载节点、资源、音频和演出，不把业务规则挪进 UI。
 - `GameSession` 是普通实例，不改成静态单例。服务通过当前 session 取状态；读档替换 `State`，不重建服务。跨异步等待的操作应确认仍属于原状态。
 - 运行态可持有已解析 definition；存档只保存稳定 ID 和实例状态。`GameProfile` 独立于单个存档。
-- 正式内容在 `mods/<modId>/data`，新增定义与修改既有定义的 MOD patch 分工见下方文档。内容字段引用的静态图片可放在 MOD 的 `assets/art`，由 `AssetResolver` 统一解析与缓存。动画、场景、主题和音视频资源通过 PCK 扩展。资源优先级见 MOD 数据补丁文档。
+- 正式内容在 `mods/<modId>/data`，新增定义与修改既有定义的 MOD patch 分工见下方文档。内容字段引用的静态图片和音频分别放在 MOD 的 `assets/art`、`assets/audio`，由 `AssetResolver` 统一加载。动画、场景、主题和视频资源通过 PCK 扩展。资源优先级与缓存方式见 MOD 数据补丁文档。
 - `World`、`UIRoot`、`AudioManager` 由 bootstrap 挂在 `/root/__GameRuntime`，不是 Godot autoload；先完成初始化，再使用各自 `Instance`。
 - Godot 运行期日志使用 `Game.Logger`。资源加载统一经 `AssetResolver`，不要在面板重复拼接资源路径或实现扩展名回退。
 - 场景脚本取节点优先使用 `unique_name_in_owner = true` 与 `%Name`；仅在层级本身具有语义时使用固定 NodePath。UI 默认使用轻量面板脚本，复杂显示可提取 Presenter，不为每个面板创建 ViewModel。

@@ -30,6 +30,7 @@ public partial class DetailPanel : JyPanel
 	{
 		base._Ready();
 		_iconRect = GetNode<TextureRect>("%IconRect");
+		_iconRect.Texture = null;
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_categoryLabel = GetNode<Label>("%CategoryLabel");
 		_contentLabel = GetNode<RichTextLabel>("%ContentLabel");

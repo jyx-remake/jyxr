@@ -13,6 +13,7 @@ public partial class SelectHeadSlot : JyButton
 	public override void _Ready()
 	{
 		_textureRect = GetNode<TextureRect>("%TextureRect");
+		_textureRect.Texture = null;
 		_tickMark = GetNode<TextureRect>("%TickMark");
 	}
 

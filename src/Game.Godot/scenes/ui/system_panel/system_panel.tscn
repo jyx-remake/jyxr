@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://sdtyoj35nitl"]
 
 [ext_resource type="Script" uid="uid://dfeiaxmn5awtk" path="res://UI/System/SystemPanel.cs" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://5n52fg3sl8bk" path="res://assets/art/battle_bg/zhulin.jpg" id="2_background"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/background.jpg" id="2_background"]
 [ext_resource type="Texture2D" uid="uid://rp0frp5p0jig" path="res://assets/art/misc/cross.png" id="3_close"]
 [ext_resource type="Texture2D" uid="uid://b1n3vntrjjyry" path="res://assets/art/ui/icon_main_menu.svg" id="4_main_menu"]
 [ext_resource type="Texture2D" uid="uid://bbc8vj3vn1kxx" path="res://assets/art/ui/icon_load.svg" id="5_load"]
@@ -57,6 +57,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 
 [node name="Background" type="TextureRect" parent="." unique_id=622011440]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

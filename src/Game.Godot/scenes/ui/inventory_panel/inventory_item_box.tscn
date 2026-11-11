@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel/inventory_item_tooltip.tscn" id="2_tooltip"]
 [ext_resource type="Texture2D" uid="uid://b173d0wt20k3t" path="res://assets/art/misc/biankuang.png" id="3_frame"]
 [ext_resource type="Texture2D" uid="uid://hhslflvjkysr" path="res://assets/art/misc/dise.png" id="4_mask"]
-[ext_resource type="Texture2D" uid="uid://c6tnvcjup3en1" path="res://assets/art/item/baoguo.png" id="5_placeholder"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/icon.jpg" id="5_placeholder"]
 [ext_resource type="LabelSettings" uid="uid://bq4vwt6mmhytg" path="res://assets/theme/item_name.tres" id="6_label"]
 
 [sub_resource type="StyleBoxFlat" id="1_rarity_band"]

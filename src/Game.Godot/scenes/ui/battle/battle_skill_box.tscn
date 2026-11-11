@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dwaq2gsykq0gf" path="res://UI/Battle/Widgets/BattleSkillBox.cs" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://cao7kwtub078m" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="2_tooltip"]
-[ext_resource type="Texture2D" uid="uid://iuhrh668ir72" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_avatar"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/icon.jpg" id="3_avatar"]
 [ext_resource type="FontVariation" path="res://assets/theme/fonts/martial_display_font.tres" id="4_font"]
 [ext_resource type="Texture2D" uid="uid://7e5fv34n2q1j" path="res://assets/art/ui/battle/fengyin.png" id="5_seal"]
 

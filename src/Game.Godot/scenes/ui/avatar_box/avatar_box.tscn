@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dgpa2bknacgnk" path="res://UI/AvatarBox.cs" id="1_anahy"]
 [ext_resource type="Texture2D" uid="uid://bno8qbr5uudas" path="res://assets/art/misc/avatar_bg.png" id="1_j1r3i"]
 [ext_resource type="Shader" uid="uid://byh2mxf018i6u" path="res://scenes/ui/avatar_box/avatar_box.gdshader" id="3_vguyd"]
-[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="4_i7gls"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/portrait.png" id="4_i7gls"]
 [ext_resource type="Texture2D" uid="uid://c8wx1redpc4qx" path="res://assets/art/misc/avatar_frame.png" id="4_rmodk"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_d7dln"]

@@ -9,7 +9,6 @@ namespace Game.Godot.UI;
 public partial class ItemTargetCharacterBox : Button
 {
 	private TextureRect _avatar = null!;
-	private Texture2D? _defaultAvatarTexture;
 	private Label _nameLabel = null!;
 	private Label _levelLabel = null!;
 	private Label _attackLabel = null!;
@@ -25,7 +24,7 @@ public partial class ItemTargetCharacterBox : Button
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
-		_defaultAvatarTexture = _avatar.Texture;
+		_avatar.Texture = null;
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_levelLabel = GetNode<Label>("%LevelLabel");
 		_attackLabel = GetNode<Label>("%AttackLabel");
@@ -57,7 +56,7 @@ public partial class ItemTargetCharacterBox : Button
 		_attackLabel.Text = $"攻:{combatStats.Attack}";
 		_defenceLabel.Text = $"防:{combatStats.Defence}";
 
-		_avatar.Texture = AssetResolver.LoadTexture(_character.Portrait) ?? _defaultAvatarTexture;
+		_avatar.Texture = AssetResolver.LoadTexture(_character.Portrait);
 
 		var enabled = _candidate.CanUse;
 		_avatar.Modulate = enabled ? Colors.White : Colors.Black;

@@ -33,6 +33,7 @@ public partial class ShopItemBox : TextureButton
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_avatar.Texture = null;
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_priceLabel = GetNode<Label>("%PriceLabel");
 		_limitLabel = GetNode<Label>("%LimitLabel");

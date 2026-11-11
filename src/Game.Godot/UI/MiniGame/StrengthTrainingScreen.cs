@@ -42,6 +42,7 @@ public partial class StrengthTrainingScreen : Control
 
 	public override void _Ready()
 	{
+		GetNode<TextureRect>("%Background").Texture = AssetResolver.LoadTexture("地图.客栈");
 		_playArea = GetNode<Control>("%PlayArea");
 		_hitEffect = GetNode<TextureRect>("%HitEffect");
 		_timeLabel = GetNode<Label>("%TimeLabel");

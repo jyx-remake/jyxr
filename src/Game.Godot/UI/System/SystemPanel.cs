@@ -1,5 +1,6 @@
 using Game.Application;
 using Game.Godot.Persistence;
+using Game.Godot.Resources;
 using Godot;
 
 namespace Game.Godot.UI;
@@ -17,6 +18,7 @@ public partial class SystemPanel : Control
 
 	public override void _Ready()
 	{
+		GetNode<TextureRect>("%Background").Texture = AssetResolver.LoadTexture("地图.竹林");
 		_backButton = GetNode<BaseButton>("%BackButton");
 		_consoleButton = GetNode<Button>("%ConsoleButton");
 		_mainMenuButton = GetNode<Button>("%MainMenuButton");

@@ -66,6 +66,7 @@ public partial class CharacterPanel : JyPanel
 	{
 		base._Ready();
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_avatar.Texture = null;
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_levelValueLabel = GetNode<Label>("%LevelValueLabel");
 		_hpValueLabel = GetNode<Label>("%HpValueLabel");
@@ -137,11 +138,7 @@ public partial class CharacterPanel : JyPanel
 			throw new InvalidOperationException("CharacterPanel.CharacterId is required.");
 		}
 
-		var portrait = AssetResolver.LoadTexture(character.Portrait);
-		if (portrait is not null)
-		{
-			_avatar.Texture = portrait;
-		}
+		_avatar.Texture = AssetResolver.LoadTexture(character.Portrait);
 
 		_nameLabel.Text = character.Name;
 		_levelValueLabel.Text = character.Level.ToString();

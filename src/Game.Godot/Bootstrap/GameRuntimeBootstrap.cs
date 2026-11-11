@@ -39,7 +39,7 @@ public static class GameRuntimeBootstrap
 		_activeModLoadout = modLoadout;
 		var logger = EnsureLogger();
 		LoadResourcePacks(modLoadout, logger);
-		AssetResolver.InitializeTextures(modLoadout.ModsInLoadOrder.Select(static mod => mod.ModDirectoryPath));
+		AssetResolver.InitializeMedia(modLoadout.ModsInLoadOrder.Select(static mod => mod.ModDirectoryPath));
 		EnsureRuntimeNodes(sceneTree);
 
 		var contentInputs = modLoadout.ModsInLoadOrder

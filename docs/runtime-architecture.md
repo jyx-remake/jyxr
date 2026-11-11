@@ -66,7 +66,7 @@ Android 启动器在扫描 MOD 前检查“所有文件访问权限”；未授�
 
 [GameRuntimeBootstrap](../src/Game.Godot/Bootstrap/GameRuntimeBootstrap.cs) 接收 ModLoadout：
 
-1. 按有效顺序加载 MOD 声明的 PCK，建立外部静态图片索引并重建图片缓存上下文，在运行时场景实例化之前完成资源准备。
+1. 按有效顺序加载 MOD 声明的 PCK，建立外部静态图片与音频索引并重建媒体资源上下文，在运行时场景实例化之前完成资源准备。
 2. 确保 `World`、`UIRoot`、`AudioManager` 存在于 `/root/__GameRuntime`。
 3. 按主 MOD、依赖 addon、用户排序 addon 的顺序装配 loose data 与 patch。
 4. 读取主 MOD 独立的设置、全局档案，构造 GameSession 并初始化宿主入口。
@@ -80,13 +80,17 @@ Android 启动器在扫描 MOD 前检查“所有文件访问权限”；未授�
 
 `ContentPackage` 承载 JSON 定义，已编译剧情通过独立参数传入仓储构建入口。`StoryScript` 保存类型化剧情段，调用与表达式直接持有解析后的语法树。
 
-新增定义、修改已有定义、地图与剧情目录规则统一见 [MOD 数据补丁](mod-data-patching.md)。[AssetResolver](../src/Game.Godot/Resources/AssetResolver.cs) 统一加载内容字段引用的图片，优先查询有效 MOD 的 `assets/art` 静态图片，再查询 Godot 已挂载资源。外部图片按 MOD 顺序后者优先，同一 MOD 内按扩展名候选顺序匹配。音视频、动画库以及场景直接引用的资源通过 Godot 资源系统加载。
+新增定义、修改已有定义、地图与剧情目录规则统一见 [MOD 数据补丁](mod-data-patching.md)。[AssetResolver](../src/Game.Godot/Resources/AssetResolver.cs) 通过 [ExternalMediaCatalog](../src/Game.Content/Loading/ExternalMediaCatalog.cs) 查询有效 MOD 的 `assets/art` 图片与 `assets/audio` 音频，再查询 Godot 已挂载资源。外部资源按 MOD 顺序后者优先，同一 MOD 内按扩展名候选顺序匹配。视频、动画库以及场景直接引用的资源通过 Godot 资源系统加载。
+
+外部音频通过 Godot 原生 OGG Vorbis、MP3、WAV 加载器创建音频流，并按实际文件路径注册到 Godot 原生资源缓存。重复请求复用仍由播放器或调用方持有的资源，释放时机跟随引擎引用计数与 C# GC。`AudioManager` 控制音乐循环、播放列表和音效多音轨。基础音频随 `mods/jyxr-base/assets/audio` 分发。
+
+基础内容的 `battle_bg`、`head`、`icon`、`item`、`map` 图片随 `mods/jyxr-base/assets/art` 分发。这些内容图片的场景预览统一引用 `assets/art/editor_samples` 下的头像、图标、背景三张样板图。节点就绪时清空样板纹理或绑定真实资源，头像与图标缺失时清空对应显示，复用界面时也会覆盖旧纹理。系统面板使用 `地图.竹林`，宝箱面板使用 `场景.商店`，两个训练小游戏使用 `地图.客栈`。
 
 图片解析索引保存引用到实际来源的映射。[TextureCache](../src/Game.Godot/Resources/TextureCache.cs) 按底层纹理实例维护字节预算和 LRU，桌面默认 `128 MiB`，移动端默认 `64 MiB`。命中任何资源别名或图集帧都会刷新其底图的最近访问顺序。容量按基础层尺寸与格式估算，常见三分量格式按 GPU 四分量对齐保守计费，同一底图仅计一次。估算过程只查询元数据。超出预算时移除最久未访问底图及其关联视图的缓存强引用。单张底图超过预算时保留弱引用，交由实际使用者持有。
 
 Godot `WeakRef` 按实际来源复用仍由节点或其他资源持有的纹理。每加载 64 个来源清理失效弱引用。淘汰由缓存释放强引用，纹理由 Godot 引用计数和 C# GC 回收，实际显存释放可能延迟。剧情对话和选择面板隐藏时清空头像纹理引用。预算控制缓存强引用的估算量，全局纹理显存还包含界面、动画、场景和其他持有者的资源。
 
-Godot 调试器自定义监控 `assets/texture_cache/*` 提供预算、保留字节数、底图数、来源数、强缓存命中、弱引用复用、来源加载和淘汰次数。来源加载次数统计成功调用加载入口的次数，其中包含 Godot 内部资源缓存命中。解析失败和加载失败共保留最近 1024 条记录，超出后允许重新尝试。界面关闭、切图和读档继续复用当前资源上下文，重建时清空索引和缓存并重新扫描外部文件。外部图片解码后修复透明边缘，再创建纹理。运行中编辑文件后需要重新启动游戏才能稳定使用新资源。完整的进程内 MOD 热切换仍受上面的运行时清理边界约束。
+Godot 调试器自定义监控 `assets/texture_cache/*` 提供预算、保留字节数、底图数、来源数、强缓存命中、弱引用复用、来源加载和淘汰次数。来源加载次数统计成功调用加载入口的次数，其中包含 Godot 内部资源缓存命中。媒体解析失败和加载失败按媒体类型隔离，共保留最近 1024 条记录，超出后允许重新尝试。界面关闭、切图和读档继续复用当前资源上下文，重建时清空索引和图片缓存并重新扫描外部文件。外部图片解码后修复透明边缘，再创建纹理。运行中编辑文件后需要重新启动游戏才能稳定使用新资源。完整的进程内 MOD 热切换仍受上面的运行时清理边界约束。
 
 ## 地图与全局事件
 

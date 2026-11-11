@@ -7,7 +7,6 @@ namespace Game.Godot.UI;
 public partial class CharacterRosterAvatarButton : Button
 {
 	private TextureRect _avatar = null!;
-	private Texture2D? _defaultAvatarTexture;
 	private Label _nameLabel = null!;
 	private Control _selectedFrame = null!;
 	private CharacterInstance? _character;
@@ -19,7 +18,7 @@ public partial class CharacterRosterAvatarButton : Button
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
-		_defaultAvatarTexture = _avatar.Texture;
+		_avatar.Texture = null;
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_selectedFrame = GetNode<Control>("%SelectedFrame");
 		Pressed += OnPressed;
@@ -45,7 +44,7 @@ public partial class CharacterRosterAvatarButton : Button
 		_nameLabel.Text = _character.Name;
 		_selectedFrame.Visible = _isSelected;
 
-		_avatar.Texture = AssetResolver.LoadTexture(_character.Portrait) ?? _defaultAvatarTexture;
+		_avatar.Texture = AssetResolver.LoadTexture(_character.Portrait);
 	}
 
 	private void OnPressed()

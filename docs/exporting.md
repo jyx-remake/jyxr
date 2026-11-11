@@ -22,12 +22,14 @@
 | --- | --- | --- |
 | `Windows Base` | `export/windows/金庸群侠传XR.exe` | 单文件 Windows 本体，内嵌基础资源 PCK 与 .NET 构建输出 |
 | `Android Base` | `export/android/金庸群侠传XR.apk` | Android 宿主及相同的本体资源 |
-| `Shared Resources PCK` | `export/shared/base.pck` | `assets/animation`、`assets/art`、`assets/audio` |
+| `Shared Resources PCK` | `export/shared/base.pck` | `assets/animation`、`assets/art` |
 
-本体使用“导出所有资源”并以 `assets/animation/*,assets/art/*,assets/audio/*` 排除共用资源；PCK 使用“导出所选资源”（不逐项勾选），以相同通配符加入资源。Godot 的 `*` 匹配完整路径，包含子目录，不需要 `**`。PCK 排除 `.uid` 辅助文件，导入资源仍由 Godot 正常处理。新增这三个目录内的资源会自动纳入 PCK。字体、启动器图片、shader、theme 和 video 仍随本体导出。
+本体使用“导出所有资源”并以 `assets/animation/*,assets/art/*` 排除共用资源。PCK 使用“导出所选资源”（不逐项勾选），以相同通配符加入资源。Godot 的 `*` 匹配完整路径，包含子目录，不需要 `**`。PCK 排除 `.uid` 辅助文件，导入资源仍由 Godot 正常处理。新增这两个目录内的资源会自动纳入 PCK。字体、启动器图片、shader、theme 和 video 随本体导出。
+
+基础 MOD 的 `battle_bg`、`head`、`icon`、`item`、`map` 图片位于 `mods/jyxr-base/assets/art`，音频位于 `mods/jyxr-base/assets/audio`，发布时随 MOD 目录分发。Godot 工程的 `assets/art` 保留图集、UI 等资源及 `editor_samples` 下的三张编辑器样板图，继续纳入共享 PCK。外部图片支持 PNG、JPG、JPEG、WebP，音频支持 OGG Vorbis、MP3、WAV，可直接由游戏运行期加载。
 
 PCK 预设借用 Windows 导出平台，保留现有纹理配置与 `extra_pck` 特性；编辑器中使用 **Export PCK/ZIP**，不要使用 **Export Project**。命令行使用上面的 `-Target Shared`，脚本会自动创建输出目录并调用 `--export-pack`。
 
 Windows 本体启用 Godot 的 `binary_format/embed_pck` 和 `dotnet/embed_build_outputs`，并关闭控制台包装器，仅需分发本体 EXE。旧导出遗留的同名 `.pck`、`.console.exe` 和 `data_engine-free-rpg_windows_x86_64` 目录不属于新的发布产物，脚本不会自动删除它们。
 
-发布时将同一份 `base.pck` 放入对应 MOD 目录，并在该 MOD 的 `mod.json` 中通过 `packs` 声明相对路径（例如 `"packs": ["base.pck"]`）。仅把 PCK 放在本体旁不会自动加载；`mods` 数据也需单独分发。内容字段引用的外部静态图片随 MOD 的 `assets/art` 目录分发，优先级见 [外部静态图片](mod-data-patching.md#外部静态图片)。Windows 的数据根为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。
+发布时将同一份 `base.pck` 放入对应 MOD 目录，并在该 MOD 的 `mod.json` 中通过 `packs` 声明相对路径（例如 `"packs": ["base.pck"]`）。仅把 PCK 放在本体旁不会自动加载。`mods` 数据也需单独分发，静态图片随 MOD 的 `assets/art` 分发，音频随 `assets/audio` 分发。优先级见 [MOD 资源说明](mod-data-patching.md#外部静态图片)。Windows 的数据根为可执行文件目录，Android 为 `/storage/emulated/0/JYXR`。

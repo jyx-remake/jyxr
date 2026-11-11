@@ -43,11 +43,14 @@ public static class MediaReferenceResolver
     public static IReadOnlyList<string> RasterTextureExtensions { get; } =
         Array.AsReadOnly<string>([".png", ".jpg", ".jpeg", ".webp"]);
 
+    public static IReadOnlyList<string> AudioExtensions { get; } =
+        Array.AsReadOnly<string>([".ogg", ".mp3", ".wav"]);
+
     private static readonly IReadOnlyDictionary<MediaAssetKind, string[]> SupportedExtensions =
         new Dictionary<MediaAssetKind, string[]>
         {
             [MediaAssetKind.Texture] = [.. RasterTextureExtensions, ".tres", ".res"],
-            [MediaAssetKind.Audio] = [".ogg", ".mp3", ".wav", ".flac"],
+            [MediaAssetKind.Audio] = [.. AudioExtensions],
             [MediaAssetKind.Video] = [".ogv"],
         };
 

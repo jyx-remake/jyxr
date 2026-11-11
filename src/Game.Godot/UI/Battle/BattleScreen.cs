@@ -76,6 +76,7 @@ public partial class BattleScreen : Control
 	{
 		_presenter = new BattlePresenter(PlayerTeam);
 		_background = GetNode<TextureRect>("%Background");
+		_background.Texture = null;
 		_titleLabel = GetNode<Label>("%TitleLabel");
 		_subtitleLabel = GetNode<Label>("%SubtitleLabel");
 		_timelineValueLabel = GetNode<Label>("%TimelineValueLabel");

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://chmb657ktjrbe"]
 
 [ext_resource type="Script" uid="uid://dg4c8clum2nra" path="res://UI/MiniGame/StrengthTrainingScreen.cs" id="1_strength"]
-[ext_resource type="Texture2D" uid="uid://bb8qkr5u278lf" path="res://assets/art/map/kezhan.jpg" id="2_background"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/background.jpg" id="2_background"]
 
 [node name="StrengthTrainingScreen" type="Control" unique_id=545250481]
 layout_mode = 3
@@ -13,6 +13,7 @@ grow_vertical = 2
 script = ExtResource("1_strength")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1230492097]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

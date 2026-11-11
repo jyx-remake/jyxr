@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ebh2ojwcneg" path="res://UI/Skills/SkillBox.cs" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://cao7kwtub078m" path="res://scenes/ui/skill_tab/skill_tooltip.tscn" id="2_tooltip"]
-[ext_resource type="Texture2D" uid="uid://iuhrh668ir72" path="res://assets/art/icon/icon_waigong_150.jpg" id="3_avatar"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/icon.jpg" id="3_avatar"]
 [ext_resource type="Texture2D" uid="uid://db82ulbrpujgy" path="res://assets/art/misc/btn-cross.png" id="4_check"]
 [ext_resource type="Texture2D" uid="uid://4dgk8dxbjd1i" path="res://assets/art/misc/touxiangbiankuang.png" id="5_badge"]
 

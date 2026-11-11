@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://d1unjwj8fihty" path="res://scenes/ui/base/jy_panel.tscn" id="1_panel"]
 [ext_resource type="Script" uid="uid://bgpdvgmngujai" path="res://UI/Character/CharacterPanel.cs" id="2_script"]
 [ext_resource type="Texture2D" uid="uid://cilt411j4qp5o" path="res://assets/art/ui/character_panel/renwuzhuangtai_dise.png" id="3_background"]
-[ext_resource type="Texture2D" uid="uid://si2ul6txxyik" path="res://assets/art/head/guoxiang.png" id="5_7x4sp"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/portrait.png" id="5_7x4sp"]
 [ext_resource type="Texture2D" uid="uid://cegwblxnksegl" path="res://assets/art/ui/character_panel/renwuzhuangtai_touxiangdise.png" id="5_avatar_background"]
 [ext_resource type="Texture2D" uid="uid://bdmh4kt0xk26e" path="res://assets/art/ui/character_panel/touxiangbiankuang.png" id="6_avatar_frame"]
 [ext_resource type="Texture2D" uid="uid://43wukauo8e1n" path="res://assets/art/ui/character_panel/renwuzhuangtai_shuxing.png" id="7_attr_button"]

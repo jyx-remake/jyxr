@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bkoqgf333t51m"]
 
-[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="1_head"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/portrait.png" id="1_head"]
 [ext_resource type="Script" uid="uid://c86ih7jb2atdp" path="res://UI/StartQuestion/SelectHeadSlot.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://db82ulbrpujgy" path="res://assets/art/misc/btn-cross.png" id="3_tick"]
 

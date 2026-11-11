@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/start_question/select_head_slot.tscn" id="2_slot"]
 [ext_resource type="Texture2D" uid="uid://db82ulbrpujgy" path="res://assets/art/misc/btn-cross.png" id="3_ack"]
 [ext_resource type="PackedScene" uid="uid://b1hd7sr7biah0" path="res://scenes/ui/base/jy_button.tscn" id="4_jy_button"]
-[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="5_head"]
 
 [ext_resource type="Script" uid="uid://drc3rpvgd2w7a" path="res://UI/Base/VirtualGrid.cs" id="virtual_grid"]
 

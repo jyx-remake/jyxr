@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ctqf22byj6lmq"]
 
 [ext_resource type="Script" uid="uid://dyf7u5f3feast" path="res://UI/Character/CharacterRosterAvatarButton.cs" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="2_avatar"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/portrait.png" id="2_avatar"]
 
 [sub_resource type="StyleBoxFlat" id="1_normal"]
 bg_color = Color(0.08, 0.06, 0.04, 0.72)

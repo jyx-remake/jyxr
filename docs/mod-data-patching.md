@@ -11,7 +11,8 @@
 | 修改已有剧情 | 在 `.story` 中提供同名段，按 MOD 加载顺序整体替换 |
 | 修改已有 JSON 定义 | 使用 `patches/**/*.patch.json`，操作规则见下文 |
 | 新增或覆盖内容字段引用的静态图片 | 放在 MOD 的 `assets/art` 中，支持 PNG、JPG、JPEG、WebP |
-| 新增或覆盖动画、场景、主题、音视频等 Godot 资源 | 导出 PCK，在 `mod.json` 的 `packs` 中声明相对路径 |
+| 新增或覆盖音频 | 放在 MOD 的 `assets/audio` 中，支持 OGG Vorbis、MP3、WAV |
+| 新增或覆盖动画、场景、主题、视频等 Godot 资源 | 导出 PCK，在 `mod.json` 的 `packs` 中声明相对路径 |
 | 迁移旧版内容 | 按 [旧 MOD 迁移指南](legacy-mod-migration-guide.md) 更新源数据 |
 
 ### MOD 清单与目录
@@ -33,15 +34,17 @@
 
 `saveImpact` 支持 `none`、`gameplay`、`structural`，主 MOD 必须声明 `structural`；存档记录加载组合，用于读档时的变更风险判断。玩家数据按主 MOD 隔离。数据根位置、启动流程与存档规则见 [运行时架构](runtime-architecture.md)。
 
-主 MOD 必须提供 `data` 目录。PCK 路径相对于所在 MOD 目录，必须指向存在的 `.pck` 文件。PCK 按有效 MOD 加载顺序和各清单中的 `packs` 顺序加载，后加载的包可以覆盖相同资源路径。启动时先加载 PCK、建立外部图片索引，再创建运行时节点、装配 JSON 内容并建立会话。
+主 MOD 必须提供 `data` 目录。PCK 路径相对于所在 MOD 目录，必须指向存在的 `.pck` 文件。PCK 按有效 MOD 加载顺序和各清单中的 `packs` 顺序加载，后加载的包可以覆盖相同资源路径。启动时先加载 PCK、建立外部图片与音频索引，再创建运行时节点、装配 JSON 内容并建立会话。
 
-发布时应同步清单、`data`、`patches`、外部图片 `assets/art` 和清单引用的资源包。本体升级不会自动迁移 MOD。缺少必填字段等无效清单目前会被发现流程跳过，可能表现为启动器没有可用 MOD。
+发布时应同步清单、`data`、`patches`、外部图片 `assets/art`、音频 `assets/audio` 和清单引用的资源包。本体升级不会自动迁移 MOD。缺少必填字段等无效清单目前会被发现流程跳过，可能表现为启动器没有可用 MOD。
 
 Android 启动器提供“导入 ZIP”，通过系统文件选择器选择压缩包，导入成功后自动重新扫描。ZIP 根目录可以直接包含单个 MOD 的 `mod.json` 和内容，也可以包含多个完整 MOD 文件夹；导入目标统一为 `mods/<清单 id>`。导入前先在独立临时目录解压并校验清单、数据目录和 PCK 引用，拒绝越界路径、符号链接和重复 ID。相同 ID 的 MOD 整个目录会被替换，旧版本中已删除的文件不会残留；玩家存档及设置不受影响。替换失败时恢复原 MOD，临时目录在正常完成或回滚后清理。
 
 ### 外部静态图片
 
 角色头像、物品图片、技能图标、地图与战斗背景等内容字段统一通过 `AssetResolver.LoadTexture` 加载。例如，将文件放在 `mods/my-addon/assets/art/head/my_hero.png`，角色的 `portrait` 填写 `head/my_hero.png`，也可填写 `head/my_hero`。资源 ID 继续通过资源定义的 `value` 引用相同的相对路径。路径使用 `/`，大小写与文件名一致。
+
+基础 MOD 的 `battle_bg`、`head`、`icon`、`item`、`map` 图片位于 `mods/jyxr-base/assets/art`，发布时随 MOD 目录分发。系统面板、宝箱面板和两个训练小游戏的固定背景也通过资源 ID 加载，addon 可覆盖相应图片。
 
 解析顺序如下。
 
@@ -55,7 +58,15 @@ Android 启动器提供“导入 ZIP”，通过系统文件选择器选择压�
 
 解析与加载失败共保留最近 1024 条记录。覆盖文件损坏时记录加载失败，修复后重新启动游戏生效。
 
-该入口作用于内容字段引用的独立静态图片。角色与技能动画的切帧、时序，以及场景直接引用的 UI 图片、主题和其他 Godot 资源，继续通过 PCK 提供。
+该入口作用于内容字段引用的独立静态图片。角色与技能动画的切帧、时序，以及场景直接引用的 UI 图片、主题和其他 Godot 资源，通过 PCK 提供。
+
+### 外部音频
+
+背景音乐、音效、技能音效和小游戏音效统一通过 `AssetResolver.LoadAudio` 加载。将文件放在 `mods/my-addon/assets/audio/theme.ogg`，内容中填写 `audio/theme.ogg`，也可填写 `audio/theme` 或使用指向该路径的资源 ID。支持自定义子目录，例如 `audio/bgm/theme.mp3`、`audio/sfx/hit.wav`。
+
+音频按有效 MOD 顺序后加载者优先，同一 MOD 内省略扩展名时依次尝试 `.ogg`、`.mp3`、`.wav`。外部文件优先于 PCK 中的同引用音频，外部没有匹配结果时查询 Godot 已挂载资源。ZIP 导入会安装 `assets/audio`，无需增加 `packs` 声明。
+
+外部音频按实际来源注册到 Godot 原生资源缓存，重复引用复用仍然存活的音频流。播放器持有当前播放的资源，使用者释放后由引擎和 C# GC 回收。背景音乐循环与播放列表由 `AudioManager` 控制。基础 MOD 的音频随 `assets/audio` 分发，格式为 OGG Vorbis。运行中替换音频后重新启动游戏生效。
 
 ### 代码扩展边界
 

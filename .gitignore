@@ -37,7 +37,6 @@ mono_crash.*.json
 # Project-local content and runtime data
 /src/Game.Godot/assets/animation/
 /src/Game.Godot/assets/art/
-/src/Game.Godot/assets/audio/
 /src/Game.Godot/assets/font/
 /src/Game.Godot/assets/launcher_art/
 /src/Game.Godot/assets/video/

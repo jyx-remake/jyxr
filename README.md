@@ -46,7 +46,7 @@ Godot 节点、输入、动画和异步演出需在引擎内另行验证。
 
 ## MOD 与玩家数据
 
-内容从各 MOD 的 loose `data` 与 `patches` 装配。内容字段引用的静态图片可直接放在 MOD 的 `assets/art`，其他 Godot 资源通过 PCK 扩展。加载顺序、图片优先级、补丁协议和存档影响声明见 [MOD 数据补丁](docs/mod-data-patching.md)。
+内容从各 MOD 的 loose `data` 与 `patches` 装配。内容字段引用的静态图片和音频分别放在 MOD 的 `assets/art`、`assets/audio`，其他 Godot 资源通过 PCK 扩展。加载顺序、资源优先级、补丁协议和存档影响声明见 [MOD 数据补丁](docs/mod-data-patching.md)。
 
 剧情直接编写为 `data/stories/**/*.story`，加载 MOD 时由游戏在内存中自动编译。源码语法和示例见 [剧情源码编写指南](docs/story-authoring.md)。
 

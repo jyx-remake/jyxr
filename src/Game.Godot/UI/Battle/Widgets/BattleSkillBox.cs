@@ -24,6 +24,7 @@ public partial class BattleSkillBox : Button
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
+		_avatar.Texture = null;
 		_sealOverlay = GetNode<TextureRect>("%SealOverlay");
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_formNameLabel = GetNode<Label>("%FormNameLabel");

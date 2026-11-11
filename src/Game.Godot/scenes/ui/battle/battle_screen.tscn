@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://di28xqh0osmwk"]
 
 [ext_resource type="Script" uid="uid://cp5451k3twt6r" path="res://UI/Battle/BattleScreen.cs" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://5n52fg3sl8bk" path="res://assets/art/battle_bg/zhulin.jpg" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/background.jpg" id="2_bg"]
 [ext_resource type="Texture2D" uid="uid://beuwbdagaqxxq" path="res://assets/art/ui/battle/battle_actionBarBg.png" id="3_action_bg"]
 [ext_resource type="Texture2D" uid="uid://cx575i6rso56w" path="res://assets/art/ui/battle/battle_shuimodi.png" id="4_bottom_strip"]
 [ext_resource type="Texture2D" uid="uid://cvcu58vmb6qvl" path="res://assets/art/ui/battle/battle_shijianxianzhi.png" id="6_clock"]

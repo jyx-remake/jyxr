@@ -25,6 +25,7 @@ public partial class SelectSectScreen : Control
 	public override void _Ready()
 	{
 		_background = GetNode<TextureRect>("%Background");
+		_background.Texture = null;
 		_masterAvatarBox = GetNode<AvatarBox>("%MasterAvatarBox");
 		_sectNameLabel = GetNode<Label>("%SectNameLabel");
 		_masterLabel = GetNode<Label>("%MasterLabel");

@@ -45,11 +45,7 @@ public partial class CharacterSummaryPanel : Control
 		}
 
 		var character = Game.State.Party.GetMember(CharacterId);
-		var portrait = AssetResolver.LoadTexture(character.Portrait);
-		if (portrait is not null)
-		{
-			_avatar.Texture = portrait;
-		}
+		_avatar.Texture = AssetResolver.LoadTexture(character.Portrait);
 
 		_nameLabel.Text = character.Name;
 		_levelLabel.Text = $"等级 {character.Level}";

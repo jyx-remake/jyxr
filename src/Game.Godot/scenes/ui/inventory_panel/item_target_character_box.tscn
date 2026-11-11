@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://btk3o4qffedfa" path="res://UI/Inventory/ItemTargetCharacterBox.cs" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://b173d0wt20k3t" path="res://assets/art/misc/biankuang.png" id="2_frame"]
 [ext_resource type="Texture2D" uid="uid://hhslflvjkysr" path="res://assets/art/misc/dise.png" id="3_mask"]
-[ext_resource type="Texture2D" uid="uid://djdqqcga07x36" path="res://assets/art/head/zhujue2.png" id="4_avatar"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/portrait.png" id="4_avatar"]
 [ext_resource type="LabelSettings" uid="uid://m7pdfcciwdqj" path="res://assets/theme/label_team_object.tres" id="5_label"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]

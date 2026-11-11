@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dpdj5h0prmm2d"]
 
 [ext_resource type="Script" uid="uid://bqne6beaqcs0n" path="res://UI/MiniGame/LightnessTrainingScreen.cs" id="1_lightness"]
-[ext_resource type="Texture2D" uid="uid://bb8qkr5u278lf" path="res://assets/art/map/kezhan.jpg" id="2_5djnk"]
+[ext_resource type="Texture2D" path="res://assets/art/editor_samples/background.jpg" id="2_5djnk"]
 
 [node name="LightnessTrainingScreen" type="Control" unique_id=1628910134]
 layout_mode = 3
@@ -13,6 +13,7 @@ grow_vertical = 2
 script = ExtResource("1_lightness")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1005864140]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

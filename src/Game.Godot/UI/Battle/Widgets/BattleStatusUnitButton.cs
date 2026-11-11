@@ -10,7 +10,6 @@ public partial class BattleStatusUnitButton : Button
 	private static readonly Color EnemyColor = Colors.Red;
 
 	private TextureRect _avatar = null!;
-	private Texture2D? _defaultAvatarTexture;
 	private Label _nameLabel = null!;
 	private Label _hpLabel = null!;
 	private Control _selectedFrame = null!;
@@ -24,7 +23,7 @@ public partial class BattleStatusUnitButton : Button
 	public override void _Ready()
 	{
 		_avatar = GetNode<TextureRect>("%Avatar");
-		_defaultAvatarTexture = _avatar.Texture;
+		_avatar.Texture = null;
 		_nameLabel = GetNode<Label>("%NameLabel");
 		_hpLabel = GetNode<Label>("%HpLabel");
 		_selectedFrame = GetNode<Control>("%SelectedFrame");
@@ -55,7 +54,7 @@ public partial class BattleStatusUnitButton : Button
 		_selectedFrame.Visible = _isSelected;
 		Modulate = _unit.IsAlive ? Colors.White : new Color(0.55f, 0.55f, 0.55f, 0.85f);
 
-		_avatar.Texture = AssetResolver.LoadTexture(_unit.Character.Portrait) ?? _defaultAvatarTexture;
+		_avatar.Texture = AssetResolver.LoadTexture(_unit.Character.Portrait);
 	}
 
 	private Color ResolveTeamColor() => _isPlayerTeam ? PlayerColor : EnemyColor;
