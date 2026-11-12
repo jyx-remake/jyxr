@@ -12,6 +12,7 @@ public partial class StoryChoicePanel : Control, IPanelBackHandler
 	private AvatarBox _avatarBox = null!;
 	private RichTextLabel _questionLabel = null!;
 	private VBoxContainer _choiceContainer = null!;
+	private BaseButton _closeButton = null!;
 
 	[Export]
 	public PackedScene ChoiceButtonScene { get; set; } = null!;
@@ -23,6 +24,8 @@ public partial class StoryChoicePanel : Control, IPanelBackHandler
 		_avatarBox = GetNode<AvatarBox>("%AvatarBox");
 		_questionLabel = GetNode<RichTextLabel>("%QuestionLabel");
 		_choiceContainer = GetNode<VBoxContainer>("%ChoiceContainer");
+		_closeButton = GetNode<BaseButton>("%CloseButton");
+		_closeButton.Pressed += HandleBack;
 		Apply();
 	}
 
@@ -92,6 +95,7 @@ public partial class StoryChoicePanel : Control, IPanelBackHandler
 		_avatarBox.Visible = portrait is not null;
 		_avatarBox.SetAvatarTexture(portrait);
 		_questionLabel.Text = _text;
+		_closeButton.Visible = AllowCancel;
 
 		foreach (var child in _choiceContainer.GetChildren())
 		{

@@ -69,18 +69,28 @@ public partial class MainMenu : Control
 
 	private async void OnMusicPressed()
 	{
-		var tracks = BuildMusicChoices();
-		var options = tracks
-			.Select(FormatMusicChoice)
-			.Append("返回")
-			.ToArray();
-		var selectedIndex = await UIRoot.Instance.ShowChoicesAsync(null, "音乐欣赏", options);
-		if (selectedIndex < 0 || selectedIndex >= tracks.Count)
+		_musicButton.Disabled = true;
+		try
 		{
-			return;
+			var tracks = BuildMusicChoices();
+			var options = tracks.Select(FormatMusicChoice).ToArray();
+			var selectedIndex = await UIRoot.Instance.ShowCancelableChoicesAsync(null, "音乐欣赏", options);
+			if (selectedIndex is int index)
+			{
+				Game.Audio.PlayBgm(tracks[index].Id);
+			}
 		}
-
-		Game.Audio.PlayBgm(tracks[selectedIndex].Id);
+		catch (OperationCanceledException)
+		{
+			// The selection was interrupted by another presentation or scene exit.
+		}
+		finally
+		{
+			if (GodotObject.IsInstanceValid(_musicButton))
+			{
+				_musicButton.Disabled = false;
+			}
+		}
 	}
 
 	private IReadOnlyList<ResourceDefinition> BuildMusicChoices()
