@@ -9,7 +9,7 @@ namespace Game.Godot.UI.Battle;
 internal sealed class BattleSettlementController(
     BattleScreen owner,
     PackedScene settlementPanelScene,
-    Control overlayRoot,
+    PanelHost panels,
     BattlePresenter presenter,
     Action<string> appendLog)
 {
@@ -81,7 +81,7 @@ internal sealed class BattleSettlementController(
         if (settlementPanelScene.Instantiate() is not BattleSettlementPanel panel)
             throw new InvalidOperationException("Battle settlement panel scene root must be BattleSettlementPanel.");
         panel.Configure(presenter.CreateSettlementView(isWin, settlement));
-        overlayRoot.AddChild(panel);
+        panels.Add(panel);
         await panel.AwaitConfirmationAsync();
     }
 }

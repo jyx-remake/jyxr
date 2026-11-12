@@ -147,7 +147,7 @@ public partial class InventoryPanel : JyPanel
 		}
 
 		panel.Configure(entry);
-		UIRoot.Instance.ModalLayer.AddChild(panel);
+		UIRoot.Instance.ShowModalPanel(panel);
 	}
 
 	private static string ResolveEntryActionLabel(InventoryEntry entry) =>

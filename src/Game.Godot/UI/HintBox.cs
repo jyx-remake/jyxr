@@ -2,7 +2,7 @@ using Godot;
 
 namespace Game.Godot.UI;
 
-public partial class HintBox : Control
+public partial class HintBox : Control, IPanelBackHandler
 {
 	private RichTextLabel _contentLabel = null!;
 	private BaseButton _ackButton = null!;
@@ -12,7 +12,7 @@ public partial class HintBox : Control
 	{
 		_contentLabel = GetNode<RichTextLabel>("%ContentLabel");
 		_ackButton = GetNode<BaseButton>("%AckButton");
-		_ackButton.Pressed += OnAckButtonPressed;
+		_ackButton.Pressed += HandleBack;
 		Hide();
 	}
 
@@ -21,7 +21,8 @@ public partial class HintBox : Control
 		ArgumentException.ThrowIfNullOrWhiteSpace(text);
 
 		_completion?.TrySetResult();
-		_completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+		_completion = completion;
 		_contentLabel.Text = text;
 		Show();
 
@@ -30,17 +31,28 @@ public partial class HintBox : Control
 			using var registration = cancellationToken.Register(static state =>
 			{
 				((TaskCompletionSource)state!).TrySetCanceled();
-			}, _completion);
-			await _completion.Task;
+			}, completion);
+			await completion.Task;
 		}
 		finally
 		{
-			Hide();
-			_completion = null!;
+			if (ReferenceEquals(_completion, completion))
+			{
+				Hide();
+				_completion = null!;
+			}
 		}
 	}
 
-	private void OnAckButtonPressed()
+	public void ResetImmediate()
+	{
+		var completion = _completion;
+		_completion = null!;
+		Hide();
+		completion?.TrySetResult();
+	}
+
+	public void HandleBack()
 	{
 		_completion?.TrySetResult();
 	}

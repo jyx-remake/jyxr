@@ -4,7 +4,7 @@ using Godot;
 
 namespace Game.Godot.UI;
 
-public partial class CharacterRosterPanel : Control
+public partial class CharacterRosterPanel : Control, IPanelBackHandler
 {
 	[Export]
 	public PackedScene CharacterAvatarButtonScene { get; set; } = null!;
@@ -40,6 +40,8 @@ public partial class CharacterRosterPanel : Control
 			Render();
 		}
 	}
+
+	public void HandleBack() => _characterPanel.HandleBack();
 
 	public override void _ExitTree()
 	{

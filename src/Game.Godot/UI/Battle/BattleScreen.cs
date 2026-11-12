@@ -12,7 +12,7 @@ using GameRoot = Game.Godot.Game;
 
 namespace Game.Godot.UI.Battle;
 
-public partial class BattleScreen : Control
+public partial class BattleScreen : Control, IPanelBackTargetProvider
 {
 	[Export]
 	public PackedScene BattleSkillBoxScene { get; set; } = null!;
@@ -69,6 +69,8 @@ public partial class BattleScreen : Control
 	private HBoxContainer _listContainer = null!;
 	private BattleLogDrawer _logDrawer = null!;
 	private Control _overlayRoot = null!;
+	private PanelHost _panels = null!;
+	public Control? BackTarget => _panels.BackTarget;
 	private int PlayerTeam => GameRoot.Config.BattlePlayerTeam;
 	internal BattlePresenter Presenter => _presenter;
 
@@ -96,6 +98,7 @@ public partial class BattleScreen : Control
 		_listContainer = GetNode<HBoxContainer>("%ListContainer");
 		_logDrawer = GetNode<BattleLogDrawer>("%BattleLogDrawer");
 		_overlayRoot = GetNode<Control>("%OverlayRoot");
+		_panels = new PanelHost(_overlayRoot);
 		_skillPresentationController = new BattleSkillPresentationController(
 			this,
 			_boardGrid,
@@ -134,7 +137,7 @@ public partial class BattleScreen : Control
 				_surrenderButton,
 				_actionDrawer,
 				_listContainer,
-				_overlayRoot),
+				_panels),
 			new BattleActionPanelScenes(
 				BattleSkillBoxScene,
 				BattleItemPanelScene,
@@ -150,7 +153,7 @@ public partial class BattleScreen : Control
 		_settlementController = new BattleSettlementController(
 			this,
 			BattleSettlementPanelScene,
-			_overlayRoot,
+			_panels,
 			_presenter,
 			AppendLog);
 		_boardGrid.CellActivated += position => DispatchIntent(new BattleUiIntent.ActivateCell(position));

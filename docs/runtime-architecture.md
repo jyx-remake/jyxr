@@ -56,6 +56,20 @@
 
 新游戏与下一周目由 `SessionFlowService` 和 [NewGameStateFactory](../src/Game.Application/NewGameStateFactory.cs) 装配。下一周目保留银两和储物箱、重建初始队伍；全局元宝保留在 GameProfile。
 
+## UI 宿主与展示协调
+
+`UIRoot` 装配场景节点与宿主对象，提供面向调用方的展示入口。`PanelHost` 管理主面板、替换式弹窗和临时面板的所有权，关闭时立即隐藏并排队释放，退出场景树时移除引用。装备选择、物品选人等模态面板通过 `ShowModalPanel` 加入宿主；战斗界面使用自己的 `PanelHost` 管理道具、人物状态和结算弹窗。
+
+宿主根据直接子节点的显示顺序提供返回目标。详情宿主和战斗界面通过 `IPanelBackTargetProvider` 提供内部宿主的目标，人物名册与战斗状态通过 `IPanelBackHandler` 显式转发给内嵌人物面板。`PanelBackInputRouter` 在右键按下时记录最上层交互目标，松开时确认目标仍有效且仍处于最上层，再调用返回操作。目标按提示层、模态层、战斗层和普通面板层的显示顺序查找。右键手势的松开事件由已捕获的界面消费，避免关闭弹窗后继续触发棋盘返回。
+
+`JyPanel` 通过已有关闭信号返回，关闭按钮隐藏或禁用时保留当前界面。系统面板复用返回操作，确认框返回取消，提示框完成当前提示等待。人物属性加点浮层优先收起。装备槽及装备卡片在 GUI 输入阶段通过 `ConsumeRightClick()` 接管当前右键手势，继续执行卸装。
+
+`StoryChoicePanel` 按调用场景设置 `AllowCancel`，默认要求选中有效选项。`UIRoot.ShowChoicesAsync` 返回有效索引；`ShowCancelableChoicesAsync` 允许右键返回，并用 `null` 表示用户取消，也支持空选项列表。选择等待和收起由选择面板管理，每次展示持有独立的完成源，旧展示的回调与清理只作用于对应展示；外部 `CancellationToken` 和主动隐藏会中断等待。
+
+`StoryPresentationCoordinator` 协调对白、选择、字幕、视频和视觉效果的展示切换与重置，具体面板负责自己的异步等待和清理。对白的延迟隐藏与展示版本校验由 `StoryDialoguePanel` 持有。`SessionPresentationCoordinator` 管理会话事件订阅、提示文案、地图返回时的场景与音乐恢复，以及读档后的表现恢复。
+
+读档或执行中断后的表现恢复会关闭宿主管理的普通、模态、详情和战斗面板，重置剧情展示及右键手势。读档事件同时收起临时面板、确认框与提示框，待处理确认返回 `false`，提示等待正常完成。确认框与提示框按独立完成源清理展示，旧等待的清理不会收起后续展示。
+
 ## 虚拟化数据网格
 
 固定尺寸的数据卡片共用 [VirtualGrid](../src/Game.Godot/UI/Base/VirtualGrid.cs)，直接放在 ScrollContainer 下。场景声明列数、卡片尺寸和间距，页面提供数据快照、节点工厂与绑定回调。控件维护完整内容高度，只实例化视口及上下各一行的卡片，滚动时复用移出视口的节点。混合奖励按卡片类型分别复用。

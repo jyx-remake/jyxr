@@ -9,7 +9,7 @@ public enum ConfirmDialogTone
 	Danger,
 }
 
-public partial class ConfirmDialog : Control
+public partial class ConfirmDialog : Control, IPanelBackHandler
 {
 	private RichTextLabel _contentLabel = null!;
 	private BaseButton _confirmButton = null!;
@@ -22,7 +22,7 @@ public partial class ConfirmDialog : Control
 		_confirmButton = GetNode<BaseButton>("%ConfirmButton");
 		_cancelButton = GetNode<BaseButton>("%CancelButton");
 		_confirmButton.Pressed += OnConfirmPressed;
-		_cancelButton.Pressed += OnCancelPressed;
+		_cancelButton.Pressed += HandleBack;
 		Hide();
 	}
 
@@ -34,7 +34,8 @@ public partial class ConfirmDialog : Control
 		ArgumentException.ThrowIfNullOrWhiteSpace(text);
 
 		_completion?.TrySetResult(false);
-		_completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+		var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+		_completion = completion;
 		_contentLabel.Text = text;
 		_contentLabel.Modulate = tone switch
 		{
@@ -51,14 +52,25 @@ public partial class ConfirmDialog : Control
 			using var registration = cancellationToken.Register(static state =>
 			{
 				((TaskCompletionSource<bool>)state!).TrySetCanceled();
-			}, _completion);
-			return await _completion.Task;
+			}, completion);
+			return await completion.Task;
 		}
 		finally
 		{
-			Hide();
-			_completion = null;
+			if (ReferenceEquals(_completion, completion))
+			{
+				Hide();
+				_completion = null;
+			}
 		}
+	}
+
+	public void ResetImmediate()
+	{
+		var completion = _completion;
+		_completion = null;
+		Hide();
+		completion?.TrySetResult(false);
 	}
 
 	private void OnConfirmPressed()
@@ -66,7 +78,7 @@ public partial class ConfirmDialog : Control
 		_completion?.TrySetResult(true);
 	}
 
-	private void OnCancelPressed()
+	public void HandleBack()
 	{
 		_completion?.TrySetResult(false);
 	}

@@ -117,6 +117,17 @@ public partial class CharacterAttributeTab : Control
 		Game.Audio.PlaySfx("音效.加点");
 	}
 
+	public bool TryCloseAssignStatWidget()
+	{
+		if (!_assignStatWidget.IsVisibleInTree())
+		{
+			return false;
+		}
+
+		HideAssignStatWidget();
+		return true;
+	}
+
 	private void HideAssignStatWidget()
 	{
 		_assignStatWidget.Hide();

@@ -3,9 +3,9 @@ using Godot;
 
 namespace Game.Godot.UI.Story;
 
-public partial class StoryChoicePanel : Control
+public partial class StoryChoicePanel : Control, IPanelBackHandler
 {
-	private TaskCompletionSource<int>? _completionSource;
+	private TaskCompletionSource<int?>? _completionSource;
 	private string _speaker = string.Empty;
 	private string _text = string.Empty;
 	private IReadOnlyList<string> _options = [];
@@ -16,6 +16,8 @@ public partial class StoryChoicePanel : Control
 	[Export]
 	public PackedScene ChoiceButtonScene { get; set; } = null!;
 
+	public bool AllowCancel { get; private set; }
+
 	public override void _Ready()
 	{
 		_avatarBox = GetNode<AvatarBox>("%AvatarBox");
@@ -24,36 +26,59 @@ public partial class StoryChoicePanel : Control
 		Apply();
 	}
 
-	public void Configure(string? speaker, string? text, IReadOnlyList<string> options)
+	public async Task<int?> ShowAsync(
+		string? speaker,
+		string? text,
+		IReadOnlyList<string> options,
+		bool allowCancel = false,
+		CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(options);
-		if (options.Count == 0)
+		if (options.Count == 0 && !allowCancel)
 		{
 			throw new InvalidOperationException("Choice panel requires at least one option.");
 		}
 
+		_completionSource?.TrySetCanceled();
+		var completion = new TaskCompletionSource<int?>(TaskCreationOptions.RunContinuationsAsynchronously);
+		_completionSource = completion;
+		AllowCancel = allowCancel;
 		_speaker = speaker?.Trim() ?? string.Empty;
 		_text = text ?? string.Empty;
 		_options = options;
-		_completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-		if (IsInsideTree())
+		try
 		{
-			Apply();
-		}
+			if (IsInsideTree())
+			{
+				Apply();
+			}
 
-		Show();
+			Show();
+			using var registration = cancellationToken.Register(() => completion.TrySetCanceled(cancellationToken));
+			return await completion.Task;
+		}
+		finally
+		{
+			if (ReferenceEquals(_completionSource, completion))
+			{
+				HidePanel();
+			}
+		}
 	}
 
-	public async Task<int> AwaitSelectionAsync(CancellationToken cancellationToken = default)
+	public void HandleBack()
 	{
-		if (_completionSource is null)
+		if (AllowCancel)
 		{
-			throw new InvalidOperationException("Choice panel must be configured before awaiting selection.");
+			Complete(_completionSource, null);
 		}
+	}
 
-		using var registration = cancellationToken.Register(() => _completionSource.TrySetCanceled(cancellationToken));
-		return await _completionSource.Task;
+	public override void _ExitTree()
+	{
+		_completionSource?.TrySetCanceled();
+		_completionSource = null;
 	}
 
 	private void Apply()
@@ -99,12 +124,19 @@ public partial class StoryChoicePanel : Control
 		}
 
 		button.Configure(text);
-		button.Pressed += () => Complete(index);
+		var completion = _completionSource;
+		button.Pressed += () => Complete(completion, index);
 		return button;
 	}
 
-	private void Complete(int index)
+	private void Complete(TaskCompletionSource<int?>? completion, int? index)
 	{
+		if (completion is null || !ReferenceEquals(_completionSource, completion) ||
+			!completion.TrySetResult(index))
+		{
+			return;
+		}
+
 		foreach (var child in _choiceContainer.GetChildren())
 		{
 			if (child is BaseButton button)
@@ -112,12 +144,13 @@ public partial class StoryChoicePanel : Control
 				button.Disabled = true;
 			}
 		}
-
-		_completionSource?.TrySetResult(index);
 	}
 
 	public void HidePanel()
 	{
+		_completionSource?.TrySetCanceled();
+		_completionSource = null;
+		AllowCancel = false;
 		Hide();
 		_avatarBox.SetAvatarTexture(null);
 	}

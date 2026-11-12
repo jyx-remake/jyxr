@@ -4,11 +4,9 @@ using Game.Core.Model;
 using Game.Core.Model.Skills;
 using Game.Core.Story;
 using Godot;
-using Game.Godot.Map;
 using Game.Godot.Persistence;
 using Game.Godot.UI.Battle;
 using Game.Godot.UI.Story;
-using System.Threading.Tasks;
 
 namespace Game.Godot.UI;
 
@@ -86,24 +84,22 @@ public partial class UIRoot : Control
 	public CanvasLayer ModalLayer { get; private set; } = null!;
 	public CanvasLayer OverlayLayer { get; private set; } = null!;
 	public StoryVisualEffects VisualEffects { get; private set; } = null!;
-	public bool IsBattleActive => BattleLayer.GetChildCount() > 0;
+	public bool IsBattleActive => _battles.HasPanels;
 	private HudPanel? _hud;
-	private StoryDialoguePanel _storyDialoguePanel = null!;
-	private StoryIntertitlePanel _storyIntertitlePanel = null!;
-	private StoryVideoPlayer _storyVideoPlayer = null!;
-	private StoryChoicePanel _regularStoryChoicePanel = null!;
-	private StoryChoicePanel _boldStoryChoicePanel = null!;
 	private ToastPanel _toastPanel = null!;
 	private HintBox _hintBox = null!;
 	private ConfirmDialog _confirmDialog = null!;
 	private DetailPanelHost _detailPanelHost = null!;
-	private SessionEvents? _sessionEvents;
-	private readonly List<IDisposable> _sessionSubscriptions = [];
-	private Control? _mainPanel;
-	private Control? _popupPanel;
 	private bool _isStoryPresentationActive;
 	private bool _isHudSuppressed;
 	private bool _isToastSuppressed;
+	private PanelHost _panels = null!;
+	private PanelHost _modals = null!;
+	private PanelHost _battles = null!;
+	private PanelHost _prompts = null!;
+	private PanelBackInputRouter _backInput = null!;
+	private StoryPresentationCoordinator _story = null!;
+	private SessionPresentationCoordinator _sessionPresentation = null!;
 
 	public override void _Ready()
 	{
@@ -114,21 +110,54 @@ public partial class UIRoot : Control
 		OverlayLayer = GetNode<CanvasLayer>("%OverlayLayer");
 		VisualEffects = GetNode<StoryVisualEffects>("%StoryVisualEffects");
 		_hud = GetNodeOrNull<HudPanel>("%Hud");
-		_storyDialoguePanel = GetNode<StoryDialoguePanel>("%StoryDialoguePanel");
-		_storyIntertitlePanel = GetNode<StoryIntertitlePanel>("%StoryIntertitlePanel");
-		_storyVideoPlayer = GetNode<StoryVideoPlayer>("%StoryVideoPlayer");
-		_regularStoryChoicePanel = GetNode<StoryChoicePanel>("%StoryRegularChoicePanel");
-		_boldStoryChoicePanel = GetNode<StoryChoicePanel>("%StoryBoldChoicePanel");
 		_toastPanel = GetNode<ToastPanel>("%ToastPanel");
 		_hintBox = GetNode<HintBox>("%HintBox");
 		_confirmDialog = GetNode<ConfirmDialog>("%ConfirmDialog");
 		_detailPanelHost = GetNode<DetailPanelHost>("%DetailPanelHost");
+		_panels = new PanelHost(PanelLayer);
+		_modals = new PanelHost(ModalLayer);
+		_battles = new PanelHost(BattleLayer);
+		_prompts = new PanelHost(GetNode<CanvasLayer>("%PromptLayer"));
+		_backInput = new PanelBackInputRouter(GetBackTarget);
+		_story = new StoryPresentationCoordinator(
+			GetNode<StoryDialoguePanel>("%StoryDialoguePanel"),
+			GetNode<StoryChoicePanel>("%StoryRegularChoicePanel"),
+			GetNode<StoryChoicePanel>("%StoryBoldChoicePanel"),
+			GetNode<StoryIntertitlePanel>("%StoryIntertitlePanel"),
+			GetNode<StoryVideoPlayer>("%StoryVideoPlayer"),
+			VisualEffects);
+		_sessionPresentation = new SessionPresentationCoordinator(this, _detailPanelHost);
 		Instance = this;
+	}
+
+	public override void _Input(InputEvent @event)
+	{
+		if (_backInput.HandleInput(@event))
+		{
+			GetViewport().SetInputAsHandled();
+		}
+	}
+
+	public void ConsumeRightClick() => _backInput.ConsumeRightClick();
+
+	private Control? GetBackTarget() =>
+		_prompts.BackTarget ?? _modals.BackTarget ??
+		(IsBattleActive ? _battles.BackTarget : _panels.BackTarget);
+
+	public void ShowModalPanel(Control panel) => _modals.Add(panel);
+
+	internal void ResetTransientPanels()
+	{
+		_modals.CloseAll();
+		_battles.CloseAll();
+		_confirmDialog.ResetImmediate();
+		_hintBox.ResetImmediate();
+		_backInput.Reset();
 	}
 
 	public override void _ExitTree()
 	{
-		DisposeSessionSubscriptions();
+		_sessionPresentation.Dispose();
 	}
 	
 	public void ShowHud()
@@ -179,14 +208,11 @@ public partial class UIRoot : Control
 		}
 		else
 		{
-			ResetStoryEffects();
+			_story.Reset();
 			ShowHud();
 		}
 
-		if (World.Instance.CurrentScene is MapScreen mapScreen)
-		{
-			mapScreen.SetStoryPresentationActive(active);
-		}
+		_sessionPresentation.PresentStoryActivity(active);
 	}
 
 	public void RefreshHud()
@@ -194,74 +220,15 @@ public partial class UIRoot : Control
 		_hud?.Refresh();
 	}
 
-	public void ResetPresentationAfterLoad()
-	{
-		SetStoryPresentationActive(false);
-		ResetStoryEffects();
-		CloseMainPanel();
-		_detailPanelHost.Close();
+	public void ResetPresentationAfterLoad() => _sessionPresentation.ResetAfterLoad();
 
-		var currentMapId = Game.State.Location.CurrentMapId;
-		if (!string.IsNullOrWhiteSpace(currentMapId))
-		{
-			World.Instance.RestoreCurrentMap();
-		}
-
-		RefreshHud();
-	}
-
-	private void ResetStoryEffects()
-	{
-		_storyDialoguePanel.StopSkipping();
-		_storyVideoPlayer.ResetImmediate();
-		_storyIntertitlePanel.ResetImmediate();
-		VisualEffects.ResetImmediate();
-	}
-
-	public void BindSessionEvents(GameSession session)
-	{
-		ArgumentNullException.ThrowIfNull(session);
-
-		if (ReferenceEquals(_sessionEvents, session.Events))
-		{
-			RefreshHud();
-			return;
-		}
-
-		if (_sessionEvents is not null)
-		{
-			DisposeSessionSubscriptions();
-		}
-
-		_sessionEvents = session.Events;
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<MapChangedEvent>(OnMapChanged));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<MapReturnedEvent>(OnMapReturned));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ClockChangedEvent>(OnClockChanged));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<CurrencyChangedEvent>(OnCurrencyChanged));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<AdventureStateChangedEvent>(OnAdventureStateChanged));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ItemAcquiredEvent>(OnItemAcquired));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ToastRequestedEvent>(OnToastRequested));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<CharacterLeveledUpEvent>(OnCharacterLeveledUp));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<SaveLoadedEvent>(OnSaveLoaded));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ExecutionAbortedEvent>(_ => ResetPresentationAfterLoad()));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<AchievementUnlockedEvent>(OnAchievementUnlocked));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ProfileChangedEvent>(OnProfileChanged));
-		_sessionSubscriptions.Add(_sessionEvents.Subscribe<ProfileLoadedEvent>(OnProfileLoaded));
-		RefreshHud();
-	}
+	public void BindSessionEvents(GameSession session) => _sessionPresentation.Bind(session);
 
 	public Control ShowPartyPanel() => ShowMainPanel(PartyPanelScene, "party panel");
 
 	public Control ShowCharacterRosterPanel(string characterId) =>
-		ShowPopupPanel(CharacterRosterPanelScene, "character roster panel", panel =>
-		{
-			if (panel is not CharacterRosterPanel characterRosterPanel)
-			{
-				throw new InvalidOperationException("Character roster panel scene root must be CharacterRosterPanel.");
-			}
-
-			characterRosterPanel.CharacterId = characterId;
-		});
+		ShowPopupPanel<CharacterRosterPanel>(CharacterRosterPanelScene, "character roster panel",
+			panel => panel.CharacterId = characterId);
 
 	public Control ShowInventoryPanel() => ShowMainPanel(InventoryPanelScene, "inventory panel");
 
@@ -271,13 +238,8 @@ public partial class UIRoot : Control
 
 	public Control ShowSystemPanel() => ShowMainPanel(SystemPanelScene, "system panel");
 
-	public Control ShowConsolePanel() => ShowPopupPanel(ConsolePanelScene, "console panel", panel =>
-	{
-		if (panel is not ConsolePanel)
-		{
-			throw new InvalidOperationException("Console panel scene root must be ConsolePanel.");
-		}
-	});
+	public Control ShowConsolePanel() =>
+		ShowPopupPanel<ConsolePanel>(ConsolePanelScene, "console panel");
 
 	public Control ShowGameOverScreen() => ShowMainPanel(GameOverScreenScene, "game over screen");
 
@@ -302,40 +264,19 @@ public partial class UIRoot : Control
 		_detailPanelHost.ShowShopProduct(product, action);
 
 	public Control ShowSaveSlotSelectionPanel(SaveSlotPanelMode mode) =>
-		ShowPopupPanel(SaveSlotSelectionPanelScene, "save slot selection panel", panel =>
-		{
-			if (panel is not SaveSlotSelectionPanel saveSlotSelectionPanel)
-			{
-				throw new InvalidOperationException("Save slot selection panel scene root must be SaveSlotSelectionPanel.");
-			}
-
-			saveSlotSelectionPanel.Configure(mode);
-		});
+		ShowPopupPanel<SaveSlotSelectionPanel>(SaveSlotSelectionPanelScene, "save slot selection panel",
+			panel => panel.Configure(mode));
 
 	public async Task ShowShopPanelAsync(string shopId, CancellationToken cancellationToken = default)
 	{
-		var panel = ShowPopupPanel(ShopPanelScene, "shop panel", panel =>
-		{
-			if (panel is not ShopPanel shopPanel)
-			{
-				throw new InvalidOperationException("Shop panel scene root must be ShopPanel.");
-			}
-
-			shopPanel.Configure(shopId);
-		});
-		await AwaitPanelClosedAsync(panel, cancellationToken);
+		var panel = ShowPopupPanel<ShopPanel>(ShopPanelScene, "shop panel", panel => panel.Configure(shopId));
+		await PanelHost.AwaitClosedAsync(panel, cancellationToken);
 	}
 
 	public async Task ShowChestPanelAsync(CancellationToken cancellationToken = default)
 	{
-		var panel = ShowPopupPanel(ChestPanelScene, "chest panel", panel =>
-		{
-			if (panel is not ChestPanel)
-			{
-				throw new InvalidOperationException("Chest panel scene root must be ChestPanel.");
-			}
-		});
-		await AwaitPanelClosedAsync(panel, cancellationToken);
+		var panel = ShowPopupPanel<ChestPanel>(ChestPanelScene, "chest panel");
+		await PanelHost.AwaitClosedAsync(panel, cancellationToken);
 	}
 
 	public async Task<IReadOnlyList<string>> ShowCombatantSelectPanelAsync(string battleId, CancellationToken cancellationToken = default) =>
@@ -355,12 +296,9 @@ public partial class UIRoot : Control
 			return Array.Empty<string>();
 		}
 
-		if (CombatantSelectPanelScene.Instantiate() is not CombatantSelectPanel panel)
-		{
-			throw new InvalidOperationException("Combatant select panel scene root must be CombatantSelectPanel.");
-		}
+		var panel = PanelHost.Create<CombatantSelectPanel>(CombatantSelectPanelScene, "combatant select panel");
 
-		ModalLayer.AddChild(panel);
+		_modals.Add(panel);
 		panel.Configure(battle, forbiddenCharacterIds);
 		return await panel.AwaitDeploymentAsync(cancellationToken);
 	}
@@ -382,24 +320,18 @@ public partial class UIRoot : Control
 	{
 		ArgumentNullException.ThrowIfNull(entries);
 
-		if (RefinementEquipmentSelectionPanelScene.Instantiate() is not RefinementEquipmentSelectionPanel panel)
-		{
-			throw new InvalidOperationException("Refinement equipment selection panel scene root must be RefinementEquipmentSelectionPanel.");
-		}
+		var panel = PanelHost.Create<RefinementEquipmentSelectionPanel>(RefinementEquipmentSelectionPanelScene, "refinement equipment selection panel");
 
-		ModalLayer.AddChild(panel);
+		_modals.Add(panel);
 		panel.Configure(entries);
 		return await panel.AwaitSelectionAsync(cancellationToken);
 	}
 
 	public async Task<int> ShowLightnessTrainingScreenAsync(CancellationToken cancellationToken = default)
 	{
-		if (LightnessTrainingScreenScene.Instantiate() is not LightnessTrainingScreen screen)
-		{
-			throw new InvalidOperationException("Lightness training screen scene root must be LightnessTrainingScreen.");
-		}
+		var screen = PanelHost.Create<LightnessTrainingScreen>(LightnessTrainingScreenScene, "lightness training screen");
 
-		ModalLayer.AddChild(screen);
+		_modals.Add(screen);
 		return await screen.AwaitCompletionAsync(cancellationToken);
 	}
 
@@ -409,24 +341,18 @@ public partial class UIRoot : Control
 	{
 		ArgumentNullException.ThrowIfNull(itemIds);
 
-		if (StrengthTrainingScreenScene.Instantiate() is not StrengthTrainingScreen screen)
-		{
-			throw new InvalidOperationException("Strength training screen scene root must be StrengthTrainingScreen.");
-		}
+		var screen = PanelHost.Create<StrengthTrainingScreen>(StrengthTrainingScreenScene, "strength training screen");
 
 		screen.Configure(itemIds);
-		ModalLayer.AddChild(screen);
+		_modals.Add(screen);
 		return await screen.AwaitCompletionAsync(cancellationToken);
 	}
 
 	public async Task<SectDefinition> ShowSelectSectScreenAsync(CancellationToken cancellationToken = default)
 	{
-		if (SelectSectScreenScene.Instantiate() is not SelectSectScreen screen)
-		{
-			throw new InvalidOperationException("Select sect screen scene root must be SelectSectScreen.");
-		}
+		var screen = PanelHost.Create<SelectSectScreen>(SelectSectScreenScene, "select sect screen");
 
-		ModalLayer.AddChild(screen);
+		_modals.Add(screen);
 		return await screen.AwaitSelectionAsync(cancellationToken);
 	}
 
@@ -435,130 +361,63 @@ public partial class UIRoot : Control
 		string defaultName = "",
 		CancellationToken cancellationToken = default)
 	{
-		if (InputNamePanelScene.Instantiate() is not InputNamePanel panel)
-		{
-			throw new InvalidOperationException("Input name panel scene root must be InputNamePanel.");
-		}
+		var panel = PanelHost.Create<InputNamePanel>(InputNamePanelScene, "input name panel");
 
-		ModalLayer.AddChild(panel);
+		_modals.Add(panel);
 		return await panel.AwaitNameAsync(characterId, defaultName, cancellationToken);
 	}
 
 	public async Task<string> ShowSelectHeadPanelAsync(CancellationToken cancellationToken = default)
 	{
-		if (SelectHeadPanelScene.Instantiate() is not SelectHeadPanel panel)
-		{
-			throw new InvalidOperationException("Select head panel scene root must be SelectHeadPanel.");
-		}
+		var panel = PanelHost.Create<SelectHeadPanel>(SelectHeadPanelScene, "select head panel");
 
-		ModalLayer.AddChild(panel);
+		_modals.Add(panel);
 		return await panel.AwaitHeadAsync(cancellationToken);
 	}
 
 	public async Task ShowRollStatsPanelAsync(string characterId, CancellationToken cancellationToken = default)
 	{
-		if (RollStatsPanelScene.Instantiate() is not RollStatsPanel panel)
-		{
-			throw new InvalidOperationException("Roll stats panel scene root must be RollStatsPanel.");
-		}
+		var panel = PanelHost.Create<RollStatsPanel>(RollStatsPanelScene, "roll stats panel");
 
-		ModalLayer.AddChild(panel);
+		_modals.Add(panel);
 		await panel.AwaitRollAsync(characterId, cancellationToken);
 	}
 
-	public void CloseMainPanel()
-	{
-		ClosePopupPanel();
+	public void CloseMainPanel() => _panels.CloseMain();
 
-		if (_mainPanel is not null && GodotObject.IsInstanceValid(_mainPanel))
-		{
-			_mainPanel.QueueFree();
-		}
-
-		_mainPanel = null;
-	}
-
-	public void ClosePopupPanel()
-	{
-		if (_popupPanel is not null && GodotObject.IsInstanceValid(_popupPanel))
-		{
-			_popupPanel.QueueFree();
-		}
-
-		_popupPanel = null;
-	}
+	public void ClosePopupPanel() => _panels.ClosePopup();
 
 	public void ClosePanel() => CloseMainPanel();
 
-	public async Task ShowDialogueAsync(string speaker, string text, CancellationToken cancellationToken = default)
-	{
-		var dialog = _storyDialoguePanel;
-		dialog.Configure(speaker, text);
-		var version = dialog.PresentationVersion;
-
-		try
-		{
-			await dialog.AwaitCompletionAsync(cancellationToken);
-		}
-		finally
-		{
-			_ = HideDialogueWhenIdleAsync(dialog, version);
-		}
-	}
+	public Task ShowDialogueAsync(string speaker, string text, CancellationToken cancellationToken = default) =>
+		_story.ShowDialogueAsync(speaker, text, cancellationToken);
 
 	public Task ShowIntertitleAsync(
 		string text,
 		string position = "center",
 		string mode = "typewriter",
 		double speed = 36d,
-		CancellationToken cancellationToken = default)
-	{
-		_storyDialoguePanel.HidePanel();
-		_regularStoryChoicePanel.HidePanel();
-		_boldStoryChoicePanel.HidePanel();
-		return _storyIntertitlePanel.ShowAsync(text, position, mode, speed, cancellationToken);
-	}
+		CancellationToken cancellationToken = default) =>
+		_story.ShowIntertitleAsync(text, position, mode, speed, cancellationToken);
 
-	public Task ShowVideoAsync(VideoStream stream, CancellationToken cancellationToken = default)
-	{
-		ArgumentNullException.ThrowIfNull(stream);
-		_storyDialoguePanel.HidePanel();
-		_regularStoryChoicePanel.HidePanel();
-		_boldStoryChoicePanel.HidePanel();
-		_storyIntertitlePanel.ResetImmediate();
-		return _storyVideoPlayer.PlayAsync(stream, cancellationToken);
-	}
+	public Task ShowVideoAsync(VideoStream stream, CancellationToken cancellationToken = default) =>
+		_story.ShowVideoAsync(stream, cancellationToken);
 
-	public async Task<int> ShowChoicesAsync(
+	public Task<int> ShowChoicesAsync(
 		string? speaker,
 		string prompt,
 		IReadOnlyList<string> options,
 		ChoiceStyle style = ChoiceStyle.Regular,
-		CancellationToken cancellationToken = default)
-	{
-		ArgumentNullException.ThrowIfNull(options);
-		if (options.Count == 0)
-		{
-			throw new InvalidOperationException("Choices cannot be empty.");
-		}
+		CancellationToken cancellationToken = default) =>
+		_story.ShowChoicesAsync(speaker, prompt, options, style, cancellationToken);
 
-		_storyDialoguePanel.StopSkipping();
-		_storyDialoguePanel.HidePanel();
-		_regularStoryChoicePanel.HidePanel();
-		_boldStoryChoicePanel.HidePanel();
-
-		var dialog = GetStoryChoicePanel(style);
-		dialog.Configure(speaker, prompt, options);
-
-		try
-		{
-			return await dialog.AwaitSelectionAsync(cancellationToken);
-		}
-		finally
-		{
-			dialog.HidePanel();
-		}
-	}
+	public Task<int?> ShowCancelableChoicesAsync(
+		string? speaker,
+		string prompt,
+		IReadOnlyList<string> options,
+		ChoiceStyle style = ChoiceStyle.Regular,
+		CancellationToken cancellationToken = default) =>
+		_story.ShowCancelableChoicesAsync(speaker, prompt, options, style, cancellationToken);
 
 	public void ShowSuggestion(string text)
 	{
@@ -603,180 +462,25 @@ public partial class UIRoot : Control
 	{
 		ArgumentNullException.ThrowIfNull(configure);
 
-		if (BattleScreenScene.Instantiate() is not BattleScreen screen)
-		{
-			throw new InvalidOperationException("Battle screen scene root must be BattleScreen.");
-		}
+		var screen = PanelHost.Create<BattleScreen>(BattleScreenScene, "battle screen");
 
-		BattleLayer.AddChild(screen);
+		_battles.Add(screen);
 		configure(screen);
 		return await screen.AwaitBattleAsync(cancellationToken);
 	}
 
 	private Control ShowMainPanel(PackedScene? scene, string description, Action<Control>? configure = null)
 	{
-		CloseMainPanel();
-		var panel = CreatePanel(scene, description, configure);
-		PanelLayer.AddChild(panel);
-		_mainPanel = panel;
-		panel.TreeExited += () => ClearPanelReference(panel);
+		var panel = PanelHost.Create<Control>(scene, description, configure);
+		_panels.ShowMain(panel);
 		return panel;
 	}
 
-	private Control ShowPopupPanel(PackedScene? scene, string description, Action<Control>? configure = null)
+	private T ShowPopupPanel<T>(PackedScene? scene, string description, Action<T>? configure = null) where T : Control
 	{
-		ClosePopupPanel();
-		var panel = CreatePanel(scene, description, configure);
-		PanelLayer.AddChild(panel);
-		_popupPanel = panel;
-		panel.TreeExited += () => ClearPanelReference(panel);
+		var panel = PanelHost.Create<T>(scene, description, configure);
+		_panels.ShowPopup(panel);
 		return panel;
 	}
 
-	private static Control CreatePanel(PackedScene? scene, string description, Action<Control>? configure = null)
-	{
-		if (scene is null)
-		{
-			throw new InvalidOperationException($"UIRoot panel scene is not assigned: {description}.");
-		}
-
-		var instance = scene.Instantiate();
-		if (instance is not Control panel)
-		{
-			instance.QueueFree();
-			throw new InvalidOperationException($"Panel scene root must be a Control: {description}.");
-		}
-
-		try
-		{
-			configure?.Invoke(panel);
-		}
-		catch
-		{
-			panel.QueueFree();
-			throw;
-		}
-
-		return panel;
-	}
-
-	private static async Task AwaitPanelClosedAsync(Control panel, CancellationToken cancellationToken)
-	{
-		var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-		panel.TreeExited += () => completion.TrySetResult();
-
-		using var registration = cancellationToken.CanBeCanceled
-			? cancellationToken.Register(() =>
-			{
-				if (completion.TrySetCanceled(cancellationToken) && GodotObject.IsInstanceValid(panel))
-				{
-					panel.QueueFree();
-				}
-			})
-			: default;
-
-		await completion.Task;
-	}
-
-	private void ClearPanelReference(Control panel)
-	{
-		if (ReferenceEquals(_popupPanel, panel))
-		{
-			_popupPanel = null;
-		}
-
-		if (ReferenceEquals(_mainPanel, panel))
-		{
-			_mainPanel = null;
-		}
-	}
-
-	private StoryChoicePanel GetStoryChoicePanel(ChoiceStyle style) => style switch
-	{
-		ChoiceStyle.Regular => _regularStoryChoicePanel,
-		ChoiceStyle.Bold => _boldStoryChoicePanel,
-		_ => throw new ArgumentOutOfRangeException(nameof(style), style, "Unsupported story choice style."),
-	};
-
-	private async Task HideDialogueWhenIdleAsync(StoryDialoguePanel dialog, int version)
-	{
-		await ToSignal(GetTree().CreateTimer(0.01d), SceneTreeTimer.SignalName.Timeout);
-
-		if (!GodotObject.IsInstanceValid(dialog))
-		{
-			return;
-		}
-
-		if (dialog.PresentationVersion != version)
-		{
-			return;
-		}
-
-		dialog.HidePanel();
-	}
-
-	private void OnMapChanged(MapChangedEvent _) => RefreshHud();
-
-	private void OnMapReturned(MapReturnedEvent returned)
-	{
-		if (GameFlow.IsMainMenuActive || string.IsNullOrWhiteSpace(returned.MapId)) return;
-		World.Instance.RefreshCurrentMap();
-		var music = Game.ContentRepository.GetMap(returned.MapId).Musics;
-		if (music.Count == 0) Game.Audio.StopBgm();
-		else Game.Audio.PlayBgm(music);
-		RefreshHud();
-	}
-
-	private void OnClockChanged(ClockChangedEvent _) => RefreshHud();
-
-	private void OnCurrencyChanged(CurrencyChangedEvent _) => RefreshHud();
-
-	private void OnAdventureStateChanged(AdventureStateChangedEvent _) => RefreshHud();
-
-	private void OnItemAcquired(ItemAcquiredEvent sessionEvent)
-	{
-		var quantitySuffix = sessionEvent.Quantity > 1
-			? $" x{sessionEvent.Quantity}"
-			: string.Empty;
-		ShowToast($"获得物品【{sessionEvent.ItemName}】{quantitySuffix}", soundEffectId: "音效.升级");
-	}
-
-	private void OnToastRequested(ToastRequestedEvent sessionEvent) =>
-		ShowToast(sessionEvent.Message, sessionEvent.Tone, sessionEvent.SoundEffectId);
-
-	private void OnCharacterLeveledUp(CharacterLeveledUpEvent sessionEvent)
-	{
-		var characterName = Game.State.Party.TryGetMember(sessionEvent.CharacterId, out var character) && character is not null
-			? character.Name
-			: sessionEvent.CharacterId;
-		ShowToast($"【{characterName}】升到{sessionEvent.NewLevel}级", ToastTone.Important);
-	}
-
-	private void OnSaveLoaded(SaveLoadedEvent _)
-	{
-		_detailPanelHost.Close();
-		RefreshHud();
-	}
-
-	private void OnAchievementUnlocked(AchievementUnlockedEvent sessionEvent)
-	{
-		ShowToast($"获得称号【{sessionEvent.AchievementId}】", ToastTone.Important);
-	}
-
-	private void OnProfileChanged(ProfileChangedEvent _)
-	{
-		RefreshHud();
-	}
-
-	private void OnProfileLoaded(ProfileLoadedEvent _) => RefreshHud();
-
-	private void DisposeSessionSubscriptions()
-	{
-		foreach (var subscription in _sessionSubscriptions)
-		{
-			subscription.Dispose();
-		}
-
-		_sessionSubscriptions.Clear();
-	}
 }

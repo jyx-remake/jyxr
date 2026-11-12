@@ -89,6 +89,7 @@ public partial class CharacterEquipmentTab : Control
 			return;
 		}
 
+		UIRoot.Instance.ConsumeRightClick();
 		Unequip(slotType);
 		GetViewport().SetInputAsHandled();
 	}
@@ -154,7 +155,7 @@ public partial class CharacterEquipmentTab : Control
 		}
 
 		panel.Configure(_character.Id, slotType);
-		UIRoot.Instance.ModalLayer.AddChild(panel);
+		UIRoot.Instance.ShowModalPanel(panel);
 	}
 
 	private void Unequip(EquipmentSlotType slotType)

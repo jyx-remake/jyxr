@@ -5,12 +5,19 @@ using Godot;
 
 namespace Game.Godot.UI;
 
-public partial class DetailPanelHost : Control
+public partial class DetailPanelHost : Control, IPanelBackTargetProvider
 {
 	[Export]
 	public PackedScene DetailPanelScene { get; set; } = null!;
 
-	private Control? _currentPanel;
+	private PanelHost _panels = null!;
+
+	public Control? BackTarget => _panels.BackTarget;
+
+	public override void _Ready()
+	{
+		_panels = new PanelHost(this);
+	}
 
 	public Control ShowSkill(SkillInstance skill, DetailPanelAction? action = null)
 	{
@@ -34,7 +41,6 @@ public partial class DetailPanelHost : Control
 	{
 		ArgumentNullException.ThrowIfNull(content);
 
-		Close();
 		if (DetailPanelScene is null)
 		{
 			throw new InvalidOperationException("DetailPanelHost.DetailPanelScene is not assigned.");
@@ -48,28 +54,10 @@ public partial class DetailPanelHost : Control
 		}
 
 		panel.Configure(content);
-		AddChild(panel);
+		_panels.ShowMain(panel);
 		MoveToFront();
-		_currentPanel = panel;
-		panel.TreeExited += () => ClearPanelReference(panel);
 		return panel;
 	}
 
-	public void Close()
-	{
-		if (_currentPanel is not null && GodotObject.IsInstanceValid(_currentPanel))
-		{
-			_currentPanel.QueueFree();
-		}
-
-		_currentPanel = null;
-	}
-
-	private void ClearPanelReference(Control panel)
-	{
-		if (ReferenceEquals(_currentPanel, panel))
-		{
-			_currentPanel = null;
-		}
-	}
+	public void Close() => _panels.CloseAll();
 }

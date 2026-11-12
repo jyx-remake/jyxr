@@ -18,7 +18,7 @@ internal sealed record BattleActionPanelView(
 	BaseButton SurrenderButton,
 	BattleActionDrawer ActionDrawer,
 	HBoxContainer ListContainer,
-	Control OverlayRoot);
+	PanelHost Panels);
 
 internal sealed record BattleActionPanelScenes(
 	PackedScene SkillBox,
@@ -95,7 +95,7 @@ internal sealed class BattleActionPanelController(
 		}
 
 		panel.Configure(itemEntries);
-		view.OverlayRoot.AddChild(panel);
+		view.Panels.Add(panel);
 		return await panel.AwaitSelectionAsync();
 	}
 
@@ -115,7 +115,7 @@ internal sealed class BattleActionPanelController(
 		}
 
 		panel.Configure(state, playerTeam);
-		view.OverlayRoot.AddChild(panel);
+		view.Panels.Add(panel);
 	}
 
 	private void RefreshSelectedSkill(BattleInteractionState interaction)

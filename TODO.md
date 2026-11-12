@@ -54,4 +54,4 @@
 - 存档槽数量扩展到较大规模后，应把存档列表摘要升级为 `LocalSaveEnvelope` 内的一等 `metadata` 字段，而不是额外维护独立 `.meta.json` 文件。列表页应通过流式 JSON 读取只解析 envelope version 与 metadata，不完整反序列化 `SaveGame`；实际读档时再读取完整存档。metadata 可同时承载玩家自定义存档备注，用于在存档页显示和搜索/筛选。
 - 当前诊断日志抽象暂放在 `Game.Application`，后续如补齐 `Infrastructure` / `Hosting` 层，应迁移 `IDiagnosticLogger` 及相关实现的抽象边界，避免应用层长期承载宿主/基础设施能力接口。
 - 当前 DTO 与 runtime definition 存在较多重复字段。后续应收缩 DTO 噪音：优先只保留确有 raw/runtime 差异的类型，并考虑把 DTO 模型进一步内聚到 loader 内部，避免扩散成整层平行定义。
-- 继续梳理执行范围外宿主 UI 的读档中断语义。删除存档的 `ShowConfirmAsync` 在等待期间读档后，旧确认仍可能继续删除所选槽位；其他主动构建且未订阅 `SaveLoadedEvent` 自动关闭的选择面板，也可能继续持有读档前的运行时对象。后续应为这些流程明确取消、关闭和结果失效语义。
+- 继续梳理执行范围外宿主 UI 跨异步等待的状态归属。确认已完成后到业务提交之间发生读档时，调用方仍需验证原 session/state，避免旧结果继续修改新状态。

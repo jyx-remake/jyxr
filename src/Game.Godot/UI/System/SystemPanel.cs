@@ -5,7 +5,7 @@ using Godot;
 
 namespace Game.Godot.UI;
 
-public partial class SystemPanel : Control
+public partial class SystemPanel : Control, IPanelBackHandler
 {
 	private BaseButton _backButton = null!;
 	private Button _consoleButton = null!;
@@ -27,7 +27,7 @@ public partial class SystemPanel : Control
 		_saveButton = GetNode<Button>("%SaveButton");
 		_deleteSaveButton = GetNode<Button>("%DeleteSaveButton");
 
-		_backButton.Pressed += () => UIRoot.Instance.CloseMainPanel();
+		_backButton.Pressed += HandleBack;
 		_consoleButton.Pressed += OnConsolePressed;
 		_mainMenuButton.Pressed += GameFlow.ReturnToMainMenu;
 		_exitGameButton.Pressed += OnExitGamePressed;
@@ -39,6 +39,8 @@ public partial class SystemPanel : Control
 		_adventureStateSubscription = Game.Session.Events.Subscribe<AdventureStateChangedEvent>(_ => ApplyNoRegretRestrictions());
 		ApplyNoRegretRestrictions();
 	}
+
+	public void HandleBack() => UIRoot.Instance.CloseMainPanel();
 
 	private async void OnExitGamePressed()
 	{

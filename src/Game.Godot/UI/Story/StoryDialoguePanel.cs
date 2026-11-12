@@ -84,8 +84,37 @@ public partial class StoryDialoguePanel : Control
 		}
 	}
 
-	public void Configure(string? speaker, string? text)
+	public async Task ShowAsync(string? speaker, string? text, CancellationToken cancellationToken = default)
 	{
+		Configure(speaker, text);
+		var version = PresentationVersion;
+		try
+		{
+			await AwaitCompletionAsync(cancellationToken);
+		}
+		finally
+		{
+			_ = HideWhenIdleAsync(version);
+		}
+	}
+
+	private async Task HideWhenIdleAsync(int version)
+	{
+		if (!IsInsideTree())
+		{
+			return;
+		}
+
+		await ToSignal(GetTree().CreateTimer(0.01d), SceneTreeTimer.SignalName.Timeout);
+		if (GodotObject.IsInstanceValid(this) && IsInsideTree() && PresentationVersion == version)
+		{
+			HidePanel();
+		}
+	}
+
+	private void Configure(string? speaker, string? text)
+	{
+		_completionSource?.TrySetCanceled();
 		_speaker = speaker?.Trim() ?? string.Empty;
 		_text = text ?? string.Empty;
 		_completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -106,22 +135,23 @@ public partial class StoryDialoguePanel : Control
 		Show();
 	}
 
-	public async Task AwaitCompletionAsync(CancellationToken cancellationToken = default)
+	private async Task AwaitCompletionAsync(CancellationToken cancellationToken = default)
 	{
 		cancellationToken.ThrowIfCancellationRequested();
-		if (_completionSource is null)
+		var completion = _completionSource;
+		if (completion is null)
 		{
 			throw new InvalidOperationException("Dialogue panel must be configured before awaiting completion.");
 		}
 
-		using var registration = cancellationToken.Register(() => _completionSource.TrySetCanceled(cancellationToken));
-		if (!_completionSource.Task.IsCompleted && Input.IsActionPressed("ui-ctrl"))
+		using var registration = cancellationToken.Register(() => completion.TrySetCanceled(cancellationToken));
+		if (!completion.Task.IsCompleted && Input.IsActionPressed("ui-ctrl"))
 		{
 			await ToSignal(GetTree().CreateTimer(0.1d), SceneTreeTimer.SignalName.Timeout);
 			return;
 		}
 
-		await _completionSource.Task;
+		await completion.Task;
 	}
 
 	private void Apply()
@@ -268,6 +298,22 @@ public partial class StoryDialoguePanel : Control
 	{
 		RevealCurrentPage();
 		_completionSource?.TrySetResult(true);
+	}
+
+	public void ResetImmediate()
+	{
+		var completion = _completionSource;
+		_completionSource = null;
+		PresentationVersion += 1;
+		StopSkipping();
+		HidePanel();
+		completion?.TrySetCanceled();
+	}
+
+	public override void _ExitTree()
+	{
+		_completionSource?.TrySetCanceled();
+		_completionSource = null;
 	}
 
 	public void HidePanel()

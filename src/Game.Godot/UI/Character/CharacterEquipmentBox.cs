@@ -81,6 +81,7 @@ public partial class CharacterEquipmentBox : Control
 				GetViewport().SetInputAsHandled();
 				break;
 			case MouseButton.Right:
+				UIRoot.Instance.ConsumeRightClick();
 				EquipmentSecondaryClicked?.Invoke();
 				GetViewport().SetInputAsHandled();
 				break;

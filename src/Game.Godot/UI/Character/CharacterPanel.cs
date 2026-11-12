@@ -104,6 +104,14 @@ public partial class CharacterPanel : JyPanel
 		}
 	}
 
+	public override void HandleBack()
+	{
+		if (!_attributeTab.TryCloseAssignStatWidget())
+		{
+			base.HandleBack();
+		}
+	}
+
 	public void Configure(
 		CharacterInstance character,
 		CharacterPanelMode mode = CharacterPanelMode.Editable,

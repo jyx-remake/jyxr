@@ -3,7 +3,7 @@ using Godot;
 
 namespace Game.Godot.UI.Battle;
 
-public partial class BattleStatusPanel : Control
+public partial class BattleStatusPanel : Control, IPanelBackHandler
 {
 	[Export]
 	public PackedScene UnitButtonScene { get; set; } = null!;
@@ -21,6 +21,8 @@ public partial class BattleStatusPanel : Control
 		_characterPanel.ClosePanelRequested += QueueFree;
 		Refresh();
 	}
+
+	public void HandleBack() => _characterPanel.HandleBack();
 
 	public void Configure(BattleState state, int playerTeam)
 	{
