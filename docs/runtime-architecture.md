@@ -64,6 +64,8 @@
 
 `JyPanel` 通过已有关闭信号返回，关闭按钮隐藏或禁用时保留当前界面。系统面板复用返回操作，确认框返回取消，提示框完成当前提示等待。人物属性加点浮层优先收起。装备槽及装备卡片在 GUI 输入阶段通过 `ConsumeRightClick()` 接管当前右键手势，继续执行卸装。
 
+键盘 `ui_cancel`（默认 Esc）通过同一返回目标执行关闭或取消操作。按键自动重复事件会被当前界面消费，每次按下只执行一次返回。
+
 `StoryChoicePanel` 按调用场景设置 `AllowCancel`，默认要求选中有效选项。`UIRoot.ShowChoicesAsync` 返回有效索引；`ShowCancelableChoicesAsync` 允许右键返回，并用 `null` 表示用户取消，也支持空选项列表。音乐欣赏使用可取消入口。选择等待和收起由选择面板管理，每次展示持有独立的完成源，旧展示的回调与清理只作用于对应展示；外部 `CancellationToken` 和主动隐藏会中断等待。
 
 `StoryPresentationCoordinator` 协调对白、选择、字幕、视频和视觉效果的展示切换与重置，具体面板负责自己的异步等待和清理。对白的延迟隐藏与展示版本校验由 `StoryDialoguePanel` 持有。`SessionPresentationCoordinator` 管理会话事件订阅、提示文案、地图返回时的场景与音乐恢复，以及读档后的表现恢复。

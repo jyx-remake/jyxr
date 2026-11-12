@@ -9,6 +9,18 @@ internal sealed class PanelBackInputRouter(Func<Control?> getTarget)
 
 	public bool HandleInput(InputEvent inputEvent)
 	{
+		if (inputEvent is InputEventKey key && key.IsActionPressed("ui_cancel", allowEcho: true))
+		{
+			var backTarget = getTarget();
+			if (!key.Echo && backTarget is IPanelBackHandler backHandler)
+			{
+				ConsumeRightClick();
+				backHandler.HandleBack();
+			}
+
+			return backTarget is not null;
+		}
+
 		if (inputEvent is not InputEventMouseButton { ButtonIndex: MouseButton.Right } button)
 		{
 			return false;
