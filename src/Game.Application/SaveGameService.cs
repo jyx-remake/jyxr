@@ -53,6 +53,13 @@ public sealed class SaveGameService
 
 	public void LoadSave(SaveGame saveGame)
 	{
+		RestoreState(saveGame);
+		_session.Events.Publish(new SaveLoadedEvent());
+		_logger.Info($"Loaded save game with {saveGame.Characters.Count} character(s).");
+	}
+
+	internal void RestoreState(SaveGame saveGame)
+	{
 		ArgumentNullException.ThrowIfNull(saveGame);
 		_session.PlayTimeService.Stop();
 
@@ -92,7 +99,5 @@ public sealed class SaveGameService
 		_session.ReplaceState(state);
 		_session.PlayTimeService.ResetInterval();
 		_session.ProfileService.RecordRoundReached(adventure.Round);
-		_session.Events.Publish(new SaveLoadedEvent());
-		_logger.Info($"Loaded save game with {characters.Count} character(s).");
 	}
 }

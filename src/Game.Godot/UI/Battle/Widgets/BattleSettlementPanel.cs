@@ -50,6 +50,8 @@ public partial class BattleSettlementPanel : JyPanel
 		Refresh();
 	}
 
+	public override void HandleBack() => Confirm();
+
 	public async Task AwaitConfirmationAsync(CancellationToken cancellationToken = default)
 	{
 		using var registration = cancellationToken.CanBeCanceled
@@ -76,7 +78,7 @@ public partial class BattleSettlementPanel : JyPanel
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel"))
+		if (@event.IsActionPressed("ui_accept"))
 		{
 			Confirm();
 			GetViewport().SetInputAsHandled();

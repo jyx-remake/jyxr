@@ -88,7 +88,7 @@ public sealed class SessionExecutionService(GameSession session)
             execution.Cancel();
             var wasStarted = session.PlayTimeService.IsStarted;
             var wasRunning = session.PlayTimeService.IsRunning;
-            session.SaveGameService.LoadSave(execution.Checkpoint);
+            session.SaveGameService.RestoreState(execution.Checkpoint);
             if (wasStarted) session.PlayTimeService.Start();
             if (!wasRunning) session.PlayTimeService.Pause();
             session.Events.Publish(new ExecutionAbortedEvent());

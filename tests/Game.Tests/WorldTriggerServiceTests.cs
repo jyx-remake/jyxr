@@ -45,10 +45,16 @@ public sealed class WorldTriggerServiceTests
     {
         var host = new TriggerHost { Execute = _ => throw new InvalidOperationException("host failed") };
         var session = CreateSession(host);
+        using var loadRequests = session.Events.Subscribe<SaveLoadedEvent>(_ => session.WorldTriggerService.RequestCheck());
+        var recoveries = 0;
+        using var recoveryEvents = session.Events.Subscribe<ExecutionAbortedEvent>(_ => recoveries++);
         session.WorldTriggerService.RequestCheck();
         await Assert.ThrowsAsync<InvalidOperationException>(() => session.WorldTriggerService.ExecutePendingAsync());
         Assert.False(session.State.WorldTriggers.IsCompleted("global"));
         Assert.False(session.WorldTriggerService.HasPendingCheck); // No automatic failure loop.
+        Assert.False(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.Equal(1, host.Calls);
+        Assert.Equal(1, recoveries);
 
         host.Execute = _ => ValueTask.CompletedTask;
         session.WorldTriggerService.RequestCheck();
@@ -61,6 +67,7 @@ public sealed class WorldTriggerServiceTests
     {
         var host = new TriggerHost { Execute = token => new ValueTask(Task.Delay(Timeout.Infinite, token)) };
         var session = CreateSession(host);
+        using var loadRequests = session.Events.Subscribe<SaveLoadedEvent>(_ => session.WorldTriggerService.RequestCheck());
         using var cancellation = new CancellationTokenSource();
         session.WorldTriggerService.RequestCheck();
         var execution = session.WorldTriggerService.ExecutePendingAsync(cancellation.Token);
@@ -68,9 +75,29 @@ public sealed class WorldTriggerServiceTests
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => execution);
         Assert.Empty(session.State.WorldTriggers.CompletedTriggerIds);
+        Assert.False(session.WorldTriggerService.HasPendingCheck);
+        Assert.False(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.Equal(1, host.Calls);
         host.Execute = _ => ValueTask.CompletedTask;
         session.WorldTriggerService.RequestCheck();
         Assert.True(await session.WorldTriggerService.ExecutePendingAsync());
+    }
+
+    [Fact]
+    public async Task LoadingSaveRequestsEventCheckThroughLoadNotification()
+    {
+        var host = new TriggerHost();
+        var session = CreateSession(host);
+        var save = session.SaveGameService.CreateSave();
+        var previousState = session.State;
+        using var loadRequests = session.Events.Subscribe<SaveLoadedEvent>(_ => session.WorldTriggerService.RequestCheck());
+
+        session.SaveGameService.LoadSave(save);
+
+        Assert.NotSame(previousState, session.State);
+        Assert.True(session.WorldTriggerService.HasPendingCheck);
+        Assert.True(await session.WorldTriggerService.ExecutePendingAsync());
+        Assert.Equal(1, host.Calls);
     }
 
     [Fact]
