@@ -20,6 +20,8 @@ public sealed record UserSettingsRecord(
 {
 	public const int CurrentVersion = 9;
 
+	public bool HideBattleHudDuringAutomatedTurns { get; init; } = true;
+
 	public static UserSettingsRecord Default { get; } = new(
 		CurrentVersion,
 		ShowBattleHp: true,

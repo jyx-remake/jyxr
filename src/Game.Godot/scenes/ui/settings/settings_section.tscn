@@ -122,6 +122,15 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "战斗加速"
 
+[node name="HideBattleHudDuringAutomatedTurnsCheckBox" type="CheckBox" parent="CombatCard/CombatContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 66)
+layout_mode = 2
+tooltip_text = "敌方行动或我方自动战斗时，隐藏战场底部的技能栏、头像和行动按钮。"
+theme_override_font_sizes/font_size = 36
+button_pressed = true
+text = "战场自动行动时隐藏操作栏"
+
 [node name="BattleSpeedMultiplierRow" type="HBoxContainer" parent="CombatCard/CombatContent" unique_id=1905512185]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2

@@ -27,6 +27,7 @@ public partial class SettingsSection : Control
 	private CheckBox _autoSaveCheckBox = null!;
 	private CheckBox _largeMapMovementAnimationCheckBox = null!;
 	private CheckBox _autoBattleCheckBox = null!;
+	private CheckBox _hideBattleHudDuringAutomatedTurnsCheckBox = null!;
 	private CheckBox _battleSpeedUpCheckBox = null!;
 	private CheckBox _typewriterDialogCheckBox = null!;
 	private HSlider _battleSpeedMultiplierSlider = null!;
@@ -45,6 +46,7 @@ public partial class SettingsSection : Control
 		_autoSaveCheckBox = GetNode<CheckBox>("%AutoSaveCheckBox");
 		_largeMapMovementAnimationCheckBox = GetNode<CheckBox>("%LargeMapMovementAnimationCheckBox");
 		_autoBattleCheckBox = GetNode<CheckBox>("%AutoBattleCheckBox");
+		_hideBattleHudDuringAutomatedTurnsCheckBox = GetNode<CheckBox>("%HideBattleHudDuringAutomatedTurnsCheckBox");
 		_battleSpeedUpCheckBox = GetNode<CheckBox>("%BattleSpeedUpCheckBox");
 		_typewriterDialogCheckBox = GetNode<CheckBox>("%TypewriterDialogCheckBox");
 		_battleSpeedMultiplierSlider = GetNode<HSlider>("%BattleSpeedMultiplierSlider");
@@ -60,6 +62,7 @@ public partial class SettingsSection : Control
 		_autoSaveCheckBox.Toggled += _ => UpdateSettings("自动存档");
 		_largeMapMovementAnimationCheckBox.Toggled += _ => UpdateSettings("大地图移动动画");
 		_autoBattleCheckBox.Toggled += _ => UpdateSettings("自动战斗");
+		_hideBattleHudDuringAutomatedTurnsCheckBox.Toggled += _ => UpdateSettings("战场自动行动时隐藏操作栏");
 		_battleSpeedUpCheckBox.Toggled += _ => UpdateSettings("战斗加速");
 		_typewriterDialogCheckBox.Toggled += _ => UpdateSettings("对话逐字显示");
 		_musicCheckBox.Toggled += _ => UpdateSettings("音乐");
@@ -113,6 +116,7 @@ public partial class SettingsSection : Control
 		_autoSaveCheckBox.SetPressedNoSignal(settings.AutoSave);
 		_largeMapMovementAnimationCheckBox.SetPressedNoSignal(settings.LargeMapMovementAnimationEnabled);
 		_autoBattleCheckBox.SetPressedNoSignal(settings.AutoBattle);
+		_hideBattleHudDuringAutomatedTurnsCheckBox.SetPressedNoSignal(settings.HideBattleHudDuringAutomatedTurns);
 		_battleSpeedUpCheckBox.SetPressedNoSignal(settings.BattleSpeedUp);
 		_typewriterDialogCheckBox.SetPressedNoSignal(settings.DialogueTypewriterEnabled);
 		_battleSpeedMultiplierSlider.SetValueNoSignal(ClampBattleSpeedMultiplier(settings.BattleSpeedMultiplier));
@@ -131,6 +135,7 @@ public partial class SettingsSection : Control
 			ShowBattleHp = _showBattleHpCheckBox.ButtonPressed,
 			AutoSave = Game.State.Adventure.NoRegret ? current.AutoSave : _autoSaveCheckBox.ButtonPressed,
 			AutoBattle = _autoBattleCheckBox.ButtonPressed,
+			HideBattleHudDuringAutomatedTurns = _hideBattleHudDuringAutomatedTurnsCheckBox.ButtonPressed,
 			BattleSpeedUp = _battleSpeedUpCheckBox.ButtonPressed,
 			BattleSpeedMultiplier = ClampBattleSpeedMultiplier((int)Math.Round(_battleSpeedMultiplierSlider.Value)),
 			MusicEnabled = _musicCheckBox.ButtonPressed,

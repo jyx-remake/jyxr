@@ -77,6 +77,9 @@ Presentation 负责与 UI 引擎无关的交互状态和展示流程；Godot 负
 - `BattleSettingsController`：速度、自动战斗和设置；按钮操作立即影响本场运行态，但只在战斗结束时统一持久化；
 - `BattleSettlementController`：carryover、奖励和结束 Task。
 
+战斗设置中的“战场自动行动时隐藏操作栏”默认开启，由用户设置持久化。开启后，底部技能栏、头像和行动按钮共用
+`BottomHud` 显示根节点，仅在我方角色手动行动时显示。敌方行动和我方自动战斗时隐藏，切换自动战斗会立即刷新显示。
+
 Godot 画面采用动作级提交：`RenderInteraction` 只更新高亮与操作能力，
 `CommitBattleStateToView` 才把规则态中的单位、血条、Buff、位置和败北状态提交到棋盘。
 技能或移动进入 `PresentingActionState` 时先清除交互高亮，规则可以即时结算；演出完成后再提交最终状态，

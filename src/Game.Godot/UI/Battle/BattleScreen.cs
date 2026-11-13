@@ -59,6 +59,7 @@ public partial class BattleScreen : Control, IPanelBackTargetProvider
 	private BaseButton _autoBattleButton = null!;
 	private CanvasItem _autoBattleActive = null!;
 	private BattleBoardView _boardGrid = null!;
+	private Control _bottomHud = null!;
 	private BattleSelectedSkillBox _selectedSkillBox = null!;
 	private BaseButton _moveButton = null!;
 	private BaseButton _statusButton = null!;
@@ -88,6 +89,7 @@ public partial class BattleScreen : Control, IPanelBackTargetProvider
 		_autoBattleButton = GetNode<BaseButton>("%AutoBattleButton");
 		_autoBattleActive = GetNode<CanvasItem>("%AutoBattleActive");
 		_boardGrid = GetNode<BattleBoardView>("%BoardGrid");
+		_bottomHud = GetNode<Control>("%BottomHud");
 		_selectedSkillBox = GetNode<BattleSelectedSkillBox>("%BattleSelectedSkillBox");
 		_actionDrawer = GetNode<BattleActionDrawer>("%BattleActionDrawer");
 		_moveButton = _actionDrawer.MoveButton;
@@ -264,7 +266,7 @@ public partial class BattleScreen : Control, IPanelBackTargetProvider
 		_timelineValueLabel.Text = header.TimelineTick.ToString();
 		_boardController.RenderInteraction(interaction);
 		_actionPanelController.RefreshActions(ResolveCapabilities(interaction));
-		RefreshGlobalButtonAvailability(interaction);
+		RefreshControlAvailability(interaction);
 		_settingsController.RefreshButtons();
 	}
 
@@ -285,7 +287,7 @@ public partial class BattleScreen : Control, IPanelBackTargetProvider
 		_timelineValueLabel.Text = header.TimelineTick.ToString();
 		_boardController.Commit(interaction);
 		_actionPanelController.Render(interaction);
-		RefreshGlobalButtonAvailability(interaction);
+		RefreshControlAvailability(interaction);
 		_settingsController.RefreshButtons();
 	}
 
@@ -338,15 +340,18 @@ public partial class BattleScreen : Control, IPanelBackTargetProvider
 
 	internal void ShowStatusPanel() => _actionPanelController.ShowStatusPanel();
 
-	internal void PresentAutoBattleSetting(bool enabled) =>
+	internal void PresentAutoBattleSetting(bool enabled)
+	{
 		_settingsController.PresentAutoBattle(enabled);
+		RefreshGlobalControls();
+	}
 
 	internal void RefreshGlobalControls()
 	{
 		if (_interaction is not null)
 		{
 			_actionPanelController.RefreshActions(ResolveCapabilities(_interaction));
-			RefreshGlobalButtonAvailability(_interaction);
+			RefreshControlAvailability(_interaction);
 			_settingsController.RefreshButtons();
 		}
 	}
@@ -380,8 +385,10 @@ public partial class BattleScreen : Control, IPanelBackTargetProvider
 			}
 			: interaction.Capabilities;
 
-	private void RefreshGlobalButtonAvailability(BattleInteractionState interaction)
+	private void RefreshControlAvailability(BattleInteractionState interaction)
 	{
+		_bottomHud.Visible = !GameRoot.UserSettings.Current.HideBattleHudDuringAutomatedTurns ||
+			(_flowContext?.ActingUnit?.Team == PlayerTeam && !_flowContext.IsAutoBattleEnabled);
 		_speedUpButton.Disabled = interaction.Kind == BattleFlowStateKind.BattleEnded;
 		_autoBattleButton.Disabled = interaction.Kind == BattleFlowStateKind.BattleEnded ||
 			_flowContext?.IsSurrenderRequested == true;

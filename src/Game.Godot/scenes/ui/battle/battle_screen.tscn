@@ -230,6 +230,7 @@ offset_right = 415.0
 offset_bottom = 849.0
 
 [node name="BottomHud" type="Control" parent="BattleUiRoot" unique_id=2050466151]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -290,10 +291,10 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 38
 
-[node name="BattleActionDrawer" parent="BattleUiRoot" unique_id=617508197 instance=ExtResource("31_action_drawer")]
+[node name="BattleActionDrawer" parent="BattleUiRoot/BottomHud" unique_id=617508197 instance=ExtResource("31_action_drawer")]
 unique_name_in_owner = true
 layout_mode = 1
-ActionBarBackgroundPath = NodePath("../BottomHud/ActionBarBg")
+ActionBarBackgroundPath = NodePath("../ActionBarBg")
 
 [node name="OverlayRoot" type="Control" parent="BattleUiRoot" unique_id=2009935606]
 unique_name_in_owner = true
